@@ -1,0 +1,110 @@
+# the page pictures (screenshots to look at): every page, with values that show something.
+# Pages: 0 Play 1 1 Play 2 2 Tone 1 3 Tone 2 4 Osc 5 LFO depths 6 LFO mods 7 Partner 8 Setup 1 9 Setup 2 10 Swell 11 Effects 1
+# 12 Effects 2.
+tap PLAY
+wait 1500
+shot play.png
+# Play 2: drone I resonant, drone II quieter
+tap HOME
+expect view 1
+spin K1 50
+spin K4 -30
+wait 300
+shot play2.png
+# Tone: drone I driven and on a narrow square, drone II as it starts
+tap EDIT
+expect view 4
+spin K1 15
+tap ENV
+expect view 2
+spin K1 40
+spin K2 50
+tap HOME
+tap ENV
+wait 2500
+shot tone.png
+# Tone 2: drone I a little pink noise under its tones, drone II white noise at the top (then both back to none)
+tap ENV
+expect view 3
+spin K1 30
+spin K3 100
+spin K4 -1
+wait 1500
+shot tone2.png
+spin K1 -30
+spin K3 -100
+# Osc: drone I between saw and square with some sub, drone II on triangle
+tap EDIT
+expect view 4
+spin K2 25
+spin K3 -100
+spin K3 33
+wait 300
+shot osc.png
+# LFO: Wave I a triangle, Wave II an exp saw; some depth on each drone's filter
+tap LFO
+expect view 5
+spin PRESET -10
+spin PRESET 1
+spin ALGO -10
+spin ALGO 3
+spin SELECT -20
+spin K2 30
+spin K4 -20
+tapkey b0
+tapkey b8
+tapkey b8
+tapkey b3
+tapkey b3
+wait 2500
+shot lfo.png
+# LFO mods: the rate mod, cross-mod's amount, the delay LFO's depth
+tap LFO
+expect view 6
+spin K1 40
+spin K3 20
+spin K4 50
+wait 300
+shot lfo2.png
+# Partner: drone I detuned (beating), drone II an octave up and a fifth
+tap SEQ
+expect view 7
+spin K2 40
+spin K3 3
+wait 300
+shot partner.png
+# Setup: some glide, drift and stereo
+tap GLO
+expect view 8
+spin K1 30
+spin K3 50
+wait 300
+shot setup.png
+# Setup 2: Morph, Tune, Scene switch
+tap GLO
+expect view 9
+spin K3 20
+wait 300
+shot setup2.png
+# Pulse (hold ARP for its page; a tap starts it): some swing
+tap ARP
+expect par55 1
+press ARP
+expect view 10
+spin K4 30
+wait 2500
+shot pulse.png
+release ARP
+# Effects: echoes and the hall
+tap FX
+expect view 11
+spin K2 30
+spin K3 40
+spin K4 20
+wait 300
+shot fx.png
+# Effects 2: the reverb's type and tail
+tap FX
+expect view 12
+wait 300
+shot fx2.png

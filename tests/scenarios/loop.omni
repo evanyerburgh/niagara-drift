@@ -1,0 +1,77 @@
+# the motion loop and the gliding knobs (2026-10-10 review): the loop goes back to its start gliding
+# over the Morph time (0.62 s), not in a jump; a recording runs past 30 s (up to 5 minutes)
+# drone I's filter LFO and the Drift at 0 (the default breathes and wanders), so the cutoff probe sees the
+# knob alone
+tap LFO
+spin K2 -25
+expect par17 0
+tap GLO
+spin K3 -30
+expect par52 0
+tap HOME
+expect view 0
+tap PLAY
+wait 1500
+expect par0 5000
+# the cutoff glides between a slow turn's detents (each over the time since the last): half way between
+# two detents 300 ms apart, it's half way (not still on the first step, as the old 60 ms smoothing left it)
+expect par7 700
+turn K2 1 10
+wait 300
+turn K2 1 10
+wait 150
+expect cut0 >7120
+expect cut0 <7185
+spin K2 -2
+expect par7 700
+# SEL held: cutoff in tenths (a detent 1, not 10)
+press SEL
+spin K2 3
+release SEL
+expect par7 703
+spin K2 -1
+expect par7 693
+spin K2 1
+press SEL
+spin K2 -3
+release SEL
+expect par7 700
+tap REC
+expect loop 1
+wait 200
+turn K1 10 200
+wait 500
+expect par0 >5500
+# loop: back to the start (5000), gliding: 0.1 s in, still most of the way up
+tap REC
+expect loop 2
+wait 100
+expect pitch0 >5350
+wait 150
+expect pitch0 >5150
+tap REC
+expect loop 0
+# a long recording: still recording at 40 s (a knob moved at 35 s, so it has something to loop)
+tap REC
+expect loop 1
+wait 35000
+spin K2 2
+wait 5000
+expect loop 1
+tap REC
+expect loop 2
+tap REC
+expect loop 0
+# SEL + PLAY: drone II alone fades out (drone I plays on), and back in
+press SEL
+tap PLAY
+release SEL
+expect playing 1
+wait 2500
+expect level1 0
+expect level0 >3
+press SEL
+tap PLAY
+release SEL
+wait 2500
+expect level1 >3

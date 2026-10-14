@@ -1,0 +1,8 @@
+build/
+.DS_Store
+__pycache__/
+*.o
+.venv/
+
+# Claude's working notes: kept on the owner's machine only (2026-10-14)
+/CLAUDE.md

@@ -1,0 +1,441 @@
+# Niagara Drift, the control map: two drones. KNOB 1-2 drone I, KNOB 3-4 drone II on every page; page
+# buttons (tap to stay, hold to peek); OCT- / OCT+; the black keys as switches, following the page; pitch
+# link; the LFO on SELECT / ALGORITHM / PRESETS; MIDI; scenes on the white keys; save and reboot.
+# Parameters (drone.h, 21 a drone): drone I 0..20 (pitch 0, X-Wave 1, width 2, mix 5, sub oct 6, cutoff 7,
+# reso 8, mode 9, level 11, partner 12, osc tap 13, osc depth 14, osc LFO to 15, filter tap 16, filter
+# depth 17, filter LFO to 18, noise 19, colour 20), drone II the same +21; then 42 cross-mod, 43 its amount,
+# 44 hard sync, 45 pitch link, 46 link offset, 47 LFO rate, 48 Wave I, 49 Wave II, 50 Glide, 51 Fade, 55 Pulse,
+# 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
+# depth.
+# Pages: 0 Play 1 1 Play 2 2 Tone 1 3 Tone 2 4 Osc 5 LFO depths 6 LFO mods 7 Partner 8 Setup 1 9 Setup 2 10 Swell
+# 11 Effects 1 12 Effects 2.
+wav drone.wav
+wait 300
+shot stopped.png
+expect view 0
+expect playing 0
+expect par0 5000
+expect par21 5700
+expect scenes 0
+# PLAY: in over the default fade (1 s)
+tap PLAY
+wait 1600
+expect fade 100
+expect level0 >3
+expect level1 >3
+peakreset
+wait 500
+expect peak_db_max -0.5
+expect peak_db_min -20
+shot playing.png
+# the Play page: KNOB 1 drone I's pitch (60 cents a detent; SEL held, a cent), KNOB 2 its cutoff,
+# KNOB 3-4 drone II's
+spin K1 2
+expect par0 5120
+press SEL
+spin K1 -83
+release SEL
+expect par0 5037
+expect view 0
+spin K2 -5
+expect par7 650
+spin K3 1
+expect par21 5760
+spin K4 10
+expect par28 780
+wait 600
+expect pitch0 5037
+# a slow turn (clicks 500 ms apart) glides on between clicks, not in stairs: each click glides over the
+# time since the one before, so 300 ms after the last it's still on its way (a 250 ms limit had it there)
+turn K1 2 500
+turn K1 1 10
+wait 300
+expect pitch0 >5160
+expect pitch0 <5212
+wait 300
+expect pitch0 5217
+spin K1 -3
+expect par0 5037
+wait 100
+# HOME again: Play 2, each drone's resonance and level (KNOB 1-2 drone I, 3-4 drone II)
+tap HOME
+expect view 1
+spin K4 -20
+expect par32 50
+wait 100
+shot play2.png
+tap HOME
+expect view 0
+# OCT- / OCT+: the MOVEMENT, every LFO depth together, 10 % a tap (100 % as set); OCT+ lit above 100 %
+expect par75 50
+tap OCT+
+expect par75 55
+tap OCT-
+tap OCT-
+expect par75 45
+# held: on and on (a step on the press, then one every 120 ms after 400 ms: 6 in 0.9 s)
+press OCT-
+wait 900
+release OCT-
+expect par75 15
+tap OCT+
+tap OCT+
+tap OCT+
+tap OCT+
+tap OCT+
+tap OCT+
+tap OCT+
+expect par75 50
+# hold ENV to peek: the knobs are the Tone page's (drive, osc mix) while it's held, then back to Play
+press ENV
+expect view 2
+spin K1 20
+expect par10 40
+release ENV
+expect view 0
+# a long hold without turning is a peek too
+press EDIT
+wait 600
+release EDIT
+expect view 0
+# tap ENV: Tone stays; again: Tone 2, KNOB 1-2 drone I's Noise and Colour, 3-4 drone II's (Colour: white 0,
+# pink 1, pink to start); again: Tone
+tap ENV
+expect view 2
+spin K2 10
+expect par5 40
+tap ENV
+expect view 3
+expect par20 1
+spin K1 25
+expect par19 25
+spin K2 -1
+expect par20 0
+spin K2 3
+expect par20 1
+spin K4 -1
+expect par41 0
+spin K3 100
+expect par40 100
+spin K1 -25
+spin K3 -100
+expect par19 0
+expect par40 0
+tap ENV
+expect view 2
+# EDIT: Osc (X-Wave, PW)
+tap EDIT
+expect view 4
+spin K1 -67
+expect par1 0
+spin K2 10
+expect par2 40
+# LFO: the depths, and the keys switch to LFO routing
+tap LFO
+expect view 5
+spin K2 30
+expect par17 55
+tapkey b0
+expect par13 2
+# the route keys go round: Wave II, both (I+II), Wave I
+tapkey b0
+expect par13 3
+tapkey b0
+expect par13 1
+tapkey b0
+expect par13 2
+# the filter LFO onto the resonance and back (the third key)
+tapkey b2
+expect par18 1
+tapkey b2
+expect par18 0
+tapkey b1
+expect par15 1
+tapkey b8
+expect par37 3
+wait 100
+shot lfo.png
+# LFO reset (drone I's filter group, either layer): the LFO back to the start of its cycle (a triangle
+# starts at the bottom)
+tapkey b4
+wait 1000
+expect lfo0 >-40
+tapkey b4
+wait 30
+expect lfo0 <-80
+# held half a second, the reset key locks the LFO to the pulse's bars (the key stays lit); again: free
+key b4 down
+wait 700
+key b4 up
+expect par67 1
+key b4 down
+wait 700
+key b4 up
+expect par67 0
+# LFO again: LFO mods, the rate mod (KNOB 1 its depth, KNOB 2 the wave that moves it); again: LFO
+tap LFO
+expect view 6
+spin K1 50
+expect par68 50
+spin K2 1
+expect par69 3
+spin K1 -50
+expect par68 0
+# ... and cross-mod's amount (KNOB 3) and the delay LFO's depth (KNOB 4), moved here from Filter 2 and
+# Effects 2
+spin K3 10
+expect par43 50
+spin K4 20
+expect par66 20
+spin K4 -20
+tap LFO
+expect view 5
+# the normal keys (back on Play): partner, sub -2, HP, hard sync, cross-mod
+tap HOME
+expect view 0
+tapkey b0
+expect par12 0
+tapkey b1
+expect par6 2
+# the sub key goes round: -2 oct, 1/3, 1/5, -1 oct (then -2 again, for what follows)
+tapkey b1
+expect par6 3
+tapkey b1
+expect par6 4
+tapkey b1
+expect par6 1
+tapkey b1
+expect par6 2
+# PITCH LOCK (the global pair's first key, key 4): the pitch knobs do nothing until it's off again
+tapkey b3
+expect par74 1
+spin K1 5
+expect par0 5037
+tapkey b3
+expect par74 0
+# the filter key (drone I's third) goes round: LP, BP, HP
+tapkey b2
+expect par9 1
+tapkey b2
+expect par9 2
+tapkey b9
+expect par44 1
+tapkey b10
+expect par42 1
+wait 100
+shot switches.png
+# pitch link: drone II keeps its pitch (offset = 4560 - 3837 = 723), KNOB 3 moves the offset, drone I
+# carries drone II (pitch link: the links pair's first key, key 9)
+tapkey b8
+expect par45 1
+expect par46 723
+spin K3 -1
+expect par46 663
+spin K1 -1
+expect par0 4977
+wait 400
+expect pitch1 5640
+tapkey b8
+expect par45 0
+expect par21 5640
+# ARP: a tap is the pulse on / off (and the page stays); held, its page, without toggling
+tap ARP
+expect par55 1
+expect view 0
+press ARP
+expect view 10
+spin K1 10
+expect par56 55
+release ARP
+expect view 0
+expect par55 1
+wait 400
+shot pulse.png
+tap ARP
+expect par55 0
+# two quick taps: the Swell page, to stay (the swell as it was); another page button leaves it
+wait 400
+tap ARP
+tap ARP
+expect view 10
+expect par55 0
+wait 600
+expect view 10
+tap HOME
+expect view 0
+# REC: the motion loop. Record two turns of KNOB 2 (drone I's cutoff, 50 now), 0.3 s apart, then loop:
+# it starts from where the recording did, plays the turns on time, comes round again; REC stops it where
+# it is
+tap REC
+expect loop 1
+wait 200
+spin K2 10
+expect par7 750
+wait 300
+spin K2 10
+expect par7 850
+wait 300
+tap REC
+expect loop 2
+expect par7 650
+wait 300
+expect par7 750
+wait 300
+expect par7 850
+wait 300
+expect par7 650
+wait 200
+expect par7 750
+wait 100
+shot loop.png
+tap REC
+expect loop 0
+wait 600
+expect par7 750
+spin K2 -10
+expect par7 650
+# FX: Delay time, Repeats, Delay mix, Reverb mix; again: Reverb type (the delay LFO depth is on LFO mods)
+tap FX
+expect view 11
+spin K1 -10
+expect par60 40
+spin K2 15
+expect par61 50
+spin K3 30
+expect par62 30
+spin K4 10
+expect par63 35
+wait 100
+shot fx.png
+tap FX
+expect view 12
+spin K1 -1
+expect par64 1
+wait 100
+shot fx2.png
+tap FX
+expect view 11
+# the delay LFO's tap: on the LFO page, drone II's filter group, second key
+tap LFO
+tapkey b9
+expect par65 2
+tap HOME
+expect view 0
+# SEQ: Partner; GLO: Setup
+tap SEQ
+expect view 7
+tap GLO
+expect view 8
+spin K2 10
+expect par51 52
+wait 100
+shot setup.png
+# SELECT: the LFO rate, PRESETS (left): Wave I, ALGORITHM (right): Wave II
+spin SELECT 10
+expect par47 40
+spin PRESET 2
+expect par48 3
+spin ALGO 1
+expect par49 2
+# MIDI: a note on channel 2 tunes drone II to it exactly
+midi 91 3C 64
+wait 20
+expect par21 6000
+# SAVE while playing: the output dips out (20 ms), the write, back (30 ms)
+tap SAVE
+wait 150
+expect store_writes 1
+expect dirty 0
+# no autosave while the drone plays (a knob moved and back: unsaved again)
+spin K1 1
+spin K1 -1
+expect dirty 1
+wait 5000
+expect dirty 1
+expect store_writes 1
+# PLAY again: out over the fade (Fade is 52 now: 2.0 s), then the autosave
+tap PLAY
+expect playing 0
+wait 2500
+expect fade 0
+wait 4500
+expect dirty 0
+expect store_writes 2
+wavstop
+# everything comes back after a reboot
+reboot
+wait 300
+expect par0 4977
+expect par21 6000
+expect par42 1
+expect par44 1
+expect par6 2
+expect playing 0
+# stopped, the screen still shows where the pitches are set (MIDI put drone II on C4)
+expect pitch1 6000
+# scenes: SAVE held + white key 1 stores (into the flash at once); the key lights
+press SAVE
+tapkey w0
+release SAVE
+expect scenes 1
+expect store_writes 3
+expect view 0
+# the sound is scene 1 (its key blinks), until a knob is turned
+expect scene_at 0
+spin K1 10
+expect scene_at -1
+expect par0 5577
+spin K2 20
+expect par7 850
+# a scene doesn't carry the room's settings: the speaker set after storing stays when it's recalled
+tap FX
+tap FX
+spin K2 30
+expect par73 30
+tap HOME
+expect view 0
+# white key 1: back to the scene, morphing over the Scene switch time (1.1 s)
+tapkey w0
+wait 450
+expect par7 >670
+expect par7 <830
+expect par0 >5000
+expect par0 <5550
+wait 900
+expect par7 650
+expect par73 30
+expect par0 4977
+expect scene_at 0
+# an empty slot: nothing changes
+tapkey w1
+expect scenes 1
+expect par7 650
+# a knob turned during a morph stops it where it is
+spin K2 20
+tapkey w0
+wait 300
+spin K4 1
+wait 1500
+expect par7 >670
+wait 100
+shot scenes.png
+# the scene survives a reboot (the SAVE above wrote it)
+reboot
+wait 300
+expect scenes 1
+shot rebooted.png
+# hold a white key: a visit. The cutoff moved off the scene (850), key 1 held: there (650) over the Scene
+# time; let go: back (850), the same way. A tap stays
+spin K2 20
+expect par7 850
+key w0 down
+wait 1500
+expect par7 650
+expect scene_at 0
+key w0 up
+wait 1500
+expect par7 850
+expect scene_at -1
+tapkey w0
+wait 1500
+expect par7 650

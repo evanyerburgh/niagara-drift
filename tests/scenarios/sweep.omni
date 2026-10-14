@@ -1,0 +1,28 @@
+# a hand on a pitch knob, to listen to (sweep.wav): drone I alone (drone II's level at 0 on the Shape page),
+# its filter fairly open. A slow full turn of KNOB 1 (20 detents, 150 ms apart: an octave in 3 s), back
+# down at a medium speed, a quick spin up, then fine tuning with SEL held. Every part should sound like
+# a continuous slide, never steps.
+tap EDIT
+tap EDIT
+spin K4 -100
+tap HOME
+spin K2 20
+wav sweep.wav
+tap PLAY
+wait 1500
+turn K1 20 150
+wait 600
+expect par0 6200
+turn K1 -20 50
+wait 600
+expect par0 >4800
+expect par0 <5000
+turn K1 15 15
+wait 600
+press SEL
+turn K1 -20 100
+release SEL
+wait 800
+tap PLAY
+wait 1200
+wavstop
