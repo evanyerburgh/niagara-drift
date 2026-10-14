@@ -46,6 +46,12 @@ LFO's routing, and X-mod lets drone I move drone II's filter); the white keys ho
 Or from a terminal, with the file from the [releases](https://github.com/evanyerburgh/niagara-drift/releases):
 `pip3 install mido python-rtmidi`, then `python3 tools/fm1_install.py niagara-drift-0.1-beta.fwsc`.
 
+**What it replaces:** Niagara Drift takes the place of M-VAVE's firmware, so the FM-1's own sounds and
+sequencer are gone until you go back (below).
+
+**Updating:** when there's a new version, run the installer again the same way. Your sound and scenes are
+kept, unless that version's notes in the [changelog](CHANGELOG.md) say otherwise.
+
 **Going back:** the installer's "Back to M-VAVE's firmware" writes M-VAVE's own FM-1 V15 back over the
 same cable (or use M-VAVE's updater, M-UPGRADE, from [m-vave.com/download](https://www.m-vave.com/download)).
 If it ever fails to start twice in a row it comes up in **safe mode** (no sound, USB on), where the installer
@@ -226,10 +232,16 @@ by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8),
 | **ARP** (tap) | the Swell on or off: both drones chopped in time. Hold ARP to peek at its page; tap twice quickly to stay on it |
 | **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 
+### MIDI
+
+Over USB or the TRS jack, a note on **channel 1** tunes drone I to it, a note on **channel 2** drone II
+(with Pitch link on, a channel 2 note sets the interval instead). It tunes; it doesn't start or stop the drones.
+
 ### Trying it in the browser
 
-Run `./emulator.command` (or double-click it in Finder): it builds the emulator, serves it at
-http://localhost:8765 and opens it. Close its window to stop it.
+[Play it on the website](https://evanyerburgh.github.io/niagara-drift/): the firmware itself, compiled for the
+browser, with sound. SAVE there keeps your sound in that browser. Working on the code, `./emulator.command`
+builds the same page from your checkout, serves it at http://localhost:8765 and opens it.
 
 | Do | Mouse | Keyboard |
 |---|---|---|
@@ -239,6 +251,12 @@ http://localhost:8765 and opens it. Close its window to stop it.
 | HOME · EDIT · Movement − · + | | Esc · V · Z · X |
 | Black keys 1–11 | click | 1 … 0, − |
 | Scenes 1–16 | click | Q … I, A … K |
+
+## Problems and ideas
+
+It's a beta, tested on one FM-1 so far. If something goes wrong, sounds wrong or could be better, please
+[open an issue](https://github.com/evanyerburgh/niagara-drift/issues): say what you did, what happened, and
+what the startup screen says the version is.
 
 ## Building and testing
 
@@ -266,7 +284,7 @@ Niagara Drift is the next link in a chain of FM-1 firmwares:
   sound engine.
 - [X0X](https://github.com/charlesvestal/fm1-x0x) and [FoMni](https://github.com/charlesvestal/fm1-fomni)
   by Charles Vestal: the platform reshaped for a single instrument, the host simulator and the
-  browser emulator. This repository starts from FoMni's code and history.
+  browser emulator. Niagara Drift started from FoMni's code.
 
 GPL-3.0-only; see [LICENSING.md](LICENSING.md).
 
