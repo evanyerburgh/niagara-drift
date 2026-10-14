@@ -176,8 +176,8 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Setup 2 | morph | tune | scene switch | tuning (equal / just) |
 
 - **Glide** is how long a drone takes to reach a new pitch (up to 10 s; off by default). **Stereo**
-  spreads the drones from mono to drone I left, drone II right: you hear it on headphones (the FM-1's
-  headphone jack is stereo; its speaker is mono).
+  spreads the drones from mono to drone I left, drone II right: you hear it best on headphones (the FM-1's
+  headphone jack is stereo).
 - **Morph** is the switch time for buttons and keys: how long they take to move the sound to its new
   setting (0.02–30 s); **fade** is how long PLAY takes (up to 60 s); **scene switch** how long the switch
   to a scene takes (0.1 s to 5 minutes).
