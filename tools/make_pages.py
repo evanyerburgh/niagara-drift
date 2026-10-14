@@ -52,9 +52,11 @@ def main(pkg, version, out):
         shutil.rmtree(out)
     shutil.copytree(emu, out)                    # the front page: the emulator page and its files
     front = (out / "index.html").read_text(encoding="utf-8")
-    if front.count("<!--ACTIONS-->") != 1:
-        raise SystemExit("web/emu/index.html must contain <!--ACTIONS--> once")
+    for mark in ("<!--ACTIONS-->", "<!--NAV-->"):
+        if front.count(mark) != 1:
+            raise SystemExit(f"web/emu/index.html must contain {mark} once")
     acts = ACTIONS.replace("__PKG__", name).replace("__REPO__", REPO).replace("__VERSION__", html.escape(label))
+    front = front.replace("<!--NAV-->", '<a href="install/">Install</a>')     # beside Source, top right
     (out / "index.html").write_text(front.replace("<!--ACTIONS-->", acts), encoding="utf-8")
     for d in ("install", "firmware"):
         (out / d).mkdir(parents=True)
