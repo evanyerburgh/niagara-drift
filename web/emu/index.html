@@ -39,9 +39,11 @@ header p.tag { font-size: var(--tag); max-width: none; padding-left: calc(0.0586
 @media (min-width: 700px) { header p.tag { white-space: nowrap; } }
 header p.spec { font: 500 clamp(1.05rem, 1.7vw, 1.35rem)/1.4 "Inter Tight", sans-serif; max-width: 44ch; margin: .7rem auto 0; text-align: center; text-wrap: balance; }
 header p.play { max-width: none; text-align: right; margin-top: .7em; }
-header nav { position: absolute; top: 5vh; right: 0; z-index: 1; font: 500 .95rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+header nav { position: absolute; top: 5vh; right: 0; z-index: 1; display: flex; gap: .5rem; font: 500 .95rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
 header nav a { color: var(--pale); background: var(--black); padding: .35em .9em; border-radius: 999px; text-decoration: none; }
 header nav a:hover, header nav a:focus-visible { text-decoration: underline; }
+/* a phone: the pills (Install, Source) above the title, not beside it */
+@media (max-width: 560px) { header, .over { padding-top: 3.8rem; } header nav { top: 1rem; } }
 a:focus-visible, button:focus-visible { outline: 3px solid var(--pale); outline-offset: 3px; }
 .vcap { position: absolute; right: .2rem; top: calc(5vh + 3.6rem); writing-mode: vertical-rl; font: 500 .95rem var(--mono);
         letter-spacing: .14em; text-transform: uppercase; }
@@ -292,7 +294,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     Inspired by the Stylophone DS-2, Subharmonicon and Lyra-8, and the amplified 1960s drones of La Monte Young and Angus MacLise.</p>
   <p class="play">Play it here: the same code the FM-1 runs. <span class="keys-link">Computer keys ↓</span></p>
   <span class="vcap">Niagara Drift · FM-1</span></div>
-  <nav><a href="https://github.com/evanyerburgh/niagara-drift">Source</a></nav>
+  <nav><!--NAV--><a href="https://github.com/evanyerburgh/niagara-drift">Source</a></nav>
 </header>
 
 <div class="device" id="device">
