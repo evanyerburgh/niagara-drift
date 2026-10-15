@@ -856,7 +856,12 @@ async function switchOn() {
   go.disabled = true;
   go.textContent = "Starting...";
   try {
+    // iPhone: Safari mutes a page's Web Audio in silent mode unless the page says it's playback, as a music
+    // app's (iOS 17's audio session; other browsers have none and ignore it); and sound may only start in the
+    // tap itself, so the context is resumed here, before anything is awaited
+    if (navigator.audioSession) navigator.audioSession.type = "playback";
     const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });
+    ac.resume();
     const [wasm] = await Promise.all([fetch("omni.wasm").then((r) => { if (!r.ok) throw new Error(`omni.wasm: ${r.status}`); return r.arrayBuffer(); }),
                                       ac.audioWorklet.addModule("worklet.js")]);
     node = new AudioWorkletNode(ac, "omni", { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] });
