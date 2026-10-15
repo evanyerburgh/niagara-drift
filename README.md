@@ -86,8 +86,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Play 1 | I pitch | I cutoff | II pitch | II cutoff |
 | Play 2 | I resonance | I level | II resonance | II level |
 
-- **MASTER** (not a page knob) is a volume up to about four-fifths of its turn; past that it drives
-  into overdrive at about the same loudness.
+- **MASTER**: past about four-fifths of its turn it drives into overdrive, at about the same loudness.
 
 #### Tone · ENV
 

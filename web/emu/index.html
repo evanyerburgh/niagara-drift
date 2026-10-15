@@ -202,6 +202,8 @@ html { scroll-behavior: smooth; } @media (prefers-reduced-motion: reduce) { html
 .steps li { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
 .steps .dir { font-weight: 600; }
 .steps .ctls { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: .35rem; }
+@container (max-width: 440px) {   /* a phone: each step's controls on their own line, under its words */
+  .steps li { grid-template-columns: minmax(0, 1fr); } .steps .ctls { justify-content: flex-start; } }
 
 .g-sub { display: block; font: 500 .78rem/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: .45rem 0 0; }
 .g-note { color: var(--muted); font-size: .92rem; margin: .7rem 0 0; }
@@ -306,7 +308,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
 
 <div class="bar">
   <span class="state"><span id="status">Off. Sound starts when you switch it on.</span> <span class="cpu" id="cpu"></span></span>
-  <button id="reset" type="button" title="Forget your notes and sound, and start again from the factory settings">Factory reset</button>
+  <button id="reset" type="button" title="Forget your sound and scenes, and start again from the factory settings">Factory reset</button>
 </div>
 <!--ACTIONS-->
 
@@ -320,9 +322,10 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <li><span class="dir">Start the drones</span><span class="ctls"><span class="cap">Switch on</span> <span class="cap">PLAY</span></span></li>
       <li><span class="dir">Tune each drone</span><span class="ctls"><span class="cap knob d1">KNOB 1</span> <span class="cap knob d2">KNOB 3</span></span></li>
       <li><span class="dir">Change the sound</span><span class="ctls"><span class="cap">ENV</span> <span class="cap">EDIT</span> <span class="cap">LFO</span> …</span></li>
-      <li><span class="dir">Save a sound</span><span class="ctls"><span class="how">hold</span> <span class="cap">SAVE</span> <span class="how">first, then</span> <span class="cap white">white key</span></span></li>
+      <li><span class="dir">Save a sound to a scene</span><span class="ctls"><span class="how">hold</span> <span class="cap">SAVE</span> <span class="how">first, then</span> <span class="cap white">white key</span></span></li>
       <li><span class="dir">Stop the drones</span><span class="ctls"><span class="cap">PLAY</span></span></li>
     </ol>
+    <p class="pnote">The keys aren’t notes: the drones play on their own. Black keys are switches, white keys hold scenes.</p>
   </div>
 
   <div class="g-card one-r">
@@ -495,7 +498,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     <dl class="acts">
       <div><dt>Go to a scene</dt><dd>Tap a <span class="cap white">white key</span></dd></div>
       <div><dt>Visit, then come back</dt><dd>Hold a <span class="cap white">white key</span>, let go</dd></div>
-      <div><dt>Save a sound</dt><dd>Hold <span class="cap">SAVE</span> first, then tap a <span class="cap white">white key</span></dd></div>
+      <div><dt>Save a sound to a scene</dt><dd>Hold <span class="cap">SAVE</span> first, then tap a <span class="cap white">white key</span></dd></div>
       <div><dt>Save everything</dt><dd>Tap <span class="cap">SAVE</span></dd></div>
     </dl>
   </div>
