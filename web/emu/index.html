@@ -90,19 +90,19 @@ a { color: var(--accent); }
 .g-wide { grid-column: 1 / -1; }
 /* the published site's row of ways in (tools/make_pages.py puts it in at the ACTIONS mark): four black pills */
 .actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 1.6rem 0 .6rem; position: relative; z-index: 2; }
-.actions a { display: block; background: var(--black); color: var(--pale); border-radius: 18px; padding: 14px 18px; text-decoration: none; }
+.actions a { display: block; background: var(--card); color: var(--pale); border-radius: 18px; padding: 14px 18px; text-decoration: none; }
 .actions a:hover b, .actions a:focus-visible b { text-decoration: underline; }
 .actions b { display: block; font: 600 1.2rem "Inter Tight", sans-serif; }
 .actions span { display: block; font: 500 .8rem/1.4 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
-.actions-note { position: relative; z-index: 2; margin: 0 0 1rem; display: inline-block; background: var(--black); color: var(--ink);
-                padding: .4em 1em; border-radius: 14px; font: 500 .85rem/1.5 var(--mono); }   /* a band may pass behind */
+.actions-note { position: relative; z-index: 2; margin: 0 0 1rem; display: inline-block; background: var(--card); color: var(--ink);
+                padding: .4em 1em; border-radius: 14px; font: 500 .85rem/1.5 var(--mono); }
 @media (max-width: 760px) { .actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .foot { position: relative; z-index: 2; margin: 5rem -16px 0; padding: 2.4rem max(16px, calc(50vw - 520px)) 2.8rem; background: var(--card);
         color: var(--ink); border-radius: 48px 48px 0 0; font-size: .95rem; }
 .foot p { margin: 0 0 .6rem; max-width: 70ch; } .foot a { color: var(--pale); }
 .foot p { font-size: .95rem; line-height: 1.55; }
 .foot-nod { font: 500 .8rem/1.6 var(--mono) !important; letter-spacing: .03em; color: var(--muted); }
-body.drawn .g-card, body.drawn .foot { background: transparent; }
+body.drawn .g-card, body.drawn .foot, body.drawn .actions a, body.drawn .actions-note { background: transparent; }   /* the bands tint them */
 .bands .ground { fill: var(--card); }
 .bands .on-card { fill: var(--card-violet); }
 .bands .on-card.dark { fill: var(--card-dark); }
@@ -910,7 +910,7 @@ document.getElementById("reset").addEventListener("click", () => {
   const SPEED = .045, T0 = 45;                 // where it starts: the shape chosen
   const paths = B.map((b) => el("path", b.dark ? { class: "dark" } : {}, bands));
   const cuts = B.map(() => el("path", {}, clip));
-  const cards = [...document.querySelectorAll(".g-card, .foot")], grain = document.querySelector(".grain");
+  const cards = [...document.querySelectorAll(".g-card, .foot, .actions a, .actions-note")], grain = document.querySelector(".grain");
   const ground = el("g", {}, bands), cardclip = el("clipPath", { id: "cardclip" }, bands.querySelector("defs"));
   const tiles = cards.map(() => el("rect", { class: "ground" }, ground));
   const tclip = cards.map(() => el("rect", {}, cardclip));
