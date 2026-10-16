@@ -293,6 +293,7 @@ static void fm1_main(void)
     fm1_adc_init();
     panel_init();
     led_pos_init();
+    plat_pressure_init();                           /* the scan tick owns the converter from here */
     dr_init();
     project_load();                                 /* defaults when nothing (or another format) is saved */
     project_apply();
@@ -320,8 +321,8 @@ static void fm1_main(void)
             bootguard.failed = 0;
         }
         {
-            int32_t a = fm1_adc_read(FM1_ADC_MASTER);
-            if (a >= 0) {
+            int32_t a = fm1_an.master;              /* sampled by the scan tick (it owns the converter) */
+            {
                 uint32_t k10;
                 knob += (a * 16 - knob) / 8;
                 k10 = (uint32_t)(knob / 16);
@@ -331,6 +332,7 @@ static void fm1_main(void)
                 master_q12 = k10 < 819u ? 3277u * k10 * k10 / (819u * 819u) : 3277u + (k10 - 819u) * 819u / 204u;
             }
         }
+        plat_pressure_poll();
         {   /* OCT- + OCT+ held 5 s: update mode (Felucca's, unchanged) */
             static uint32_t t0, shown;
             uint32_t both = (1u << panel.btn[B_OCTDN]) | (1u << panel.btn[B_OCTUP]);

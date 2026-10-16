@@ -8,6 +8,13 @@
 #include "fm1_sys.h"
 #include "fm1_irq.h"
 #include "fm1_guard.h"
+/* the key pressure (MONK-1's, from Velo): the scan tick hands each analog row sample to app/plat_fm1.c */
+static void plat_analog_sample(uint32_t col, uint32_t rowbit, uint32_t v, uint32_t driven);
+static int plat_analog_drive(uint32_t col, uint32_t rowbit);
+static int plat_analog_led_ok(uint32_t col, uint32_t rowbit);
+#define FM1_INPUT_ANALOG(c, r, v, d) plat_analog_sample(c, r, v, d)
+#define FM1_INPUT_DRIVE(c, r) plat_analog_drive(c, r)
+#define FM1_INPUT_LED_OK(c, r) plat_analog_led_ok(c, r)
 #include "fm1_input.h"
 #include "fm1_timer.h"
 #include "fm1_audio.h"
@@ -123,6 +130,7 @@ static void ota_commit(const uint8_t *parm)
 }
 
 #include "app/app.h"
+#include "app/sense.c"
 #include "app/panel.c"
 #include "app/plat_fm1.c"
 #include "app/project.c"
