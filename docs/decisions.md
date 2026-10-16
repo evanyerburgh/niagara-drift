@@ -349,3 +349,16 @@ repo and folder were called fm1-drone until 2026-10-11.
 - 2026-10-14 (Evan, on the FM-1: B, singing, too strong; E of three renders): Feedback's loop gain at 100 0.9,
   its ceiling 0.45: much more texture than the first (0.85 / 0.35), no louder at 100 than without it (-10.5 dB
   on the default sound, as with none).
+- 2026-10-16 (v0.2; Evan: the crossfade will be played by key pressure, so read it first): key pressure ported
+  from MONK-1 (Charles Vestal; Velo's sensing): the scan tick samples the two analog key rows (the 20 lower keys,
+  F3 .. C5) and owns the converter, so MASTER is read there too; the seven top keys (C#5 .. G5) have no
+  converter and no pressure. MONK-1's settings (DRIVE 2, WAIT 2, no calibration) and its pressure curve
+  (counted from where the key rests, Sensitive 50). Nothing plays from it yet: a held key shows its pressure on
+  the screen (a test readout), and it goes out as polyphonic aftertouch over USB for measuring. To try on the
+  FM-1 before the crossfade is designed on it.
+- 2026-10-17 (Evan, on the FM-1, three rounds with `tools/fm1_pressure.py`): MONK-1's pressure, counted from
+  where the key rests, fell while a firm press was held and read a fast hard press as 0; it fits a vowel, not a
+  crossfade. Now absolute: the pill's resistance on a log scale from a light touch (driven reading 900) to a firm
+  press (540; the firmest presses measured 472 .. 536 across F3, B3, E4, F4, G4), to the power 1.6 (light
+  presses read too high), with a hysteresis of 32 counts (a held firm press creeps back up ~30). Evan: light,
+  held, eased and let go all as expected.

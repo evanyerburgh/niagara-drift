@@ -71,6 +71,13 @@ int32_t plat_enc(int role)
     return v;
 }
 uint32_t plat_master(void) { return master; }
+static uint8_t pressure_v[NKEYS];              /* the script's "pressure KEY V": the 20 lower keys sense it */
+int plat_pressure(uint32_t k)
+{
+    if (k >= NKEYS || k >= 20u)
+        return -1;
+    return (held_keys >> k & 1u) ? pressure_v[k] : 0;
+}
 void plat_leds(uint32_t b, uint32_t k)
 {
     lit_btn = b;
@@ -446,6 +453,10 @@ int main(int argc, char **argv)
                     held_keys &= ~(1u << k);
                 run_ms(2);
             }
+        } else if (!strcmp(cmd, "pressure")) {      /* pressure KEY V: a held key pressed harder, 0..127 */
+            int k = key_of(a), v = atoi(b);
+            pressure_v[k] = (uint8_t)(v < 0 ? 0 : v > 127 ? 127 : v);
+            run_ms(2);
         } else if (!strcmp(cmd, "strum")) {          /* strum A B [MS]: a finger across the white keys */
             int x = atoi(a), y = atoi(b), gap = c[0] ? atoi(c) : 25, s = y >= x ? 1 : -1;
             for (;; x += s) {
