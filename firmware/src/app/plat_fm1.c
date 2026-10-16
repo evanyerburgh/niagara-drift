@@ -108,52 +108,66 @@ static void plat_pressure_init(void)
     fm1_an.probe = 0;
     fm1_an.con = (uint16_t)FM1_ADC_CON(7, 2);
 }
-/* MONK-1's ui.c pressure(): counted from where the key RESTS, not where it landed (a key goes on settling
- * after the press). The zero follows the driven reading down for P_SETTLE ms, then creeps after it, and
- * comes back up at once when the key is eased. The lean is the pill's resistance below its rest on a log
- * scale: P_DEAD of an octave is noise, P_DEAD + P_SPAN is full (MONK-1's Sensitive at 50). Smoothed over
- * ~30 ms. Every 5 ms from the main loop; a change goes out as polyphonic aftertouch (the key as a note,
- * F3 = 53) for measuring. */
-#define P_SETTLE 250u
-#define P_DEAD 0.04f
-#define P_SPAN 0.46f
-static float p_base[NKEYS], p_s[NKEYS];
-static uint32_t p_t0[NKEYS];
-static uint8_t p_on[NKEYS], p_val[NKEYS];
+/* The pressure on an absolute scale (v0.2: MONK-1's, counted from where the key rests, drifted after a held
+ * press and read a fast hard press as 0, on Evan's FM-1): the pill's resistance (the driven reading less the
+ * diode, SN_DBASE) on a log scale, conductive rubber's resistance falling as a power of the force: 0 at
+ * PR_LIGHT (a light touch that seats), 100 % at PR_FIRM (a firm press). Smoothed over ~30 ms. Every 5 ms
+ * from the main loop. For measuring, over USB: the pressure as polyphonic aftertouch (the key as a note,
+ * F3 = 53), and the raw driven reading / 8 as CC (the key's number, 0..26) on channel 16; both 0 when let go. */
+/* driven readings, measured on Evan's FM-1 (2026-10-16, tools/fm1_pressure.py, F3 B3 E4 G4): a light touch
+ * 920 .. 1016, the firmest press 480 .. 528. 0 % under a resting finger, 100 % within every key's firm press */
+#define PR_LIGHT 900.0f
+#define PR_FIRM 540.0f
+/* Evan, on the FM-1: a light press read too high, and holding a firm press the number fell: the reading creeps
+ * back up ~30 counts under a steady hard press (472 .. 504, measured). So a curve (x ^ PR_CURVE: slow at first,
+ * steep near the top) and a hysteresis: harder is followed at once, easing only once the reading has risen
+ * PR_HYST above the firmest point since (the creep and the jitter stay put; a real ease-off still moves it) */
+#define PR_CURVE 1.6f
+#define PR_HYST 32u
+static float p_s[NKEYS];
+static uint16_t p_ref[NKEYS];
+static uint8_t p_val[NKEYS], p_raw[NKEYS];
 static void plat_pressure_poll(void)
 {
     static uint32_t t;
+    const float lo = PR_FIRM - (float)SN_DBASE, hi = PR_LIGHT - (float)SN_DBASE;
     uint32_t i, now = fm1_ms;
     if (now - t < 5u)
         return;
     t = now;
     for (i = 0; i < NKEYS; i++) {
-        float d, x;
-        uint8_t p;
+        float r, x;
+        uint8_t p, raw;
         if (!sense_is_analog(i))
             continue;
         if (sn_key[i].st != SN_DOWN || !sn_key[i].dn) {
-            p_on[i] = 0;
+            if (p_raw[i]) {                                    /* let go: both to 0 (a held key's raw never is) */
+                plat_midi_out(0x0Au | 0xA0u << 8 | (53u + i) << 16);
+                plat_midi_out(0x0Bu | 0xBFu << 8 | i << 16);
+            }
             p_s[i] = 0.0f;
             p_val[i] = 0;
+            p_raw[i] = 0;
+            p_ref[i] = 0;
             continue;
         }
-        d = (float)(sn_key[i].d > SN_DBASE + 1u ? sn_key[i].d - SN_DBASE : 1u);
-        if (!p_on[i]) {
-            p_on[i] = 1;
-            p_base[i] = d;
-            p_t0[i] = now;
-        }
-        if (d > p_base[i])
-            p_base[i] = d;                                     /* eased off: that is the rest now */
-        else
-            p_base[i] += (d - p_base[i]) * (now - p_t0[i] < P_SETTLE ? 0.25f : 0.0008f);
-        x = fm_clampf((fm_log2f(p_base[i] / d) - P_DEAD) / P_SPAN, 0.0f, 1.0f);
+        if (!p_ref[i] || sn_key[i].d < p_ref[i])
+            p_ref[i] = sn_key[i].d;                            /* harder: at once */
+        else if (sn_key[i].d > p_ref[i] + PR_HYST)
+            p_ref[i] = (uint16_t)(sn_key[i].d - PR_HYST);      /* eased off, past the creep */
+        r = (float)(p_ref[i] > SN_DBASE + 1u ? p_ref[i] - SN_DBASE : 1u);
+        x = fm_clampf(fm_log2f(hi / r) / fm_log2f(hi / lo), 0.0f, 1.0f);
+        x = fm_exp2f(PR_CURVE * fm_log2f(x > 1e-6f ? x : 1e-6f));   /* x ^ PR_CURVE */
         p_s[i] += (x - p_s[i]) * 0.17f;
         p = (uint8_t)(p_s[i] * 127.0f + 0.5f);
+        raw = (uint8_t)(sn_key[i].d >> 3 > 127u ? 127u : sn_key[i].d >> 3);
         if (p != p_val[i]) {
             p_val[i] = p;
             plat_midi_out(0x0Au | 0xA0u << 8 | (53u + i) << 16 | (uint32_t)p << 24);
+        }
+        if (raw != p_raw[i]) {
+            p_raw[i] = raw;
+            plat_midi_out(0x0Bu | 0xBFu << 8 | i << 16 | (uint32_t)raw << 24);
         }
     }
 }

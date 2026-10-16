@@ -356,3 +356,9 @@ repo and folder were called fm1-drone until 2026-10-11.
   (counted from where the key rests, Sensitive 50). Nothing plays from it yet: a held key shows its pressure on
   the screen (a test readout), and it goes out as polyphonic aftertouch over USB for measuring. To try on the
   FM-1 before the crossfade is designed on it.
+- 2026-10-17 (Evan, on the FM-1, three rounds with `tools/fm1_pressure.py`): MONK-1's pressure, counted from
+  where the key rests, fell while a firm press was held and read a fast hard press as 0; it fits a vowel, not a
+  crossfade. Now absolute: the pill's resistance on a log scale from a light touch (driven reading 900) to a firm
+  press (540; the firmest presses measured 472 .. 536 across F3, B3, E4, F4, G4), to the power 1.6 (light
+  presses read too high), with a hysteresis of 32 counts (a held firm press creeps back up ~30). Evan: light,
+  held, eased and let go all as expected.

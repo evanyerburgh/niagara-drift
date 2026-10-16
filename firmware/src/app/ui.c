@@ -2044,15 +2044,21 @@ static void draw_splash(uint32_t t0)
 }
 
 /* KEY PRESSURE, a test readout (v0.2): while a key is held, how hard, 0..100 %; nothing plays from it yet.
- * The lowest held key; the seven top keys (C#5 .. G5) sense no pressure. */
+ * The lowest held key; the seven top keys (C#5 .. G5) sense no pressure. Gone as the key is let go. */
 static void pressure_readout(void)
 {
     static const char *const NAME[12] = {"F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E"};
+    static uint8_t shown;
     char a[24], b[24];
     uint32_t k, i, n;
     int p;
-    if (!ui.keys)
+    if (!ui.keys) {
+        if (shown)                                     /* let go: the readout goes at once */
+            ui.msg_until = plat_ms();
+        shown = 0;
         return;
+    }
+    shown = 1;
     for (k = 0; !(ui.keys >> k & 1u); k++)
         ;
     p = plat_pressure(k);
