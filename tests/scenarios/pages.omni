@@ -131,3 +131,16 @@ spin K2 10
 spin K4 10
 wait 300
 shot fx2.png
+# SEL held: the black keys' map (the normal layer: drone II's partner on, as the start has it)
+tap HOME
+wait 300
+press SEL
+wait 200
+expect keymap 0
+wait 400
+expect keymap 1
+wait 300
+shot keymap.png
+spin K2 1
+expect keymap 0
+release SEL

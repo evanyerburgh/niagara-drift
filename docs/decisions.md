@@ -175,3 +175,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   sensitivity x0.5–x2). Speaker and Pressure are room settings, not in scenes. PROJ_FORMAT 23 (22 converted).
 - 2026-10-18: worst-case sound on the FM-1 (everything on, full feedback and character, all macros): 57 %
   average, 70 % peak block, no late blocks (0.1's effects). The new effects cost the same on the host.
+- 2026-10-18: SEL held 0.4 s shows the black keys' map over the whole screen: the five groups as rows, each key lit
+  as on the panel with its name and setting (the LFO pages' layer there); a turning knob or a held white key
+  takes the screen back.
+- 2026-10-18: during a crossfade, SEL down holds the blend where it is; letting go of the key then keeps it (a
+  finger's pressure falls on the way up, which had carried the blend back first).
+- 2026-10-18: the drones' pictures blend each new capture in over ~0.1 s.

@@ -364,6 +364,8 @@ static int expect(const char *what, const char *val)
         got = (int)(dr_fade * 100.0f + 0.5f);
     else if (!strcmp(what, "view"))
         got = ui.view;
+    else if (!strcmp(what, "keymap"))             /* the black keys' map showing (SEL held) */
+        got = keymap_on();
     else if (!strcmp(what, "dirty"))
         got = ui.dirty;
     else if (!strcmp(what, "loop"))                /* the motion loop: 0 idle, 1 recording, 2 playing */
