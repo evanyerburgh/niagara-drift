@@ -34,22 +34,22 @@ static void check(const char *what, int ok)
     fails += !ok;
 }
 
-static void old_project(uint32_t format)       /* 16 scenes, as 0.1 saved them; scene n's pitch 3000 + n */
+static void old_project(uint32_t format)       /* 16 scenes of 78 values, as 0.1 saved them; scene n's pitch 3000 + n */
 {
-    static project_old_t o;
+    static proj_v20_t o;
     int i, k;
     memset(&o, 0, sizeof o);
     o.magic = PROJ_MAGIC;
     o.format = format;
-    for (k = 0; k < DR_NPARAMS; k++)
+    for (k = 0; k < NP21; k++)
         o.par[k] = dr_param_info(k)->def;
     o.par[DR_GP(0, GP_PITCH)] = 4321;
     o.par[DR_GP(0, GP_NCOLOR)] = format == 19u ? 1 : 100;
     o.par[DR_GP(1, GP_NCOLOR)] = 0;
     o.leds = 1;
     o.scene_used = 1u << 0 | 1u << 11 | 1u << 12 | 1u << 15;
-    for (i = 0; i < OLD_NSCENES; i++) {
-        for (k = 0; k < DR_NPARAMS; k++)
+    for (i = 0; i < 16; i++) {
+        for (k = 0; k < NP21; k++)
             o.scene[i][k] = o.par[k];
         o.scene[i][DR_GP(0, GP_PITCH)] = (int16_t)(3000 + i);
         o.scene[i][DR_GP(1, GP_NCOLOR)] = format == 19u ? 1 : 100;
@@ -64,7 +64,8 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 21, on bank A", proj.format == 21u && PROJ_FORMAT == 21u && proj.bank == 0);
+    check("now format 22, on bank A", proj.format == 22u && PROJ_FORMAT == 22u && proj.bank == 0);
+    check("a value 0.1 didn't have (Beat's depth) at its default", proj.par[P_GD_BEAT] == dr_param_info(P_GD_BEAT)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
           proj.par[DR_GP(0, GP_NCOLOR)] == 100 && proj.par[DR_GP(1, GP_NCOLOR)] == 0);
@@ -86,9 +87,41 @@ int main(void)
     proj.bank = 2;
     project_save();
     memset(&proj, 0, sizeof proj);
-    check("reloaded (21): as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
+    check("reloaded (22): as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
                                          scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 3015 && scene_get(2, 2) &&
                                          scene_get(2, 2)[DR_GP(0, GP_PITCH)] == 5000 && scene_get(0, 11));
+    {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */
+        static proj_v21_t p21;
+        static bank_v21_t b21;
+        int k;
+        memset(&p21, 0, sizeof p21);
+        memset(&b21, 0, sizeof b21);
+        p21.magic = PROJ_MAGIC;
+        p21.format = 21u;
+        for (k = 0; k < NP21; k++)
+            p21.par[k] = b21.scene[2][k] = p21.scene[5][k] = dr_param_info(k)->def;
+        p21.par[DR_GP(1, GP_PITCH)] = 4444;
+        p21.bank = 1;
+        p21.scene_used = 1u << 5;
+        p21.scene[5][DR_GP(0, GP_PITCH)] = 3333;
+        b21.magic = BANK_MAGIC;
+        b21.format = 21u;
+        b21.used = 1u << 2;
+        b21.scene[2][DR_GP(0, GP_PITCH)] = 2222;
+        memset(store_n, 0, sizeof store_n);
+        memcpy(store[OBJ_PROJ], &p21, sizeof p21);
+        store_n[OBJ_PROJ] = (int)sizeof p21;
+        memcpy(store[OBJ_BANKB], &b21, sizeof b21);
+        store_n[OBJ_BANKB] = (int)sizeof b21;
+        check("PR #10's project (21) loads, its sound and bank kept",
+              project_load() == 0 && proj.par[DR_GP(1, GP_PITCH)] == 4444 && proj.bank == 1);
+        check("... A6 and B3 as they were, the macros at their defaults",
+              scene_get(0, 5) && scene_get(0, 5)[DR_GP(0, GP_PITCH)] == 3333 && scene_get(1, 2) &&
+                  scene_get(1, 2)[DR_GP(0, GP_PITCH)] == 2222 && scene_get(1, 2)[P_M_BLOOM] == 0 &&
+                  scene_get(1, 2)[P_GD_HEAT] == dr_param_info(P_GD_HEAT)->def);
+        check("... and B written again in the new layout on the next save",
+              project_save() == 0 && store_n[OBJ_BANKB] == (int)sizeof(bank_t));
+    }
     old_project(20u);
     check("v0.2's first (20) loads, Colours as they were",
           project_load() == 0 && proj.par[DR_GP(0, GP_NCOLOR)] == 100 && scene_get(1, 0) &&

@@ -489,19 +489,28 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     </div>
   </div>
 
+  <div class="g-card mid">
+    <h3>Macros <span class="g-sub">several settings at once, on top of your sound</span></h3>
+    <dl class="acts">
+      <div><dt>Bloom · Weight · Tide · Tear</dt><dd><span class="cap">SEQ</span>: the Macros page, KNOB 1–4 · <span class="cap">PRESETS</span> plays one (Bloom to start; hold <span class="cap">SEL</span> and turn it to pick)</dd></div>
+      <div><dt>Beat · Heat · Converge · Wash</dt><dd>The top four <span class="cap white">white keys</span>: hold to swell in, let go to swell out, tap to latch</dd></div>
+      <div><dt>Set a gesture</dt><dd>Hold its key: <span class="cap">PRESETS</span> its depth, <span class="cap">ALGORITHM</span> its swell</dd></div>
+    </dl>
+  </div>
+
   <h2 class="sec"><span>Scenes</span></h2>
 
   <div class="g-card one-l">
     <h3>White keys <span class="g-sub">12 scenes a bank · lit: a sound is saved there · blinking: the one you’re on</span></h3>
     <div class="g-scenes" aria-hidden="true">
       <span class="on at">1</span><span class="on">2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
-      <span>9</span><span>10</span><span>11</span><span>12</span><span class="bank">A</span><span class="bank">B</span><span class="bank">C</span><span class="bank">P</span>
+      <span>9</span><span>10</span><span>11</span><span>12</span><span class="bank">Beat</span><span class="bank">Heat</span><span class="bank">Conv</span><span class="bank">Wash</span>
     </div>
     <dl class="acts">
       <div><dt>Go to a scene</dt><dd>Tap a <span class="cap white">white key</span></dd></div>
       <div><dt>Visit, then come back</dt><dd>Hold a <span class="cap white">white key</span>, let go (on the FM‑1: press harder to go further in, all the way to take it, <span class="cap">SEL</span> as you let go to keep the blend)</dd></div>
       <div><dt>Save a sound to a scene</dt><dd>Hold <span class="cap">SAVE</span> first, then tap a <span class="cap white">white key</span></dd></div>
-      <div><dt>Pick a bank</dt><dd>Hold <span class="cap">SEL</span>, tap one of the top four <span class="cap white">white keys</span>: A · B · C · Presets</dd></div>
+      <div><dt>Pick a bank</dt><dd>Hold <span class="cap">SEL</span>, tap one of the top four <span class="cap white">white keys</span>: A · B · C · Presets (alone they’re the gestures)</dd></div>
       <div><dt>Save everything</dt><dd>Tap <span class="cap">SAVE</span></dd></div>
     </dl>
   </div>
@@ -653,9 +662,9 @@ function hit(c, cls) {
 const TIP = { FX: "Effects 1: delay and reverb (again: Effects 2: reverb type, speaker, feedback, character)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths)",
   ENV: "Tone: noise and its colour, white to pink; hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: LFO mods: rate mod, cross-mod amount, delay LFO)",
   EDIT: "Osc: X-Wave, pulse width (again: Source: osc mix, drive); hold to peek", GLO: "Setup 1: glide, fade, drift, stereo width (again: Setup 2: morph, scene switch, tune, tuning)",
-  HOME: "Play 1: pitch, cutoff (again: Play 2: resonance, levels)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Partner page: interval, detune",
+  HOME: "Play 1: pitch, cutoff (again: Play 2: resonance, levels)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Macros: Bloom, Weight, Tide, Tear (again: Partner: interval, detune)",
   PLAY: "Drone in / out", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
-  SELECT: "LFO rate", PRESETS: "A macro (coming in v0.2)", ALGORITHM: "Movement: every LFO depth together",
+  SELECT: "LFO rate", PRESETS: "A macro: Bloom to start (hold SEL and turn to pick another)", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
 for (const [n, c] of [...Object.entries(buttons), ...Object.entries(knobs)]) if (TIP[n]) c.g.setAttribute("aria-description", TIP[n]);
 // the keys: the black ones as switches (and what they do on the LFO pages), the white ones as scenes

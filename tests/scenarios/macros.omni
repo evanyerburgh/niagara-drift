@@ -1,0 +1,103 @@
+# the macros (v0.2): offsets on top of the sound, the sound's own values untouched. heardN is what's heard
+# (the sound plus the macros), parN the sound's own. 7 drone I's cutoff, 5 its osc mix, 4 its detune, 63 the
+# reverb mix, 44 hard sync, 42 cross-mod; 78-81 Bloom, Weight, Tide, Tear; 82-85 the gestures' depths, 86-89
+# their swells, 90-93 their latches (Beat, Heat, Converge, Wash).
+tap PLAY
+wait 1000
+expect heard7 700
+# SEQ: the Macros page. Bloom at 100: the cutoffs +220, the reverb mix +30; the knob's own value stays
+tap SEQ
+expect view 7
+spin K1 100
+wait 100
+expect par78 100
+expect par7 700
+expect heard7 920
+expect heard63 55
+spin K1 -100
+wait 100
+expect heard7 700
+# PRESETS plays the live macro (Bloom to start); SEL + PRESETS picks another (Weight)
+spin PRESET 50
+wait 100
+expect par78 50
+expect heard7 810
+spin PRESET -50
+press SEL
+spin PRESET 1
+release SEL
+expect mlive 1
+spin PRESET 100
+wait 100
+expect par79 100
+expect heard5 80
+spin PRESET -100
+wait 100
+expect heard5 30
+# Tear: hard sync on from its first step
+spin K4 1
+wait 100
+expect heard44 1
+spin K4 -1
+wait 100
+expect heard44 0
+# a gesture held swells in, let go it swells out (Beat: detune +60 x its depth 70 at full; 2.3 s)
+key w12 down
+wait 3000
+expect heard4 54
+key w12 up
+wait 3000
+expect heard4 12
+# a tap latches it; a press lets it go
+tapkey w12
+wait 3000
+expect par90 100
+expect heard4 54
+tapkey w12
+wait 3000
+expect par90 0
+expect heard4 12
+# SEL held as you let go: latched where it is
+key w12 down
+wait 1000
+press SEL
+key w12 up
+release SEL
+expect par90 >20
+expect par90 <60
+tapkey w12
+wait 3000
+expect par90 0
+# held: PRESETS sets its depth, ALGORITHM its swell (Heat)
+key w13 down
+spin PRESET -20
+spin ALGO 10
+key w13 up
+expect par83 50
+expect par87 35
+expect par75 50
+# Converge: cross-mod on while it's in
+key w14 down
+wait 3000
+expect heard42 1
+key w14 up
+wait 3000
+expect heard42 0
+# a scene keeps the macros: A1 stored with Bloom 40 and Wash latched, recalled from none
+spin K1 40
+tapkey w15
+wait 3000
+press SAVE
+tapkey w0
+release SAVE
+wait 300
+spin K1 -40
+tapkey w15
+wait 3000
+expect par78 0
+expect par93 0
+tapkey w0
+wait 3000
+expect par78 40
+expect par93 100
+expect heard7 788

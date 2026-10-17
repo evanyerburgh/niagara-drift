@@ -109,6 +109,11 @@ enum {
                                      * filters through their drive: thicker, then howling, held by the clip */
     P_CHAR,                         /* CHARACTER, 0..100: clean .. vintage oscillators (softer edges, a bent
                                      * saw, even harmonics, pitch jitter, the drones a little apart, noise) */
+    /* THE MACROS (v0.2): offsets on top of the sound (drone.c MACRO_OFF), the sound's own values untouched */
+    P_M_BLOOM, P_M_WEIGHT, P_M_TIDE, P_M_TEAR,           /* the set macros' amounts, 0..100 (SEQ, PRESETS) */
+    P_GD_BEAT, P_GD_HEAT, P_GD_CONVERGE, P_GD_WASH,      /* the gestures' depths, 0..100 */
+    P_GR_BEAT, P_GR_HEAT, P_GR_CONVERGE, P_GR_WASH,      /* ... their swell's time, 0..100 = 1 .. 30 s */
+    P_GL_BEAT, P_GL_HEAT, P_GL_CONVERGE, P_GL_WASH,      /* ... latched at, 0..100 (0: not latched) */
     DR_NPARAMS
 };
 
@@ -117,6 +122,11 @@ enum { DR_SINE, DR_TRI, DR_SAW, DR_SQUARE };          /* the X-WAVE's four waves
 enum { DR_LFO_OFF, DR_LFO_I, DR_LFO_II, DR_LFO_BOTH };   /* a route's wave; BOTH: I + II, summed */
 enum { DR_TO_PITCH, DR_TO_XWAVE };
 enum { DR_TO_CUTOFF, DR_TO_RESO };
+#define DR_NSETM 4                             /* the set macros: Bloom, Weight, Tide, Tear */
+#define DR_NGEST 4                             /* the gestures: Beat, Heat, Converge, Wash */
+extern const char *const DR_MACRO_NAME[DR_NSETM + DR_NGEST];
+void dr_gesture(int g, int amt);               /* gesture g's amount now, 0..1000 (the UI swells it) */
+int dr_heard(int p);                           /* a value as heard: the sound's own plus the macros (tests) */
 #define DR_LFO_NSHAPES 9                                /* each tap: off and eight shapes */
 #define DR_LFO_RANDOM 8                                 /* the eighth: random (I: steps, II: a glide) */
 extern const char *const DR_LFO_W1_NAME[DR_LFO_NSHAPES];

@@ -124,14 +124,17 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 - **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width.
 - **Osc mix** goes from the oscillators to the sub; **drive** pushes each drone into its filter.
 
-#### Partner · SEQ
+#### Macros and Partner · SEQ
 
-<img src="docs/img/page-partner.png" width="244" alt="The Partner page: each drone's partner oscillator under its main one, and how fast they beat">
+<img src="docs/img/page-seq.png" width="488" alt="The Macros page: four set macros as meters, the one PRESETS plays marked, and the four gestures under them; the Partner page">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
+| Macros | Bloom | Weight | Tide | Tear |
 | Partner | I interval | I detune | II interval | II detune |
 
+- **Macros** move several things at once, by set amounts, on top of your sound: your own settings stay as
+  they are, so a macro back at 0 is exactly where you were. Scenes remember them. See [The macros](#the-macros).
 - The partner oscillator sits an interval above or below each drone; **detune** makes them beat.
   With **Tuning: just** (Setup 2) the intervals are pure ratios.
 
@@ -226,7 +229,31 @@ little, so set an osc depth to hear it work.
 | | the LFO's rate, its shapes, and where the waves go (the black keys on the LFO pages) |
  Turning a
 depth that can't be heard says why on the screen (Movement at 0%, or its wave off).
-PRESETS is kept for a macro, coming in v0.2.
+**PRESETS** plays a macro, Bloom to start (see below).
+
+### The macros
+
+Eight moves, each a few settings together, by set amounts, on top of your sound. Your own settings stay as they
+are underneath: at 0 a macro is gone without a trace.
+
+| Macro | What it moves | Played on |
+|---|---|---|
+| **Bloom** | both cutoffs up, resonance a little down, more reverb: the sound opens | SEQ, KNOB 1; **PRESETS** to start |
+| **Weight** | osc mix toward the sub, cutoffs a little down, less noise: it sinks | SEQ, KNOB 2 |
+| **Tide** | more Movement while the LFO slows: bigger and slower together | SEQ, KNOB 3 |
+| **Tear** | hard sync on, drone II's pitch up to an octave and its resonance up: the sync sweep | SEQ, KNOB 4 |
+| **Beat** | the partners detuned, wider, more drift: the drones shimmer | D5, held |
+| **Heat** | drive, character, feedback and a little resonance, the level held: grit without getting louder | E5, held |
+| **Converge** | drone II leans toward drone I (to the nearest unison or octave), cross-mod on | F5, held |
+| **Wash** | into the delay and the reverb, the dry sound a little down | G5, held |
+
+- **The set macros** (SEQ's Macros page) stay where you leave them. **PRESETS** plays one of them, always at
+  hand: Bloom to start; hold **SEL** and turn PRESETS to pick another.
+- **The gestures** are the top four white keys. **Hold** one and it swells in; **let go** and it swells back
+  out. **Tap** it to latch it on; press it again to let it go. **SEL held as you let go** latches it where it is.
+  While you hold one, **PRESETS** sets how deep it goes and **ALGORITHM** how long it takes to swell (1–30 s).
+  Its key glows dimly, and lights as it comes in.
+- Turning a knob while a scene switch is on its way lets go of that setting; the rest still lands.
 
 ### Black keys: switches
 
@@ -265,7 +292,7 @@ by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8),
 | **SEL held as you let go** | the blend **stays**, as a sound of its own between the two |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're read-only (pick bank A, B or C first: SEL + D5, E5 or F5) |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (the starting sound and a deep bass sound for now; more to come). The screen names scenes by bank: "B5" |
-| **Top white key** (D5–G5) alone | kept for the gesture macros, coming in v0.2 |
+| **Top white key** (D5–G5) alone | a **gesture**: Beat, Heat, Converge, Wash (see [The macros](#the-macros)) |
 | **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it |
 | **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 
@@ -287,7 +314,7 @@ builds the same page from your checkout, serves it at http://localhost:8765 and 
 | PLAY · SAVE (hold) · SEL (hold) | | Space · Enter · C |
 | HOME · EDIT · Wave I · Wave II (OCT− · OCT+) | | Esc · V · Z · X |
 | Black keys 1–11 | click | 1 … 0, − |
-| Scenes 1–12 · top keys | click | Q … I, A … F · G … K |
+| Scenes 1–12 · gestures | click | Q … I, A … F · G … K |
 
 ## Problems and ideas
 

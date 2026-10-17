@@ -103,105 +103,136 @@ static int in_range(const int16_t *v)
     return 1;
 }
 
-/* 19 and 20 had 16 scenes in the project, at the same place: the first 12 are bank A as they lie, 13-16
- * become B1-B4 (moved there by project_load, which has the bytes) */
-#define OLD_NSCENES 16
+/* the older layouts, each with 78 values a sound (DR_NPARAMS before the macros): 19 and 20 had 16 scenes in
+ * the project (scenes 13-16 become B1-B4), 21 had bank A there and B, C in their own objects. A value added
+ * since takes its default. */
+#define NP21 78
+_Static_assert(DR_NPARAMS >= NP21, "the values only grow");
 typedef struct {
     uint32_t magic, format;
-    int16_t par[DR_NPARAMS];
+    int16_t par[NP21];
     uint8_t leds;
     uint8_t rsv[15];
     uint16_t scene_used;
-    int16_t scene[OLD_NSCENES][DR_NPARAMS];
-} project_old_t;
+    int16_t scene[16][NP21];
+} proj_v20_t;
+typedef struct {
+    uint32_t magic, format;
+    int16_t par[NP21];
+    uint8_t leds, bank;
+    uint8_t rsv[14];
+    uint16_t scene_used;
+    int16_t scene[NSCENES][NP21];
+} proj_v21_t;
+typedef struct {
+    uint32_t magic, format;
+    uint16_t used, rsv;
+    int16_t scene[NSCENES][NP21];
+} bank_v21_t;
 static union {
     project_t p;
-    project_old_t o;
+    proj_v20_t o20;
+    proj_v21_t o21;
+    bank_t b;
+    bank_v21_t b21;
     uint8_t raw[PLAT_STORE_MAX];
 } ld;
 
-static int project_valid(void)
+static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old sound: the new values' defaults */
 {
-    int i;
-    uint32_t from = proj.format;
-    if (proj.magic != PROJ_MAGIC || from < 19u || from > PROJ_FORMAT)
-        return 0;
-    if (proj.par[P_LFO_RATE] < 0)              /* slower than 50 s, as it went before 2026-10-14: the slowest */
-        proj.par[P_LFO_RATE] = 0;
-    convert(proj.par, from);
-    for (i = 0; i < NSCENES; i++) {
-        if (proj.scene[i][P_LFO_RATE] < 0)
-            proj.scene[i][P_LFO_RATE] = 0;
-        convert(proj.scene[i], from);
-    }
-    if (from < 21u) {                          /* 19, 20: scenes 13-16 to B1-B4 */
-        bank_blank(&bank_bc[0]);
-        for (i = 0; i < 4; i++)
-            if (ld.o.scene_used >> (12 + i) & 1u) {
-                memcpy(bank_bc[0].scene[i], ld.o.scene[12 + i], sizeof bank_bc[0].scene[i]);
-                if (bank_bc[0].scene[i][P_LFO_RATE] < 0)
-                    bank_bc[0].scene[i][P_LFO_RATE] = 0;
-                convert(bank_bc[0].scene[i], from);
-                bank_bc[0].used |= (uint16_t)(1u << i);
-            }
-        proj.scene_used &= (1u << NSCENES) - 1u;
-        proj.bank = 0;
-        memset(proj.rsv, 0, sizeof proj.rsv);
-        bank_dirty |= 1u << 1;                 /* B written with the next save */
-    }
-    proj.format = PROJ_FORMAT;
-    if (proj.bank >= NBANKS)
-        proj.bank = 0;
-    if (!in_range(proj.par))
-        return 0;
-    for (i = 0; i < NSCENES; i++)              /* a scene out of range is dropped, not the project */
-        if ((proj.scene_used >> i & 1u) && !in_range(proj.scene[i]))
-            proj.scene_used &= (uint16_t)~(1u << i);
-    return 1;
+    int k;
+    for (k = 0; k < DR_NPARAMS; k++)
+        dst[k] = k < NP21 ? src[k] : dr_param_info(k)->def;
+    if (dst[P_LFO_RATE] < 0)                   /* slower than 50 s, as it went before 2026-10-14: the slowest */
+        dst[P_LFO_RATE] = 0;
+    convert(dst, from);
 }
 
 static void bank_load(int b)                   /* B (1) or C (2): from its object, if it's sound */
 {
     bank_t *k = &bank_bc[b - 1];
     int i;
+    bank_blank(k);
     memset(ld.raw, 0, sizeof ld.raw);
-    if (plat_store_load(b == 1 ? OBJ_BANKB : OBJ_BANKC, ld.raw, sizeof ld.raw) < 8)
+    if (plat_store_load(b == 1 ? OBJ_BANKB : OBJ_BANKC, ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
         return;
-    memcpy(k, ld.raw, sizeof *k);
-    if (k->magic != BANK_MAGIC || k->format < 21u || k->format > PROJ_FORMAT) {
-        bank_blank(k);
+    if (ld.b.format == PROJ_FORMAT) {
+        *k = ld.b;
+    } else if (ld.b.format == 21u) {
+        k->used = ld.b21.used;
+        for (i = 0; i < NSCENES; i++)
+            widen(k->scene[i], ld.b21.scene[i], 21u);
+        bank_dirty |= (uint8_t)(1u << b);
+    } else {
         return;
-    }
-    for (i = 0; i < NSCENES; i++) {
-        convert(k->scene[i], k->format);
-        if ((k->used >> i & 1u) && !in_range(k->scene[i]))
-            k->used &= (uint16_t)~(1u << i);
     }
     k->format = PROJ_FORMAT;
+    for (i = 0; i < NSCENES; i++)
+        if ((k->used >> i & 1u) && !in_range(k->scene[i]))
+            k->used &= (uint16_t)~(1u << i);
 }
 
 int project_load(void)
 {
-    int n;
+    int n, i;
+    uint32_t from;
     presets_init();
     bank_dirty = 0;
     bank_blank(&bank_bc[0]);
     bank_blank(&bank_bc[1]);
     memset(ld.raw, 0, sizeof ld.raw);
     n = plat_store_load(OBJ_PROJ, ld.raw, sizeof ld.raw);
-    memcpy(&proj, ld.raw, sizeof proj);
-    if (n < 8 || proj.magic != PROJ_MAGIC) {
+    from = ld.p.format;
+    if (n < 8 || ld.p.magic != PROJ_MAGIC || from < 19u || from > PROJ_FORMAT) {
         project_defaults();
         return -1;
     }
-    if (proj.format >= 21u) {                  /* B and C first: a converted 0.1 project fills B itself */
+    if (from == PROJ_FORMAT) {
+        proj = ld.p;
+    } else if (from == 21u) {
+        static proj_v21_t o;
+        o = ld.o21;
+        memset(&proj, 0, sizeof proj);
+        widen(proj.par, o.par, from);
+        proj.leds = o.leds;
+        proj.bank = o.bank;
+        proj.scene_used = o.scene_used & ((1u << NSCENES) - 1u);
+        for (i = 0; i < NSCENES; i++)
+            widen(proj.scene[i], o.scene[i], from);
+    } else {                                   /* 19, 20 */
+        static proj_v20_t o;
+        o = ld.o20;
+        memset(&proj, 0, sizeof proj);
+        widen(proj.par, o.par, from);
+        proj.leds = o.leds;
+        proj.scene_used = o.scene_used & ((1u << NSCENES) - 1u);
+        for (i = 0; i < NSCENES; i++)
+            widen(proj.scene[i], o.scene[i], from);
+        for (i = 0; i < 4; i++)                /* scenes 13-16 to B1-B4 */
+            if (o.scene_used >> (12 + i) & 1u) {
+                widen(bank_bc[0].scene[i], o.scene[12 + i], from);
+                bank_bc[0].used |= (uint16_t)(1u << i);
+            }
+        bank_dirty |= 1u << 1;
+    }
+    if (from >= 21u) {
         bank_load(1);
         bank_load(2);
     }
-    if (project_valid())
-        return 0;
-    project_defaults();
-    return -1;
+    proj.magic = PROJ_MAGIC;
+    proj.format = PROJ_FORMAT;
+    if (proj.bank >= NBANKS)
+        proj.bank = 0;
+    if (proj.mlive >= DR_NSETM)
+        proj.mlive = 0;
+    if (!in_range(proj.par)) {
+        project_defaults();
+        return -1;
+    }
+    for (i = 0; i < NSCENES; i++)              /* a scene out of range is dropped, not the project */
+        if ((proj.scene_used >> i & 1u) && !in_range(proj.scene[i]))
+            proj.scene_used &= (uint16_t)~(1u << i);
+    return 0;
 }
 
 int project_save(void)                         /* the banks first: a converted 0.1 project's B1-B4 are on
