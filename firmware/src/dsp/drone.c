@@ -344,6 +344,7 @@ typedef struct {
     float lofs, lslide;                           /* PITCH LINK: the offset (semitones), its slide a tick */
     uint8_t linked;                               /* PITCH LINK was on last tick */
     uint16_t sc_n, sc_dec, sc_cnt, sc_wait;       /* the scope: points taken, a point every sc_dec samples */
+    uint16_t sc_arm;                              /* ... samples armed without a cycle starting */
     float slide;                                  /* semitones a control tick toward the pitch; 0: there */
     float st;                                     /* where the slide is: the Glide follows it */
     uint16_t slide_ms;                            /* dr_slide: the next pitch change's slide, ms */
@@ -1213,8 +1214,12 @@ static void render_group(int g, uint32_t n)
                 }
             } else if (v->sc_wait) {
                 v->sc_wait--;
-            } else if (ph + inc >= 1.0f) {      /* armed: start on the next cycle */
+                v->sc_arm = 0;
+            } else if (ph + inc >= 1.0f || ++v->sc_arm >= 4410u) {   /* armed: start on the next cycle, or after
+                                                * 0.1 s anyway (hard sync can restart drone II's oscillator before
+                                                * its cycle ends: the picture froze) */
                 float d = 2.0f / (inc * (float)DR_SCOPE_N);
+                v->sc_arm = 0;
                 v->sc_n = 0;
                 v->sc_cnt = 0;
                 v->sc_dec = (uint16_t)(d < 1.0f ? 1.0f : d > 4000.0f ? 4000.0f : d);

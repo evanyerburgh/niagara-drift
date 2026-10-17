@@ -143,3 +143,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   far in. Where a key has no pressure (the emulator), a hold is 0.1's timed visit.
 - 2026-10-17: LFO mods: a negative delay wobble reads "-+25%"; X-mod draws the range it pushes drone II's
   filter through.
+- 2026-10-17: a value a hand moves while a scene switch (or a crossfade) is on its way is let go by the switch:
+  the left encoders (LFO rate, Movement, the macro) and the OCT wave taps; the rest still lands. A page knob
+  still stops the switch where it is. A new switch moves everything again.
+- 2026-10-17: the drones' pictures start on a cycle, or after 0.1 s without one (hard sync could freeze
+  drone II's).

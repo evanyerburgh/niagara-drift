@@ -156,6 +156,8 @@ static struct {
     uint32_t press_t0, press_hi_t;     /* ... since; above the commit level since (0: not) */
     float press_x;                     /* ... how far into the scene, 0..1, smoothed */
     uint32_t flash_t;                  /* a scene taken: its key flashes from then */
+    uint64_t hands[(DR_NPARAMS + 63) / 64];   /* the values a hand has moved since a scene switch began: the
+                                               * switch lets go of them (Evan, 2026-10-17: Movement fought it) */
     int16_t press_to[DR_NPARAMS];      /* ... the scene */
     uint32_t frame;
     uint32_t sig[3];                   /* what each band shows: redrawn when it changes */
@@ -504,11 +506,16 @@ static float morph_ms(void) { return 20.0f * fm_exp2f((float)proj.par[P_MORPH] *
 
 /* OCT- / OCT+: the LFO's two waves (v0.2): a tap is the next shape, round and round (Off, the seven, random);
  * SEL + OCT the one before. The engine glides a new shape in over the Morph time. Shown in the top bar */
+static void hands_on(int p) { ui.hands[p / 64] |= (uint64_t)1 << (p % 64); }
+static int hands_has(int p) { return (int)(ui.hands[p / 64] >> (p % 64) & 1u); }
+static void hands_clear(void) { memset(ui.hands, 0, sizeof ui.hands); }
+
 static void wave_step(int w, int dir)
 {
     char t[12];
     const int p = w ? P_LFO_W2 : P_LFO_W1, n = DR_LFO_NSHAPES;
     int v = (proj.par[p] + dir + n) % n;
+    hands_on(p);                               /* a scene on its way leaves it alone */
     param_set(p, v);
     ui.scene_at = -1;
     loop_note(p, v, 0);
@@ -728,6 +735,7 @@ static void scene_recall(int n)                        /* a white key: morph the
         ui.morph_from[k] = proj.par[k];
         ui.morph_to[k] = sc[k];
     }
+    hands_clear();                             /* a new switch: it moves everything again */
     ui.morph = (int8_t)n;
     ui.scene_at = (int8_t)n;
     ui.morph_t0 = plat_ms();
@@ -756,7 +764,8 @@ static void sound_blend(const int16_t *from, const int16_t *to, float x)
     int k;
     for (k = 0; k < DR_NPARAMS; k++) {
         int v;
-        if (scene_room(k))                             /* the room's settings aren't a scene's */
+        if (scene_room(k) || hands_has(k))             /* the room's settings aren't a scene's; nor what a
+                                                        * hand has moved since the switch began */
             continue;
         if (proj.par[P_PLOCK] && (k == DR_GP(0, GP_PITCH) || k == DR_GP(1, GP_PITCH) || k == P_PLINK_OFF))
             continue;                                  /* pitch lock: the drones keep their pitch (2026-10-17) */
@@ -800,9 +809,11 @@ static void scene_morph(void)
 static void press_start(int n, const int16_t *sc)
 {
     int k;
-    if (!(ui.morph == VISIT_BACK && ui.visit == -2 - n))   /* not already gliding back from this key: */
+    if (!(ui.morph == VISIT_BACK && ui.visit == -2 - n)) {  /* not already gliding back from this key: */
         for (k = 0; k < DR_NPARAMS; k++)                   /* where letting go comes back to */
             ui.visit_back[k] = proj.par[k];
+        hands_clear();
+    }
     ui.visit_from = ui.scene_at;
     for (k = 0; k < DR_NPARAMS; k++)
         ui.press_to[k] = sc[k];
@@ -927,6 +938,7 @@ static void global_turn(int role, int p, const char *name, int32_t e)
     char t[12];
     const dr_param_t *in = dr_param_info(p);
     ui.scene_at = -1;                          /* a hand on the sound */
+    hands_on(p);                               /* a scene on its way leaves it alone (the morph goes on) */
     if (in->hi - in->lo > 24)
         cont_turn(p, role, e);                 /* the LFO rate glides as a knob on the page does */
     else {

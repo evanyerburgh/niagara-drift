@@ -76,3 +76,27 @@ expect par7 >480
 key w0 up
 wait 1200
 expect par7 297
+# turning ALGORITHM (Movement, par75) while a scene switch is on its way: the switch lets go of it, and the
+# rest still lands (scene A2 stored with Movement 50 and cutoff 697; the sound at Movement 80, cutoff 297)
+spin K2 40
+wait 300
+press SAVE
+tapkey w1
+release SAVE
+wait 300
+spin K2 -40
+spin ALGO 30
+wait 300
+expect par75 80
+tap GLO
+tap GLO
+spin K2 20
+tap HOME
+tapkey w1
+wait 400
+spin ALGO 10
+wait 200
+spin ALGO 5
+wait 7500
+expect par75 >90
+expect par7 697
