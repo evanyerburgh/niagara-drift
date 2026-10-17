@@ -1,0 +1,78 @@
+# the pressure crossfade (v0.2): a scene key held is a fader into its scene. Drone I's cutoff (par7) shows
+# where the sound is: scene A1 at 700, the sound before it at 300.
+pressure w0 0
+tap PLAY
+wait 1500
+press SAVE
+tapkey w0
+release SAVE
+wait 300
+spin K2 -40
+wait 300
+expect par7 300
+# a light rest: nothing moves
+key w0 down
+pressure w0 5
+wait 400
+expect par7 300
+# half way in (pressure 64 of 127: ~52 %)
+pressure w0 64
+wait 400
+expect par7 >480
+expect par7 <540
+# let go: back to where it began, over the Morph time (0.6 s)
+key w0 up
+wait 1200
+expect par7 300
+expect scene_at -1
+# a tap, however hard: there, over the Scene switch time (1.1 s), and stay
+key w0 down
+pressure w0 127
+wait 100
+key w0 up
+wait 1600
+expect par7 700
+expect scene_at 0
+# pressed through (held near full for 0.3 s): taken, and it stays after letting go
+spin K2 -40
+wait 300
+expect scene_at -1
+key w0 down
+pressure w0 127
+wait 800
+expect par7 700
+key w0 up
+wait 1200
+expect par7 700
+expect scene_at 0
+# SEL held as you let go: the blend stays (parked)
+spin K2 -40
+wait 300
+key w0 down
+pressure w0 64
+wait 400
+press SEL
+key w0 up
+release SEL
+wait 1200
+expect par7 >480
+expect par7 <540
+expect scene_at -1
+# pressed again on the way back: picked up from there, and back to where it first began
+spin K2 -21
+wait 300
+expect par7 297
+key w0 down
+pressure w0 127
+wait 300
+pressure w0 80
+wait 300
+key w0 up
+wait 150
+key w0 down
+pressure w0 64
+wait 400
+expect par7 >480
+key w0 up
+wait 1200
+expect par7 297

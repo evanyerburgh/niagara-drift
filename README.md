@@ -38,7 +38,7 @@ banks you pick with SEL and the top four.*
 - **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
 - **Morph**: buttons and keys never jump: the sound moves to a new setting over a time you set.
 - **Scenes**: 12 on the white keys in each of three banks (36 of yours), plus a Presets bank, recalled
-  with a morph; a **motion loop** that records your knob
+  with a morph, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob
   moves.
 
 ## Installing
@@ -259,7 +259,10 @@ by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8),
 
 | | |
 |---|---|
-| **White key** (the lower 12, F3–C5) | tap: morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). **Hold** to visit: let go and it morphs back to where you were. A scene keeps the sound, not the room: Speaker, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
+| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). A tap is anything under a quarter of a second, however hard. A scene keeps the sound, not the room: Speaker, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
+| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, over the Morph time. Press it again on the way back and you pick up from there |
+| **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
+| **SEL held as you let go** | the blend **stays**, as a sound of its own between the two |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're read-only (pick bank A, B or C first: SEL + D5, E5 or F5) |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (the starting sound and a deep bass sound for now; more to come). The screen names scenes by bank: "B5" |
 | **Top white key** (D5–G5) alone | kept for the gesture macros, coming in v0.2 |

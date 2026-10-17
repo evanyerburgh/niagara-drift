@@ -136,3 +136,10 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-17: backup and restore over USB (SysEx 0x70–0x73: read, write, commit an object; restart):
   `fm1_install.py --backup [FILE]`, `--restore FILE`, and a backup in `~/niagara-drift-backups/` before every
   install over Niagara Drift (`--no-backup`: not). The web installer's comes later.
+- 2026-10-17: the pressure crossfade: a scene key held is a fader from the sound before into its scene; under 8 %
+  nothing moves, 90 % is all the way, and held there 0.3 s the scene is taken (the key flashes). A tap (under
+  0.25 s, however hard) goes there over the Scene switch time; letting go glides back over the Morph time
+  (pressed again on the way, from there); SEL held at release keeps the blend. The key's brightness shows how
+  far in. Where a key has no pressure (the emulator), a hold is 0.1's timed visit.
+- 2026-10-17: LFO mods: a negative delay wobble reads "-+25%"; X-mod draws the range it pushes drone II's
+  filter through.
