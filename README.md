@@ -2,6 +2,10 @@
 
 **A drone synth for the M-VAVE FM-1.**
 
+> **This page describes v0.2, in development.** The version you can download is the 0.1 beta: its manual is
+> [the README of 0.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.1-beta/README.md), and the
+> [website](https://evanyerburgh.github.io/niagara-drift/) matches it until v0.2 is released.
+
 Niagara Drift is open-source firmware that turns the M-VAVE
 FM-1 into a drone synthesizer: two always-on drones you tune, shape and move rather than play note by
 note. It's inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the Soma Lyra-8.
@@ -201,6 +205,13 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | OCT− · OCT+ | Wave I's · Wave II's shape: tap for the next (or off), round and round; SEL + OCT for the one before |
 
 One clock, two waves; the OCT− and OCT+ lights pulse with them. The last shape on each is random.
+
+**Movement** (ALGORITHM) is how much of all that you hear: it scales every LFO depth together (each drone's
+osc and filter depth, and the delay's wobble), as you've set them on the LFO depths page. At 0% the LFO
+moves nothing, whatever the depths say; at 100% (the middle) the depths are as set; at 200% they're twice as
+deep. It doesn't touch the rate, the shapes or where the waves go, and it can only scale depths you've set:
+the starting sound only breathes its filters a little, so set an osc depth to hear it work. Turning a
+depth that can't be heard says why on the screen (Movement at 0%, or its wave off).
 PRESETS is kept for a macro, coming in v0.2.
 
 ### Black keys: switches
