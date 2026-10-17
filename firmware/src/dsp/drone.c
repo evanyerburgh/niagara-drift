@@ -24,26 +24,28 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-4th",
 #define VOICE_PARAMS(pitch, wave, ival, mix, cut, level, olfo, flfo, fdep)                                           \
     {"Pitch", DR_PITCH_LO, DR_PITCH_HI, pitch}, {"X-Wave", 0, 100, wave}, {"PW", 0, 100, 30},               \
         {"Interval", 0, DR_NINTERVALS - 1, ival}, {"Detune", 0, 100, 12}, {"Osc mix", 0, 100, mix},            \
-        {"Sub oct", 1, 4, 1}, {"Cutoff", 0, 1000, cut}, {"Reso", 0, 1000, 350}, {"Mode", DR_LP, DR_HP, DR_LP},    \
+        {"Sub oct", 1, 4, 1}, {"Cutoff", 0, 1000, cut}, {"Reso", 0, 1000, 250}, {"Mode", DR_LP, DR_HP, DR_LP},    \
         {"Drive", 0, 100, 20}, {"Level", 0, 100, level}, {"Partner", 0, 1, 1},                                 \
         {"Osc LFO", DR_LFO_OFF, DR_LFO_BOTH, olfo}, {"Osc depth", -100, 100, 0},                                \
         {"Osc LFO to", DR_TO_PITCH, DR_TO_XWAVE, DR_TO_PITCH}, {"Filter LFO", DR_LFO_OFF, DR_LFO_BOTH, flfo},     \
         {"Filt depth", -100, 100, fdep}, {"Filt LFO to", DR_TO_CUTOFF, DR_TO_RESO, DR_TO_CUTOFF},           \
         {"Noise", 0, 100, 0}, {"Colour", 0, 100, 100}
 
-/* each voice's LFO taps start routed (I or II); the filters breathe a little from the start (depth +25 on
- * drone I, -25 on drone II: they move against each other), so the Movement (OCT- / OCT+) is heard at once;
- * the oscillators' depths start at 0 */
+/* THE STARTING SOUND (2026-10-17, Evan: Lyra-like; measured against two Lyra-8 recordings: changes mostly slower
+ * than one every two seconds, ~16 dB of slow loudness swell, ~1.6 octaves of brightness): each voice's LFO taps
+ * start routed (I or II), the filters breathing deep and against each other (+85 drone I, -85 drone II) on a
+ * slow LFO (a cycle in ~25 s; Wave II a random glide), the Swell on as a slow breath (one in ~35 s, 12 dB),
+ * some delay with a gentle wobble, a little more reverb; the oscillators' depths start at 0 */
 static const dr_param_t PARAMS[DR_NPARAMS] = {
-    VOICE_PARAMS(5000, 67, 3, 30, 700, 80, DR_LFO_I, DR_LFO_I, 25),     /* I: D3, saw, partner in unison */
-    VOICE_PARAMS(5700, 33, 8, 15, 680, 70, DR_LFO_II, DR_LFO_II, -25),   /* II: A3, triangle, partner an octave up */
+    VOICE_PARAMS(5000, 67, 3, 30, 700, 80, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
+    VOICE_PARAMS(5700, 33, 8, 15, 680, 70, DR_LFO_II, DR_LFO_II, -85),   /* II: A3, triangle, partner an octave up */
     {"Cross-mod", 0, 1, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
-    {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 30}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
-    {"Wave II", 0, DR_LFO_NSHAPES - 1, 1}, {"Glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
+    {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
+    {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
     {"Stereo", 0, 100, 60}, {"Tune", -50, 50, 0},
-    {"Pulse", 0, 1, 0}, {"Rate", 0, 100, 45}, {"Depth", 0, 100, 48}, {"Shape", 0, 100, 25}, {"Swing", 0, 50, 0},
-    {"Time", 0, 100, 50}, {"Repeats", 0, 100, 35}, {"Dly mix", 0, 100, 0}, {"Rev mix", 0, 100, 25},
-    {"Reverb", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Dly LFO", -100, 100, 0},
+    {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", 0, 100, 25}, {"Swing", 0, 50, 0},
+    {"Time", 0, 100, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
+    {"Reverb", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Dly LFO", -100, 100, 20},
     {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
     {"Morph", 0, 100, 47}, {"Scene switch", 0, 100, 30}, {"Tuning", 0, 1, 0}, {"Speaker", 0, 100, 0},
     {"Pitch lock", 0, 1, 0}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
@@ -303,14 +305,17 @@ void dr_param_text(int i, int v, char *b)
 
 /* -------------------------------------------------------------- commands --- */
 enum { C_SET, C_PLAY, C_VOICE, C_PANIC, C_SLIDE, C_LFO_RESET, C_PSLIDE, C_SEED, C_DUCK, C_GEST };
-#define QN 64u
+/* a load (boot, project_apply) posts every value at once, before the render drains any: the queue holds
+ * them all (at 64 the last values of a saved sound were dropped at start-up, the macros among them) */
+#define QN 128u
+typedef char qn_holds_a_load[DR_NPARAMS + 16 <= QN ? 1 : -1];
 static uint32_t q[QN];
 static volatile uint32_t q_w, q_r;
 static void post(uint32_t c, int a, int b)
 {
     uint32_t w = q_w;
     if (w - q_r >= QN)
-        return;                                   /* full: dropped (never, at the UI's rate) */
+        return;                                   /* full: dropped (never: a load is DR_NPARAMS) */
     q[w % QN] = c << 24 | ((uint32_t)a & 0xFFu) << 16 | ((uint32_t)b & 0xFFFFu);
     BARRIER();
     q_w = w + 1;

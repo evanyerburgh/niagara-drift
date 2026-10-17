@@ -98,7 +98,6 @@ spin K3 20
 wait 300
 shot setup2.png
 # Pulse (hold ARP for its page; a tap starts it): some swing
-tap ARP
 expect par55 1
 press ARP
 expect view 11

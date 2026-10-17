@@ -542,7 +542,19 @@ int main(int argc, char **argv)
             printf("\n");
         } else if (!strcmp(cmd, "expect"))
             fails += expect(a, b);
-        else if (!strcmp(cmd, "reboot")) {
+        else if (!strcmp(cmd, "classic")) {         /* the starting sound before 2026-10-17, for the scenarios made on
+                                                    * it (they test the controls, not the starting sound) */
+            static const int16_t OLD[][2] = {{DR_GP(0, GP_FLFO_DEPTH), 25}, {DR_GP(1, GP_FLFO_DEPTH), -25},
+                {DR_GP(0, GP_RESO), 350}, {DR_GP(1, GP_RESO), 350}, {P_LFO_RATE, 30}, {P_LFO_W2, 1},
+                {P_DLY_REPEATS, 35}, {P_DLY_MIX, 0}, {P_REV_MIX, 25}, {P_DLY_LFO_DEPTH, 0}, {P_PULSE, 0},
+                {P_PULSE_RATE, 45}, {P_PULSE_DEPTH, 48}};
+            uint32_t i;
+            for (i = 0; i < sizeof OLD / sizeof OLD[0]; i++) {  /* only these (the engine's queue holds 64) */
+                proj.par[OLD[i][0]] = OLD[i][1];
+                dr_set(OLD[i][0], OLD[i][1]);
+            }
+            run_ms(50);
+        } else if (!strcmp(cmd, "reboot")) {
             memset(&proj, 0, sizeof proj);
             boot();
         } else if (!strcmp(cmd, "echo"))
