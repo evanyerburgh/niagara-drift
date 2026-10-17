@@ -2,6 +2,10 @@
 
 **A drone synth for the M-VAVE FM-1.**
 
+> **This page describes v0.2, in development.** The version you can download is the 0.1 beta: its manual is
+> [the README of 0.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.1-beta/README.md), and the
+> [website](https://evanyerburgh.github.io/niagara-drift/) matches it until v0.2 is released.
+
 Niagara Drift is open-source firmware that turns the M-VAVE
 FM-1 into a drone synthesizer: two always-on drones you tune, shape and move rather than play note by
 note. It's inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the Soma Lyra-8.
@@ -34,7 +38,7 @@ banks you pick with SEL and the top four.*
 - **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
 - **Morph**: buttons and keys never jump: the sound moves to a new setting over a time you set.
 - **Scenes**: 12 on the white keys in each of three banks (36 of yours), plus a Presets bank, recalled
-  with a morph; a **motion loop** that records your knob
+  with a morph, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob
   moves.
 
 ## Installing
@@ -141,6 +145,14 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | LFO mods | rate mod | mod by (wave) | I → II cutoff amount | delay LFO depth |
 
 - **Depths** and **rate mod** are centred: the middle is none.
+- **LFO mods**, the LFO moving other things:
+  - **Rate mod**: the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
+  - **Mod by**: which wave does that (I, II or both).
+  - **X-mod amt**: how much drone I's sound moves drone II's filter, while the cross-mod switch (black key 11) is on.
+  - **Dly LFO**: how far the LFO wobbles the delay's time (up to ±25%; negative the other way), on the wave black
+    key 10 picks on the LFO pages. You hear it only with some delay mix (Effects 1).
+  - Movement (ALGORITHM) scales the delay's wobble too, as it does the LFO depths; not Rate mod or X-mod (see
+    [The LFO](#the-lfo)).
 - The LFO's rate and waves are on the top-left knobs; see [The LFO](#the-lfo) below.
 
 #### Swell · ARP
@@ -201,6 +213,19 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | OCT− · OCT+ | Wave I's · Wave II's shape: tap for the next (or off), round and round; SEL + OCT for the one before |
 
 One clock, two waves; the OCT− and OCT+ lights pulse with them. The last shape on each is random.
+
+**Movement** (ALGORITHM) is how much of all that you hear: it scales every LFO depth together, as you've set
+them. At 0% the LFO moves nothing, whatever the depths say; at 100% (the middle) the depths are as set; at 200%
+they're twice as deep. It can only scale depths you've set: the starting sound only breathes its filters a
+little, so set an osc depth to hear it work.
+
+| Movement scales | Movement leaves alone |
+|---|---|
+| **LFO depths**: all four knobs (each drone's osc depth and filter depth) | **LFO mods: Rate mod** (how much the LFO speeds itself up) |
+| **LFO mods: Dly LFO** (the delay's wobble) | **LFO mods: X-mod amt** (drone I moving drone II's filter: that's sound, not the LFO) |
+| | the LFO's rate, its shapes, and where the waves go (the black keys on the LFO pages) |
+ Turning a
+depth that can't be heard says why on the screen (Movement at 0%, or its wave off).
 PRESETS is kept for a macro, coming in v0.2.
 
 ### Black keys: switches
@@ -234,8 +259,11 @@ by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8),
 
 | | |
 |---|---|
-| **White key** (the lower 12, F3–C5) | tap: morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). **Hold** to visit: let go and it morphs back to where you were. A scene keeps the sound, not the room: Speaker, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
-| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're read-only |
+| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). A tap is anything under a quarter of a second, however hard. A scene keeps the sound, not the room: Speaker, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
+| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, over the Morph time. Press it again on the way back and you pick up from there |
+| **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
+| **SEL held as you let go** | the blend **stays**, as a sound of its own between the two |
+| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're read-only (pick bank A, B or C first: SEL + D5, E5 or F5) |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (the starting sound and a deep bass sound for now; more to come). The screen names scenes by bank: "B5" |
 | **Top white key** (D5–G5) alone | kept for the gesture macros, coming in v0.2 |
 | **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it |

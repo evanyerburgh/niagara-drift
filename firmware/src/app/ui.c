@@ -151,6 +151,12 @@ static struct {
     uint32_t morph_t0, morph_ms;
     int16_t morph_from[DR_NPARAMS];
     int16_t morph_to[DR_NPARAMS];      /* the scene being morphed to, as it was when its key was pressed */
+    int8_t press;                      /* the scene key held in a pressure crossfade (v0.2), or -1 */
+    uint8_t press_done;                /* ... pressed through: the scene is taken */
+    uint32_t press_t0, press_hi_t;     /* ... since; above the commit level since (0: not) */
+    float press_x;                     /* ... how far into the scene, 0..1, smoothed */
+    uint32_t flash_t;                  /* a scene taken: its key flashes from then */
+    int16_t press_to[DR_NPARAMS];      /* ... the scene */
     uint32_t frame;
     uint32_t sig[3];                   /* what each band shows: redrawn when it changes */
     uint32_t splash_t0;                /* the start's animation: since */
@@ -696,7 +702,7 @@ static void save_run(void)                             /* each look at the input
 static void scene_store(int n)                         /* SAVE held + a white key: and into the flash */
 {
     if (proj.bank == BANK_PRESETS) {                   /* the Presets are the firmware's: the way out */
-        say_c("PRESETS: READ-ONLY", "SEL+D5: A", K_GOLD);
+        say_c("PRESETS", "READ-ONLY", K_GOLD);       /* the README says the way out: a bank of yours */
         return;
     }
     scene_put(proj.bank, n);
@@ -743,18 +749,11 @@ static void scene_back(void)
     say("BACK", 0);
 }
 
-/* the morph, each frame: smooth values glide, steps flip half way; the Fade itself isn't recalled */
-static void scene_morph(void)
+/* the sound moved x of the way from one set of values to another: smooth values glide, steps flip half way;
+ * the room's settings stay, and with Pitch lock on the pitches */
+static void sound_blend(const int16_t *from, const int16_t *to, float x)
 {
-    const int16_t *to;
-    float x;
     int k;
-    if (ui.morph < 0)
-        return;
-    to = ui.morph == VISIT_BACK ? ui.visit_back : ui.morph_to;
-    x = ui.morph_ms ? (float)(plat_ms() - ui.morph_t0) / (float)ui.morph_ms : 1.0f;
-    if (x > 1.0f)
-        x = 1.0f;
     for (k = 0; k < DR_NPARAMS; k++) {
         int v;
         if (scene_room(k))                             /* the room's settings aren't a scene's */
@@ -762,9 +761,9 @@ static void scene_morph(void)
         if (proj.par[P_PLOCK] && (k == DR_GP(0, GP_PITCH) || k == DR_GP(1, GP_PITCH) || k == P_PLINK_OFF))
             continue;                                  /* pitch lock: the drones keep their pitch (2026-10-17) */
         if (scene_step(k))
-            v = x >= 0.5f ? to[k] : ui.morph_from[k];
+            v = x >= 0.5f ? to[k] : from[k];
         else
-            v = ui.morph_from[k] + (int)((float)(to[k] - ui.morph_from[k]) * x + (to[k] > ui.morph_from[k] ? 0.5f : -0.5f));
+            v = from[k] + (int)((float)(to[k] - from[k]) * x + (to[k] > from[k] ? 0.5f : -0.5f));
         if (v == proj.par[k])
             continue;
         if (k == DR_GP(0, GP_PITCH) || k == DR_GP(1, GP_PITCH))
@@ -773,8 +772,125 @@ static void scene_morph(void)
             dr_slide(1, 20);
         param_set(k, v);
     }
+}
+
+/* the morph, each frame: over its time, from where it started */
+static void scene_morph(void)
+{
+    float x;
+    if (ui.morph < 0)
+        return;
+    x = ui.morph_ms ? (float)(plat_ms() - ui.morph_t0) / (float)ui.morph_ms : 1.0f;
+    if (x > 1.0f)
+        x = 1.0f;
+    sound_blend(ui.morph_from, ui.morph == VISIT_BACK ? ui.visit_back : ui.morph_to, x);
     if (x >= 1.0f)
         ui.morph = -1;
+}
+
+/* THE PRESSURE CROSSFADE (v0.2, option D): a scene key held is a fader into its scene. Under PR_DEAD nothing
+ * moves; PR_FULL is all the way; held at PR_COMMIT for PR_COMMIT_MS the scene is taken (the key flashes);
+ * a tap (under PR_TAP_MS, however hard) goes there as before. Let go: back to where it began over the Morph
+ * time; with SEL held, the blend stays. Pressing it again on the way back picks up from there. */
+#define PR_DEAD 0.08f
+#define PR_FULL 0.90f
+#define PR_COMMIT 0.90f
+#define PR_COMMIT_MS 300u
+#define PR_TAP_MS 250u
+static void press_start(int n, const int16_t *sc)
+{
+    int k;
+    if (!(ui.morph == VISIT_BACK && ui.visit == -2 - n))   /* not already gliding back from this key: */
+        for (k = 0; k < DR_NPARAMS; k++)                   /* where letting go comes back to */
+            ui.visit_back[k] = proj.par[k];
+    ui.visit_from = ui.scene_at;
+    for (k = 0; k < DR_NPARAMS; k++)
+        ui.press_to[k] = sc[k];
+    ui.morph = -1;
+    ui.press = (int8_t)n;
+    ui.press_done = 0;
+    ui.press_t0 = plat_ms();
+    ui.press_hi_t = 0;
+    ui.press_x = 0.0f;
+}
+
+static void press_run(void)                            /* each frame, while a scene key is held */
+{
+    char t[16];
+    int p;
+    float x;
+    uint32_t now = plat_ms();
+    if (ui.press < 0)
+        return;
+    p = plat_pressure(WHITE_K[ui.press]);
+    x = fm_clampf(((float)p / 127.0f - PR_DEAD) / (PR_FULL - PR_DEAD), 0.0f, 1.0f);
+    if ((float)p / 127.0f >= PR_COMMIT) {
+        if (!ui.press_hi_t)
+            ui.press_hi_t = now;
+        if (!ui.press_done && now - ui.press_hi_t >= PR_COMMIT_MS && now - ui.press_t0 >= PR_TAP_MS) {
+            ui.press_done = 1;
+            ui.flash_t = now;
+        }
+    } else {
+        ui.press_hi_t = 0;
+    }
+    if (ui.press_done)
+        x = 1.0f;
+    ui.press_x += (x - ui.press_x) * 0.35f;            /* ~50 ms at the frame rate: calm, not slow */
+    if (now - ui.press_t0 < PR_TAP_MS && !ui.press_done)
+        return;                                        /* a tap so far: nothing moves yet */
+    sound_blend(ui.visit_back, ui.press_to, ui.press_x);
+    t[0] = 0;
+    scene_name(t, proj.bank, ui.press);
+    if (ui.press_done)
+        say_c(t, "TAKEN", K_GOLD);
+    else {                                             /* "B5  40%" */
+        char *q = t;
+        while (*q)
+            q++;
+        *q++ = ' ';
+        *q++ = ' ';
+        itoa_u((uint32_t)(ui.press_x * 100.0f + 0.5f), q);
+        while (*q)
+            q++;
+        scopy(q, "%");
+        say_c(t, "SEL: KEEP", K_GOLD);
+    }
+}
+
+static void press_end(void)                            /* the key let go */
+{
+    int n = ui.press, k;
+    uint32_t now = plat_ms();
+    char t[16] = "SCENE ";
+    ui.press = -1;
+    if (n < 0)
+        return;
+    if (!ui.press_done && now - ui.press_t0 < PR_TAP_MS) {   /* a tap: there, over the Scene switch time */
+        scene_recall(n);
+        return;
+    }
+    scene_name(t + 6, proj.bank, n);
+    for (k = 0; k < DR_NPARAMS; k++)
+        ui.morph_from[k] = proj.par[k];
+    ui.morph_t0 = now;
+    ui.morph_ms = (uint32_t)morph_ms();
+    if (ui.press_done) {                               /* taken: the rest of the way, and it's the scene now */
+        for (k = 0; k < DR_NPARAMS; k++)
+            ui.morph_to[k] = ui.press_to[k];
+        ui.morph = (int8_t)n;
+        ui.scene_at = (int8_t)n;
+        say_c(t, "TAKEN", K_GOLD);
+    } else if (ui.btn >> B_SEL & 1u) {                 /* SEL held: the blend stays, a sound of its own */
+        ui.btn_used |= 1u << B_SEL;
+        ui.scene_at = -1;
+        say_c("KEPT", 0, K_GOLD);
+    } else {                                           /* back to where it began */
+        ui.morph = VISIT_BACK;
+        ui.visit = (int8_t)(-2 - n);                   /* (pressed again on the way: picked up from there) */
+        ui.scene_at = ui.visit_from;
+        say("BACK", 0);
+    }
 }
 
 static void button(int b)                              /* the other buttons, on release */
@@ -901,7 +1017,9 @@ static void input(void)
             if (btn >> B_SAVE & 1u) {
                 ui.btn_used |= 1u << B_SAVE;           /* SAVE let go: not a plain save */
                 scene_store((int)i);
-            } else {
+            } else if (plat_pressure(WHITE_K[i]) >= 0 && scene_get(proj.bank, (int)i)) {
+                press_start((int)i, scene_get(proj.bank, (int)i));   /* the pressure crossfade (v0.2) */
+            } else {                                   /* no pressure here (the emulator): 0.1's timed visit */
                 int k;
                 for (k = 0; k < DR_NPARAMS; k++)       /* where a visit comes back to */
                     ui.visit_back[k] = proj.par[k];
@@ -910,6 +1028,8 @@ static void input(void)
                 ui.visit = ui.morph == (int8_t)i ? (int8_t)i : -1;
                 ui.visit_t = plat_ms();
             }
+        } else if ((ch & ~keys) >> WHITE_K[i] & 1u && ui.press == (int8_t)i) {
+            press_end();
         } else if ((ch & ~keys) >> WHITE_K[i] & 1u && ui.visit == (int8_t)i) {
             ui.visit = -1;                             /* let go: a tap stays; a hold was a visit: */
             if (plat_ms() - ui.visit_t >= HOLD_MS)     /* back to the sound before it, as it came */
@@ -957,6 +1077,7 @@ static void input(void)
             ui.scene_at = -1;                          /* the sound is no longer the scene's */
             ui.morph = -1;                             /* a hand on a knob: the morph stops where it is */
             ui.visit = -1;                             /* ... and a visit held becomes a stay (no way back) */
+            ui.press = -1;                             /* ... a crossfade too, where it is */
             if (ui.hold_btn >= 0)
                 ui.hold_turned = 1;                    /* a peek: let go of the button, back to the page */
             ui.touch_t[i] = plat_ms() + 1200u;
@@ -1572,10 +1693,19 @@ static void pic_lfo2(int32_t y0)
     /* --- cross-mod (bottom left): drone II's filter moving with drone I's sound --- */
     {
         int on = proj.par[P_XMOD] != 0;
-        float a = (float)proj.par[P_XMOD_AMT] * 0.01f, cut = dr_cut[1];
-        float sft = on ? dr_scope[0][(ui.frame * 7u) % DR_SCOPE_N] * 12.0f * a * a / 0.0981378f : 0.0f;
-        if (on && a > 0.0f)
-            draw_filter(1, cut, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
+        float a = (float)proj.par[P_XMOD_AMT] * 0.01f, cut = dr_cut[1], k = 12.0f * a * a / 0.0981378f;
+        float sft = on ? dr_scope[0][(ui.frame * 7u) % DR_SCOPE_N] * k : 0.0f;
+        if (on && a > 0.0f) {                  /* the range drone I's sound pushes it through (a band that widens
+                                                * with the amount: one moving line alone hardly showed it), dim */
+            float mn = 0.0f, mx = 0.0f;
+            uint32_t j;
+            for (j = 0; j < DR_SCOPE_N; j++) {
+                mn = fm_minf(mn, dr_scope[0][j]);
+                mx = fm_maxf(mx, dr_scope[0][j]);
+            }
+            draw_filter(1, cut + mn * k, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
+            draw_filter(1, cut + mx * k, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
+        }
         draw_filter(1, cut + sft, 14, y0 + 86, 96, 36, on ? K_DRONE[1] : K_FAINT);
         cv_text(12, y0 + 66, &FONT_S, on ? "I > II cut" : "x-mod off", on ? K_DRONE[1] : K_DIM);
     }
@@ -1593,9 +1723,9 @@ static void pic_lfo2(int32_t y0)
         cv_rect(126, yc, 96, 1, K_GRID);
         plot(126, 2, yd, 49, dd && (w1 || w2) ? K_FX : K_FAINT);
         q = scopy(t, "delay ");
-        if (dd && (w1 || w2)) {
-            q = scopy(q, "+-");
-            itoa_u((uint32_t)(dep * 100.0f + 0.5f), q);
+        if (dd && (w1 || w2)) {                /* "+-25%"; a negative depth wobbles the other way: "-+25%" */
+            q = scopy(q, dd < 0 ? "-+" : "+-");
+            itoa_u((uint32_t)(fm_fabsf(dep) * 100.0f + 0.5f), q);
             while (*q)
                 q++;
             scopy(q, "%");
@@ -1990,6 +2120,12 @@ static void leds(void)
         if (scene_get(proj.bank, (int)i) &&            /* one the sound is, blinking slowly */
             (ui.scene_at != (int8_t)i || plat_ms() % 1000u < 600u))
             k[WHITE_K[i]] = 255;
+    if (ui.press >= 0)                                 /* the key pressed into: as bright as how far in */
+        k[WHITE_K[ui.press]] = (uint8_t)(40.0f + 215.0f * ui.press_x);
+    if (ui.flash_t && plat_ms() - ui.flash_t < 480u && ui.scene_at >= 0)   /* taken: three quick flashes */
+        k[WHITE_K[ui.scene_at]] = (plat_ms() - ui.flash_t) % 160u < 80u ? 255 : 0;
+    else if (ui.flash_t && ui.press >= 0 && plat_ms() - ui.flash_t < 480u)
+        k[WHITE_K[ui.press]] = (plat_ms() - ui.flash_t) % 160u < 80u ? 255 : 0;
     for (i = 0; i < 4u; i++)                         /* the top four: the gestures to come, a dim glow */
         k[WHITE_K[NSCENES + i]] = 60;
     plat_leds(b, k);
@@ -2012,6 +2148,7 @@ void ui_init(void)
     ui.hold_btn = -1;
     ui.morph = -1;
     ui.visit = -1;
+    ui.press = -1;
     ui.scene_at = -1;
     ui.save_q = -2;
     ui.splash_t0 = plat_ms();
@@ -2124,6 +2261,7 @@ static void draw_splash(uint32_t t0)
 void ui_frame(void)
 {
     input();
+    press_run();
     scene_morph();
     autosave();
     if (!ui.splash_done) {
