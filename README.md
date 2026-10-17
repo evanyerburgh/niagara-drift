@@ -25,7 +25,7 @@ LFO's routing, and X-mod lets drone I move drone II's filter); the white keys ho
 - **The Ultra LFO**, after the DS-2's: one rate, two waves of eight shapes each (one of them truly
   random), routed to each drone's pitch or X-WAVE and cutoff or resonance, alone or summed. It can
   move its own rate and lock to the Swell.
-- **Movement** (OCT− / OCT+): all the LFO's depths down or up together, from still to double.
+- **Movement** (ALGORITHM): all the LFO's depths down or up together, from still to double.
 - **The Swell**: both drones breathing in time, from a slow soft swell to a hard rhythmic gate, with swing.
 - **Effects**: a dark PT2399-style delay (the LFO can warble its time) into a stereo reverb (Room,
   Plate, Hall, Chorus hall).
@@ -66,7 +66,7 @@ the screen shows each page's settings as a picture, and the value of the knob yo
 | | |
 |---|---|
 | **PLAY** | fade the drones in or out; **SEL + PLAY** fades drone II alone out or back in |
-| **OCT− / OCT+** | **Movement**: all the LFO's movement down or up together, 10% a tap (hold to keep going), from still (0%) to double (200%); lit while it isn't 100% |
+| **OCT− / OCT+** | the LFO's **Wave I** / **Wave II**: tap for the next shape, round and round; **SEL + OCT** for the one before. Each lights up in time with its wave |
 | **SAVE** | save the sound, at once. While the drone plays, the sound dips out and back over about 50 ms around the write; the dot by the page name means not yet written |
 | **SEL** (hold) | fine: a pitch knob moves in single cents, cutoff and resonance in tenths |
 
@@ -90,28 +90,28 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Tone · ENV
 
-<img src="docs/img/page-tone.png" width="488" alt="The Tone 1 and Tone 2 pages: each drone's sound through its drive; each drone's noise through its filter">
+<img src="docs/img/page-tone.png" width="244" alt="The Tone page: each drone's noise through its filter, and its colour">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Tone 1 | I drive | I osc mix | II drive | II osc mix |
-| Tone 2 | I noise | I colour | II noise | II colour |
+| Tone | I noise | I colour | II noise | II colour |
 
-- **Osc mix** goes from the oscillators to the sub.
 - **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
   It's heard all along the knob and never louder than them (100 is 6 dB under, 50 −12 dB, 25 −18). It
   goes through the drone's filter with them, so the cutoff, resonance, LFO and Drift shape it.
-  **Colour** is white or pink (turn right for pink, left for white; it crossfades over the Morph time).
+- **Colour** blends from white (left) to pink (right).
 
 #### Osc · EDIT
 
-<img src="docs/img/page-osc.png" width="244" alt="The Osc page: each drone's waveform on the sine to square scale, and its pulse width">
+<img src="docs/img/page-osc.png" width="488" alt="The Osc and Source pages: each drone's waveform on the sine to square scale, and its pulse width; each drone's sound through its drive">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Osc | I X-Wave | I PW (pulse width) | II X-Wave | II PW |
+| Source | I osc mix | I drive | II osc mix | II drive |
 
 - **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width.
+- **Osc mix** goes from the oscillators to the sub; **drive** pushes each drone into its filter.
 
 #### Partner · SEQ
 
@@ -172,7 +172,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Setup 1 | glide | fade | drift | stereo |
-| Setup 2 | morph | tune | scene switch | tuning (equal / just) |
+| Setup 2 | morph | scene switch | tune | tuning (equal / just) |
 
 - **Glide** is how long a drone takes to reach a new pitch (up to 10 s; off by default). **Stereo**
   spreads the drones from mono to drone I left, drone II right.
@@ -190,10 +190,11 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Knob | Sets |
 |---|---|
 | SELECT | the rate, from one cycle in 50 seconds to 70 Hz (below 0.1 Hz the screen shows a cycle's length, "21s") |
-| PRESETS | Wave I's shape (or off) |
-| ALGORITHM | Wave II's shape (or off) |
+| ALGORITHM | the **Movement**: every LFO depth together, from still (0%) to double (200%) |
+| OCT− · OCT+ | Wave I's · Wave II's shape: tap for the next (or off), round and round; SEL + OCT for the one before |
 
-One clock, two waves; the two lights by PLAY show them moving. The last shape on each is random.
+One clock, two waves; OCT− and OCT+ light up in time with them. The last shape on each is random.
+PRESETS is kept for a macro, coming in v0.2.
 
 ### Black keys: switches
 
@@ -244,10 +245,10 @@ builds the same page from your checkout, serves it at http://localhost:8765 and 
 
 | Do | Mouse | Keyboard |
 |---|---|---|
-| Turn a knob | drag up or down, or scroll | ↑ ↓ LFO rate, ← → Wave I |
+| Turn a knob | drag up or down, or scroll | ↑ ↓ LFO rate, ← → Movement |
 | Hold a button | Shift-click or right-click (click again to let go) | |
 | PLAY · SAVE (hold) · SEL (hold) | | Space · Enter · C |
-| HOME · EDIT · Movement − · + | | Esc · V · Z · X |
+| HOME · EDIT · Wave I · Wave II (OCT− · OCT+) | | Esc · V · Z · X |
 | Black keys 1–11 | click | 1 … 0, − |
 | Scenes 1–16 | click | Q … I, A … K |
 

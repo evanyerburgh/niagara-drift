@@ -100,7 +100,7 @@ static const scene_t SCENES[] = {
     {"17-noise-colours", "the drones as they start, drone I's noise at the top (-6 dB) beside its tones: white, then "
      "pink, white, pink (the switch crossfading over the Morph)",
      {{0, E_SET, P_FADE, 20}, {0, E_SET, V1(GP_NOISE), 100}, {0, E_SET, V1(GP_NCOLOR), 0}, {0, E_PLAY, 1},
-      {6, E_SET, V1(GP_NCOLOR), 1}, {11, E_SET, V1(GP_NCOLOR), 0}, {16, E_SET, V1(GP_NCOLOR), 1}, {21, E_PLAY, 0},
+      {6, E_SET, V1(GP_NCOLOR), 100}, {11, E_SET, V1(GP_NCOLOR), 0}, {16, E_SET, V1(GP_NCOLOR), 100}, {21, E_PLAY, 0},
       {23, E_END}}},
     {"18-noise-level", "the drones as they start, both drones' noise (pink) brought up slowly from none to the top, "
      "then back down to 50",

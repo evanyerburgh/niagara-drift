@@ -59,7 +59,7 @@ enum {
     GP_FLFO_DEST,   /* what the filter's LFO moves: DR_TO_CUTOFF, DR_TO_RESO (a switch) */
     GP_NOISE,       /* NOISE, 0..100: its level, added to the oscillators (they stay as they are); 100 is 6 dB
                      * under them, 50 -12 dB, 25 -18 */
-    GP_NCOLOR,      /* the noise's COLOUR: 0 white, 1 pink (-3 dB/oct); a switch, crossfading over the Morph */
+    GP_NCOLOR,      /* the noise's COLOUR, 0..100: white .. pink (-3 dB/oct), a blend (v0.2; it was 0 / 1) */
     GP_N
 };
 #define DR_GP(g, p) ((g) * GP_N + (p))

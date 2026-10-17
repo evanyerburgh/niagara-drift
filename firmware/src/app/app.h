@@ -11,7 +11,7 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 19u                  /* 19: the Swell's Depth in dB (18: noise, 17: cutoff / resonance 0..1000, 16: Feedback, Character, 15: Movement, 14: tuning, speaker, pitch lock, subharmonics (13: gliding knobs, Scene time, 12: Morph, 11: the LFO rate mod, 10: the LFO lock, 9: the filter LFO's destination, 8: the effects,
+#define PROJ_FORMAT 20u                  /* 20: the noise Colour a blend 0..100 (19 is read and converted); 19: the Swell's Depth in dB (18: noise, 17: cutoff / resonance 0..1000, 16: Feedback, Character, 15: Movement, 14: tuning, speaker, pitch lock, subharmonics (13: gliding knobs, Scene time, 12: Morph, 11: the LFO rate mod, 10: the LFO lock, 9: the filter LFO's destination, 8: the effects,
                                           * 7: the pulse, 6: scenes) */
 #define NSCENES 16                       /* the white keys */
 

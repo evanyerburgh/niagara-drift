@@ -110,3 +110,12 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-17: key pressure on the 20 lower keys (F3–C5; the top seven have no converter), ported from MONK-1. Absolute scale: 0 % at a light touch
   (reading 900), 100 % at a firm press (540), curve ^1.6, hysteresis 32. Shown on screen while held; nothing
   plays from it yet.
+
+## v0.2
+
+- 2026-10-17: OCT− / OCT+ play the LFO's Wave I / Wave II: a tap is the next shape, wrapping; SEL + OCT the one
+  before; each lit while its wave is up. ALGORITHM is the Movement; PRESETS is kept for a macro.
+- 2026-10-17: EDIT has Osc (X-Wave, PW) and Source (osc mix, drive); ENV has one page, Tone (noise, colour);
+  Setup 2 is morph, scene switch, tune, tuning.
+- 2026-10-17: the noise Colour is a blend, 0 white .. 100 pink (PROJ_FORMAT 20; a 0.1 project loads, its
+  Colours turned into 0 or 100).

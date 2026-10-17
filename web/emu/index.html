@@ -367,14 +367,14 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">ENV</div>
         <div class="pstack">
-        <div class="g-page"><i>Tone 1</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Drive</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Osc mix<small>osc ↔ sub</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Drive</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Osc mix<small>osc ↔ sub</small></span></div>
-        <div class="g-page"><i>Tone 2</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Noise</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Colour<small>white · pink</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Noise</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Colour<small>white · pink</small></span></div>
+        <div class="g-page"><i>Tone</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Noise</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Colour<small>white ↔ pink</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Noise</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Colour<small>white ↔ pink</small></span></div>
         </div>
       </div>
       <div class="pblock">
         <div class="g-btn">EDIT</div>
         <div class="pstack">
         <div class="g-page"><i>Osc</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>X‑Wave<small>sine → square</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>PW<small>square width</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>X‑Wave<small>sine → square</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>PW<small>square width</small></span></div>
+        <div class="g-page"><i>Source</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Osc mix<small>osc ↔ sub</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Drive</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Osc mix<small>osc ↔ sub</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Drive</span></div>
         </div>
       </div>
       <div class="pblock">
@@ -436,7 +436,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
 
   <div class="g-card narrow-r">
     <h3>The LFO <span class="g-sub">the three knobs at the top left, and OCT− · OCT+ below them</span></h3>
-    <svg class="minimap" viewBox="0 0 1000 640" role="img" aria-label="The FM‑1 from above: SELECT (rate), PRESETS (Wave I) and ALGORITHM (Wave II) are the knobs at the top left, OCT− and OCT+ (Movement) the buttons below them">
+    <svg class="minimap" viewBox="0 0 1000 640" role="img" aria-label="The FM‑1 from above: SELECT (rate) and ALGORITHM (Movement) are knobs at the top left, OCT− and OCT+ (Wave I and Wave II) the buttons below them">
       <rect x="4" y="4" width="992" height="632" rx="44" fill="#3a3d42"/>
       <rect x="318" y="62" width="200" height="200" rx="14" fill="#14151a"/>
       <circle cx="105" cy="100" r="26" fill="#1f2124"/>
@@ -446,19 +446,20 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <rect x="36" y="340" width="928" height="270" rx="18" fill="#26282c"/>
       <g fill="#d9dadc"><rect x="54.0" y="456" width="44" height="140" rx="22"/><rect x="110.5" y="456" width="44" height="140" rx="22"/><rect x="167.0" y="456" width="44" height="140" rx="22"/><rect x="223.5" y="456" width="44" height="140" rx="22"/><rect x="280.0" y="456" width="44" height="140" rx="22"/><rect x="336.5" y="456" width="44" height="140" rx="22"/><rect x="393.0" y="456" width="44" height="140" rx="22"/><rect x="449.5" y="456" width="44" height="140" rx="22"/><rect x="506.0" y="456" width="44" height="140" rx="22"/><rect x="562.5" y="456" width="44" height="140" rx="22"/><rect x="619.0" y="456" width="44" height="140" rx="22"/><rect x="675.5" y="456" width="44" height="140" rx="22"/><rect x="732.0" y="456" width="44" height="140" rx="22"/><rect x="788.5" y="456" width="44" height="140" rx="22"/><rect x="845.0" y="456" width="44" height="140" rx="22"/><rect x="901.5" y="456" width="44" height="140" rx="22"/></g>
       <g fill="none" stroke="#c99bff" stroke-width="9">
-        <circle cx="215" cy="100" r="30"/><circle cx="105" cy="205" r="30"/><circle cx="215" cy="205" r="30"/>
+        <circle cx="215" cy="100" r="30"/><circle cx="215" cy="205" r="30"/>
       </g>
-      <g fill="#c99bff"><circle cx="215" cy="100" r="18"/><circle cx="105" cy="205" r="18"/><circle cx="215" cy="205" r="18"/></g>
+      <g fill="#c99bff"><circle cx="215" cy="100" r="18"/><circle cx="215" cy="205" r="18"/></g>
     </svg>
     <div class="g-trio">
       <div><b>SELECT</b><span>Rate</span></div>
-      <div><b>PRESETS</b><span>Wave I</span></div>
-      <div><b>ALGORITHM</b><span>Wave II</span></div>
+      <div><b>ALGORITHM</b><span>Movement</span></div>
+      <div><b>OCT− · OCT+</b><span>Wave I · II</span></div>
     </div>
     <dl class="acts">
+      <div><dt>Movement</dt><dd>every LFO depth together, still (0%) to double (200%)</dd></div>
       <div><dt>Wave I</dt><dd>triangle · square · saw · roundtooth · 2× tri · 2× exp · 4× pattern · random</dd></div>
       <div><dt>Wave II</dt><dd>tri 90° · square 90° · exp saw · log tri · 2× saw · 2× pattern · 4× exp · random glide</dd></div>
-      <div><dt><span class="cap">OCT−</span> <span class="cap">OCT+</span></dt><dd>Less · more movement</dd></div>
+      <div><dt><span class="cap">OCT−</span> <span class="cap">OCT+</span></dt><dd>Tap: the next shape, round and round · with <span class="cap">SEL</span>: the one before</dd></div>
     </dl>
   </div>
 
@@ -513,7 +514,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
         <div class="g-btn">GLO</div>
         <div class="pstack">
         <div class="g-page"><i>Setup 1</i><span class="k both"><span class="sr">Knob 1: </span>Glide</span><span class="k both"><span class="sr">Knob 2: </span>Fade<small>PLAY’s fade</small></span><span class="k both"><span class="sr">Knob 3: </span>Drift<small>slow wander</small></span><span class="k both"><span class="sr">Knob 4: </span>Stereo<small>width</small></span></div>
-        <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Morph<small>switch time</small></span><span class="k both"><span class="sr">Knob 2: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 3: </span>Scene switch<small>switch time</small></span><span class="k both"><span class="sr">Knob 4: </span>Tuning<small>equal · just</small></span></div>
+        <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Morph<small>switch time</small></span><span class="k both"><span class="sr">Knob 2: </span>Scene switch<small>switch time</small></span><span class="k both"><span class="sr">Knob 3: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 4: </span>Tuning<small>equal · just</small></span></div>
         </div>
       </div>
     </div>
@@ -530,7 +531,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div><dt>SAVE · SEL (hold)</dt><dd><kbd>Enter</kbd> · <kbd>C</kbd></dd></div>
       <div><dt>HOME · EDIT</dt><dd><kbd>Esc</kbd> · <kbd>V</kbd></dd></div>
       <div><dt>OCT− · OCT+</dt><dd><kbd>Z</kbd> · <kbd>X</kbd></dd></div>
-      <div><dt>LFO rate · Wave I</dt><dd><kbd>↑</kbd><kbd>↓</kbd> · <kbd>←</kbd><kbd>→</kbd></dd></div>
+      <div><dt>LFO rate · Movement</dt><dd><kbd>↑</kbd><kbd>↓</kbd> · <kbd>←</kbd><kbd>→</kbd></dd></div>
       <div><dt>Any knob</dt><dd><kbd>Tab</kbd> to it, then <kbd>↑</kbd><kbd>↓</kbd></dd></div>
     </dl>
   </div>
@@ -648,11 +649,11 @@ function hit(c, cls) {
 }
 // what each control does, on hover (the Buttons list below says the same)
 const TIP = { FX: "Effects 1: delay and reverb (again: Effects 2: reverb type, speaker, feedback, character)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths)",
-  ENV: "Tone 1: drive, osc mix (again: Tone 2: noise, colour); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: LFO mods: rate mod, cross-mod amount, delay LFO)",
-  EDIT: "Osc page: X-Wave, pulse width; hold to peek", GLO: "Setup 1: glide, fade, drift, stereo width (again: Setup 2: morph, tune, scene switch, tuning)",
+  ENV: "Tone: noise and its colour, white to pink; hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: LFO mods: rate mod, cross-mod amount, delay LFO)",
+  EDIT: "Osc: X-Wave, pulse width (again: Source: osc mix, drive); hold to peek", GLO: "Setup 1: glide, fade, drift, stereo width (again: Setup 2: morph, scene switch, tune, tuning)",
   HOME: "Play 1: pitch, cutoff (again: Play 2: resonance, levels)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Partner page: interval, detune",
-  PLAY: "Drone in / out", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "Movement down: all LFO depths together (hold to keep going)", "OCT+": "Movement up: all LFO depths together (hold to keep going)",
-  SELECT: "LFO rate", PRESETS: "LFO Wave I", ALGORITHM: "LFO Wave II",
+  PLAY: "Drone in / out", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
+  SELECT: "LFO rate", PRESETS: "A macro (coming in v0.2)", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
 for (const [n, c] of [...Object.entries(buttons), ...Object.entries(knobs)]) if (TIP[n]) c.g.setAttribute("aria-description", TIP[n]);
 // the keys: the black ones as switches (and what they do on the LFO pages), the white ones as scenes
@@ -798,7 +799,7 @@ Object.assign(KEYMAP, { Space: { btn: BTN.PLAY }, Enter: { btn: BTN.SAVE }, KeyC
 addEventListener("keydown", (e) => {
   if (!node || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.code === "ArrowUp" || e.code === "ArrowDown") { turn(knobs.SELECT, e.code === "ArrowUp" ? 1 : -1); e.preventDefault(); return; }
-  if (e.code === "ArrowLeft" || e.code === "ArrowRight") { turn(knobs.PRESETS, e.code === "ArrowRight" ? 1 : -1); e.preventDefault(); return; }
+  if (e.code === "ArrowLeft" || e.code === "ArrowRight") { turn(knobs.ALGORITHM, e.code === "ArrowRight" ? 1 : -1); e.preventDefault(); return; }
   const m = KEYMAP[e.code];
   if (!m) return;
   e.preventDefault();

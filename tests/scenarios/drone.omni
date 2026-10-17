@@ -7,7 +7,7 @@
 # 44 hard sync, 45 pitch link, 46 link offset, 47 LFO rate, 48 Wave I, 49 Wave II, 50 Glide, 51 Fade, 55 Pulse,
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
 # depth.
-# Pages: 0 Play 1 1 Play 2 2 Tone 1 3 Tone 2 4 Osc 5 LFO depths 6 LFO mods 7 Partner 8 Setup 1 9 Setup 2 10 Swell
+# Pages: 0 Play 1 1 Play 2 2 Tone 3 Osc 4 Source 5 LFO depths 6 LFO mods 7 Partner 8 Setup 1 9 Setup 2 10 Swell
 # 11 Effects 1 12 Effects 2.
 wav drone.wav
 wait 300
@@ -66,31 +66,44 @@ wait 100
 shot play2.png
 tap HOME
 expect view 0
-# OCT- / OCT+: the MOVEMENT, every LFO depth together, 10 % a tap (100 % as set); OCT+ lit above 100 %
-expect par75 50
+# OCT- / OCT+: the LFO's waves (v0.2): a tap is the next shape, round and round; SEL + OCT the one before
+expect par48 1
+expect par49 1
+tap OCT-
+expect par48 2
 tap OCT+
+expect par49 2
+press SEL
+tap OCT-
+tap OCT-
+release SEL
+expect par48 0
+tap OCT-
+expect par48 1
+press SEL
+tap OCT+
+release SEL
+expect par49 1
+# ...back past Off: round and round
+press SEL
+tap OCT+
+tap OCT+
+release SEL
+expect par49 8
+tap OCT+
+tap OCT+
+expect par49 1
+# ALGORITHM: the Movement (every LFO depth together, 50 = as set, 100 = twice)
+expect par75 50
+spin ALGO 5
 expect par75 55
-tap OCT-
-tap OCT-
-expect par75 45
-# held: on and on (a step on the press, then one every 120 ms after 400 ms: 6 in 0.9 s)
-press OCT-
-wait 900
-release OCT-
-expect par75 15
-tap OCT+
-tap OCT+
-tap OCT+
-tap OCT+
-tap OCT+
-tap OCT+
-tap OCT+
+spin ALGO -5
 expect par75 50
-# hold ENV to peek: the knobs are the Tone page's (drive, osc mix) while it's held, then back to Play
+# hold ENV to peek: the knobs are the Tone page's (noise, colour) while it's held, then back to Play
 press ENV
 expect view 2
 spin K1 20
-expect par10 40
+expect par19 20
 release ENV
 expect view 0
 # a long hold without turning is a peek too
@@ -98,22 +111,17 @@ press EDIT
 wait 600
 release EDIT
 expect view 0
-# tap ENV: Tone stays; again: Tone 2, KNOB 1-2 drone I's Noise and Colour, 3-4 drone II's (Colour: white 0,
-# pink 1, pink to start); again: Tone
+# tap ENV: Tone, one page: KNOB 1-2 drone I's Noise and Colour (0 white .. 100 pink, pink to start), 3-4 drone II's
 tap ENV
 expect view 2
-spin K2 10
-expect par5 40
-tap ENV
-expect view 3
-expect par20 1
-spin K1 25
+expect par20 100
+spin K1 5
 expect par19 25
-spin K2 -1
-expect par20 0
-spin K2 3
-expect par20 1
-spin K4 -1
+spin K2 -40
+expect par20 60
+spin K2 50
+expect par20 100
+spin K4 -100
 expect par41 0
 spin K3 100
 expect par40 100
@@ -123,13 +131,21 @@ expect par19 0
 expect par40 0
 tap ENV
 expect view 2
-# EDIT: Osc (X-Wave, PW)
+# EDIT: Osc (X-Wave, PW); again: Source (osc mix, drive); again: Osc
 tap EDIT
-expect view 4
+expect view 3
 spin K1 -67
 expect par1 0
 spin K2 10
 expect par2 40
+tap EDIT
+expect view 4
+spin K1 10
+expect par5 40
+spin K2 20
+expect par10 40
+tap EDIT
+expect view 3
 # LFO: the depths, and the keys switch to LFO routing
 tap LFO
 expect view 5
@@ -330,13 +346,12 @@ spin K2 10
 expect par51 52
 wait 100
 shot setup.png
-# SELECT: the LFO rate, PRESETS (left): Wave I, ALGORITHM (right): Wave II
+# SELECT: the LFO rate; PRESETS: nothing yet (the macro to come), the waves stay
 spin SELECT 10
 expect par47 40
 spin PRESET 2
-expect par48 3
-spin ALGO 1
-expect par49 2
+expect par48 1
+expect par49 1
 # MIDI: a note on channel 2 tunes drone II to it exactly
 midi 91 3C 64
 wait 20

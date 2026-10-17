@@ -24,6 +24,9 @@ run fastmath sh -c "$CC -O2 -ffp-contract=off -Wall -Wextra -Werror -o $OUT/fast
 run encoder sh -c "$CC -O2 -w -Ifirmware/hal -o $OUT/encoder_test tests/host/encoder_test.c && $OUT/encoder_test"
 run uac sh -c "$CC -O2 -w -Ifirmware/src -Ifirmware/hal -o $OUT/uac_test tests/host/uac_test.c -lm && $OUT/uac_test"
 run trs sh -c "$CC -O2 -w -Ifirmware/src -Ifirmware/hal -o $OUT/trs_test tests/host/trs_test.c && $OUT/trs_test"
+# the project's format change from 0.1: a 0.1 project loads, its scenes kept, the Colour converted
+run project sh -c "$CC -O2 -std=c99 -Wall -Wextra -Werror -DOM_HOST -o $OUT/project_test tests/host/project_test.c \
+    firmware/src/dsp/drone.c -lm && $OUT/project_test"
 # the key pressure sensing (MONK-1's sense.c, from Velo), on synthetic press curves
 run sense sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Wno-unused-function -Wdouble-promotion -Werror \
     -o $OUT/sense_test tests/host/sense_test.c -lm && $OUT/sense_test"

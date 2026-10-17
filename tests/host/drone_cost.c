@@ -71,7 +71,7 @@ static void drone(int partners, int voices, int heavy)   /* voices: how many dro
             dr_set(DR_GP(g, GP_OLFO_DEST), DR_TO_XWAVE);
             dr_set(DR_GP(g, GP_FLFO_DEPTH), 50);
             dr_set(DR_GP(g, GP_NOISE), 30);       /* the noise, coloured (six shelves a sample) */
-            dr_set(DR_GP(g, GP_NCOLOR), 1);
+            dr_set(DR_GP(g, GP_NCOLOR), 100);
         }
     }
     if (heavy) {                                  /* and the links: cross-mod (a filter update a sample), sync */

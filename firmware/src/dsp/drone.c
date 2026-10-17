@@ -29,7 +29,7 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-4th",
         {"Osc LFO", DR_LFO_OFF, DR_LFO_BOTH, olfo}, {"Osc depth", -100, 100, 0},                                \
         {"Osc LFO to", DR_TO_PITCH, DR_TO_XWAVE, DR_TO_PITCH}, {"Filter LFO", DR_LFO_OFF, DR_LFO_BOTH, flfo},     \
         {"Filt depth", -100, 100, fdep}, {"Filt LFO to", DR_TO_CUTOFF, DR_TO_RESO, DR_TO_CUTOFF},           \
-        {"Noise", 0, 100, 0}, {"Colour", 0, 1, 1}
+        {"Noise", 0, 100, 0}, {"Colour", 0, 100, 100}
 
 /* each voice's LFO taps start routed (I or II); the filters breathe a little from the start (depth +25 on
  * drone I, -25 on drone II: they move against each other), so the Movement (OCT- / OCT+) is heard at once;
@@ -248,8 +248,14 @@ void dr_param_text(int i, int v, char *b)
             b++;
         copy_s(b, "ms");
     }
-    else if (gp == GP_NCOLOR)
-        copy_s(b, v ? "Pink" : "White");
+    else if (gp == GP_NCOLOR) {                  /* "White", "Pink 40", "Pink" */
+        if (v <= 0 || v >= 100)
+            copy_s(b, v > 0 ? "Pink" : "White");
+        else {
+            copy_s(b, "Pink ");
+            itoa_s(v, b + 5);
+        }
+    }
     else if (gp == GP_PITCH)
         pitch_text(v, b);
     else if (gp == GP_CUTOFF || gp == GP_RESO) {   /* 0..1000 shown 0..100: "70", "70.5" between */
@@ -829,7 +835,7 @@ static void morph_snap(int g)                    /* all of a drone's switches wh
     for (i = 0; i < 3; i++)
         v->wm[i] = p[GP_MODE] == i ? 1.0f : 0.0f;
     v->pg = p[GP_PARTNER] ? 1.0f : 0.0f;
-    v->nc = p[GP_NCOLOR] ? 1.0f : 0.0f;
+    v->nc = (float)p[GP_NCOLOR] * 0.01f;
     v->sg = 1.0f;
     v->sdiv = sub_div(p[GP_SUBOCT]);
     v->sy = 1.0f;
@@ -851,7 +857,7 @@ static void morph_tick(int g, float step)        /* one control tick of the swit
     for (i = 0; i < 3; i++)
         v->wm[i] = toward(v->wm[i], p[GP_MODE] == i ? 1.0f : 0.0f, step);
     v->pg = toward(v->pg, p[GP_PARTNER] ? 1.0f : 0.0f, step);
-    v->nc = toward(v->nc, p[GP_NCOLOR] ? 1.0f : 0.0f, step);
+    v->nc = pfs[DR_GP(g, GP_NCOLOR)] * 0.01f;    /* the colour, a blend white .. pink, gliding as a knob does */
     if (v->sdiv != sdiv) {                       /* the sub: down, then swap the octave, then up */
         v->sg -= 2.0f * step;
         if (v->sg <= 0.0f) {
