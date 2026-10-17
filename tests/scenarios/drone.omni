@@ -379,7 +379,8 @@ wait 2500
 expect fade 0
 wait 4500
 expect dirty 0
-expect store_writes 2
+# the knob came back where it was: the flash has this sound already, so nothing is written
+expect store_writes 1
 wavstop
 # everything comes back after a reboot
 reboot
@@ -397,7 +398,7 @@ press SAVE
 tapkey w0
 release SAVE
 expect scenes 1
-expect store_writes 3
+expect store_writes 2
 expect view 0
 # the sound is scene 1 (its key blinks), until a knob is turned
 expect scene_at 0

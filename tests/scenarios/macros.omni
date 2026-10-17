@@ -109,3 +109,8 @@ reboot
 wait 500
 expect par78 40
 expect heard7 788
+# SAVE again with nothing changed: nothing is written (each write is a late block while playing)
+expect store_writes 1
+tap SAVE
+wait 500
+expect store_writes 1
