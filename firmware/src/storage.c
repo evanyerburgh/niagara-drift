@@ -18,7 +18,8 @@
 #define ST_PAYLOAD_MAX (ST_SECTOR - ST_PAYLOAD_OFF)
 
 /* flash map, OMNI (plat.h OBJ_*): the project at 0xFC000 (Felucca's FL_GLOB), the panel calibration at
- * 0xDC000 (Felucca's user-preset area). Nothing above 0xDFFFF: 0xE0000.. is the update loader's
+ * 0xDC000 (Felucca's user-preset area), scene banks B and C at 0x97000 and 0x99000 (Felucca's main store,
+ * above the app area our loader writes, 0x4000..0x93000). Nothing above 0xDFFFF: 0xE0000.. is the update loader's
  * staging area. The magic is X0X's, so a project is told apart by its own magic (project.c). */
 typedef struct {
     uint32_t magic;
@@ -48,7 +49,8 @@ static uint32_t st_crc32(const void *p, uint32_t n)   /* zlib CRC-32, 4 bits per
 
 static uint32_t st_sector(uint32_t obj, uint32_t copy)  /* flash offset of copy A (0) / B (1) */
 {
-    return (obj == OBJ_PANEL ? 0xDC000u : 0xFC000u) + copy * ST_SECTOR;
+    static const uint32_t BASE[OBJ_NOBJ] = {0xFC000u, 0xDC000u, 0x97000u, 0x99000u};
+    return (obj < OBJ_NOBJ ? BASE[obj] : 0xFC000u) + copy * ST_SECTOR;
 }
 
 static uint8_t st_buf[ST_PAYLOAD_MAX] __attribute__((aligned(4)));

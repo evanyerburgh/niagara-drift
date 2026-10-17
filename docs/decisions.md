@@ -125,3 +125,14 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-17: turning an LFO depth that can't be heard shows why: "MOVEMENT 0% ALGORITHM", or "WAVE I OFF tap OCT-"
   (II and OCT+ likewise). The top bar's right-hand text (PLAY to start, FADING) shortens or hides where the
   badges on the left (II OUT) would overlap it.
+- 2026-10-17: scenes are in banks: 12 a bank on the lower white keys (F3–C5, the keys that sense pressure);
+  banks A, B, C are yours (A in the project object, B and C in their own at 0x97000 and 0x99000, above the
+  app area the loader writes), and a read-only Presets bank is in the firmware (so far the starting sound and
+  the bass test). SEL + D5 / E5 / F5 / G5 picks A / B / C / Presets; the top four keys alone are kept for the
+  gesture macros. A 0.1 project's scenes 1–12 become A1–A12 and 13–16 B1–B4 (PROJ_FORMAT 21; the banks are
+  written before the project, so a power cut can't lose them).
+- 2026-10-17: scene switches and visits follow Pitch lock: lock on, the drones keep their pitch (and the link
+  offset).
+- 2026-10-17: backup and restore over USB (SysEx 0x70–0x73: read, write, commit an object; restart):
+  `fm1_install.py --backup [FILE]`, `--restore FILE`, and a backup in `~/niagara-drift-backups/` before every
+  install over Niagara Drift (`--no-backup`: not). The web installer's comes later.

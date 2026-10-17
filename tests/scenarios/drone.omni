@@ -454,3 +454,56 @@ expect scene_at -1
 tapkey w0
 wait 1500
 expect par7 650
+# banks (v0.2): SEL + a top white key (D5 .. G5) picks the bank; the 12 scene keys play it
+expect bank 0
+press SEL
+tapkey w13
+release SEL
+expect bank 1
+expect bscenes 0
+press SAVE
+tapkey w2
+release SAVE
+wait 300
+expect bscenes 4
+expect scenes 1
+# a top key alone: a gesture (to come); the bank stays
+tapkey w12
+expect bank 1
+# the Presets: two so far (the starting sound, the bass test); read-only
+press SEL
+tapkey w15
+release SEL
+expect bank 3
+expect bscenes 3
+press SAVE
+tapkey w5
+release SAVE
+wait 300
+expect bscenes 3
+tapkey w1
+wait 6000
+expect par0 3800
+expect par21 4500
+# pitch lock on: a scene leaves the pitches where they are
+tapkey w0
+wait 6000
+expect par0 5000
+tapkey b3
+spin K1 10
+tapkey w1
+wait 6000
+expect par0 5000
+tapkey b3
+# back to A; bank B's scene survives a reboot
+press SEL
+tapkey w12
+release SEL
+expect bank 0
+expect scenes 1
+reboot
+wait 300
+press SEL
+tapkey w13
+release SEL
+expect bscenes 4

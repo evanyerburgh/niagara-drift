@@ -9,8 +9,13 @@ step 2, the loader reads the whole package and writes it. In both steps the
 device asks (SysEx read requests on the logical image) and we answer. Then
 the FM-1 restarts and the installed identity is checked.
 
-  fm1_install.py PACKAGE.fwsc [--port NAME] [--yes] [--force]
+  fm1_install.py PACKAGE.fwsc [--port NAME] [--yes] [--force] [--no-backup]
   fm1_install.py --info [--port NAME]
+  fm1_install.py --backup [FILE]       Niagara Drift: save the sound, the scenes and the settings to a file
+  fm1_install.py --restore FILE        ... and put them back (the FM-1 restarts)
+
+Before an install over Niagara Drift, a backup is saved first, in ~/niagara-drift-backups/ (--no-backup:
+not). Restore it after coming back from another firmware.
 
 If the FM-1 is still in update mode (an earlier install was cut off), the
 install finishes the write. Needs mido with python-rtmidi.
@@ -20,6 +25,9 @@ Exit codes: 0 done, 1 cancelled or other error, 2 bad arguments or package,
 loader / no restart), 6 wrong model, or another identity after the install.
 """
 import argparse
+import base64
+import json
+import os
 import queue
 import re
 import sys
@@ -36,7 +44,7 @@ PORT_RE = re.compile(r"fm-1|felucca|ota|composite|sinco|usb-midi", re.I)   # nev
 # seconds; the tests shorten them
 DELAY = {"open": 0.3, "start": 2.0, "reply": 0.01, "loader": 3.0, "reboot": 3.0, "retry": 1.0,
          "poll": 1.0, "hs": 1.0, "idle_check": 8.0, "idle_write": 180.0,
-         "wait_loader": 30.0, "wait_reboot": 40.0}
+         "wait_loader": 30.0, "wait_reboot": 40.0, "backup": 1.0}
 
 EXIT = {"usage": 2, "badpkg": 2, "notfound": 3, "model": 6, "lost": 4, "stopped": 4, "badreq": 4,
         "noloader": 5, "noreturn": 5, "mismatch": 6}
@@ -208,6 +216,106 @@ def pair_output(name, outs):
     if len(same) == 1:
         return same[0]
     return outs[0] if len(outs) == 1 else None
+
+
+# -------------------------------------------------------- backup / restore ---
+# Niagara Drift's stored objects (firmware/src/app/main_fm1.c, backup_cmd): the sound and bank A, the panel
+# calibration, banks B and C, read and written as they lie on the flash.
+OBJECTS = {0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C"}
+BACKUP_DIR = os.path.join(os.path.expanduser("~"), "niagara-drift-backups")
+
+
+def nd_msg(cmd, body=b""):
+    body = bytes(body)
+    u = bytes([0x00, 0x59, cmd, len(body) & 0xFF, (len(body) >> 8) & 0xFF, 0]) + body + bytes([~sum(body) & 0xFF])
+    return b"\xF0" + pack7(u) + b"\xF7"
+
+
+def nd_reply(pkt, cmd):
+    if not pkt or len(pkt) < 2 or pkt[0] != 0xF0 or pkt[-1] != 0xF7:
+        return None
+    u = unpack7(pkt[1:-1])
+    if len(u) < 7 or u[:3] != bytes([0, 0x59, cmd]) or int.from_bytes(u[3:6], "little") + 7 != len(u):
+        return None
+    if ~sum(u[6:-1]) & 0xFF != u[-1]:
+        return None
+    return u[6:-1]
+
+
+def nd_transact(link, cmd, body, want, tries=3):
+    """send, and the reply to it: want(reply) says which one it is"""
+    for _ in range(tries):
+        if not link.send(nd_msg(cmd, body)):
+            raise InstallError("lost", "FM-1 disconnected")
+        end = time.monotonic() + DELAY["backup"]
+        while (left := end - time.monotonic()) > 0:
+            r = nd_reply(link.read(left), cmd)
+            if r is not None and want(r):
+                return r
+    return None
+
+
+def nd_backup(link):
+    """{obj: bytes} (b"" when none is stored), or None: this firmware can't make a backup"""
+    objs = {}
+    for obj in OBJECTS:
+        data, off, total = b"", 0, None
+        while total is None or off < total:
+            r = nd_transact(link, 0x70, [obj, off & 0xFF, off >> 8],
+                            lambda r: len(r) >= 5 and r[0] == obj and r[1] | r[2] << 8 == off)
+            if r is None:
+                if obj == 0 and off == 0:
+                    return None
+                raise InstallError("lost", f"backup: no answer reading the {OBJECTS[obj]}")
+            total, chunk = r[3] | r[4] << 8, r[5:]
+            if total and not chunk:
+                raise InstallError("lost", f"backup: the {OBJECTS[obj]} came back short")
+            data += chunk
+            off += len(chunk)
+            if not total:
+                break
+        objs[obj] = data
+    return objs
+
+
+def nd_restore(link, objs, out):
+    for obj, data in sorted(objs.items()):
+        if not data:
+            continue
+        for off in range(0, len(data), 128):
+            part = data[off:off + 128]
+            r = nd_transact(link, 0x71, bytes([obj, off & 0xFF, off >> 8]) + part,
+                            lambda r: len(r) >= 4 and r[0] == obj and r[1] | r[2] << 8 == off)
+            if r is None or r[3]:
+                raise InstallError("lost", f"restore: the {OBJECTS[obj]} wasn't accepted")
+        r = nd_transact(link, 0x72, [obj, len(data) & 0xFF, len(data) >> 8], lambda r: len(r) >= 2 and r[0] == obj)
+        if r is None or r[1]:
+            raise InstallError("lost", f"restore: the {OBJECTS[obj]} couldn't be written")
+        print(f"restored: {OBJECTS[obj]} ({len(data)} bytes)", file=out)
+    link.send(nd_msg(0x73))
+
+
+def backup_file(objs, ident, path):
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    with open(path, "w") as f:
+        json.dump({"niagara_drift_backup": 1, "identity": ident.text, "saved": time.strftime("%Y-%m-%d %H:%M:%S"),
+                   "objects": {str(k): base64.b64encode(v).decode() for k, v in objs.items()}}, f, indent=1)
+
+
+def read_backup(path):
+    try:
+        with open(path) as f:
+            j = json.load(f)
+        objs = {int(k): base64.b64decode(v) for k, v in j["objects"].items()}
+    except (OSError, ValueError, KeyError) as e:
+        raise InstallError("usage", f"{path}: not a Niagara Drift backup ({e})")
+    if any(k not in OBJECTS for k in objs):
+        raise InstallError("usage", f"{path}: unknown objects in the backup")
+    return objs
+
+
+def default_backup_path():
+    return os.path.join(BACKUP_DIR, "backup-" + time.strftime("%Y%m%d-%H%M%S") + ".json")
 
 
 # --------------------------------------------------------------- updater ---
@@ -417,6 +525,31 @@ def run(a, backend, out, ask):
         mode = "update loader (update not finished)" if dev.id.loader else "running"
         print(f"{dev.id.text}  [{mode}]  port: {dev.name}", file=out)
         return 0
+    if a.backup is not None or a.restore:
+        dev = up.find()
+        if not dev:
+            raise not_found(up)
+        if dev.id.loader:
+            raise InstallError("usage", "the FM-1 is in update mode: finish the install first")
+        try:
+            if a.restore:
+                objs = read_backup(a.restore)
+                if not a.yes and not ask(f"Restore {a.restore} onto the FM-1 ({dev.id.text})? It replaces its "
+                                         "sound and scenes, and it restarts. [y/N] "):
+                    print("cancelled", file=out)
+                    return 1
+                nd_restore(dev.link, objs, out)
+                print("done: the FM-1 restarts with the restored sound and scenes", file=out)
+                return 0
+            objs = nd_backup(dev.link)
+            if objs is None:
+                raise InstallError("model", "this firmware can't make a backup (Niagara Drift v0.2 or later can)")
+            path = a.backup or default_backup_path()
+            backup_file(objs, dev.id, path)
+            print(f"backup: {path}", file=out)
+            return 0
+        finally:
+            dev.link.close()
     product, image = load_package(a.package, a.force)
     print(f"package: {product}  ({a.package})", file=out)
     dev = up.find()
@@ -428,6 +561,12 @@ def run(a, backend, out, ask):
         dev.link.close()
         print("cancelled", file=out)
         return 1
+    if not dev.id.loader and not a.no_backup:  # Niagara Drift: its sound and scenes saved first
+        objs = nd_backup(dev.link)
+        if objs is not None:
+            path = default_backup_path()
+            backup_file(objs, dev.id, path)
+            print(f"backup:  {path}  (put back with --restore)", file=out)
     prog = Progress(out)
     try:
         up.install(dev, image, product, prog)
@@ -450,9 +589,13 @@ def main(argv=None, backend=None, out=sys.stdout, ask=ask_tty):
     ap.add_argument("--port", metavar="NAME", help="MIDI port to use (part of its name)")
     ap.add_argument("--yes", action="store_true", help="do not ask for confirmation")
     ap.add_argument("--force", action="store_true", help="install a package without the Felucca loader marker")
+    ap.add_argument("--backup", nargs="?", const="", metavar="FILE",
+                    help="save the sound, scenes and settings (Niagara Drift) to FILE (default ~/niagara-drift-backups/)")
+    ap.add_argument("--restore", metavar="FILE", help="put a backup back onto the FM-1 (it restarts)")
+    ap.add_argument("--no-backup", action="store_true", help="install without saving a backup first")
     a = ap.parse_args(argv)
-    if bool(a.info) == bool(a.package):
-        ap.error("give a PACKAGE.fwsc or --info")
+    if sum([bool(a.info), bool(a.package), a.backup is not None, bool(a.restore)]) != 1:
+        ap.error("give a PACKAGE.fwsc, --info, --backup or --restore")
     try:
         if backend is None:
             try:

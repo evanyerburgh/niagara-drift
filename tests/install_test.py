@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 import fm1_install as I  # noqa: E402
 
 I.DELAY.update(open=0, start=0.01, reply=0, loader=0.01, reboot=0.01, retry=0.02, poll=0.05, hs=0.1,
-               idle_check=0.4, idle_write=0.4, wait_loader=2, wait_reboot=2)
+               idle_check=0.4, idle_write=0.4, wait_loader=2, wait_reboot=2, backup=0.1)
 failed = 0
 
 
@@ -67,8 +67,10 @@ class FakeFM1:
     """a MIDI backend with one FM-1 on it"""
 
     def __init__(self, image, identity="FM-1_015", name="FM-1", unplug_after=None, after_write="FM-1_900",
-                 stall_after=None, bad_addr=None):
+                 stall_after=None, bad_addr=None, stored=None):
         self.image, self.unplug_after, self.after_write = image, unplug_after, after_write
+        self.stored = stored                  # Niagara Drift's objects {obj: bytes}; None: no backup commands
+        self.buf, self.restarted = bytearray(3840), 0
         self.stall_after, self.bad_addr = stall_after, bad_addr
         self.served = self.bad = self.upgrades = 0
         self.sent, self.links, self.gen, self.lock = [], [], 0, threading.Lock()
@@ -97,7 +99,29 @@ class FakeFM1:
             if link.gen == self.gen and not link.closed:
                 link.q.put(bytes(pkt))
 
+    def nd(self, d):                          # Niagara Drift's backup / restore (main_fm1.c backup_cmd)
+        u = I.unpack7(d[1:-1])
+        if self.stored is None or len(u) < 7 or u[:2] != b"\x00\x59" or not 0x70 <= u[2] <= 0x73:
+            return False
+        cmd, b = u[2], u[6:-1]
+        if cmd == 0x70:
+            data = self.stored.get(b[0], b"")
+            off = b[1] | b[2] << 8
+            self.tx(I.nd_msg(0x70, bytes([b[0], b[1], b[2], len(data) & 0xFF, len(data) >> 8]) + data[off:off + 24]))
+        elif cmd == 0x71:
+            off = b[1] | b[2] << 8
+            self.buf[off:off + len(b) - 3] = b[3:]
+            self.tx(I.nd_msg(0x71, bytes([b[0], b[1], b[2], 0])))
+        elif cmd == 0x72:
+            self.stored[b[0]] = bytes(self.buf[:b[1] | b[2] << 8])
+            self.tx(I.nd_msg(0x72, bytes([b[0], 0])))
+        else:
+            self.restarted += 1
+        return True
+
     def rx(self, d):
+        if self.nd(d):
+            return
         if d == I.HS_QUERY:
             t = self.identity.encode()
             self.tx(b"\xF0" + I.pack7(bytes([0, 0x59, 0x11, 0, 0, 0]) + t + bytes(28 - len(t))) + b"\xF7")
@@ -283,8 +307,44 @@ def against_js():
     ok(I.LOADER_MARK in raw, f"{clean.name} carries the Felucca loader marker")
 
 
+def backups():
+    image = I.logical_image(package())
+    objs = {0: bytes(range(256)) * 5 + b"proj", 1: b"panel-cal", 2: b"", 3: b"bank C " * 40}
+    dev = FakeFM1(image, identity="FM-1_800", stored=dict(objs))
+    f = TMP / "b.json"
+    rc, out, err = cli(["--backup", str(f)], dev)
+    ok(rc == 0 and f.exists(), "--backup writes a file")
+    got = I.read_backup(str(f))
+    ok(got == objs, "... with every object as stored (an empty one empty)")
+    dev2 = FakeFM1(image, identity="FM-1_800", stored={})
+    rc, out, err = cli(["--restore", str(f), "--yes"], dev2)
+    ok(rc == 0 and {k: v for k, v in dev2.stored.items()} == {k: v for k, v in objs.items() if v},
+       "--restore writes them back (empty ones skipped)")
+    ok(dev2.restarted == 1, "... and restarts the FM-1")
+    rc, out, err = cli(["--backup", str(TMP / "x.json")], FakeFM1(image))
+    ok(rc != 0 and "can't make a backup" in err, "--backup on another firmware: refused, no file")
+    old = I.BACKUP_DIR
+    I.BACKUP_DIR = str(TMP / "auto")
+    try:
+        p = pkgfile("nd.fwsc", package())
+        dev = FakeFM1(image, identity="FM-1_800", stored=dict(objs))
+        rc, out, err = cli([p, "--yes"], dev)
+        saved = list((TMP / "auto").glob("backup-*.json"))
+        ok(rc == 0 and len(saved) == 1 and I.read_backup(str(saved[0])) == objs,
+           "an install over Niagara Drift saves a backup first")
+        rc, out, err = cli([p, "--yes", "--no-backup"], FakeFM1(image, identity="FM-1_800", stored=dict(objs)))
+        ok(rc == 0 and len(list((TMP / "auto").glob("backup-*.json"))) == 1, "... not with --no-backup")
+    finally:
+        I.BACKUP_DIR = old
+    bad = TMP / "bad.json"
+    bad.write_text("{}")
+    rc, out, err = cli(["--restore", str(bad), "--yes"], FakeFM1(image, identity="FM-1_800", stored={}))
+    ok(rc != 0 and "not a Niagara Drift backup" in err, "--restore of a file that isn't a backup: refused")
+
+
 wire()
 installs()
+backups()
 errors()
 against_js()
 shutil.rmtree(TMP, ignore_errors=True)

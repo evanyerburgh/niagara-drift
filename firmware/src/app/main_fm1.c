@@ -230,11 +230,53 @@ static void safe_main(void)
 
 /* the update handshake, and the audio's load for tools/fm1_cpu.py: cmd 0x7E (an empty M-UPGRADE-framed
  * message) answers eight words: the smoothed load (x256), the longest render and its budget (us), late
- * halves, halves, timer IRQs nested in the render, boots, the last render (us). Read-only. */
+ * halves, halves, timer IRQs nested in the render, boots, the last render (us). Read-only.
+ * BACKUP / RESTORE (v0.2, tools/fm1_install.py --backup / --restore, and before every install): the stored
+ * objects (the sound and bank A, the panel calibration, banks B and C) as they are on the flash.
+ *   0x70 [obj, off lo, off hi]           -> 0x70 [obj, off lo, off hi, len lo, len hi, up to 24 bytes]
+ *                                           (off 0 reads the object afresh; len 0: none stored)
+ *   0x71 [obj, off lo, off hi, bytes...] -> 0x71 [obj, off lo, off hi, 0 ok / 1 refused]   (into a buffer)
+ *   0x72 [obj, len lo, len hi]           -> 0x72 [obj, 0 written / 1 refused]   (the buffer to the flash)
+ *   0x73 []                              -> restart (the restored objects load as at power-on) */
+static uint8_t bk_buf[PLAT_STORE_MAX];
+static int bk_n;
+static void backup_cmd(uint32_t cmd, const uint8_t *b, uint32_t n)
+{
+    uint8_t r[29];
+    uint32_t obj = n ? b[0] : 0xFFu, off = n >= 3u ? b[1] | (uint32_t)b[2] << 8 : 0u, k;
+    r[0] = (uint8_t)obj;
+    r[1] = (uint8_t)off;
+    r[2] = (uint8_t)(off >> 8);
+    if (cmd == 0x70u && n >= 3u && obj < OBJ_NOBJ) {
+        if (off == 0u)
+            bk_n = plat_store_load(obj, bk_buf, sizeof bk_buf);
+        r[3] = (uint8_t)(bk_n > 0 ? bk_n : 0);
+        r[4] = (uint8_t)((bk_n > 0 ? bk_n : 0) >> 8);
+        for (k = 0; k < 24u && (int)(off + k) < bk_n; k++)
+            r[5 + k] = bk_buf[off + k];
+        ota_send_msg(0x70, r, 5u + k);
+    } else if (cmd == 0x71u && n >= 3u) {
+        int ok = obj < OBJ_NOBJ && off + (n - 3u) <= sizeof bk_buf;
+        for (k = 0; ok && k < n - 3u; k++)
+            bk_buf[off + k] = b[3 + k];
+        r[3] = (uint8_t)!ok;
+        ota_send_msg(0x71, r, 4u);
+    } else if (cmd == 0x72u && n >= 3u) {
+        int ok = obj < OBJ_NOBJ && off >= 8u && off <= sizeof bk_buf && plat_store_save(obj, bk_buf, off) == 0;
+        r[1] = (uint8_t)!ok;
+        ota_send_msg(0x72, r, 2u);
+    } else if (cmd == 0x73u) {
+        fm1_delay_ms(50);                           /* the reply to the last commit out first */
+        fm1_reboot();
+    }
+}
+
 static void dbg_service(void)
 {
     uint32_t d = ota_take();
-    if (d == 7u && ota_dec[2] == 0x11) {
+    if (d >= 7u && ota_dec[2] >= 0x70 && ota_dec[2] <= 0x73) {
+        backup_cmd(ota_dec[2], ota_dec + 6, d - 7u);
+    } else if (d == 7u && ota_dec[2] == 0x11) {
         ota_reply_identity();
     } else if (d == 7u && ota_dec[2] == 0x7E) {
         const uint32_t w[8] = {om_dbg.cpu_q8, om_dbg.max_us, HALF_FRAMES * 1000000u / FS, om_dbg.late,

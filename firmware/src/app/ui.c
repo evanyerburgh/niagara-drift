@@ -78,7 +78,12 @@ static const struct {
 /* ------------------------------------------------------------ switches --- */
 /* the black keys (key numbers, F3 = 0) and what each does: normally, and on the LFO page */
 static const uint8_t BLACK_K[11] = {1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25};
-static const uint8_t WHITE_K[NSCENES] = {0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26};
+/* the white keys: the first NSCENES (F3 .. C5, which sense pressure) the scenes of the bank; the top four
+ * (D5 .. G5, no pressure) SEL + key: the bank, alone: the gesture macros (to come) */
+#define NWHITE 16
+static const uint8_t WHITE_K[NWHITE] = {0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26};
+static const char BANK_L[NBANKS] = {'A', 'B', 'C', 'P'};
+static const char *const GESTURE[4] = {"BEAT", "HEAT", "CONVERGE", "WASH"};
 enum { S_NONE, S_PARTNER, S_SUBOCT, S_HP, S_OTAP, S_ODEST, S_FTAP, S_FDEST, S_PLINK, S_SYNC, S_XMOD, S_LFORESET, S_DTAP,
        S_PLOCK };
 typedef struct {
@@ -145,6 +150,7 @@ static struct {
     int16_t loop_from[DR_NPARAMS];     /* every value when the recording began */
     uint32_t morph_t0, morph_ms;
     int16_t morph_from[DR_NPARAMS];
+    int16_t morph_to[DR_NPARAMS];      /* the scene being morphed to, as it was when its key was pressed */
     uint32_t frame;
     uint32_t sig[3];                   /* what each band shows: redrawn when it changes */
     uint32_t splash_t0;                /* the start's animation: since */
@@ -641,6 +647,13 @@ static int scene_room(int p)
            p == P_SCENE_T;
 }
 
+/* a scene's name: its bank's letter and its number ("B5"; the Presets "P2") */
+static void scene_name(char *t, int bank, int n)
+{
+    t[0] = BANK_L[bank];
+    itoa_u((uint32_t)n + 1u, t + 1);
+}
+
 /* into the flash now: n = -1 the sound (SAVE), else scene n (just stored) */
 static void save_now(int n)
 {
@@ -651,7 +664,7 @@ static void save_now(int n)
     if (n < 0) {
         say(ok ? "SAVED" : "NOT SAVED", ok ? 0 : "FLASH ERROR");
     } else {
-        itoa_u((uint32_t)n + 1u, t + 6);
+        scene_name(t + 6, proj.bank, n);
         say(t, ok ? "STORED" : "NOT STORED");
     }
 }
@@ -682,10 +695,11 @@ static void save_run(void)                             /* each look at the input
 
 static void scene_store(int n)                         /* SAVE held + a white key: and into the flash */
 {
-    int k;
-    for (k = 0; k < DR_NPARAMS; k++)
-        proj.scene[n][k] = proj.par[k];
-    proj.scene_used |= (uint16_t)(1u << n);
+    if (proj.bank == BANK_PRESETS) {                   /* the Presets are the firmware's: the way out */
+        say_c("PRESETS: READ-ONLY", "SEL+D5: A", K_GOLD);
+        return;
+    }
+    scene_put(proj.bank, n);
     ui.scene_at = (int8_t)n;
     ui.dirty = 1;
     save_ask(n);
@@ -697,14 +711,17 @@ static float scene_s(void) { return 0.1f * fm_exp2f((float)proj.par[P_SCENE_T] *
 static void scene_recall(int n)                        /* a white key: morph there over the Fade time */
 {
     char t[12] = "SCENE ";
+    const int16_t *sc = scene_get(proj.bank, n);
     int k;
-    itoa_u((uint32_t)n + 1u, t + 6);
-    if (!(proj.scene_used >> n & 1u)) {
-        say(t, "EMPTY");
+    scene_name(t + 6, proj.bank, n);
+    if (!sc) {
+        say(t, proj.bank == BANK_PRESETS ? "TO COME" : "EMPTY: SAVE+KEY");
         return;
     }
-    for (k = 0; k < DR_NPARAMS; k++)
+    for (k = 0; k < DR_NPARAMS; k++) {
         ui.morph_from[k] = proj.par[k];
+        ui.morph_to[k] = sc[k];
+    }
     ui.morph = (int8_t)n;
     ui.scene_at = (int8_t)n;
     ui.morph_t0 = plat_ms();
@@ -734,7 +751,7 @@ static void scene_morph(void)
     int k;
     if (ui.morph < 0)
         return;
-    to = ui.morph == VISIT_BACK ? ui.visit_back : proj.scene[ui.morph];
+    to = ui.morph == VISIT_BACK ? ui.visit_back : ui.morph_to;
     x = ui.morph_ms ? (float)(plat_ms() - ui.morph_t0) / (float)ui.morph_ms : 1.0f;
     if (x > 1.0f)
         x = 1.0f;
@@ -742,6 +759,8 @@ static void scene_morph(void)
         int v;
         if (scene_room(k))                             /* the room's settings aren't a scene's */
             continue;
+        if (proj.par[P_PLOCK] && (k == DR_GP(0, GP_PITCH) || k == DR_GP(1, GP_PITCH) || k == P_PLINK_OFF))
+            continue;                                  /* pitch lock: the drones keep their pitch (2026-10-17) */
         if (scene_step(k))
             v = x >= 0.5f ? to[k] : ui.morph_from[k];
         else
@@ -895,6 +914,28 @@ static void input(void)
             ui.visit = -1;                             /* let go: a tap stays; a hold was a visit: */
             if (plat_ms() - ui.visit_t >= HOLD_MS)     /* back to the sound before it, as it came */
                 scene_back();
+        }
+    }
+    for (i = 0; i < 4u; i++) {                         /* the top four white keys */
+        if (!((ch & keys) >> WHITE_K[NSCENES + i] & 1u))
+            continue;
+        if (btn >> B_SEL & 1u) {                       /* SEL + a top key: the bank (not while a scene key is
+                                                        * held: a visit's way back stays put) */
+            uint32_t j, held = 0;
+            static const char *const BANK_N[NBANKS] = {"A", "B", "C", "PRESETS"};
+            ui.btn_used |= 1u << B_SEL;
+            for (j = 0; j < NSCENES; j++)
+                held |= keys >> WHITE_K[j] & 1u;
+            if (held)
+                continue;
+            if (proj.bank != i) {
+                proj.bank = (uint8_t)i;
+                ui.scene_at = -1;
+                mark_dirty();
+            }
+            say_c("BANK", BANK_N[i], K_GOLD);
+        } else {
+            say_c(GESTURE[i], "TO COME", K_LFO);       /* the gesture macros, v0.2 */
         }
     }
     if (btn || keys || ch)
@@ -1087,9 +1128,9 @@ static void draw_bar(void)
     }
     if (proj.par[P_PULSE] && ui.view != V_PULSE)  /* on its own page, its name says it */
         x = cv_text(x, 2, &FONT_XS, "SWELL", K_PULSE) + 6;
-    if (visiting) {                            /* "VISIT 3": let go and it goes back */
-        char t[10] = "VISIT ";
-        itoa_u((uint32_t)ui.visit + 1u, t + 6);
+    if (visiting) {                            /* "VISIT B3": let go and it goes back */
+        char t[12] = "VISIT ";
+        scene_name(t + 6, proj.bank, ui.visit);
         x = cv_text(x, 2, &FONT_XS, t, K_GOLD) + 6;
     }
     if (ui.v2_out)                             /* drone II faded out on its own (SEL + PLAY) */
@@ -1945,10 +1986,12 @@ static void leds(void)
         if (v)
             k[BLACK_K[i]] = 255;
     }
-    for (i = 0; i < NSCENES; i++)                    /* the white keys: the slots that hold a scene; the one */
-        if ((proj.scene_used >> i & 1u) &&             /* the sound is, blinking slowly */
+    for (i = 0; i < NSCENES; i++)                    /* the scene keys: the bank's slots that hold a scene; the */
+        if (scene_get(proj.bank, (int)i) &&            /* one the sound is, blinking slowly */
             (ui.scene_at != (int8_t)i || plat_ms() % 1000u < 600u))
             k[WHITE_K[i]] = 255;
+    for (i = 0; i < 4u; i++)                         /* the top four: the gestures to come, a dim glow */
+        k[WHITE_K[NSCENES + i]] = 60;
     plat_leds(b, k);
 }
 
