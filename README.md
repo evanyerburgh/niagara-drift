@@ -66,7 +66,7 @@ the screen shows each page's settings as a picture, and the value of the knob yo
 | | |
 |---|---|
 | **PLAY** | fade the drones in or out; **SEL + PLAY** fades drone II alone out or back in |
-| **OCT− / OCT+** | the LFO's **Wave I** / **Wave II**: tap for the next shape, round and round; **SEL + OCT** for the one before. Each lights up in time with its wave |
+| **OCT− / OCT+** | the LFO's **Wave I** / **Wave II**: tap for the next shape, round and round; **SEL + OCT** for the one before. Each light pulses with its wave |
 | **SAVE** | save the sound, at once. While the drone plays, the sound dips out and back over about 50 ms around the write; the dot by the page name means not yet written |
 | **SEL** (hold) | fine: a pitch knob moves in single cents, cutoff and resonance in tenths |
 
@@ -193,7 +193,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | ALGORITHM | the **Movement**: every LFO depth together, from still (0%) to double (200%) |
 | OCT− · OCT+ | Wave I's · Wave II's shape: tap for the next (or off), round and round; SEL + OCT for the one before |
 
-One clock, two waves; OCT− and OCT+ light up in time with them. The last shape on each is random.
+One clock, two waves; the OCT− and OCT+ lights pulse with them. The last shape on each is random.
 PRESETS is kept for a macro, coming in v0.2.
 
 ### Black keys: switches
@@ -229,7 +229,7 @@ by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8),
 |---|---|
 | **White key** | tap: morph to the scene stored there, over the scene switch time, and stay (turn a knob to stop part way). **Hold** to visit: let go and it morphs back to where you were. A scene keeps the sound, not the room: Speaker, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written) |
-| **ARP** (tap) | the Swell on or off: both drones chopped in time. Hold ARP to peek at its page; tap twice quickly to stay on it |
+| **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it |
 | **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 
 ### MIDI

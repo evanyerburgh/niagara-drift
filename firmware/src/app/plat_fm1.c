@@ -39,19 +39,35 @@ static void led_pos_init(void)
                     led_pos[id] = (uint8_t)((p << 3) | r);
     }
 }
-void plat_leds(uint32_t buttons, uint32_t keys)
+/* a level 0..255 as the eye sees it; 255 is steadily lit, below that the HAL's PWM: the share of frames lit
+ * is the level squared (the eye's curve, roughly), at least one frame in 32 for any level above 0 */
+void plat_leds(const uint8_t *buttons, const uint8_t *keys)
 {
-    uint8_t nl[FM1_NCOL] = {0};
-    uint32_t i, c;
+    uint8_t nl[FM1_NCOL] = {0}, pw[FM1_LED_PHASES][FM1_NCOL];
+    uint32_t i, c, f;
+    memset(pw, 0, sizeof pw);
     for (i = 0; i < NB + NKEYS; i++) {
-        uint32_t id = i < NB ? panel.btn[i] : 14u + (i - NB);
-        int on = i < NB ? (buttons >> i) & 1u : (keys >> (i - NB)) & 1u;
-        uint8_t q = led_pos[id];
-        if (on && q != 0xFF)
-            nl[q >> 3] |= (uint8_t)(1u << (q & 7u));
+        uint32_t id = i < NB ? panel.btn[i] : 14u + (i - NB), lv = i < NB ? buttons[i] : keys[i - NB], d;
+        uint8_t q = led_pos[id], m;
+        if (!lv || q == 0xFF)
+            continue;
+        m = (uint8_t)(1u << (q & 7u));
+        if (lv >= 255u) {
+            nl[q >> 3] |= m;
+            continue;
+        }
+        d = (lv * lv * FM1_LED_PHASES + 255u * 255u / 2u) / (255u * 255u);
+        if (!d)
+            d = 1;
+        for (f = 0; f < FM1_LED_PHASES; f++)       /* d frames of 32, evenly spread */
+            if ((f + 1u) * d / FM1_LED_PHASES != f * d / FM1_LED_PHASES)
+                pw[f][q >> 3] |= m;
     }
     for (c = 0; c < FM1_NCOL; c++)
         fm1_led[c] = nl[c];
+    for (f = 0; f < FM1_LED_PHASES; f++)
+        for (c = 0; c < FM1_NCOL; c++)
+            fm1_led_pwm[f][c] = pw[f][c];
 }
 
 /* KEY PRESSURE (aftertouch), MONK-1's (Charles Vestal), from Velo's sensing (sense.c). The scan tick hands

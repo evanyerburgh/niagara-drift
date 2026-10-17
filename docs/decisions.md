@@ -119,3 +119,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   Setup 2 is morph, scene switch, tune, tuning.
 - 2026-10-17: the noise Colour is a blend, 0 white .. 100 pink (PROJ_FORMAT 20; a 0.1 project loads, its
   Colours turned into 0 or 100).
+- 2026-10-17: lights have brightness levels (software PWM over 32 scan frames, the share lit the level squared);
+  the OCT lights pulse with the LFO waves and the ARP light breathes with the Swell. The pressure test readout
+  is gone (it covered the black keys' banners).

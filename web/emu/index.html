@@ -832,8 +832,12 @@ function drawScreen(fb) {
   }
   ctx.putImageData(img, 0, 0);
 }
-function drawLights(b, k) {
-  for (const x of Object.values(buttons)) x.g.classList.toggle("lit", !!(b & (1 << x.bit)));
+function drawLights(b, k, lv) {
+  for (const x of Object.values(buttons)) {
+    const l = lv ? lv[x.bit] : (b & (1 << x.bit) ? 255 : 0), face = x.face || (x.face = x.g.querySelector(".btnface"));
+    x.g.classList.toggle("lit", l >= 128);
+    if (face) face.style.fill = l > 0 && l < 255 ? `color-mix(in srgb, #f28a5a ${Math.round(100 * (l / 255) ** 2)}%, #2e3135)` : "";
+  }
   keys.forEach((x, i) => x.g.classList.toggle("lit", !!(k & (1 << i))));
 }
 
@@ -876,7 +880,7 @@ async function switchOn() {
         if (m.type === "ready") res();
         else if (m.type === "frame") {
           if (m.fb) drawScreen(m.fb);
-          drawLights(m.buttons, m.keys);
+          drawLights(m.buttons, m.keys, m.levels);
           window.omniLast = m;
           if (m.load !== undefined) cpu.textContent = `Niagara Drift uses ${m.load}% of this computer's time`;
           if (m.store) saveStore(m.store);

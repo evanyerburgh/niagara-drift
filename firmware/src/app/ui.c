@@ -1887,37 +1887,41 @@ static void draw_values(void)
     cv_blit(0, VAL_Y);
 }
 
+/* a wave -1..1 as a light's level: dark at its bottom, lit at its top */
+static uint8_t wave_lvl(float w) { return (uint8_t)(fm_clampf(0.5f + 0.5f * w, 0.0f, 1.0f) * 255.0f + 0.5f); }
+
 static void leds(void)
 {
-    uint32_t b = 0, k = 0, i;
+    uint8_t b[NB] = {0}, k[NKEYS] = {0};
+    uint32_t i;
     for (i = 0; i < NPAGE_BTN; i++)                  /* the button of the page shown */
         if (on_pages((int)i))
-            b |= 1u << PAGE_BTN[i].btn;
+            b[PAGE_BTN[i].btn] = 255;
     if (ui.playing)
-        b |= 1u << B_PLAY;
-    if (proj.par[P_LFO_W1] && dr_lfo[0] > 0.0f)        /* OCT- / OCT+: each wave, lit while it's up */
-        b |= 1u << B_OCTDN;
-    if (proj.par[P_LFO_W2] && dr_lfo[1] > 0.0f)
-        b |= 1u << B_OCTUP;
-    if (proj.par[P_PULSE]) {                           /* ARP: in time with the swell, from the moment it's on: */
-        float b1 = 1.0f + (float)proj.par[P_PULSE_SWING] * 0.01f, ph = dr_pulse_ph;   /* the first half */
-        if ((ph < b1 ? ph / b1 : (ph - b1) / (2.0f - b1)) < 0.5f)                     /* of each beat */
-            b |= 1u << B_ARP;
+        b[B_PLAY] = 255;
+    if (proj.par[P_LFO_W1])                            /* OCT- / OCT+: each wave, pulsing with it */
+        b[B_OCTDN] = wave_lvl(dr_lfo[0]);
+    if (proj.par[P_LFO_W2])
+        b[B_OCTUP] = wave_lvl(dr_lfo[1]);
+    if (proj.par[P_PULSE]) {                           /* ARP: breathing with the swell, a beat a breath */
+        float b1 = 1.0f + (float)proj.par[P_PULSE_SWING] * 0.01f, ph = dr_pulse_ph;
+        float u = ph < b1 ? ph / b1 : (ph - b1) / (2.0f - b1);
+        b[B_ARP] = wave_lvl(fm_cosf(6.2831853f * u));
     }
     if (ui.loop == L_PLAY || (ui.loop == L_REC && (ui.frame / 8u) & 1u))
-        b |= 1u << B_REC;                              /* REC: blinking recording, steady looping */
+        b[B_REC] = 255;                                /* REC: blinking recording, steady looping */
     for (i = 0; i < 11u; i++) {                      /* the black keys: the switches that are on */
         sw_t w = sw_layer()[i];
         int v = w.s == S_LFORESET ? (int)(ui.keys >> BLACK_K[i] & 1u) || proj.par[P_LFO_LOCK] != 0 : sw_get(w);
         if (v == 2)                                    /* a third state (both LFO waves): lit, winking */
             v = plat_ms() % 1200u < 1000u;
         if (v)
-            k |= 1u << BLACK_K[i];
+            k[BLACK_K[i]] = 255;
     }
     for (i = 0; i < NSCENES; i++)                    /* the white keys: the slots that hold a scene; the one */
         if ((proj.scene_used >> i & 1u) &&             /* the sound is, blinking slowly */
             (ui.scene_at != (int8_t)i || plat_ms() % 1000u < 600u))
-            k |= 1u << WHITE_K[i];
+            k[WHITE_K[i]] = 255;
     plat_leds(b, k);
 }
 
@@ -2047,47 +2051,9 @@ static void draw_splash(uint32_t t0)
     }
 }
 
-/* KEY PRESSURE, a test readout (v0.2): while a key is held, how hard, 0..100 %; nothing plays from it yet.
- * The lowest held key; the seven top keys (C#5 .. G5) sense no pressure. Gone as the key is let go. */
-static void pressure_readout(void)
-{
-    static const char *const NAME[12] = {"F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E"};
-    static uint8_t shown;
-    char a[24], b[24];
-    uint32_t k, i, n;
-    int p;
-    if (!ui.keys) {
-        if (shown)                                     /* let go: the readout goes at once */
-            ui.msg_until = plat_ms();
-        shown = 0;
-        return;
-    }
-    shown = 1;
-    for (k = 0; !(ui.keys >> k & 1u); k++)
-        ;
-    p = plat_pressure(k);
-    n = 0;
-    for (i = 0; NAME[k % 12u][i]; i++)
-        a[n++] = NAME[k % 12u][i];
-    a[n++] = (char)('3' + (k + 5u) / 12u);
-    a[n] = 0;
-    if (p < 0) {
-        say(a, "NO PRESSURE");
-        return;
-    }
-    n = (uint32_t)(scopy(b, "PRESSURE ") - b);
-    itoa_u((uint32_t)(p * 100 + 63) / 127u, b + n);
-    for (; b[n]; n++)
-        ;
-    b[n++] = '%';
-    b[n] = 0;
-    say(a, b);
-}
-
 void ui_frame(void)
 {
     input();
-    pressure_readout();
     scene_morph();
     autosave();
     if (!ui.splash_done) {

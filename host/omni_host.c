@@ -78,10 +78,19 @@ int plat_pressure(uint32_t k)
         return -1;
     return (held_keys >> k & 1u) ? pressure_v[k] : 0;
 }
-void plat_leds(uint32_t b, uint32_t k)
+static uint8_t lvl_btn[NB], lvl_keys[NKEYS];     /* the brightness 0..255; lit_* = at least half */
+void plat_leds(const uint8_t *b, const uint8_t *k)
 {
-    lit_btn = b;
-    lit_keys = k;
+    uint32_t i;
+    lit_btn = lit_keys = 0;
+    for (i = 0; i < NB; i++) {
+        lvl_btn[i] = b[i];
+        lit_btn |= (uint32_t)(b[i] >= 128u) << i;
+    }
+    for (i = 0; i < NKEYS; i++) {
+        lvl_keys[i] = k[i];
+        lit_keys |= (uint32_t)(k[i] >= 128u) << i;
+    }
 }
 
 #define MQ 256
