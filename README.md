@@ -235,7 +235,7 @@ by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8),
 | | |
 |---|---|
 | **White key** (the lower 12, F3–C5) | tap: morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). **Hold** to visit: let go and it morphs back to where you were. A scene keeps the sound, not the room: Speaker, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
-| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're read-only |
+| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're read-only (pick bank A, B or C first: SEL + D5, E5 or F5) |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (the starting sound and a deep bass sound for now; more to come). The screen names scenes by bank: "B5" |
 | **Top white key** (D5–G5) alone | kept for the gesture macros, coming in v0.2 |
 | **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it |
