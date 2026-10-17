@@ -148,3 +148,12 @@ at the end. The current state is in the [README](../README.md) and the code.
   still stops the switch where it is. A new switch moves everything again.
 - 2026-10-17: the drones' pictures start on a cycle, or after 0.1 s without one (hard sync could freeze
   drone II's).
+- 2026-10-17: the macros: eight fixed moves, each a few settings by set amounts, added on top of the sound
+  (the sound's own values untouched; what's heard is clamped to each range). Set macros Bloom, Weight, Tide,
+  Tear on SEQ's Macros page (SEQ again: Partner); PRESETS plays one, Bloom to start, SEL + PRESETS picks
+  (the player's choice, not a scene's). Gestures Beat, Heat, Converge, Wash on D5–G5: held they swell in, let
+  go out; a tap latches, a press releases, SEL at release latches where it is; held, PRESETS sets the depth
+  and ALGORITHM the swell (1–30 s). Tear switches hard sync on and lifts drone II up to an octave; Converge
+  turns cross-mod on and leans drone II toward the nearest unison or octave of drone I. Amounts, depths,
+  swells and latches are values scenes keep; with Pitch lock on a scene leaves Converge's latch alone.
+  PROJ_FORMAT 22 (19–21 converted: their 78 values a sound widened, the new ones at their defaults).

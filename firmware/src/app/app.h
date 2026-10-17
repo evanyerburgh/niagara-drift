@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 21u                  /* 21: scenes in banks: A (12) here, B and C in their own objects (v0.2;
+#define PROJ_FORMAT 22u                  /* 22: the macros (16 values more a sound; 19-21 are read and converted);
+                                          * 21: scenes in banks: A (12) here, B and C in their own objects (v0.2;
                                           * 19 and 20 are read and converted: scenes 13-16 become B1-B4);
                                           * 20: the noise Colour a blend 0..100; 19: the Swell's Depth in dB (18: noise,
                                           * 17: cutoff / resonance 0..1000, 16: Feedback, Character, 15: Movement, 14: tuning,
@@ -27,7 +28,8 @@ typedef struct {
     int16_t par[DR_NPARAMS];             /* drone.h parameters */
     uint8_t leds;                        /* key lights on */
     uint8_t bank;                        /* the bank the scene keys play (0 A .. 3 Presets) */
-    uint8_t rsv[14];                     /* room to grow: an older, shorter project loads (zeros here) */
+    uint8_t mlive;                       /* the set macro PRESETS plays (0 Bloom .. 3 Tear; the player's, not a scene's) */
+    uint8_t rsv[13];                     /* room to grow: an older, shorter project loads (zeros here) */
     uint16_t scene_used;                 /* bank A: bit n, scene n holds a sound */
     int16_t scene[NSCENES][DR_NPARAMS];  /* bank A: every parameter, recalled but for the room's settings */
 } project_t;

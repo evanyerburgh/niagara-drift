@@ -41,8 +41,9 @@
 
 /* ------------------------------------------------------------- pages --- */
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
-enum { V_PLAY, V_PLAY2, V_TONE, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_SETUP, V_SETUP2, V_PULSE, V_FX, V_FX2, NVIEWS };
-static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone", "Osc", "Source", "LFO depths", "LFO mods", "Partner",
+enum { V_PLAY, V_PLAY2, V_TONE, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_MACROS, V_PARTNER, V_SETUP, V_SETUP2, V_PULSE, V_FX, V_FX2,
+       NVIEWS };
+static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone", "Osc", "Source", "LFO depths", "LFO mods", "Macros", "Partner",
                                               "Setup 1", "Setup 2", "Swell", "Effects 1", "Effects 2"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
  * nothing (g NONE) */
@@ -59,6 +60,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{0, GP_MIX}, {0, GP_DRIVE}, {1, GP_MIX}, {1, GP_DRIVE}},
     {{0, GP_OLFO_DEPTH}, {0, GP_FLFO_DEPTH}, {1, GP_OLFO_DEPTH}, {1, GP_FLFO_DEPTH}},
     {{G, P_LFO_RMOD}, {G, P_LFO_RMOD_SRC}, {G, P_XMOD_AMT}, {G, P_DLY_LFO_DEPTH}},
+    {{G, P_M_BLOOM}, {G, P_M_WEIGHT}, {G, P_M_TIDE}, {G, P_M_TEAR}},
     {{0, GP_INTERVAL}, {0, GP_DETUNE}, {1, GP_INTERVAL}, {1, GP_DETUNE}},
     {{G, P_GLIDE}, {G, P_FADE}, {G, P_DRIFT}, {G, P_WIDTH}},
     {{G, P_MORPH}, {G, P_SCENE_T}, {G, P_TUNE}, {G, P_JUST}},
@@ -70,7 +72,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
 static const struct {
     uint8_t btn, first, n;
 } PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_TONE, 1}, {B_EDIT, V_OSC, 2}, {B_LFO, V_LFO, 2},
-                {B_SEQ, V_PARTNER, 1}, {B_GLO, V_SETUP, 2}, {B_FX, V_FX, 2},
+                {B_SEQ, V_MACROS, 2}, {B_GLO, V_SETUP, 2}, {B_FX, V_FX, 2},
                 {B_ARP, V_PULSE, 1}};                                    /* ARP: a tap toggles */
 #define NPAGE_BTN (sizeof PAGE_BTN / sizeof PAGE_BTN[0])
 #define HOLD_MS 400u                   /* a page button held this long (or a knob turned) is a peek */
@@ -84,6 +86,9 @@ static const uint8_t BLACK_K[11] = {1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25};
 static const uint8_t WHITE_K[NWHITE] = {0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26};
 static const char BANK_L[NBANKS] = {'A', 'B', 'C', 'P'};
 static const char *const GESTURE[4] = {"BEAT", "HEAT", "CONVERGE", "WASH"};
+static const char *const GESTURE_DEPTH[4] = {"BEAT DEPTH", "HEAT DEPTH", "CONV DEPTH", "WASH DEPTH"};
+static const char *const GESTURE_SWELL[4] = {"BEAT SWELL", "HEAT SWELL", "CONV SWELL", "WASH SWELL"};
+static const char *const MACRO_UP[DR_NSETM] = {"BLOOM", "WEIGHT", "TIDE", "TEAR"};
 enum { S_NONE, S_PARTNER, S_SUBOCT, S_HP, S_OTAP, S_ODEST, S_FTAP, S_FDEST, S_PLINK, S_SYNC, S_XMOD, S_LFORESET, S_DTAP,
        S_PLOCK };
 typedef struct {
@@ -156,6 +161,12 @@ static struct {
     uint32_t press_t0, press_hi_t;     /* ... since; above the commit level since (0: not) */
     float press_x;                     /* ... how far into the scene, 0..1, smoothed */
     uint32_t flash_t;                  /* a scene taken: its key flashes from then */
+    uint8_t g_held;                    /* the gesture keys held: bit g (Beat, Heat, Converge, Wash) */
+    uint8_t g_rel;                     /* ... pressed to release a latch: the let-go does nothing more */
+    uint32_t g_t0[DR_NGEST];           /* ... since */
+    float g_amt[DR_NGEST];             /* ... how far in each is, 0..1 */
+    int16_t g_sent[DR_NGEST];          /* ... as the engine has it, 0..1000 */
+    uint32_t g_last;                   /* the last swell step's time */
     uint64_t hands[(DR_NPARAMS + 63) / 64];   /* the values a hand has moved since a scene switch began: the
                                                * switch lets go of them (Evan, 2026-10-17: Movement fought it) */
     int16_t press_to[DR_NPARAMS];      /* ... the scene */
@@ -767,7 +778,8 @@ static void sound_blend(const int16_t *from, const int16_t *to, float x)
         if (scene_room(k) || hands_has(k))             /* the room's settings aren't a scene's; nor what a
                                                         * hand has moved since the switch began */
             continue;
-        if (proj.par[P_PLOCK] && (k == DR_GP(0, GP_PITCH) || k == DR_GP(1, GP_PITCH) || k == P_PLINK_OFF))
+        if (proj.par[P_PLOCK] && (k == DR_GP(0, GP_PITCH) || k == DR_GP(1, GP_PITCH) || k == P_PLINK_OFF ||
+                                  k == P_GL_CONVERGE))   /* Converge is a pitch move: the lock keeps its latch */
             continue;                                  /* pitch lock: the drones keep their pitch (2026-10-17) */
         if (scene_step(k))
             v = x >= 0.5f ? to[k] : from[k];
@@ -933,6 +945,78 @@ static void midi_in(void)
     }
 }
 
+/* THE GESTURES (v0.2): Beat, Heat, Converge, Wash on the top four white keys, which sense no pressure, so time
+ * stands in: held, a gesture swells in (over its swell time, 1 .. 30 s); let go, it swells back out. A tap
+ * latches it on (at full); pressing a latched one lets it go; SEL held as you let go latches it where it is.
+ * Held, PRESETS sets its depth and ALGORITHM its swell. Latched levels are values (P_GL_*): scenes keep them. */
+static int gesture_held(void)                          /* the gesture key held (the lowest), or -1 */
+{
+    int g;
+    for (g = 0; g < DR_NGEST; g++)
+        if (ui.g_held >> g & 1u)
+            return g;
+    return -1;
+}
+static void gesture_down(int g)
+{
+    if (proj.par[P_GL_BEAT + g]) {                     /* latched: let go of it, whatever the press */
+        param_set(P_GL_BEAT + g, 0);
+        hands_on(P_GL_BEAT + g);
+        ui.g_rel |= (uint8_t)(1u << g);
+        say_c(GESTURE[g], "OFF", K_LFO);
+    }
+    ui.g_held |= (uint8_t)(1u << g);
+    ui.g_t0[g] = plat_ms();
+}
+static void gesture_up(int g)
+{
+    uint32_t held = plat_ms() - ui.g_t0[g];
+    ui.g_held &= (uint8_t)~(1u << g);
+    if (ui.g_rel >> g & 1u) {
+        ui.g_rel &= (uint8_t)~(1u << g);
+        return;
+    }
+    if (held < PR_TAP_MS) {                            /* a tap: latched, at full */
+        param_set(P_GL_BEAT + g, 100);
+        hands_on(P_GL_BEAT + g);
+        say_c(GESTURE[g], "LATCHED", K_LFO);
+    } else if (ui.btn >> B_SEL & 1u) {                 /* SEL held: latched where it is */
+        int v = (int)(ui.g_amt[g] * 100.0f + 0.5f);
+        ui.btn_used |= 1u << B_SEL;
+        param_set(P_GL_BEAT + g, v < 1 ? 1 : v);
+        hands_on(P_GL_BEAT + g);
+        say_c(GESTURE[g], "KEPT", K_LFO);
+    }
+}
+static void gesture_run(void)                          /* each frame: each gesture toward where it's going */
+{
+    uint32_t now = plat_ms(), dt = now - ui.g_last;
+    int g;
+    ui.g_last = now;
+    if (dt > 100u)
+        dt = 100u;
+    for (g = 0; g < DR_NGEST; g++) {
+        float to = (ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u) ? 1.0f : (float)proj.par[P_GL_BEAT + g] * 0.01f;
+        float step = (float)dt * 0.001f / fm_exp2f((float)proj.par[P_GR_BEAT + g] * 0.0490689f);
+        float *a = &ui.g_amt[g];
+        int16_t q;
+        *a = *a < to ? fm_minf(*a + step, to) : fm_maxf(*a - step, to);
+        q = (int16_t)(*a * 1000.0f + 0.5f);
+        if (q != ui.g_sent[g]) {
+            ui.g_sent[g] = q;
+            dr_gesture(g, q);
+        }
+        if ((ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u) && now - ui.g_t0[g] >= PR_TAP_MS) {
+            char t[8], *q = t;
+            itoa_u((uint32_t)(*a * 100.0f + 0.5f), t);
+            while (*q)
+                q++;
+            scopy(q, "%");
+            say_c(GESTURE[g], t, K_LFO);
+        }
+    }
+}
+
 static void global_turn(int role, int p, const char *name, int32_t e)
 {
     char t[12];
@@ -1067,21 +1151,39 @@ static void input(void)
             }
             say_c("BANK", BANK_N[i], K_GOLD);
         } else {
-            say_c(GESTURE[i], "TO COME", K_LFO);       /* the gesture macros, v0.2 */
+            gesture_down((int)i);                      /* the gesture macros (v0.2) */
         }
     }
+    for (i = 0; i < 4u; i++)                         /* ... and let go */
+        if ((ch & ~keys) >> WHITE_K[NSCENES + i] & 1u)
+            gesture_up((int)i);
     if (btn || keys || ch)
         ui.act_t = plat_ms();
     loop_run();
     midi_in();
     if ((e = plat_enc(EN_SELECT)) != 0)
         global_turn(EN_SELECT, P_LFO_RATE, "LFO RATE", e);
-    if ((e = plat_enc(EN_ALGO)) != 0)                /* ALGORITHM: the Movement, every LFO depth 0 .. 200 % */
-        global_turn(EN_ALGO, P_MOVE, "MOVEMENT", e);
-    if ((e = plat_enc(EN_PRESET)) != 0) {            /* PRESETS: the live macro, to come (v0.2) */
-        scopy(ui.glab[0], "PRESETS");
-        scopy(ui.glab[1], "macro: soon");
-        ui.glab_until = plat_ms() + 1500u;
+    if ((e = plat_enc(EN_ALGO)) != 0) {              /* ALGORITHM: the Movement, every LFO depth 0 .. 200 %; */
+        int g = gesture_held();                        /* a gesture key held: its swell's time */
+        if (g >= 0)
+            global_turn(EN_ALGO, P_GR_BEAT + g, GESTURE_SWELL[g], e);
+        else
+            global_turn(EN_ALGO, P_MOVE, "MOVEMENT", e);
+    }
+    if ((e = plat_enc(EN_PRESET)) != 0) {            /* PRESETS: the live macro (SEL held: which one); a */
+        int g = gesture_held();                        /* gesture key held: its depth */
+        if (g >= 0) {
+            global_turn(EN_PRESET, P_GD_BEAT + g, GESTURE_DEPTH[g], e);
+        } else if (btn >> B_SEL & 1u) {
+            ui.btn_used |= 1u << B_SEL;
+            proj.mlive = (uint8_t)((proj.mlive + (e > 0 ? 1 : DR_NSETM - 1)) % DR_NSETM);
+            mark_dirty();
+            scopy(ui.glab[0], "PRESETS PLAYS");
+            scopy(ui.glab[1], MACRO_UP[proj.mlive]);
+            ui.glab_until = plat_ms() + 1500u;
+        } else {
+            global_turn(EN_PRESET, P_M_BLOOM + proj.mlive, MACRO_UP[proj.mlive], e);
+        }
     }
     for (i = 0; i < 4; i++)
         if ((e = plat_enc(EN_K1 + (int)i)) != 0) {
@@ -1201,6 +1303,7 @@ static uint16_t page_col(void)
     case V_LFO: case V_LFO2: return K_LFO;
     case V_FX: case V_FX2: return K_FX;
     case V_PULSE: return K_PULSE;
+    case V_MACROS: return K_GOLD;
     case V_SETUP: case V_SETUP2: return K_SETUP;
     default: return K_DIM;
     }
@@ -1968,6 +2071,33 @@ static void pic_setup(int32_t y0)
 
 /* the picture: the page's own (on Play, the two waveforms), a banner while a message shows. No interval
  * between the drones (Evan, 2026-10-10: tune by ear) */
+/* Macros (SEQ): the four set macros as meters over their knobs, PRESETS' one marked; under them the four
+ * gestures (the top white keys) as they swell, latched ones lit */
+static void pic_macros(int32_t y0)
+{
+    int i;
+    for (i = 0; i < DR_NSETM; i++) {
+        int32_t x = 10 + i * 56, v = proj.par[P_M_BLOOM + i], h = 52 * v / 100;
+        uint16_t c = v ? K_GOLD : K_DIM;
+        text_c(x + 25, y0 + 2, &FONT_S, DR_MACRO_NAME[i], c);
+        cv_round(x + 18, y0 + 24, 14, 52, 4, K_GRID);
+        if (h > 0)
+            cv_round(x + 18, y0 + 76 - h, 14, h, 4, c);
+        if (proj.mlive == i)                           /* PRESETS plays this one */
+            text_c(x + 25, y0 + 79, &FONT_XS, "PRESETS", K_GOLD);
+    }
+    cv_rect(12, y0 + 97, 210, 1, K_GRID);
+    for (i = 0; i < DR_NGEST; i++) {
+        int32_t x = 10 + i * 56, w = (int32_t)(44.0f * ui.g_amt[i] + 0.5f);
+        int latched = proj.par[P_GL_BEAT + i] != 0;
+        uint16_t c = ui.g_amt[i] > 0.0f || latched ? K_LFO : K_DIM;
+        text_c(x + 25, y0 + 101, &FONT_XS, DR_MACRO_NAME[DR_NSETM + i], c);
+        cv_round(x + 3, y0 + 120, 44, 4, 2, K_GRID);
+        if (w > 0)
+            cv_round(x + 3, y0 + 120, w, 4, 2, c);
+    }
+}
+
 static void draw_pic(void)
 {
     int msg = plat_ms() < ui.msg_until;
@@ -1977,11 +2107,12 @@ static void draw_pic(void)
         return;                                /* the waveforms move: redrawn ~20 times a second */
     ui.sig[1] = h;
     cv_begin(240, PIC_H, K_BG);
-    if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 ||
+    if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 || ui.view == V_MACROS ||
         ui.view == V_SETUP || ui.view == V_SETUP2) {
         cv_round(6, 4, WIDE_W, PAN_H, 4, K_PANEL);
         switch (ui.view) {
         case V_PULSE: pic_pulse(4); break;
+        case V_MACROS: pic_macros(4); break;
         case V_LFO: pic_lfo(4); break;
         case V_LFO2: pic_lfo2(4); break;
         case V_FX: pic_fx(4); break;
@@ -2138,8 +2269,8 @@ static void leds(void)
         k[WHITE_K[ui.scene_at]] = (plat_ms() - ui.flash_t) % 160u < 80u ? 255 : 0;
     else if (ui.flash_t && ui.press >= 0 && plat_ms() - ui.flash_t < 480u)
         k[WHITE_K[ui.press]] = (plat_ms() - ui.flash_t) % 160u < 80u ? 255 : 0;
-    for (i = 0; i < 4u; i++)                         /* the top four: the gestures to come, a dim glow */
-        k[WHITE_K[NSCENES + i]] = 60;
+    for (i = 0; i < 4u; i++)                         /* the gestures: a dim glow, lit as far as each is in */
+        k[WHITE_K[NSCENES + i]] = (uint8_t)(40.0f + 215.0f * ui.g_amt[i]);
     plat_leds(b, k);
 }
 
@@ -2274,6 +2405,7 @@ void ui_frame(void)
 {
     input();
     press_run();
+    gesture_run();
     scene_morph();
     autosave();
     if (!ui.splash_done) {

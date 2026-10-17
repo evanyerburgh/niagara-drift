@@ -47,7 +47,13 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
     {"Morph", 0, 100, 47}, {"Scene switch", 0, 100, 30}, {"Tuning", 0, 1, 0}, {"Speaker", 0, 100, 0},
     {"Pitch lock", 0, 1, 0}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
+    {"Bloom", 0, 100, 0}, {"Weight", 0, 100, 0}, {"Tide", 0, 100, 0}, {"Tear", 0, 100, 0},
+    {"Beat depth", 0, 100, 70}, {"Heat depth", 0, 100, 70}, {"Conv. depth", 0, 100, 100}, {"Wash depth", 0, 100, 70},
+    {"Beat swell", 0, 100, 25}, {"Heat swell", 0, 100, 25}, {"Conv. swell", 0, 100, 25}, {"Wash swell", 0, 100, 25},
+    {"Beat latch", 0, 100, 0}, {"Heat latch", 0, 100, 0}, {"Conv. latch", 0, 100, 0}, {"Wash latch", 0, 100, 0},
 };
+const char *const DR_MACRO_NAME[DR_NSETM + DR_NGEST] = {"Bloom", "Weight", "Tide", "Tear", "Beat", "Heat",
+                                                        "Converge", "Wash"};
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Plate", "Hall", "Chorus hall"};
 
 /* the Ultra LFO's shapes, after the DS-2's names; how each moves is ours (the DS-2 doesn't say) */
@@ -238,8 +244,10 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_REV_NAME[(unsigned)v < DR_NREV ? v : 0]);
     else if (i == P_DLY_LFO || i == P_LFO_RMOD_SRC)
         copy_s(b, TAP[(unsigned)v < 4u ? v : 1]);
-    else if (i == P_MORPH || i == P_FADE || i == P_SCENE_T) {   /* a time: "0.62s", "4.2s", "25s", "2m30" */
-        float t = i == P_MORPH ? 0.02f * fm_exp2f((float)v * 0.105507f)
+    else if (i == P_MORPH || i == P_FADE || i == P_SCENE_T || (i >= P_GR_BEAT && i <= P_GR_WASH)) {
+        /* a time: "0.62s", "4.2s", "25s", "2m30"; a gesture's swell 1 .. 30 s */
+        float t = i >= P_GR_BEAT ? fm_exp2f((float)v * 0.0490689f)
+                : i == P_MORPH ? 0.02f * fm_exp2f((float)v * 0.105507f)
                 : i == P_FADE ? 0.05f * fm_exp2f((float)v * 0.102288f) : 0.1f * fm_exp2f((float)v * 0.115507f);
         secs_text(t, b);
     } else if (i == P_DLY_TIME) {                  /* "177ms" */
@@ -294,7 +302,7 @@ void dr_param_text(int i, int v, char *b)
 }
 
 /* -------------------------------------------------------------- commands --- */
-enum { C_SET, C_PLAY, C_VOICE, C_PANIC, C_SLIDE, C_LFO_RESET, C_PSLIDE, C_SEED, C_DUCK };
+enum { C_SET, C_PLAY, C_VOICE, C_PANIC, C_SLIDE, C_LFO_RESET, C_PSLIDE, C_SEED, C_DUCK, C_GEST };
 #define QN 64u
 static uint32_t q[QN];
 static volatile uint32_t q_w, q_r;
@@ -316,6 +324,7 @@ void dr_slide(int g, int ms) { post(C_SLIDE, g, ms); }
 void dr_pslide(int param, int ms) { post(C_PSLIDE, param, ms); }
 void dr_lfo_reset(void) { post(C_LFO_RESET, 0, 0); }
 void dr_seed(uint32_t s) { post(C_SEED, (int)(s >> 16 & 0xFFu), (int)(s & 0xFFFFu)); }
+void dr_gesture(int g, int amt) { post(C_GEST, g, amt); }
 
 /* ----------------------------------------------------------------- state --- */
 volatile float dr_level[DR_NGROUPS];
@@ -381,7 +390,13 @@ typedef struct {
                                                    * cutoff .. 1 resonance */
 } grp_t;
 
-static int16_t par[DR_NPARAMS];
+static int16_t par[DR_NPARAMS];                   /* the values heard: the sound's own plus the macros' offsets */
+static int16_t base[DR_NPARAMS];                  /* the sound's own values (dr_set) */
+static float gam[DR_NGEST];                       /* the gestures' amounts now, 0..1 (dr_gesture) */
+static uint8_t mac_dirty;                         /* an amount or a depth changed: the offsets again */
+static int16_t moff[DR_NPARAMS];                  /* the macros' offset on each value now (MOFF_ON: a switch on) */
+#define MOFF_ON 0x7FFF
+static float mac_p2;                              /* drone II's pitch move, semitones: Tear's and Converge's */
 /* FEEDBACK: the finished sound (mono, after the effects), kept for a fixed 256 samples (5.8 ms) and fed
  * back into the drones' filters: a loop of the same length whatever the block size */
 #define FB_N 512u
@@ -441,8 +456,12 @@ static void fx_clear(void);                      /* drone_fx.c, included below *
 void dr_init(void)
 {
     int i, g;
+    for (i = 0; i < DR_NGEST; i++)
+        gam[i] = 0.0f;
+    mac_p2 = 0.0f;
     for (i = 0; i < DR_NPARAMS; i++) {
-        par[i] = PARAMS[i].def;
+        par[i] = base[i] = PARAMS[i].def;
+        moff[i] = 0;
         pfs[i] = (float)par[i];
         pslide_ms[i] = 0;
     }
@@ -484,6 +503,81 @@ void dr_init(void)
     q_r = q_w;
 }
 
+/* THE MACROS (v0.2, option D; two performer reviews): each moves several values together, by fixed amounts
+ * at full (D_SW: a switch, on from its first step). Set macros by their amount (P_M_*), gestures by the UI's
+ * swell (gam) times their depth (P_GD_*). The sound's own values (base) stay as they are; what's heard is
+ * base + the sum, clamped to each value's range. Tear and Converge also move drone II's pitch (mac_p2, in
+ * the render: Tear up to an octave, Converge toward the nearest unison or octave of drone I). */
+#define D_SW 0x7FFF
+typedef struct {
+    uint8_t p;
+    int16_t d;
+} moff_t;
+static const moff_t MACRO_OFF[DR_NSETM + DR_NGEST][9] = {
+    /* Bloom: open the sound */
+    {{DR_GP(0, GP_CUTOFF), 220}, {DR_GP(1, GP_CUTOFF), 220}, {DR_GP(0, GP_RESO), -100}, {DR_GP(1, GP_RESO), -100},
+     {P_REV_MIX, 30}, {0, 0}},
+    /* Weight: sink into the sub */
+    {{DR_GP(0, GP_MIX), 50}, {DR_GP(1, GP_MIX), 50}, {DR_GP(0, GP_CUTOFF), -120}, {DR_GP(1, GP_CUTOFF), -120},
+     {DR_GP(0, GP_NOISE), -40}, {DR_GP(1, GP_NOISE), -40}, {0, 0}},
+    /* Tide: bigger and slower together */
+    {{P_MOVE, 40}, {P_LFO_RATE, -25}, {0, 0}},
+    /* Tear: the sync sweep (and drone II up an octave, mac_p2) */
+    {{P_SYNC, D_SW}, {DR_GP(1, GP_RESO), 300}, {0, 0}},
+    /* Beat: the drones beating faster, wider */
+    {{DR_GP(0, GP_DETUNE), 60}, {DR_GP(1, GP_DETUNE), 60}, {P_WIDTH, 40}, {P_DRIFT, 40}, {0, 0}},
+    /* Heat: grit without getting louder */
+    {{DR_GP(0, GP_DRIVE), 60}, {DR_GP(1, GP_DRIVE), 60}, {P_CHAR, 50}, {P_FEEDBACK, 45}, {DR_GP(0, GP_RESO), 80},
+     {DR_GP(1, GP_RESO), 80}, {DR_GP(0, GP_LEVEL), -12}, {DR_GP(1, GP_LEVEL), -12}, {0, 0}},
+    /* Converge: drone II leaning into drone I (its pitch, mac_p2), cross-mod */
+    {{P_XMOD, D_SW}, {P_XMOD_AMT, 60}, {0, 0}},
+    /* Wash: into the delay and the reverb */
+    {{P_DLY_REPEATS, 40}, {P_DLY_MIX, 50}, {P_REV_MIX, 50}, {DR_GP(0, GP_LEVEL), -15}, {DR_GP(1, GP_LEVEL), -15}, {0, 0}},
+};
+static float mac_amt(int m)                      /* a macro's amount now, 0..1 */
+{
+    return m < DR_NSETM ? (float)base[P_M_BLOOM + m] * 0.01f
+                        : gam[m - DR_NSETM] * (float)base[P_GD_BEAT + m - DR_NSETM] * 0.01f;
+}
+static int heard(int i)                          /* the sound's own value with the macros' offset, in range */
+{
+    int v = moff[i] == MOFF_ON ? PARAMS[i].hi : base[i] + moff[i];
+    return v < PARAMS[i].lo ? PARAMS[i].lo : v > PARAMS[i].hi ? PARAMS[i].hi : v;
+}
+static void macro_apply(void)                    /* the offsets again; what changes glides over 25 ms */
+{
+    float off[DR_NPARAMS];
+    uint8_t on[DR_NPARAMS];
+    int m, k, i;
+    for (i = 0; i < DR_NPARAMS; i++) {
+        off[i] = 0.0f;
+        on[i] = 0;
+    }
+    for (m = 0; m < DR_NSETM + DR_NGEST; m++) {
+        float a = mac_amt(m);
+        if (a <= 0.0f)
+            continue;
+        for (k = 0; k < 9 && MACRO_OFF[m][k].d; k++) {
+            if (MACRO_OFF[m][k].d == D_SW)
+                on[MACRO_OFF[m][k].p] = 1;
+            else
+                off[MACRO_OFF[m][k].p] += (float)MACRO_OFF[m][k].d * a;
+        }
+    }
+    for (i = 0; i < DR_NPARAMS; i++) {
+        int v;
+        moff[i] = on[i] ? (int16_t)MOFF_ON : (int16_t)(off[i] + (off[i] >= 0.0f ? 0.5f : -0.5f));
+        v = heard(i);
+        if (v != par[i]) {
+            par[i] = (int16_t)v;
+            pfstep[i] = fm_maxf(fm_fabsf((float)v - pfs[i]) * 1000.0f / (25.0f * DR_SR), 1e-7f);
+        }
+    }
+    mac_dirty = 0;
+}
+
+int dr_heard(int p) { return p >= 0 && p < DR_NPARAMS ? par[p] : 0; }
+
 static void drain(void)
 {
     while (q_r != q_w) {
@@ -492,9 +586,18 @@ static void drain(void)
         BARRIER();
         q_r++;
         switch (c >> 24) {
+        case C_GEST:
+            if (a < DR_NGEST) {
+                gam[a] = fm_clampf((float)b * 0.001f, 0.0f, 1.0f);
+                mac_dirty = 1;
+            }
+            break;
         case C_SET:
             if (a < DR_NPARAMS) {
-                par[a] = (int16_t)(b < PARAMS[a].lo ? PARAMS[a].lo : b > PARAMS[a].hi ? PARAMS[a].hi : b);
+                base[a] = (int16_t)(b < PARAMS[a].lo ? PARAMS[a].lo : b > PARAMS[a].hi ? PARAMS[a].hi : b);
+                par[a] = (int16_t)heard(a);    /* with the macros' offset on it, if any */
+                if (a >= P_M_BLOOM && a <= P_GD_WASH)
+                    mac_dirty = 1;             /* an amount or a depth: the offsets again */
                 {   /* its glide: a step a sample, to arrive over the time asked for (or 25 ms) */
                     float ms = pslide_ms[a] ? (float)pslide_ms[a] : 25.0f;
                     pfstep[a] = fm_maxf(fm_fabsf((float)par[a] - pfs[a]) * 1000.0f / (ms * DR_SR), 1e-7f);
@@ -1094,8 +1197,8 @@ static void render_group(int g, uint32_t n)
         }
         if (chr > 0.0f)                          /* the jitter: noise, low-passed to ~20 Hz */
             v->jit += (rnd() - v->jit) * 0.045f;
-        inc = note_inc(v->ps2 + tune + pmod + v->drift[0] * drift_c + chr * (0.4f * v->jit + mm));
-        pinc = note_inc(v->ps2 + tune + pmod + ival + detune + dw * 0.1f * v->wn[3] + v->drift[1] * drift_c +
+        inc = note_inc(v->ps2 + tune + pmod + v->drift[0] * drift_c + chr * (0.4f * v->jit + mm) + (g ? mac_p2 : 0.0f));
+        pinc = note_inc(v->ps2 + tune + pmod + (g ? mac_p2 : 0.0f) + ival + detune + dw * 0.1f * v->wn[3] + v->drift[1] * drift_c +
                         chr * (0.4f * v->jit + mm));
         sinc = inc * v->sdiv;
         while (sinc < 20.0f / DR_SR)             /* no subsonic sub: under 20 Hz, an octave up (the -2 oct
@@ -1350,10 +1453,18 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
     const float m = (float)gain_q12 * (1.0f / 4096.0f), over = fm_maxf((m - 0.8f) * 5.0f, 0.0f);
     const float gain = fm_minf(m, 0.8f) * 1.78f * (1.0f + 4.0f * over), mout = 1.0f / (1.0f + 0.6f * over);
     drain();
+    if (mac_dirty)
+        macro_apply();
     while (n) {
         uint32_t k = n > BLK ? BLK : n, j;
         int g;
         float frate = fade_rate();
+        {   /* Tear and Converge: drone II's pitch move this block (Converge: toward the nearest unison or
+             * octave of drone I, never more than 6 semitones) */
+            float d = grp[0].ps2 - grp[1].ps2;
+            d -= 12.0f * (float)(int)(d * (1.0f / 12.0f) + (d >= 0.0f ? 0.5f : -0.5f));
+            mac_p2 = 12.0f * mac_amt(3) + d * mac_amt(DR_NSETM + 2);
+        }
         for (j = 0; j < k; j++)
             mixl[j] = mixr[j] = 0.0f;
         pf_run(k);

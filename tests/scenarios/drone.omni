@@ -7,7 +7,7 @@
 # 44 hard sync, 45 pitch link, 46 link offset, 47 LFO rate, 48 Wave I, 49 Wave II, 50 Glide, 51 Fade, 55 Pulse,
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
 # depth.
-# Pages: 0 Play 1 1 Play 2 2 Tone 3 Osc 4 Source 5 LFO depths 6 LFO mods 7 Partner 8 Setup 1 9 Setup 2 10 Swell
+# Pages: 0 Play 1 1 Play 2 2 Tone 3 Osc 4 Source 5 LFO depths 6 LFO mods 7 Macros 8 Partner 9 Setup 1 10 Setup 2 11 Swell
 # 11 Effects 1 12 Effects 2.
 wav drone.wav
 wait 300
@@ -259,7 +259,7 @@ tap ARP
 expect par55 1
 expect view 0
 press ARP
-expect view 10
+expect view 11
 spin K1 10
 expect par56 55
 release ARP
@@ -273,10 +273,10 @@ expect par55 0
 wait 400
 tap ARP
 tap ARP
-expect view 10
+expect view 11
 expect par55 0
 wait 600
-expect view 10
+expect view 11
 tap HOME
 expect view 0
 # REC: the motion loop. Record two turns of KNOB 2 (drone I's cutoff, 50 now), 0.3 s apart, then loop:
@@ -312,7 +312,7 @@ spin K2 -10
 expect par7 650
 # FX: Delay time, Repeats, Delay mix, Reverb mix; again: Reverb type (the delay LFO depth is on LFO mods)
 tap FX
-expect view 11
+expect view 12
 spin K1 -10
 expect par60 40
 spin K2 15
@@ -324,24 +324,26 @@ expect par63 35
 wait 100
 shot fx.png
 tap FX
-expect view 12
+expect view 13
 spin K1 -1
 expect par64 1
 wait 100
 shot fx2.png
 tap FX
-expect view 11
+expect view 12
 # the delay LFO's tap: on the LFO page, drone II's filter group, second key
 tap LFO
 tapkey b9
 expect par65 2
 tap HOME
 expect view 0
-# SEQ: Partner; GLO: Setup
+# SEQ: Macros, again: Partner; GLO: Setup
 tap SEQ
 expect view 7
-tap GLO
+tap SEQ
 expect view 8
+tap GLO
+expect view 9
 spin K2 10
 expect par51 52
 wait 100

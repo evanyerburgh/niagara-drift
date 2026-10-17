@@ -9,7 +9,7 @@ import os, subprocess, sys, tempfile
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BUTTONS = [("play", ["play", "play2"]), ("tone", ["tone"]), ("osc", ["osc", "source"]), ("partner", ["partner"]),
+BUTTONS = [("play", ["play", "play2"]), ("tone", ["tone"]), ("osc", ["osc", "source"]), ("seq", ["macros", "partner"]),
            ("lfo", ["lfo", "lfo2"]), ("swell", ["pulse"]), ("effects", ["fx", "fx2"]), ("setup", ["setup", "setup2"])]
 SCALE, GAP = 2, 16
 BG = (26, 4, 24)
@@ -42,11 +42,11 @@ BODY, TRAY, KNOB, BTN, LABEL = (58, 61, 66), (38, 40, 44), (31, 33, 36), (46, 49
 KEY_W, KEY_B = (217, 218, 220), (201, 202, 205)
 AMBER, TEAL, LILAC, PALE, INK = (255, 176, 74), (69, 227, 211), (201, 155, 255), (255, 214, 240), (20, 0, 15)
 KNOBS = [(105, 100, "MASTER", "Volume", PALE), (215, 100, "SELECT", "LFO rate", LILAC),
-         (105, 205, "PRESETS", "Macro (soon)", PALE), (215, 205, "ALGORITHM", "Movement", LILAC)] + \
+         (105, 205, "PRESETS", "Macro", PALE), (215, 205, "ALGORITHM", "Movement", LILAC)] + \
         [(610 + i * 104, 100, "KNOB%d" % (i + 1), "Drone I" if i < 2 else "Drone II", AMBER if i < 2 else TEAL)
          for i in range(4)]
 ROW1 = [("FX", "Effects"), ("SEL", "Fine"), ("ENV", "Tone"), ("LFO", "LFO"), ("EDIT", "Osc · Src"), ("GLO", "Setup")]
-ROW2 = [("HOME", "Play"), ("SAVE", "Save"), ("ARP", "Swell"), ("SEQ", "Partner"), ("PLAY", "On · off"),
+ROW2 = [("HOME", "Play"), ("SAVE", "Save"), ("ARP", "Swell"), ("SEQ", "Macros"), ("PLAY", "On · off"),
         ("REC", "Loop")]
 BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14]
 BLACK = [("Partner", AMBER), ("Sub", AMBER), ("Filter", AMBER), ("Pitch lock", None), ("LFO reset", None),
