@@ -1593,9 +1593,9 @@ static void pic_lfo2(int32_t y0)
         cv_rect(126, yc, 96, 1, K_GRID);
         plot(126, 2, yd, 49, dd && (w1 || w2) ? K_FX : K_FAINT);
         q = scopy(t, "delay ");
-        if (dd && (w1 || w2)) {
-            q = scopy(q, "+-");
-            itoa_u((uint32_t)(dep * 100.0f + 0.5f), q);
+        if (dd && (w1 || w2)) {                /* "+-25%"; a negative depth wobbles the other way: "-+25%" */
+            q = scopy(q, dd < 0 ? "-+" : "+-");
+            itoa_u((uint32_t)(fm_fabsf(dep) * 100.0f + 0.5f), q);
             while (*q)
                 q++;
             scopy(q, "%");

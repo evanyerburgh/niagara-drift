@@ -145,6 +145,13 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | LFO mods | rate mod | mod by (wave) | I → II cutoff amount | delay LFO depth |
 
 - **Depths** and **rate mod** are centred: the middle is none.
+- **LFO mods**, the LFO moving other things:
+  - **Rate mod**: the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
+  - **Mod by**: which wave does that (I, II or both).
+  - **X-mod amt**: how much drone I's sound moves drone II's filter, while the cross-mod switch (black key 11) is on.
+  - **Dly LFO**: how far the LFO wobbles the delay's time (up to ±25%; negative the other way), on the wave black
+    key 10 picks on the LFO pages. You hear it only with some delay mix (Effects 1).
+  - Movement scales the delay's wobble too, as it does every depth.
 - The LFO's rate and waves are on the top-left knobs; see [The LFO](#the-lfo) below.
 
 #### Swell · ARP
