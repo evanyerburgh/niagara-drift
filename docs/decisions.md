@@ -157,3 +157,10 @@ at the end. The current state is in the [README](../README.md) and the code.
   turns cross-mod on and leans drone II toward the nearest unison or octave of drone I. Amounts, depths,
   swells and latches are values scenes keep; with Pitch lock on a scene leaves Converge's latch alone.
   PROJ_FORMAT 22 (19–21 converted: their 78 values a sound widened, the new ones at their defaults).
+- 2026-10-17: a new starting sound (also Preset P1), slow and breathing like the calm Lyra-8: filter LFO depths
+  ±85 at LFO rate 8, Wave II a random glide, the Swell on (rate 6, depth 40), resonance 250, delay mix 25 with
+  repeats 50 and a +20 wobble, reverb mix 35. Measured: a 16 dB loudness swing, 1.6 octaves of brightness, 95–99 %
+  of the movement slower than 0.5 Hz (0.1's start: 3.7 dB, 0.7 octaves, ~42 %).
+- 2026-10-17: a restart brings back every saved value (the engine's queue held 64 and dropped the rest of a
+  load, so effects, Character, Feedback and the macros came back at their defaults); it holds 128 now.
+- 2026-10-17: a save writes the project only when it differs from what's on the flash (the banks already were).

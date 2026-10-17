@@ -21,12 +21,31 @@ static int32_t buf[2 * 256];
 
 /* the engine as it boots, but dry (no reverb, no delay): the drones' own pitch and level are measured;
  * the effects have their own checks below */
+/* the starting sound before 2026-10-17 (the Lyra-like one is slower, deeper, with the Swell, the delay, more
+ * reverb): these checks were made on it, and test the engine, not the starting sound */
+static void classic(void)
+{
+    dr_set(DR_GP(0, GP_FLFO_DEPTH), 25);
+    dr_set(DR_GP(1, GP_FLFO_DEPTH), -25);
+    dr_set(DR_GP(0, GP_RESO), 350);
+    dr_set(DR_GP(1, GP_RESO), 350);
+    dr_set(P_LFO_RATE, 30);
+    dr_set(P_LFO_W2, 1);
+    dr_set(P_DLY_REPEATS, 35);
+    dr_set(P_DLY_MIX, 0);
+    dr_set(P_REV_MIX, 25);
+    dr_set(P_DLY_LFO_DEPTH, 0);
+    dr_set(P_PULSE, 0);
+    dr_set(P_PULSE_RATE, 45);
+    dr_set(P_PULSE_DEPTH, 48);
+}
 static void dry_init(void)
 {
     dr_init();
+    dr_set(P_MORPH, 0);                             /* switches at once (20 ms); the Morph has its own checks */
+    classic();
     dr_set(P_REV_MIX, 0);
     dr_set(P_DLY_MIX, 0);
-    dr_set(P_MORPH, 0);                             /* switches at once (20 ms); the Morph has its own checks */
     dr_set(DR_GP(0, GP_FLFO_DEPTH), 0);             /* the drones still (the default breathes a little) */
     dr_set(DR_GP(1, GP_FLFO_DEPTH), 0);
 }
@@ -873,6 +892,7 @@ int main(void)
         }
         {   /* the tails ring on after PLAY stops (the default: some reverb) */
             dr_init();
+    classic();
             dr_set(P_FADE, 0);
             dr_play(1);
             run(secs(1.0f));

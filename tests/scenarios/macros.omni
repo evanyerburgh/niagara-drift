@@ -5,7 +5,7 @@
 tap PLAY
 wait 1000
 expect heard7 700
-# SEQ: the Macros page. Bloom at 100: the cutoffs +220, the reverb mix +30; the knob's own value stays
+# SEQ: the Macros page. Bloom at 100: the cutoffs +220, the reverb mix +30 (35 to start); the knob's own value stays
 tap SEQ
 expect view 7
 spin K1 100
@@ -13,7 +13,7 @@ wait 100
 expect par78 100
 expect par7 700
 expect heard7 920
-expect heard63 55
+expect heard63 65
 spin K1 -100
 wait 100
 expect heard7 700
@@ -101,3 +101,16 @@ wait 3000
 expect par78 40
 expect par93 100
 expect heard7 788
+# a restart brings the whole sound back to the engine, the macros too (the last values of a load were
+# once dropped)
+tap SAVE
+wait 500
+reboot
+wait 500
+expect par78 40
+expect heard7 788
+# SAVE again with nothing changed: nothing is written (each write is a late block while playing)
+expect store_writes 1
+tap SAVE
+wait 500
+expect store_writes 1

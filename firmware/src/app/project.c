@@ -5,6 +5,16 @@
 project_t proj;
 static bank_t bank_bc[2];                  /* banks B, C */
 static uint8_t bank_dirty;                 /* bit 1 B, bit 2 C: to be written with the next save */
+static uint32_t proj_h;                    /* a hash of the project as on the flash, 0 = unknown: a save that
+                                            * would write the same bytes skips it (each write is a late block) */
+static uint32_t proj_hash(void)
+{
+    const uint8_t *p = (const uint8_t *)&proj;
+    uint32_t h = 2166136261u, i;               /* FNV-1a */
+    for (i = 0; i < sizeof proj; i++)
+        h = (h ^ p[i]) * 16777619u;
+    return h | 1u;                             /* never 0 */
+}
 
 /* the Presets bank: the starting sound, and the bass test (both drones an octave down, the filters darker,
  * resonance 100); the rest to be made by ear. Each a list of changes from the defaults, ended by -1 */
@@ -42,6 +52,7 @@ static void bank_blank(bank_t *b)
 void project_defaults(void)
 {
     int i;
+    proj_h = 0;
     memset(&proj, 0, sizeof proj);
     proj.magic = PROJ_MAGIC;
     proj.format = PROJ_FORMAT;
@@ -232,6 +243,7 @@ int project_load(void)
     for (i = 0; i < NSCENES; i++)              /* a scene out of range is dropped, not the project */
         if ((proj.scene_used >> i & 1u) && !in_range(proj.scene[i]))
             proj.scene_used &= (uint16_t)~(1u << i);
+    proj_h = from == PROJ_FORMAT ? proj_hash() : 0u;   /* converted: not yet on the flash in this format */
     return 0;
 }
 
@@ -239,13 +251,21 @@ int project_save(void)                         /* the banks first: a converted 0
                                                 * the flash before the project that no longer holds them */
 {
     int rc = 0, b;
+    uint32_t h;
     for (b = 1; b <= 2; b++)
         if (!rc && (bank_dirty >> b & 1u)) {
             rc = plat_store_save(b == 1 ? OBJ_BANKB : OBJ_BANKC, &bank_bc[b - 1], sizeof bank_bc[b - 1]);
             if (!rc)
                 bank_dirty &= (uint8_t)~(1u << b);
         }
-    return rc ? rc : plat_store_save(OBJ_PROJ, &proj, sizeof proj);
+    if (rc)
+        return rc;
+    h = proj_hash();
+    if (h == proj_h)
+        return 0;                              /* the flash has it already */
+    rc = plat_store_save(OBJ_PROJ, &proj, sizeof proj);
+    proj_h = rc ? 0u : h;
+    return rc;
 }
 
 void project_apply(void)

@@ -1,3 +1,5 @@
+# from the starting sound before 2026-10-17 (these checks were made on it)
+classic
 # the motion loop and the gliding knobs (2026-10-10 review): the loop goes back to its start gliding
 # over the Morph time (0.62 s), not in a jump; a recording runs past 30 s (up to 5 minutes)
 # drone I's filter LFO and the Drift at 0 (the default breathes and wanders), so the cutoff probe sees the

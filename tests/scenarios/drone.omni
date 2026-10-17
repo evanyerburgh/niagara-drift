@@ -1,3 +1,5 @@
+# from the starting sound before 2026-10-17 (these checks were made on it)
+classic
 # Niagara Drift, the control map: two drones. KNOB 1-2 drone I, KNOB 3-4 drone II on every page; page
 # buttons (tap to stay, hold to peek); OCT- / OCT+; the black keys as switches, following the page; pitch
 # link; the LFO on SELECT / ALGORITHM / PRESETS; MIDI; scenes on the white keys; save and reboot.
@@ -377,7 +379,8 @@ wait 2500
 expect fade 0
 wait 4500
 expect dirty 0
-expect store_writes 2
+# the knob came back where it was: the flash has this sound already, so nothing is written
+expect store_writes 1
 wavstop
 # everything comes back after a reboot
 reboot
@@ -395,7 +398,7 @@ press SAVE
 tapkey w0
 release SAVE
 expect scenes 1
-expect store_writes 3
+expect store_writes 2
 expect view 0
 # the sound is scene 1 (its key blinks), until a knob is turned
 expect scene_at 0
