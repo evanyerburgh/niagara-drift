@@ -1572,10 +1572,19 @@ static void pic_lfo2(int32_t y0)
     /* --- cross-mod (bottom left): drone II's filter moving with drone I's sound --- */
     {
         int on = proj.par[P_XMOD] != 0;
-        float a = (float)proj.par[P_XMOD_AMT] * 0.01f, cut = dr_cut[1];
-        float sft = on ? dr_scope[0][(ui.frame * 7u) % DR_SCOPE_N] * 12.0f * a * a / 0.0981378f : 0.0f;
-        if (on && a > 0.0f)
-            draw_filter(1, cut, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
+        float a = (float)proj.par[P_XMOD_AMT] * 0.01f, cut = dr_cut[1], k = 12.0f * a * a / 0.0981378f;
+        float sft = on ? dr_scope[0][(ui.frame * 7u) % DR_SCOPE_N] * k : 0.0f;
+        if (on && a > 0.0f) {                  /* the range drone I's sound pushes it through (a band that widens
+                                                * with the amount: one moving line alone hardly showed it), dim */
+            float mn = 0.0f, mx = 0.0f;
+            uint32_t j;
+            for (j = 0; j < DR_SCOPE_N; j++) {
+                mn = fm_minf(mn, dr_scope[0][j]);
+                mx = fm_maxf(mx, dr_scope[0][j]);
+            }
+            draw_filter(1, cut + mn * k, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
+            draw_filter(1, cut + mx * k, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
+        }
         draw_filter(1, cut + sft, 14, y0 + 86, 96, 36, on ? K_DRONE[1] : K_FAINT);
         cv_text(12, y0 + 66, &FONT_S, on ? "I > II cut" : "x-mod off", on ? K_DRONE[1] : K_DIM);
     }
