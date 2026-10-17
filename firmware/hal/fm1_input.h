@@ -126,6 +126,12 @@ static uint8_t fm1_led[FM1_NCOL];
 static uint8_t fm1_led_dim[FM1_NCOL];
 static volatile uint8_t fm1_led_dim_div;
 static uint8_t fm1__dim_frame;
+/* Niagara Drift: brightness levels by software PWM. A scan frame (every column once, ~1.1 ms) is one of
+ * FM1_LED_PHASES; fm1_led_pwm[phase][col] adds the LEDs lit in that frame (packed as fm1_led). A level's frames
+ * are spread evenly over the cycle, so a half-lit LED alternates every frame (~450 Hz) instead of 16 on, 16 off. */
+#define FM1_LED_PHASES 32u
+static uint8_t fm1_led_pwm[FM1_LED_PHASES][FM1_NCOL];
+static uint8_t fm1__pwm_phase;
 /* MONK-1: a lit LED's current goes through its column line and lifts the readings of that column's keys
  * (Velo measured +25 counts): a key that is held would see its pressure jump when an LED in its column
  * changes. FM1_INPUT_LED_OK(col, rowbit) answers 0 for a key that is not open: its column's LEDs then
@@ -135,7 +141,7 @@ static uint8_t fm1__dim_frame;
 #endif
 static uint32_t fm1__leds(uint32_t n)
 {
-    return fm1_led[n] | (fm1_led_dim_div && fm1__dim_frame == 0u ? fm1_led_dim[n] : 0u);
+    return fm1_led[n] | fm1_led_pwm[fm1__pwm_phase][n] | (fm1_led_dim_div && fm1__dim_frame == 0u ? fm1_led_dim[n] : 0u);
 }
 static volatile struct {
     uint16_t con;                /* the conversion's clock / start delay (FM1_ADC_CON); 0 = analog off */
@@ -422,6 +428,7 @@ static void fm1_input_tick(void)
         uint32_t np = (fm1_an.probe & 1u) + ((fm1_an.probe >> 1) & 1u) + ((fm1_an.probe >> 2) & 1u);
         if (++fm1__dim_frame >= fm1_led_dim_div)
             fm1__dim_frame = 0;
+        fm1__pwm_phase = (uint8_t)((fm1__pwm_phase + 1u) % FM1_LED_PHASES);
         fm1__frame();
         fm1_an.phase = (uint8_t)(fm1_an.phase + 1u >= 2u + np ? 0u : fm1_an.phase + 1u);
     }
