@@ -696,7 +696,7 @@ static void save_run(void)                             /* each look at the input
 static void scene_store(int n)                         /* SAVE held + a white key: and into the flash */
 {
     if (proj.bank == BANK_PRESETS) {                   /* the Presets are the firmware's: the way out */
-        say_c("PRESETS: READ-ONLY", "SEL+D5: A", K_GOLD);
+        say_c("PRESETS", "READ-ONLY", K_GOLD);       /* the README says the way out: a bank of yours */
         return;
     }
     scene_put(proj.bank, n);
