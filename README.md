@@ -167,7 +167,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Swell | rate | depth | shape | swing |
 
 - Tap ARP to start or stop the Swell; tap it twice to see this page.
-- **The Swell** runs from a 33-second breath to a buzz (it starts at about one breath every two seconds).
+- **The Swell** runs from a 33-second breath to a buzz (the starting sound has it on: a slow breath, 40 deep).
 - **Depth** is how far it dips, in dB (down to −30; all the way, silence). **Shape** firms the breath up into
   a pulse, and only at the top into a hard gate.
 
@@ -219,8 +219,8 @@ One clock, two waves; the OCT− and OCT+ lights pulse with them. The last shape
 
 **Movement** (ALGORITHM) is how much of all that you hear: it scales every LFO depth together, as you've set
 them. At 0% the LFO moves nothing, whatever the depths say; at 100% (the middle) the depths are as set; at 200%
-they're twice as deep. It can only scale depths you've set: the starting sound only breathes its filters a
-little, so set an osc depth to hear it work.
+they're twice as deep. It can only scale depths you've set: the starting sound breathes its filters deeply
+and slowly, so Movement is heard at once; set an osc depth to hear it move the pitch too.
 
 | Movement scales | Movement leaves alone |
 |---|---|
