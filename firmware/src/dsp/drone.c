@@ -45,7 +45,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Stereo", 0, 100, 60}, {"Tune", -50, 50, 0},
     {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", 0, 100, 25}, {"Swing", 0, 50, 0},
     {"Time", 0, 100, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
-    {"Reverb", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Dly LFO", -100, 100, 20},
+    {"Type", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Dly LFO", -100, 100, 20},
     {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
     {"Morph", 0, 100, 47}, {"Scene switch", 0, 100, 30}, {"Tuning", 0, 1, 0}, {"Speaker", 0, 100, 0},
     {"Pitch lock", 0, 1, 0}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
@@ -53,10 +53,12 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Beat depth", 0, 100, 70}, {"Heat depth", 0, 100, 70}, {"Conv. depth", 0, 100, 100}, {"Wash depth", 0, 100, 70},
     {"Beat swell", 0, 100, 25}, {"Heat swell", 0, 100, 25}, {"Conv. swell", 0, 100, 25}, {"Wash swell", 0, 100, 25},
     {"Beat latch", 0, 100, 0}, {"Heat latch", 0, 100, 0}, {"Conv. latch", 0, 100, 0}, {"Wash latch", 0, 100, 0},
+    {"Type", 0, DR_NDLY - 1, 0}, {"Length", 0, 100, 60}, {"Damp", 0, 100, 40}, {"Pressure", 0, 100, 50},
 };
 const char *const DR_MACRO_NAME[DR_NSETM + DR_NGEST] = {"Bloom", "Weight", "Tide", "Tear", "Beat", "Heat",
                                                         "Converge", "Wash"};
-const char *const DR_REV_NAME[DR_NREV] = {"Room", "Plate", "Hall", "Chorus hall"};
+const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
+const char *const DR_DLY_NAME[DR_NDLY] = {"Tape", "Wide", "Ping-pong", "Clean"};
 
 /* the Ultra LFO's shapes, after the DS-2's names; how each moves is ours (the DS-2 doesn't say) */
 const char *const DR_LFO_W1_NAME[DR_LFO_NSHAPES] = {"Off", "Triangle", "Square", "Saw", "Roundtooth",
@@ -244,6 +246,14 @@ void dr_param_text(int i, int v, char *b)
     }
     else if (i == P_REV_TYPE)
         copy_s(b, DR_REV_NAME[(unsigned)v < DR_NREV ? v : 0]);
+    else if (i == P_DLY_TYPE)
+        copy_s(b, DR_DLY_NAME[(unsigned)v < DR_NDLY ? v : 0]);
+    else if (i == P_REV_LEN) {                   /* "4.4s", "Inf" */
+        if (v >= 100)
+            copy_s(b, "Inf");
+        else
+            secs_text(0.3f * fm_exp2f((float)v * 0.070607f), b);
+    }
     else if (i == P_DLY_LFO || i == P_LFO_RMOD_SRC)
         copy_s(b, TAP[(unsigned)v < 4u ? v : 1]);
     else if (i == P_MORPH || i == P_FADE || i == P_SCENE_T || (i >= P_GR_BEAT && i <= P_GR_WASH)) {
@@ -537,7 +547,8 @@ static const moff_t MACRO_OFF[DR_NSETM + DR_NGEST][9] = {
     /* Converge: drone II leaning into drone I (its pitch, mac_p2), cross-mod */
     {{P_XMOD, D_SW}, {P_XMOD_AMT, 60}, {0, 0}},
     /* Wash: into the delay and the reverb */
-    {{P_DLY_REPEATS, 40}, {P_DLY_MIX, 50}, {P_REV_MIX, 50}, {DR_GP(0, GP_LEVEL), -15}, {DR_GP(1, GP_LEVEL), -15}, {0, 0}},
+    {{P_DLY_REPEATS, 40}, {P_DLY_MIX, 50}, {P_REV_MIX, 50}, {P_REV_LEN, 45}, {DR_GP(0, GP_LEVEL), -15},
+     {DR_GP(1, GP_LEVEL), -15}, {0, 0}},
 };
 static float mac_amt(int m)                      /* a macro's amount now, 0..1 */
 {
@@ -1519,9 +1530,8 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
             for (j = 0; j < k; j++)
                 pk = fm_maxf(pk, fm_maxf(fm_fabsf(mixl[j]), fm_fabsf(mixr[j])));
             fx_quiet = pk < 1e-6f ? fx_quiet + 1u : 0u;
-        } else {                                 /* resting: the delay's time goes straight to its knob */
-            dly_t = dly_ms(par[P_DLY_TIME]) * 0.001f * DR_SR;
-            fx_gains();
+        } else {                                 /* resting: the delay goes straight to its knobs */
+            fx_rest();
         }
         {                                        /* FEEDBACK: this block's sound, for the drones 256 samples on */
             float pk = 0.0f;

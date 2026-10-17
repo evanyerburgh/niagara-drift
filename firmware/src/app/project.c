@@ -114,11 +114,12 @@ static int in_range(const int16_t *v)
     return 1;
 }
 
-/* the older layouts, each with 78 values a sound (DR_NPARAMS before the macros): 19 and 20 had 16 scenes in
- * the project (scenes 13-16 become B1-B4), 21 had bank A there and B, C in their own objects. A value added
- * since takes its default. */
+/* the older layouts: 19 and 20 had 16 scenes in the project (scenes 13-16 become B1-B4), 21 had bank A there and
+ * B, C in their own objects, each with 78 values a sound (DR_NPARAMS before the macros); 22 as 21 with 94 (before
+ * the effects' four). A value added since takes its default. */
 #define NP21 78
-_Static_assert(DR_NPARAMS >= NP21, "the values only grow");
+#define NP22 94
+_Static_assert(DR_NPARAMS >= NP22, "the values only grow");
 typedef struct {
     uint32_t magic, format;
     int16_t par[NP21];
@@ -140,20 +141,36 @@ typedef struct {
     uint16_t used, rsv;
     int16_t scene[NSCENES][NP21];
 } bank_v21_t;
+typedef struct {
+    uint32_t magic, format;
+    int16_t par[NP22];
+    uint8_t leds, bank, mlive;
+    uint8_t rsv[13];
+    uint16_t scene_used;
+    int16_t scene[NSCENES][NP22];
+} proj_v22_t;
+typedef struct {
+    uint32_t magic, format;
+    uint16_t used, rsv;
+    int16_t scene[NSCENES][NP22];
+} bank_v22_t;
 static union {
     project_t p;
     proj_v20_t o20;
     proj_v21_t o21;
     bank_t b;
     bank_v21_t b21;
+    proj_v22_t o22;
+    bank_v22_t b22;
     uint8_t raw[PLAT_STORE_MAX];
 } ld;
 
 static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old sound: the new values' defaults */
 {
     int k;
+    const int np = from >= 22u ? NP22 : NP21;
     for (k = 0; k < DR_NPARAMS; k++)
-        dst[k] = k < NP21 ? src[k] : dr_param_info(k)->def;
+        dst[k] = k < np ? src[k] : dr_param_info(k)->def;
     if (dst[P_LFO_RATE] < 0)                   /* slower than 50 s, as it went before 2026-10-14: the slowest */
         dst[P_LFO_RATE] = 0;
     convert(dst, from);
@@ -169,6 +186,11 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
         return;
     if (ld.b.format == PROJ_FORMAT) {
         *k = ld.b;
+    } else if (ld.b.format == 22u) {
+        k->used = ld.b22.used;
+        for (i = 0; i < NSCENES; i++)
+            widen(k->scene[i], ld.b22.scene[i], 22u);
+        bank_dirty |= (uint8_t)(1u << b);
     } else if (ld.b.format == 21u) {
         k->used = ld.b21.used;
         for (i = 0; i < NSCENES; i++)
@@ -200,6 +222,17 @@ int project_load(void)
     }
     if (from == PROJ_FORMAT) {
         proj = ld.p;
+    } else if (from == 22u) {
+        static proj_v22_t o;
+        o = ld.o22;
+        memset(&proj, 0, sizeof proj);
+        widen(proj.par, o.par, from);
+        proj.leds = o.leds;
+        proj.bank = o.bank;
+        proj.mlive = o.mlive;
+        proj.scene_used = o.scene_used & ((1u << NSCENES) - 1u);
+        for (i = 0; i < NSCENES; i++)
+            widen(proj.scene[i], o.scene[i], from);
     } else if (from == 21u) {
         static proj_v21_t o;
         o = ld.o21;

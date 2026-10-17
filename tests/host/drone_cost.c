@@ -83,6 +83,22 @@ static void drone(int partners, int voices, int heavy)   /* voices: how many dro
         dr_set(P_DLY_LFO_DEPTH, 50);
         dr_set(P_REV_TYPE, 3);
     }
+    if (heavy > 1) {                              /* the worst case: everything above, with the feedback, the
+                                                   * character, Drift, stereo, rate mod and the macros all in */
+        dr_set(P_FEEDBACK, 100);
+        dr_set(P_CHAR, 100);
+        dr_set(P_DRIFT, 100);
+        dr_set(P_WIDTH, 100);
+        dr_set(P_LFO_RMOD, 50);
+        dr_set(P_DLY_REPEATS, 90);
+        dr_set(P_REV_MIX, 80);
+        dr_set(P_M_BLOOM, 100);
+        dr_set(P_M_WEIGHT, 50);
+        dr_set(P_M_TIDE, 50);
+        dr_set(P_M_TEAR, 50);
+        for (g = 0; g < DR_NGEST; g++)
+            dr_gesture(g, 1000);
+    }
     dr_play(1);
 }
 
@@ -126,6 +142,10 @@ int main(void)
     /* the limit: the engine's worst case under ~40 % of the device, leaving the rest for the delay,
      * the reverb and the UI */
     report("everything: blends, LFOs, links, pulse, delay, reverb", ipc, ns, 2350.0);
+
+    drone(1, 2, 2);
+    ipc = cost(dr_render, &ns);
+    report("worst case: + feedback, character, drift, macros", ipc, ns, 0);
 
     printf(bad ? "drone cost: OVER LIMIT\n" : "drone cost: ok\n");
     return bad ? 1 : 0;

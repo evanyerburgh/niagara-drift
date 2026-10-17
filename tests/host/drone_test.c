@@ -841,34 +841,35 @@ int main(void)
                 }
             }
         }
-        {   /* the reverb: each type's tail (time to fall 30 dB after a burst), and stereo */
-            float tail[DR_NREV], mono[DR_NREV];
-            int ty;
-            for (ty = 0; ty < DR_NREV; ty++) {
-                static float capr[88200];
+        {   /* the reverb: the tail (time to fall 30 dB after a burst) follows LENGTH, every type is stereo and
+             * mono-safe, and Inf holds while playing and lets go when PLAY stops */
+            float tail[3], mono[DR_NREV];
+            static const int LEN[3] = {20, 40, 55};
+            int ty, li;
+            for (li = 0; li < 3 + DR_NREV; li++) {
+                static float capr[176400];
                 float ref;
+                ty = li < 3 ? 2 : li - 3;
                 dry_init();
                 dr_set(P_FADE, 0);
                 dr_set(DR_GP(1, GP_LEVEL), 0);
                 dr_set(P_REV_MIX, 100);
                 dr_set(P_REV_TYPE, ty);
-                run(secs(0.3f));                        /* the tank rebuilt at its size */
+                dr_set(P_REV_LEN, li < 3 ? LEN[li] : 55);
+                run(secs(0.3f));
                 dr_play(1);
                 run(secs(0.3f));
                 dr_play(0);
                 run(secs(0.06f));                       /* the drone gone (50 ms fade) */
-                capture(capr, 88200, 0);
-                ref = rms_of(capr, 2205);
-                for (k = 0; k < 40 && rms_of(capr + k * 2205, 2205) > ref * 0.0316f; k++)
-                    ;
-                tail[ty] = (float)k * 0.05f;
-                {   /* stereo, and mono-safe: the tail's mid (L+R) within 6 dB of its sides (uncorrelated: 3) */
+                if (li < 3) {
+                    capture(capr, 176400, 0);
+                    ref = rms_of(capr, 2205);
+                    for (k = 0; k < 80 && rms_of(capr + k * 2205, 2205) > ref * 0.0316f; k++)
+                        ;
+                    tail[li] = (float)k * 0.05f;
+                } else {   /* stereo, and mono-safe: the tail's mid (L+R) within 6 dB of its sides (uncorrelated: 3) */
                     float sl = 0.0f, sr = 0.0f, sm = 0.0f;
                     int i2, kk = 0;
-                    dr_play(1);
-                    run(secs(0.12f));
-                    dr_play(0);
-                    run(secs(0.07f));
                     while (kk < 20480) {
                         dr_render(buf, 256, 3277);
                         for (i2 = 0; i2 < 256; i2++, kk++) {
@@ -881,14 +882,35 @@ int main(void)
                     mono[ty] = 10.0f * log10f(sm / (0.5f * (sl + sr)));
                 }
             }
-            printf("    reverb tails (to -30 dB): room %.2f s, plate %.2f s, hall %.2f s, chorus hall %.2f s\n",
-                   (double)tail[0], (double)tail[1], (double)tail[2], (double)tail[3]);
+            printf("    reverb tails (to -30 dB) at Length 20, 40, 55: %.2f, %.2f, %.2f s\n", (double)tail[0],
+                   (double)tail[1], (double)tail[2]);
             printf("    reverb mono (mid vs sides): %.1f, %.1f, %.1f, %.1f dB\n", (double)mono[0], (double)mono[1],
                    (double)mono[2], (double)mono[3]);
             check("reverb: stereo but mono-safe (the mid within 6 dB of the sides, every type)",
                   mono[0] > -6.0f && mono[1] > -6.0f && mono[2] > -6.0f && mono[3] > -6.0f && mono[0] < -0.5f);
-            check("reverb: room < plate < hall, chorus hall at least the hall", tail[0] < tail[1] && tail[1] < tail[2] &&
-                                                                              tail[3] >= tail[2] && tail[0] > 0.1f);
+            check("reverb: a longer Length, a longer tail", tail[0] > 0.1f && tail[0] < tail[1] && tail[1] < tail[2]);
+            {   /* Inf: a burst, then the drones silent but playing: the tail holds; PLAY off: it lets go */
+                float a1, a2, a3;
+                dry_init();
+                dr_set(P_FADE, 0);
+                dr_set(P_REV_MIX, 100);
+                dr_set(P_REV_LEN, 100);
+                dr_play(1);
+                run(secs(0.5f));
+                dr_set(DR_GP(0, GP_LEVEL), 0);
+                dr_set(DR_GP(1, GP_LEVEL), 0);
+                run(secs(0.5f));
+                a1 = (run(secs(0.5f)), rms());
+                run(secs(3.0f));
+                a2 = (run(secs(0.5f)), rms());
+                dr_play(0);
+                run(secs(4.0f));
+                a3 = (run(secs(0.5f)), rms());
+                printf("    reverb Inf: %.1f dB after 3 s playing, %.1f dB 4 s after PLAY off\n",
+                       (double)(20.0f * log10f(a2 / a1)), (double)(20.0f * log10f(a3 / a1 + 1e-9f)));
+                check("reverb: Inf holds while playing (within 3 dB over 3 s) and lets go when PLAY stops",
+                      a1 > 1e-4f && a2 > a1 * 0.7f && a3 < a1 * 0.05f);
+            }
         }
         {   /* the tails ring on after PLAY stops (the default: some reverb) */
             dr_init();

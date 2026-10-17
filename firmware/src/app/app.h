@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 22u                  /* 22: the macros (16 values more a sound; 19-21 are read and converted);
+#define PROJ_FORMAT 23u                  /* 23: the effects (delay type, reverb length and damp, pressure; 19-22
+                                          * are read and converted); 22: the macros (16 values more a sound; 19-21 are read and converted);
                                           * 21: scenes in banks: A (12) here, B and C in their own objects (v0.2;
                                           * 19 and 20 are read and converted: scenes 13-16 become B1-B4);
                                           * 20: the noise Colour a blend 0..100; 19: the Swell's Depth in dB (18: noise,
