@@ -32,8 +32,8 @@ banks you pick with SEL and the top four.*
   move its own rate and lock to the Swell.
 - **Movement** (ALGORITHM): all the LFO's depths down or up together, from still to double.
 - **The Swell**: both drones breathing in time, from a slow soft swell to a hard rhythmic gate, with swing.
-- **Effects**: a dark PT2399-style delay (the LFO can warble its time) into a stereo reverb (Room,
-  Plate, Hall, Chorus hall).
+- **Effects**: a stereo delay of four types (Tape, Wide, Ping-pong, Clean; the LFO can warble its time) into
+  a reverb of four (Room, Hall, Cathedral, Chorus hall) whose length goes to Inf, a freeze.
 - **Feedback** (the finished sound fed back into the drones) and **Character** (clean to vintage).
 - **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
 - **Morph**: buttons and keys never jump: the sound moves to a new setting over a time you set.
@@ -101,16 +101,25 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Tone · ENV
 
-<img src="docs/img/page-tone.png" width="244" alt="The Tone page: each drone's noise through its filter, and its colour">
+<img src="docs/img/page-tone.png" width="488" alt="The Tone 1 and Tone 2 pages: each drone's noise through its filter, and its colour; the character, the feedback and the speaker's low cut">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Tone | I noise | I colour | II noise | II colour |
+| Tone 1 | I noise | I colour | II noise | II colour |
+| Tone 2 | character | feedback | speaker (low cut) | pressure |
 
 - **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
   It's heard all along the knob and never louder than them (100 is 6 dB under, 50 −12 dB, 25 −18). It
   goes through the drone's filter with them, so the cutoff, resonance, LFO and Drift shape it.
 - **Colour** blends from white (left) to pink (right).
+- **Character** takes the oscillators from clean to vintage: softer edges, a bent saw, a little pitch
+  jitter, the two drones slightly apart, a whisper of noise.
+- **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
+  thickening colour that grows with the knob (more with the delay up), rough at the top but never louder than
+  the sound without it; it fades with the drones when you stop.
+- **Speaker** cuts the deep bass a small speaker can't play (40–240 Hz); leave it off on headphones.
+- **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
+  tuned). Speaker and Pressure are the room's settings: scenes don't change them.
 
 #### Osc · EDIT
 
@@ -153,7 +162,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
   - **Mod by**: which wave does that (I, II or both).
   - **X-mod amt**: how much drone I's sound moves drone II's filter, while the cross-mod switch (black key 11) is on.
   - **Dly LFO**: how far the LFO wobbles the delay's time (up to ±25%; negative the other way), on the wave black
-    key 10 picks on the LFO pages. You hear it only with some delay mix (Effects 1).
+    key 10 picks on the LFO pages. You hear it only with some delay mix (FX, the Delay page).
   - Movement (ALGORITHM) scales the delay's wobble too, as it does the LFO depths; not Rate mod or X-mod (see
     [The LFO](#the-lfo)).
 - The LFO's rate and waves are on the top-left knobs; see [The LFO](#the-lfo) below.
@@ -171,21 +180,26 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 - **Depth** is how far it dips, in dB (down to −30; all the way, silence). **Shape** firms the breath up into
   a pulse, and only at the top into a hard gate.
 
-#### Effects · FX
+#### Delay and Reverb · FX
 
-<img src="docs/img/page-effects.png" width="488" alt="The Effects 1 and Effects 2 pages: the delay's echoes and the reverb's tail; the reverb type and the feedback">
+<img src="docs/img/page-effects.png" width="488" alt="The Delay and Reverb pages: the echoes on the left and right, and the reverb's tail">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Effects 1 | delay time | repeats | delay mix | reverb mix |
-| Effects 2 | reverb type | speaker (low cut) | feedback | character |
+| Delay | type | time | repeats | delay mix |
+| Reverb | type | length | damp | reverb mix |
 
-- **Speaker** cuts the deep bass a small speaker can't play (40–240 Hz); leave it off on headphones.
-- **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
-  thickening colour that grows with the knob (more with the delay up), rough at the top but never louder than
-  the sound without it; it fades with the drones when you stop.
-- **Character** takes the oscillators from clean to vintage: softer edges, a bent saw, a little pitch
-  jitter, the two drones slightly apart, a whisper of noise.
+- **Delay types**: **Tape** (the same on both sides, warm, a gentle wow), **Wide** (stereo: the right side's
+  echoes come at three-quarters of the left's time), **Ping-pong** (the echoes bounce left and right),
+  **Clean** (bright, with no wow, so a just-tuned drone stays still). Changing type glides.
+- **Time** is 70–450 ms, and turning it bends the echoes' pitch, as tape does. **Repeats** past about 85 runs
+  away into self-oscillation ("runaway" on the screen), held by a soft clip.
+- **Reverb types**: **Room**, **Hall**, **Cathedral** (the largest), **Chorus hall** (a hall that shimmers).
+  They differ in size, distance and movement; changing type glides.
+- **Length** is how long the tail takes to die away, 0.3 to 40 seconds. At the top, **Inf**, it never does: a
+  freeze. Press PLAY to stop and the freeze lets go, over about twice the Fade time.
+- **Damp** darkens the tail (out at Inf, so a freeze holds what's in it).
+- The delay and reverb are ChoralRoot's design (see [Credits](#credits)).
 
 #### Setup · GLO
 
@@ -245,7 +259,7 @@ are underneath: at 0 a macro is gone without a trace.
 | **Beat** | the partners detuned, wider, more drift: the drones shimmer | D5, held |
 | **Heat** | drive, character, feedback and a little resonance, the level held: grit without getting louder | E5, held |
 | **Converge** | drone II leans toward drone I (to the nearest unison or octave), cross-mod on | F5, held |
-| **Wash** | into the delay and the reverb, the dry sound a little down | G5, held |
+| **Wash** | into the delay and the reverb, the reverb longer (to Inf, a freeze, at full depth), the dry sound a little down | G5, held |
 
 - **The set macros** (SEQ's Macros page) stay where you leave them. **PRESETS** plays one of them, always at
   hand: Bloom to start; hold **SEL** and turn PRESETS to pick another.
@@ -286,7 +300,7 @@ by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8),
 
 | | |
 |---|---|
-| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). A tap is anything under a quarter of a second, however hard. A scene keeps the sound, not the room: Speaker, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
+| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). A tap is anything under a quarter of a second, however hard. A scene keeps the sound, not the room: Speaker, Pressure, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, over the Morph time. Press it again on the way back and you pick up from there |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **SEL held as you let go** | the blend **stays**, as a sound of its own between the two |
@@ -349,6 +363,8 @@ Niagara Drift is the next link in a chain of FM-1 firmwares:
 - [X0X](https://github.com/charlesvestal/fm1-x0x) and [FoMni](https://github.com/charlesvestal/fm1-fomni)
   by Charles Vestal: the platform reshaped for a single instrument, the host simulator and the
   browser emulator. Niagara Drift started from FoMni's code.
+- [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) by Quixotic7: the design of the delay and the
+  reverb, written anew here.
 
 GPL-3.0-only; see [LICENSING.md](LICENSING.md).
 

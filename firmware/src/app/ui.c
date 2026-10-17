@@ -34,8 +34,10 @@
  * REC            the MOTION LOOP: tap to record what the knobs do, tap again to loop it from the start,
  *                tap again to stop (everything stays where it is); up to 5 minutes (lit: blinking recording,
  *                steady looping)
- *   FX             the effects: Delay time, Repeats, Delay mix, Reverb mix; again: Reverb type
+ *   FX             Delay: type, time, repeats, mix; again: Reverb: type, length (to Inf), damp, mix
  *                  (the delay LFO's tap: the LFO page's key in drone II's filter group)
+ *   ENV            Tone 1: each drone's noise and colour; again: Tone 2: character, feedback, speaker,
+ *                  pressure (the last two the room's)
  * Saving: SAVE, and by itself a few seconds after a change while stopped (a flash write stops the audio
  * for a moment). MIDI in: notes on channel 1 tune drone I, on channel 2 drone II. */
 
@@ -2020,7 +2022,7 @@ static void pic_tone2(int32_t y0)
         float g = press_gain();
         int16_t y[51];
         for (i = 0; i < 51; i++)
-            y[i] = (int16_t)(y0 + 112 - (int32_t)(fm_minf((float)i / 50.0f * g, 1.0f) * 40.0f));
+            y[i] = (int16_t)(y0 + 118 - (int32_t)(fm_minf((float)i / 50.0f * g, 1.0f) * 32.0f));
         cv_text(12, y0 + 64, &FONT_S, "PRESSURE", K_FX);
         plot(12, 2, y, 51, K_FX);
         cv_text(128, y0 + 80, &FONT_XS, "light .. firm", K_DIM);
@@ -2030,7 +2032,7 @@ static void pic_tone2(int32_t y0)
         for (i = 0; i < 51; i++) {
             float f = 20.0f * fm_exp2f((float)i * (5.643856f / 50.0f)), r4 = f / fc;   /* 20 Hz .. 1 kHz */
             float db = sp ? 10.0f * 0.30103f * fm_log2f(r4 * r4 * r4 * r4 / (1.0f + r4 * r4 * r4 * r4)) : 0.0f;
-            y[i] = (int16_t)(y0 + 76 - (int32_t)(fm_maxf(db, -30.0f) * 1.2f));
+            y[i] = (int16_t)(y0 + 86 - (int32_t)(fm_maxf(db, -30.0f) * 1.0f));
         }
         cv_text(12, y0 + 64, &FONT_S, "SPEAKER", sp ? K_FX : K_DIM);
         plot(12, 2, y, 51, sp ? K_FX : K_FAINT);

@@ -22,6 +22,17 @@ wait 1500
 shot tone.png
 spin K1 -30
 spin K3 -100
+# Tone 2: some character and feedback, the speaker's low cut on
+tap ENV
+expect view 3
+spin K1 40
+spin K2 25
+spin K3 30
+wait 1500
+shot tone2.png
+spin K1 -40
+spin K2 -25
+spin K3 -30
 # Osc: drone I between saw and square, drone II on triangle
 tap EDIT
 expect view 4
@@ -105,16 +116,18 @@ spin K4 30
 wait 2500
 shot pulse.png
 release ARP
-# Effects: echoes and the hall
+# Delay: Wide, its echoes left and right
 tap FX
 expect view 13
-spin K2 30
-spin K3 40
+spin K1 1
+spin K3 20
 spin K4 20
 wait 300
 shot fx.png
-# Effects 2: the reverb's type and tail
+# Reverb: the cathedral's tail, a little longer
 tap FX
 expect view 14
+spin K2 10
+spin K4 10
 wait 300
 shot fx2.png
