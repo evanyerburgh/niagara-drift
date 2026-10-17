@@ -90,7 +90,7 @@ enum {
     P_DLY_REPEATS,                  /* 0..100: its feedback; past ~85 it runs away (held by a soft clip) */
     P_DLY_MIX,                      /* 0..100: dry .. wet */
     P_REV_MIX,                      /* the REVERB: 0..100, dry .. wet */
-    P_REV_TYPE,                     /* Room, Plate, Hall, Chorus hall (DR_REV_NAME) */
+    P_REV_TYPE,                     /* Room, Hall, Cathedral, Chorus hall (DR_REV_NAME) */
     P_DLY_LFO,                      /* the delay time's LFO tap: DR_LFO_I, _II, _BOTH (a switch) */
     P_DLY_LFO_DEPTH,                /* -100..100: up to +-25 % of the time; 0 none */
     P_LFO_LOCK,                     /* the LFO restarts at each Pulse bar (two beats) while the pulse runs (1) /
@@ -114,6 +114,11 @@ enum {
     P_GD_BEAT, P_GD_HEAT, P_GD_CONVERGE, P_GD_WASH,      /* the gestures' depths, 0..100 */
     P_GR_BEAT, P_GR_HEAT, P_GR_CONVERGE, P_GR_WASH,      /* ... their swell's time, 0..100 = 1 .. 30 s */
     P_GL_BEAT, P_GL_HEAT, P_GL_CONVERGE, P_GL_WASH,      /* ... latched at, 0..100 (0: not latched) */
+    /* THE EFFECTS (v0.2, ChoralRoot's design) */
+    P_DLY_TYPE,                     /* the delay's type: Tape, Wide, Ping-pong, Clean (DR_DLY_NAME) */
+    P_REV_LEN,                      /* the reverb's LENGTH: 0..99 = 0.3 .. 40 s (its decay time), 100 Inf (a freeze) */
+    P_REV_DAMP,                     /* 0..100: how dark its tail gets, open .. ~600 Hz (out at Inf) */
+    P_PRESS_SENS,                   /* the keys' pressure sensitivity, 0..100 (50: as tuned; a room setting) */
     DR_NPARAMS
 };
 
@@ -134,7 +139,9 @@ extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
 #define DR_PITCH_LO 2068                       /* 27 Hz, in cents over MIDI note 0 */
 #define DR_PITCH_HI 9135                       /* 1.6 kHz */
 #define DR_NREV 4
-extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Plate", "Hall", "Chorus hall" */
+extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
+#define DR_NDLY 4
+extern const char *const DR_DLY_NAME[DR_NDLY];          /* "Tape", "Wide", "Ping-pong", "Clean" */
 #define DR_NINTERVALS 10
 extern const int8_t DR_INTERVALS[DR_NINTERVALS];        /* semitones: -12, -7, -5, 0, 3, 4, 5, 7, 12, 19 */
 

@@ -164,3 +164,14 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-17: a restart brings back every saved value (the engine's queue held 64 and dropped the rest of a
   load, so effects, Character, Feedback and the macros came back at their defaults); it holds 128 now.
 - 2026-10-17: a save writes the project only when it differs from what's on the flash (the banks already were).
+- 2026-10-18: the effects are ChoralRoot's design, written anew in float. The delay is stereo, with four types
+  (each a mode, spread, tone and wow): Tape (mono, warm, gentle wow), Wide (the right at 3/4 of the left's time),
+  Ping-pong, Clean (bright, no wow). The reverb is an eight-line feedback delay network at 22.05 kHz with four
+  types (size, pre-delay, swing, low cut, width): Room, Hall, Cathedral, Chorus hall. FX: Delay (type, time,
+  repeats, mix) / Reverb (type, length 0.3–40 s and Inf, damp, mix); a type change glides. Inf is a freeze
+  (damping out of the loop); stopped, it lets go over about twice the Fade time. Wash adds +45 Length (Inf at
+  full depth). Defaults: Tape, Length 60 (5.9 s), Damp 40.
+- 2026-10-18: ENV has two pages: Tone 1 (noise, colour) and Tone 2 (character, feedback, speaker, pressure
+  sensitivity x0.5–x2). Speaker and Pressure are room settings, not in scenes. PROJ_FORMAT 23 (22 converted).
+- 2026-10-18: worst-case sound on the FM-1 (everything on, full feedback and character, all macros): 57 %
+  average, 70 % peak block, no late blocks (0.1's effects). The new effects cost the same on the host.

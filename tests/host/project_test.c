@@ -64,7 +64,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 22, on bank A", proj.format == 22u && PROJ_FORMAT == 22u && proj.bank == 0);
+    check("now format 23, on bank A", proj.format == 23u && PROJ_FORMAT == 23u && proj.bank == 0);
     check("a value 0.1 didn't have (Beat's depth) at its default", proj.par[P_GD_BEAT] == dr_param_info(P_GD_BEAT)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -87,7 +87,7 @@ int main(void)
     proj.bank = 2;
     project_save();
     memset(&proj, 0, sizeof proj);
-    check("reloaded (22): as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
+    check("reloaded (23): as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
                                          scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 3015 && scene_get(2, 2) &&
                                          scene_get(2, 2)[DR_GP(0, GP_PITCH)] == 5000 && scene_get(0, 11));
     {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */
@@ -121,6 +121,41 @@ int main(void)
                   scene_get(1, 2)[P_GD_HEAT] == dr_param_info(P_GD_HEAT)->def);
         check("... and B written again in the new layout on the next save",
               project_save() == 0 && store_n[OBJ_BANKB] == (int)sizeof(bank_t));
+    }
+    {   /* PR #12's (22): the macros, 94 values a sound; the effects' four take their defaults */
+        static proj_v22_t p22;
+        static bank_v22_t b22;
+        int k;
+        memset(&p22, 0, sizeof p22);
+        memset(&b22, 0, sizeof b22);
+        p22.magic = PROJ_MAGIC;
+        p22.format = 22u;
+        for (k = 0; k < NP22; k++)
+            p22.par[k] = b22.scene[0][k] = p22.scene[1][k] = dr_param_info(k)->def;
+        p22.par[P_M_BLOOM] = 60;
+        p22.par[P_REV_TYPE] = 1;
+        p22.mlive = 2;
+        p22.bank = 2;
+        p22.scene_used = 1u << 1;
+        p22.scene[1][P_GL_WASH] = 100;
+        b22.magic = BANK_MAGIC;
+        b22.format = 22u;
+        b22.used = 1u;
+        b22.scene[0][P_CHAR] = 77;
+        memset(store_n, 0, sizeof store_n);
+        memcpy(store[OBJ_PROJ], &p22, sizeof p22);
+        store_n[OBJ_PROJ] = (int)sizeof p22;
+        memcpy(store[OBJ_BANKC], &b22, sizeof b22);
+        store_n[OBJ_BANKC] = (int)sizeof b22;
+        check("PR #12's project (22) loads: its macros, reverb type, bank and live macro kept",
+              project_load() == 0 && proj.par[P_M_BLOOM] == 60 && proj.par[P_REV_TYPE] == 1 && proj.bank == 2 &&
+                  proj.mlive == 2 && proj.par[P_REV_LEN] == dr_param_info(P_REV_LEN)->def);
+        check("... A2 and C1 as they were, the new values at their defaults",
+              scene_get(0, 1) && scene_get(0, 1)[P_GL_WASH] == 100 && scene_get(2, 0) &&
+                  scene_get(2, 0)[P_CHAR] == 77 && scene_get(2, 0)[P_DLY_TYPE] == 0 &&
+                  scene_get(2, 0)[P_PRESS_SENS] == 50);
+        check("... and C written again in the new layout on the next save",
+              project_save() == 0 && store_n[OBJ_BANKC] == (int)sizeof(bank_t));
     }
     old_project(20u);
     check("v0.2's first (20) loads, Colours as they were",

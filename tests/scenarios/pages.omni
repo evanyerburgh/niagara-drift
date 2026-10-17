@@ -22,9 +22,20 @@ wait 1500
 shot tone.png
 spin K1 -30
 spin K3 -100
+# Tone 2: some character and feedback, the speaker's low cut on
+tap ENV
+expect view 3
+spin K1 40
+spin K2 25
+spin K3 30
+wait 1500
+shot tone2.png
+spin K1 -40
+spin K2 -25
+spin K3 -30
 # Osc: drone I between saw and square, drone II on triangle
 tap EDIT
-expect view 3
+expect view 4
 spin K1 15
 spin K2 25
 spin K3 -100
@@ -33,14 +44,14 @@ wait 300
 shot osc.png
 # Source: drone I driven with some sub, drone II as it starts
 tap EDIT
-expect view 4
+expect view 5
 spin K1 20
 spin K2 50
 wait 2500
 shot source.png
 # LFO: Wave I a triangle, Wave II an exp saw; some depth on each drone's filter
 tap LFO
-expect view 5
+expect view 6
 tap OCT+
 tap OCT+
 spin SELECT -20
@@ -55,7 +66,7 @@ wait 2500
 shot lfo.png
 # LFO mods: the rate mod, cross-mod's amount, the delay LFO's depth
 tap LFO
-expect view 6
+expect view 7
 spin K1 40
 spin K3 20
 spin K4 50
@@ -63,7 +74,7 @@ wait 300
 shot lfo2.png
 # Macros: Bloom up, some Tide; Beat held a moment, Wash latched
 tap SEQ
-expect view 7
+expect view 8
 spin K1 60
 spin K3 30
 key w12 down
@@ -78,21 +89,21 @@ spin K3 -30
 wait 3000
 # Partner: drone I detuned (beating), drone II an octave up and a fifth
 tap SEQ
-expect view 8
+expect view 9
 spin K2 40
 spin K3 3
 wait 300
 shot partner.png
 # Setup: some glide, drift and stereo
 tap GLO
-expect view 9
+expect view 10
 spin K1 30
 spin K3 50
 wait 300
 shot setup.png
 # Setup 2: Morph, Scene switch, Tune, Tuning
 tap GLO
-expect view 10
+expect view 11
 spin K2 20
 spin K3 20
 wait 300
@@ -100,21 +111,23 @@ shot setup2.png
 # Pulse (hold ARP for its page; a tap starts it): some swing
 expect par55 1
 press ARP
-expect view 11
+expect view 12
 spin K4 30
 wait 2500
 shot pulse.png
 release ARP
-# Effects: echoes and the hall
+# Delay: Wide, its echoes left and right
 tap FX
-expect view 12
-spin K2 30
-spin K3 40
+expect view 13
+spin K1 1
+spin K3 20
 spin K4 20
 wait 300
 shot fx.png
-# Effects 2: the reverb's type and tail
+# Reverb: the cathedral's tail, a little longer
 tap FX
-expect view 13
+expect view 14
+spin K2 10
+spin K4 10
 wait 300
 shot fx2.png
