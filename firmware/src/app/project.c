@@ -17,7 +17,18 @@ void project_defaults(void)
 static int project_valid(void)
 {
     int i;
-    if (proj.magic != PROJ_MAGIC || proj.format != PROJ_FORMAT)
+    if (proj.magic != PROJ_MAGIC)
+        return 0;
+    if (proj.format == 19u) {                   /* 0.1: the noise Colour was 0 / 1, now 0..100 (white .. pink) */
+        int g, k;
+        for (g = 0; g < DR_NGROUPS; g++) {
+            proj.par[DR_GP(g, GP_NCOLOR)] = proj.par[DR_GP(g, GP_NCOLOR)] ? 100 : 0;
+            for (k = 0; k < NSCENES; k++)
+                proj.scene[k][DR_GP(g, GP_NCOLOR)] = proj.scene[k][DR_GP(g, GP_NCOLOR)] ? 100 : 0;
+        }
+        proj.format = PROJ_FORMAT;
+    }
+    if (proj.format != PROJ_FORMAT)
         return 0;
     if (proj.par[P_LFO_RATE] < 0)                /* slower than 50 s, as it went before 2026-10-14: the slowest */
         proj.par[P_LFO_RATE] = 0;

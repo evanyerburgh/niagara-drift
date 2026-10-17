@@ -7,15 +7,16 @@
  *   KNOB 1-2       drone I's two values on the page shown, KNOB 3-4 drone II's; the Play page (HOME):
  *                  Pitch and Cutoff. A pitch is continuous, 27 Hz .. 1.6 kHz, a slow full turn an octave;
  *                  hold SEL for a cent a detent. With PITCH LINK on, KNOB 3 moves drone II's offset.
- *   SELECT         LFO rate      PRESETS   LFO Wave I (left)      ALGORITHM   LFO Wave II (right)
+ *   SELECT         LFO rate      ALGORITHM   MOVEMENT: every LFO depth together, 0 .. 200 %      PRESETS   (a macro, v0.2)
  *   PLAY           the drone fades in / out      MASTER   volume      SAVE   saves
  * One button away (tap: the knobs stay on its page, pressed again its second page; hold: they switch
  * only while it's held, and the page you were on comes back when it's let go):
- *   HOME Play, Play 2 (Reso, Level) · ENV Tone (Drive, Osc mix), Tone 2 (Noise, Colour) · EDIT Osc (X-Wave, PW) · LFO LFO
- *   (depths), Mod (Rate mod, Mod by, X-mod amount, Delay LFO depth) · SEQ Partner · GLO Setup, Setup 2
- *   (Morph, Tune, Scene switch) (global). The top bar shows a dot for each of a button's pages.
- *   OCT- / OCT+    MOVEMENT: every LFO depth down / up together, 10 % a tap (held: on and on), 0 .. 200 %,
- *                  gliding; lit while above (OCT+) or below (OCT-) 100 %
+ *   HOME Play, Play 2 (Reso, Level) · ENV Tone (Noise, Colour: white .. pink) · EDIT Osc (X-Wave, PW), Source
+ *   (Osc mix, Drive) · LFO LFO (depths), Mod (Rate mod, Mod by, X-mod amount, Delay LFO depth) · SEQ Partner ·
+ *   GLO Setup, Setup 2 (Morph, Scene switch, Tune, Tuning) (global). The top bar shows a dot for each of a
+ *   button's pages.
+ *   OCT- / OCT+    the LFO's Wave I / Wave II: a tap is the next shape, round and round; SEL + OCT the one
+ *                  before; lit while its wave is up
  * White keys: 16 scenes. Tap: recall (every value morphs there over the Scene switch time; a knob turned stops
  *   it); hold (a visit): there while held, back to where it was when let go (a knob turned: it stays);
  *   hold SAVE and tap: store. Lit: the slot holds a scene; blinking slowly: the sound is that scene (stored or
@@ -40,8 +41,8 @@
 
 /* ------------------------------------------------------------- pages --- */
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
-enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_LFO, V_LFO2, V_PARTNER, V_SETUP, V_SETUP2, V_PULSE, V_FX, V_FX2, NVIEWS };
-static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone 1", "Tone 2", "Osc", "LFO depths", "LFO mods", "Partner",
+enum { V_PLAY, V_PLAY2, V_TONE, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_SETUP, V_SETUP2, V_PULSE, V_FX, V_FX2, NVIEWS };
+static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone", "Osc", "Source", "LFO depths", "LFO mods", "Partner",
                                               "Setup 1", "Setup 2", "Swell", "Effects 1", "Effects 2"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
  * nothing (g NONE) */
@@ -53,14 +54,14 @@ typedef struct {
 static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{0, GP_PITCH}, {0, GP_CUTOFF}, {1, GP_PITCH}, {1, GP_CUTOFF}},
     {{0, GP_RESO}, {0, GP_LEVEL}, {1, GP_RESO}, {1, GP_LEVEL}},
-    {{0, GP_DRIVE}, {0, GP_MIX}, {1, GP_DRIVE}, {1, GP_MIX}},
     {{0, GP_NOISE}, {0, GP_NCOLOR}, {1, GP_NOISE}, {1, GP_NCOLOR}},
     {{0, GP_WAVE}, {0, GP_WIDTH}, {1, GP_WAVE}, {1, GP_WIDTH}},
+    {{0, GP_MIX}, {0, GP_DRIVE}, {1, GP_MIX}, {1, GP_DRIVE}},
     {{0, GP_OLFO_DEPTH}, {0, GP_FLFO_DEPTH}, {1, GP_OLFO_DEPTH}, {1, GP_FLFO_DEPTH}},
     {{G, P_LFO_RMOD}, {G, P_LFO_RMOD_SRC}, {G, P_XMOD_AMT}, {G, P_DLY_LFO_DEPTH}},
     {{0, GP_INTERVAL}, {0, GP_DETUNE}, {1, GP_INTERVAL}, {1, GP_DETUNE}},
     {{G, P_GLIDE}, {G, P_FADE}, {G, P_DRIFT}, {G, P_WIDTH}},
-    {{G, P_MORPH}, {G, P_TUNE}, {G, P_SCENE_T}, {G, P_JUST}},
+    {{G, P_MORPH}, {G, P_SCENE_T}, {G, P_TUNE}, {G, P_JUST}},
     {{G, P_PULSE_RATE}, {G, P_PULSE_DEPTH}, {G, P_PULSE_SHAPE}, {G, P_PULSE_SWING}},
     {{G, P_DLY_TIME}, {G, P_DLY_REPEATS}, {G, P_DLY_MIX}, {G, P_REV_MIX}},
     {{G, P_REV_TYPE}, {G, P_SPEAKER}, {G, P_FEEDBACK}, {G, P_CHAR}},
@@ -68,7 +69,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
 /* the page buttons: each shows its first page, pressed again the next */
 static const struct {
     uint8_t btn, first, n;
-} PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_TONE, 2}, {B_EDIT, V_OSC, 1}, {B_LFO, V_LFO, 2},
+} PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_TONE, 1}, {B_EDIT, V_OSC, 2}, {B_LFO, V_LFO, 2},
                 {B_SEQ, V_PARTNER, 1}, {B_GLO, V_SETUP, 2}, {B_FX, V_FX, 2},
                 {B_ARP, V_PULSE, 1}};                                    /* ARP: a tap toggles */
 #define NPAGE_BTN (sizeof PAGE_BTN / sizeof PAGE_BTN[0])
@@ -121,7 +122,6 @@ static struct {
     uint32_t act_t;
     int8_t save_q;                     /* a save waiting for the dip (playing): -2 none, -1 the sound, N scene N */
     uint32_t save_t;                   /* ... asked then */
-    uint32_t oct_next;                 /* OCT- / OCT+ held: when the next Movement step comes */
     uint32_t arp_t;                    /* the last ARP tap (two quick taps: stay on the Swell page) */
     uint8_t v2_out;                    /* drone II faded out on its own (SEL + PLAY) */
     uint32_t rst_t;                    /* when the LFO reset key went down (a hold locks the LFO to the pulse) */
@@ -467,22 +467,20 @@ static void page_up(int b)
 
 static float morph_ms(void) { return 20.0f * fm_exp2f((float)proj.par[P_MORPH] * 0.105507f); }
 
-/* OCT- / OCT+: the MOVEMENT, a step (10 %) a tap, gliding; held, a step every 120 ms after 400 ms. Shown in
- * the top bar as a knob off the page is */
-static void movement_step(int dir)
+/* OCT- / OCT+: the LFO's two waves (v0.2): a tap is the next shape, round and round (Off, the seven, random);
+ * SEL + OCT the one before. The engine glides a new shape in over the Morph time. Shown in the top bar */
+static void wave_step(int w, int dir)
 {
     char t[12];
-    int v = proj.par[P_MOVE] + 5 * dir;
-    v = v < 0 ? 0 : v > 100 ? 100 : v;
-    dr_pslide(P_MOVE, 150);
-    param_set(P_MOVE, v);
+    const int p = w ? P_LFO_W2 : P_LFO_W1, n = DR_LFO_NSHAPES;
+    int v = (proj.par[p] + dir + n) % n;
+    param_set(p, v);
     ui.scene_at = -1;
-    loop_note(P_MOVE, v, 150);
-    dr_param_text(P_MOVE, v, t);
-    scopy(ui.glab[0], "MOVEMENT");
+    loop_note(p, v, 0);
+    dr_param_text(p, v, t);
+    scopy(ui.glab[0], w ? "WAVE II" : "WAVE I");
     scopy(ui.glab[1], t);
     ui.glab_until = plat_ms() + 1500u;
-    ui.oct_next = plat_ms() + 400u;
 }
 
 /* -------------------------------------------------------- motion loop --- */
@@ -809,9 +807,12 @@ static void input(void)
                 page_up((int)i);
         } else if (btn & m) {
             ui.btn_used &= ~m;
-            if (i == B_OCTDN || i == B_OCTUP) {        /* the MOVEMENT, on the press (and held) */
+            if (i == B_OCTDN || i == B_OCTUP) {        /* the LFO waves, on the press; SEL + OCT: back one */
+                int back = (int)(btn >> B_SEL & 1u);
                 ui.btn_used |= m;
-                movement_step(i == B_OCTUP ? 1 : -1);
+                if (back)
+                    ui.btn_used |= 1u << B_SEL;
+                wave_step(i == B_OCTUP, back ? -1 : 1);
             }
             if (i == B_PLAY && (btn >> B_SEL & 1u)) {  /* SEL + PLAY: drone II alone, out / in */
                 ui.btn_used |= 1u << B_SEL;
@@ -831,10 +832,6 @@ static void input(void)
         } else if (!(ui.btn_used & m) && i != B_PLAY) {
             button((int)i);
         }
-    }
-    if ((btn & (1u << B_OCTDN | 1u << B_OCTUP)) && (int32_t)(plat_ms() - ui.oct_next) >= 0) {
-        movement_step(btn >> B_OCTUP & 1u ? 1 : -1);   /* held: on and on */
-        ui.oct_next = plat_ms() + 120u;
     }
     ch = keys ^ ui.keys;                               /* the black keys: switches, on the press */
     ui.keys = keys;
@@ -883,10 +880,13 @@ static void input(void)
     midi_in();
     if ((e = plat_enc(EN_SELECT)) != 0)
         global_turn(EN_SELECT, P_LFO_RATE, "LFO RATE", e);
-    if ((e = plat_enc(EN_PRESET)) != 0)              /* PRESETS (left): Wave I, ALGORITHM (right): Wave II */
-        global_turn(EN_PRESET, P_LFO_W1, "WAVE I", e);
-    if ((e = plat_enc(EN_ALGO)) != 0)
-        global_turn(EN_ALGO, P_LFO_W2, "WAVE II", e);
+    if ((e = plat_enc(EN_ALGO)) != 0)                /* ALGORITHM: the Movement, every LFO depth 0 .. 200 % */
+        global_turn(EN_ALGO, P_MOVE, "MOVEMENT", e);
+    if ((e = plat_enc(EN_PRESET)) != 0) {            /* PRESETS: the live macro, to come (v0.2) */
+        scopy(ui.glab[0], "PRESETS");
+        scopy(ui.glab[1], "macro: soon");
+        ui.glab_until = plat_ms() + 1500u;
+    }
     for (i = 0; i < 4; i++)
         if ((e = plat_enc(EN_K1 + (int)i)) != 0) {
             knob_turn((int)i, e);
@@ -1259,12 +1259,12 @@ static void pic_play2(int g, int32_t x0, int32_t y0)
 /* Tone 2: each drone's noise as it leaves the filter: its colour's slope (0 dB/oct white, -3 pink, level
  * at 100 Hz) through the filter's curve (dim behind it, moving with the LFO as Play 2's), as low as its level
  * is; its colour's name, and its level against the oscillators */
-static void pic_tone2(int g, int32_t x0, int32_t y0)
+static void pic_tone(int g, int32_t x0, int32_t y0)
 {
     int16_t y[PAN_W];
     int i, nv = gpar(g, GP_NOISE), cv = gpar(g, GP_NCOLOR), n = (PAN_W - 8) / 2 + 1;
     int32_t gx = x0 + 4, gy = y0 + 22, gh = 52, z = gy + gh * 18 / 54;
-    float slope = cv ? -3.0f : 0.0f, share = 20.0f * 0.30103f * fm_log2f(fm_maxf((float)nv * 0.005f, 1e-3f));
+    float slope = -3.0f * (float)cv * 0.01f, share = 20.0f * 0.30103f * fm_log2f(fm_maxf((float)nv * 0.005f, 1e-3f));
     char t[16], *q;
     draw_filter(g, dr_cut[g], gx, gy, PAN_W - 8, gh, K_DRONE_DIM[g]);
     if (nv > 0) {
@@ -1275,7 +1275,8 @@ static void pic_tone2(int g, int32_t x0, int32_t y0)
         }
         plot(gx, 2, y, n, K_DRONE[g]);
     }
-    scopy(t, cv ? "pink" : "white");
+    dr_param_text(DR_GP(g, GP_NCOLOR), cv, t);
+    t[0] = (char)(t[0] - 'A' + 'a');
     cv_text(x0 + PAN_W - 6 - text_w(&FONT_S, t), y0 + 3, &FONT_S, t, nv ? K_DRONE[g] : K_DIM);
     if (!nv)                                   /* its level against the oscillators: "noise -12 dB" */
         scopy(t, "no noise");
@@ -1561,7 +1562,8 @@ static void pic_setup2(int32_t y0)
     cv_text(12, y0 + 3, &FONT_S, "MORPH", K_SETUP);
     dr_param_text(P_MORPH, proj.par[P_MORPH], t);
     cv_text(12, y0 + 89, &FONT_S, t, K_TEXT2);
-    cv_text(12, y0 + 109, &FONT_XS, "buttons & keys glide", K_DIM);
+    dr_param_text(P_SCENE_T, proj.par[P_SCENE_T], scopy(t, "scenes "));   /* KNOB 2: a scene's morph */
+    cv_text(12, y0 + 109, &FONT_XS, t, K_DIM);
     cv_rect(146, y0 + 10, 1, PAN_H - 30, K_GRID);
     cv_text(156, y0 + 3, &FONT_S, "TUNE", K_SETUP);
     {   /* a needle: -50 .. +50 cents */
@@ -1580,7 +1582,9 @@ static void pic_setup2(int32_t y0)
         q++;
     scopy(q, " cents");
     text_c(190, y0 + 89, &FONT_S, t, K_TEXT2);
-    dr_param_text(P_SCENE_T, proj.par[P_SCENE_T], scopy(t, "scenes "));   /* KNOB 3: a scene's morph */
+    q = scopy(t, "tuning ");                   /* KNOB 4: equal / just */
+    dr_param_text(P_JUST, proj.par[P_JUST], q);
+    *q = (char)(*q - 'A' + 'a');
     text_c(190, y0 + 109, &FONT_XS, t, K_DIM);
 }
 
@@ -1780,7 +1784,7 @@ static void draw_pic(void)
         for (g = 0; g < DR_NGROUPS; g++) {
             int32_t x0 = pan_x(g);
             switch (ui.view) {
-            case V_PLAY2: case V_TONE2: case V_OSC: case V_PARTNER:
+            case V_PLAY2: case V_TONE: case V_OSC: case V_PARTNER:
                 cv_round(x0, 4, PAN_W, PAN_H, 4, K_PANEL);
                 cv_text(x0 + 5, 7, &FONT_S, g ? "II" : "I", K_DRONE[g]);
                 break;
@@ -1789,7 +1793,7 @@ static void draw_pic(void)
             }
             switch (ui.view) {
             case V_PLAY2: pic_play2(g, x0, 4); break;
-            case V_TONE2: pic_tone2(g, x0, 4); break;
+            case V_TONE: pic_tone(g, x0, 4); break;
             case V_OSC: pic_osc(g, x0, 4); break;
             case V_PARTNER: pic_partner(g, x0, 4); break;
             default: break;
@@ -1891,10 +1895,10 @@ static void leds(void)
             b |= 1u << PAGE_BTN[i].btn;
     if (ui.playing)
         b |= 1u << B_PLAY;
-    if (proj.par[P_MOVE] > 50)                         /* the Movement off 100 %: the way it's gone */
-        b |= 1u << B_OCTUP;
-    else if (proj.par[P_MOVE] < 50)
+    if (proj.par[P_LFO_W1] && dr_lfo[0] > 0.0f)        /* OCT- / OCT+: each wave, lit while it's up */
         b |= 1u << B_OCTDN;
+    if (proj.par[P_LFO_W2] && dr_lfo[1] > 0.0f)
+        b |= 1u << B_OCTUP;
     if (proj.par[P_PULSE]) {                           /* ARP: in time with the swell, from the moment it's on: */
         float b1 = 1.0f + (float)proj.par[P_PULSE_SWING] * 0.01f, ph = dr_pulse_ph;   /* the first half */
         if ((ph < b1 ? ph / b1 : (ph - b1) / (2.0f - b1)) < 0.5f)                     /* of each beat */

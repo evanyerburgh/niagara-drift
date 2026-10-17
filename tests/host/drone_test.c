@@ -167,13 +167,13 @@ static int nz_c;
 static void nz_backdrop(void) { noise_setup(nz_c, 0); }
 static void nz_saw(void)                         /* drone I's saw at A3, its partner off */
 {
-    noise_setup(1, 0);
+    noise_setup(100, 0);
     dr_set(DR_GP(0, GP_WAVE), 67);
     dr_set(DR_GP(0, GP_PITCH), 5700);
 }
 static void nz_both(void)                        /* both drones, apart (I left, II right) */
 {
-    noise_setup(1, 0);
+    noise_setup(100, 0);
     dr_set(DR_GP(1, GP_LEVEL), 80);
     dr_set(DR_GP(1, GP_CUTOFF), 1000);
     dr_set(DR_GP(1, GP_RESO), 0);
@@ -1398,10 +1398,10 @@ int main(void)
 
     {   /* NOISE: its colour's slope, measured over a decade (250 Hz -> 2.5 kHz): white flat, pink -10 dB (-3 dB/oct) */
         static float x[32768];
-        float sl[2], lv[2];
+        float sl[3], lv[3];
         int c;
-        for (c = 0; c < 2; c++) {
-            nz_c = c;
+        for (c = 0; c < 3; c++) {
+            nz_c = c == 2 ? 50 : c * 100;              /* white, pink, and halfway (a blend, v0.2) */
             noise_only(nz_backdrop, 100, x, 32768, 0);
             sl[c] = band_db(x, 32768, 2500.0f) - band_db(x, 32768, 250.0f);
             lv[c] = 20.0f * log10f(rms_of(x, 32768));
@@ -1412,6 +1412,9 @@ int main(void)
         check("noise colours: white flat, pink -10 dB a decade (against white)", fabsf(sl[0]) < 2.0f &&
               fabsf(sl[1] - sl[0] + 10.0f) < 1.5f);
         check("white and pink about as loud (within 3 dB)", fabsf(lv[1] - lv[0]) < 3.0f);
+        printf("    noise colour 50: %+.1f dB a decade, RMS %.1f dBFS\n", (double)sl[2], (double)lv[2]);
+        check("colour 50 is between white and pink, about as loud",
+              sl[2] < sl[0] - 2.0f && sl[2] > sl[1] + 2.0f && fabsf(lv[2] - lv[0]) < 3.0f);
         /* a level beside the oscillators: they stay as they are (but for the soft clip into the filter, which
          * a hot mix squeezes a little); at 100 it's 6 dB under them (a saw), never over; 50 is -12 dB, 25 -18:
          * heard all along the knob */
@@ -1481,7 +1484,7 @@ int main(void)
         for (g = 0; g < 2; g++) {
             dr_set(DR_GP(g, GP_LEVEL), 100);
             dr_set(DR_GP(g, GP_NOISE), 100);
-            dr_set(DR_GP(g, GP_NCOLOR), 1);
+            dr_set(DR_GP(g, GP_NCOLOR), 100);
             dr_set(DR_GP(g, GP_CUTOFF), 300);
             dr_set(DR_GP(g, GP_RESO), 1000);
             dr_set(DR_GP(g, GP_DRIVE), 100);
