@@ -122,3 +122,6 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-17: lights have brightness levels (software PWM over 32 scan frames, the share lit the level squared);
   the OCT lights pulse with the LFO waves and the ARP light breathes with the Swell. The pressure test readout
   is gone (it covered the black keys' banners).
+- 2026-10-17: turning an LFO depth that can't be heard shows why: "MOVEMENT 0% ALGORITHM", or "WAVE I OFF tap OCT-"
+  (II and OCT+ likewise). The top bar's right-hand text (PLAY to start, FADING) shortens or hides where the
+  badges on the left (II OUT) would overlap it.

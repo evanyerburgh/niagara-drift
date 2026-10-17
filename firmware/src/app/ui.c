@@ -298,6 +298,27 @@ static void cont_turn(int p, int role, int32_t s)
     loop_note(p, proj.par[p], slide);
 }
 
+/* an LFO depth turned that can't be heard: the Movement at 0 %, or the wave(s) it follows off. A hint then,
+ * only then (Evan, 2026-10-17: nothing on the screen said why the depths did nothing) */
+static void depth_hint(int p)
+{
+    int tap = -1, w1 = proj.par[P_LFO_W1] != 0, w2 = proj.par[P_LFO_W2] != 0, g;
+    for (g = 0; g < DR_NGROUPS; g++) {
+        if (p == DR_GP(g, GP_OLFO_DEPTH))
+            tap = proj.par[DR_GP(g, GP_OLFO)];
+        else if (p == DR_GP(g, GP_FLFO_DEPTH))
+            tap = proj.par[DR_GP(g, GP_FLFO)];
+    }
+    if (p == P_DLY_LFO_DEPTH)
+        tap = proj.par[P_DLY_LFO];
+    if (tap < 0 || !proj.par[p])
+        return;
+    if (proj.par[P_MOVE] == 0)
+        say_c("MOVEMENT 0%", "ALGORITHM", K_LFO);
+    else if ((tap == DR_LFO_I && !w1) || (tap == DR_LFO_II && !w2) || (tap == DR_LFO_BOTH && !w1 && !w2))
+        say_c(tap == DR_LFO_II ? "WAVE II OFF" : "WAVE I OFF", tap == DR_LFO_II ? "tap OCT+" : "tap OCT-", K_LFO);
+}
+
 static void knob_turn(int i, int32_t e)
 {
     int p = knob_param(i);
@@ -312,6 +333,8 @@ static void knob_turn(int i, int32_t e)
         param_set(p, proj.par[p] + accel(EN_K1 + i, e, dr_param_info(p)->hi - dr_param_info(p)->lo));
         loop_note(p, proj.par[p], 0);
     }
+    if (ui.view == V_LFO || ui.view == V_LFO2)
+        depth_hint(p);
 }
 
 /* ------------------------------------------------------------ switches --- */
@@ -1070,7 +1093,7 @@ static void draw_bar(void)
         x = cv_text(x, 2, &FONT_XS, t, K_GOLD) + 6;
     }
     if (ui.v2_out)                             /* drone II faded out on its own (SEL + PLAY) */
-        cv_text(x, 2, &FONT_XS, "II OUT", K_DRONE[1]);
+        x = cv_text(x, 2, &FONT_XS, "II OUT", K_DRONE[1]) + 6;
     for (i = 0; i < 2; i++) {                  /* the LFO's rate lights, as the DS-2's: Wave I, Wave II */
         int q = lfo_q((int)i);
         cv_round(222 + 10 * i, 5, 7, 7, 3, q < 0 ? K_GRID : blend(K_GRID, K_LFO, q, 7));
@@ -1086,11 +1109,15 @@ static void draw_bar(void)
         cv_round(rx - w, 1, w, BAR_H - 2, 6, K_CARD);
         cv_frame(rx - w, 1, w, BAR_H - 2, K_LFO);
         cv_text(rx - w + 6, 2, &FONT_XS, t, K_LFO);
-    } else if (!ui.playing) {                  /* stopped: say what PLAY does (the panel has no label) */
-        const char *st = fade_q() > 0 ? "FADING OUT" : "PLAY to start";
-        cv_text(rx - text_w(&FONT_XS, st), 2, &FONT_XS, st, K_DIM);
-    } else if (fade_q() < 20) {
-        cv_text(rx - text_w(&FONT_XS, "FADING IN"), 2, &FONT_XS, "FADING IN", K_DIM);
+    } else {                                   /* stopped: say what PLAY does (the panel has no label); fading. Only
+                                                * where the badges on the left leave room (II OUT covered it), else
+                                                * a short form, else nothing */
+        const char *st = !ui.playing ? (fade_q() > 0 ? "FADING OUT" : "PLAY to start") : fade_q() < 20 ? "FADING IN" : 0;
+        const char *sh = !ui.playing ? (fade_q() > 0 ? "FADING" : "PLAY") : "FADING";
+        if (st && rx - text_w(&FONT_XS, st) < x)
+            st = sh;
+        if (st && rx - text_w(&FONT_XS, st) >= x)
+            cv_text(rx - text_w(&FONT_XS, st), 2, &FONT_XS, st, K_DIM);
     }
     cv_blit(0, 0);
 }
