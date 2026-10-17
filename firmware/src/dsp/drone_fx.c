@@ -46,14 +46,15 @@ enum { DT_TAPE, DT_WIDE, DT_PING, DT_CLEAN, DT_NTYPES };
 typedef struct {
     float spread, tone, out, wow, ping;  /* R's time / L's; the loop's low-pass k; the wet's low-pass k; the wow,
                                           * samples of swing; ping-pong 0 .. 1 */
+    float gain;                          /* the wet's level: the types as loud as each other (measured on a drone) */
 } dly_type_t;
 static const dly_type_t DLY_TYPE[DT_NTYPES] = {
-    {1.00f, 0.39f, 0.51f, 30.0f, 0.0f},  /* TAPE: ~3.5 kHz in the loop, ~5 kHz out, 0.7 ms of wow */
-    {0.75f, 0.57f, 0.70f, 14.0f, 0.0f},  /* WIDE: ~6 kHz, ~8.5 kHz */
-    {1.00f, 0.50f, 0.66f, 14.0f, 1.0f},  /* PING-PONG */
-    {1.00f, 0.86f, 1.00f, 0.0f, 0.0f},   /* CLEAN: ~14 kHz, nothing out */
+    {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f},   /* TAPE: ~3.5 kHz in the loop, ~5 kHz out, 0.7 ms of wow */
+    {0.75f, 0.57f, 0.70f, 14.0f, 0.0f, 1.15f},   /* WIDE: ~6 kHz, ~8.5 kHz */
+    {1.00f, 0.50f, 0.66f, 14.0f, 1.0f, 1.66f},   /* PING-PONG: each repeat on one side (3 dB of it) */
+    {1.00f, 0.86f, 1.00f, 0.0f, 0.0f, 1.08f},    /* CLEAN: ~14 kHz, nothing out */
 };
-static dly_type_t dly_c = {1.00f, 0.39f, 0.51f, 30.0f, 0.0f};   /* the type as it glides */
+static dly_type_t dly_c = {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f};   /* the type as it glides */
 
 static float dly_ms(int v) { return 70.0f * fm_exp2f((float)v * 0.026845f); }   /* 70 * (450/70)^(v/100) */
 
@@ -74,12 +75,13 @@ enum { RV_ROOM, RV_HALL, RV_CATHEDRAL, RV_CHORUS_HALL, RV_NTYPES };
 typedef struct {
     float size, pre_ms, mod, lowcut, width;   /* the lines' lengths x; pre-delay; the swing, samples at 22.05 kHz;
                                                * the input's low cut, Hz; 0 mono .. 1 */
+    float gain;                               /* the wet's level: the types as loud as each other (measured) */
 } rv_type_t;
 static const rv_type_t RV_TYPE[RV_NTYPES] = {
-    {0.35f, 4.0f, 2.0f, 120.0f, 0.8f},        /* ROOM: small, close */
-    {0.75f, 18.0f, 5.0f, 90.0f, 0.9f},        /* HALL */
-    {1.00f, 42.0f, 7.0f, 60.0f, 0.85f},       /* CATHEDRAL: the largest, the furthest */
-    {0.85f, 24.0f, 18.0f, 90.0f, 1.0f},       /* CHORUS HALL: a hall whose lines swing wide */
+    {0.35f, 4.0f, 2.0f, 120.0f, 0.8f, 0.80f},    /* ROOM: small, close */
+    {0.75f, 18.0f, 5.0f, 90.0f, 0.9f, 0.93f},    /* HALL */
+    {1.00f, 42.0f, 7.0f, 60.0f, 0.85f, 1.00f},   /* CATHEDRAL: the largest, the furthest */
+    {0.85f, 24.0f, 18.0f, 90.0f, 1.0f, 1.45f},   /* CHORUS HALL: a hall whose lines swing wide (they cancel a little) */
 };
 #define RV_FS (DR_SR * 0.5f)
 /* the eight lines at size 1, samples at 22.05 kHz (57 .. 125 ms; primes, ~1.12 from one to the next:
@@ -102,7 +104,7 @@ static struct {
                                           * the swing, worked out once a block), the pre-delay's step */
     float lp[8], g[8], dk, ig;           /* the damping's states, the lines' gains, damp's k, the input gain */
     float h0, h1, lk;                    /* the low cut (two poles) and its k */
-    float pre, mod, width;               /* the pre-delay now (samples), the swing, the width: gliding */
+    float pre, mod, width, gain;         /* the pre-delay now (samples), the swing, the width, the level: gliding */
     float mph[4];                        /* the four swings' phases */
     hb_t dn, up[2];
     float hold[2];                       /* an odd block's last sample: the wet of the one before */
@@ -184,6 +186,7 @@ static void rv_coefs(float ease)
     rv.lk = onepole_k(t->lowcut, RV_FS);
     rv.mod += (t->mod - rv.mod) * ease;
     rv.width += (t->width - rv.width) * ease;
+    rv.gain += (t->gain - rv.gain) * ease;
 }
 
 static void rv_clear(void)
@@ -207,6 +210,7 @@ static void rv_clear(void)
         rv.pre = t->pre_ms * 0.001f * RV_FS;
         rv.mod = t->mod;
         rv.width = t->width;
+        rv.gain = t->gain;
     }
     for (i = 0; i < 4u; i++)
         rv.app[i] = 0;
@@ -376,7 +380,8 @@ static void fx_run(float *l, float *r, uint32_t n)
     dly_c.out += (dt->out - dly_c.out) * ease;
     dly_c.wow += (dt->wow - dly_c.wow) * ease;
     dly_c.ping += (dt->ping - dly_c.ping) * ease;
-    pgain = 1.0f + 0.41f * dly_c.ping;   /* ping-pong: each repeat on one side, 3 dB up */
+    dly_c.gain += (dt->gain - dly_c.gain) * ease;
+    pgain = dly_c.gain;
     if (dt->spread >= 1.0f && dt->ping <= 0.0f && dly_c.spread > 0.9995f && dly_c.ping < 0.0005f) {
         dly_c.spread = 1.0f;             /* settled on a mono type */
         dly_c.ping = 0.0f;
@@ -455,8 +460,8 @@ static void fx_run(float *l, float *r, uint32_t n)
     for (j = 0; j < n; j++) {
         dry2 += dd2;
         wet2 += dw2;
-        l[j] = l[j] * dry2 + sl[j] * RV_WET * wet2;
-        r[j] = r[j] * dry2 + sr[j] * RV_WET * wet2;
+        l[j] = l[j] * dry2 + sl[j] * RV_WET * rv.gain * wet2;
+        r[j] = r[j] * dry2 + sr[j] * RV_WET * rv.gain * wet2;
     }
     fx_g[0] = fbg1;
     fx_g[1] = dry1e;
