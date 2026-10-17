@@ -151,7 +151,8 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
   - **X-mod amt**: how much drone I's sound moves drone II's filter, while the cross-mod switch (black key 11) is on.
   - **Dly LFO**: how far the LFO wobbles the delay's time (up to ±25%; negative the other way), on the wave black
     key 10 picks on the LFO pages. You hear it only with some delay mix (Effects 1).
-  - Movement scales the delay's wobble too, as it does every depth.
+  - Movement (ALGORITHM) scales the delay's wobble too, as it does the LFO depths; not Rate mod or X-mod (see
+    [The LFO](#the-lfo)).
 - The LFO's rate and waves are on the top-left knobs; see [The LFO](#the-lfo) below.
 
 #### Swell · ARP
@@ -213,11 +214,17 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 One clock, two waves; the OCT− and OCT+ lights pulse with them. The last shape on each is random.
 
-**Movement** (ALGORITHM) is how much of all that you hear: it scales every LFO depth together (each drone's
-osc and filter depth, and the delay's wobble), as you've set them on the LFO depths page. At 0% the LFO
-moves nothing, whatever the depths say; at 100% (the middle) the depths are as set; at 200% they're twice as
-deep. It doesn't touch the rate, the shapes or where the waves go, and it can only scale depths you've set:
-the starting sound only breathes its filters a little, so set an osc depth to hear it work. Turning a
+**Movement** (ALGORITHM) is how much of all that you hear: it scales every LFO depth together, as you've set
+them. At 0% the LFO moves nothing, whatever the depths say; at 100% (the middle) the depths are as set; at 200%
+they're twice as deep. It can only scale depths you've set: the starting sound only breathes its filters a
+little, so set an osc depth to hear it work.
+
+| Movement scales | Movement leaves alone |
+|---|---|
+| **LFO depths**: all four knobs (each drone's osc depth and filter depth) | **LFO mods: Rate mod** (how much the LFO speeds itself up) |
+| **LFO mods: Dly LFO** (the delay's wobble) | **LFO mods: X-mod amt** (drone I moving drone II's filter: that's sound, not the LFO) |
+| | the LFO's rate, its shapes, and where the waves go (the black keys on the LFO pages) |
+ Turning a
 depth that can't be heard says why on the screen (Movement at 0%, or its wave off).
 PRESETS is kept for a macro, coming in v0.2.
 
