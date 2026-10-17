@@ -1411,13 +1411,18 @@ static void draw_bar(void)
 
 /* a drone's waveform in its panel: its scope, glowing (a dim line around a bright one); its height is
  * its level (it fades with PLAY and its level) */
+/* the picture as drawn: each new capture blends into it (~0.1 s at ~20 pictures a second), so a detuned partner's
+ * ramp slides across instead of jumping from picture to picture (it looked like two waves at once) */
+static float sc_disp[DR_NGROUPS][DR_SCOPE_N];
 static void draw_scope(int g, int32_t x0, int32_t y0, int32_t w, int32_t h)
 {
     int32_t i, mid = y0 + h / 2, py = mid, half = h / 2 - 4;
     const float k = (float)half / 0.6f;       /* a drone at full level (with sub and drive) peaks near 0.6 */
     cv_round(x0, y0, w, h, 4, K_PANEL);
     for (i = 0; i < DR_SCOPE_N && i < w - 8; i++) {
-        int32_t yy = mid - (int32_t)fm_clampf(dr_scope[g][i] * k, (float)-half, (float)half), x = x0 + 4 + i;
+        int32_t yy, x = x0 + 4 + i;
+        sc_disp[g][i] += (dr_scope[g][i] - sc_disp[g][i]) * 0.45f;
+        yy = mid - (int32_t)fm_clampf(sc_disp[g][i] * k, (float)-half, (float)half);
         if (i) {
             cv_line(x - 1, py - 1, x, yy - 1, K_DRONE_DIM[g]);
             cv_line(x - 1, py + 1, x, yy + 1, K_DRONE_DIM[g]);
