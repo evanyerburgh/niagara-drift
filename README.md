@@ -10,7 +10,8 @@ note. It's inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the S
 
 *Your FM-1 with Niagara Drift installed: what each knob, button and key now does. Amber is drone I,
 teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO pages they set the
-LFO's routing, and X-mod lets drone I move drone II's filter); the white keys hold 16 scenes.*
+LFO's routing, and X-mod lets drone I move drone II's filter); the lower 12 white keys hold scenes, in
+banks you pick with SEL and the top four.*
 
 **Status: 0.1 beta.** It runs on the FM-1 (tested on one unit so far) and in the browser:
 [try it](https://evanyerburgh.github.io/niagara-drift/) without an FM-1, the same code with sound.
@@ -32,7 +33,8 @@ LFO's routing, and X-mod lets drone I move drone II's filter); the white keys ho
 - **Feedback** (the finished sound fed back into the drones) and **Character** (clean to vintage).
 - **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
 - **Morph**: buttons and keys never jump: the sound moves to a new setting over a time you set.
-- **16 scenes** on the white keys, recalled with a morph; a **motion loop** that records your knob
+- **Scenes**: 12 on the white keys in each of three banks (36 of yours), plus a Presets bank, recalled
+  with a morph; a **motion loop** that records your knob
   moves.
 
 ## Installing
@@ -51,6 +53,11 @@ sequencer are gone until you go back (below).
 
 **Updating:** when there's a new version, run the installer again the same way. Your sound and scenes are
 kept, unless that version's notes in the [changelog](CHANGELOG.md) say otherwise.
+
+**Backing up:** from v0.2, `python3 tools/fm1_install.py --backup` saves your sound, scenes and settings to a
+file (in `~/niagara-drift-backups/`), and `--restore FILE` puts them back (the FM-1 restarts). The terminal
+installer saves one by itself before every install. Back up before trying another firmware, and restore
+when you come back. A backup is for the same FM-1: it carries that unit's knob calibration too.
 
 **Going back:** the installer's "Back to M-VAVE's firmware" writes M-VAVE's own FM-1 V15 back over the
 same cable (or use M-VAVE's updater, M-UPGRADE, from [m-vave.com/download](https://www.m-vave.com/download)).
@@ -206,7 +213,7 @@ by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8),
 | 1 | I partner | I osc wave (I, II, both) |
 | 2 | I sub: −1 oct, −2 oct, ⅓, ⅕ | I osc LFO → X-Wave (instead of pitch) |
 | 3 | I filter: LP, BP, HP | I filter LFO → resonance (instead of cutoff) |
-| 4 | pitch lock (the pitch knobs do nothing) | I filter wave (I, II, both) |
+| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are) | I filter wave (I, II, both) |
 | 5 | LFO reset | LFO reset |
 | 6 | II partner | II osc wave (I, II, both) |
 | 7 | II sub: −1 oct, −2 oct, ⅓, ⅕ | II osc LFO → X-Wave |
@@ -227,8 +234,10 @@ by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8),
 
 | | |
 |---|---|
-| **White key** | tap: morph to the scene stored there, over the scene switch time, and stay (turn a knob to stop part way). **Hold** to visit: let go and it morphs back to where you were. A scene keeps the sound, not the room: Speaker, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
-| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written) |
+| **White key** (the lower 12, F3–C5) | tap: morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). **Hold** to visit: let go and it morphs back to where you were. A scene keeps the sound, not the room: Speaker, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
+| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're read-only |
+| **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (the starting sound and a deep bass sound for now; more to come). The screen names scenes by bank: "B5" |
+| **Top white key** (D5–G5) alone | kept for the gesture macros, coming in v0.2 |
 | **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it |
 | **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 
@@ -250,7 +259,7 @@ builds the same page from your checkout, serves it at http://localhost:8765 and 
 | PLAY · SAVE (hold) · SEL (hold) | | Space · Enter · C |
 | HOME · EDIT · Wave I · Wave II (OCT− · OCT+) | | Esc · V · Z · X |
 | Black keys 1–11 | click | 1 … 0, − |
-| Scenes 1–16 | click | Q … I, A … K |
+| Scenes 1–12 · top keys | click | Q … I, A … F · G … K |
 
 ## Problems and ideas
 

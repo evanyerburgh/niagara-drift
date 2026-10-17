@@ -270,6 +270,7 @@ html { scroll-behavior: smooth; } @media (prefers-reduced-motion: reduce) { html
 .g-scenes span { background: var(--ground); border: 1px solid var(--rule); border-radius: 0 0 12px 12px; height: 3.2rem;
                  display: grid; align-items: end; justify-items: center; font-size: .75rem; color: var(--muted); padding-bottom: .2rem; }
 .g-scenes span.on { background: #f6b48e; color: #2a140a; border-color: #f6b48e; }
+.g-scenes span.bank { border-style: dashed; color: var(--muted, inherit); }
 .g-scenes span.at { animation: scene-at 1s step-end infinite; }   /* as the key: 0.6 s lit, 0.4 s dark */
 @keyframes scene-at { 60% { background: var(--ground); color: inherit; border-color: var(--rule); } }
 @media (prefers-reduced-motion: reduce) { .g-scenes span.at { animation: none; outline: 2px solid #f6b48e; outline-offset: 2px; } }
@@ -491,15 +492,16 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
   <h2 class="sec"><span>Scenes</span></h2>
 
   <div class="g-card one-l">
-    <h3>White keys <span class="g-sub">lit: a sound is saved there · blinking: the one you’re on</span></h3>
+    <h3>White keys <span class="g-sub">12 scenes a bank · lit: a sound is saved there · blinking: the one you’re on</span></h3>
     <div class="g-scenes" aria-hidden="true">
       <span class="on at">1</span><span class="on">2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
-      <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span>
+      <span>9</span><span>10</span><span>11</span><span>12</span><span class="bank">A</span><span class="bank">B</span><span class="bank">C</span><span class="bank">P</span>
     </div>
     <dl class="acts">
       <div><dt>Go to a scene</dt><dd>Tap a <span class="cap white">white key</span></dd></div>
       <div><dt>Visit, then come back</dt><dd>Hold a <span class="cap white">white key</span>, let go</dd></div>
       <div><dt>Save a sound to a scene</dt><dd>Hold <span class="cap">SAVE</span> first, then tap a <span class="cap white">white key</span></dd></div>
+      <div><dt>Pick a bank</dt><dd>Hold <span class="cap">SEL</span>, tap one of the top four <span class="cap white">white keys</span>: A · B · C · Presets</dd></div>
       <div><dt>Save everything</dt><dd>Tap <span class="cap">SAVE</span></dd></div>
     </dl>
   </div>

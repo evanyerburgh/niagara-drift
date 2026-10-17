@@ -117,7 +117,7 @@ void plat_midi_out(uint32_t pkt)
 
 /* flash: one buffer per object, kept across a simulated reboot */
 static uint8_t store[OBJ_NOBJ][PLAT_STORE_MAX];
-static int store_len[OBJ_NOBJ] = {-1, -1};
+static int store_len[OBJ_NOBJ] = {-1, -1, -1, -1};
 static uint32_t store_writes;
 int plat_store_load(uint32_t obj, void *dst, uint32_t max)
 {
@@ -371,6 +371,14 @@ static int expect(const char *what, const char *val)
         got = ui.scene_at;
     else if (!strcmp(what, "scenes"))              /* the scene slots in use, as a bit mask */
         got = proj.scene_used;
+    else if (!strcmp(what, "bank"))                /* the bank the scene keys play: 0 A, 1 B, 2 C, 3 Presets */
+        got = proj.bank;
+    else if (!strcmp(what, "bscenes")) {           /* the current bank's slots in use, as a bit mask */
+        int n;
+        got = 0;
+        for (n = 0; n < NSCENES; n++)
+            got |= (scene_get(proj.bank, n) != 0) << n;
+    }
     else if (!strcmp(what, "lfo0"))                /* the LFO's Wave I now, x 100 */
         got = (int)(dr_lfo[0] * 100.0f);
     else if (!strcmp(what, "store_writes"))

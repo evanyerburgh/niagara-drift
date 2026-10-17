@@ -78,7 +78,12 @@ static const struct {
 /* ------------------------------------------------------------ switches --- */
 /* the black keys (key numbers, F3 = 0) and what each does: normally, and on the LFO page */
 static const uint8_t BLACK_K[11] = {1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25};
-static const uint8_t WHITE_K[NSCENES] = {0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26};
+/* the white keys: the first NSCENES (F3 .. C5, which sense pressure) the scenes of the bank; the top four
+ * (D5 .. G5, no pressure) SEL + key: the bank, alone: the gesture macros (to come) */
+#define NWHITE 16
+static const uint8_t WHITE_K[NWHITE] = {0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26};
+static const char BANK_L[NBANKS] = {'A', 'B', 'C', 'P'};
+static const char *const GESTURE[4] = {"BEAT", "HEAT", "CONVERGE", "WASH"};
 enum { S_NONE, S_PARTNER, S_SUBOCT, S_HP, S_OTAP, S_ODEST, S_FTAP, S_FDEST, S_PLINK, S_SYNC, S_XMOD, S_LFORESET, S_DTAP,
        S_PLOCK };
 typedef struct {
@@ -145,6 +150,7 @@ static struct {
     int16_t loop_from[DR_NPARAMS];     /* every value when the recording began */
     uint32_t morph_t0, morph_ms;
     int16_t morph_from[DR_NPARAMS];
+    int16_t morph_to[DR_NPARAMS];      /* the scene being morphed to, as it was when its key was pressed */
     uint32_t frame;
     uint32_t sig[3];                   /* what each band shows: redrawn when it changes */
     uint32_t splash_t0;                /* the start's animation: since */
@@ -298,6 +304,27 @@ static void cont_turn(int p, int role, int32_t s)
     loop_note(p, proj.par[p], slide);
 }
 
+/* an LFO depth turned that can't be heard: the Movement at 0 %, or the wave(s) it follows off. A hint then,
+ * only then (Evan, 2026-10-17: nothing on the screen said why the depths did nothing) */
+static void depth_hint(int p)
+{
+    int tap = -1, w1 = proj.par[P_LFO_W1] != 0, w2 = proj.par[P_LFO_W2] != 0, g;
+    for (g = 0; g < DR_NGROUPS; g++) {
+        if (p == DR_GP(g, GP_OLFO_DEPTH))
+            tap = proj.par[DR_GP(g, GP_OLFO)];
+        else if (p == DR_GP(g, GP_FLFO_DEPTH))
+            tap = proj.par[DR_GP(g, GP_FLFO)];
+    }
+    if (p == P_DLY_LFO_DEPTH)
+        tap = proj.par[P_DLY_LFO];
+    if (tap < 0 || !proj.par[p])
+        return;
+    if (proj.par[P_MOVE] == 0)
+        say_c("MOVEMENT 0%", "ALGORITHM", K_LFO);
+    else if ((tap == DR_LFO_I && !w1) || (tap == DR_LFO_II && !w2) || (tap == DR_LFO_BOTH && !w1 && !w2))
+        say_c(tap == DR_LFO_II ? "WAVE II OFF" : "WAVE I OFF", tap == DR_LFO_II ? "tap OCT+" : "tap OCT-", K_LFO);
+}
+
 static void knob_turn(int i, int32_t e)
 {
     int p = knob_param(i);
@@ -312,6 +339,8 @@ static void knob_turn(int i, int32_t e)
         param_set(p, proj.par[p] + accel(EN_K1 + i, e, dr_param_info(p)->hi - dr_param_info(p)->lo));
         loop_note(p, proj.par[p], 0);
     }
+    if (ui.view == V_LFO || ui.view == V_LFO2)
+        depth_hint(p);
 }
 
 /* ------------------------------------------------------------ switches --- */
@@ -618,6 +647,13 @@ static int scene_room(int p)
            p == P_SCENE_T;
 }
 
+/* a scene's name: its bank's letter and its number ("B5"; the Presets "P2") */
+static void scene_name(char *t, int bank, int n)
+{
+    t[0] = BANK_L[bank];
+    itoa_u((uint32_t)n + 1u, t + 1);
+}
+
 /* into the flash now: n = -1 the sound (SAVE), else scene n (just stored) */
 static void save_now(int n)
 {
@@ -628,7 +664,7 @@ static void save_now(int n)
     if (n < 0) {
         say(ok ? "SAVED" : "NOT SAVED", ok ? 0 : "FLASH ERROR");
     } else {
-        itoa_u((uint32_t)n + 1u, t + 6);
+        scene_name(t + 6, proj.bank, n);
         say(t, ok ? "STORED" : "NOT STORED");
     }
 }
@@ -659,10 +695,11 @@ static void save_run(void)                             /* each look at the input
 
 static void scene_store(int n)                         /* SAVE held + a white key: and into the flash */
 {
-    int k;
-    for (k = 0; k < DR_NPARAMS; k++)
-        proj.scene[n][k] = proj.par[k];
-    proj.scene_used |= (uint16_t)(1u << n);
+    if (proj.bank == BANK_PRESETS) {                   /* the Presets are the firmware's: the way out */
+        say_c("PRESETS: READ-ONLY", "SEL+D5: A", K_GOLD);
+        return;
+    }
+    scene_put(proj.bank, n);
     ui.scene_at = (int8_t)n;
     ui.dirty = 1;
     save_ask(n);
@@ -674,14 +711,17 @@ static float scene_s(void) { return 0.1f * fm_exp2f((float)proj.par[P_SCENE_T] *
 static void scene_recall(int n)                        /* a white key: morph there over the Fade time */
 {
     char t[12] = "SCENE ";
+    const int16_t *sc = scene_get(proj.bank, n);
     int k;
-    itoa_u((uint32_t)n + 1u, t + 6);
-    if (!(proj.scene_used >> n & 1u)) {
-        say(t, "EMPTY");
+    scene_name(t + 6, proj.bank, n);
+    if (!sc) {
+        say(t, proj.bank == BANK_PRESETS ? "TO COME" : "EMPTY: SAVE+KEY");
         return;
     }
-    for (k = 0; k < DR_NPARAMS; k++)
+    for (k = 0; k < DR_NPARAMS; k++) {
         ui.morph_from[k] = proj.par[k];
+        ui.morph_to[k] = sc[k];
+    }
     ui.morph = (int8_t)n;
     ui.scene_at = (int8_t)n;
     ui.morph_t0 = plat_ms();
@@ -711,7 +751,7 @@ static void scene_morph(void)
     int k;
     if (ui.morph < 0)
         return;
-    to = ui.morph == VISIT_BACK ? ui.visit_back : proj.scene[ui.morph];
+    to = ui.morph == VISIT_BACK ? ui.visit_back : ui.morph_to;
     x = ui.morph_ms ? (float)(plat_ms() - ui.morph_t0) / (float)ui.morph_ms : 1.0f;
     if (x > 1.0f)
         x = 1.0f;
@@ -719,6 +759,8 @@ static void scene_morph(void)
         int v;
         if (scene_room(k))                             /* the room's settings aren't a scene's */
             continue;
+        if (proj.par[P_PLOCK] && (k == DR_GP(0, GP_PITCH) || k == DR_GP(1, GP_PITCH) || k == P_PLINK_OFF))
+            continue;                                  /* pitch lock: the drones keep their pitch (2026-10-17) */
         if (scene_step(k))
             v = x >= 0.5f ? to[k] : ui.morph_from[k];
         else
@@ -872,6 +914,28 @@ static void input(void)
             ui.visit = -1;                             /* let go: a tap stays; a hold was a visit: */
             if (plat_ms() - ui.visit_t >= HOLD_MS)     /* back to the sound before it, as it came */
                 scene_back();
+        }
+    }
+    for (i = 0; i < 4u; i++) {                         /* the top four white keys */
+        if (!((ch & keys) >> WHITE_K[NSCENES + i] & 1u))
+            continue;
+        if (btn >> B_SEL & 1u) {                       /* SEL + a top key: the bank (not while a scene key is
+                                                        * held: a visit's way back stays put) */
+            uint32_t j, held = 0;
+            static const char *const BANK_N[NBANKS] = {"A", "B", "C", "PRESETS"};
+            ui.btn_used |= 1u << B_SEL;
+            for (j = 0; j < NSCENES; j++)
+                held |= keys >> WHITE_K[j] & 1u;
+            if (held)
+                continue;
+            if (proj.bank != i) {
+                proj.bank = (uint8_t)i;
+                ui.scene_at = -1;
+                mark_dirty();
+            }
+            say_c("BANK", BANK_N[i], K_GOLD);
+        } else {
+            say_c(GESTURE[i], "TO COME", K_LFO);       /* the gesture macros, v0.2 */
         }
     }
     if (btn || keys || ch)
@@ -1064,13 +1128,13 @@ static void draw_bar(void)
     }
     if (proj.par[P_PULSE] && ui.view != V_PULSE)  /* on its own page, its name says it */
         x = cv_text(x, 2, &FONT_XS, "SWELL", K_PULSE) + 6;
-    if (visiting) {                            /* "VISIT 3": let go and it goes back */
-        char t[10] = "VISIT ";
-        itoa_u((uint32_t)ui.visit + 1u, t + 6);
+    if (visiting) {                            /* "VISIT B3": let go and it goes back */
+        char t[12] = "VISIT ";
+        scene_name(t + 6, proj.bank, ui.visit);
         x = cv_text(x, 2, &FONT_XS, t, K_GOLD) + 6;
     }
     if (ui.v2_out)                             /* drone II faded out on its own (SEL + PLAY) */
-        cv_text(x, 2, &FONT_XS, "II OUT", K_DRONE[1]);
+        x = cv_text(x, 2, &FONT_XS, "II OUT", K_DRONE[1]) + 6;
     for (i = 0; i < 2; i++) {                  /* the LFO's rate lights, as the DS-2's: Wave I, Wave II */
         int q = lfo_q((int)i);
         cv_round(222 + 10 * i, 5, 7, 7, 3, q < 0 ? K_GRID : blend(K_GRID, K_LFO, q, 7));
@@ -1086,11 +1150,15 @@ static void draw_bar(void)
         cv_round(rx - w, 1, w, BAR_H - 2, 6, K_CARD);
         cv_frame(rx - w, 1, w, BAR_H - 2, K_LFO);
         cv_text(rx - w + 6, 2, &FONT_XS, t, K_LFO);
-    } else if (!ui.playing) {                  /* stopped: say what PLAY does (the panel has no label) */
-        const char *st = fade_q() > 0 ? "FADING OUT" : "PLAY to start";
-        cv_text(rx - text_w(&FONT_XS, st), 2, &FONT_XS, st, K_DIM);
-    } else if (fade_q() < 20) {
-        cv_text(rx - text_w(&FONT_XS, "FADING IN"), 2, &FONT_XS, "FADING IN", K_DIM);
+    } else {                                   /* stopped: say what PLAY does (the panel has no label); fading. Only
+                                                * where the badges on the left leave room (II OUT covered it), else
+                                                * a short form, else nothing */
+        const char *st = !ui.playing ? (fade_q() > 0 ? "FADING OUT" : "PLAY to start") : fade_q() < 20 ? "FADING IN" : 0;
+        const char *sh = !ui.playing ? (fade_q() > 0 ? "FADING" : "PLAY") : "FADING";
+        if (st && rx - text_w(&FONT_XS, st) < x)
+            st = sh;
+        if (st && rx - text_w(&FONT_XS, st) >= x)
+            cv_text(rx - text_w(&FONT_XS, st), 2, &FONT_XS, st, K_DIM);
     }
     cv_blit(0, 0);
 }
@@ -1918,10 +1986,12 @@ static void leds(void)
         if (v)
             k[BLACK_K[i]] = 255;
     }
-    for (i = 0; i < NSCENES; i++)                    /* the white keys: the slots that hold a scene; the one */
-        if ((proj.scene_used >> i & 1u) &&             /* the sound is, blinking slowly */
+    for (i = 0; i < NSCENES; i++)                    /* the scene keys: the bank's slots that hold a scene; the */
+        if (scene_get(proj.bank, (int)i) &&            /* one the sound is, blinking slowly */
             (ui.scene_at != (int8_t)i || plat_ms() % 1000u < 600u))
             k[WHITE_K[i]] = 255;
+    for (i = 0; i < 4u; i++)                         /* the top four: the gestures to come, a dim glow */
+        k[WHITE_K[NSCENES + i]] = 60;
     plat_leds(b, k);
 }
 
