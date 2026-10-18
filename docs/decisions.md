@@ -198,3 +198,16 @@ at the end. The current state is in the [README](../README.md) and the code.
   cutoffs -100, the sub over 20-100 %. Converge: drone I dips (level -25, cutoff -60) while drone II moves (a bump, in
   over 0-20 %, out over 45-75 %, both ways). Wash: its release is 2.5x its swell; at the top (85-100 %) the dry levels
   breathe -14 at 0.15 Hz.
+- 2026-10-18 (Evan's listening, round 3): Weight is a full, warm bass, not focused: osc mix +45 (0-70 %), cutoffs -30,
+  resonance -40, drive +35, Character +25, noise -40, drone I's level +8; the width, detune and Movement moves are gone.
+  Converge never quite converges: drone II stays 0.09 semitone short of the consonance, wavering by 0.05 at 0.07 Hz
+  (about 1.3 beats a second at A3); the partners' detune and Drift ease by 60 %, not to 0.
+- 2026-10-18: the gestures play by hold (in while held, out when let go) and tap (to its depth, stays; tap again: out);
+  depth on PRESETS while held. Swells shorter: Weight 30 (2.8 s), Shift 40 (3.9 s), Converge 35 (3.3 s), Wash 35
+  (3.3 s); letting go takes as long as the swell (Wash's 2.5x release gone; its tails are the reverb's own). PROJ_FORMAT
+  25 (24's swells reset to these). Clean, when built, keeps the notes (no unison or sync).
+- 2026-10-18: the player times the gestures (Evan: "not just on-off effects"). PRESETS is Macro time: every
+  gesture's time x0.1 .. x10 (50: as set), live, kept in the project (not scenes; PROJ_FORMAT 26, in the byte that
+  held the macro PRESETS played, which is gone). Let go after a hold: out over as long as it was held, x Macro time.
+  Holding a gesture key: ALGORITHM its depth (Shift: its move), PRESETS its own time. A move's level glides over
+  0.15 s at most (was 0.6).

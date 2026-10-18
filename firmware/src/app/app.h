@@ -11,7 +11,9 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 24u                  /* 24: the gestures Weight, Shift, Converge, Wash (23's gesture values
+#define PROJ_FORMAT 26u                  /* 26: Macro time (the byte of the macro PRESETS played: 25's reset);
+                                          * 25: the gestures' swells shorter (24's reset to the new defaults);
+                                          * 24: the gestures Weight, Shift, Converge, Wash (23's gesture values
                                           * reset: Beat and Heat are gone); 23: the effects (delay type, reverb length and damp, pressure; 19-22
                                           * are read and converted); 22: the macros (16 values more a sound; 19-21 are read and converted);
                                           * 21: scenes in banks: A (12) here, B and C in their own objects (v0.2;
@@ -30,7 +32,8 @@ typedef struct {
     int16_t par[DR_NPARAMS];             /* drone.h parameters */
     uint8_t leds;                        /* key lights on */
     uint8_t bank;                        /* the bank the scene keys play (0 A .. 3 Presets) */
-    uint8_t mlive;                       /* the set macro PRESETS plays (0 Bloom .. 3 Tear; the player's, not a scene's) */
+    uint8_t mtime;                       /* MACRO TIME, 0..100 (PRESETS): every gesture's speed x0.1 .. x10, 50 as set
+                                          * (the player's, not a scene's; was the macro PRESETS played, format <= 25) */
     uint8_t rsv[13];                     /* room to grow: an older, shorter project loads (zeros here) */
     uint16_t scene_used;                 /* bank A: bit n, scene n holds a sound */
     int16_t scene[NSCENES][DR_NPARAMS];  /* bank A: every parameter, recalled but for the room's settings */
@@ -44,6 +47,7 @@ typedef struct {                         /* banks B and C: an object each (OBJ_B
     int16_t scene[NSCENES][DR_NPARAMS];
 } bank_t;
 _Static_assert(sizeof(bank_t) <= PLAT_STORE_MAX, "a bank must fit one flash object");
+#define MTIME_DEF 50                     /* Macro time to start: the gestures' own swells */
 #define BANK_MAGIC 0x314B4E42u           /* "BNK1" */
 
 extern project_t proj;

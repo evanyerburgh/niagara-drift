@@ -388,8 +388,8 @@ static int expect(const char *what, const char *val)
         got = (int)store_writes;
     else if (!strncmp(what, "heard", 5))          /* heardN: parameter N as heard (with the macros) */
         got = dr_heard(atoi(what + 5));
-    else if (!strncmp(what, "mlive", 5))          /* the set macro PRESETS plays */
-        got = proj.mlive;
+    else if (!strncmp(what, "mtime", 5))          /* Macro time (PRESETS), 0..100 */
+        got = proj.mtime;
     else if (!strncmp(what, "par", 3))            /* parN: parameter N (drone.h) */
         got = proj.par[atoi(what + 3)];
     else if (!strncmp(what, "mpitch", 6))         /* mpitchG: group G's pitch move by the macros now, in cents */

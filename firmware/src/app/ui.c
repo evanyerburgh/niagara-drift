@@ -7,7 +7,8 @@
  *   KNOB 1-2       drone I's two values on the page shown, KNOB 3-4 drone II's; the Play page (HOME):
  *                  Pitch and Cutoff. A pitch is continuous, 27 Hz .. 1.6 kHz, a slow full turn an octave;
  *                  hold SEL for a cent a detent. With PITCH LINK on, KNOB 3 moves drone II's offset.
- *   SELECT         LFO rate      ALGORITHM   MOVEMENT: every LFO depth together, 0 .. 200 %      PRESETS   (a macro, v0.2)
+ *   SELECT         LFO rate      ALGORITHM   MOVEMENT: every LFO depth together, 0 .. 200 %
+ *   PRESETS        MACRO TIME: every gesture's speed, x0.1 .. x10 (v0.2)
  *   PLAY           the drone fades in / out      MASTER   volume      SAVE   saves
  * One button away (tap: the knobs stay on its page, pressed again its second page; hold: they switch
  * only while it's held, and the page you were on comes back when it's let go):
@@ -91,8 +92,7 @@ static const uint8_t WHITE_K[NWHITE] = {0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19
 static const char BANK_L[NBANKS] = {'A', 'B', 'C', 'P'};
 static const char *const GESTURE[4] = {"WEIGHT", "SHIFT", "CONVERGE", "WASH"};
 static const char *const GESTURE_DEPTH[4] = {"WEIGHT DEPTH", "SHIFT MOVE", "CONV DEPTH", "WASH DEPTH"};
-static const char *const GESTURE_SWELL[4] = {"WEIGHT SWELL", "SHIFT SWELL", "CONV SWELL", "WASH SWELL"};
-static const char *const MACRO_UP[DR_NSETM] = {"BLOOM", "WEIGHT", "TIDE", "TEAR"};
+static const char *const GESTURE_SWELL[4] = {"WEIGHT TIME", "SHIFT TIME", "CONV TIME", "WASH TIME"};
 enum { S_NONE, S_PARTNER, S_SUBOCT, S_HP, S_OTAP, S_ODEST, S_FTAP, S_FDEST, S_PLINK, S_SYNC, S_XMOD, S_LFORESET, S_DTAP,
        S_PLOCK };
 typedef struct {
@@ -172,6 +172,9 @@ static struct {
     uint8_t g_held;                    /* the gesture keys held: bit g (Weight, Shift, Converge, Wash) */
     uint8_t g_rel;                     /* ... pressed to release a latch: the let-go does nothing more */
     uint32_t g_t0[DR_NGEST];           /* ... since */
+    float g_out[DR_NGEST];             /* ... let go after a hold: how far in it was, and over how long (s, at Macro
+                                        * time x1) it goes: as long as it was held (Evan, 2026-10-18); 0: the swell */
+    float g_out_s[DR_NGEST];
     float g_amt[DR_NGEST];             /* ... how far in each is, 0..1 */
     int16_t g_sent[DR_NGEST];          /* ... as the engine has it, 0..1000 */
     uint32_t g_last;                   /* the last swell step's time */
@@ -981,10 +984,10 @@ static void midi_in(void)
 }
 
 /* THE GESTURES (v0.2): Weight, Shift, Converge, Wash on the top four white keys, which sense no pressure, so
- * time stands in: held, a gesture swells in (over its swell time, 1 .. 30 s), its parts in order; let go, it
- * swells back out. A tap latches it on (at full); pressing a latched one lets it go; SEL held as you let go
- * latches it where it is. Held, PRESETS sets its depth (Shift's: its move, a 4th or 5th up or down) and
- * ALGORITHM its swell. Latched levels are values (P_GL_*): scenes keep them. */
+ * time stands in: held, a gesture comes in (over its own time x Macro time), its parts in order; let go, it goes
+ * over as long as it was held (x Macro time, turned live: Evan, 2026-10-18). A tap latches it on (at its depth);
+ * tapping a latched one lets it go (over its own time); SEL held as you let go keeps it where it is. Held,
+ * ALGORITHM sets its depth (Shift's: its move, a 4th or 5th up or down) and PRESETS its own time. Latched levels are values (P_GL_*): scenes keep them. */
 static int gesture_held(void)                          /* the gesture key held (the lowest), or -1 */
 {
     int g;
@@ -1003,6 +1006,7 @@ static void gesture_down(int g)
     }
     ui.g_held |= (uint8_t)(1u << g);
     ui.g_t0[g] = plat_ms();
+    ui.g_out_s[g] = 0.0f;
 }
 static void gesture_up(int g)
 {
@@ -1011,6 +1015,10 @@ static void gesture_up(int g)
     if (ui.g_rel >> g & 1u) {
         ui.g_rel &= (uint8_t)~(1u << g);
         return;
+    }
+    if (held >= PR_TAP_MS && !(ui.btn >> B_SEL & 1u)) {   /* let go after a hold: out over as long as it was held */
+        ui.g_out[g] = ui.g_amt[g];
+        ui.g_out_s[g] = fm_minf((float)held * 0.001f, 60.0f);
     }
     if (held < PR_TAP_MS) {                            /* a tap: latched, at full */
         param_set(P_GL_WEIGHT + g, 100);
@@ -1024,6 +1032,29 @@ static void gesture_up(int g)
         say_c(GESTURE[g], "KEPT", K_LFO);
     }
 }
+static char *dec1(float v, char *b);                   /* below */
+static float mtime_k(void)                             /* MACRO TIME: the gestures' times x 0.1 .. x 10 */
+{
+    return fm_exp2f(((float)proj.mtime - 50.0f) * 0.0664386f);
+}
+static void mtime_turn(int32_t e)                      /* PRESETS, no gesture key held: Macro time */
+{
+    int v = (int)proj.mtime + (int)e;
+    float k;
+    char *q;
+    proj.mtime = (uint8_t)(v < 0 ? 0 : v > 100 ? 100 : v);
+    mark_dirty();
+    k = mtime_k();
+    scopy(ui.glab[0], "MACRO TIME");
+    q = ui.glab[1];
+    *q++ = 'x';
+    if (k < 9.95f)
+        dec1(k, q);
+    else
+        itoa_u((uint32_t)(k + 0.5f), q);
+    ui.glab_until = plat_ms() + 1500u;
+    ui.act_t = plat_ms();
+}
 static void gesture_run(void)                          /* each frame: each gesture toward where it's going */
 {
     uint32_t now = plat_ms(), dt = now - ui.g_last;
@@ -1033,12 +1064,14 @@ static void gesture_run(void)                          /* each frame: each gestu
         dt = 100u;
     for (g = 0; g < DR_NGEST; g++) {
         float to = (ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u) ? 1.0f : (float)proj.par[P_GL_WEIGHT + g] * 0.01f;
-        static const float REL_K[DR_NGEST] = {1.0f, 1.0f, 1.0f, 2.5f};   /* letting go takes this much longer:
-                                                                            * Wash's tails (Evan, 2026-10-18) */
-        float *a = &ui.g_amt[g];
-        float step = (float)dt * 0.001f / fm_exp2f((float)proj.par[P_GR_WEIGHT + g] * 0.0490689f) / (*a > to ? REL_K[g] : 1.0f);
+        float *a = &ui.g_amt[g], k = mtime_k();
+        float step = *a > to && ui.g_out_s[g] > 0.0f
+                       ? (float)dt * 0.001f * ui.g_out[g] / (ui.g_out_s[g] * k)   /* let go: as long as it was held */
+                       : (float)dt * 0.001f / (fm_exp2f((float)proj.par[P_GR_WEIGHT + g] * 0.0490689f) * k);
         int16_t q;
         *a = *a < to ? fm_minf(*a + step, to) : fm_maxf(*a - step, to);
+        if (*a <= to)
+            ui.g_out_s[g] = 0.0f;                      /* out (or on its way in again): its own time from here */
         q = (int16_t)(*a * 1000.0f + 0.5f);
         if (q != ui.g_sent[g]) {
             ui.g_sent[g] = q;
@@ -1204,26 +1237,18 @@ static void input(void)
     if ((e = plat_enc(EN_SELECT)) != 0)
         global_turn(EN_SELECT, P_LFO_RATE, "LFO RATE", e);
     if ((e = plat_enc(EN_ALGO)) != 0) {              /* ALGORITHM: the Movement, every LFO depth 0 .. 200 %; */
-        int g = gesture_held();                        /* a gesture key held: its swell's time */
+        int g = gesture_held();                        /* a gesture key held: its depth (Shift's: its move) */
         if (g >= 0)
-            global_turn(EN_ALGO, P_GR_WEIGHT + g, GESTURE_SWELL[g], e);
+            global_turn(EN_ALGO, P_GD_WEIGHT + g, GESTURE_DEPTH[g], e);
         else
             global_turn(EN_ALGO, P_MOVE, "MOVEMENT", e);
     }
-    if ((e = plat_enc(EN_PRESET)) != 0) {            /* PRESETS: the live macro (SEL held: which one); a */
-        int g = gesture_held();                        /* gesture key held: its depth */
-        if (g >= 0) {
-            global_turn(EN_PRESET, P_GD_WEIGHT + g, GESTURE_DEPTH[g], e);
-        } else if (btn >> B_SEL & 1u) {
-            ui.btn_used |= 1u << B_SEL;
-            proj.mlive = (uint8_t)((proj.mlive + (e > 0 ? 1 : DR_NSETM - 1)) % DR_NSETM);
-            mark_dirty();
-            scopy(ui.glab[0], "PRESETS PLAYS");
-            scopy(ui.glab[1], MACRO_UP[proj.mlive]);
-            ui.glab_until = plat_ms() + 1500u;
-        } else {
-            global_turn(EN_PRESET, P_M_BLOOM + proj.mlive, MACRO_UP[proj.mlive], e);
-        }
+    if ((e = plat_enc(EN_PRESET)) != 0) {            /* PRESETS: Macro time, every gesture's speed; a gesture */
+        int g = gesture_held();                        /* key held: its own time */
+        if (g >= 0)
+            global_turn(EN_PRESET, P_GR_WEIGHT + g, GESTURE_SWELL[g], e);
+        else
+            mtime_turn(e);
     }
     for (i = 0; i < 4; i++)
         if ((e = plat_enc(EN_K1 + (int)i)) != 0) {
@@ -2203,7 +2228,7 @@ static void pic_setup(int32_t y0)
 
 /* the picture: the page's own (on Play, the two waveforms), a banner while a message shows. No interval
  * between the drones (Evan, 2026-10-10: tune by ear) */
-/* Macros (SEQ): the four set macros as meters over their knobs, PRESETS' one marked; under them the four
+/* Macros (SEQ): the four set macros as meters over their knobs; under them the four
  * gestures (the top white keys) as they swell, latched ones lit */
 static void pic_macros(int32_t y0)
 {
@@ -2215,8 +2240,6 @@ static void pic_macros(int32_t y0)
         cv_round(x + 18, y0 + 24, 14, 52, 4, K_GRID);
         if (h > 0)
             cv_round(x + 18, y0 + 76 - h, 14, h, 4, c);
-        if (proj.mlive == i)                           /* PRESETS plays this one */
-            text_c(x + 25, y0 + 79, &FONT_XS, "PRESETS", K_GOLD);
     }
     cv_rect(12, y0 + 97, 210, 1, K_GRID);
     for (i = 0; i < DR_NGEST; i++) {
