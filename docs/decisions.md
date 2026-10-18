@@ -246,3 +246,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   at random gaps from 25-30 s (1) to 0.5-2 s (100), log between; it reaches an octave either way. Wash moves the
   delay mix, repeats, reverb mix and length toward 70, 80, 80 and 100 (only up, never past the sound's own), so the
   repeats stay under the delay's howl (87). PROJ_FORMAT 29: 28's gesture latches let go.
+- 2026-10-18 (Evan): GLO holds only the room's settings (none in a sound), on two pages: Setup 1 Fade, Morph, Scene
+  switch; Setup 2 Tune, Stereo, Speaker, Pressure (Setup 3 gone). Glide moves to Moves KNOB 2, Drift to Tone 2 KNOB
+  4. Tuning goes into each drone's Interval: 17 steps, each interval tempered then just (-Oct, -5th, -5th just, -4th,
+  -4th just, Unison, +m3, +m3 just, +M3, +M3 just, +4th, +4th just, +5th, +5th just, +Oct, +Oct+5, +Oct+5 just);
+  P_JUST unused. PROJ_FORMAT 30 folds 29's Tuning into each interval.

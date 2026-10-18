@@ -41,7 +41,7 @@ enum {
     GP_PITCH,       /* cents over MIDI note 0: 2068 (27 Hz) .. 9135 (1.6 kHz); 4500 is A2, 5700 A3 */
     GP_WAVE,        /* X-WAVE, 0..100: 0 sine, 33 triangle, 67 saw, 100 square, blended in between */
     GP_WIDTH,       /* the square's pulse width: 0 even (50 %) .. 100 narrow (5 %) */
-    GP_INTERVAL,    /* the partner's interval: an index into DR_INTERVALS */
+    GP_INTERVAL,    /* the partner's interval: an index into DR_IV_SEMI (each tempered, then just, pure) */
     GP_DETUNE,      /* the partner's detune, 0..100 = 0..30 cents */
     GP_MIX,         /* OSC MIX, 0..100: 0 the oscillators alone .. 100 the sub alone (a crossfade) */
     GP_SUBOCT,      /* the sub: 1 an octave below, 2 two, 3 a third of the pitch, 4 a fifth (subharmonics) */
@@ -101,7 +101,7 @@ enum {
                                      * the sound to its new setting: OCT, filter mode, pulse, partner, sub, the
                                      * links, the LFO routes */
     P_SCENE_T,                      /* 0..100 = 0.1 s .. 5 min: a scene's morph (the white keys) */
-    P_JUST,                         /* the partner's intervals: equal-tempered (0) or just, pure ratios (1) */
+    P_JUST,                         /* unused since 30 (Tuning: now in each drone's Interval) */
     P_SPEAKER,                      /* 0..100: a low cut for a small speaker, 0 off (headphones) .. 240 Hz */
     P_PLOCK,                        /* the pitches locked (1): the pitch knobs do nothing (a switch) */
     P_MOVE,                         /* MOVEMENT, 0..100 = every LFO depth x 0 .. x 2 (50: as set) */
@@ -156,8 +156,9 @@ extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
 extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
 #define DR_NDLY 4
 extern const char *const DR_DLY_NAME[DR_NDLY];          /* "Tape", "Wide", "Ping-pong", "Clean" */
-#define DR_NINTERVALS 10
-extern const int8_t DR_INTERVALS[DR_NINTERVALS];        /* semitones: -12, -7, -5, 0, 3, 4, 5, 7, 12, 19 */
+#define DR_NINTERVALS 17
+extern const float DR_IV_SEMI[DR_NINTERVALS];           /* semitones: -Oct, -5th, -5th just .. +Oct+5 just */
+#define DR_IV_UNISON 5
 
 typedef struct {
     const char *name;

@@ -13,12 +13,13 @@
 #define CR 16u                                  /* control rate: one update every 16 samples */
 #define BLK 256u
 
-const int8_t DR_INTERVALS[DR_NINTERVALS] = {-12, -7, -5, 0, 3, 4, 5, 7, 12, 19};
-/* the same intervals just, in semitones: 1/2, 2/3, 3/4, 1, 6/5, 5/4, 4/3, 3/2, 2, 3 */
-static const float DR_JUST[DR_NINTERVALS] = {-12.0f, -7.01955f, -4.98045f, 0.0f, 3.15641f, 3.86314f, 4.98045f,
-                                             7.01955f, 12.0f, 19.01955f};
-static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-4th", "Unison", "+m3",
-                                                         "+M3",  "+4th", "+5th", "+Oct",   "+Oct+5"};
+/* the partner's intervals, each tempered and then just (pure ratios: 2/3, 3/4, 6/5, 5/4, 4/3, 3/2, 3; a just one
+ * doesn't beat, Detune still can), so Tuning is the Interval knob's (Evan, 2026-10-18); octaves and unison are both */
+const float DR_IV_SEMI[DR_NINTERVALS] = {-12.0f, -7.0f, -7.01955f, -5.0f, -4.98045f, 0.0f, 3.0f, 3.15641f, 4.0f,
+                                         3.86314f, 5.0f, 4.98045f, 7.0f, 7.01955f, 12.0f, 19.0f, 19.01955f};
+static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th just", "-4th", "-4th just", "Unison",
+                                                         "+m3", "+m3 just", "+M3", "+M3 just", "+4th", "+4th just",
+                                                         "+5th", "+5th just", "+Oct", "+Oct+5", "+Oct+5 just"};
 
 /* ------------------------------------------------------------ parameters --- */
 #define VOICE_PARAMS(pitch, wave, ival, mix, cut, level, olfo, flfo, fdep)                                           \
@@ -37,8 +38,8 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-4th",
  * slow LFO (a cycle in ~25 s; Wave II a random glide), the Swell on as a slow breath (one in ~35 s, 12 dB),
  * some delay with a gentle wobble, a little more reverb; the oscillators' depths start at 0 */
 static const dr_param_t PARAMS[DR_NPARAMS] = {
-    VOICE_PARAMS(5000, 67, 3, 30, 700, 80, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
-    VOICE_PARAMS(5700, 33, 8, 15, 680, 70, DR_LFO_II, DR_LFO_II, -85),   /* II: A3, triangle, partner an octave up */
+    VOICE_PARAMS(5000, 67, 5, 30, 700, 80, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
+    VOICE_PARAMS(5700, 33, 14, 15, 680, 70, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
     {"Cross-mod", 0, 1, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
@@ -210,7 +211,7 @@ void dr_param_text(int i, int v, char *b)
     else if (gp == GP_MODE)
         copy_s(b, MODE[(unsigned)v < 3u ? v : 0]);
     else if (gp == GP_INTERVAL)
-        copy_s(b, INTERVAL_NAME[(unsigned)v < DR_NINTERVALS ? v : 3]);
+        copy_s(b, INTERVAL_NAME[(unsigned)v < DR_NINTERVALS ? v : DR_IV_UNISON]);
     else if (gp == GP_WAVE) {                    /* on a wave: its name; between two: "Tri/Saw" */
         int x = v * 3, i = (x + 2) / 100, at = x - 100 * i <= 2;   /* within 2 of a wave: it, as the engine */
         if (at) {
@@ -1341,15 +1342,15 @@ static void render_group(int g, uint32_t n)
     /* DRIFT's wanders, at 100: cutoff +-0.5 octave, X-WAVE +-0.12, level +-2.4 dB, detune +-10 cents; each a
      * slow random walk around where it's set (a new aim every 10..40 s, glided to over ~8 s) */
     const float dw = pfs[P_DRIFT] * 0.01f;
-    const int iv = (unsigned)p[GP_INTERVAL] < DR_NINTERVALS ? p[GP_INTERVAL] : 3;
+    const int iv = (unsigned)p[GP_INTERVAL] < DR_NINTERVALS ? p[GP_INTERVAL] : DR_IV_UNISON;
     /* the partner's interval: tempered, or just (pure ratios, so a fifth or a third doesn't beat; Detune
      * still adds beating on purpose) */
-    const float ival = par[P_JUST] ? DR_JUST[iv] : (float)DR_INTERVALS[iv];
+    const float ival = DR_IV_SEMI[iv];
     const float detune = pv[GP_DETUNE] * 0.003f;            /* semitones: 30 cents at 100 */
     /* Unison with no Detune is one fat oscillator: the partner is pulled into phase with the main (~25 ms),
      * so it can't sit half a cycle out and cancel it (it did: -20 dB, depending on what came before), and
      * Drift's wanders don't beat them. Any Detune lets it go. */
-    const int plock = iv == 3 && pv[GP_DETUNE] < 0.5f;
+    const int plock = iv == DR_IV_UNISON && pv[GP_DETUNE] < 0.5f;
     const float tune = (float)par[P_TUNE] * 0.01f, target = (float)p[GP_PITCH] * 0.01f;
     /* the cutoff, 0..1000 = log2 20 .. log2 18000 */
     const float cut_t = 4.32192809f + pv[GP_CUTOFF] * 0.00981378f;

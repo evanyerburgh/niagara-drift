@@ -64,7 +64,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 29, on bank A", proj.format == 29u && PROJ_FORMAT == 29u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 30, on bank A", proj.format == 30u && PROJ_FORMAT == 30u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -115,6 +115,19 @@ int main(void)
               project_load() == 0 && proj.par[P_GR_1] == dr_param_info(P_GR_1)->def &&
                   proj.par[P_SHIFT_MOVE] == 200 && proj.par[P_GD_1] == dr_param_info(P_GD_1)->def &&
                   proj.par[P_GL_3] == 0);
+    }
+    {   /* PR #24's (29): Tuning was one setting; now each Interval has its just one */
+        static project_t p29;
+        p29 = proj;
+        p29.format = 29u;
+        p29.par[DR_GP(0, GP_INTERVAL)] = 7;    /* +5th then */
+        p29.par[DR_GP(1, GP_INTERVAL)] = 3;    /* unison then */
+        p29.par[P_JUST] = 1;
+        memcpy(store[OBJ_PROJ], &p29, sizeof p29);
+        store_n[OBJ_PROJ] = (int)sizeof p29;
+        check("PR #24's project (29) loads: a just +5th stays just, unison stays unison, Tuning folded in",
+              project_load() == 0 && proj.par[DR_GP(0, GP_INTERVAL)] == 13 &&
+                  proj.par[DR_GP(1, GP_INTERVAL)] == DR_IV_UNISON && proj.par[P_JUST] == 0);
     }
     {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */
         static proj_v21_t p21;
