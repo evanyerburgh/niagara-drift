@@ -23,7 +23,7 @@ banks you pick with SEL and the top four.*
 ## What it does
 
 - **Two drones**, each a main oscillator that blends sine → triangle → saw → square (X-WAVE), a
-  partner oscillator at an interval with detune (equal or just tuning), a sub one or two octaves down
+  partner oscillator at an interval (tempered or just) with detune, a sub one or two octaves down
   or a subharmonic (⅓, ⅕ of the pitch), and a white or pink noise, into its own self-oscillating
   filter (low-, band- or high-pass) with drive. Pitch is free between notes, from 27 Hz to 1.6 kHz.
 - **Links** between them: pitch link, hard sync, and drone I's sound moving drone II's cutoff.
@@ -101,12 +101,12 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Tone · ENV
 
-<img src="docs/img/page-tone.png" width="488" alt="The Tone 1 and Tone 2 pages: each drone's noise through its filter, and its colour; the character and the feedback">
+<img src="docs/img/page-tone.png" width="488" alt="The Tone 1 and Tone 2 pages: each drone's noise through its filter, and its colour; the character, the feedback, Age and Drift">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Tone 1 | I noise | I colour | II noise | II colour |
-| Tone 2 | character | feedback | age | |
+| Tone 2 | character | feedback | age | drift |
 
 - **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
   It's heard all along the knob, and at the top it's as loud as them (100 is level with them, 50 −6 dB, 25 −12). It
@@ -119,6 +119,9 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
   the sound without it; it fades with the drones when you stop.
 - **Age** wears the sound like an old tape: darker, a slow wow in the pitch, a little hiss, more character. It
   wears in slowly (about 20 s from none to full) and wears out as slowly when you turn it back.
+- **Drift** keeps the drones from ever being quite still: besides a little pitch wander, each drone's
+  cutoff, timbre (X-Wave), level and partner detune slowly wander on their own, around where you've set
+  them, never repeating. Gentle by default; 0 holds everything exactly where you put it.
 
 #### Osc · EDIT
 
@@ -139,19 +142,22 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Partner | I interval | I detune | II interval | II detune |
-| Moves | Shift's move | | II wander | Wander's scale |
+| Moves | Shift's move | glide | II wander | Wander's scale |
 
 - **Shift's move** is where the Shift gesture takes the drones: from a fifth down through none in the middle to a
   fifth up, 10 cents a detent, 1 with SEL held; it lights while Shift (E5) is in. See [The macros](#the-macros).
 - **Wander** gives drone II a slow random melody: it jumps from note to note in no order, the notes of a scale on
   drone I (in any octave, up to an octave from its own pitch), and only now and then comes home. The knob is **how
   often**, at random times within a range: 25–30 s apart at the bottom, 0.5–2 s at the top; the screen shows the
-  range. It doesn't glide by itself: **Glide** (Setup 1) slides it. At 0 it's off.
+  range. It doesn't glide by itself: **Glide** slides it. At 0 it's off.
+- **Glide** is how long a drone takes to reach a new pitch (up to 10 s; off by default): a pitch knob, a scene,
+  Wander's notes.
 - **Wander's scale**: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just (the
   harmonics 1–8 of drone I, pure: the root, the pure major third, fifth and the seventh harmonic).
 
 - The partner oscillator sits an interval above or below each drone; **detune** makes them beat.
-  With **Tuning: just** (Setup 2) the intervals are pure ratios.
+- Each **interval** comes twice: tempered, then **just** ("+5th just"), a pure ratio (a fifth is exactly 3/2) that
+  doesn't beat; detune still adds beating on purpose. Octaves and unison are both at once.
 
 #### LFO · LFO
 
@@ -209,27 +215,23 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Setup · GLO
 
-<img src="docs/img/page-setup.png" width="732" alt="The Setup 1, 2 and 3 pages: glide, fade, drift and stereo; the Morph time and the tuning; the speaker's low cut and the keys' pressure">
+<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, Morph and scene switch times; the tune, stereo width, the speaker's low cut and the keys' pressure">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Setup 1 | glide | fade | drift | stereo |
-| Setup 2 | morph | scene switch | tune | tuning (equal / just) |
-| Setup 3 | speaker (low cut) | pressure | | |
+| Setup 1 | fade | morph | scene switch | |
+| Setup 2 | tune | stereo | speaker (low cut) | pressure |
 
-- **Glide** is how long a drone takes to reach a new pitch (up to 10 s; off by default). **Stereo**
-  spreads the drones from mono to drone I left, drone II right.
-- **Morph** is the switch time for buttons and keys: how long they take to move the sound to its new
-  setting (0.02–30 s); **fade** is how long PLAY takes (up to 60 s); **scene switch** how long the switch
-  to a scene takes (0.1 s to 5 minutes).
-- **Drift** keeps the drones from ever being quite still: besides a little pitch wander, each drone's
-  cutoff, timbre (X-Wave), level and partner detune slowly wander on their own, around where you've set
-  them, never repeating. Gentle by default; 0 holds everything exactly where you put it.
-- **Tuning: just** makes the partner's intervals pure ratios (a fifth is exactly 3/2), so they don't
-  beat; detune still adds beating on purpose.
+Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't change it.
+
+- **Fade** is how long PLAY takes (up to 60 s); **Morph** is the switch time for buttons and keys: how long they
+  take to move the sound to its new setting (0.02–30 s); **scene switch** how long the switch to a scene takes
+  (0.1 s to 5 minutes).
+- **Tune** moves everything up or down by up to 50 cents. **Stereo** spreads the drones from mono to drone I
+  left, drone II right.
 - **Speaker** cuts the deep bass a small speaker can't play (40–240 Hz); leave it off on headphones.
 - **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
-  tuned). Speaker and Pressure are the room's settings: scenes don't change them.
+  tuned).
 
 ### The LFO
 

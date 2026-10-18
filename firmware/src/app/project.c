@@ -116,6 +116,15 @@ static void convert(int16_t *v, uint32_t from)
     if (from <= 27u)                            /* NOISE's top was 6 dB lower: the same level is half the value now */
         for (g = 0; g < DR_NGROUPS; g++)
             v[DR_GP(g, GP_NOISE)] = (int16_t)((v[DR_GP(g, GP_NOISE)] + 1) / 2);
+    if (from <= 29u) {                          /* Tuning into each drone's Interval: tempered, then just */
+        static const int8_t EQ[10] = {0, 1, 3, 5, 6, 8, 10, 12, 14, 15}, JU[10] = {0, 2, 4, 5, 7, 9, 11, 13, 14, 16};
+        for (g = 0; g < DR_NGROUPS; g++) {
+            int iv = v[DR_GP(g, GP_INTERVAL)];
+            iv = (unsigned)iv < 10u ? iv : 3;
+            v[DR_GP(g, GP_INTERVAL)] = v[P_JUST] ? JU[iv] : EQ[iv];
+        }
+        v[P_JUST] = 0;
+    }
     if (from <= 28u)                            /* the keys fixed: a latch may have been another gesture's */
         for (g = P_GL_0; g <= P_GL_3; g++)
             v[g] = 0;
@@ -209,10 +218,10 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
     memset(ld.raw, 0, sizeof ld.raw);
     if (plat_store_load(b == 1 ? OBJ_BANKB : OBJ_BANKC, ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
         return;
-    if (ld.b.format == PROJ_FORMAT || (ld.b.format >= 23u && ld.b.format <= 28u)) {
+    if (ld.b.format == PROJ_FORMAT || (ld.b.format >= 23u && ld.b.format <= 29u)) {
         uint32_t f = ld.b.format;
         *k = ld.b;
-        if (f != PROJ_FORMAT) {                /* 23-28: the same layout */
+        if (f != PROJ_FORMAT) {                /* 23-29: the same layout */
             for (i = 0; i < NSCENES; i++)
                 convert(k->scene[i], f);
             bank_dirty |= (uint8_t)(1u << b);
@@ -251,7 +260,7 @@ int project_load(void)
         project_defaults();
         return -1;
     }
-    if (from == PROJ_FORMAT || (from >= 23u && from <= 28u)) {   /* 23-28: the same layout */
+    if (from == PROJ_FORMAT || (from >= 23u && from <= 29u)) {   /* 23-29: the same layout */
         proj = ld.p;
         if (from != PROJ_FORMAT) {
             convert(proj.par, from);

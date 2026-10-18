@@ -95,8 +95,7 @@ spin ALGO 30
 wait 300
 expect par75 80
 tap GLO
-tap GLO
-spin K2 20
+spin K3 20
 tap HOME
 tapkey w1
 wait 400

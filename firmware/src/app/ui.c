@@ -44,10 +44,10 @@
 
 /* ------------------------------------------------------------- pages --- */
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
-enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_MOVES, V_SETUP, V_SETUP2, V_SETUP3,
+enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_MOVES, V_SETUP, V_SETUP2,
        V_PULSE, V_FX, V_FX2, NVIEWS };
 static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone 1", "Tone 2", "Osc", "Source", "LFO depths", "LFO mods",
-                                              "Partner", "Moves", "Setup 1", "Setup 2", "Setup 3", "Swell", "Delay", "Reverb"};
+                                              "Partner", "Moves", "Setup 1", "Setup 2", "Swell", "Delay", "Reverb"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
  * nothing (g NONE) */
 #define G 2
@@ -59,16 +59,16 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{0, GP_PITCH}, {0, GP_CUTOFF}, {1, GP_PITCH}, {1, GP_CUTOFF}},
     {{0, GP_LEVEL}, {0, GP_RESO}, {1, GP_LEVEL}, {1, GP_RESO}},
     {{0, GP_NOISE}, {0, GP_NCOLOR}, {1, GP_NOISE}, {1, GP_NCOLOR}},
-    {{G, P_CHAR}, {G, P_FEEDBACK}, {G, P_AGE}, {NONE, 0}},
+    {{G, P_CHAR}, {G, P_FEEDBACK}, {G, P_AGE}, {G, P_DRIFT}},
     {{0, GP_WAVE}, {0, GP_WIDTH}, {1, GP_WAVE}, {1, GP_WIDTH}},
     {{0, GP_MIX}, {0, GP_DRIVE}, {1, GP_MIX}, {1, GP_DRIVE}},
     {{0, GP_OLFO_DEPTH}, {0, GP_FLFO_DEPTH}, {1, GP_OLFO_DEPTH}, {1, GP_FLFO_DEPTH}},
     {{G, P_LFO_RMOD}, {G, P_LFO_RMOD_SRC}, {G, P_XMOD_AMT}, {G, P_DLY_LFO_DEPTH}},
     {{0, GP_INTERVAL}, {0, GP_DETUNE}, {1, GP_INTERVAL}, {1, GP_DETUNE}},
-    {{G, P_SHIFT_MOVE}, {NONE, 0}, {G, P_WANDER}, {G, P_WSCALE}},   /* Shift's move; Wander and its scale */
-    {{G, P_GLIDE}, {G, P_FADE}, {G, P_DRIFT}, {G, P_WIDTH}},
-    {{G, P_MORPH}, {G, P_SCENE_T}, {G, P_TUNE}, {G, P_JUST}},
-    {{G, P_SPEAKER}, {G, P_PRESS_SENS}, {NONE, 0}, {NONE, 0}},
+    {{G, P_SHIFT_MOVE}, {G, P_GLIDE}, {G, P_WANDER}, {G, P_WSCALE}},   /* Shift's move, Glide; Wander, its scale */
+    /* GLO: the room's settings only, none in a sound (Evan, 2026-10-18): the times, then the unit and the room */
+    {{G, P_FADE}, {G, P_MORPH}, {G, P_SCENE_T}, {NONE, 0}},
+    {{G, P_TUNE}, {G, P_WIDTH}, {G, P_SPEAKER}, {G, P_PRESS_SENS}},
     {{G, P_PULSE_RATE}, {G, P_PULSE_DEPTH}, {G, P_PULSE_SHAPE}, {G, P_PULSE_SWING}},
     {{G, P_DLY_TYPE}, {G, P_DLY_TIME}, {G, P_DLY_REPEATS}, {G, P_DLY_MIX}},
     {{G, P_REV_TYPE}, {G, P_REV_LEN}, {G, P_REV_DAMP}, {G, P_REV_MIX}},
@@ -77,7 +77,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
 static const struct {
     uint8_t btn, first, n;
 } PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_TONE, 2}, {B_EDIT, V_OSC, 2}, {B_LFO, V_LFO, 2},
-                {B_SEQ, V_PARTNER, 2}, {B_GLO, V_SETUP, 3}, {B_FX, V_FX, 2},
+                {B_SEQ, V_PARTNER, 2}, {B_GLO, V_SETUP, 2}, {B_FX, V_FX, 2},
                 {B_ARP, V_PULSE, 1}};                                    /* ARP: a tap toggles */
 #define NPAGE_BTN (sizeof PAGE_BTN / sizeof PAGE_BTN[0])
 #define HOLD_MS 400u                   /* a page button held this long (or a knob turned) is a peek */
@@ -1356,7 +1356,7 @@ static uint16_t page_col(void)
     case V_LFO: case V_LFO2: return K_LFO;
     case V_FX: case V_FX2: case V_TONE2: return K_FX;
     case V_PULSE: return K_PULSE;
-    case V_SETUP: case V_SETUP2: case V_SETUP3: return K_SETUP;
+    case V_SETUP: case V_SETUP2: return K_SETUP;
     default: return K_DIM;
     }
 }
@@ -1677,7 +1677,7 @@ static void pic_osc(int g, int32_t x0, int32_t y0)
 static void pic_partner(int g, int32_t x0, int32_t y0)
 {
     int on = gpar(g, GP_PARTNER) != 0, iv = gpar(g, GP_INTERVAL), x = gpar(g, GP_WAVE);
-    float semi = (float)DR_INTERVALS[(unsigned)iv < DR_NINTERVALS ? iv : 3];
+    float semi = DR_IV_SEMI[(unsigned)iv < DR_NINTERVALS ? iv : DR_IV_UNISON];
     float hz = 8.1757989f * fm_exp2f((dr_pitch[g] + semi) / 12.0f);   /* the partner's pitch */
     float beats = hz * (fm_exp2f((float)gpar(g, GP_DETUNE) * 0.003f / 12.0f) - 1.0f), ph;
     char t[24], *q;
@@ -1903,54 +1903,51 @@ static void pic_lfo2(int32_t y0)
     }
 }
 
-/* Setup 2: the Morph (a switch's move from one setting to the next) and the master tune. The move ends as
- * far across as the knob is turned (0.02 s at the switch .. 30 s at the right edge: time in octaves, as the
- * knob is), so every turn moves it alike; ticks at 1 s and 10 s */
+/* Setup 2: the unit and the room, a corner each: TUNE (KNOB 1) a needle, -50 .. +50 cents; STEREO (KNOB 2) the
+ * drones as far apart as it puts them; SPEAKER (KNOB 3) its low cut, 20 Hz .. 1 kHz; PRESSURE (KNOB 4) what a key's
+ * press gives, light .. firm. None is in scenes */
 static void pic_setup2(int32_t y0)
 {
-    const int32_t xs = 12 + 12, len = 108 * proj.par[P_MORPH] / 100;
-    int16_t y[61];
-    int i, tn = proj.par[P_TUNE];
-    char t[16], *q;
-    for (i = 0; i < 61; i++) {                 /* from the switch, low to high */
-        int32_t x = 12 + 2 * i;
-        float v = x <= xs ? 0.0f : fm_minf((float)(x - xs) / (float)(len > 0 ? len : 1), 1.0f);
-        y[i] = (int16_t)(y0 + 84 - (int32_t)(v * 50.0f));
+    int tn = proj.par[P_TUNE], sp = proj.par[P_SPEAKER], i;
+    float wid = (float)proj.par[P_WIDTH] * 0.01f;
+    char t[16];
+    {   /* TUNE */
+        int32_t cx = 60, nx = cx + tn * 40 / 50;
+        cv_text(12, y0 + 3, &FONT_S, "TUNE", K_SETUP);
+        dr_param_text(P_TUNE, tn, t);
+        text_r(110, y0 + 3, t, K_TEXT2);
+        cv_rect(cx - 40, y0 + 34, 81, 1, K_GRID);
+        cv_rect(cx, y0 + 26, 1, 17, K_FAINT);
+        cv_round(nx - 3, y0 + 31, 7, 7, 3, K_SETUP);
     }
-    cv_rect(12, y0 + 85, 120, 1, K_GRID);
-    cv_rect(xs, y0 + 22, 1, 64, K_GRID);      /* the switch */
-    cv_rect(xs + 58, y0 + 82, 1, 6, K_GRID);  /* 1 s, 10 s: where the knob puts them */
-    cv_rect(xs + 92, y0 + 82, 1, 6, K_GRID);
-    cv_text(xs + 58 - text_w(&FONT_XS, "1s") / 2, y0 + 90, &FONT_XS, "1s", K_DIM);
-    cv_text(xs + 92 - text_w(&FONT_XS, "10s") / 2, y0 + 90, &FONT_XS, "10s", K_DIM);
-    plot(12, 2, y, 61, K_SETUP);
-    cv_text(12, y0 + 3, &FONT_S, "MORPH", K_SETUP);
-    dr_param_text(P_MORPH, proj.par[P_MORPH], t);
-    cv_text(12, y0 + 89, &FONT_S, t, K_TEXT2);
-    dr_param_text(P_SCENE_T, proj.par[P_SCENE_T], scopy(t, "scenes "));   /* KNOB 2: a scene's morph */
-    cv_text(12, y0 + 109, &FONT_XS, t, K_DIM);
-    cv_rect(146, y0 + 10, 1, PAN_H - 30, K_GRID);
-    cv_text(156, y0 + 3, &FONT_S, "TUNE", K_SETUP);
-    {   /* a needle: -50 .. +50 cents */
-        int32_t cx = 190, nx = cx + tn * 30 / 50;
-        cv_rect(cx - 30, y0 + 60, 61, 1, K_GRID);
-        cv_rect(cx, y0 + 52, 1, 17, K_FAINT);
-        cv_round(nx - 3, y0 + 57, 7, 7, 3, K_SETUP);
+    {   /* STEREO: drone I and II, two short upright bars on a line */
+        int32_t cx = 176;
+        cv_text(128, y0 + 3, &FONT_S, "STEREO", K_SETUP);
+        cv_rect(cx - 30, y0 + 34, 61, 1, K_GRID);
+        cv_rect(cx - 2 - (int32_t)(wid * 28.0f), y0 + 24, 3, 20, K_DRONE[0]);
+        cv_rect(cx + (int32_t)(wid * 28.0f), y0 + 24, 3, 20, K_DRONE[1]);
     }
-    q = t;
-    if (tn > 0)
-        *q++ = '+';
-    else if (tn < 0)
-        *q++ = '-';
-    itoa_u((uint32_t)(tn < 0 ? -tn : tn), q);
-    while (*q)
-        q++;
-    scopy(q, " cents");
-    text_c(190, y0 + 89, &FONT_S, t, K_TEXT2);
-    q = scopy(t, "tuning ");                   /* KNOB 4: equal / just */
-    dr_param_text(P_JUST, proj.par[P_JUST], q);
-    *q = (char)(*q - 'A' + 'a');
-    text_c(190, y0 + 109, &FONT_XS, t, K_DIM);
+    cv_rect(12, y0 + 54, 210, 1, K_GRID);
+    {   /* SPEAKER: 12 dB an octave under its corner, 0 dB .. -30 dB */
+        float fc = 40.0f * fm_exp2f((float)sp * 0.0258496f);
+        int16_t y[46];
+        for (i = 0; i < 46; i++) {
+            float f = 20.0f * fm_exp2f((float)i * (5.643856f / 45.0f)), r4 = f / fc;   /* 20 Hz .. 1 kHz */
+            float db = sp ? 10.0f * 0.30103f * fm_log2f(r4 * r4 * r4 * r4 / (1.0f + r4 * r4 * r4 * r4)) : 0.0f;
+            y[i] = (int16_t)(y0 + 84 - (int32_t)(fm_maxf(db, -30.0f) * 0.9f));
+        }
+        cv_text(12, y0 + 60, &FONT_S, "SPEAKER", sp ? K_SETUP : K_DIM);
+        plot(12, 2, y, 46, sp ? K_SETUP : K_FAINT);
+        cv_text(12, y0 + 110, &FONT_XS, sp ? "low cut" : "off: all the bass", K_TEXT2);
+    }
+    {   /* PRESSURE: what a press gives, light .. firm */
+        float g = press_gain();
+        int16_t y[46];
+        for (i = 0; i < 46; i++)
+            y[i] = (int16_t)(y0 + 112 - (int32_t)(fm_minf((float)i / 45.0f * g, 1.0f) * 30.0f));
+        cv_text(128, y0 + 60, &FONT_S, "PRESSURE", K_SETUP);
+        plot(128, 2, y, 46, K_SETUP);
+    }
 }
 
 /* the reverb's tail, as measured (to -60 dB after a burst, QA batch 3; doubling the -30 dB time had made
@@ -2034,7 +2031,7 @@ static void pic_fx2(int32_t y0)
 }
 
 /* Tone 2: the oscillators' character, a saw from clean to vintage (left, KNOB 1); the feedback loop's level, live
- * (right, KNOB 2); under them AGE (KNOB 3): how worn the sound is, a bar (it wears in slowly) */
+ * (right, KNOB 2); under them AGE (KNOB 3): how worn the sound is, a bar (it wears in slowly), and DRIFT (KNOB 4) */
 static void pic_tone2(int32_t y0)
 {
     int fb = proj.par[P_FEEDBACK], ch = proj.par[P_CHAR], i;
@@ -2058,43 +2055,24 @@ static void pic_tone2(int32_t y0)
         if (fb && bh > 3)
             cv_round(164, y0 + 84 - (bh * 56 / 72), 14, bh * 56 / 72, 4, dr_fb > 0.6f ? K_GOLD : K_FX);
     }
-    {   /* AGE */
+    {   /* AGE (KNOB 3): how worn, a bar */
         int ag = proj.par[P_AGE];
-        int32_t w = 150 * ag / 100;
+        int32_t w = 56 * ag / 100;
         cv_text(12, y0 + 98, &FONT_S, "AGE", ag ? K_TEXT2 : K_DIM);
-        cv_round(64, y0 + 106, 150, 6, 3, K_GRID);
+        cv_round(52, y0 + 106, 56, 6, 3, K_GRID);
         if (w > 3)
-            cv_round(64, y0 + 106, w, 6, 3, K_TEXT2);
+            cv_round(52, y0 + 106, w, 6, 3, K_TEXT2);
     }
-}
-
-/* Setup 3: how the unit meets the room: the speaker's low cut, 20 Hz .. 1 kHz (left, KNOB 1); what a key's
- * press gives, light .. firm, at the pressure sensitivity (right, KNOB 2). Neither is in scenes */
-static void pic_setup3(int32_t y0)
-{
-    int sp = proj.par[P_SPEAKER], i;
-    {   /* SPEAKER: 12 dB an octave under its corner, 0 dB .. -30 dB */
-        float fc = 40.0f * fm_exp2f((float)sp * 0.0258496f);
-        int16_t y[51];
-        for (i = 0; i < 51; i++) {
-            float f = 20.0f * fm_exp2f((float)i * (5.643856f / 50.0f)), r4 = f / fc;   /* 20 Hz .. 1 kHz */
-            float db = sp ? 10.0f * 0.30103f * fm_log2f(r4 * r4 * r4 * r4 / (1.0f + r4 * r4 * r4 * r4)) : 0.0f;
-            y[i] = (int16_t)(y0 + 40 - (int32_t)(fm_maxf(db, -30.0f) * 1.6f));
+    {   /* DRIFT (KNOB 4): a slow wander, as wide as it is set, moving */
+        float drift = (float)proj.par[P_DRIFT] * 0.08f;
+        int16_t y[21];
+        for (i = 0; i < 21; i++) {
+            float s = (float)i * 0.35f + (float)(plat_ms() % 60000u) * 0.0008f;
+            y[i] = (int16_t)(y0 + 108 - (int32_t)(fm_sinf(s) * fm_sinf(s * 0.37f + 1.0f) * drift * 1.2f));
         }
-        cv_text(12, y0 + 3, &FONT_S, "SPEAKER", sp ? K_SETUP : K_DIM);
-        plot(12, 2, y, 51, sp ? K_SETUP : K_FAINT);
-        cv_text(12, y0 + 94, &FONT_XS, sp ? "low cut" : "off: all the bass", K_TEXT2);
+        cv_text(128, y0 + 98, &FONT_S, "DRIFT", drift > 0.0f ? K_TEXT2 : K_DIM);
+        plot(180, 2, y, 21, drift > 0.0f ? K_TEXT2 : K_FAINT);
     }
-    {   /* PRESSURE: what a press gives, light .. firm */
-        float g = press_gain();
-        int16_t y[51];
-        for (i = 0; i < 51; i++)
-            y[i] = (int16_t)(y0 + 88 - (int32_t)(fm_minf((float)i / 50.0f * g, 1.0f) * 56.0f));
-        cv_text(128, y0 + 3, &FONT_S, "PRESSURE", K_SETUP);
-        plot(128, 2, y, 51, K_SETUP);
-        cv_text(128, y0 + 94, &FONT_XS, "light .. firm", K_DIM);
-    }
-    cv_text(12, y0 + 110, &FONT_XS, "not in scenes", K_DIM);
 }
 
 /* THE BLACK KEYS' MAP (SEL held 0.4 s, nothing else asking for the screen: a knob turning, a white key held): the
@@ -2162,65 +2140,24 @@ static void keymap_rows(int32_t y0, int r0, int r1)
     }
 }
 
-/* Setup: a small sketch for each knob: the glide, the fade's curve, the drift, how wide the drones sit */
+/* Setup 1: the three times, a row each: FADE (KNOB 1, PLAY's fade in and out), MORPH (KNOB 2, a switch's move to
+ * its new setting), SCENES (KNOB 3, a scene switch); each a bar as far as its knob and its time. None is in scenes */
 static void pic_setup(int32_t y0)
 {
-    float glide = (float)proj.par[P_GLIDE] * 0.01f, fade = fade_s();
-    float drift = (float)proj.par[P_DRIFT] * 0.08f, wid = (float)proj.par[P_WIDTH] * 0.01f;
-    int32_t yb = y0 + 74, i, cx;
-    int16_t y[25];
-    char t[16], *q;
-    /* GLIDE: a step in pitch, then the slide to it (straight up when 0) */
-    glide = 10.0f * glide * glide;
-    for (i = 0; i < 25; i++) {
-        float s = (float)i / 24.0f * 3.0f - 0.5f;   /* -0.5 .. 2.5 s */
-        float v = s < 0.0f ? 0.0f : glide <= 0.0f ? 1.0f : 1.0f - fm_exp2f(-s / (glide * 0.25f) * 1.4427f);
-        y[i] = (int16_t)(yb - (int32_t)(v * 40.0f));
+    static const uint8_t P[3] = {P_FADE, P_MORPH, P_SCENE_T};
+    static const char *const N[3] = {"FADE", "MORPH", "SCENES"}, *const W[3] = {"PLAY in, out", "a switch", "a scene"};
+    int r;
+    for (r = 0; r < 3; r++) {
+        int32_t y = y0 + 4 + r * 38, w = 120 * proj.par[P[r]] / 100;
+        char t[16];
+        cv_text(12, y, &FONT_S, N[r], K_SETUP);
+        cv_text(12, y + 18, &FONT_XS, W[r], K_DIM);
+        dr_param_text(P[r], proj.par[P[r]], t);
+        text_r(222, y, t, K_TEXT2);
+        cv_round(102, y + 24, 120, 6, 3, K_GRID);
+        if (w > 3)
+            cv_round(102, y + 24, w, 6, 3, K_SETUP);
     }
-    plot(10, 2, y, 25, K_SETUP);
-    if (glide <= 0.0f)
-        scopy(t, "none");
-    else
-        scopy(dec1(glide, t), " s");
-    cv_text(10, yb + 4, &FONT_XS, "Glide", K_DIM);
-    cv_text(10, yb + 20, &FONT_S, t, K_TEXT2);
-    /* FADE: PLAY's fade in, over its time (the sketch spans 0 .. 5 s) */
-    for (i = 0; i < 25; i++) {
-        float s = (float)i / 24.0f * 5.0f, v = fm_minf(s / fade, 1.0f);
-        y[i] = (int16_t)(yb - (int32_t)(v * v * 40.0f));
-    }
-    plot(68, 2, y, 25, K_SETUP);
-    scopy(dec1(fade, t), " s");
-    cv_text(68, yb + 4, &FONT_XS, "Fade", K_DIM);
-    cv_text(68, yb + 20, &FONT_S, t, K_TEXT2);
-    /* DRIFT: a slow wander, as wide as it is set (+-8 cents at the top), moving */
-    for (i = 0; i < 25; i++) {
-        float s = (float)i * 0.35f + (float)(plat_ms() % 60000u) * 0.0008f;
-        y[i] = (int16_t)(yb - 20 - (int32_t)(fm_sinf(s) * fm_sinf(s * 0.37f + 1.0f) * drift * 2.2f));
-    }
-    plot(126, 2, y, 25, K_SETUP);
-    q = scopy(t, "+-");
-    dec1(drift, q);
-    for (q = t; *q; q++)
-        ;
-    scopy(q, "c");
-    cv_text(126, yb + 4, &FONT_XS, "Drift", K_DIM);
-    cv_text(126, yb + 20, &FONT_S, t, K_TEXT2);
-    /* STEREO: drone I and II, as far apart as Width puts them: two short upright bars on a line */
-    cx = 204;
-    cv_rect(cx - 22, yb - 20, 45, 1, K_GRID);
-    cv_rect(cx - 2 - (int32_t)(wid * 20.0f), yb - 30, 3, 20, K_DRONE[0]);
-    cv_rect(cx + (int32_t)(wid * 20.0f), yb - 30, 3, 20, K_DRONE[1]);
-    if (wid <= 0.0f)
-        scopy(t, "mono");
-    else {
-        itoa_u((uint32_t)proj.par[P_WIDTH], t);
-        for (q = t; *q; q++)
-            ;
-        scopy(q, "%");
-    }
-    cv_text(184, yb + 4, &FONT_XS, "Stereo", K_DIM);
-    cv_text(184, yb + 20, &FONT_S, t, K_TEXT2);
 }
 
 /* the picture: the page's own (on Play, the two waveforms), a banner while a message shows. No interval
@@ -2278,7 +2215,7 @@ static void draw_pic(void)
         cv_round(6, 4, WIDE_W, PAN_H + 8, 4, K_PANEL);
         keymap_rows(8, 0, 3);
     } else if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 ||
-        ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_SETUP3 || ui.view == V_TONE2 ||
+        ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_TONE2 ||
         ui.view == V_MOVES) {
         cv_round(6, 4, WIDE_W, PAN_H, 4, K_PANEL);
         switch (ui.view) {
@@ -2289,7 +2226,6 @@ static void draw_pic(void)
         case V_FX2: pic_fx2(4); break;
         case V_TONE2: pic_tone2(4); break;
         case V_SETUP2: pic_setup2(4); break;
-        case V_SETUP3: pic_setup3(4); break;
         case V_MOVES: pic_moves(4); break;
         default: pic_setup(4); break;
         }

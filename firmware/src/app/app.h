@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 29u                  /* 29: the gesture keys fixed (Weight, Shift, Clean, Wash; 28's latches
+#define PROJ_FORMAT 30u                  /* 30: Tuning in each Interval (the interval and Tuning to one index);
+                                          * 29: the gesture keys fixed (Weight, Shift, Clean, Wash; 28's latches
                                           * let go, a key may play something else now); 28: Shift's move in cents (27's four to theirs); Noise's top
                                           * 6 dB up (27's values halved);
                                           * 27: the set macros gone (their four values zeroed; now Wander, Age,

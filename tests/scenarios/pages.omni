@@ -1,6 +1,6 @@
 # the page pictures (screenshots to look at): every page, with values that show something.
 # Pages: 0 Play 1 1 Play 2 2 Tone 1 3 Tone 2 4 Osc 5 Source 6 LFO depths 7 LFO mods 8 Partner 9 Moves
-# 10 Setup 1 11 Setup 2 12 Setup 3 13 Swell 14 Delay 15 Reverb.
+# 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
 tap PLAY
 wait 1500
 shot play.png
@@ -91,40 +91,37 @@ tapkey w13
 spin K3 -60
 spin K4 -1
 wait 15000
-# Setup: some glide, drift and stereo
+# Setup 1: the times: a longer Morph and Scene switch
 tap GLO
 expect view 10
-spin K1 30
-spin K3 50
-wait 300
-shot setup.png
-# Setup 2: Morph, Scene switch, Tune, Tuning
-tap GLO
-expect view 11
 spin K2 20
 spin K3 20
 wait 300
-shot setup2.png
-# Setup 3: the speaker's low cut on, the keys a little more sensitive (then both back)
+shot setup.png
+# Setup 2: tuned a little sharp, wider, the speaker's low cut on, the keys a little more sensitive (then back)
 tap GLO
-expect view 12
-spin K1 30
-spin K2 20
+expect view 11
+spin K1 6
+spin K2 30
+spin K3 30
+spin K4 20
 wait 300
-shot setup3.png
-spin K1 -30
-spin K2 -20
+shot setup2.png
+spin K1 -6
+spin K2 -30
+spin K3 -30
+spin K4 -20
 # Pulse (hold ARP for its page; a tap starts it): some swing
 expect par55 1
 press ARP
-expect view 13
+expect view 12
 spin K4 30
 wait 2500
 shot pulse.png
 release ARP
 # Delay: Wide, its echoes left and right
 tap FX
-expect view 14
+expect view 13
 spin K1 1
 spin K3 20
 spin K4 20
@@ -132,7 +129,7 @@ wait 300
 shot fx.png
 # Reverb: the cathedral's tail, a little longer
 tap FX
-expect view 15
+expect view 14
 spin K2 10
 spin K4 10
 wait 300

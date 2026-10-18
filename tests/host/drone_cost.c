@@ -84,7 +84,7 @@ static void drone(int partners, int voices, int heavy)   /* voices: how many dro
         dr_set(P_REV_TYPE, 3);
     }
     if (heavy > 1) {                              /* the worst case: everything above, with the feedback, the
-                                                   * character, Drift, stereo, rate mod and the macros all in */
+                                                   * character, Drift, stereo, rate mod, Wander, Age and the gestures in */
         dr_set(P_FEEDBACK, 100);
         dr_set(P_CHAR, 100);
         dr_set(P_DRIFT, 100);
@@ -92,8 +92,11 @@ static void drone(int partners, int voices, int heavy)   /* voices: how many dro
         dr_set(P_LFO_RMOD, 50);
         dr_set(P_DLY_REPEATS, 90);
         dr_set(P_REV_MIX, 80);
-        for (g = 0; g < DR_NGEST; g++)
-            dr_gesture(g, 1000);
+        dr_set(P_WANDER, 100);
+        dr_set(P_AGE, 100);
+        for (g = 0; g < DR_NGEST; g++)            /* every gesture in but Clean (which takes things away) */
+            if (g != DR_G_CLEAN)
+                dr_gesture(g, 1000);
     }
     dr_play(1);
 }
