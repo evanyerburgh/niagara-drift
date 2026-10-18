@@ -109,11 +109,17 @@ enum {
                                      * filters through their drive: thicker, then howling, held by the clip */
     P_CHAR,                         /* CHARACTER, 0..100: clean .. vintage oscillators (softer edges, a bent
                                      * saw, even harmonics, pitch jitter, the drones a little apart, noise) */
-    /* THE MACROS (v0.2): offsets on top of the sound (drone.c MACRO_OFF), the sound's own values untouched */
-    P_M_BLOOM, P_M_WEIGHT, P_M_TIDE, P_M_TEAR,           /* the set macros' amounts, 0..100 (SEQ, PRESETS) */
-    P_GD_WEIGHT, P_GD_SHIFT, P_GD_CONVERGE, P_GD_WASH,      /* the gestures' depths, 0..100 (Shift's: its move, DR_SHIFT_NAME) */
-    P_GR_WEIGHT, P_GR_SHIFT, P_GR_CONVERGE, P_GR_WASH,      /* ... their swell's time, 0..100 = 1 .. 30 s */
-    P_GL_WEIGHT, P_GL_SHIFT, P_GL_CONVERGE, P_GL_WASH,      /* ... latched at, 0..100 (0: not latched) */
+    /* THE MACROS (v0.2): offsets on top of the sound (drone.c MACRO_MV), the sound's own values untouched. These
+     * four were the set macros (Bloom, Weight, Tide, Tear) until 2026-10-18 */
+    P_WANDER,                       /* WANDER, 0..100: drone II walks slowly between notes that sit well with drone
+                                     * I, gliding, at uneven times (how far and how often); 0 still (Partner 2) */
+    P_AGE,                          /* AGE, 0..100: the sound worn, like an old tape: darker, a slow wow, hiss,
+                                     * more character; it wears in (and out) slowly (Tone 2) */
+    P_SHIFT_MOVE,                   /* Shift's move: DR_SHIFT_NAME (a 5th up, a 4th up, a 4th down, a 5th down) */
+    P_OLD_M3,                       /* unused, 0 */
+    P_GD_0, P_GD_1, P_GD_2, P_GD_3,      /* each gesture key's depth (D5..G5), 0..100 */
+    P_GR_0, P_GR_1, P_GR_2, P_GR_3,      /* ... its own time, 0..100 = 1 .. 30 s */
+    P_GL_0, P_GL_1, P_GL_2, P_GL_3,      /* ... latched at, 0..100 (0: not latched) */
     /* THE EFFECTS (v0.2, ChoralRoot's design) */
     P_DLY_TYPE,                     /* the delay's type: Tape, Wide, Ping-pong, Clean (DR_DLY_NAME) */
     P_REV_LEN,                      /* the reverb's LENGTH: 0..99 = 0.3 .. 40 s (its decay time), 100 Inf (a freeze) */
@@ -127,12 +133,15 @@ enum { DR_SINE, DR_TRI, DR_SAW, DR_SQUARE };          /* the X-WAVE's four waves
 enum { DR_LFO_OFF, DR_LFO_I, DR_LFO_II, DR_LFO_BOTH };   /* a route's wave; BOTH: I + II, summed */
 enum { DR_TO_PITCH, DR_TO_XWAVE };
 enum { DR_TO_CUTOFF, DR_TO_RESO };
-#define DR_NSETM 4                             /* the set macros: Bloom, Weight, Tide, Tear */
-#define DR_NGEST 4                             /* the gestures: Weight, Shift, Converge, Wash (D5-G5) */
+#define DR_NGEST 4                             /* the gesture keys, D5-G5 */
+enum { DR_G_WEIGHT, DR_G_SHIFT, DR_G_CONVERGE, DR_G_WASH, DR_G_CLEAN, DR_G_GLITCH, DR_NGTYPE };   /* what a key plays */
 #define DR_NSHIFT 4                            /* Shift's moves: a fifth up, a fourth up, a fourth down, a fifth down */
 extern const char *const DR_SHIFT_NAME[DR_NSHIFT];
-extern const char *const DR_MACRO_NAME[DR_NSETM + DR_NGEST];
-void dr_gesture(int g, int amt);               /* gesture g's amount now, 0..1000 (the UI swells it) */
+extern const char *const DR_GEST_NAME[DR_NGTYPE];
+extern const uint8_t DR_GEST_DEPTH[DR_NGTYPE], DR_GEST_TIME[DR_NGTYPE];   /* each one's depth and time to start */
+void dr_gesture(int g, int amt);               /* gesture key g's amount now, 0..1000 (the UI swells it) */
+void dr_gesture_type(int g, int type);         /* what gesture key g plays (DR_G_*) */
+float dr_wander(void);                         /* Wander's move of drone II now, semitones (the screen) */
 int dr_heard(int p);                           /* a value as heard: the sound's own plus the macros (tests) */
 float dr_mac_pitch(int g);                     /* drone g's pitch move by the macros now, semitones (tests) */
 #define DR_LFO_NSHAPES 9                                /* each tap: off and eight shapes */

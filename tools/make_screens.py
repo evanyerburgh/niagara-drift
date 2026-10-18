@@ -9,7 +9,7 @@ import os, subprocess, sys, tempfile
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BUTTONS = [("play", ["play", "play2"]), ("tone", ["tone", "tone2"]), ("osc", ["osc", "source"]), ("seq", ["macros", "partner"]),
+BUTTONS = [("play", ["play", "play2"]), ("tone", ["tone", "tone2"]), ("osc", ["osc", "source"]), ("seq", ["gestures", "partner", "partner2"]),
            ("lfo", ["lfo", "lfo2"]), ("swell", ["pulse"]), ("effects", ["fx", "fx2"]), ("setup", ["setup", "setup2", "setup3"]), ("keys", ["keymap"])]
 SCALE, GAP = 2, 16
 BG = (26, 4, 24)
@@ -46,7 +46,7 @@ KNOBS = [(105, 100, "MASTER", "Volume", PALE), (215, 100, "SELECT", "LFO rate", 
         [(610 + i * 104, 100, "KNOB%d" % (i + 1), "Drone I" if i < 2 else "Drone II", AMBER if i < 2 else TEAL)
          for i in range(4)]
 ROW1 = [("FX", "Delay · Rev"), ("SEL", "Fine"), ("ENV", "Tone"), ("LFO", "LFO"), ("EDIT", "Osc · Src"), ("GLO", "Setup")]
-ROW2 = [("HOME", "Play"), ("SAVE", "Save"), ("ARP", "Swell"), ("SEQ", "Macros"), ("PLAY", "On · off"),
+ROW2 = [("HOME", "Play"), ("SAVE", "Save"), ("ARP", "Swell"), ("SEQ", "Partner"), ("PLAY", "On · off"),
         ("REC", "Loop")]
 BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14]
 BLACK = [("Partner", AMBER), ("Sub", AMBER), ("Filter", AMBER), ("Pitch lock", None), ("LFO reset", None),

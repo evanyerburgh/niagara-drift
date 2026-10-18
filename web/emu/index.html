@@ -370,7 +370,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
         <div class="g-btn">ENV</div>
         <div class="pstack">
         <div class="g-page"><i>Tone 1</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Noise</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Colour<small>white ↔ pink</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Noise</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Colour<small>white ↔ pink</small></span></div>
-        <div class="g-page"><i>Tone 2</i><span class="k both"><span class="sr">Knob 1: </span>Character<small>clean → vintage</small></span><span class="k both"><span class="sr">Knob 2: </span>Feedback</span><span class="k both none"><span class="sr">Knob 3: </span>–</span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
+        <div class="g-page"><i>Tone 2</i><span class="k both"><span class="sr">Knob 1: </span>Character<small>clean → vintage</small></span><span class="k both"><span class="sr">Knob 2: </span>Feedback</span><span class="k both"><span class="sr">Knob 3: </span>Age<small>wears in slowly</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
         </div>
       </div>
       <div class="pblock">
@@ -383,7 +383,9 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">SEQ</div>
         <div class="pstack">
+        <div class="g-page"><i>Gestures</i><span class="k both"><span class="sr">Knob 1: </span>D5 depth</span><span class="k both"><span class="sr">Knob 2: </span>E5 depth</span><span class="k both"><span class="sr">Knob 3: </span>F5 depth</span><span class="k both"><span class="sr">Knob 4: </span>G5 depth</span></div>
         <div class="g-page"><i>Partner</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Interval<small>its gap</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Detune</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Interval<small>its gap</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Detune</span></div>
+        <div class="g-page"><i>Partner 2</i><span class="k both none"><span class="sr">Knob 1: </span>–</span><span class="k both none"><span class="sr">Knob 2: </span>–</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Wander<small>walks between notes</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
         </div>
       </div>
     </div>
@@ -494,10 +496,10 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
   <div class="g-card mid">
     <h3>Macros <span class="g-sub">several settings at once, on top of your sound</span></h3>
     <dl class="acts">
-      <div><dt>Bloom · Weight · Tide · Tear</dt><dd><span class="cap">SEQ</span>: the Macros page, KNOB 1–4</dd></div>
       <div><dt>Weight · Shift · Converge · Wash</dt><dd>The top four <span class="cap white">white keys</span>: hold to bring in, let go and it leaves as slowly as you held it; tap to stay</dd></div>
       <div><dt>Macro time</dt><dd><span class="cap">PRESETS</span>: every gesture faster or slower, even while it moves</dd></div>
       <div><dt>Set a gesture</dt><dd>Hold its key: <span class="cap">ALGORITHM</span> its depth (Shift: its move), <span class="cap">PRESETS</span> its own time</dd></div>
+      <div><dt>Pick what a key plays</dt><dd>Hold its key, turn <span class="cap">SELECT</span>: Weight · Shift · Converge · Wash · Clean · Glitch</dd></div>
     </dl>
   </div>
 
@@ -664,9 +666,9 @@ function hit(c, cls) {
 }
 // what each control does, on hover (the Buttons list below says the same)
 const TIP = { FX: "Delay: type, time, repeats, mix (again: Reverb: type, length to Inf, damp, mix)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths)",
-  ENV: "Tone 1: noise and its colour, white to pink (again: Tone 2: character, feedback); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: LFO mods: rate mod, cross-mod amount, delay LFO)",
+  ENV: "Tone 1: noise and its colour, white to pink (again: Tone 2: character, feedback, age); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: LFO mods: rate mod, cross-mod amount, delay LFO)",
   EDIT: "Osc: X-Wave, pulse width (again: Source: osc mix, drive); hold to peek", GLO: "Setup 1: glide, fade, drift, stereo width (again: Setup 2: morph, scene switch, tune, tuning; again: Setup 3: speaker, pressure)",
-  HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Macros: Bloom, Weight, Tide, Tear (again: Partner: interval, detune)",
+  HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Gestures: each key's depth (again: Partner: interval, detune; again: Partner 2: Wander)",
   PLAY: "Drone in / out", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "Macro time: every gesture faster or slower", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
