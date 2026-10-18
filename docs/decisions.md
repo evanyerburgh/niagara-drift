@@ -188,3 +188,13 @@ at the end. The current state is in the [README](../README.md) and the code.
   value, pale pink ink; amber drone I, teal drone II, lilac the LFO, everything else in the ink (no blue, pink or
   gold). All text 4.5:1 or more on its background. No dots: page dots become "1/3", the unsaved dot becomes a dim
   SAVE light, the LFO rate lights go (OCT- / OCT+ pulse), Setup 1's stereo dots become two bars. Barlow stays.
+- 2026-10-18: the gestures (D5-G5) are Weight, Shift, Converge, Wash (Beat and Heat gone). Each macro's moves come in
+  over their own part of its amount and leave over another (eased, gliding up to 0.6 s), so parts arrive in order.
+  Shift: drone I then drone II to a 5th up (default), 4th up, 4th down or 5th down (PRESETS held). Converge pulls to
+  the nearest unison, 4th, 5th or octave (at most 2.5 semitones), detune and Drift to 0, cross-mod last. Weight adds
+  drive +30 and resonance -80. Wash adds Damp +15. Swells to start: Weight 45 (4.6 s), Shift 70 (11 s), Converge 60
+  (7.7 s), Wash 55 (6.5 s). PROJ_FORMAT 24 (23's gesture values reset). The Macros page is unchanged for now.
+- 2026-10-18 (Evan's listening): Weight focuses: Width, the partners' detune to 0 and Movement -25 over its first 60 %,
+  cutoffs -100, the sub over 20-100 %. Converge: drone I dips (level -25, cutoff -60) while drone II moves (a bump, in
+  over 0-20 %, out over 45-75 %, both ways). Wash: its release is 2.5x its swell; at the top (85-100 %) the dry levels
+  breathe -14 at 0.15 Hz.

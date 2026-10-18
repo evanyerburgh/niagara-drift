@@ -64,8 +64,8 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 23, on bank A", proj.format == 23u && PROJ_FORMAT == 23u && proj.bank == 0);
-    check("a value 0.1 didn't have (Beat's depth) at its default", proj.par[P_GD_BEAT] == dr_param_info(P_GD_BEAT)->def);
+    check("now format 24, on bank A", proj.format == 24u && PROJ_FORMAT == 24u && proj.bank == 0);
+    check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_WEIGHT] == dr_param_info(P_GD_WEIGHT)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
           proj.par[DR_GP(0, GP_NCOLOR)] == 100 && proj.par[DR_GP(1, GP_NCOLOR)] == 0);
@@ -87,9 +87,22 @@ int main(void)
     proj.bank = 2;
     project_save();
     memset(&proj, 0, sizeof proj);
-    check("reloaded (23): as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
+    check("reloaded (24): as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
                                          scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 3015 && scene_get(2, 2) &&
                                          scene_get(2, 2)[DR_GP(0, GP_PITCH)] == 5000 && scene_get(0, 11));
+    {   /* PR #14's (23): the same layout, the gestures Beat, Heat, Converge, Wash */
+        static project_t p23;
+        p23 = proj;
+        p23.format = 23u;
+        p23.par[P_M_BLOOM] = 40;
+        p23.par[P_GD_SHIFT] = 70;              /* Heat's depth then; out of Shift's range now */
+        p23.par[P_GL_WEIGHT] = 100;            /* Beat latched then */
+        memcpy(store[OBJ_PROJ], &p23, sizeof p23);
+        store_n[OBJ_PROJ] = (int)sizeof p23;
+        check("PR #14's project (23) loads: its sound kept, the gestures at their defaults",
+              project_load() == 0 && proj.par[P_M_BLOOM] == 40 && proj.par[P_GD_SHIFT] == 0 &&
+                  proj.par[P_GL_WEIGHT] == 0 && proj.par[P_GR_WASH] == dr_param_info(P_GR_WASH)->def);
+    }
     {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */
         static proj_v21_t p21;
         static bank_v21_t b21;
@@ -118,7 +131,7 @@ int main(void)
         check("... A6 and B3 as they were, the macros at their defaults",
               scene_get(0, 5) && scene_get(0, 5)[DR_GP(0, GP_PITCH)] == 3333 && scene_get(1, 2) &&
                   scene_get(1, 2)[DR_GP(0, GP_PITCH)] == 2222 && scene_get(1, 2)[P_M_BLOOM] == 0 &&
-                  scene_get(1, 2)[P_GD_HEAT] == dr_param_info(P_GD_HEAT)->def);
+                  scene_get(1, 2)[P_GD_SHIFT] == dr_param_info(P_GD_SHIFT)->def);
         check("... and B written again in the new layout on the next save",
               project_save() == 0 && store_n[OBJ_BANKB] == (int)sizeof(bank_t));
     }
@@ -150,8 +163,8 @@ int main(void)
         check("PR #12's project (22) loads: its macros, reverb type, bank and live macro kept",
               project_load() == 0 && proj.par[P_M_BLOOM] == 60 && proj.par[P_REV_TYPE] == 1 && proj.bank == 2 &&
                   proj.mlive == 2 && proj.par[P_REV_LEN] == dr_param_info(P_REV_LEN)->def);
-        check("... A2 and C1 as they were, the new values at their defaults",
-              scene_get(0, 1) && scene_get(0, 1)[P_GL_WASH] == 100 && scene_get(2, 0) &&
+        check("... A2 and C1 as they were, the new values and the gestures at their defaults",
+              scene_get(0, 1) && scene_get(0, 1)[P_GL_WASH] == 0 && scene_get(2, 0) &&
                   scene_get(2, 0)[P_CHAR] == 77 && scene_get(2, 0)[P_DLY_TYPE] == 0 &&
                   scene_get(2, 0)[P_PRESS_SENS] == 50);
         check("... and C written again in the new layout on the next save",

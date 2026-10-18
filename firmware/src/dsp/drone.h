@@ -111,9 +111,9 @@ enum {
                                      * saw, even harmonics, pitch jitter, the drones a little apart, noise) */
     /* THE MACROS (v0.2): offsets on top of the sound (drone.c MACRO_OFF), the sound's own values untouched */
     P_M_BLOOM, P_M_WEIGHT, P_M_TIDE, P_M_TEAR,           /* the set macros' amounts, 0..100 (SEQ, PRESETS) */
-    P_GD_BEAT, P_GD_HEAT, P_GD_CONVERGE, P_GD_WASH,      /* the gestures' depths, 0..100 */
-    P_GR_BEAT, P_GR_HEAT, P_GR_CONVERGE, P_GR_WASH,      /* ... their swell's time, 0..100 = 1 .. 30 s */
-    P_GL_BEAT, P_GL_HEAT, P_GL_CONVERGE, P_GL_WASH,      /* ... latched at, 0..100 (0: not latched) */
+    P_GD_WEIGHT, P_GD_SHIFT, P_GD_CONVERGE, P_GD_WASH,      /* the gestures' depths, 0..100 (Shift's: its move, DR_SHIFT_NAME) */
+    P_GR_WEIGHT, P_GR_SHIFT, P_GR_CONVERGE, P_GR_WASH,      /* ... their swell's time, 0..100 = 1 .. 30 s */
+    P_GL_WEIGHT, P_GL_SHIFT, P_GL_CONVERGE, P_GL_WASH,      /* ... latched at, 0..100 (0: not latched) */
     /* THE EFFECTS (v0.2, ChoralRoot's design) */
     P_DLY_TYPE,                     /* the delay's type: Tape, Wide, Ping-pong, Clean (DR_DLY_NAME) */
     P_REV_LEN,                      /* the reverb's LENGTH: 0..99 = 0.3 .. 40 s (its decay time), 100 Inf (a freeze) */
@@ -128,10 +128,13 @@ enum { DR_LFO_OFF, DR_LFO_I, DR_LFO_II, DR_LFO_BOTH };   /* a route's wave; BOTH
 enum { DR_TO_PITCH, DR_TO_XWAVE };
 enum { DR_TO_CUTOFF, DR_TO_RESO };
 #define DR_NSETM 4                             /* the set macros: Bloom, Weight, Tide, Tear */
-#define DR_NGEST 4                             /* the gestures: Beat, Heat, Converge, Wash */
+#define DR_NGEST 4                             /* the gestures: Weight, Shift, Converge, Wash (D5-G5) */
+#define DR_NSHIFT 4                            /* Shift's moves: a fifth up, a fourth up, a fourth down, a fifth down */
+extern const char *const DR_SHIFT_NAME[DR_NSHIFT];
 extern const char *const DR_MACRO_NAME[DR_NSETM + DR_NGEST];
 void dr_gesture(int g, int amt);               /* gesture g's amount now, 0..1000 (the UI swells it) */
 int dr_heard(int p);                           /* a value as heard: the sound's own plus the macros (tests) */
+float dr_mac_pitch(int g);                     /* drone g's pitch move by the macros now, semitones (tests) */
 #define DR_LFO_NSHAPES 9                                /* each tap: off and eight shapes */
 #define DR_LFO_RANDOM 8                                 /* the eighth: random (I: steps, II: a glide) */
 extern const char *const DR_LFO_W1_NAME[DR_LFO_NSHAPES];
