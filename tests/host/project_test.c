@@ -64,7 +64,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 27, on bank A", proj.format == 27u && PROJ_FORMAT == 27u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 28, on bank A", proj.format == 28u && PROJ_FORMAT == 28u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -87,7 +87,7 @@ int main(void)
     proj.bank = 2;
     project_save();
     memset(&proj, 0, sizeof proj);
-    check("reloaded (27): as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
+    check("reloaded (28): as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
                                          scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 3015 && scene_get(2, 2) &&
                                          scene_get(2, 2)[DR_GP(0, GP_PITCH)] == 5000 && scene_get(0, 11));
     {   /* PR #14's (23): the same layout, the gestures Beat, Heat, Converge, Wash */
@@ -102,7 +102,7 @@ int main(void)
         store_n[OBJ_PROJ] = (int)sizeof p23;
         check("PR #14's project (23) loads: its sound kept, the gestures at their defaults, the set macros gone",
               project_load() == 0 && proj.par[P_FEEDBACK] == 40 && proj.par[P_WANDER] == 0 && proj.par[P_GD_1] == dr_param_info(P_GD_1)->def &&
-                  proj.par[P_SHIFT_MOVE] == 0 &&
+                  proj.par[P_SHIFT_MOVE] == 1400 &&
                   proj.par[P_GL_0] == 0 && proj.par[P_GR_3] == dr_param_info(P_GR_3)->def);
         p23 = proj;                            /* PR #18's (24): the long swells */
         p23.format = 24u;
@@ -113,7 +113,7 @@ int main(void)
         store_n[OBJ_PROJ] = (int)sizeof p23;
         check("PR #18's project (24) loads: the swells to the new defaults, Shift's move moved, the keys as they were",
               project_load() == 0 && proj.par[P_GR_1] == dr_param_info(P_GR_1)->def &&
-                  proj.par[P_SHIFT_MOVE] == 2 && proj.par[P_GD_1] == dr_param_info(P_GD_1)->def &&
+                  proj.par[P_SHIFT_MOVE] == 200 && proj.par[P_GD_1] == dr_param_info(P_GD_1)->def &&
                   proj.par[P_GL_3] == 100 && proj.gkey[1] == DR_G_SHIFT);
     }
     {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */

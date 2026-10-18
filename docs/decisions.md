@@ -222,3 +222,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   noise +30, Character +35, a wow of +-14 cents a drone; wears in over 20 s. Wander: steps among 5th, 4th, octave
   (then 3rds, 6ths further up), placed nearest drone II's pitch, home about every other step, every (40 - 32 x
   amount) s x 0.6-1.4, gliding 3-5 s. Turning drone II's knobs on Play while it's out says "II OFF  SEL + PLAY".
+- 2026-10-18 (Evan): Wander is a random melody: it jumps (GLO's Glide slides it) among a minor pentatonic on drone I
+  (root, minor 3rd, 4th, 5th, minor 7th, any octave) within 7 + 5 x amount semitones of drone II's pitch, home with a
+  chance of 0.12 a step, a note every (20 - 18.5 x amount) s x 0.5-1.5. Shift's move is continuous, in cents
+  (0..1400, 700 none: a fifth down to a fifth up; a detent 10, SEL 1). SEQ adds Gestures 2: each key's own time.
+  NOISE at 100 is level with the oscillators (was 6 dB under), as a Moog's mixer; PROJ_FORMAT 28 halves 27's noise
+  values (the same level) and turns Shift's four moves into cents.

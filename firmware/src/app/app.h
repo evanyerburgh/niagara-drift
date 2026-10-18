@@ -11,7 +11,9 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 27u                  /* 27: the set macros gone (their four values zeroed; now Wander, Age,
+#define PROJ_FORMAT 28u                  /* 28: Shift's move in cents (27's four to theirs); Noise's top
+                                          * 6 dB up (27's values halved);
+                                          * 27: the set macros gone (their four values zeroed; now Wander, Age,
                                           * Shift's move); what each gesture key plays; 26: Macro time (the byte of the macro PRESETS played: 25's reset);
                                           * 25: the gestures' swells shorter (24's reset to the new defaults);
                                           * 24: the gestures Weight, Shift, Converge, Wash (23's gesture values

@@ -1483,7 +1483,7 @@ int main(void)
                    (double)(20.0f * log10f(n50)), (double)(20.0f * log10f(n25)), (double)(20.0f * log10f(t100 / t0)));
             check("noise beside the oscillators: they stay (within 1.5 dB at noise 100)",
                   fabsf(20.0f * log10f(t100 / t0)) < 1.5f);
-            check("noise 100 6 dB under the oscillators (within 2 dB)", fabsf(20.0f * log10f(n100 / l0) + 6.0f) < 2.0f);
+            check("noise 100 level with the oscillators (within 2 dB)", fabsf(20.0f * log10f(n100 / l0)) < 2.0f);
             check("noise's curve: 50 is -6 dB from the top, 25 -12 (within 1)", fabsf(20.0f * log10f(n50 / n100) + 6.0f) < 1.0f &&
                   fabsf(20.0f * log10f(n25 / n100) + 12.0f) < 1.0f);
         }

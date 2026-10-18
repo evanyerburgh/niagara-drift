@@ -74,13 +74,14 @@ expect par90 <60
 tapkey w12
 wait 4000
 expect par90 0
-# SHIFT: held, ALGORITHM picks its move (a 4th down: 80), PRESETS its own time (3.9 s, 4 shorter: 3.4 s)
+# SHIFT: held, ALGORITHM picks its move (80, in cents + 700: a 5th up to start, 120 detents down: a 4th down), PRESETS
+# its own time (3.9 s, 4 shorter: 3.4 s)
 key w13 down
-spin ALGO 2
+spin ALGO -120
 spin PRESET -4
 wait 300
 key w13 up
-expect par80 2
+expect par80 200
 expect par87 36
 expect par75 50
 wait 4000
