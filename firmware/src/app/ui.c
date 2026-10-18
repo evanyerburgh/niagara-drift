@@ -136,6 +136,7 @@ static struct {
     int8_t save_q;                     /* a save waiting for the dip (playing): -2 none, -1 the sound, N scene N */
     uint32_t save_t;                   /* ... asked then */
     uint32_t arp_t;                    /* the last ARP tap (two quick taps: stay on the Swell page) */
+    uint32_t sel_t;                    /* when SEL went down (held 0.4 s: the black keys' map) */
     uint8_t v2_out;                    /* drone II faded out on its own (SEL + PLAY) */
     uint32_t rst_t;                    /* when the LFO reset key went down (a hold locks the LFO to the pulse) */
     uint8_t rst_done;                  /* that hold has acted */
@@ -855,6 +856,26 @@ static void press_run(void)                            /* each frame, while a sc
     uint32_t now = plat_ms();
     if (ui.press < 0)
         return;
+    if ((ui.btn >> B_SEL & 1u) && !ui.press_done && now - ui.press_t0 >= PR_TAP_MS) {
+        /* SEL down during a crossfade: the blend holds where it is, so lifting the finger (its pressure falls
+         * on the way up, before the key lets go) can't take it back; let go to keep it */
+        ui.btn_used |= 1u << B_SEL;
+        ui.press_hi_t = 0;
+        scene_name(t, proj.bank, ui.press);
+        {
+            char *q = t;
+            while (*q)
+                q++;
+            *q++ = ' ';
+            *q++ = ' ';
+            itoa_u((uint32_t)(ui.press_x * 100.0f + 0.5f), q);
+            while (*q)
+                q++;
+            scopy(q, "%");
+        }
+        say_c(t, "HELD", K_GOLD);
+        return;
+    }
     p = press_scaled(plat_pressure(WHITE_K[ui.press]));
     x = fm_clampf(((float)p / 127.0f - PR_DEAD) / (PR_FULL - PR_DEAD), 0.0f, 1.0f);
     if ((float)p / 127.0f >= PR_COMMIT) {
@@ -1060,6 +1081,8 @@ static void input(void)
     save_run();
     ch = btn ^ ui.btn;
     ui.btn = btn;
+    if ((ch & btn) >> B_SEL & 1u)
+        ui.sel_t = plat_ms();
     for (i = 0; i < NB; i++) {
         uint32_t m = 1u << i;
         if (!(ch & m))
@@ -1411,13 +1434,18 @@ static void draw_bar(void)
 
 /* a drone's waveform in its panel: its scope, glowing (a dim line around a bright one); its height is
  * its level (it fades with PLAY and its level) */
+/* the picture as drawn: each new capture blends into it (~0.1 s at ~20 pictures a second), so a detuned partner's
+ * ramp slides across instead of jumping from picture to picture (it looked like two waves at once) */
+static float sc_disp[DR_NGROUPS][DR_SCOPE_N];
 static void draw_scope(int g, int32_t x0, int32_t y0, int32_t w, int32_t h)
 {
     int32_t i, mid = y0 + h / 2, py = mid, half = h / 2 - 4;
     const float k = (float)half / 0.6f;       /* a drone at full level (with sub and drive) peaks near 0.6 */
     cv_round(x0, y0, w, h, 4, K_PANEL);
     for (i = 0; i < DR_SCOPE_N && i < w - 8; i++) {
-        int32_t yy = mid - (int32_t)fm_clampf(dr_scope[g][i] * k, (float)-half, (float)half), x = x0 + 4 + i;
+        int32_t yy, x = x0 + 4 + i;
+        sc_disp[g][i] += (dr_scope[g][i] - sc_disp[g][i]) * 0.45f;
+        yy = mid - (int32_t)fm_clampf(sc_disp[g][i] * k, (float)-half, (float)half);
         if (i) {
             cv_line(x - 1, py - 1, x, yy - 1, K_DRONE_DIM[g]);
             cv_line(x - 1, py + 1, x, yy + 1, K_DRONE_DIM[g]);
@@ -2041,6 +2069,71 @@ static void pic_tone2(int32_t y0)
     cv_text(128, y0 + 100, &FONT_XS, "not in scenes", K_DIM);
 }
 
+/* THE BLACK KEYS' MAP (SEL held 0.4 s, nothing else asking for the screen: a knob turning, a white key held): the
+ * eleven keys as the panel groups them, each row a group (drone I | the global two | drone II | the links |
+ * cross-mod), its keys lit as the panel's are, each key's name and setting. The LFO pages' layer on those pages */
+#define KEYMAP_MS 400u
+static int keymap_on(void)
+{
+    uint32_t white = 0, i;
+    for (i = 0; i < NWHITE; i++)
+        white |= 1u << WHITE_K[i];
+    return (ui.btn >> B_SEL & 1u) && plat_ms() - ui.sel_t >= KEYMAP_MS && !lit(0) && !lit(1) && !lit(2) &&
+           !lit(3) && !(ui.keys & white) && ui.press < 0;
+}
+static void sw_text(sw_t w, const char **name, const char **st)
+{
+    static const char *const SUB[5] = {"", "-1 oct", "-2 oct", "1/3", "1/5"}, *const MODE[3] = {"LP", "BP", "HP"};
+    static const char *const TAP[4] = {"off", "I", "II", "I+II"};
+    const int16_t *p = &proj.par[DR_GP(w.g, 0)];
+    int on = sw_get(w);
+    *st = on ? "on" : "off";
+    switch (w.s) {
+    case S_PARTNER: *name = "Partner"; break;
+    case S_SUBOCT: *name = "Sub"; *st = SUB[(unsigned)p[GP_SUBOCT] < 5u ? p[GP_SUBOCT] : 1]; break;
+    case S_HP: *name = "Filter"; *st = MODE[(unsigned)p[GP_MODE] < 3u ? p[GP_MODE] : 0]; break;
+    case S_PLOCK: *name = "Pitch lock"; break;
+    case S_LFORESET: *name = "LFO reset"; *st = proj.par[P_LFO_LOCK] ? "locked" : "tap"; break;
+    case S_PLINK: *name = "Pitch link"; break;
+    case S_SYNC: *name = "Hard sync"; break;
+    case S_XMOD: *name = "X-mod"; break;
+    case S_OTAP: *name = "Osc LFO"; *st = TAP[(unsigned)p[GP_OLFO] & 3u]; break;
+    case S_ODEST: *name = "Osc to"; *st = on ? "X-Wave" : "Pitch"; break;
+    case S_FDEST: *name = "Filt to"; *st = on ? "Reso" : "Cutoff"; break;
+    case S_FTAP: *name = "Filt LFO"; *st = TAP[(unsigned)p[GP_FLFO] & 3u]; break;
+    case S_DTAP: *name = "Dly LFO"; *st = TAP[(unsigned)proj.par[P_DLY_LFO] & 3u]; break;
+    default: *name = ""; *st = ""; break;
+    }
+}
+/* rows r0 .. r1 - 1 of the map from y0 (38 px a row): the picture holds the first three, the values' place the
+ * last two and the line about SEL's other uses */
+#define KEYMAP_ROW 38
+static void keymap_rows(int32_t y0, int r0, int r1)
+{
+    static const uint8_t GROUP[5][2] = {{0, 3}, {3, 2}, {5, 3}, {8, 2}, {10, 1}};   /* first key, how many */
+    const sw_t *layer = sw_layer();
+    int r, k;
+    for (r = r0; r < r1; r++) {
+        int32_t y = y0 + (r - r0) * KEYMAP_ROW;
+        uint16_t c = r == 0 ? K_DRONE[0] : r == 2 ? K_DRONE[1] : K_TEXT2;
+        if (r == 0 || r == 2)
+            cv_text(10, y + 8, &FONT_S, r ? "II" : "I", c);
+        for (k = 0; k < GROUP[r][1]; k++) {
+            sw_t w = layer[GROUP[r][0] + k];
+            int on = sw_get(w);
+            const char *name, *st;
+            int32_t kx = 28 + k * 8, cx = 56 + k * 62;
+            if (on)                            /* the key: lit as the panel's (a third choice: half) */
+                cv_round(kx, y + 6, 5, 18, 2, on == 2 ? blend(K_PANEL, c, 1, 2) : c);
+            else
+                cv_frame(kx, y + 6, 5, 18, K_FAINT);
+            sw_text(w, &name, &st);
+            cv_text(cx, y + 1, &FONT_XS, name, K_DIM);
+            cv_text(cx, y + 14, &FONT_S, st, on ? c : K_TEXT2);
+        }
+    }
+}
+
 /* Setup: a small sketch for each knob: the glide, the fade's curve, the drift, how wide the drones sit */
 static void pic_setup(int32_t y0)
 {
@@ -2134,13 +2227,16 @@ static void pic_macros(int32_t y0)
 static void draw_pic(void)
 {
     int msg = plat_ms() < ui.msg_until;
-    uint32_t h = hash(hash(2166136261u, (uint32_t)msg | ui.view << 2),
+    uint32_t h = hash(hash(2166136261u, (uint32_t)msg | ui.view << 2 | (uint32_t)keymap_on() << 8),
                       msg ? ui.msg_until : 0);
     if (h == ui.sig[1] && ui.frame % SCOPE_EVERY)
         return;                                /* the waveforms move: redrawn ~20 times a second */
     ui.sig[1] = h;
     cv_begin(240, PIC_H, K_BG);
-    if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 || ui.view == V_MACROS ||
+    if (keymap_on()) {
+        cv_round(6, 4, WIDE_W, PAN_H + 8, 4, K_PANEL);
+        keymap_rows(8, 0, 3);
+    } else if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 || ui.view == V_MACROS ||
         ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_TONE2) {
         cv_round(6, 4, WIDE_W, PAN_H, 4, K_PANEL);
         switch (ui.view) {
@@ -2197,6 +2293,20 @@ static void draw_values(void)
         int p = knob_param((int)i);
         h = hash(h, (p < 0 ? 0xFFFFu : (uint32_t)(uint16_t)proj.par[p]) | (uint32_t)lit((int)i) << 16 |
                         (uint32_t)(ui.btn >> B_SEL & 1u) << 17 | (uint32_t)(proj.par[P_PLOCK] != 0) << 18);
+    }
+    if (keymap_on()) {                         /* SEL held: the map's last two rows here */
+        h = hash(h, 0x4B4Du);
+        for (i = 0; i < 11u; i++)
+            h = hash(h, (uint32_t)sw_get(sw_layer()[i]) | (uint32_t)proj.par[P_LFO_LOCK] << 4);
+        if (h == ui.sig[2])
+            return;
+        ui.sig[2] = h;
+        cv_begin(240, VAL_H, K_BG);
+        cv_round(6, 0, WIDE_W, 70, 4, K_PANEL);
+        keymap_rows(-4, 3, 5);
+        cv_text(10, 72, &FONT_XS, "with SEL:  D5-G5 bank   OCT wave back", K_DIM);
+        cv_blit(0, VAL_Y);
+        return;
     }
     if (h == ui.sig[2])
         return;

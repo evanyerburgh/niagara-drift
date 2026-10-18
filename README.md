@@ -274,6 +274,11 @@ are underneath: at 0 a macro is gone without a trace.
 Lit means on. They follow the page: on the LFO pages they set the LFO's routing. Normally they're grouped
 by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8), the links (9–11).
 
+**Hold SEL** for a moment and the screen shows what every black key does on this page, and how each is set,
+in the panel's groups. It steps aside while you turn a knob or hold a white key.
+
+<img src="docs/img/page-keys.png" width="244" alt="The black keys' map while SEL is held: each group of keys, lit as on the panel, with its name and setting">
+
 | Key | Normally | On the LFO pages |
 |---|---|---|
 | 1 | I partner | I osc wave (I, II, both) |
@@ -303,7 +308,7 @@ by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8),
 | **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). A tap is anything under a quarter of a second, however hard. A scene keeps the sound, not the room: Speaker, Pressure, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, over the Morph time. Press it again on the way back and you pick up from there |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
-| **SEL held as you let go** | the blend **stays**, as a sound of its own between the two |
+| **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down (lifting your finger can't move it), and **stays** when you let go: a sound of its own between the two |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're read-only (pick bank A, B or C first: SEL + D5, E5 or F5) |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (the starting sound and a deep bass sound for now; more to come). The screen names scenes by bank: "B5" |
 | **Top white key** (D5–G5) alone | a **gesture**: Beat, Heat, Converge, Wash (see [The macros](#the-macros)) |

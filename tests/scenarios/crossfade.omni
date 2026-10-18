@@ -45,13 +45,19 @@ key w0 up
 wait 1200
 expect par7 700
 expect scene_at 0
-# SEL held as you let go: the blend stays (parked)
+# SEL held as you let go: the blend stays (parked); SEL down holds it, so the finger's pressure falling on the
+# way up doesn't take it back
 spin K2 -40
 wait 300
 key w0 down
 pressure w0 64
 wait 400
 press SEL
+wait 100
+pressure w0 30
+wait 300
+pressure w0 0
+wait 300
 key w0 up
 release SEL
 wait 1200
