@@ -85,13 +85,13 @@ static const struct {
 /* the black keys (key numbers, F3 = 0) and what each does: normally, and on the LFO page */
 static const uint8_t BLACK_K[11] = {1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25};
 /* the white keys: the first NSCENES (F3 .. C5, which sense pressure) the scenes of the bank; the top four
- * (D5 .. G5, no pressure) SEL + key: the bank, alone: the gesture macros (to come) */
+ * (D5 .. G5, no pressure) SEL + key: the bank, alone: the gesture macros (Weight, Shift, Converge, Wash) */
 #define NWHITE 16
 static const uint8_t WHITE_K[NWHITE] = {0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26};
 static const char BANK_L[NBANKS] = {'A', 'B', 'C', 'P'};
-static const char *const GESTURE[4] = {"BEAT", "HEAT", "CONVERGE", "WASH"};
-static const char *const GESTURE_DEPTH[4] = {"BEAT DEPTH", "HEAT DEPTH", "CONV DEPTH", "WASH DEPTH"};
-static const char *const GESTURE_SWELL[4] = {"BEAT SWELL", "HEAT SWELL", "CONV SWELL", "WASH SWELL"};
+static const char *const GESTURE[4] = {"WEIGHT", "SHIFT", "CONVERGE", "WASH"};
+static const char *const GESTURE_DEPTH[4] = {"WEIGHT DEPTH", "SHIFT MOVE", "CONV DEPTH", "WASH DEPTH"};
+static const char *const GESTURE_SWELL[4] = {"WEIGHT SWELL", "SHIFT SWELL", "CONV SWELL", "WASH SWELL"};
 static const char *const MACRO_UP[DR_NSETM] = {"BLOOM", "WEIGHT", "TIDE", "TEAR"};
 enum { S_NONE, S_PARTNER, S_SUBOCT, S_HP, S_OTAP, S_ODEST, S_FTAP, S_FDEST, S_PLINK, S_SYNC, S_XMOD, S_LFORESET, S_DTAP,
        S_PLOCK };
@@ -169,7 +169,7 @@ static struct {
     uint32_t press_t0, press_hi_t;     /* ... since; above the commit level since (0: not) */
     float press_x;                     /* ... how far into the scene, 0..1, smoothed */
     uint32_t flash_t;                  /* a scene taken: its key flashes from then */
-    uint8_t g_held;                    /* the gesture keys held: bit g (Beat, Heat, Converge, Wash) */
+    uint8_t g_held;                    /* the gesture keys held: bit g (Weight, Shift, Converge, Wash) */
     uint8_t g_rel;                     /* ... pressed to release a latch: the let-go does nothing more */
     uint32_t g_t0[DR_NGEST];           /* ... since */
     float g_amt[DR_NGEST];             /* ... how far in each is, 0..1 */
@@ -787,7 +787,7 @@ static void sound_blend(const int16_t *from, const int16_t *to, float x)
                                                         * hand has moved since the switch began */
             continue;
         if (proj.par[P_PLOCK] && (k == DR_GP(0, GP_PITCH) || k == DR_GP(1, GP_PITCH) || k == P_PLINK_OFF ||
-                                  k == P_GL_CONVERGE))   /* Converge is a pitch move: the lock keeps its latch */
+                                  k == P_GL_SHIFT || k == P_GL_CONVERGE))   /* pitch moves: the lock keeps their latch */
             continue;                                  /* pitch lock: the drones keep their pitch (2026-10-17) */
         if (scene_step(k))
             v = x >= 0.5f ? to[k] : from[k];
@@ -980,10 +980,11 @@ static void midi_in(void)
     }
 }
 
-/* THE GESTURES (v0.2): Beat, Heat, Converge, Wash on the top four white keys, which sense no pressure, so time
- * stands in: held, a gesture swells in (over its swell time, 1 .. 30 s); let go, it swells back out. A tap
- * latches it on (at full); pressing a latched one lets it go; SEL held as you let go latches it where it is.
- * Held, PRESETS sets its depth and ALGORITHM its swell. Latched levels are values (P_GL_*): scenes keep them. */
+/* THE GESTURES (v0.2): Weight, Shift, Converge, Wash on the top four white keys, which sense no pressure, so
+ * time stands in: held, a gesture swells in (over its swell time, 1 .. 30 s), its parts in order; let go, it
+ * swells back out. A tap latches it on (at full); pressing a latched one lets it go; SEL held as you let go
+ * latches it where it is. Held, PRESETS sets its depth (Shift's: its move, a 4th or 5th up or down) and
+ * ALGORITHM its swell. Latched levels are values (P_GL_*): scenes keep them. */
 static int gesture_held(void)                          /* the gesture key held (the lowest), or -1 */
 {
     int g;
@@ -994,9 +995,9 @@ static int gesture_held(void)                          /* the gesture key held (
 }
 static void gesture_down(int g)
 {
-    if (proj.par[P_GL_BEAT + g]) {                     /* latched: let go of it, whatever the press */
-        param_set(P_GL_BEAT + g, 0);
-        hands_on(P_GL_BEAT + g);
+    if (proj.par[P_GL_WEIGHT + g]) {                     /* latched: let go of it, whatever the press */
+        param_set(P_GL_WEIGHT + g, 0);
+        hands_on(P_GL_WEIGHT + g);
         ui.g_rel |= (uint8_t)(1u << g);
         say_c(GESTURE[g], "OFF", K_LFO);
     }
@@ -1012,14 +1013,14 @@ static void gesture_up(int g)
         return;
     }
     if (held < PR_TAP_MS) {                            /* a tap: latched, at full */
-        param_set(P_GL_BEAT + g, 100);
-        hands_on(P_GL_BEAT + g);
+        param_set(P_GL_WEIGHT + g, 100);
+        hands_on(P_GL_WEIGHT + g);
         say_c(GESTURE[g], "LATCHED", K_LFO);
     } else if (ui.btn >> B_SEL & 1u) {                 /* SEL held: latched where it is */
         int v = (int)(ui.g_amt[g] * 100.0f + 0.5f);
         ui.btn_used |= 1u << B_SEL;
-        param_set(P_GL_BEAT + g, v < 1 ? 1 : v);
-        hands_on(P_GL_BEAT + g);
+        param_set(P_GL_WEIGHT + g, v < 1 ? 1 : v);
+        hands_on(P_GL_WEIGHT + g);
         say_c(GESTURE[g], "KEPT", K_LFO);
     }
 }
@@ -1031,8 +1032,8 @@ static void gesture_run(void)                          /* each frame: each gestu
     if (dt > 100u)
         dt = 100u;
     for (g = 0; g < DR_NGEST; g++) {
-        float to = (ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u) ? 1.0f : (float)proj.par[P_GL_BEAT + g] * 0.01f;
-        float step = (float)dt * 0.001f / fm_exp2f((float)proj.par[P_GR_BEAT + g] * 0.0490689f);
+        float to = (ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u) ? 1.0f : (float)proj.par[P_GL_WEIGHT + g] * 0.01f;
+        float step = (float)dt * 0.001f / fm_exp2f((float)proj.par[P_GR_WEIGHT + g] * 0.0490689f);
         float *a = &ui.g_amt[g];
         int16_t q;
         *a = *a < to ? fm_minf(*a + step, to) : fm_maxf(*a - step, to);
@@ -1203,14 +1204,14 @@ static void input(void)
     if ((e = plat_enc(EN_ALGO)) != 0) {              /* ALGORITHM: the Movement, every LFO depth 0 .. 200 %; */
         int g = gesture_held();                        /* a gesture key held: its swell's time */
         if (g >= 0)
-            global_turn(EN_ALGO, P_GR_BEAT + g, GESTURE_SWELL[g], e);
+            global_turn(EN_ALGO, P_GR_WEIGHT + g, GESTURE_SWELL[g], e);
         else
             global_turn(EN_ALGO, P_MOVE, "MOVEMENT", e);
     }
     if ((e = plat_enc(EN_PRESET)) != 0) {            /* PRESETS: the live macro (SEL held: which one); a */
         int g = gesture_held();                        /* gesture key held: its depth */
         if (g >= 0) {
-            global_turn(EN_PRESET, P_GD_BEAT + g, GESTURE_DEPTH[g], e);
+            global_turn(EN_PRESET, P_GD_WEIGHT + g, GESTURE_DEPTH[g], e);
         } else if (btn >> B_SEL & 1u) {
             ui.btn_used |= 1u << B_SEL;
             proj.mlive = (uint8_t)((proj.mlive + (e > 0 ? 1 : DR_NSETM - 1)) % DR_NSETM);
@@ -2218,7 +2219,7 @@ static void pic_macros(int32_t y0)
     cv_rect(12, y0 + 97, 210, 1, K_GRID);
     for (i = 0; i < DR_NGEST; i++) {
         int32_t x = 10 + i * 56, w = (int32_t)(44.0f * ui.g_amt[i] + 0.5f);
-        int latched = proj.par[P_GL_BEAT + i] != 0;
+        int latched = proj.par[P_GL_WEIGHT + i] != 0;
         uint16_t c = ui.g_amt[i] > 0.0f || latched ? K_LFO : K_DIM;
         text_c(x + 25, y0 + 101, &FONT_XS, DR_MACRO_NAME[DR_NSETM + i], c);
         cv_round(x + 3, y0 + 120, 44, 4, 2, K_GRID);

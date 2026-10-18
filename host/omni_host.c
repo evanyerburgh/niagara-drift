@@ -392,6 +392,8 @@ static int expect(const char *what, const char *val)
         got = proj.mlive;
     else if (!strncmp(what, "par", 3))            /* parN: parameter N (drone.h) */
         got = proj.par[atoi(what + 3)];
+    else if (!strncmp(what, "mpitch", 6))         /* mpitchG: group G's pitch move by the macros now, in cents */
+        got = (int)(dr_mac_pitch(atoi(what + 6)) * 100.0f + (dr_mac_pitch(atoi(what + 6)) >= 0.0f ? 0.5f : -0.5f));
     else if (!strncmp(what, "pitch", 5))          /* pitchG: group G's pitch now (gliding), in cents */
         got = (int)(dr_pitch[atoi(what + 5)] * 100.0f + 0.5f);
     else if (!strncmp(what, "cut", 3))            /* cutG: group G's cutoff now (gliding), knob units x 100 */
@@ -513,6 +515,20 @@ int main(int argc, char **argv)
             accel_off = 1;
             run_ms(1);
             accel_off = 0;
+        } else if (!strcmp(cmd, "set")) {           /* set P V [MS]: parameter P to V, gliding over MS (sketches of
+                                                    * macros not built yet: a sound moved by hand, in time) */
+            int p = atoi(a), v = atoi(b), ms = atoi(c);
+            if (p >= 0 && p < DR_NPARAMS) {
+                proj.par[p] = (int16_t)v;
+                if (ms > 0) {
+                    if (p < P_XMOD && p % GP_N == GP_PITCH)
+                        dr_slide(p / GP_N, ms);
+                    else
+                        dr_pslide(p, ms);
+                }
+                dr_set(p, v);
+            }
+            run_ms(1);
         } else if (!strcmp(cmd, "master"))
             master = (uint32_t)atoi(a);
         else if (!strcmp(cmd, "midi")) {

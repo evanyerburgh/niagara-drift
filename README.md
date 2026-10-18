@@ -249,24 +249,25 @@ depth that can't be heard says why on the screen (Movement at 0%, or its wave of
 ### The macros
 
 Eight moves, each a few settings together, by set amounts, on top of your sound. Your own settings stay as they
-are underneath: at 0 a macro is gone without a trace.
+are underneath: at 0 a macro is gone without a trace. A macro's parts come in one after another, and go in their
+own order when you let go.
 
 | Macro | What it moves | Played on |
 |---|---|---|
 | **Bloom** | both cutoffs up, resonance a little down, more reverb: the sound opens | SEQ, KNOB 1; **PRESETS** to start |
-| **Weight** | osc mix toward the sub, cutoffs a little down, less noise: it sinks | SEQ, KNOB 2 |
+| **Weight** | the cutoffs down first, then the osc mix toward the sub, a little drive so a small speaker hears it: it sinks. Let go: the cutoffs come back first, the sub lingers | SEQ, KNOB 2; D5, held |
 | **Tide** | more Movement while the LFO slows: bigger and slower together | SEQ, KNOB 3 |
 | **Tear** | hard sync on, drone II's pitch up to an octave and its resonance up: the sync sweep | SEQ, KNOB 4 |
-| **Beat** | the partners detuned, wider, more drift: the drones shimmer | D5, held |
-| **Heat** | drive, character, feedback and a little resonance, the level held: grit without getting louder | E5, held |
-| **Converge** | drone II leans toward drone I (to the nearest unison or octave), cross-mod on | F5, held |
-| **Wash** | into the delay and the reverb, the reverb longer (to Inf, a freeze, at full depth), the dry sound a little down | G5, held |
+| **Shift** | a new chord, a voice at a time: drone I glides a fifth or fourth up or down, drone II follows. Let go: drone I comes back first | E5, held |
+| **Converge** | drone II's pitch to the nearest unison, fourth, fifth or octave of drone I, then the beating slows (detune and drift to 0), cross-mod last. Let go: cross-mod goes first, the pitch drifts back last | F5, held |
+| **Wash** | the delay first, then the reverb opens and grows longer and darker (to Inf, a freeze, at full depth), the dry sound dips last. Let go: the dry comes back first, the tails go last | G5, held |
 
 - **The set macros** (SEQ's Macros page) stay where you leave them. **PRESETS** plays one of them, always at
   hand: Bloom to start; hold **SEL** and turn PRESETS to pick another.
 - **The gestures** are the top four white keys. **Hold** one and it swells in; **let go** and it swells back
   out. **Tap** it to latch it on; press it again to let it go. **SEL held as you let go** latches it where it is.
-  While you hold one, **PRESETS** sets how deep it goes and **ALGORITHM** how long it takes to swell (1–30 s).
+  While you hold one, **PRESETS** sets how deep it goes (for Shift: its move, a fifth or fourth up or down) and
+  **ALGORITHM** how long it takes to swell (1–30 s; to start Weight 4.6 s, Shift 11 s, Converge 7.7 s, Wash 6.5 s).
   Its key glows dimly, and lights as it comes in.
 - Turning a knob while a scene switch is on its way lets go of that setting; the rest still lands.
 
@@ -312,7 +313,7 @@ in the panel's groups. It steps aside while you turn a knob or hold a white key.
 | **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down (lifting your finger can't move it), and **stays** when you let go: a sound of its own between the two |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're read-only (pick bank A, B or C first: SEL + D5, E5 or F5) |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (the starting sound and a deep bass sound for now; more to come). The screen names scenes by bank: "B5" |
-| **Top white key** (D5–G5) alone | a **gesture**: Beat, Heat, Converge, Wash (see [The macros](#the-macros)) |
+| **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Converge, Wash (see [The macros](#the-macros)) |
 | **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it |
 | **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 

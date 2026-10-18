@@ -101,6 +101,9 @@ static void convert(int16_t *v, uint32_t from)
     if (from <= 19u)                            /* 0.1: the noise Colour was 0 / 1, now 0..100 (white .. pink) */
         for (g = 0; g < DR_NGROUPS; g++)
             v[DR_GP(g, GP_NCOLOR)] = v[DR_GP(g, GP_NCOLOR)] ? 100 : 0;
+    if (from <= 23u)                            /* the gestures were Beat, Heat, Converge, Wash: theirs to defaults */
+        for (g = P_GD_WEIGHT; g <= P_GL_WASH; g++)
+            v[g] = dr_param_info(g)->def;
 }
 
 static int in_range(const int16_t *v)
@@ -184,8 +187,13 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
     memset(ld.raw, 0, sizeof ld.raw);
     if (plat_store_load(b == 1 ? OBJ_BANKB : OBJ_BANKC, ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
         return;
-    if (ld.b.format == PROJ_FORMAT) {
+    if (ld.b.format == PROJ_FORMAT || ld.b.format == 23u) {
         *k = ld.b;
+        if (ld.b.format == 23u) {
+            for (i = 0; i < NSCENES; i++)
+                convert(k->scene[i], 23u);
+            bank_dirty |= (uint8_t)(1u << b);
+        }
     } else if (ld.b.format == 22u) {
         k->used = ld.b22.used;
         for (i = 0; i < NSCENES; i++)
@@ -220,8 +228,13 @@ int project_load(void)
         project_defaults();
         return -1;
     }
-    if (from == PROJ_FORMAT) {
+    if (from == PROJ_FORMAT || from == 23u) {   /* 23: the same layout */
         proj = ld.p;
+        if (from == 23u) {
+            convert(proj.par, from);
+            for (i = 0; i < NSCENES; i++)
+                convert(proj.scene[i], from);
+        }
     } else if (from == 22u) {
         static proj_v22_t o;
         o = ld.o22;

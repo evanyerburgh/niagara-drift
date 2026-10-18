@@ -1,7 +1,9 @@
-# the macros (v0.2): offsets on top of the sound, the sound's own values untouched. heardN is what's heard
-# (the sound plus the macros), parN the sound's own. 7 drone I's cutoff, 5 its osc mix, 4 its detune, 63 the
-# reverb mix, 44 hard sync, 42 cross-mod; 78-81 Bloom, Weight, Tide, Tear; 82-85 the gestures' depths, 86-89
-# their swells, 90-93 their latches (Beat, Heat, Converge, Wash).
+# the macros (v0.2): offsets on top of the sound, the sound's own values untouched; each part comes in over its own
+# stretch of the way in and goes over its own on the way out, gliding (0.6 s at most). heardN is what's heard (the
+# sound plus the macros), parN the sound's own, mpitchG a drone's pitch move by the macros (cents). 7 drone I's
+# cutoff, 5 its osc mix, 25 drone II's detune, 63 the reverb mix, 44 hard sync, 42 cross-mod;
+# 78-81 Bloom, Weight, Tide, Tear; 82-85 the gestures' depths (83: Shift's move), 86-89 their swells, 90-93 their
+# latches (Weight, Shift, Converge, Wash on D5-G5: w12-w15).
 tap PLAY
 wait 1000
 expect heard7 700
@@ -9,17 +11,17 @@ expect heard7 700
 tap SEQ
 expect view 8
 spin K1 100
-wait 100
+wait 700
 expect par78 100
 expect par7 700
 expect heard7 920
 expect heard63 65
 spin K1 -100
-wait 100
+wait 700
 expect heard7 700
 # PRESETS plays the live macro (Bloom to start); SEL + PRESETS picks another (Weight)
 spin PRESET 50
-wait 100
+wait 700
 expect par78 50
 expect heard7 810
 spin PRESET -50
@@ -28,79 +30,106 @@ spin PRESET 1
 release SEL
 expect mlive 1
 spin PRESET 100
-wait 100
+wait 700
 expect par79 100
 expect heard5 80
 spin PRESET -100
-wait 100
+wait 700
 expect heard5 30
 # Tear: hard sync on from its first step
 spin K4 1
 wait 100
 expect heard44 1
 spin K4 -1
-wait 100
+wait 700
 expect heard44 0
-# a gesture held swells in, let go it swells out (Beat: detune +60 x its depth 70 at full; 2.3 s)
+# WEIGHT held swells in (4.6 s), the cutoff first: half way, the cutoff most of the way down, the sub not yet
 key w12 down
+wait 2300
+expect heard7 <640
+expect heard5 <52
 wait 3000
-expect heard4 54
+expect heard5 >62
 key w12 up
-wait 3000
-expect heard4 12
+wait 2000
+expect heard7 >680
+expect heard5 >38
+wait 4000
+expect heard5 30
+expect heard7 700
 # a tap latches it; a press lets it go
 tapkey w12
-wait 3000
+wait 6000
 expect par90 100
-expect heard4 54
+expect heard5 >62
 tapkey w12
-wait 3000
+wait 6000
 expect par90 0
-expect heard4 12
+expect heard5 30
 # SEL held as you let go: latched where it is
 key w12 down
-wait 1000
+wait 1500
 press SEL
 key w12 up
 release SEL
 expect par90 >20
 expect par90 <60
 tapkey w12
-wait 3000
+wait 6000
 expect par90 0
-# held: PRESETS sets its depth, ALGORITHM its swell (Heat)
+# SHIFT: held, PRESETS picks its move (a 4th down), ALGORITHM its swell (10.8 s, 1 s quicker per 2)
 key w13 down
-spin PRESET -20
-spin ALGO 10
+spin PRESET 2
+spin ALGO -4
+wait 300
 key w13 up
-expect par83 50
-expect par87 35
+expect par83 2
+expect par87 66
 expect par75 50
-# Converge: cross-mod on while it's in
+wait 12000
+expect mpitch0 0
+expect mpitch1 0
+# tapped: drone I glides down a 4th first, drone II after it
+tapkey w13
+wait 4500
+expect mpitch0 <-250
+expect mpitch1 >-100
+wait 8000
+expect mpitch0 -500
+expect mpitch1 -500
+tapkey w13
+wait 12000
+expect mpitch0 0
+expect mpitch1 0
+# CONVERGE: drone II's pitch to a consonance with drone I first, cross-mod last (7.7 s)
 key w14 down
-wait 3000
-expect heard42 1
-key w14 up
-wait 3000
+wait 2000
 expect heard42 0
+wait 7000
+expect heard42 1
+expect heard25 0
+key w14 up
+wait 9000
+expect heard42 0
+expect mpitch1 0
 # a scene keeps the macros: A1 stored with Bloom 40 and Wash latched, recalled from none
 spin K1 40
 tapkey w15
-wait 3000
+wait 7000
 press SAVE
 tapkey w0
 release SAVE
 wait 300
 spin K1 -40
 tapkey w15
-wait 3000
+wait 7000
 expect par78 0
 expect par93 0
 tapkey w0
-wait 3000
+wait 7000
 expect par78 40
 expect par93 100
-expect heard7 788
+expect heard7 777
 # a restart brings the whole sound back to the engine, the macros too (the last values of a load were
 # once dropped)
 tap SAVE
@@ -108,7 +137,7 @@ wait 500
 reboot
 wait 500
 expect par78 40
-expect heard7 788
+expect heard7 777
 # SAVE again with nothing changed: nothing is written (each write is a late block while playing)
 expect store_writes 1
 tap SAVE

@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 23u                  /* 23: the effects (delay type, reverb length and damp, pressure; 19-22
+#define PROJ_FORMAT 24u                  /* 24: the gestures Weight, Shift, Converge, Wash (23's gesture values
+                                          * reset: Beat and Heat are gone); 23: the effects (delay type, reverb length and damp, pressure; 19-22
                                           * are read and converted); 22: the macros (16 values more a sound; 19-21 are read and converted);
                                           * 21: scenes in banks: A (12) here, B and C in their own objects (v0.2;
                                           * 19 and 20 are read and converted: scenes 13-16 become B1-B4);
