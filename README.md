@@ -338,16 +338,16 @@ over any of them with your own sound (SAVE + the key), except P12.
 | Key | Preset | What it shows |
 |---|---|---|
 | P1 | **Niagara** | the starting sound: two drones a fifth apart, breathing slowly, like a calm Lyra-8 |
-| P2 | **Abyss** | dark: low, a minor third apart, a saw and a narrow square, a subharmonic sub, closed resonant filters, character and feedback, a dark hall, faint wide echoes |
-| P3 | **Eerie** | a tritone apart, near-sines, drone II through a ringing band-pass with a breath of white noise, wandering a whole-tone scale; long clean echoes, a chorus hall |
+| P2 | **Abyss** | dark: low, a minor third apart, a saw and a narrow square, a subharmonic sub, closed resonant filters, character and feedback, a dark hall, faint wide echoes; the LFOs on the resonance, very slowly: it swells and rings |
+| P3 | **Eerie** | a tritone apart, near-sines, drone II through a ringing band-pass with a breath of white noise, wandering a whole-tone scale; long clean echoes, a chorus hall; drone II's pitch wavers, the LFO's rate uneven |
 | P4 | **Glass** | high sines an octave apart, beating a little, in a long bright reverb |
-| P5 | **Heaven** | a major tenth apart, sines with just thirds and fifths, open and bright, a long light cathedral, wide echoes |
-| P6 | **Wanderer** | a minor seventh apart, warm resonant saws, drone II wandering Dorian, gliding; wide echoes, a hall |
-| P7 | **Tape** | worn: a minor third apart, a wide square and a saw, Age and lots of Character, a tape delay, hiss, a small room |
-| P8 | **Pulse** | a whole tone apart, the Swell in time, deep and swung, drone II high-passed and resonant, ping-pong echoes |
-| P9 | **Howl** | low, a semitone apart so they grind, the feedback high, drone II band-passed, driven; a short slap in a small room |
-| P10 | **Cathedral** | a major sixth apart, soft waves, a subharmonic far below, a long dark reverb, almost a freeze |
-| P11 | **Metal** | cross-mod and hard sync, squares an inharmonic gap apart, drone I high-passed and resonant, a clean slapback |
+| P5 | **Heaven** | a major tenth apart, sines with just thirds and fifths, open and bright, a long light cathedral, wide echoes; the sines bloom slowly toward triangles and back |
+| P6 | **Wanderer** | a minor seventh apart, warm resonant saws, drone II wandering Dorian, gliding; wide echoes, a hall; a gentler sweep |
+| P7 | **Tape** | worn: a minor third apart, a wide square and a saw, Age and lots of Character, a tape delay, hiss, a small room; tape wow on both pitches |
+| P8 | **Pulse** | a whole tone apart, the Swell in time, deep and swung, drone II high-passed and resonant, ping-pong echoes; the LFO locked to the Swell's bars |
+| P9 | **Howl** | low, a semitone apart so they grind, the feedback high, drone II band-passed, driven; a short slap in a small room; the LFO in random steps on the resonance: it flares |
+| P10 | **Cathedral** | a major sixth apart, soft waves, a subharmonic far below, a long dark reverb, almost a freeze; almost no LFO: still and huge |
+| P11 | **Metal** | cross-mod and hard sync, squares an inharmonic gap apart, drone I high-passed and resonant, a clean slapback; the waves shimmer, a quicker sweep |
 | P12 | **Clean** (locked) | one oscillator, everything else off: a plain saw to build from. Drone II is out: SEL + PLAY brings it in |
 
 ### MIDI

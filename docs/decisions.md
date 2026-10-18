@@ -265,3 +265,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   PLAY) is a sound's value (P_II_OUT, Tuning's old slot): P12 Clean has it out, and turning drone II's knobs on any
   page says "II OFF  SEL + PLAY". A scene key let go under 500 ms is a tap (was 250), as a gesture key; the
   pressure crossfade still starts at 250 ms.
+- 2026-10-18 (Evan): each Preset moves its own way with the LFOs (before, all shared the starting sound's cutoff
+  sweep): Abyss the filter LFOs on resonance (+-55, rate 3); Eerie drone II's osc LFO on pitch (12) and rate mod 40
+  by Wave I; Heaven the osc LFOs on X-Wave (65); Wanderer Wave I Roundtooth, rate 12, filter +-60; Tape osc LFO on
+  both pitches (7, 6), rate 40 (a tape wow), filter +-40; Pulse the LFO locked to the Swell's bars, rate 35; Howl Wave
+  I random steps on drone I's resonance (50), rate 20; Cathedral filter +-15, Movement 25; Metal osc LFOs on X-Wave
+  (45), rate 45, filter +-50. A preset holds up to 40 changes.
