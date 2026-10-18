@@ -49,14 +49,6 @@ static void bank_blank(bank_t *b)
     b->format = PROJ_FORMAT;
 }
 
-static void gkeys_default(void)                  /* D5-G5: Weight, Shift, Converge, Wash */
-{
-    proj.gkey[0] = DR_G_WEIGHT;
-    proj.gkey[1] = DR_G_SHIFT;
-    proj.gkey[2] = DR_G_CONVERGE;
-    proj.gkey[3] = DR_G_WASH;
-}
-
 void project_defaults(void)
 {
     int i;
@@ -68,7 +60,6 @@ void project_defaults(void)
         proj.par[i] = dr_param_info(i)->def;
     proj.leds = 1;
     proj.mtime = MTIME_DEF;
-    gkeys_default();
     bank_blank(&bank_bc[0]);
     bank_blank(&bank_bc[1]);
 }
@@ -125,6 +116,9 @@ static void convert(int16_t *v, uint32_t from)
     if (from <= 27u)                            /* NOISE's top was 6 dB lower: the same level is half the value now */
         for (g = 0; g < DR_NGROUPS; g++)
             v[DR_GP(g, GP_NOISE)] = (int16_t)((v[DR_GP(g, GP_NOISE)] + 1) / 2);
+    if (from <= 28u)                            /* the keys fixed: a latch may have been another gesture's */
+        for (g = P_GL_0; g <= P_GL_3; g++)
+            v[g] = 0;
     if (from <= 27u) {                          /* Shift's move was one of four: now in cents, 700 none */
         static const int16_t M[4] = {1400, 1200, 200, 0};   /* a 5th up, a 4th up, a 4th down, a 5th down */
         v[P_SHIFT_MOVE] = M[(unsigned)v[P_SHIFT_MOVE] < 4u ? v[P_SHIFT_MOVE] : 0];
@@ -215,10 +209,10 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
     memset(ld.raw, 0, sizeof ld.raw);
     if (plat_store_load(b == 1 ? OBJ_BANKB : OBJ_BANKC, ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
         return;
-    if (ld.b.format == PROJ_FORMAT || (ld.b.format >= 23u && ld.b.format <= 27u)) {
+    if (ld.b.format == PROJ_FORMAT || (ld.b.format >= 23u && ld.b.format <= 28u)) {
         uint32_t f = ld.b.format;
         *k = ld.b;
-        if (f != PROJ_FORMAT) {                /* 23-27: the same layout */
+        if (f != PROJ_FORMAT) {                /* 23-28: the same layout */
             for (i = 0; i < NSCENES; i++)
                 convert(k->scene[i], f);
             bank_dirty |= (uint8_t)(1u << b);
@@ -257,7 +251,7 @@ int project_load(void)
         project_defaults();
         return -1;
     }
-    if (from == PROJ_FORMAT || (from >= 23u && from <= 27u)) {   /* 23-27: the same layout */
+    if (from == PROJ_FORMAT || (from >= 23u && from <= 28u)) {   /* 23-28: the same layout */
         proj = ld.p;
         if (from != PROJ_FORMAT) {
             convert(proj.par, from);
@@ -311,11 +305,7 @@ int project_load(void)
         proj.bank = 0;
     if (from <= 25u || proj.mtime > 100u)    /* the byte was the macro PRESETS played */
         proj.mtime = MTIME_DEF;
-    for (i = 0; i < DR_NGEST; i++)
-        if (from <= 26u || proj.gkey[i] >= DR_NGTYPE) {   /* these bytes were spare: the keys as they were */
-            gkeys_default();
-            break;
-        }
+    memset(proj.gkey_old, 0, sizeof proj.gkey_old);
     if (!in_range(proj.par)) {
         project_defaults();
         return -1;
@@ -351,8 +341,6 @@ int project_save(void)                         /* the banks first: a converted 0
 void project_apply(void)
 {
     int i;
-    for (i = 0; i < DR_NGEST; i++)
-        dr_gesture_type(i, proj.gkey[i]);
     for (i = 0; i < DR_NPARAMS; i++)
         dr_set(i, proj.par[i]);
 }

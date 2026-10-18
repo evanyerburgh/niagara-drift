@@ -384,7 +384,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
         <div class="g-btn">SEQ</div>
         <div class="pstack">
         <div class="g-page"><i>Partner</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Interval<small>its gap</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Detune</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Interval<small>its gap</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Detune</span></div>
-        <div class="g-page"><i>Partner 2</i><span class="k both"><span class="sr">Knob 1: </span>Shift<small>its move, a 5th down–up</small></span><span class="k both none"><span class="sr">Knob 2: </span>–</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Wander<small>a random melody</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Scale<small>Wander’s notes</small></span></div>
+        <div class="g-page"><i>Moves</i><span class="k both"><span class="sr">Knob 1: </span>Shift<small>its move, a 5th down–up</small></span><span class="k both none"><span class="sr">Knob 2: </span>–</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Wander<small>a random melody: how often</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Scale<small>Wander’s notes</small></span></div>
         </div>
       </div>
     </div>
@@ -495,10 +495,9 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
   <div class="g-card mid">
     <h3>Macros <span class="g-sub">several settings at once, on top of your sound</span></h3>
     <dl class="acts">
-      <div><dt>Weight · Shift · Converge · Wash</dt><dd>The top four <span class="cap white">white keys</span>: hold to bring in, let go and it leaves as slowly as you held it; tap: all the way, to stay</dd></div>
+      <div><dt>Weight · Shift · Clean · Wash</dt><dd>The top four <span class="cap white">white keys</span>: hold to bring in, let go and it leaves as slowly as you held it; tap: all the way, to stay</dd></div>
       <div><dt>Macro time</dt><dd><span class="cap">PRESETS</span>: every gesture faster or slower, even while it moves</dd></div>
-      <div><dt>Shift’s move</dt><dd><span class="cap">SEQ</span> twice (Partner 2), <span class="cap">KNOB 1</span>: a fifth down to a fifth up</dd></div>
-      <div><dt>Pick what a key plays</dt><dd>Hold its key, turn <span class="cap">SELECT</span>: Weight · Shift · Converge · Wash · Clean · Glitch</dd></div>
+      <div><dt>Shift’s move</dt><dd><span class="cap">SEQ</span> twice (Moves), <span class="cap">KNOB 1</span>: a fifth down to a fifth up</dd></div>
     </dl>
   </div>
 
@@ -508,7 +507,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     <h3>White keys <span class="g-sub">12 scenes a bank · lit: a sound is saved there · blinking: the one you’re on</span></h3>
     <div class="g-scenes" aria-hidden="true">
       <span class="on at">1</span><span class="on">2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
-      <span>9</span><span>10</span><span>11</span><span>12</span><span class="bank">Weight</span><span class="bank">Shift</span><span class="bank">Conv</span><span class="bank">Wash</span>
+      <span>9</span><span>10</span><span>11</span><span>12</span><span class="bank">Weight</span><span class="bank">Shift</span><span class="bank">Clean</span><span class="bank">Wash</span>
     </div>
     <dl class="acts">
       <div><dt>Go to a scene</dt><dd>Tap a <span class="cap white">white key</span></dd></div>
@@ -667,7 +666,7 @@ function hit(c, cls) {
 const TIP = { FX: "Delay: type, time, repeats, mix (again: Reverb: type, length to Inf, damp, mix)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths)",
   ENV: "Tone 1: noise and its colour, white to pink (again: Tone 2: character, feedback, age); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: LFO mods: rate mod, cross-mod amount, delay LFO)",
   EDIT: "Osc: X-Wave, pulse width (again: Source: osc mix, drive); hold to peek", GLO: "Setup 1: glide, fade, drift, stereo width (again: Setup 2: morph, scene switch, tune, tuning; again: Setup 3: speaker, pressure)",
-  HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Partner: interval, detune (again: Partner 2: Shift's move, Wander, its scale)",
+  HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Partner: interval, detune (again: Moves: Shift's move, Wander, its scale)",
   PLAY: "Drone in / out", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "Macro time: every gesture faster or slower", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };

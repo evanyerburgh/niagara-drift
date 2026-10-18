@@ -64,7 +64,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 28, on bank A", proj.format == 28u && PROJ_FORMAT == 28u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 29, on bank A", proj.format == 29u && PROJ_FORMAT == 29u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -111,10 +111,10 @@ int main(void)
         p23.par[P_GL_3] = 100;
         memcpy(store[OBJ_PROJ], &p23, sizeof p23);
         store_n[OBJ_PROJ] = (int)sizeof p23;
-        check("PR #18's project (24) loads: the swells to the new defaults, Shift's move moved, the keys as they were",
+        check("PR #18's project (24) loads: the swells to the new defaults, Shift's move moved, the latches let go",
               project_load() == 0 && proj.par[P_GR_1] == dr_param_info(P_GR_1)->def &&
                   proj.par[P_SHIFT_MOVE] == 200 && proj.par[P_GD_1] == dr_param_info(P_GD_1)->def &&
-                  proj.par[P_GL_3] == 100 && proj.gkey[1] == DR_G_SHIFT);
+                  proj.par[P_GL_3] == 0);
     }
     {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */
         static proj_v21_t p21;

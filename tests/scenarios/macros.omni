@@ -1,9 +1,9 @@
-# the gestures (v0.2): Weight, Shift, Converge, Wash on D5-G5 (w12-w15), offsets on top of the sound, the sound's own
+# the gestures (v0.2): Weight, Shift, Clean, Wash on D5-G5 (w12-w15), always the same, offsets on top of the sound, the sound's own
 # values untouched; each part comes in over its own stretch of the way in and goes over its own on the way out.
 # heardN is what's heard (the sound plus the macros), parN the sound's own, mpitchG a drone's pitch move by the
 # macros (cents). 7 drone I's cutoff, 5 its osc mix, 11 its level, 25 drone II's detune, 63 the reverb mix, 42
 # cross-mod, 60-62 the delay's time, repeats, mix, 66 the delay LFO's depth, 17 drone I's filter LFO depth, 77
-# Character; 78 Wander, 79 Age, 80 Shift's move, 81 Wander's scale; 90-93 the keys' latches. What each key plays: gkeyN (0 Weight .. 4 Clean, 5 Glitch).
+# Character; 78 Wander, 79 Age, 80 Shift's move, 81 Wander's scale; 90-93 the keys' latches.
 tap PLAY
 wait 1000
 expect heard7 700
@@ -46,11 +46,11 @@ wait 2500
 expect heard5 >38
 wait 3000
 expect heard5 30
-# Macro time x0.1 (PRESETS all the way down): in by about 0.3 s
+# Macro time x0.1 (PRESETS all the way down): in by about 0.3 s (held 0.6 s: under 0.5 s would be a tap)
 spin PRESET -50
 expect mtime 0
 key w12 down
-wait 400
+wait 600
 expect heard5 >70
 key w12 up
 wait 600
@@ -77,7 +77,7 @@ expect par90 <60
 tapkey w12
 wait 4000
 expect par90 0
-# SHIFT: its move on Partner 2's KNOB 1 (80, in cents + 700: a 5th up to start, 120 detents down: a 4th down); a
+# SHIFT: its move on Moves' KNOB 1 (80, in cents + 700: a 5th up to start, 120 detents down: a 4th down); a
 # gesture key held, ALGORITHM is still the Movement and PRESETS Macro time (3.9 s)
 tap SEQ
 tap SEQ
@@ -88,7 +88,7 @@ tap HOME
 key w13 down
 spin ALGO 2
 spin ALGO -2
-wait 300
+wait 700
 key w13 up
 expect par75 50
 expect par80 200
@@ -107,35 +107,21 @@ tapkey w13
 wait 4500
 expect mpitch0 0
 expect mpitch1 0
-# CONVERGE: drone II's pitch toward a consonance with drone I first (drone I stepping back, quieter, meanwhile),
-# never quite there (a few cents short, so they pulse; here they're a fifth already), cross-mod last (3.3 s)
-expect heard11 80
-key w14 down
-wait 1000
-expect heard42 0
-expect heard11 <72
-wait 3000
-expect heard42 1
-expect heard25 5
-expect mpitch1 <-3
-expect mpitch1 >-16
-expect heard11 80
-key w14 up
-wait 4500
-expect heard42 0
-expect mpitch1 0
-# a key plays what you pick: D5 held, SELECT on four: Clean
+# a press needn't be quick to be a tap: 400 ms latches
 key w12 down
-spin SELECT 4
+wait 400
 key w12 up
-expect gkey0 4
-wait 3000
-# CLEAN held (3.3 s): a dirty sound comes clean, the grit first; the notes stay
+wait 300
+expect par90 100
+tapkey w12
+wait 4000
+expect par90 0
+# CLEAN (F5) held (3.3 s): a dirty sound comes clean, the grit first; the notes stay
 set 77 60
 set 10 50
 set 62 50
 wait 300
-key w12 down
+key w14 down
 wait 900
 expect heard77 0
 expect heard10 0
@@ -143,40 +129,29 @@ expect heard62 >30
 wait 3000
 expect heard62 0
 expect mpitch0 0
-key w12 up
+key w14 up
 wait 4500
 expect heard77 60
 expect heard62 50
 set 77 0
 set 10 20
 set 62 25
-# E5 to GLITCH (SELECT on four from Shift): the delay a little up, its time leaning off and back; the dry as it is
-key w13 down
-spin SELECT 4
-key w13 up
-expect gkey1 5
-wait 4000
-key w13 down
+# WASH (G5) on a sound with its own effects up: each goes toward Wash's aim, not past it (the delay mix to 70, the
+# repeats to 80, under the delay's howl)
+set 61 70
+set 62 60
+wait 300
+tapkey w15
 wait 5000
-expect heard62 45
-expect heard11 80
-# the delay LFO off the delay time it leans
-expect heard66 0
-key w13 up
+expect heard61 80
+expect heard62 70
+tapkey w15
 wait 6000
-expect heard62 25
-expect heard66 20
-# back as they were
-key w12 down
-spin SELECT -4
-key w12 up
-key w13 down
-spin SELECT -4
-key w13 up
-expect gkey0 0
-expect gkey1 1
-wait 5000
-# WANDER (Partner 2): drone II walks off its pitch, gliding; at 0 it comes home
+expect heard61 70
+set 61 50
+set 62 25
+wait 300
+# WANDER (Moves): drone II walks off its pitch, gliding; at 0 it comes home
 set 78 60
 wait 7000
 expect wander >150

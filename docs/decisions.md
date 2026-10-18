@@ -240,3 +240,9 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-18 (Evan): Wash eases both filter LFOs' depths to a third (by 67 %, in over 20-70 % of its amount, out
   over 0-40 %): with Movement up their cutoff sweeps piled up in the reverb and delay as surges (Movement 100: 9.5
   -> 4.7 dB loudness swing, 2.6 -> 0.5 octaves brightness swing; at Movement 0 unchanged).
+- 2026-10-18 (Evan): the gesture keys are fixed, so you learn where they are: D5 Weight, E5 Shift, F5 Clean, G5
+  Wash; hold + SELECT picks nothing (SELECT is the LFO rate). Converge and Glitch are gone. A gesture key let go
+  under 500 ms is a tap (was 250). SEQ's second page is **Moves** (was Partner 2). Wander's knob is how often: notes
+  at random gaps from 25-30 s (1) to 0.5-2 s (100), log between; it reaches an octave either way. Wash moves the
+  delay mix, repeats, reverb mix and length toward 70, 80, 80 and 100 (only up, never past the sound's own), so the
+  repeats stay under the delay's howl (87). PROJ_FORMAT 29: 28's gesture latches let go.

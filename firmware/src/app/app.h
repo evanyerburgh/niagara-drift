@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 28u                  /* 28: Shift's move in cents (27's four to theirs); Noise's top
+#define PROJ_FORMAT 29u                  /* 29: the gesture keys fixed (Weight, Shift, Clean, Wash; 28's latches
+                                          * let go, a key may play something else now); 28: Shift's move in cents (27's four to theirs); Noise's top
                                           * 6 dB up (27's values halved);
                                           * 27: the set macros gone (their four values zeroed; now Wander, Age,
                                           * Shift's move); what each gesture key plays; 26: Macro time (the byte of the macro PRESETS played: 25's reset);
@@ -37,7 +38,7 @@ typedef struct {
     uint8_t bank;                        /* the bank the scene keys play (0 A .. 3 Presets) */
     uint8_t mtime;                       /* MACRO TIME, 0..100 (PRESETS): every gesture's speed x0.1 .. x10, 50 as set
                                           * (the player's, not a scene's; was the macro PRESETS played, format <= 25) */
-    uint8_t gkey[DR_NGEST];              /* what each gesture key plays (DR_G_*; the player's, not a scene's; 27) */
+    uint8_t gkey_old[4];                 /* unused since 29 (what each gesture key played, 27-28) */
     uint8_t rsv[9];                      /* room to grow: an older, shorter project loads (zeros here) */
     uint16_t scene_used;                 /* bank A: bit n, scene n holds a sound */
     int16_t scene[NSCENES][DR_NPARAMS];  /* bank A: every parameter, recalled but for the room's settings */
