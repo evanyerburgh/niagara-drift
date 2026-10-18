@@ -101,13 +101,17 @@ tapkey w13
 wait 12000
 expect mpitch0 0
 expect mpitch1 0
-# CONVERGE: drone II's pitch to a consonance with drone I first, cross-mod last (7.7 s)
+# CONVERGE: drone II's pitch to a consonance with drone I first (drone I stepping back, quieter, meanwhile),
+# cross-mod last (7.7 s)
+expect heard11 80
 key w14 down
 wait 2000
 expect heard42 0
+expect heard11 <72
 wait 7000
 expect heard42 1
 expect heard25 0
+expect heard11 80
 key w14 up
 wait 9000
 expect heard42 0
