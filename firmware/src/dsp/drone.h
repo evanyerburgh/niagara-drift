@@ -110,7 +110,8 @@ enum {
     P_CHAR,                         /* CHARACTER, 0..100: clean .. vintage oscillators (softer edges, a bent
                                      * saw, even harmonics, pitch jitter, the drones a little apart, noise) */
     /* THE MACROS (v0.2): offsets on top of the sound (drone.c MACRO_OFF), the sound's own values untouched */
-    P_M_BLOOM, P_M_WEIGHT, P_M_TIDE, P_M_TEAR,           /* the set macros' amounts, 0..100 (SEQ, PRESETS) */
+    P_OLD_M0, P_OLD_M1, P_OLD_M2, P_OLD_M3,           /* unused: the set macros (Bloom, Weight, Tide, Tear), gone
+                                                       * 2026-10-18 with the Macros page; kept for the layout, 0 */
     P_GD_WEIGHT, P_GD_SHIFT, P_GD_CONVERGE, P_GD_WASH,      /* the gestures' depths, 0..100 (Shift's: its move, DR_SHIFT_NAME) */
     P_GR_WEIGHT, P_GR_SHIFT, P_GR_CONVERGE, P_GR_WASH,      /* ... their swell's time, 0..100 = 1 .. 30 s */
     P_GL_WEIGHT, P_GL_SHIFT, P_GL_CONVERGE, P_GL_WASH,      /* ... latched at, 0..100 (0: not latched) */
@@ -127,11 +128,10 @@ enum { DR_SINE, DR_TRI, DR_SAW, DR_SQUARE };          /* the X-WAVE's four waves
 enum { DR_LFO_OFF, DR_LFO_I, DR_LFO_II, DR_LFO_BOTH };   /* a route's wave; BOTH: I + II, summed */
 enum { DR_TO_PITCH, DR_TO_XWAVE };
 enum { DR_TO_CUTOFF, DR_TO_RESO };
-#define DR_NSETM 4                             /* the set macros: Bloom, Weight, Tide, Tear */
 #define DR_NGEST 4                             /* the gestures: Weight, Shift, Converge, Wash (D5-G5) */
 #define DR_NSHIFT 4                            /* Shift's moves: a fifth up, a fourth up, a fourth down, a fifth down */
 extern const char *const DR_SHIFT_NAME[DR_NSHIFT];
-extern const char *const DR_MACRO_NAME[DR_NSETM + DR_NGEST];
+extern const char *const DR_MACRO_NAME[DR_NGEST];
 void dr_gesture(int g, int amt);               /* gesture g's amount now, 0..1000 (the UI swells it) */
 int dr_heard(int p);                           /* a value as heard: the sound's own plus the macros (tests) */
 float dr_mac_pitch(int g);                     /* drone g's pitch move by the macros now, semitones (tests) */

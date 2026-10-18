@@ -49,14 +49,13 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
     {"Morph", 0, 100, 47}, {"Scene switch", 0, 100, 30}, {"Tuning", 0, 1, 0}, {"Speaker", 0, 100, 0},
     {"Pitch lock", 0, 1, 0}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
-    {"Bloom", 0, 100, 0}, {"Weight", 0, 100, 0}, {"Tide", 0, 100, 0}, {"Tear", 0, 100, 0},
+    {"-", 0, 100, 0}, {"-", 0, 100, 0}, {"-", 0, 100, 0}, {"-", 0, 100, 0},          /* unused (the set macros) */
     {"Weight depth", 0, 100, 70}, {"Shift move", 0, DR_NSHIFT - 1, 0}, {"Conv. depth", 0, 100, 100}, {"Wash depth", 0, 100, 70},
     {"Weight swell", 0, 100, 30}, {"Shift swell", 0, 100, 40}, {"Conv. swell", 0, 100, 35}, {"Wash swell", 0, 100, 35},
     {"Weight latch", 0, 100, 0}, {"Shift latch", 0, 100, 0}, {"Conv. latch", 0, 100, 0}, {"Wash latch", 0, 100, 0},
     {"Type", 0, DR_NDLY - 1, 0}, {"Length", 0, 100, 60}, {"Damp", 0, 100, 40}, {"Pressure", 0, 100, 50},
 };
-const char *const DR_MACRO_NAME[DR_NSETM + DR_NGEST] = {"Bloom", "Weight", "Tide", "Tear", "Weight", "Shift",
-                                                        "Converge", "Wash"};
+const char *const DR_MACRO_NAME[DR_NGEST] = {"Weight", "Shift", "Converge", "Wash"};
 const char *const DR_SHIFT_NAME[DR_NSHIFT] = {"5th up", "4th up", "4th down", "5th down"};
 static const int8_t SHIFT_ST[DR_NSHIFT] = {7, 5, -5, -7};       /* ... in semitones */
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
@@ -415,7 +414,7 @@ static float gam[DR_NGEST];                       /* the gestures' amounts now, 
 static uint8_t mac_dirty;                         /* an amount or a depth changed: the offsets again */
 static int16_t moff[DR_NPARAMS];                  /* the macros' offset on each value now (MOFF_ON: a switch on) */
 #define MOFF_ON 0x7FFF
-static float mac_p[DR_NGROUPS];                   /* each drone's pitch move, semitones: Tear's, Shift's, Converge's */
+static float mac_p[DR_NGROUPS];                   /* each drone's pitch move, semitones: Shift's, Converge's */
 /* FEEDBACK: the finished sound (mono, after the effects), kept for a fixed 256 samples (5.8 ms) and fed
  * back into the drones' filters: a loop of the same length whatever the block size */
 #define FB_N 512u
@@ -524,18 +523,18 @@ void dr_init(void)
     q_r = q_w;
 }
 
-/* THE MACROS (v0.2, option D; two performer reviews; staged 2026-10-18 after the macro research): each moves
- * several values, by fixed amounts at full. Set macros by their amount (P_M_*), gestures by the UI's swell (gam)
- * times their depth (P_GD_*). The sound's own values (base) stay as they are; what's heard is base + the sum,
+/* THE MACROS (v0.2, option D; two performer reviews; staged 2026-10-18 after the macro research): the gestures
+ * on D5-G5, each moving several values, by fixed amounts at full, by the UI's swell (gam) times their depth
+ * (P_GD_*). The sound's own values (base) stay as they are; what's heard is base + the sum,
  * clamped to each value's range.
  * Each move comes in over its own part of the macro's way in (in0 .. in1 of the amount, eased) and goes over
  * its own part of the way out (out0 .. out1), so a macro's parts arrive in order and leave in their own order
  * (Strymon Deco's auto-flange: "the controls are smoothly returned"); a move's level glides (MOVE_S) so turning
  * back half way doesn't jump. Kinds: ADD an offset; SW a switch on while the move is in; ZERO the value toward 0 (by d %, all the way when d is 0);
- * P_SHIFT / P_CONV / P_OCT a drone's pitch (Shift's move; Converge's pull to the nearest unison, fourth, fifth or
- * octave of drone I; Tear's octave); BUMP an offset that rises over in0 .. in1 and falls again over out0 .. out1,
+ * SHIFT / CONV a drone's pitch (Shift's move; Converge's pull toward the nearest unison, fourth, fifth or octave
+ * of drone I); BUMP an offset that rises over in0 .. in1 and falls again over out0 .. out1,
  * both ways (a dip while something else moves); PULSE an offset breathing slowly (PULSE_HZ) while it's in. */
-enum { MK_ADD, MK_SW, MK_ZERO, MK_SHIFT, MK_CONV, MK_OCT, MK_BUMP, MK_PULSE };
+enum { MK_ADD, MK_SW, MK_ZERO, MK_SHIFT, MK_CONV, MK_BUMP, MK_PULSE };
 typedef struct {
     uint8_t p, kind;                             /* the value (or, for a pitch move, the drone) and the kind */
     int16_t d;                                   /* the amount at full (MK_ADD) */
@@ -545,22 +544,7 @@ typedef struct {
 #define PULSE_HZ 0.15f                           /* a PULSE move's breath: about 7 s */
 #define MOVE_S 0.15f                             /* a move's level: the whole way in this long, at most (a
                                                   * turn back half way doesn't jump; Macro time can be quick) */
-static const move_t MACRO_MV[DR_NSETM + DR_NGEST][MV_N] = {
-    /* Bloom (page): open the sound */
-    {{DR_GP(0, GP_CUTOFF), MK_ADD, 220, 0, 100, 0, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, 220, 0, 100, 0, 100},
-     {DR_GP(0, GP_RESO), MK_ADD, -100, 0, 100, 0, 100}, {DR_GP(1, GP_RESO), MK_ADD, -100, 0, 100, 0, 100},
-     {P_REV_MIX, MK_ADD, 30, 0, 100, 0, 100}},
-    /* Weight (page): as the key's */
-    {{DR_GP(0, GP_MIX), MK_ADD, 45, 0, 70, 0, 60}, {DR_GP(1, GP_MIX), MK_ADD, 45, 0, 70, 0, 60},
-     {DR_GP(0, GP_CUTOFF), MK_ADD, -30, 0, 50, 40, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -30, 0, 50, 40, 100},
-     {DR_GP(0, GP_RESO), MK_ADD, -40, 0, 50, 40, 100}, {DR_GP(1, GP_RESO), MK_ADD, -40, 0, 50, 40, 100},
-     {DR_GP(0, GP_DRIVE), MK_ADD, 35, 20, 100, 20, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 35, 20, 100, 20, 100},
-     {P_CHAR, MK_ADD, 25, 30, 100, 30, 100}, {DR_GP(0, GP_NOISE), MK_ADD, -40, 0, 50, 50, 100},
-     {DR_GP(1, GP_NOISE), MK_ADD, -40, 0, 50, 50, 100}, {DR_GP(0, GP_LEVEL), MK_ADD, 8, 20, 100, 0, 60}},
-    /* Tide (page): bigger and slower together */
-    {{P_MOVE, MK_ADD, 40, 0, 100, 0, 100}, {P_LFO_RATE, MK_ADD, -25, 0, 100, 0, 100}},
-    /* Tear (page): the sync sweep, drone II up an octave */
-    {{P_SYNC, MK_SW, 0, 0, 100, 0, 100}, {DR_GP(1, GP_RESO), MK_ADD, 300, 0, 100, 0, 100}, {1, MK_OCT, 0, 0, 100, 0, 100}},
+static const move_t MACRO_MV[DR_NGEST][MV_N] = {
     /* WEIGHT (D5): a full, warm bass (Evan, 2026-10-18): the sub comes up through most of the swell, the
      * resonance and the noise give way and the cutoffs ease down a little (warm, not dark), then drive and the
      * vintage character round it off, so a small speaker hears it fuller. Let go: the brightness comes back first,
@@ -592,15 +576,15 @@ static const move_t MACRO_MV[DR_NSETM + DR_NGEST][MV_N] = {
      {DR_GP(1, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100},
      {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100}},
 };
-static float mv_lvl[DR_NSETM + DR_NGEST][MV_N];  /* each move's level now, 0..1 (gliding) */
-static float mac_last[DR_NSETM + DR_NGEST];      /* each macro's amount last time ... */
+static float mv_lvl[DR_NGEST][MV_N];  /* each move's level now, 0..1 (gliding) */
+static float mac_last[DR_NGEST];      /* each macro's amount last time ... */
 static uint8_t mac_out;                          /* ... and which are on their way out (bit m) */
 static uint8_t mv_moving;                        /* a move's level still gliding: again next block */
 static float mac_ph;                             /* the PULSE moves' phase, cycles */
 static void macro_reset(void)
 {
     int m, k;
-    for (m = 0; m < DR_NSETM + DR_NGEST; m++) {
+    for (m = 0; m < DR_NGEST; m++) {
         mac_last[m] = 0.0f;
         for (k = 0; k < MV_N; k++)
             mv_lvl[m][k] = 0.0f;
@@ -611,9 +595,8 @@ static void macro_reset(void)
 }
 static float mac_amt(int m)                      /* a macro's amount now, 0..1 */
 {
-    return m < DR_NSETM ? (float)base[P_M_BLOOM + m] * 0.01f
-         : m == DR_NSETM + 1 ? gam[1]          /* Shift: its depth is its move */
-                             : gam[m - DR_NSETM] * (float)base[P_GD_WEIGHT + m - DR_NSETM] * 0.01f;
+    return m == 1 ? gam[1]                     /* Shift: its depth is its move */
+                  : gam[m] * (float)base[P_GD_WEIGHT + m] * 0.01f;
 }
 static float mv_ease(float a, int lo, int hi)    /* the amount a through the window lo .. hi %, eased */
 {
@@ -655,7 +638,7 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
         on[i] = 0;
     }
     mv_moving = 0;
-    for (m = 0; m < DR_NSETM + DR_NGEST; m++) {
+    for (m = 0; m < DR_NGEST; m++) {
         float a = mac_amt(m);
         if (a > mac_last[m] + 1e-4f)
             mac_out &= (uint8_t)~(1u << m);
@@ -677,7 +660,6 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
             case MK_ZERO: off[v->p] -= (float)base[v->p] * *l * (v->d ? (float)v->d * 0.01f : 1.0f); break;
             case MK_SHIFT: pm[v->p] += (float)SHIFT_ST[(unsigned)base[P_GD_SHIFT] < DR_NSHIFT ? base[P_GD_SHIFT] : 0] * *l; break;
             case MK_CONV: pm[v->p] += conv_st() * *l; mv_moving = 1; conving = 1; break;    /* follows drone I */
-            case MK_OCT: pm[v->p] += 12.0f * *l; break;
             case MK_PULSE: off[v->p] += (float)v->d * *l * (0.5f - 0.5f * fm_cosf(6.2831853f * mac_ph)); pulsing = 1; break;
             default: off[v->p] += (float)v->d * *l; break;
             }
@@ -729,7 +711,7 @@ static void drain(void)
             if (a < DR_NPARAMS) {
                 base[a] = (int16_t)(b < PARAMS[a].lo ? PARAMS[a].lo : b > PARAMS[a].hi ? PARAMS[a].hi : b);
                 par[a] = (int16_t)heard(a);    /* with the macros' offset on it, if any */
-                if (a >= P_M_BLOOM && a <= P_GD_WASH)
+                if (a >= P_GD_WEIGHT && a <= P_GD_WASH)
                     mac_dirty = 1;             /* an amount or a depth: the offsets again */
                 {   /* its glide: a step a sample, to arrive over the time asked for (or 25 ms) */
                     float ms = pslide_ms[a] ? (float)pslide_ms[a] : 25.0f;

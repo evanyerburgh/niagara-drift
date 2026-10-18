@@ -130,17 +130,14 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 - **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width.
 - **Osc mix** goes from the oscillators to the sub; **drive** pushes each drone into its filter.
 
-#### Macros and Partner · SEQ
+#### Partner · SEQ
 
-<img src="docs/img/page-seq.png" width="488" alt="The Macros page: four set macros as meters and the four gestures under them; the Partner page">
+<img src="docs/img/page-seq.png" width="244" alt="The Partner page: each drone's partner oscillator, its interval and detune">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Macros | Bloom | Weight | Tide | Tear |
 | Partner | I interval | I detune | II interval | II detune |
 
-- **Macros** move several things at once, by set amounts, on top of your sound: your own settings stay as
-  they are, so a macro back at 0 is exactly where you were. Scenes remember them. See [The macros](#the-macros).
 - The partner oscillator sits an interval above or below each drone; **detune** makes them beat.
   With **Tuning: just** (Setup 2) the intervals are pure ratios.
 
@@ -248,21 +245,17 @@ depth that can't be heard says why on the screen (Movement at 0%, or its wave of
 
 ### The macros
 
-Eight moves, each a few settings together, by set amounts, on top of your sound. Your own settings stay as they
-are underneath: at 0 a macro is gone without a trace. A macro's parts come in one after another, and go in their
-own order when you let go.
+Four gestures on the top four white keys, each a few settings together, by set amounts, on top of your sound.
+Your own settings stay as they are underneath: when a gesture has gone, it's gone without a trace. A gesture's
+parts come in one after another, and go in their own order when you let go. Scenes remember which are latched.
 
-| Macro | What it moves | Played on |
+| Gesture | What it moves | Key |
 |---|---|---|
-| **Bloom** | both cutoffs up, resonance a little down, more reverb: the sound opens | SEQ, KNOB 1 |
-| **Weight** | a full, warm bass: the sub comes up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. Let go: the brightness comes back first, the sub lingers | SEQ, KNOB 2; D5, held |
-| **Tide** | more Movement while the LFO slows: bigger and slower together | SEQ, KNOB 3 |
-| **Tear** | hard sync on, drone II's pitch up to an octave and its resonance up: the sync sweep | SEQ, KNOB 4 |
-| **Shift** | a new chord, a voice at a time: drone I glides a fifth or fourth up or down, drone II follows. Let go: drone I comes back first | E5, held |
-| **Converge** | drone II's pitch toward the nearest unison, fourth, fifth or octave of drone I (drone I steps back, quieter and darker, while it moves), never quite arriving: it stays a few cents short and wavers, so the two pulse; the partners' beating and Drift ease, cross-mod last. Let go: cross-mod goes first, the pitch drifts back last. It takes the swell time however far drone II has to go | F5, held |
-| **Wash** | the delay first, then the reverb opens and grows longer and darker (to Inf, a freeze, at full depth), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5, held |
+| **Weight** | a full, warm bass: the sub comes up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. Let go: the brightness comes back first, the sub lingers | D5 |
+| **Shift** | a new chord, a voice at a time: drone I glides a fifth or fourth up or down, drone II follows. Let go: drone I comes back first | E5 |
+| **Converge** | drone II's pitch toward the nearest unison, fourth, fifth or octave of drone I (drone I steps back, quieter and darker, while it moves), never quite arriving: it stays a few cents short and wavers, so the two pulse; the partners' beating and Drift ease, cross-mod last. Let go: cross-mod goes first, the pitch drifts back last. It takes the swell time however far drone II has to go | F5 |
+| **Wash** | the delay first, then the reverb opens and grows longer and darker (to Inf, a freeze, at full depth), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5 |
 
-- **The set macros** (SEQ's Macros page) stay where you leave them.
 - **The gestures** are the top four white keys (they don't sense pressure). **Hold** one and it comes in while you
   hold; **let go** and it goes, over as long as you held it (hold 2 s, it leaves in 2 s; hold 10 s, it drifts out
   over 10 s). **Tap** it and it goes to its depth and stays; tap again and it goes. **SEL held as you let go** keeps

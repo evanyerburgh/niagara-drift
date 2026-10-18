@@ -92,10 +92,6 @@ static void drone(int partners, int voices, int heavy)   /* voices: how many dro
         dr_set(P_LFO_RMOD, 50);
         dr_set(P_DLY_REPEATS, 90);
         dr_set(P_REV_MIX, 80);
-        dr_set(P_M_BLOOM, 100);
-        dr_set(P_M_WEIGHT, 50);
-        dr_set(P_M_TIDE, 50);
-        dr_set(P_M_TEAR, 50);
         for (g = 0; g < DR_NGEST; g++)
             dr_gesture(g, 1000);
     }

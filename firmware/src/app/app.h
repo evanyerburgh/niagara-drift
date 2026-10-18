@@ -11,7 +11,7 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 26u                  /* 26: Macro time (the byte of the macro PRESETS played: 25's reset);
+#define PROJ_FORMAT 27u                  /* 27: the set macros gone (their four values zeroed); 26: Macro time (the byte of the macro PRESETS played: 25's reset);
                                           * 25: the gestures' swells shorter (24's reset to the new defaults);
                                           * 24: the gestures Weight, Shift, Converge, Wash (23's gesture values
                                           * reset: Beat and Heat are gone); 23: the effects (delay type, reverb length and damp, pressure; 19-22

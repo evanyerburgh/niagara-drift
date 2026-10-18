@@ -44,10 +44,10 @@
 
 /* ------------------------------------------------------------- pages --- */
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
-enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_MACROS, V_PARTNER, V_SETUP, V_SETUP2, V_SETUP3,
+enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_SETUP, V_SETUP2, V_SETUP3,
        V_PULSE, V_FX, V_FX2, NVIEWS };
 static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone 1", "Tone 2", "Osc", "Source", "LFO depths", "LFO mods",
-                                              "Macros", "Partner", "Setup 1", "Setup 2", "Setup 3", "Swell", "Delay", "Reverb"};
+                                              "Partner", "Setup 1", "Setup 2", "Setup 3", "Swell", "Delay", "Reverb"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
  * nothing (g NONE) */
 #define G 2
@@ -64,7 +64,6 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{0, GP_MIX}, {0, GP_DRIVE}, {1, GP_MIX}, {1, GP_DRIVE}},
     {{0, GP_OLFO_DEPTH}, {0, GP_FLFO_DEPTH}, {1, GP_OLFO_DEPTH}, {1, GP_FLFO_DEPTH}},
     {{G, P_LFO_RMOD}, {G, P_LFO_RMOD_SRC}, {G, P_XMOD_AMT}, {G, P_DLY_LFO_DEPTH}},
-    {{G, P_M_BLOOM}, {G, P_M_WEIGHT}, {G, P_M_TIDE}, {G, P_M_TEAR}},
     {{0, GP_INTERVAL}, {0, GP_DETUNE}, {1, GP_INTERVAL}, {1, GP_DETUNE}},
     {{G, P_GLIDE}, {G, P_FADE}, {G, P_DRIFT}, {G, P_WIDTH}},
     {{G, P_MORPH}, {G, P_SCENE_T}, {G, P_TUNE}, {G, P_JUST}},
@@ -77,7 +76,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
 static const struct {
     uint8_t btn, first, n;
 } PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_TONE, 2}, {B_EDIT, V_OSC, 2}, {B_LFO, V_LFO, 2},
-                {B_SEQ, V_MACROS, 2}, {B_GLO, V_SETUP, 3}, {B_FX, V_FX, 2},
+                {B_SEQ, V_PARTNER, 1}, {B_GLO, V_SETUP, 3}, {B_FX, V_FX, 2},
                 {B_ARP, V_PULSE, 1}};                                    /* ARP: a tap toggles */
 #define NPAGE_BTN (sizeof PAGE_BTN / sizeof PAGE_BTN[0])
 #define HOLD_MS 400u                   /* a page button held this long (or a knob turned) is a peek */
@@ -1366,7 +1365,6 @@ static uint16_t page_col(void)
     case V_LFO: case V_LFO2: return K_LFO;
     case V_FX: case V_FX2: case V_TONE2: return K_FX;
     case V_PULSE: return K_PULSE;
-    case V_MACROS: return K_GOLD;
     case V_SETUP: case V_SETUP2: case V_SETUP3: return K_SETUP;
     default: return K_DIM;
     }
@@ -2228,31 +2226,6 @@ static void pic_setup(int32_t y0)
 
 /* the picture: the page's own (on Play, the two waveforms), a banner while a message shows. No interval
  * between the drones (Evan, 2026-10-10: tune by ear) */
-/* Macros (SEQ): the four set macros as meters over their knobs; under them the four
- * gestures (the top white keys) as they swell, latched ones lit */
-static void pic_macros(int32_t y0)
-{
-    int i;
-    for (i = 0; i < DR_NSETM; i++) {
-        int32_t x = 10 + i * 56, v = proj.par[P_M_BLOOM + i], h = 52 * v / 100;
-        uint16_t c = v ? K_GOLD : K_DIM;
-        text_c(x + 25, y0 + 2, &FONT_S, DR_MACRO_NAME[i], c);
-        cv_round(x + 18, y0 + 24, 14, 52, 4, K_GRID);
-        if (h > 0)
-            cv_round(x + 18, y0 + 76 - h, 14, h, 4, c);
-    }
-    cv_rect(12, y0 + 97, 210, 1, K_GRID);
-    for (i = 0; i < DR_NGEST; i++) {
-        int32_t x = 10 + i * 56, w = (int32_t)(44.0f * ui.g_amt[i] + 0.5f);
-        int latched = proj.par[P_GL_WEIGHT + i] != 0;
-        uint16_t c = ui.g_amt[i] > 0.0f || latched ? K_LFO : K_DIM;
-        text_c(x + 25, y0 + 101, &FONT_XS, DR_MACRO_NAME[DR_NSETM + i], c);
-        cv_round(x + 3, y0 + 120, 44, 4, 2, K_GRID);
-        if (w > 0)
-            cv_round(x + 3, y0 + 120, w, 4, 2, c);
-    }
-}
-
 static void draw_pic(void)
 {
     int msg = plat_ms() < ui.msg_until;
@@ -2265,12 +2238,11 @@ static void draw_pic(void)
     if (keymap_on()) {
         cv_round(6, 4, WIDE_W, PAN_H + 8, 4, K_PANEL);
         keymap_rows(8, 0, 3);
-    } else if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 || ui.view == V_MACROS ||
+    } else if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 ||
         ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_SETUP3 || ui.view == V_TONE2) {
         cv_round(6, 4, WIDE_W, PAN_H, 4, K_PANEL);
         switch (ui.view) {
         case V_PULSE: pic_pulse(4); break;
-        case V_MACROS: pic_macros(4); break;
         case V_LFO: pic_lfo(4); break;
         case V_LFO2: pic_lfo2(4); break;
         case V_FX: pic_fx(4); break;

@@ -1,45 +1,17 @@
-# the macros (v0.2): offsets on top of the sound, the sound's own values untouched; each part comes in over its own
-# stretch of the way in and goes over its own on the way out, gliding (0.6 s at most). heardN is what's heard (the
-# sound plus the macros), parN the sound's own, mpitchG a drone's pitch move by the macros (cents). 7 drone I's
-# cutoff, 5 its osc mix, 25 drone II's detune, 63 the reverb mix, 44 hard sync, 42 cross-mod;
-# 78-81 Bloom, Weight, Tide, Tear; 82-85 the gestures' depths (83: Shift's move), 86-89 their swells, 90-93 their
-# latches (Weight, Shift, Converge, Wash on D5-G5: w12-w15).
+# the gestures (v0.2): Weight, Shift, Converge, Wash on D5-G5 (w12-w15), offsets on top of the sound, the sound's own
+# values untouched; each part comes in over its own stretch of the way in and goes over its own on the way out.
+# heardN is what's heard (the sound plus the macros), parN the sound's own, mpitchG a drone's pitch move by the
+# macros (cents). 7 drone I's cutoff, 5 its osc mix, 11 its level, 25 drone II's detune, 63 the reverb mix, 42
+# cross-mod; 78-81 unused (the set macros, gone); 82-85 the gestures' depths (83: Shift's move), 86-89 their own
+# times, 90-93 their latches.
 tap PLAY
 wait 1000
 expect heard7 700
-# SEQ: the Macros page. Bloom at 100: the cutoffs +220, the reverb mix +30 (35 to start); the knob's own value stays
-tap SEQ
-expect view 8
-spin K1 100
-wait 700
-expect par78 100
-expect par7 700
-expect heard7 920
-expect heard63 65
-spin K1 -100
-wait 700
-expect heard7 700
-# the page's Weight at 100: the sub +45
-spin K2 100
-wait 700
-expect par79 100
-expect heard5 75
-spin K2 -100
-wait 700
-expect heard5 30
-# PRESETS: Macro time (50: each gesture's own time); no macro's amount moves
+# PRESETS: Macro time (50: each gesture's own time)
 spin PRESET 10
 expect mtime 60
-expect par78 0
 spin PRESET -10
 expect mtime 50
-# Tear: hard sync on from its first step
-spin K4 1
-wait 100
-expect heard44 1
-spin K4 -1
-wait 700
-expect heard44 0
 # WEIGHT held swells in (2.8 s), a warm bass: half way, the cutoff most of the way down (by 30 at most), the sub
 # half way up
 key w12 down
@@ -143,32 +115,30 @@ key w14 up
 wait 4500
 expect heard42 0
 expect mpitch1 0
-# a scene keeps the macros: A1 stored with Bloom 40 and Wash latched, recalled from none
-spin K1 40
+# a scene keeps the gestures: A1 stored with Wash latched, recalled from none
 tapkey w15
-wait 7000
+wait 5000
+expect heard63 >60
 press SAVE
 tapkey w0
 release SAVE
 wait 300
-spin K1 -40
 tapkey w15
-wait 7000
-expect par78 0
+wait 5000
 expect par93 0
+expect heard63 35
 tapkey w0
-wait 7000
-expect par78 40
+wait 5000
 expect par93 100
-expect heard7 777
-# a restart brings the whole sound back to the engine, the macros too (the last values of a load were
-# once dropped)
+expect heard63 >60
+# a restart brings the whole sound back to the engine, the gestures too (the last values of a load were once
+# dropped)
 tap SAVE
 wait 500
 reboot
-wait 500
-expect par78 40
-expect heard7 777
+wait 5000
+expect par93 100
+expect heard63 >60
 # SAVE again with nothing changed: nothing is written (each write is a late block while playing)
 expect store_writes 1
 tap SAVE

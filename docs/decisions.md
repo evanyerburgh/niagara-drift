@@ -211,3 +211,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   held the macro PRESETS played, which is gone). Let go after a hold: out over as long as it was held, x Macro time.
   Holding a gesture key: ALGORITHM its depth (Shift: its move), PRESETS its own time. A move's level glides over
   0.15 s at most (was 0.6).
+- 2026-10-18: the Macros page goes, with the set macros Bloom, Weight, Tide and Tear (Evan). SEQ opens Partner. Their
+  four values stay in the layout, unused (0); PROJ_FORMAT 27 zeroes them. Any new page of macros comes later, if
+  Clean, Drifting pitch or Glitch earn one.
