@@ -228,3 +228,12 @@ at the end. The current state is in the [README](../README.md) and the code.
   (0..1400, 700 none: a fifth down to a fifth up; a detent 10, SEL 1). SEQ adds Gestures 2: each key's own time.
   NOISE at 100 is level with the oscillators (was 6 dB under), as a Moog's mixer; PROJ_FORMAT 28 halves 27's noise
   values (the same level) and turns Shift's four moves into cents.
+- 2026-10-18 (Evan): one way to play a gesture. The Gestures pages go, with each key's depth and time (P_GD_* and
+  P_GR_* unused): a hold goes as far as you hold, a tap all the way (each gesture's full depth: Weight, Wash,
+  Glitch 70, the others 100; its time: Weight 2.8 s, Shift 3.9 s, the others 3.3 s, x Macro time). A gesture key
+  held: ALGORITHM is still Movement, PRESETS Macro time, SELECT what it plays. SEQ = Partner / Partner 2; Partner 2:
+  KNOB 1 Shift's move, KNOB 3 Wander, KNOB 4 Wander's scale (P_WSCALE, the old unused slot 81; no format change):
+  minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, just (harmonics 1-8: 0, 386, 702,
+  969 cents). While a gesture is in, the LFO moving the same thing eases toward 0, as far as the move or the
+  gesture is in: the oscillator LFO (routed to pitch) for Shift and Converge, the filter LFO (routed to what it
+  moves) for cutoff or resonance moves, the delay LFO for the delay time.
