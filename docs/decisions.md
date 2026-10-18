@@ -251,3 +251,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   4. Tuning goes into each drone's Interval: 17 steps, each interval tempered then just (-Oct, -5th, -5th just, -4th,
   -4th just, Unison, +m3, +m3 just, +M3, +M3 just, +4th, +4th just, +5th, +5th just, +Oct, +Oct+5, +Oct+5 just);
   P_JUST unused. PROJ_FORMAT 30 folds 29's Tuning into each interval.
+- 2026-10-18 (Evan): the Presets bank holds twelve sounds, P1 Niagara (the starting sound), P2 Deep, P3 Just fifths,
+  P4 Glass, P5 Choir, P6 Wanderer, P7 Tape, P8 Pulse, P9 Howl, P10 Cathedral, P11 Metal, P12 Clean (one oscillator,
+  everything off). Any but P12 can be saved over (OBJ_BANKP at 0x9B000; the firmware's comes back where none is
+  saved); P12 is locked ("CLEAN IS LOCKED"). Levelled to P1 within about 2 dB (K-weighted). A new FM-1 starts on the
+  Presets bank. The installer backs up the saved-over Presets too. SEL + a top key no longer latches that key's
+  gesture as it's let go.

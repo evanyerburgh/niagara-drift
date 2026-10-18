@@ -731,8 +731,8 @@ static void save_run(void)                             /* each look at the input
 
 static void scene_store(int n)                         /* SAVE held + a white key: and into the flash */
 {
-    if (proj.bank == BANK_PRESETS) {                   /* the Presets are the firmware's: the way out */
-        say_c("PRESETS", "READ-ONLY", K_GOLD);       /* the README says the way out: a bank of yours */
+    if (proj.bank == BANK_PRESETS && n == PRESET_LOCKED) {   /* the clean sound stays as it is */
+        say_c("CLEAN", "IS LOCKED", K_GOLD);
         return;
     }
     scene_put(proj.bank, n);
@@ -751,7 +751,7 @@ static void scene_recall(int n)                        /* a white key: morph the
     int k;
     scene_name(t + 6, proj.bank, n);
     if (!sc) {
-        say(t, proj.bank == BANK_PRESETS ? "TO COME" : "EMPTY: SAVE+KEY");
+        say(t, "EMPTY: SAVE+KEY");
         return;
     }
     for (k = 0; k < DR_NPARAMS; k++) {
@@ -1009,6 +1009,8 @@ static void gesture_down(int g)
 static void gesture_up(int g)
 {
     uint32_t held = plat_ms() - ui.g_t0[g];
+    if (!(ui.g_held >> g & 1u))
+        return;                                        /* not a gesture's press (SEL + the key: a bank) */
     ui.g_held &= (uint8_t)~(1u << g);
     if (ui.g_rel >> g & 1u) {
         ui.g_rel &= (uint8_t)~(1u << g);

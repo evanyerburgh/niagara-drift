@@ -83,13 +83,21 @@ int main(void)
                                                        store_n[OBJ_BANKB] == (int)sizeof(bank_t) && !store_n[OBJ_BANKC]);
     proj.par[DR_GP(0, GP_PITCH)] = 5000;
     check("a scene into C3", scene_put(2, 2) == 0 && scene_get(2, 2) && project_save() == 0 && store_n[OBJ_BANKC]);
-    check("the Presets can't be written", scene_put(BANK_PRESETS, 0) != 0 && scene_get(BANK_PRESETS, 0));
+    check("P12 (Clean) can't be saved over", scene_put(BANK_PRESETS, PRESET_LOCKED) != 0 &&
+                                                 scene_get(BANK_PRESETS, PRESET_LOCKED)[DR_GP(1, GP_LEVEL)] == 0);
+    proj.par[DR_GP(0, GP_PITCH)] = 4321;
+    check("P3 can: saved into its own object", scene_put(BANK_PRESETS, 2) == 0 &&
+                                               scene_get(BANK_PRESETS, 2)[DR_GP(0, GP_PITCH)] == 4321 &&
+                                               project_save() == 0 && store_n[OBJ_BANKP] == (int)sizeof(bank_t));
     proj.bank = 2;
     project_save();
     memset(&proj, 0, sizeof proj);
-    check("reloaded (28): as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
-                                         scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 3015 && scene_get(2, 2) &&
-                                         scene_get(2, 2)[DR_GP(0, GP_PITCH)] == 5000 && scene_get(0, 11));
+    check("reloaded: as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
+                                    scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 3015 && scene_get(2, 2) &&
+                                    scene_get(2, 2)[DR_GP(0, GP_PITCH)] == 5000 && scene_get(0, 11));
+    check("... P3 as saved over, P1 the firmware's", scene_get(BANK_PRESETS, 2)[DR_GP(0, GP_PITCH)] == 4321 &&
+                                                     scene_get(BANK_PRESETS, 0)[DR_GP(0, GP_PITCH)] ==
+                                                         dr_param_info(DR_GP(0, GP_PITCH))->def);
     {   /* PR #14's (23): the same layout, the gestures Beat, Heat, Converge, Wash */
         static project_t p23;
         p23 = proj;

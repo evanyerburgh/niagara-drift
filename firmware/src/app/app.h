@@ -31,6 +31,7 @@
 #define NSCENES 12                       /* a bank: the 12 lower white keys (F3 .. C5, which sense pressure) */
 #define NBANKS 4                         /* A, B, C (yours), and the Presets (fixed, in the firmware) */
 #define BANK_PRESETS 3
+#define PRESET_LOCKED 11                 /* P12, the clean sound: the one Preset that can't be saved over */
 
 typedef struct {
     uint32_t magic, format;
@@ -46,7 +47,7 @@ typedef struct {
 } project_t;
 _Static_assert(sizeof(project_t) <= PLAT_STORE_MAX, "the project must fit one flash object");
 
-typedef struct {                         /* banks B and C: an object each (OBJ_BANKB, OBJ_BANKC) */
+typedef struct {                         /* banks B and C, and the Presets saved over: an object each */
     uint32_t magic, format;
     uint16_t used;
     uint16_t rsv;
