@@ -44,10 +44,10 @@
 
 /* ------------------------------------------------------------- pages --- */
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
-enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_GEST, V_PARTNER, V_PARTNER2, V_SETUP, V_SETUP2, V_SETUP3,
+enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_GEST, V_GEST2, V_PARTNER, V_PARTNER2, V_SETUP, V_SETUP2, V_SETUP3,
        V_PULSE, V_FX, V_FX2, NVIEWS };
 static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone 1", "Tone 2", "Osc", "Source", "LFO depths", "LFO mods",
-                                              "Gestures", "Partner", "Partner 2", "Setup 1", "Setup 2", "Setup 3", "Swell", "Delay", "Reverb"};
+                                              "Gestures", "Gestures 2", "Partner", "Partner 2", "Setup 1", "Setup 2", "Setup 3", "Swell", "Delay", "Reverb"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
  * nothing (g NONE) */
 #define G 2
@@ -65,6 +65,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{0, GP_OLFO_DEPTH}, {0, GP_FLFO_DEPTH}, {1, GP_OLFO_DEPTH}, {1, GP_FLFO_DEPTH}},
     {{G, P_LFO_RMOD}, {G, P_LFO_RMOD_SRC}, {G, P_XMOD_AMT}, {G, P_DLY_LFO_DEPTH}},
     {{G, P_GD_0}, {G, P_GD_1}, {G, P_GD_2}, {G, P_GD_3}},   /* (a key playing Shift: its move) */
+    {{G, P_GR_0}, {G, P_GR_1}, {G, P_GR_2}, {G, P_GR_3}},   /* their own times */
     {{0, GP_INTERVAL}, {0, GP_DETUNE}, {1, GP_INTERVAL}, {1, GP_DETUNE}},
     {{NONE, 0}, {NONE, 0}, {G, P_WANDER}, {NONE, 0}},
     {{G, P_GLIDE}, {G, P_FADE}, {G, P_DRIFT}, {G, P_WIDTH}},
@@ -78,7 +79,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
 static const struct {
     uint8_t btn, first, n;
 } PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_TONE, 2}, {B_EDIT, V_OSC, 2}, {B_LFO, V_LFO, 2},
-                {B_SEQ, V_GEST, 3}, {B_GLO, V_SETUP, 3}, {B_FX, V_FX, 2},
+                {B_SEQ, V_GEST, 4}, {B_GLO, V_SETUP, 3}, {B_FX, V_FX, 2},
                 {B_ARP, V_PULSE, 1}};                                    /* ARP: a tap toggles */
 #define NPAGE_BTN (sizeof PAGE_BTN / sizeof PAGE_BTN[0])
 #define HOLD_MS 400u                   /* a page button held this long (or a knob turned) is a peek */
@@ -324,9 +325,10 @@ static void cont_turn(int p, int role, int32_t s)
         float v = 1000.0f / (float)(dt ? dt : 1u), x = fm_clampf((v - 10.0f) * (1.0f / 60.0f), 0.0f, 1.0f);
         steps = (int)s * (int)(accel_off ? 1.0f : 1.0f + 3.0f * x * x + 0.5f);
     }
-    {   /* cutoff and resonance run 0..1000: a detent is 10, with SEL held 1 (fine, as a pitch's cent) */
+    {   /* cutoff and resonance run 0..1000, Shift's move in cents: a detent is 10, with SEL held 1 (fine, as a
+         * pitch's cent) */
         int gp = p < P_XMOD ? p % GP_N : -1;
-        if (gp == GP_CUTOFF || gp == GP_RESO) {
+        if (gp == GP_CUTOFF || gp == GP_RESO || p == P_SHIFT_MOVE) {
             if (ui.btn >> B_SEL & 1u) {
                 ui.btn_used |= 1u << B_SEL;
                 steps = (int)s;
@@ -1374,7 +1376,9 @@ static const char *card_name(int p)
 {
     const char *n = p == P_PLINK_OFF ? "Link ofs" : dr_param_info(p)->name;
     if (p >= P_GD_0 && p <= P_GD_3)
-        return DR_GEST_NAME[GT(p - P_GD_0)];   /* the Gestures page: the key's gesture */
+        return DR_GEST_NAME[GT(p - P_GD_0)];   /* the Gestures pages: the key's gesture */
+    if (p >= P_GR_0 && p <= P_GR_3)
+        return DR_GEST_NAME[GT(p - P_GR_0)];
     if (p == P_SHIFT_MOVE)
         return "Shift";
     if (n[0] == 'S' && n[1] == 'c' && n[2] == 'e')
@@ -1666,7 +1670,7 @@ static void pic_tone(int g, int32_t x0, int32_t y0)
     int16_t y[PAN_W];
     int i, nv = gpar(g, GP_NOISE), cv = gpar(g, GP_NCOLOR), n = (PAN_W - 8) / 2 + 1;
     int32_t gx = x0 + 4, gy = y0 + 22, gh = 52, z = gy + gh * 18 / 54;
-    float slope = -3.0f * (float)cv * 0.01f, share = 20.0f * 0.30103f * fm_log2f(fm_maxf((float)nv * 0.005f, 1e-3f));
+    float slope = -3.0f * (float)cv * 0.01f, share = 20.0f * 0.30103f * fm_log2f(fm_maxf((float)nv * 0.01f, 1e-3f));   /* 100: 0 dB */
     char t[16], *q;
     draw_filter(g, dr_cut[g], gx, gy, PAN_W - 8, gh, K_DRONE_DIM[g]);
     if (nv > 0) {
@@ -2290,7 +2294,11 @@ static void pic_gest(int32_t y0)
         if (latched)
             text_c(x + 25, y0 + 110, &FONT_XS, "held", K_LFO);
         else if (t == DR_G_SHIFT)
-            text_c(x + 25, y0 + 110, &FONT_XS, DR_SHIFT_NAME[(unsigned)proj.par[P_SHIFT_MOVE] < DR_NSHIFT ? proj.par[P_SHIFT_MOVE] : 0], K_DIM);
+        {
+            char mv[12];
+            dr_param_text(P_SHIFT_MOVE, proj.par[P_SHIFT_MOVE], mv);
+            text_c(x + 25, y0 + 110, &FONT_XS, mv, K_DIM);
+        }
     }
 }
 
@@ -2334,7 +2342,7 @@ static void draw_pic(void)
         cv_round(6, 4, WIDE_W, PAN_H + 8, 4, K_PANEL);
         keymap_rows(8, 0, 3);
     } else if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 ||
-        ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_SETUP3 || ui.view == V_TONE2 || ui.view == V_GEST ||
+        ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_SETUP3 || ui.view == V_TONE2 || ui.view == V_GEST || ui.view == V_GEST2 ||
         ui.view == V_PARTNER2) {
         cv_round(6, 4, WIDE_W, PAN_H, 4, K_PANEL);
         switch (ui.view) {
@@ -2346,7 +2354,7 @@ static void draw_pic(void)
         case V_TONE2: pic_tone2(4); break;
         case V_SETUP2: pic_setup2(4); break;
         case V_SETUP3: pic_setup3(4); break;
-        case V_GEST: pic_gest(4); break;
+        case V_GEST: case V_GEST2: pic_gest(4); break;
         case V_PARTNER2: pic_partner2(4); break;
         default: pic_setup(4); break;
         }

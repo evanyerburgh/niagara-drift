@@ -116,11 +116,18 @@ static void convert(int16_t *v, uint32_t from)
             v[g] = dr_param_info(g)->def;
     if (from <= 26u) {                          /* the set macros (Bloom, Weight, Tide, Tear) gone: their values 0 (now
                                                  * Wander, Age, Shift's move: 0 is their start); Shift's move was E5's depth */
-        v[P_SHIFT_MOVE] = (unsigned)v[P_GD_1] < DR_NSHIFT ? v[P_GD_1] : 0;
+        v[P_SHIFT_MOVE] = (unsigned)v[P_GD_1] < 4u ? v[P_GD_1] : 0;   /* 0..3 then, as in 27 */
         for (g = P_WANDER; g <= P_OLD_M3; g++)
             if (g != P_SHIFT_MOVE)
                 v[g] = 0;
         v[P_GD_1] = dr_param_info(P_GD_1)->def;
+    }
+    if (from <= 27u)                            /* NOISE's top was 6 dB lower: the same level is half the value now */
+        for (g = 0; g < DR_NGROUPS; g++)
+            v[DR_GP(g, GP_NOISE)] = (int16_t)((v[DR_GP(g, GP_NOISE)] + 1) / 2);
+    if (from <= 27u) {                          /* Shift's move was one of four: now in cents, 700 none */
+        static const int16_t M[4] = {1400, 1200, 200, 0};   /* a 5th up, a 4th up, a 4th down, a 5th down */
+        v[P_SHIFT_MOVE] = M[(unsigned)v[P_SHIFT_MOVE] < 4u ? v[P_SHIFT_MOVE] : 0];
     }
     if (from == 24u)                            /* the swells shorter (2-4 s, Evan 2026-10-18): to the new defaults */
         for (g = P_GR_0; g <= P_GR_3; g++)
@@ -208,10 +215,10 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
     memset(ld.raw, 0, sizeof ld.raw);
     if (plat_store_load(b == 1 ? OBJ_BANKB : OBJ_BANKC, ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
         return;
-    if (ld.b.format == PROJ_FORMAT || (ld.b.format >= 23u && ld.b.format <= 26u)) {
+    if (ld.b.format == PROJ_FORMAT || (ld.b.format >= 23u && ld.b.format <= 27u)) {
         uint32_t f = ld.b.format;
         *k = ld.b;
-        if (f != PROJ_FORMAT) {                /* 23-26: the same layout */
+        if (f != PROJ_FORMAT) {                /* 23-27: the same layout */
             for (i = 0; i < NSCENES; i++)
                 convert(k->scene[i], f);
             bank_dirty |= (uint8_t)(1u << b);
@@ -250,7 +257,7 @@ int project_load(void)
         project_defaults();
         return -1;
     }
-    if (from == PROJ_FORMAT || (from >= 23u && from <= 26u)) {   /* 23-26: the same layout */
+    if (from == PROJ_FORMAT || (from >= 23u && from <= 27u)) {   /* 23-27: the same layout */
         proj = ld.p;
         if (from != PROJ_FORMAT) {
             convert(proj.par, from);

@@ -111,11 +111,13 @@ enum {
                                      * saw, even harmonics, pitch jitter, the drones a little apart, noise) */
     /* THE MACROS (v0.2): offsets on top of the sound (drone.c MACRO_MV), the sound's own values untouched. These
      * four were the set macros (Bloom, Weight, Tide, Tear) until 2026-10-18 */
-    P_WANDER,                       /* WANDER, 0..100: drone II walks slowly between notes that sit well with drone
-                                     * I, gliding, at uneven times (how far and how often); 0 still (Partner 2) */
+    P_WANDER,                       /* WANDER, 0..100: drone II plays a slow random melody, jumping between the
+                                     * notes of a minor pentatonic on drone I (how far and how often; GLO's Glide
+                                     * glides it); 0 still (Partner 2) */
     P_AGE,                          /* AGE, 0..100: the sound worn, like an old tape: darker, a slow wow, hiss,
                                      * more character; it wears in (and out) slowly (Tone 2) */
-    P_SHIFT_MOVE,                   /* Shift's move: DR_SHIFT_NAME (a 5th up, a 4th up, a 4th down, a 5th down) */
+    P_SHIFT_MOVE,                   /* Shift's move in cents, 0..1400 = a fifth down .. none (700) .. a fifth up (a
+                                     * detent 10, with SEL held 1) */
     P_OLD_M3,                       /* unused, 0 */
     P_GD_0, P_GD_1, P_GD_2, P_GD_3,      /* each gesture key's depth (D5..G5), 0..100 */
     P_GR_0, P_GR_1, P_GR_2, P_GR_3,      /* ... its own time, 0..100 = 1 .. 30 s */
@@ -135,8 +137,7 @@ enum { DR_TO_PITCH, DR_TO_XWAVE };
 enum { DR_TO_CUTOFF, DR_TO_RESO };
 #define DR_NGEST 4                             /* the gesture keys, D5-G5 */
 enum { DR_G_WEIGHT, DR_G_SHIFT, DR_G_CONVERGE, DR_G_WASH, DR_G_CLEAN, DR_G_GLITCH, DR_NGTYPE };   /* what a key plays */
-#define DR_NSHIFT 4                            /* Shift's moves: a fifth up, a fourth up, a fourth down, a fifth down */
-extern const char *const DR_SHIFT_NAME[DR_NSHIFT];
+#define DR_SHIFT_MID 700                       /* Shift's move: none (cents + 700) */
 extern const char *const DR_GEST_NAME[DR_NGTYPE];
 extern const uint8_t DR_GEST_DEPTH[DR_NGTYPE], DR_GEST_TIME[DR_NGTYPE];   /* each one's depth and time to start */
 void dr_gesture(int g, int amt);               /* gesture key g's amount now, 0..1000 (the UI swells it) */
