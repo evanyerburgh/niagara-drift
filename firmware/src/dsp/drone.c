@@ -589,13 +589,15 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
      {DR_GP(1, GP_DETUNE), MK_ZERO, 60, 30, 80, 20, 70}, {P_DRIFT, MK_ZERO, 60, 30, 80, 20, 70},
      {P_XMOD, MK_SW, 0, 60, 100, 70, 100}, {P_XMOD_AMT, MK_ADD, 60, 60, 100, 70, 100}},
     /* WASH: the delay first, then the reverb opens (Length to Inf at full), darker as it grows, the dry dips
-     * last; at the top the dry breathes slowly in and out of the cloud. Let go: the dry comes back first, the
-     * tails ring on (the reverb's own length) and go last */
+     * last; at the top the dry breathes slowly in and out of the cloud; the filter LFOs ease to a third as it opens
+     * (Evan, 2026-10-18: with Movement up, their sweeps piled up in the tails as surges). Let go: the dry comes
+     * back first, the filter LFOs with it, the tails ring on (the reverb's own length) and go last */
     {{P_DLY_MIX, MK_ADD, 50, 0, 40, 0, 30}, {P_DLY_REPEATS, MK_ADD, 40, 0, 40, 0, 30},
      {P_REV_MIX, MK_ADD, 50, 30, 80, 0, 30}, {P_REV_LEN, MK_ADD, 45, 50, 100, 20, 60},
      {P_REV_DAMP, MK_ADD, 15, 50, 100, 20, 60}, {DR_GP(0, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100},
      {DR_GP(1, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100},
-     {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100}},
+     {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100},
+     {DR_GP(0, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}, {DR_GP(1, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}},
     /* CLEAN (Evan's idea, 2026-10-18): back to a clean sound, the notes kept (no unison, no sync), each kind of dirt
      * leaving at its own pace from the start: the grit first (drive, character, feedback, noise, cross-mod, hard
      * sync), then the movement (Movement, Drift, the Swell's depth), then the effects (the delay's repeats, both
