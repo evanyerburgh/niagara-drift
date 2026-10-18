@@ -90,23 +90,23 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Play · HOME
 
-<img src="docs/img/page-play.png" width="488" alt="The Play 1 and Play 2 pages: each drone's waveform; each drone's filter curve and level">
+<img src="docs/img/page-play.png" width="488" alt="The Play 1 and Play 2 pages: each drone's waveform; each drone's level and filter curve">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Play 1 | I pitch | I cutoff | II pitch | II cutoff |
-| Play 2 | I resonance | I level | II resonance | II level |
+| Play 2 | I level | I resonance | II level | II resonance |
 
 - **MASTER**: past about four-fifths of its turn it drives into overdrive, at about the same loudness.
 
 #### Tone · ENV
 
-<img src="docs/img/page-tone.png" width="488" alt="The Tone 1 and Tone 2 pages: each drone's noise through its filter, and its colour; the character, the feedback and the speaker's low cut">
+<img src="docs/img/page-tone.png" width="488" alt="The Tone 1 and Tone 2 pages: each drone's noise through its filter, and its colour; the character and the feedback">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Tone 1 | I noise | I colour | II noise | II colour |
-| Tone 2 | character | feedback | speaker (low cut) | pressure |
+| Tone 2 | character | feedback | | |
 
 - **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
   It's heard all along the knob and never louder than them (100 is 6 dB under, 50 −12 dB, 25 −18). It
@@ -117,9 +117,6 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
   thickening colour that grows with the knob (more with the delay up), rough at the top but never louder than
   the sound without it; it fades with the drones when you stop.
-- **Speaker** cuts the deep bass a small speaker can't play (40–240 Hz); leave it off on headphones.
-- **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
-  tuned). Speaker and Pressure are the room's settings: scenes don't change them.
 
 #### Osc · EDIT
 
@@ -203,12 +200,13 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Setup · GLO
 
-<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and Setup 2 pages: glide, fade, drift and stereo; the Morph time and the tuning">
+<img src="docs/img/page-setup.png" width="732" alt="The Setup 1, 2 and 3 pages: glide, fade, drift and stereo; the Morph time and the tuning; the speaker's low cut and the keys' pressure">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Setup 1 | glide | fade | drift | stereo |
 | Setup 2 | morph | scene switch | tune | tuning (equal / just) |
+| Setup 3 | speaker (low cut) | pressure | | |
 
 - **Glide** is how long a drone takes to reach a new pitch (up to 10 s; off by default). **Stereo**
   spreads the drones from mono to drone I left, drone II right.
@@ -220,6 +218,9 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
   them, never repeating. Gentle by default; 0 holds everything exactly where you put it.
 - **Tuning: just** makes the partner's intervals pure ratios (a fifth is exactly 3/2), so they don't
   beat; detune still adds beating on purpose.
+- **Speaker** cuts the deep bass a small speaker can't play (40–240 Hz); leave it off on headphones.
+- **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
+  tuned). Speaker and Pressure are the room's settings: scenes don't change them.
 
 ### The LFO
 

@@ -11,9 +11,10 @@
  *   PLAY           the drone fades in / out      MASTER   volume      SAVE   saves
  * One button away (tap: the knobs stay on its page, pressed again its second page; hold: they switch
  * only while it's held, and the page you were on comes back when it's let go):
- *   HOME Play, Play 2 (Reso, Level) · ENV Tone (Noise, Colour: white .. pink) · EDIT Osc (X-Wave, PW), Source
+ *   HOME Play, Play 2 (Level, Reso) · ENV Tone (Noise, Colour: white .. pink) · EDIT Osc (X-Wave, PW), Source
  *   (Osc mix, Drive) · LFO LFO (depths), Mod (Rate mod, Mod by, X-mod amount, Delay LFO depth) · SEQ Partner ·
- *   GLO Setup, Setup 2 (Morph, Scene switch, Tune, Tuning) (global). The top bar shows a dot for each of a
+ *   GLO Setup, Setup 2 (Morph, Scene switch, Tune, Tuning), Setup 3 (Speaker,
+ *   Pressure) (global). The top bar shows a dot for each of a
  *   button's pages.
  *   OCT- / OCT+    the LFO's Wave I / Wave II: a tap is the next shape, round and round; SEL + OCT the one
  *                  before; lit while its wave is up
@@ -36,17 +37,16 @@
  *                steady looping)
  *   FX             Delay: type, time, repeats, mix; again: Reverb: type, length (to Inf), damp, mix
  *                  (the delay LFO's tap: the LFO page's key in drone II's filter group)
- *   ENV            Tone 1: each drone's noise and colour; again: Tone 2: character, feedback, speaker,
- *                  pressure (the last two the room's)
+ *   ENV            Tone 1: each drone's noise and colour; again: Tone 2: character, feedback
  * Saving: SAVE, and by itself a few seconds after a change while stopped (a flash write stops the audio
  * for a moment). MIDI in: notes on channel 1 tune drone I, on channel 2 drone II. */
 
 /* ------------------------------------------------------------- pages --- */
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
-enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_MACROS, V_PARTNER, V_SETUP, V_SETUP2, V_PULSE,
-       V_FX, V_FX2, NVIEWS };
+enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_MACROS, V_PARTNER, V_SETUP, V_SETUP2, V_SETUP3,
+       V_PULSE, V_FX, V_FX2, NVIEWS };
 static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone 1", "Tone 2", "Osc", "Source", "LFO depths", "LFO mods",
-                                              "Macros", "Partner", "Setup 1", "Setup 2", "Swell", "Delay", "Reverb"};
+                                              "Macros", "Partner", "Setup 1", "Setup 2", "Setup 3", "Swell", "Delay", "Reverb"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
  * nothing (g NONE) */
 #define G 2
@@ -56,9 +56,9 @@ typedef struct {
 } knob_t;
 static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{0, GP_PITCH}, {0, GP_CUTOFF}, {1, GP_PITCH}, {1, GP_CUTOFF}},
-    {{0, GP_RESO}, {0, GP_LEVEL}, {1, GP_RESO}, {1, GP_LEVEL}},
+    {{0, GP_LEVEL}, {0, GP_RESO}, {1, GP_LEVEL}, {1, GP_RESO}},
     {{0, GP_NOISE}, {0, GP_NCOLOR}, {1, GP_NOISE}, {1, GP_NCOLOR}},
-    {{G, P_CHAR}, {G, P_FEEDBACK}, {G, P_SPEAKER}, {G, P_PRESS_SENS}},
+    {{G, P_CHAR}, {G, P_FEEDBACK}, {NONE, 0}, {NONE, 0}},
     {{0, GP_WAVE}, {0, GP_WIDTH}, {1, GP_WAVE}, {1, GP_WIDTH}},
     {{0, GP_MIX}, {0, GP_DRIVE}, {1, GP_MIX}, {1, GP_DRIVE}},
     {{0, GP_OLFO_DEPTH}, {0, GP_FLFO_DEPTH}, {1, GP_OLFO_DEPTH}, {1, GP_FLFO_DEPTH}},
@@ -67,6 +67,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{0, GP_INTERVAL}, {0, GP_DETUNE}, {1, GP_INTERVAL}, {1, GP_DETUNE}},
     {{G, P_GLIDE}, {G, P_FADE}, {G, P_DRIFT}, {G, P_WIDTH}},
     {{G, P_MORPH}, {G, P_SCENE_T}, {G, P_TUNE}, {G, P_JUST}},
+    {{G, P_SPEAKER}, {G, P_PRESS_SENS}, {NONE, 0}, {NONE, 0}},
     {{G, P_PULSE_RATE}, {G, P_PULSE_DEPTH}, {G, P_PULSE_SHAPE}, {G, P_PULSE_SWING}},
     {{G, P_DLY_TYPE}, {G, P_DLY_TIME}, {G, P_DLY_REPEATS}, {G, P_DLY_MIX}},
     {{G, P_REV_TYPE}, {G, P_REV_LEN}, {G, P_REV_DAMP}, {G, P_REV_MIX}},
@@ -75,7 +76,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
 static const struct {
     uint8_t btn, first, n;
 } PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_TONE, 2}, {B_EDIT, V_OSC, 2}, {B_LFO, V_LFO, 2},
-                {B_SEQ, V_MACROS, 2}, {B_GLO, V_SETUP, 2}, {B_FX, V_FX, 2},
+                {B_SEQ, V_MACROS, 2}, {B_GLO, V_SETUP, 3}, {B_FX, V_FX, 2},
                 {B_ARP, V_PULSE, 1}};                                    /* ARP: a tap toggles */
 #define NPAGE_BTN (sizeof PAGE_BTN / sizeof PAGE_BTN[0])
 #define HOLD_MS 400u                   /* a page button held this long (or a knob turned) is a peek */
@@ -841,7 +842,7 @@ static void press_start(int n, const int16_t *sc)
     ui.press_x = 0.0f;
 }
 
-/* a key's pressure at the player's sensitivity (Tone 2, KNOB 4): x 0.5 .. x 2, 50 as tuned */
+/* a key's pressure at the player's sensitivity (Setup 3, KNOB 2): x 0.5 .. x 2, 50 as tuned */
 static float press_gain(void) { return fm_exp2f(((float)proj.par[P_PRESS_SENS] - 50.0f) * 0.02f); }
 static int press_scaled(int p)
 {
@@ -1337,7 +1338,7 @@ static uint16_t page_col(void)
     case V_FX: case V_FX2: case V_TONE2: return K_FX;
     case V_PULSE: return K_PULSE;
     case V_MACROS: return K_GOLD;
-    case V_SETUP: case V_SETUP2: return K_SETUP;
+    case V_SETUP: case V_SETUP2: case V_SETUP3: return K_SETUP;
     default: return K_DIM;
     }
 }
@@ -1569,17 +1570,17 @@ static void draw_filter(int g, float cut, int32_t x0, int32_t y0, int32_t w, int
     plot(x0, 2, y, n, c);
 }
 
-/* Play 2: each drone's resonance (its filter's curve, the peak growing) and its level (a live meter) */
+/* Play 2: each drone's level (a live meter, KNOB 1 / 3) and its resonance (its filter's curve, the peak growing,
+ * KNOB 2 / 4) */
 static void pic_play2(int g, int32_t x0, int32_t y0)
 {
     int32_t mw = PAN_W - 16, fw;
     float l = dr_level[g], db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
     char t[12];
-    draw_filter(g, dr_cut[g], x0 + 4, y0 + 22, PAN_W - 8, 52, K_DRONE[g]);
-    cv_round(x0 + 8, y0 + 88, mw, 8, 3, K_GRID);                       /* the level, -48 .. 0 dBFS */
+    cv_round(x0 + 8, y0 + 26, mw, 8, 3, K_GRID);                       /* the level, -48 .. 0 dBFS (on top, as KNOB 1 / 3 comes first) */
     fw = (int32_t)(fm_clampf((db + 48.0f) / 48.0f, 0.0f, 1.0f) * (float)mw);
     if (fw > 3)
-        cv_round(x0 + 8, y0 + 88, fw, 8, 3, K_DRONE[g]);
+        cv_round(x0 + 8, y0 + 26, fw, 8, 3, K_DRONE[g]);
     if (db > -60.0f) {
         char *q = t;
         *q++ = '-';
@@ -1592,7 +1593,8 @@ static void pic_play2(int g, int32_t x0, int32_t y0)
     } else {
         scopy(t, ui.playing ? "silent" : "stopped");
     }
-    text_c(x0 + PAN_W / 2, y0 + 101, &FONT_S, t, K_TEXT2);
+    text_c(x0 + PAN_W / 2, y0 + 38, &FONT_S, t, K_TEXT2);
+    draw_filter(g, dr_cut[g], x0 + 4, y0 + 66, PAN_W - 8, 52, K_DRONE[g]);
 }
 
 
@@ -2019,54 +2021,60 @@ static void pic_fx2(int32_t y0)
     cv_text(12, y0 + 114, &FONT_XS, "5 s", K_DIM);
 }
 
-/* Tone 2: the oscillators' character, a saw from clean to vintage (left top, KNOB 1); the feedback loop's
- * level, live (right top, KNOB 2); the speaker's low cut, 20 Hz .. 1 kHz (left bottom, KNOB 3), or while
- * KNOB 4 turns the keys' pressure curve; speaker and pressure are the room's, not the scenes' */
+/* Tone 2: the oscillators' character, a saw from clean to vintage (left, KNOB 1); the feedback loop's level, live
+ * (right, KNOB 2) */
 static void pic_tone2(int32_t y0)
 {
-    int fb = proj.par[P_FEEDBACK], ch = proj.par[P_CHAR], sp = proj.par[P_SPEAKER], i;
-    {   /* CHARACTER: two cycles of a saw as the oscillators now make it (bent, rounded) */
+    int fb = proj.par[P_FEEDBACK], ch = proj.par[P_CHAR], i;
+    {   /* CHARACTER: three cycles of a saw as the oscillators now make it (bent, rounded) */
         float c = (float)ch * 0.01f, r = 0.0f, k2 = 1.0f - 0.85f * c;
-        int16_t y[48];
-        for (i = 0; i < 48 + 8; i++) {         /* 8 to settle the rounding */
-            float ph = (float)(i % 24) / 24.0f, s = 1.0f - 2.0f * ph;
+        int16_t y[51];
+        for (i = 0; i < 51 + 8; i++) {         /* 8 to settle the rounding */
+            float ph = (float)(i % 17) / 17.0f, s = 1.0f - 2.0f * ph;
             s += 0.25f * c * s * s - 0.083f * c;
             r += (s - r) * k2;
             if (i >= 8)
-                y[i - 8] = (int16_t)(y0 + 38 - (int32_t)(r * 14.0f));
+                y[i - 8] = (int16_t)(y0 + 62 - (int32_t)(r * 24.0f));
         }
         cv_text(12, y0 + 3, &FONT_S, ch ? "CHARACTER" : "clean", ch ? K_TEXT2 : K_DIM);
-        plot(12, 2, y, 48, ch ? K_TEXT2 : K_FAINT);
+        plot(12, 2, y, 51, ch ? K_TEXT2 : K_FAINT);
     }
     {   /* FEEDBACK: a bar, the loop's level now */
-        int32_t bw = (int32_t)(fm_clampf(dr_fb, 0.0f, 1.0f) * 94.0f);
+        int32_t bh = (int32_t)(fm_clampf(dr_fb, 0.0f, 1.0f) * 72.0f);
         cv_text(128, y0 + 3, &FONT_S, "FEEDBACK", fb ? K_FX : K_DIM);
-        cv_round(128, y0 + 28, 94, 8, 3, K_GRID);
-        if (fb && bw > 3)
-            cv_round(128, y0 + 28, bw, 8, 3, dr_fb > 0.6f ? K_GOLD : K_FX);
+        cv_round(164, y0 + 28, 14, 72, 4, K_GRID);
+        if (fb && bh > 3)
+            cv_round(164, y0 + 100 - bh, 14, bh, 4, dr_fb > 0.6f ? K_GOLD : K_FX);
     }
-    cv_rect(12, y0 + 60, 210, 1, K_GRID);
-    if (lit(3)) {                              /* PRESSURE: what a press gives, light .. firm */
-        float g = press_gain();
-        int16_t y[51];
-        for (i = 0; i < 51; i++)
-            y[i] = (int16_t)(y0 + 118 - (int32_t)(fm_minf((float)i / 50.0f * g, 1.0f) * 32.0f));
-        cv_text(12, y0 + 64, &FONT_S, "PRESSURE", K_FX);
-        plot(12, 2, y, 51, K_FX);
-        cv_text(128, y0 + 80, &FONT_XS, "light .. firm", K_DIM);
-    } else {                                   /* SPEAKER: 12 dB an octave under its corner, 0 dB .. -30 dB */
+}
+
+/* Setup 3: how the unit meets the room: the speaker's low cut, 20 Hz .. 1 kHz (left, KNOB 1); what a key's
+ * press gives, light .. firm, at the pressure sensitivity (right, KNOB 2). Neither is in scenes */
+static void pic_setup3(int32_t y0)
+{
+    int sp = proj.par[P_SPEAKER], i;
+    {   /* SPEAKER: 12 dB an octave under its corner, 0 dB .. -30 dB */
         float fc = 40.0f * fm_exp2f((float)sp * 0.0258496f);
         int16_t y[51];
         for (i = 0; i < 51; i++) {
             float f = 20.0f * fm_exp2f((float)i * (5.643856f / 50.0f)), r4 = f / fc;   /* 20 Hz .. 1 kHz */
             float db = sp ? 10.0f * 0.30103f * fm_log2f(r4 * r4 * r4 * r4 / (1.0f + r4 * r4 * r4 * r4)) : 0.0f;
-            y[i] = (int16_t)(y0 + 86 - (int32_t)(fm_maxf(db, -30.0f) * 1.0f));
+            y[i] = (int16_t)(y0 + 40 - (int32_t)(fm_maxf(db, -30.0f) * 1.6f));
         }
-        cv_text(12, y0 + 64, &FONT_S, "SPEAKER", sp ? K_FX : K_DIM);
-        plot(12, 2, y, 51, sp ? K_FX : K_FAINT);
-        cv_text(128, y0 + 80, &FONT_XS, sp ? "low cut" : "off: all the bass", K_TEXT2);
+        cv_text(12, y0 + 3, &FONT_S, "SPEAKER", sp ? K_SETUP : K_DIM);
+        plot(12, 2, y, 51, sp ? K_SETUP : K_FAINT);
+        cv_text(12, y0 + 94, &FONT_XS, sp ? "low cut" : "off: all the bass", K_TEXT2);
     }
-    cv_text(128, y0 + 100, &FONT_XS, "not in scenes", K_DIM);
+    {   /* PRESSURE: what a press gives, light .. firm */
+        float g = press_gain();
+        int16_t y[51];
+        for (i = 0; i < 51; i++)
+            y[i] = (int16_t)(y0 + 88 - (int32_t)(fm_minf((float)i / 50.0f * g, 1.0f) * 56.0f));
+        cv_text(128, y0 + 3, &FONT_S, "PRESSURE", K_SETUP);
+        plot(128, 2, y, 51, K_SETUP);
+        cv_text(128, y0 + 94, &FONT_XS, "light .. firm", K_DIM);
+    }
+    cv_text(12, y0 + 110, &FONT_XS, "not in scenes", K_DIM);
 }
 
 /* THE BLACK KEYS' MAP (SEL held 0.4 s, nothing else asking for the screen: a knob turning, a white key held): the
@@ -2237,7 +2245,7 @@ static void draw_pic(void)
         cv_round(6, 4, WIDE_W, PAN_H + 8, 4, K_PANEL);
         keymap_rows(8, 0, 3);
     } else if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 || ui.view == V_MACROS ||
-        ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_TONE2) {
+        ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_SETUP3 || ui.view == V_TONE2) {
         cv_round(6, 4, WIDE_W, PAN_H, 4, K_PANEL);
         switch (ui.view) {
         case V_PULSE: pic_pulse(4); break;
@@ -2248,6 +2256,7 @@ static void draw_pic(void)
         case V_FX2: pic_fx2(4); break;
         case V_TONE2: pic_tone2(4); break;
         case V_SETUP2: pic_setup2(4); break;
+        case V_SETUP3: pic_setup3(4); break;
         default: pic_setup(4); break;
         }
     } else {
