@@ -271,3 +271,10 @@ at the end. The current state is in the [README](../README.md) and the code.
   both pitches (7, 6), rate 40 (a tape wow), filter +-40; Pulse the LFO locked to the Swell's bars, rate 35; Howl Wave
   I random steps on drone I's resonance (50), rate 20; Cathedral filter +-15, Movement 25; Metal osc LFOs on X-Wave
   (45), rate 45, filter +-50. A preset holds up to 40 changes.
+- 2026-10-18 (Evan, after review 3): Shift and the 60-cent pitch step stay. Pitch lock stays off by default (it
+  also locks the pitch knobs); most Presets put drone I on D (D2-D5) so moving between them keeps the root. P6
+  Tanpura (Sa and Pa, plucked by the Swell) and P8 Whistle (self-oscillating filters at D5 and A5) replace Wanderer
+  and Pulse. No sub under 40 Hz (Abyss and Cathedral a third's subharmonic of D3, 49 Hz; Tape an octave down).
+  Presets levelled to P1 within about 2.4 dB A-weighted and through a 200 Hz high-pass (a small speaker); the screen
+  names a Preset as it's chosen ("SCENE P3 EERIE"; not once it's saved over). Clean holds the loudness: the output's
+  slow level (30 s while Clean is out, 3 s while in) eases down to match, as far as Clean is in, 12 dB at most.

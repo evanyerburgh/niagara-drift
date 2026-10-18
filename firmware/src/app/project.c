@@ -27,61 +27,61 @@ static uint32_t proj_hash(void)
 static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     /* P1 NIAGARA: the starting sound */
     {-1},
-    /* P2 ABYSS (dark): low, a minor third apart, a saw and a narrow square, the subs a subharmonic (a third of
-     * the pitch) down, closed resonant filters, character and a little feedback, a dark hall.
+    /* P2 ABYSS (dark): a minor third apart (D3 over B2), a saw and a narrow square, the subs a subharmonic (a third of
+     * the pitch: 49 Hz, heard) down, closed resonant filters, character and a little feedback, a dark hall.
      * The LFOs on the resonance, very slowly: it swells and rings */
-    {I_(GP_PITCH), 3600, II_(GP_PITCH), 3900, I_(GP_WAVE), 67, II_(GP_WAVE), 100, II_(GP_WIDTH), 70,
-     I_(GP_INTERVAL), 0, II_(GP_DETUNE), 30, I_(GP_MIX), 30, I_(GP_SUBOCT), 3, I_(GP_CUTOFF), 650, II_(GP_CUTOFF), 610,
+    {I_(GP_PITCH), 5000, II_(GP_PITCH), 4700, I_(GP_WAVE), 67, II_(GP_WAVE), 100, II_(GP_WIDTH), 70,
+     I_(GP_INTERVAL), 0, II_(GP_DETUNE), 30, I_(GP_MIX), 45, I_(GP_SUBOCT), 3, I_(GP_CUTOFF), 650, II_(GP_CUTOFF), 610,
      I_(GP_RESO), 450, II_(GP_RESO), 450, I_(GP_DRIVE), 70, II_(GP_DRIVE), 60, P_CHAR, 40, P_FEEDBACK, 30,
-     P_LFO_RATE, 3, P_REV_TYPE, 1, P_REV_LEN, 75, P_REV_DAMP, 80, P_REV_MIX, 40, I_(GP_NOISE), 8, I_(GP_LEVEL), 100,
-     II_(GP_LEVEL), 100, P_DLY_TYPE, 1, P_DLY_TIME, 85, P_DLY_REPEATS, 45, P_DLY_MIX, 15, I_(GP_FLFO_DEST), DR_TO_RESO,
+     P_LFO_RATE, 3, P_REV_TYPE, 1, P_REV_LEN, 75, P_REV_DAMP, 80, P_REV_MIX, 40, I_(GP_NOISE), 8, I_(GP_LEVEL), 79,
+     II_(GP_LEVEL), 79, P_DLY_TYPE, 1, P_DLY_TIME, 85, P_DLY_REPEATS, 45, P_DLY_MIX, 15, I_(GP_FLFO_DEST), DR_TO_RESO,
      I_(GP_FLFO_DEPTH), 55, II_(GP_FLFO_DEST), DR_TO_RESO, II_(GP_FLFO_DEPTH), -55, -1},
     /* P3 EERIE: a tritone apart, near-sines, drone II through a ringing band-pass with a breath of white noise,
      * its partner a just minor third; drone II wanders a whole-tone scale; the LFO's doubled curve, more Movement; the longest clean echoes, a chorus hall.
      * Drone II's pitch wavers a little (the oscillator LFO), the LFO's own wave bending its rate: uneven */
-    {I_(GP_PITCH), 4500, II_(GP_PITCH), 5100, I_(GP_WAVE), 20, II_(GP_WAVE), 33, I_(GP_INTERVAL), 1,
+    {I_(GP_PITCH), 5000, II_(GP_PITCH), 5600, I_(GP_WAVE), 20, II_(GP_WAVE), 33, I_(GP_INTERVAL), 1,
      II_(GP_INTERVAL), 7, I_(GP_DETUNE), 35, II_(GP_DETUNE), 8, II_(GP_MODE), DR_BP, II_(GP_CUTOFF), 640,
      II_(GP_RESO), 720, I_(GP_CUTOFF), 600, II_(GP_NOISE), 12, II_(GP_NCOLOR), 0, P_WANDER, 25, P_WSCALE, 3,
      P_GLIDE, 45, P_LFO_W1, 6, P_MOVE, 70, P_PULSE, 0, P_REV_TYPE, 3, P_REV_MIX, 55, P_DLY_TYPE, 3, P_DLY_TIME, 100,
      P_DLY_REPEATS, 70, P_DLY_MIX, 30, II_(GP_OLFO), DR_LFO_II, II_(GP_OLFO_DEPTH), 12, P_LFO_RMOD, 40,
      P_LFO_RMOD_SRC, DR_LFO_I, -1},
-    /* P4 GLASS: high sines an octave apart, beating a little, a long bright cathedral */
-    {I_(GP_PITCH), 7200, II_(GP_PITCH), 7900, I_(GP_WAVE), 0, II_(GP_WAVE), 0, I_(GP_INTERVAL), 14, I_(GP_DETUNE), 20,
+    /* P4 GLASS: high sines a fifth apart (D5, A5), drone I's partner an octave up, beating a little, a long bright cathedral */
+    {I_(GP_PITCH), 7400, II_(GP_PITCH), 8100, I_(GP_WAVE), 0, II_(GP_WAVE), 0, I_(GP_INTERVAL), 14, I_(GP_DETUNE), 20,
      II_(GP_DETUNE), 25, I_(GP_CUTOFF), 900, II_(GP_CUTOFF), 900, I_(GP_RESO), 100, II_(GP_RESO), 100, I_(GP_MIX), 0,
      II_(GP_MIX), 0, P_PULSE, 0, P_REV_LEN, 85, P_REV_MIX, 60, P_REV_DAMP, 15, P_DLY_TIME, 70, P_DLY_MIX, 30,
-     P_DLY_REPEATS, 60, I_(GP_LEVEL), 33, II_(GP_LEVEL), 29, -1},
-    /* P5 HEAVEN: a major tenth apart (G3 and B4), sines, their partners a just third and a just fifth, gently
+     P_DLY_REPEATS, 60, I_(GP_LEVEL), 20, II_(GP_LEVEL), 17, -1},
+    /* P5 HEAVEN: a major tenth apart (D4 and F#5), sines, their partners a just third and a just fifth, gently
      * beating, open and bright, a long light cathedral, the delay high and soft; no Swell.
      * The oscillator LFOs on X-Wave: the sines bloom slowly toward triangles and back */
-    {I_(GP_PITCH), 5500, II_(GP_PITCH), 7100, I_(GP_WAVE), 0, II_(GP_WAVE), 10, I_(GP_INTERVAL), 9,
+    {I_(GP_PITCH), 6200, II_(GP_PITCH), 7800, I_(GP_WAVE), 0, II_(GP_WAVE), 10, I_(GP_INTERVAL), 9,
      II_(GP_INTERVAL), 13, I_(GP_DETUNE), 15, II_(GP_DETUNE), 15, I_(GP_MIX), 0, II_(GP_MIX), 0, I_(GP_CUTOFF), 950,
      II_(GP_CUTOFF), 950, I_(GP_RESO), 50, II_(GP_RESO), 50, P_PULSE, 0, P_MOVE, 35, P_REV_TYPE, 2, P_REV_LEN, 92,
-     P_REV_DAMP, 20, P_REV_MIX, 65, P_DLY_TIME, 80, P_DLY_MIX, 25, P_DLY_REPEATS, 60, I_(GP_LEVEL), 38,
-     II_(GP_LEVEL), 33, P_DLY_TYPE, 1, I_(GP_OLFO_DEST), DR_TO_XWAVE, I_(GP_OLFO_DEPTH), 65, II_(GP_OLFO), DR_LFO_II,
+     P_REV_DAMP, 20, P_REV_MIX, 65, P_DLY_TIME, 80, P_DLY_MIX, 25, P_DLY_REPEATS, 60, I_(GP_LEVEL), 22,
+     II_(GP_LEVEL), 19, P_DLY_TYPE, 1, I_(GP_OLFO_DEST), DR_TO_XWAVE, I_(GP_OLFO_DEPTH), 65, II_(GP_OLFO), DR_LFO_II,
      II_(GP_OLFO_DEST), DR_TO_XWAVE, II_(GP_OLFO_DEPTH), 65, -1},
-    /* P6 WANDERER: a minor seventh apart, warm saws with some resonance; drone II wanders Dorian over drone I,
-     * gliding; no Swell.
-     * A gentler sweep on a rounder wave */
-    {I_(GP_PITCH), 5000, II_(GP_PITCH), 6000, I_(GP_WAVE), 55, II_(GP_WAVE), 55, I_(GP_CUTOFF), 620,
-     II_(GP_CUTOFF), 600, I_(GP_RESO), 400, II_(GP_RESO), 400, P_WANDER, 45, P_WSCALE, 4, P_GLIDE, 35, P_PULSE, 0,
-     P_DLY_MIX, 35, P_DLY_REPEATS, 55, I_(GP_LEVEL), 76, II_(GP_LEVEL), 67, P_DLY_TYPE, 1, P_DLY_TIME, 60,
-     P_REV_TYPE, 1, P_REV_LEN, 50, P_REV_MIX, 30, P_LFO_W1, 4, P_LFO_RATE, 12, I_(GP_FLFO_DEPTH), 60,
-     II_(GP_FLFO_DEPTH), -60, -1},
-    /* P7 TAPE: worn: a minor third apart, a wide square and a saw, Age and a lot of Character, a tape delay,
-     * hiss, darker, the sub a fifth's subharmonic.
+    /* P6 TANPURA: Sa and Pa: drone I on D3 with its high Sa (the partner an octave up), drone II on the Pa below
+     * (A2), bright buzzing strings (the jawari: character, drive, an open resonant filter), plucked: the Swell about
+     * once a second, swung; a hall. The LFO slow and gentle */
+    {II_(GP_PITCH), 4500, I_(GP_WAVE), 67, II_(GP_WAVE), 67, I_(GP_INTERVAL), 14, II_(GP_INTERVAL), 14,
+     I_(GP_DETUNE), 6, II_(GP_DETUNE), 6, I_(GP_MIX), 0, II_(GP_MIX), 0, I_(GP_CUTOFF), 820, II_(GP_CUTOFF), 780,
+     I_(GP_RESO), 320, II_(GP_RESO), 320, I_(GP_DRIVE), 40, II_(GP_DRIVE), 40, P_CHAR, 40, P_PULSE_RATE, 50,
+     P_PULSE_DEPTH, 45, P_PULSE_SHAPE, 40, P_PULSE_SWING, 15, P_MOVE, 30, P_REV_TYPE, 1, P_REV_LEN, 55,
+     P_REV_MIX, 30, P_DLY_MIX, 10, I_(GP_LEVEL), 53, II_(GP_LEVEL), 46, -1},
+    /* P7 TAPE: worn: a minor third apart (D3, F3), a wide square and a saw, Age and a lot of Character, a tape delay,
+     * hiss, darker, the sub an octave down.
      * Tape wow: the oscillator LFO on both pitches, slow and small (about 2 s, +-12 cents) */
-    {I_(GP_PITCH), 4100, II_(GP_PITCH), 4400, I_(GP_WAVE), 100, I_(GP_WIDTH), 35, II_(GP_WAVE), 67, I_(GP_MIX), 30,
-     I_(GP_SUBOCT), 4, P_AGE, 80, P_CHAR, 70, P_DLY_TYPE, 0, P_DLY_MIX, 35, P_DLY_REPEATS, 55, I_(GP_CUTOFF), 720,
-     II_(GP_CUTOFF), 700, I_(GP_NOISE), 18, II_(GP_NOISE), 12, I_(GP_LEVEL), 100, II_(GP_LEVEL), 100, P_REV_TYPE, 0,
+    {I_(GP_PITCH), 5000, II_(GP_PITCH), 5300, I_(GP_WAVE), 100, I_(GP_WIDTH), 35, II_(GP_WAVE), 67, I_(GP_MIX), 30,
+     P_AGE, 80, P_CHAR, 70, P_DLY_TYPE, 0, P_DLY_MIX, 35, P_DLY_REPEATS, 55, I_(GP_CUTOFF), 720,
+     II_(GP_CUTOFF), 700, I_(GP_NOISE), 18, II_(GP_NOISE), 12, I_(GP_LEVEL), 49, II_(GP_LEVEL), 49, P_REV_TYPE, 0,
      P_REV_LEN, 35, P_REV_MIX, 25, I_(GP_OLFO_DEPTH), 7, II_(GP_OLFO), DR_LFO_I, II_(GP_OLFO_DEPTH), 6, P_LFO_RATE, 40,
      I_(GP_FLFO_DEPTH), 40, II_(GP_FLFO_DEPTH), -40, -1},
-    /* P8 PULSE: a whole tone apart (a cluster), saws, the Swell in time, deep and swung, drone II high-passed and
-     * resonant, ping-pong echoes, a hall.
-     * The LFO locked to the Swell's bars, quicker */
-    {II_(GP_PITCH), 5200, I_(GP_PITCH), 5000, II_(GP_MODE), DR_HP, II_(GP_CUTOFF), 560, II_(GP_RESO), 600,
-     P_PULSE_RATE, 40, P_PULSE_DEPTH, 70, P_PULSE_SHAPE, 60, P_PULSE_SWING, 20, P_DLY_TYPE, 2, P_DLY_TIME, 45,
-     P_DLY_MIX, 30, P_REV_TYPE, 1, P_REV_LEN, 45, P_REV_MIX, 25, P_LFO_LOCK, 1, P_LFO_RATE, 35, I_(GP_FLFO_DEPTH), 70,
-     -1},
+    /* P8 WHISTLE: the filters' resonance at its edge, so they sing as sines of their own: drone I's at D5 and
+     * drone II's at A5, over soft low drones (D2, A2) that feed them; the filter LFO drifts the whistles a little;
+     * long clean echoes in a cathedral; no Swell */
+    {I_(GP_PITCH), 3800, II_(GP_PITCH), 4500, I_(GP_WAVE), 20, II_(GP_WAVE), 20, I_(GP_CUTOFF), 497,
+     II_(GP_CUTOFF), 556, I_(GP_RESO), 960, II_(GP_RESO), 960, I_(GP_DRIVE), 10, II_(GP_DRIVE), 10, I_(GP_MIX), 0,
+     II_(GP_MIX), 0, I_(GP_FLFO_DEPTH), 12, II_(GP_FLFO_DEPTH), -12, P_PULSE, 0, P_MOVE, 40, P_DLY_TYPE, 3,
+     P_DLY_TIME, 90, P_DLY_REPEATS, 55, P_DLY_MIX, 25, P_REV_TYPE, 2, P_REV_LEN, 80, P_REV_MIX, 50, I_(GP_LEVEL), 61, II_(GP_LEVEL), 54, -1},
     /* P9 HOWL: low, a semitone apart (they grind), the feedback high, resonant, drone II band-passed, driven, dark;
      * a short tape slap in a small room.
      * The LFO in random steps on drone I's resonance: the howl flares unpredictably */
@@ -90,28 +90,37 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      P_DLY_REPEATS, 45, P_DLY_MIX, 40, P_REV_TYPE, 0, P_REV_LEN, 40, P_REV_MIX, 50, P_MOVE, 40, I_(GP_LEVEL), 100,
      II_(GP_LEVEL), 100, P_LFO_W1, DR_LFO_RANDOM, P_LFO_RATE, 20, I_(GP_FLFO_DEST), DR_TO_RESO, I_(GP_FLFO_DEPTH), 50,
      -1},
-    /* P10 CATHEDRAL: a major sixth apart, soft waves, drone I's sub a fifth's subharmonic far below, a long dark
+    /* P10 CATHEDRAL: a major sixth apart (D3, B3), soft waves, drone I's sub a third's subharmonic below (49 Hz), a long dark
      * reverb, almost a freeze.
      * Almost no LFO: still and huge */
-    {I_(GP_PITCH), 4800, II_(GP_PITCH), 5700, I_(GP_WAVE), 20, II_(GP_WAVE), 20, I_(GP_MIX), 35, I_(GP_SUBOCT), 4,
+    {I_(GP_PITCH), 5000, II_(GP_PITCH), 5900, I_(GP_WAVE), 20, II_(GP_WAVE), 20, I_(GP_MIX), 35, I_(GP_SUBOCT), 3,
      I_(GP_CUTOFF), 650, II_(GP_CUTOFF), 650, P_PULSE, 0, P_REV_TYPE, 2, P_REV_LEN, 98, P_REV_MIX, 75, P_REV_DAMP, 55,
-     P_DLY_MIX, 10, I_(GP_LEVEL), 43, II_(GP_LEVEL), 38, I_(GP_FLFO_DEPTH), 15, II_(GP_FLFO_DEPTH), -15, P_MOVE, 25, -1},
+     P_DLY_MIX, 10, I_(GP_LEVEL), 34, II_(GP_LEVEL), 30, I_(GP_FLFO_DEPTH), 15, II_(GP_FLFO_DEPTH), -15, P_MOVE, 25, -1},
     /* P11 METAL: cross-mod and hard sync, an inharmonic gap (a tritone and a bit), squares, drone I high-passed,
      * resonant, in a small room.
      * The oscillator LFOs on X-Wave and a quicker filter sweep: a moving, metallic shimmer */
-    {I_(GP_PITCH), 4300, II_(GP_PITCH), 6230, P_XMOD, 1, P_XMOD_AMT, 60, P_SYNC, 1, I_(GP_WAVE), 100,
+    {I_(GP_PITCH), 3800, II_(GP_PITCH), 5730, P_XMOD, 1, P_XMOD_AMT, 60, P_SYNC, 1, I_(GP_WAVE), 100,
      II_(GP_WAVE), 100, I_(GP_WIDTH), 50, I_(GP_MODE), DR_HP, I_(GP_CUTOFF), 520, II_(GP_CUTOFF), 750,
      I_(GP_RESO), 650, II_(GP_RESO), 400, I_(GP_DRIVE), 55, II_(GP_DRIVE), 55, P_REV_TYPE, 0, P_REV_MIX, 25,
-     I_(GP_LEVEL), 100, II_(GP_LEVEL), 100, P_DLY_TYPE, 3, P_DLY_TIME, 10, P_DLY_REPEATS, 30, P_DLY_MIX, 25,
+     I_(GP_LEVEL), 53, II_(GP_LEVEL), 53, P_DLY_TYPE, 3, P_DLY_TIME, 10, P_DLY_REPEATS, 30, P_DLY_MIX, 25,
      I_(GP_OLFO_DEST), DR_TO_XWAVE, I_(GP_OLFO_DEPTH), 45, II_(GP_OLFO), DR_LFO_II, II_(GP_OLFO_DEST), DR_TO_XWAVE,
      II_(GP_OLFO_DEPTH), 45, P_LFO_RATE, 45, I_(GP_FLFO_DEPTH), 50, II_(GP_FLFO_DEPTH), -50, -1},
     /* P12 CLEAN (locked): one oscillator, drone I's saw alone through an open filter, everything else off; drone II
      * out on its own (SEL + PLAY brings it in, as it is) */
     {P_II_OUT, 1, I_(GP_PARTNER), 0, II_(GP_PARTNER), 0, I_(GP_MIX), 0, I_(GP_CUTOFF), 1000, I_(GP_RESO), 0,
      I_(GP_DRIVE), 0, I_(GP_OLFO_DEPTH), 0, I_(GP_FLFO_DEPTH), 0, II_(GP_FLFO_DEPTH), 0, P_DRIFT, 0, P_PULSE, 0,
-     P_DLY_MIX, 0, P_REV_MIX, 0, P_DLY_LFO_DEPTH, 0, P_MOVE, 0, I_(GP_LEVEL), 67, -1},
+     P_DLY_MIX, 0, P_REV_MIX, 0, P_DLY_LFO_DEPTH, 0, P_MOVE, 0, I_(GP_LEVEL), 40, II_(GP_LEVEL), 41, -1},
 };
 #define NPRESETS ((int)(sizeof PRESET_CHANGES / sizeof PRESET_CHANGES[0]))
+static const char *const PRESET_NAME[] = {"NIAGARA", "ABYSS", "EERIE", "GLASS", "HEAVEN", "TANPURA", "TAPE", "WHISTLE",
+                                          "HOWL", "CATHEDRAL", "METAL", "CLEAN"};
+_Static_assert(sizeof PRESET_NAME / sizeof PRESET_NAME[0] == NSCENES, "a name for each Preset");
+const char *preset_name(int n)             /* a Preset's name, or 0 once it's saved over (it's yours then) */
+{
+    if (n < 0 || n >= NPRESETS || (n != PRESET_LOCKED && (bank_bc[2].used >> n & 1u)))
+        return 0;
+    return PRESET_NAME[n];
+}
 _Static_assert(NPRESETS == NSCENES && PRESET_LOCKED < NPRESETS, "a Preset for every key, the clean one locked");
 static int16_t preset[NPRESETS][DR_NPARAMS];
 

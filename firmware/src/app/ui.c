@@ -762,7 +762,7 @@ static void scene_recall(int n)                        /* a white key: morph the
     ui.scene_at = (int8_t)n;
     ui.morph_t0 = plat_ms();
     ui.morph_ms = (uint32_t)(scene_s() * 1000.0f);
-    say(t, 0);
+    say(t, proj.bank == BANK_PRESETS ? preset_name(n) : 0);   /* "SCENE P3" / "EERIE" */
 }
 
 /* a visit let go: morph back to the sound before it, over the Scene switch time */
@@ -2168,7 +2168,7 @@ static void pic_setup(int32_t y0)
 /* Moves: SHIFT's move (KNOB 1) on the left: where Shift (E5) takes the drones (the line home, the mark the move, a
  * fifth up or down at the edges; lit while Shift is in); WANDER (KNOB 3, its scale KNOB 4) on the right:
  * drone II's walk around its own pitch, the line its home, the dot where it is now (an octave up or down at the
- * edges) and how far, in semitones (beside the scale) */
+ * edges) and how far, in semitones (under the scale) */
 static void pic_moves(int32_t y0)
 {
     float w = dr_wander();
@@ -2202,7 +2202,8 @@ static void pic_moves(int32_t y0)
             q++;
         scopy(q, " st");
     }
-    cv_text(222 - text_w(&FONT_XS, t), y0 + 22, &FONT_XS, t, K_TEXT2);
+    if (wa || w != 0.0f)                       /* off and home: "0: drone II still" says it (no overlap) */
+        cv_text(222 - text_w(&FONT_XS, t), y0 + 34, &FONT_XS, t, K_TEXT2);   /* under the scale's name */
 }
 
 static void draw_pic(void)
