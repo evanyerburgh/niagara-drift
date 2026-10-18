@@ -281,7 +281,8 @@ parts come in one after another, and go in their own order when you let go. Scen
   while a gesture moves to change it on the way.
 - **The LFOs step aside**: while a gesture is in, the LFO that moves the same thing eases off (the filter LFO for
   Weight's cutoff, the oscillator LFO for Shift's and Converge's pitch, the delay LFO for Glitch's delay time), so
-  a high **Movement** doesn't wobble what the gesture is doing. It comes back as the gesture goes.
+  a high **Movement** doesn't wobble what the gesture is doing. **Wash** also eases the filter LFOs to a third, so
+  their sweeps don't pile up in the reverb as surges. They come back as the gesture goes.
 - Turning a knob while a scene switch is on its way lets go of that setting; the rest still lands.
 
 ### Black keys: switches

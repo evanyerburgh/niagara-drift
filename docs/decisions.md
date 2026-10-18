@@ -237,3 +237,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   969 cents). While a gesture is in, the LFO moving the same thing eases toward 0, as far as the move or the
   gesture is in: the oscillator LFO (routed to pitch) for Shift and Converge, the filter LFO (routed to what it
   moves) for cutoff or resonance moves, the delay LFO for the delay time.
+- 2026-10-18 (Evan): Wash eases both filter LFOs' depths to a third (by 67 %, in over 20-70 % of its amount, out
+  over 0-40 %): with Movement up their cutoff sweeps piled up in the reverb and delay as surges (Movement 100: 9.5
+  -> 4.7 dB loudness swing, 2.6 -> 0.5 octaves brightness swing; at Movement 0 unchanged).

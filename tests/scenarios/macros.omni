@@ -204,6 +204,9 @@ expect heard7 700
 tapkey w15
 wait 5000
 expect heard63 >60
+# ... and Wash eases the filter LFOs to a third (85: 28), so Movement's sweeps don't pile up in the tails
+expect heard17 28
+expect heard38 -28
 press SAVE
 tapkey w0
 release SAVE
