@@ -64,7 +64,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 24, on bank A", proj.format == 24u && PROJ_FORMAT == 24u && proj.bank == 0);
+    check("now format 25, on bank A", proj.format == 25u && PROJ_FORMAT == 25u && proj.bank == 0);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_WEIGHT] == dr_param_info(P_GD_WEIGHT)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -87,7 +87,7 @@ int main(void)
     proj.bank = 2;
     project_save();
     memset(&proj, 0, sizeof proj);
-    check("reloaded (24): as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
+    check("reloaded (25): as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
                                          scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 3015 && scene_get(2, 2) &&
                                          scene_get(2, 2)[DR_GP(0, GP_PITCH)] == 5000 && scene_get(0, 11));
     {   /* PR #14's (23): the same layout, the gestures Beat, Heat, Converge, Wash */
@@ -102,6 +102,16 @@ int main(void)
         check("PR #14's project (23) loads: its sound kept, the gestures at their defaults",
               project_load() == 0 && proj.par[P_M_BLOOM] == 40 && proj.par[P_GD_SHIFT] == 0 &&
                   proj.par[P_GL_WEIGHT] == 0 && proj.par[P_GR_WASH] == dr_param_info(P_GR_WASH)->def);
+        p23 = proj;                            /* PR #18's (24): the long swells */
+        p23.format = 24u;
+        p23.par[P_GR_SHIFT] = 70;
+        p23.par[P_GD_SHIFT] = 2;
+        p23.par[P_GL_WASH] = 100;
+        memcpy(store[OBJ_PROJ], &p23, sizeof p23);
+        store_n[OBJ_PROJ] = (int)sizeof p23;
+        check("PR #18's project (24) loads: the swells to the new defaults, the rest kept",
+              project_load() == 0 && proj.par[P_GR_SHIFT] == dr_param_info(P_GR_SHIFT)->def &&
+                  proj.par[P_GD_SHIFT] == 2 && proj.par[P_GL_WASH] == 100);
     }
     {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */
         static proj_v21_t p21;

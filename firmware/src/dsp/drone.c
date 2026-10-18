@@ -51,7 +51,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Pitch lock", 0, 1, 0}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
     {"Bloom", 0, 100, 0}, {"Weight", 0, 100, 0}, {"Tide", 0, 100, 0}, {"Tear", 0, 100, 0},
     {"Weight depth", 0, 100, 70}, {"Shift move", 0, DR_NSHIFT - 1, 0}, {"Conv. depth", 0, 100, 100}, {"Wash depth", 0, 100, 70},
-    {"Weight swell", 0, 100, 45}, {"Shift swell", 0, 100, 70}, {"Conv. swell", 0, 100, 60}, {"Wash swell", 0, 100, 55},
+    {"Weight swell", 0, 100, 30}, {"Shift swell", 0, 100, 40}, {"Conv. swell", 0, 100, 35}, {"Wash swell", 0, 100, 35},
     {"Weight latch", 0, 100, 0}, {"Shift latch", 0, 100, 0}, {"Conv. latch", 0, 100, 0}, {"Wash latch", 0, 100, 0},
     {"Type", 0, DR_NDLY - 1, 0}, {"Length", 0, 100, 60}, {"Damp", 0, 100, 40}, {"Pressure", 0, 100, 50},
 };
@@ -583,8 +583,8 @@ static const move_t MACRO_MV[DR_NSETM + DR_NGEST][MV_N] = {
      {DR_GP(1, GP_DETUNE), MK_ZERO, 60, 30, 80, 20, 70}, {P_DRIFT, MK_ZERO, 60, 30, 80, 20, 70},
      {P_XMOD, MK_SW, 0, 60, 100, 70, 100}, {P_XMOD_AMT, MK_ADD, 60, 60, 100, 70, 100}},
     /* WASH (G5): the delay first, then the reverb opens (Length to Inf at full), darker as it grows, the dry
-     * dips last; at the top the dry breathes slowly in and out of the cloud. Let go (slowly: the UI's release is
-     * 2.5x the swell): the dry comes back first, the tails ring on and go last */
+     * dips last; at the top the dry breathes slowly in and out of the cloud. Let go: the dry comes back first, the
+     * tails ring on (the reverb's own length) and go last */
     {{P_DLY_MIX, MK_ADD, 50, 0, 40, 0, 30}, {P_DLY_REPEATS, MK_ADD, 40, 0, 40, 0, 30},
      {P_REV_MIX, MK_ADD, 50, 30, 80, 0, 30}, {P_REV_LEN, MK_ADD, 45, 50, 100, 20, 60},
      {P_REV_DAMP, MK_ADD, 15, 50, 100, 20, 60}, {DR_GP(0, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100},

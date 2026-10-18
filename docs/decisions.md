@@ -202,3 +202,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   resonance -40, drive +35, Character +25, noise -40, drone I's level +8; the width, detune and Movement moves are gone.
   Converge never quite converges: drone II stays 0.09 semitone short of the consonance, wavering by 0.05 at 0.07 Hz
   (about 1.3 beats a second at A3); the partners' detune and Drift ease by 60 %, not to 0.
+- 2026-10-18: the gestures play by hold (in while held, out when let go) and tap (to its depth, stays; tap again: out);
+  depth on PRESETS while held. Swells shorter: Weight 30 (2.8 s), Shift 40 (3.9 s), Converge 35 (3.3 s), Wash 35
+  (3.3 s); letting go takes as long as the swell (Wash's 2.5x release gone; its tails are the reverb's own). PROJ_FORMAT
+  25 (24's swells reset to these). Clean, when built, keeps the notes (no unison or sync).

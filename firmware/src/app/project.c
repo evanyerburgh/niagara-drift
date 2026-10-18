@@ -104,6 +104,9 @@ static void convert(int16_t *v, uint32_t from)
     if (from <= 23u)                            /* the gestures were Beat, Heat, Converge, Wash: theirs to defaults */
         for (g = P_GD_WEIGHT; g <= P_GL_WASH; g++)
             v[g] = dr_param_info(g)->def;
+    if (from == 24u)                            /* the swells shorter (2-4 s, Evan 2026-10-18): to the new defaults */
+        for (g = P_GR_WEIGHT; g <= P_GR_WASH; g++)
+            v[g] = dr_param_info(g)->def;
 }
 
 static int in_range(const int16_t *v)
@@ -187,11 +190,12 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
     memset(ld.raw, 0, sizeof ld.raw);
     if (plat_store_load(b == 1 ? OBJ_BANKB : OBJ_BANKC, ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
         return;
-    if (ld.b.format == PROJ_FORMAT || ld.b.format == 23u) {
+    if (ld.b.format == PROJ_FORMAT || ld.b.format == 23u || ld.b.format == 24u) {
+        uint32_t f = ld.b.format;
         *k = ld.b;
-        if (ld.b.format == 23u) {
+        if (f != PROJ_FORMAT) {                /* 23, 24: the same layout */
             for (i = 0; i < NSCENES; i++)
-                convert(k->scene[i], 23u);
+                convert(k->scene[i], f);
             bank_dirty |= (uint8_t)(1u << b);
         }
     } else if (ld.b.format == 22u) {
@@ -228,9 +232,9 @@ int project_load(void)
         project_defaults();
         return -1;
     }
-    if (from == PROJ_FORMAT || from == 23u) {   /* 23: the same layout */
+    if (from == PROJ_FORMAT || from == 23u || from == 24u) {   /* 23, 24: the same layout */
         proj = ld.p;
-        if (from == 23u) {
+        if (from != PROJ_FORMAT) {
             convert(proj.par, from);
             for (i = 0; i < NSCENES; i++)
                 convert(proj.scene[i], from);

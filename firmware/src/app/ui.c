@@ -1033,10 +1033,8 @@ static void gesture_run(void)                          /* each frame: each gestu
         dt = 100u;
     for (g = 0; g < DR_NGEST; g++) {
         float to = (ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u) ? 1.0f : (float)proj.par[P_GL_WEIGHT + g] * 0.01f;
-        static const float REL_K[DR_NGEST] = {1.0f, 1.0f, 1.0f, 2.5f};   /* letting go takes this much longer:
-                                                                            * Wash's tails (Evan, 2026-10-18) */
         float *a = &ui.g_amt[g];
-        float step = (float)dt * 0.001f / fm_exp2f((float)proj.par[P_GR_WEIGHT + g] * 0.0490689f) / (*a > to ? REL_K[g] : 1.0f);
+        float step = (float)dt * 0.001f / fm_exp2f((float)proj.par[P_GR_WEIGHT + g] * 0.0490689f);
         int16_t q;
         *a = *a < to ? fm_minf(*a + step, to) : fm_maxf(*a - step, to);
         q = (int16_t)(*a * 1000.0f + 0.5f);

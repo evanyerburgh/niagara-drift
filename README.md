@@ -260,14 +260,15 @@ own order when you let go.
 | **Tear** | hard sync on, drone II's pitch up to an octave and its resonance up: the sync sweep | SEQ, KNOB 4 |
 | **Shift** | a new chord, a voice at a time: drone I glides a fifth or fourth up or down, drone II follows. Let go: drone I comes back first | E5, held |
 | **Converge** | drone II's pitch toward the nearest unison, fourth, fifth or octave of drone I (drone I steps back, quieter and darker, while it moves), never quite arriving: it stays a few cents short and wavers, so the two pulse; the partners' beating and Drift ease, cross-mod last. Let go: cross-mod goes first, the pitch drifts back last. It takes the swell time however far drone II has to go | F5, held |
-| **Wash** | the delay first, then the reverb opens and grows longer and darker (to Inf, a freeze, at full depth), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: it returns slowly (2.5 times the swell), the dry first, the tails last | G5, held |
+| **Wash** | the delay first, then the reverb opens and grows longer and darker (to Inf, a freeze, at full depth), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5, held |
 
 - **The set macros** (SEQ's Macros page) stay where you leave them. **PRESETS** plays one of them, always at
   hand: Bloom to start; hold **SEL** and turn PRESETS to pick another.
-- **The gestures** are the top four white keys. **Hold** one and it swells in; **let go** and it swells back
-  out. **Tap** it to latch it on; press it again to let it go. **SEL held as you let go** latches it where it is.
+- **The gestures** are the top four white keys (they don't sense pressure). **Hold** one and it comes in while you
+  hold; **let go** and it goes. **Tap** it and it goes to its depth and stays; tap again and it goes. **SEL held as
+  you let go** keeps it where it is.
   While you hold one, **PRESETS** sets how deep it goes (for Shift: its move, a fifth or fourth up or down) and
-  **ALGORITHM** how long it takes to swell (1–30 s; to start Weight 4.6 s, Shift 11 s, Converge 7.7 s, Wash 6.5 s).
+  **ALGORITHM** how long it takes to swell (1–30 s; to start Weight 2.8 s, Shift 3.9 s, Converge 3.3 s, Wash 3.3 s; going takes as long as coming in).
   Its key glows dimly, and lights as it comes in.
 - Turning a knob while a scene switch is on its way lets go of that setting; the rest still lands.
 
