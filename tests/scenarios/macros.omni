@@ -2,8 +2,8 @@
 # values untouched; each part comes in over its own stretch of the way in and goes over its own on the way out.
 # heardN is what's heard (the sound plus the macros), parN the sound's own, mpitchG a drone's pitch move by the
 # macros (cents). 7 drone I's cutoff, 5 its osc mix, 11 its level, 25 drone II's detune, 63 the reverb mix, 42
-# cross-mod; 78-81 unused (the set macros, gone); 82-85 the gestures' depths (83: Shift's move), 86-89 their own
-# times, 90-93 their latches.
+# cross-mod, 60-62 the delay's time, repeats, mix, 77 Character; 78 Wander, 79 Age, 80 Shift's move; 82-85 the
+# keys' depths, 86-89 their own times, 90-93 their latches. What each key plays: gkeyN (0 Weight .. 4 Clean, 5 Glitch).
 tap PLAY
 wait 1000
 expect heard7 700
@@ -74,13 +74,13 @@ expect par90 <60
 tapkey w12
 wait 4000
 expect par90 0
-# SHIFT: held, ALGORITHM picks its move (a 4th down), PRESETS its own time (3.9 s, 4 shorter: 3.4 s)
+# SHIFT: held, ALGORITHM picks its move (a 4th down: 80), PRESETS its own time (3.9 s, 4 shorter: 3.4 s)
 key w13 down
 spin ALGO 2
 spin PRESET -4
 wait 300
 key w13 up
-expect par83 2
+expect par80 2
 expect par87 36
 expect par75 50
 wait 4000
@@ -115,6 +115,71 @@ key w14 up
 wait 4500
 expect heard42 0
 expect mpitch1 0
+# a key plays what you pick: D5 held, SELECT on four: Clean (its depth and time to Clean's)
+key w12 down
+spin SELECT 4
+key w12 up
+expect gkey0 4
+expect par82 100
+wait 3000
+# CLEAN held (3.3 s): a dirty sound comes clean, the grit first; the notes stay
+set 77 60
+set 10 50
+set 62 50
+wait 300
+key w12 down
+wait 900
+expect heard77 0
+expect heard10 0
+expect heard62 >30
+wait 3000
+expect heard62 0
+expect mpitch0 0
+key w12 up
+wait 4500
+expect heard77 60
+expect heard62 50
+set 77 0
+set 10 20
+set 62 25
+# E5 to GLITCH (SELECT on four from Shift): the delay a little up, its time leaning off and back; the dry as it is
+key w13 down
+spin SELECT 4
+key w13 up
+expect gkey1 5
+wait 4000
+key w13 down
+wait 5000
+expect heard62 45
+expect heard11 80
+key w13 up
+wait 6000
+expect heard62 25
+# back as they were
+key w12 down
+spin SELECT -4
+key w12 up
+key w13 down
+spin SELECT -4
+key w13 up
+expect gkey0 0
+expect gkey1 1
+wait 5000
+# WANDER (Partner 2): drone II walks off its pitch, gliding; at 0 it comes home
+set 78 60
+wait 7000
+expect wander >150
+set 78 0
+wait 30000
+expect wander 0
+# AGE (Tone 2): wears in over 20 s: darker, more character
+set 79 100
+wait 21000
+expect heard7 630
+expect heard77 35
+set 79 0
+wait 21000
+expect heard7 700
 # a scene keeps the gestures: A1 stored with Wash latched, recalled from none
 tapkey w15
 wait 5000

@@ -388,6 +388,10 @@ static int expect(const char *what, const char *val)
         got = (int)store_writes;
     else if (!strncmp(what, "heard", 5))          /* heardN: parameter N as heard (with the macros) */
         got = dr_heard(atoi(what + 5));
+    else if (!strncmp(what, "gkey", 4))           /* gkeyN: what gesture key N plays (DR_G_*) */
+        got = proj.gkey[atoi(what + 4) & 3];
+    else if (!strcmp(what, "wander"))             /* Wander's move of drone II now, |cents| */
+        got = (int)(fm_fabsf(dr_wander()) * 100.0f + 0.5f);
     else if (!strncmp(what, "mtime", 5))          /* Macro time (PRESETS), 0..100 */
         got = proj.mtime;
     else if (!strncmp(what, "par", 3))            /* parN: parameter N (drone.h) */

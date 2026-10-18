@@ -211,6 +211,14 @@ at the end. The current state is in the [README](../README.md) and the code.
   held the macro PRESETS played, which is gone). Let go after a hold: out over as long as it was held, x Macro time.
   Holding a gesture key: ALGORITHM its depth (Shift: its move), PRESETS its own time. A move's level glides over
   0.15 s at most (was 0.6).
-- 2026-10-18: the Macros page goes, with the set macros Bloom, Weight, Tide and Tear (Evan). SEQ opens Partner. Their
-  four values stay in the layout, unused (0); PROJ_FORMAT 27 zeroes them. Any new page of macros comes later, if
-  Clean, Drifting pitch or Glitch earn one.
+- 2026-10-18: the set macros Bloom, Weight, Tide and Tear go (Evan). SEQ: Gestures (KNOB 1-4 each gesture key's depth;
+  a key playing Shift: its move), Partner, Partner 2 (KNOB 3 Wander). Their four values become Wander, Age, Shift's
+  move (from E5's depth) and one unused; PROJ_FORMAT 27 converts. Each gesture key plays what the player picks
+  (hold it + SELECT): Weight, Shift, Converge, Wash, Clean, Glitch; kept in the project (gkey, not scenes), D5-G5 to
+  start Weight, Shift, Converge, Wash. Clean: grit ZERO over 0-25 %, Movement -80 % / Drift -70 % / the Swell's
+  depth over 10-55 %, repeats -70 % over 25-70 %, delay mix 0 / reverb mix -75 % / length -50 % over 30-100 %; cross-mod
+  and hard sync held off; the notes kept. Glitch (Slip): delay mix +20, repeats +12, delay time wandering +-6 (a new
+  aim every 1.5-4 s, followed over ~1 s; a third with a 150 ms snag of +0.4). Age (Tone 2 KNOB 3): cutoffs -70,
+  noise +30, Character +35, a wow of +-14 cents a drone; wears in over 20 s. Wander: steps among 5th, 4th, octave
+  (then 3rds, 6ths further up), placed nearest drone II's pitch, home about every other step, every (40 - 32 x
+  amount) s x 0.6-1.4, gliding 3-5 s. Turning drone II's knobs on Play while it's out says "II OFF  SEL + PLAY".

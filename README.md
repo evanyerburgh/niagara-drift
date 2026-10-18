@@ -106,7 +106,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Tone 1 | I noise | I colour | II noise | II colour |
-| Tone 2 | character | feedback | | |
+| Tone 2 | character | feedback | age | |
 
 - **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
   It's heard all along the knob and never louder than them (100 is 6 dB under, 50 −12 dB, 25 −18). It
@@ -117,6 +117,8 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
   thickening colour that grows with the knob (more with the delay up), rough at the top but never louder than
   the sound without it; it fades with the drones when you stop.
+- **Age** wears the sound like an old tape: darker, a slow wow in the pitch, a little hiss, more character. It
+  wears in slowly (about 20 s from none to full) and wears out as slowly when you turn it back.
 
 #### Osc · EDIT
 
@@ -130,13 +132,21 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 - **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width.
 - **Osc mix** goes from the oscillators to the sub; **drive** pushes each drone into its filter.
 
-#### Partner · SEQ
+#### Gestures and Partner · SEQ
 
-<img src="docs/img/page-seq.png" width="244" alt="The Partner page: each drone's partner oscillator, its interval and detune">
+<img src="docs/img/page-seq.png" width="732" alt="The Gestures page: what each gesture key plays, how far in it is and its depth; the Partner page; Partner 2: Wander, drone II's walk">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
+| Gestures | D5's depth | E5's depth | F5's depth | G5's depth |
 | Partner | I interval | I detune | II interval | II detune |
+| Partner 2 | | | II wander | |
+
+- **Gestures** shows the four gesture keys: what each plays, how far in it is now, and its depth (a key playing
+  Shift shows its move instead). See [The macros](#the-macros).
+- **Wander** sends drone II walking slowly between notes that sit well with drone I (a fifth, a fourth, the octave;
+  further up the knob the thirds and sixths too), gliding there and home again, at uneven times: rarely at the
+  bottom of the knob, every 8 s or so at the top. At 0 it stays still.
 
 - The partner oscillator sits an interval above or below each drone; **detune** makes them beat.
   With **Tuning: just** (Setup 2) the intervals are pure ratios.
@@ -245,21 +255,25 @@ depth that can't be heard says why on the screen (Movement at 0%, or its wave of
 
 ### The macros
 
-Four gestures on the top four white keys, each a few settings together, by set amounts, on top of your sound.
+The top four white keys are gestures, each a few settings together, by set amounts, on top of your sound.
 Your own settings stay as they are underneath: when a gesture has gone, it's gone without a trace. A gesture's
 parts come in one after another, and go in their own order when you let go. Scenes remember which are latched.
 
-| Gesture | What it moves | Key |
+| Gesture | What it moves | Key to start |
 |---|---|---|
 | **Weight** | a full, warm bass: the sub comes up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. Let go: the brightness comes back first, the sub lingers | D5 |
 | **Shift** | a new chord, a voice at a time: drone I glides a fifth or fourth up or down, drone II follows. Let go: drone I comes back first | E5 |
 | **Converge** | drone II's pitch toward the nearest unison, fourth, fifth or octave of drone I (drone I steps back, quieter and darker, while it moves), never quite arriving: it stays a few cents short and wavers, so the two pulse; the partners' beating and Drift ease, cross-mod last. Let go: cross-mod goes first, the pitch drifts back last. It takes the swell time however far drone II has to go | F5 |
 | **Wash** | the delay first, then the reverb opens and grows longer and darker (to Inf, a freeze, at full depth), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5 |
+| **Clean** | back to a clean sound, your notes kept: the grit leaves first (drive, character, feedback, noise, cross-mod, hard sync), then the movement (Movement, Drift, the Swell), then the effects (the repeats, both mixes, the reverb's length). Let go: the effects come back first, the grit last | pick it |
+| **Glitch** | a little more delay, its time wandering slowly so the echoes lean a semitone or two off the drone and back, now and then a small quick snag; the dry sound stays as it is | pick it |
 
 - **The gestures** are the top four white keys (they don't sense pressure). **Hold** one and it comes in while you
   hold; **let go** and it goes, over as long as you held it (hold 2 s, it leaves in 2 s; hold 10 s, it drifts out
   over 10 s). **Tap** it and it goes to its depth and stays; tap again and it goes. **SEL held as you let go** keeps
   it where it is. Its key glows dimly, and lights as it comes in.
+- **Pick what a key plays**: hold the key and turn **SELECT**: Weight, Shift, Converge, Wash, Clean, Glitch. Its
+  depth and time go to that gesture's own; your pick is kept.
 - **PRESETS is Macro time**: it speeds up or slows down every gesture, coming in and going out, from 10 times faster
   to 10 times slower (the middle: each gesture's own time). Turn it while a gesture moves to change it on the way.
 - **While you hold a gesture key**, **ALGORITHM** sets how deep it goes (for Shift: its move, a fifth or fourth up

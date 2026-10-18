@@ -49,6 +49,14 @@ static void bank_blank(bank_t *b)
     b->format = PROJ_FORMAT;
 }
 
+static void gkeys_default(void)                  /* D5-G5: Weight, Shift, Converge, Wash */
+{
+    proj.gkey[0] = DR_G_WEIGHT;
+    proj.gkey[1] = DR_G_SHIFT;
+    proj.gkey[2] = DR_G_CONVERGE;
+    proj.gkey[3] = DR_G_WASH;
+}
+
 void project_defaults(void)
 {
     int i;
@@ -60,6 +68,7 @@ void project_defaults(void)
         proj.par[i] = dr_param_info(i)->def;
     proj.leds = 1;
     proj.mtime = MTIME_DEF;
+    gkeys_default();
     bank_blank(&bank_bc[0]);
     bank_blank(&bank_bc[1]);
 }
@@ -103,13 +112,18 @@ static void convert(int16_t *v, uint32_t from)
         for (g = 0; g < DR_NGROUPS; g++)
             v[DR_GP(g, GP_NCOLOR)] = v[DR_GP(g, GP_NCOLOR)] ? 100 : 0;
     if (from <= 23u)                            /* the gestures were Beat, Heat, Converge, Wash: theirs to defaults */
-        for (g = P_GD_WEIGHT; g <= P_GL_WASH; g++)
+        for (g = P_GD_0; g <= P_GL_3; g++)
             v[g] = dr_param_info(g)->def;
-    if (from <= 26u)                            /* the set macros (Bloom, Weight, Tide, Tear) gone: their values 0 */
-        for (g = P_OLD_M0; g <= P_OLD_M3; g++)
-            v[g] = 0;
+    if (from <= 26u) {                          /* the set macros (Bloom, Weight, Tide, Tear) gone: their values 0 (now
+                                                 * Wander, Age, Shift's move: 0 is their start); Shift's move was E5's depth */
+        v[P_SHIFT_MOVE] = (unsigned)v[P_GD_1] < DR_NSHIFT ? v[P_GD_1] : 0;
+        for (g = P_WANDER; g <= P_OLD_M3; g++)
+            if (g != P_SHIFT_MOVE)
+                v[g] = 0;
+        v[P_GD_1] = dr_param_info(P_GD_1)->def;
+    }
     if (from == 24u)                            /* the swells shorter (2-4 s, Evan 2026-10-18): to the new defaults */
-        for (g = P_GR_WEIGHT; g <= P_GR_WASH; g++)
+        for (g = P_GR_0; g <= P_GR_3; g++)
             v[g] = dr_param_info(g)->def;
 }
 
@@ -290,6 +304,11 @@ int project_load(void)
         proj.bank = 0;
     if (from <= 25u || proj.mtime > 100u)    /* the byte was the macro PRESETS played */
         proj.mtime = MTIME_DEF;
+    for (i = 0; i < DR_NGEST; i++)
+        if (from <= 26u || proj.gkey[i] >= DR_NGTYPE) {   /* these bytes were spare: the keys as they were */
+            gkeys_default();
+            break;
+        }
     if (!in_range(proj.par)) {
         project_defaults();
         return -1;
@@ -325,6 +344,8 @@ int project_save(void)                         /* the banks first: a converted 0
 void project_apply(void)
 {
     int i;
+    for (i = 0; i < DR_NGEST; i++)
+        dr_gesture_type(i, proj.gkey[i]);
     for (i = 0; i < DR_NPARAMS; i++)
         dr_set(i, proj.par[i]);
 }

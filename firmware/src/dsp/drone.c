@@ -49,13 +49,12 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
     {"Morph", 0, 100, 47}, {"Scene switch", 0, 100, 30}, {"Tuning", 0, 1, 0}, {"Speaker", 0, 100, 0},
     {"Pitch lock", 0, 1, 0}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
-    {"-", 0, 100, 0}, {"-", 0, 100, 0}, {"-", 0, 100, 0}, {"-", 0, 100, 0},          /* unused (the set macros) */
-    {"Weight depth", 0, 100, 70}, {"Shift move", 0, DR_NSHIFT - 1, 0}, {"Conv. depth", 0, 100, 100}, {"Wash depth", 0, 100, 70},
-    {"Weight swell", 0, 100, 30}, {"Shift swell", 0, 100, 40}, {"Conv. swell", 0, 100, 35}, {"Wash swell", 0, 100, 35},
-    {"Weight latch", 0, 100, 0}, {"Shift latch", 0, 100, 0}, {"Conv. latch", 0, 100, 0}, {"Wash latch", 0, 100, 0},
+    {"Wander", 0, 100, 0}, {"Age", 0, 100, 0}, {"Shift move", 0, DR_NSHIFT - 1, 0}, {"-", 0, 100, 0},
+    {"D5 depth", 0, 100, 70}, {"E5 depth", 0, 100, 100}, {"F5 depth", 0, 100, 100}, {"G5 depth", 0, 100, 70},
+    {"D5 time", 0, 100, 30}, {"E5 time", 0, 100, 40}, {"F5 time", 0, 100, 35}, {"G5 time", 0, 100, 35},
+    {"D5 latch", 0, 100, 0}, {"E5 latch", 0, 100, 0}, {"F5 latch", 0, 100, 0}, {"G5 latch", 0, 100, 0},
     {"Type", 0, DR_NDLY - 1, 0}, {"Length", 0, 100, 60}, {"Damp", 0, 100, 40}, {"Pressure", 0, 100, 50},
 };
-const char *const DR_MACRO_NAME[DR_NGEST] = {"Weight", "Shift", "Converge", "Wash"};
 const char *const DR_SHIFT_NAME[DR_NSHIFT] = {"5th up", "4th up", "4th down", "5th down"};
 static const int8_t SHIFT_ST[DR_NSHIFT] = {7, 5, -5, -7};       /* ... in semitones */
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
@@ -249,7 +248,7 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_REV_NAME[(unsigned)v < DR_NREV ? v : 0]);
     else if (i == P_DLY_TYPE)
         copy_s(b, DR_DLY_NAME[(unsigned)v < DR_NDLY ? v : 0]);
-    else if (i == P_GD_SHIFT)
+    else if (i == P_SHIFT_MOVE)
         copy_s(b, DR_SHIFT_NAME[(unsigned)v < DR_NSHIFT ? v : 0]);
     else if (i == P_REV_LEN) {                   /* "4.4s", "Inf" */
         if (v >= 100)
@@ -259,9 +258,9 @@ void dr_param_text(int i, int v, char *b)
     }
     else if (i == P_DLY_LFO || i == P_LFO_RMOD_SRC)
         copy_s(b, TAP[(unsigned)v < 4u ? v : 1]);
-    else if (i == P_MORPH || i == P_FADE || i == P_SCENE_T || (i >= P_GR_WEIGHT && i <= P_GR_WASH)) {
+    else if (i == P_MORPH || i == P_FADE || i == P_SCENE_T || (i >= P_GR_0 && i <= P_GR_3)) {
         /* a time: "0.62s", "4.2s", "25s", "2m30"; a gesture's swell 1 .. 30 s */
-        float t = i >= P_GR_WEIGHT ? fm_exp2f((float)v * 0.0490689f)
+        float t = i >= P_GR_0 ? fm_exp2f((float)v * 0.0490689f)
                 : i == P_MORPH ? 0.02f * fm_exp2f((float)v * 0.105507f)
                 : i == P_FADE ? 0.05f * fm_exp2f((float)v * 0.102288f) : 0.1f * fm_exp2f((float)v * 0.115507f);
         secs_text(t, b);
@@ -317,7 +316,7 @@ void dr_param_text(int i, int v, char *b)
 }
 
 /* -------------------------------------------------------------- commands --- */
-enum { C_SET, C_PLAY, C_VOICE, C_PANIC, C_SLIDE, C_LFO_RESET, C_PSLIDE, C_SEED, C_DUCK, C_GEST };
+enum { C_SET, C_PLAY, C_VOICE, C_PANIC, C_SLIDE, C_LFO_RESET, C_PSLIDE, C_SEED, C_DUCK, C_GEST, C_GTYPE };
 /* a load (boot, project_apply) posts every value at once, before the render drains any: the queue holds
  * them all (at 64 the last values of a saved sound were dropped at start-up, the macros among them) */
 #define QN 128u
@@ -343,6 +342,7 @@ void dr_pslide(int param, int ms) { post(C_PSLIDE, param, ms); }
 void dr_lfo_reset(void) { post(C_LFO_RESET, 0, 0); }
 void dr_seed(uint32_t s) { post(C_SEED, (int)(s >> 16 & 0xFFu), (int)(s & 0xFFFFu)); }
 void dr_gesture(int g, int amt) { post(C_GEST, g, amt); }
+void dr_gesture_type(int g, int type) { post(C_GTYPE, g, type); }
 
 /* ----------------------------------------------------------------- state --- */
 volatile float dr_level[DR_NGROUPS];
@@ -523,64 +523,107 @@ void dr_init(void)
     q_r = q_w;
 }
 
-/* THE MACROS (v0.2, option D; two performer reviews; staged 2026-10-18 after the macro research): the gestures
- * on D5-G5, each moving several values, by fixed amounts at full, by the UI's swell (gam) times their depth
- * (P_GD_*). The sound's own values (base) stay as they are; what's heard is base + the sum,
- * clamped to each value's range.
+/* THE MACROS (v0.2, option D; two performer reviews; staged 2026-10-18 after the macro research). The four gesture
+ * keys (D5-G5) each play one gesture (gtype: Weight, Shift, Converge, Wash, Clean, Glitch; the player picks), by the
+ * UI's swell (gam) times the key's depth (P_GD_*). Two slow states on knobs: AGE (Tone 2) and WANDER (Partner 2).
+ * The sound's own values (base) stay as they are; what's heard is base + the sum, clamped to each value's range.
  * Each move comes in over its own part of the macro's way in (in0 .. in1 of the amount, eased) and goes over
  * its own part of the way out (out0 .. out1), so a macro's parts arrive in order and leave in their own order
  * (Strymon Deco's auto-flange: "the controls are smoothly returned"); a move's level glides (MOVE_S) so turning
- * back half way doesn't jump. Kinds: ADD an offset; SW a switch on while the move is in; ZERO the value toward 0 (by d %, all the way when d is 0);
- * SHIFT / CONV a drone's pitch (Shift's move; Converge's pull toward the nearest unison, fourth, fifth or octave
- * of drone I); BUMP an offset that rises over in0 .. in1 and falls again over out0 .. out1,
- * both ways (a dip while something else moves); PULSE an offset breathing slowly (PULSE_HZ) while it's in. */
-enum { MK_ADD, MK_SW, MK_ZERO, MK_SHIFT, MK_CONV, MK_BUMP, MK_PULSE };
+ * back half way doesn't jump. Kinds: ADD an offset; SW a switch on while the move is in, OFF one off; ZERO the
+ * value toward 0 (by d %, all the way when d is 0); SHIFT / CONV a drone's pitch (Shift's move; Converge's pull
+ * toward the nearest unison, fourth, fifth or octave of drone I); BUMP an offset that rises over in0 .. in1 and
+ * falls again over out0 .. out1, both ways (a dip while something else moves); PULSE an offset breathing slowly
+ * (PULSE_HZ) while it's in; SLIP an offset wandering slowly at random, with now and then a small quick snag
+ * (Glitch's delay time: the echoes lean off the drone and back); WOW a drone's pitch wavering slowly, d cents. */
+enum { MK_ADD, MK_SW, MK_OFF, MK_ZERO, MK_SHIFT, MK_CONV, MK_BUMP, MK_PULSE, MK_SLIP, MK_WOW };
 typedef struct {
     uint8_t p, kind;                             /* the value (or, for a pitch move, the drone) and the kind */
     int16_t d;                                   /* the amount at full (MK_ADD) */
     uint8_t in0, in1, out0, out1;                /* where it comes in and goes, in % of the macro's amount */
 } move_t;
-#define MV_N 12
+#define MV_N 16
 #define PULSE_HZ 0.15f                           /* a PULSE move's breath: about 7 s */
 #define MOVE_S 0.15f                             /* a move's level: the whole way in this long, at most (a
                                                   * turn back half way doesn't jump; Macro time can be quick) */
-static const move_t MACRO_MV[DR_NGEST][MV_N] = {
-    /* WEIGHT (D5): a full, warm bass (Evan, 2026-10-18): the sub comes up through most of the swell, the
-     * resonance and the noise give way and the cutoffs ease down a little (warm, not dark), then drive and the
-     * vintage character round it off, so a small speaker hears it fuller. Let go: the brightness comes back first,
-     * the sub lingers */
+#define MOFF_OFF 0x7FFE                          /* moff[]: a switch held off */
+const char *const DR_GEST_NAME[DR_NGTYPE] = {"Weight", "Shift", "Converge", "Wash", "Clean", "Glitch"};
+const uint8_t DR_GEST_DEPTH[DR_NGTYPE] = {70, 100, 100, 70, 100, 70};
+const uint8_t DR_GEST_TIME[DR_NGTYPE] = {30, 40, 35, 35, 35, 35};      /* 2.8 s, 3.9 s, 3.3 s ... */
+static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
+    /* WEIGHT: a full, warm bass (Evan, 2026-10-18): the sub comes up through most of the swell, the resonance and
+     * the noise give way and the cutoffs ease down a little (warm, not dark), then drive and the vintage character
+     * round it off, so a small speaker hears it fuller. Let go: the brightness comes back first, the sub lingers */
     {{DR_GP(0, GP_MIX), MK_ADD, 45, 0, 70, 0, 60}, {DR_GP(1, GP_MIX), MK_ADD, 45, 0, 70, 0, 60},
      {DR_GP(0, GP_CUTOFF), MK_ADD, -30, 0, 50, 40, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -30, 0, 50, 40, 100},
      {DR_GP(0, GP_RESO), MK_ADD, -40, 0, 50, 40, 100}, {DR_GP(1, GP_RESO), MK_ADD, -40, 0, 50, 40, 100},
      {DR_GP(0, GP_DRIVE), MK_ADD, 35, 20, 100, 20, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 35, 20, 100, 20, 100},
      {P_CHAR, MK_ADD, 25, 30, 100, 30, 100}, {DR_GP(0, GP_NOISE), MK_ADD, -40, 0, 50, 50, 100},
      {DR_GP(1, GP_NOISE), MK_ADD, -40, 0, 50, 50, 100}, {DR_GP(0, GP_LEVEL), MK_ADD, 8, 20, 100, 0, 60}},
-    /* SHIFT (E5): a new chord, a voice at a time (the Lyra-8 manual's chord changes): drone I glides there
-     * first, drone II follows; let go, drone I comes back first */
+    /* SHIFT: a new chord, a voice at a time (the Lyra-8 manual's chord changes): drone I glides there first, drone
+     * II follows; let go, drone I comes back first. Its move: P_SHIFT_MOVE */
     {{0, MK_SHIFT, 0, 0, 60, 40, 100}, {1, MK_SHIFT, 0, 40, 100, 0, 60}},
-    /* CONVERGE (F5): drone II's pitch toward the nearest consonance with drone I (drone I stepping back, quieter
-     * and darker, while it moves, so the move is heard), never quite there: it stays a few cents short, wavering,
-     * so the two pulse as it tries to hold drone I's pitch (Evan, 2026-10-18); the beating of the partners and
-     * Drift eases (by 60 %), cross-mod last.
-     * Let go: cross-mod leaves first, the pitch drifts back last (drone I stepping back again) */
+    /* CONVERGE: drone II's pitch toward the nearest consonance with drone I (drone I stepping back, quieter and
+     * darker, while it moves, so the move is heard), never quite there: it stays a few cents short, wavering, so
+     * the two pulse as it tries to hold drone I's pitch (Evan, 2026-10-18); the beating of the partners and Drift
+     * eases (by 60 %), cross-mod last. Let go: cross-mod leaves first, the pitch drifts back last */
     {{1, MK_CONV, 0, 0, 50, 0, 70}, {DR_GP(0, GP_LEVEL), MK_BUMP, -25, 0, 20, 45, 75},
      {DR_GP(0, GP_CUTOFF), MK_BUMP, -60, 0, 20, 45, 75}, {DR_GP(0, GP_DETUNE), MK_ZERO, 60, 30, 80, 20, 70},
      {DR_GP(1, GP_DETUNE), MK_ZERO, 60, 30, 80, 20, 70}, {P_DRIFT, MK_ZERO, 60, 30, 80, 20, 70},
      {P_XMOD, MK_SW, 0, 60, 100, 70, 100}, {P_XMOD_AMT, MK_ADD, 60, 60, 100, 70, 100}},
-    /* WASH (G5): the delay first, then the reverb opens (Length to Inf at full), darker as it grows, the dry
-     * dips last; at the top the dry breathes slowly in and out of the cloud. Let go: the dry comes back first, the
+    /* WASH: the delay first, then the reverb opens (Length to Inf at full), darker as it grows, the dry dips
+     * last; at the top the dry breathes slowly in and out of the cloud. Let go: the dry comes back first, the
      * tails ring on (the reverb's own length) and go last */
     {{P_DLY_MIX, MK_ADD, 50, 0, 40, 0, 30}, {P_DLY_REPEATS, MK_ADD, 40, 0, 40, 0, 30},
      {P_REV_MIX, MK_ADD, 50, 30, 80, 0, 30}, {P_REV_LEN, MK_ADD, 45, 50, 100, 20, 60},
      {P_REV_DAMP, MK_ADD, 15, 50, 100, 20, 60}, {DR_GP(0, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100},
      {DR_GP(1, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100},
      {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100}},
+    /* CLEAN (Evan's idea, 2026-10-18): back to a clean sound, the notes kept (no unison, no sync), each kind of dirt
+     * leaving at its own pace from the start: the grit first (drive, character, feedback, noise, cross-mod, hard
+     * sync), then the movement (Movement, Drift, the Swell's depth), then the effects (the delay's repeats, both
+     * mixes, the reverb's length). Let go: the effects come back first, the grit last */
+    {{DR_GP(0, GP_DRIVE), MK_ZERO, 0, 0, 25, 0, 25}, {DR_GP(1, GP_DRIVE), MK_ZERO, 0, 0, 25, 0, 25},
+     {P_CHAR, MK_ZERO, 0, 0, 25, 0, 25}, {P_FEEDBACK, MK_ZERO, 0, 0, 25, 0, 25},
+     {DR_GP(0, GP_NOISE), MK_ZERO, 0, 0, 25, 0, 25}, {DR_GP(1, GP_NOISE), MK_ZERO, 0, 0, 25, 0, 25},
+     {P_XMOD, MK_OFF, 0, 10, 30, 10, 30}, {P_SYNC, MK_OFF, 0, 10, 30, 10, 30},
+     {P_MOVE, MK_ZERO, 80, 10, 55, 10, 55}, {P_DRIFT, MK_ZERO, 70, 10, 55, 10, 55},
+     {P_PULSE_DEPTH, MK_ZERO, 0, 10, 55, 10, 55}, {P_DLY_REPEATS, MK_ZERO, 70, 25, 70, 25, 70},
+     {P_DLY_MIX, MK_ZERO, 0, 30, 100, 30, 100}, {P_REV_MIX, MK_ZERO, 75, 30, 100, 30, 100},
+     {P_REV_LEN, MK_ZERO, 50, 30, 100, 30, 100}},
+    /* GLITCH, as Slip (from the macro research: a bucket-brigade delay's time knob, kept in the drones' range;
+     * Evan, 2026-10-18: quiet, no dropouts): a little more delay, its time wandering slowly so the echoes lean a
+     * semitone or two off the drone and come back, now and then a small quick snag. The dry stays as it is */
+    {{P_DLY_MIX, MK_ADD, 20, 0, 40, 0, 40}, {P_DLY_REPEATS, MK_ADD, 12, 0, 40, 0, 40},
+     {P_DLY_TIME, MK_SLIP, 6, 20, 100, 0, 80}},
 };
-static float mv_lvl[DR_NGEST][MV_N];  /* each move's level now, 0..1 (gliding) */
-static float mac_last[DR_NGEST];      /* each macro's amount last time ... */
+/* AGE (Tone 2), a state: as the old tape wears, darker, a little hiss, more character, the pitch wavering slowly;
+ * it wears in (and out) over AGE_S */
+static const move_t AGE_MV[MV_N] = {
+    {DR_GP(0, GP_CUTOFF), MK_ADD, -70, 0, 100, 0, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -70, 0, 100, 0, 100},
+    {DR_GP(0, GP_NOISE), MK_ADD, 30, 0, 100, 0, 100}, {DR_GP(1, GP_NOISE), MK_ADD, 30, 0, 100, 0, 100},
+    {P_CHAR, MK_ADD, 35, 0, 100, 0, 100}, {0, MK_WOW, 14, 0, 100, 0, 100}, {1, MK_WOW, 14, 0, 100, 0, 100},
+};
+#define AGE_S 20.0f                              /* Age wears in from none to full this long */
+static uint8_t gtype[DR_NGEST] = {DR_G_WEIGHT, DR_G_SHIFT, DR_G_CONVERGE, DR_G_WASH};   /* what each key plays */
+static float mv_lvl[DR_NGEST][MV_N];             /* each key's moves' levels now, 0..1 (gliding) */
+static float mac_last[DR_NGEST];                 /* each key's amount last time ... */
 static uint8_t mac_out;                          /* ... and which are on their way out (bit m) */
 static uint8_t mv_moving;                        /* a move's level still gliding: again next block */
 static float mac_ph;                             /* the PULSE moves' phase, cycles */
+static float age_l, age_ph;                      /* Age as heard now (gliding), 0..1; its wow's phase */
+static float slip_v, slip_to, slip_snag;         /* Glitch's slip now and where it's heading, -1..1; a snag */
+static uint32_t slip_n, slip_snag_n;             /* samples to its next aim; the snag's samples left */
+static float wand_st, wand_to, wand_rate;        /* WANDER: drone II's move now and aimed at, semitones; st/sample */
+static uint32_t wand_n;                          /* samples to its next step */
+static uint32_t mac_rng = 0x6D2B79F5u;           /* the macros' own random steps */
+static float mac_rand(void)                      /* 0..1 */
+{
+    mac_rng ^= mac_rng << 13;
+    mac_rng ^= mac_rng >> 17;
+    mac_rng ^= mac_rng << 5;
+    return (float)(mac_rng >> 8) * (1.0f / 16777216.0f);
+}
 static void macro_reset(void)
 {
     int m, k;
@@ -591,12 +634,18 @@ static void macro_reset(void)
     }
     mac_out = 0;
     mv_moving = 0;
-    mac_ph = 0.0f;
+    mac_ph = age_l = age_ph = 0.0f;
+    slip_v = slip_to = slip_snag = 0.0f;
+    slip_n = slip_snag_n = 0;
+    wand_st = wand_to = wand_rate = 0.0f;
+    wand_n = 0;
+    for (m = 0; m < DR_NGEST; m++)
+        gtype[m] = (uint8_t)m;                   /* Weight, Shift, Converge, Wash */
 }
-static float mac_amt(int m)                      /* a macro's amount now, 0..1 */
+static float mac_amt(int m)                      /* a key's amount now, 0..1 */
 {
-    return m == 1 ? gam[1]                     /* Shift: its depth is its move */
-                  : gam[m] * (float)base[P_GD_WEIGHT + m] * 0.01f;
+    return gtype[m] == DR_G_SHIFT ? gam[m]       /* Shift: its depth is its move */
+                                  : gam[m] * (float)base[P_GD_0 + m] * 0.01f;
 }
 static float mv_ease(float a, int lo, int hi)    /* the amount a through the window lo .. hi %, eased */
 {
@@ -605,7 +654,7 @@ static float mv_ease(float a, int lo, int hi)    /* the amount a through the win
 }
 static int heard(int i)                          /* the sound's own value with the macros' offset, in range */
 {
-    int v = moff[i] == MOFF_ON ? PARAMS[i].hi : base[i] + moff[i];
+    int v = moff[i] == MOFF_ON ? PARAMS[i].hi : moff[i] == MOFF_OFF ? PARAMS[i].lo : base[i] + moff[i];
     return v < PARAMS[i].lo ? PARAMS[i].lo : v > PARAMS[i].hi ? PARAMS[i].hi : v;
 }
 static float conv_ph;                            /* Converge's waver, cycles */
@@ -628,59 +677,149 @@ static float conv_st(void)                       /* Converge: drone II to the ne
         return best >= 0.0f ? best - sh : best + sh;
     }
 }
+/* Glitch's slip, n samples on: a slow random lean (a new aim every 1.5 .. 4 s, followed over about a second), and
+ * now and then (a third of the aims) a snag: a small jump for 150 ms */
+static void slip_run(uint32_t n)
+{
+    if (slip_n <= n) {
+        slip_to = 2.0f * mac_rand() - 1.0f;
+        slip_n = (uint32_t)((1.5f + 2.5f * mac_rand()) * DR_SR);
+        if (mac_rand() < 0.33f)
+            slip_snag_n = (uint32_t)(0.15f * DR_SR);
+    } else {
+        slip_n -= n;
+    }
+    slip_v += (slip_to - slip_v) * fm_minf((float)n / (1.0f * DR_SR), 1.0f);
+    slip_snag = slip_snag_n ? 0.4f : 0.0f;
+    slip_snag_n = slip_snag_n > n ? slip_snag_n - n : 0;
+}
+/* WANDER, n samples on: drone II walks between notes that sit well with drone I (a fifth, a fourth, the octave;
+ * further up the knob the thirds and sixths), each placed as near its own pitch as it goes, and home again about
+ * every other step; a step every 8 .. 40 s (more often further up), gliding there over 3 .. 5 s */
+static void wander_run(uint32_t n)
+{
+    static const float C[7] = {7.0f, 5.0f, 12.0f, 4.0f, 3.0f, 9.0f, 8.0f};
+    float a = (float)base[P_WANDER] * 0.01f;
+    if (a <= 0.0f) {
+        wand_to = 0.0f;
+        wand_rate = fm_maxf(wand_rate, 0.5f / DR_SR);
+        wand_n = 0;
+    } else if (wand_n <= n) {
+        float gap = (40.0f - 32.0f * a) * (0.6f + 0.8f * mac_rand());
+        if (wand_to != 0.0f && mac_rand() < 0.5f) {
+            wand_to = 0.0f;                      /* home */
+        } else {
+            int pool = a < 0.35f ? 3 : a < 0.7f ? 5 : 7;
+            float c = C[(int)(mac_rand() * (float)pool) % pool], x = grp[0].ps2 + c - grp[1].ps2;
+            x -= 12.0f * (float)(int)(x * (1.0f / 12.0f) + (x >= 0.0f ? 0.5f : -0.5f));   /* the nearest of it */
+            wand_to = fm_fabsf(x) < 0.5f ? (x >= 0.0f ? 12.0f : -12.0f) + x : x;          /* a move, not a stay */
+            if (fm_fabsf(wand_to) > 12.0f)
+                wand_to = x;
+        }
+        wand_rate = fm_fabsf(wand_to - wand_st) / ((3.0f + 2.0f * mac_rand()) * DR_SR);
+        wand_n = (uint32_t)(gap * DR_SR);
+    } else {
+        wand_n -= n;
+    }
+    {
+        float d = wand_to - wand_st, s = wand_rate * (float)n;
+        wand_st = fm_fabsf(d) <= s ? wand_to : wand_st + (d > 0.0f ? s : -s);
+    }
+}
+static void mv_add(const move_t *v, float l, float *off, uint8_t *on, float *pm, int *flags)
+{
+    switch (v->kind) {
+    case MK_SW: on[v->p] = 1; break;
+    case MK_OFF: on[v->p] = 2; break;
+    case MK_ZERO: off[v->p] -= (float)base[v->p] * l * (v->d ? (float)v->d * 0.01f : 1.0f); break;
+    case MK_SHIFT: pm[v->p] += (float)SHIFT_ST[(unsigned)base[P_SHIFT_MOVE] < DR_NSHIFT ? base[P_SHIFT_MOVE] : 0] * l; break;
+    case MK_CONV: pm[v->p] += conv_st() * l; *flags |= 1; break;    /* follows drone I */
+    case MK_PULSE: off[v->p] += (float)v->d * l * (0.5f - 0.5f * fm_cosf(6.2831853f * mac_ph)); *flags |= 2; break;
+    case MK_SLIP: off[v->p] += (float)v->d * l * (slip_v + slip_snag); *flags |= 4; break;
+    case MK_WOW: {                               /* two slow sines a drone, apart */
+        float ph = 6.2831853f * age_ph, g = (float)v->p;
+        pm[v->p] += (float)v->d * 0.01f * l * (0.6f * fm_sinf(ph * 0.21f + 2.0f * g) + 0.4f * fm_sinf(ph * (0.13f + 0.04f * g)));
+        *flags |= 8;
+        break;
+    }
+    default: off[v->p] += (float)v->d * l; break;
+    }
+}
 static void macro_apply(uint32_t n)              /* the offsets again, n samples on; what changes glides 25 ms */
 {
     float off[DR_NPARAMS], pm[DR_NGROUPS] = {0.0f, 0.0f}, step = (float)n / (MOVE_S * DR_SR);
     uint8_t on[DR_NPARAMS];
-    int m, k, i, pulsing = 0, conving = 0;
+    int m, k, i, flags = 0;
     for (i = 0; i < DR_NPARAMS; i++) {
         off[i] = 0.0f;
         on[i] = 0;
     }
     mv_moving = 0;
     for (m = 0; m < DR_NGEST; m++) {
+        const move_t *row = MACRO_MV[gtype[m] < DR_NGTYPE ? gtype[m] : 0];
         float a = mac_amt(m);
         if (a > mac_last[m] + 1e-4f)
             mac_out &= (uint8_t)~(1u << m);
         else if (a < mac_last[m] - 1e-4f)
             mac_out |= (uint8_t)(1u << m);
         mac_last[m] = a;
-        for (k = 0; k < MV_N && (MACRO_MV[m][k].d || MACRO_MV[m][k].kind != MK_ADD); k++) {
-            const move_t *v = &MACRO_MV[m][k];
+        for (k = 0; k < MV_N && (row[k].d || row[k].kind != MK_ADD); k++) {
+            const move_t *v = &row[k];
             float to = v->kind == MK_BUMP ? mv_ease(a, v->in0, v->in1) * (1.0f - mv_ease(a, v->out0, v->out1))
                      : mac_out >> m & 1u ? mv_ease(a, v->out0, v->out1) : mv_ease(a, v->in0, v->in1), *l = &mv_lvl[m][k];
             if (*l != to) {
                 *l = *l < to ? fm_minf(*l + step, to) : fm_maxf(*l - step, to);
                 mv_moving = 1;
             }
-            if (*l <= 0.0f)
-                continue;
-            switch (v->kind) {
-            case MK_SW: on[v->p] = 1; break;
-            case MK_ZERO: off[v->p] -= (float)base[v->p] * *l * (v->d ? (float)v->d * 0.01f : 1.0f); break;
-            case MK_SHIFT: pm[v->p] += (float)SHIFT_ST[(unsigned)base[P_GD_SHIFT] < DR_NSHIFT ? base[P_GD_SHIFT] : 0] * *l; break;
-            case MK_CONV: pm[v->p] += conv_st() * *l; mv_moving = 1; conving = 1; break;    /* follows drone I */
-            case MK_PULSE: off[v->p] += (float)v->d * *l * (0.5f - 0.5f * fm_cosf(6.2831853f * mac_ph)); pulsing = 1; break;
-            default: off[v->p] += (float)v->d * *l; break;
-            }
+            if (*l > 0.0f)
+                mv_add(v, *l, off, on, pm, &flags);
         }
+    }
+    {   /* AGE: toward its knob, slowly */
+        float to = (float)base[P_AGE] * 0.01f, s = (float)n / (AGE_S * DR_SR);
+        if (age_l != to) {
+            age_l = age_l < to ? fm_minf(age_l + s, to) : fm_maxf(age_l - s, to);
+            mv_moving = 1;
+        }
+        if (age_l > 0.0f)
+            for (k = 0; k < MV_N && (AGE_MV[k].d || AGE_MV[k].kind != MK_ADD); k++)
+                mv_add(&AGE_MV[k], age_l, off, on, pm, &flags);
+    }
+    if (base[P_WANDER] || wand_st != 0.0f) {     /* WANDER */
+        wander_run(n);
+        pm[1] += wand_st;
+        mv_moving = 1;
     }
     mac_p[0] = pm[0];
     mac_p[1] = pm[1];
-    if (conving) {                               /* Converge wavering */
+    if (flags & 1) {                             /* Converge wavering */
         conv_ph += (float)n * (CONV_HZ / DR_SR);
         conv_ph -= (float)(int)conv_ph;
+        mv_moving = 1;
     }
-    if (pulsing) {                               /* breathing: on, and on again next block */
+    if (flags & 2) {                             /* breathing: on, and on again next block */
         mac_ph += (float)n * (PULSE_HZ / DR_SR);
         mac_ph -= (float)(int)mac_ph;
         mv_moving = 1;
     } else {
         mac_ph = 0.0f;                           /* the next breath starts from the top (no dip at once) */
     }
+    if (flags & 4) {                             /* Glitch's slip */
+        slip_run(n);
+        mv_moving = 1;
+    } else {
+        slip_v = slip_to = 0.0f;
+        slip_n = 0;
+    }
+    if (flags & 8) {                             /* Age's wow */
+        age_ph += (float)n / DR_SR;
+        if (age_ph > 1000.0f)
+            age_ph -= 1000.0f;
+    }
     for (i = 0; i < DR_NPARAMS; i++) {
         int v;
-        moff[i] = on[i] ? (int16_t)MOFF_ON : (int16_t)(off[i] + (off[i] >= 0.0f ? 0.5f : -0.5f));
+        moff[i] = on[i] == 1 ? (int16_t)MOFF_ON : on[i] == 2 ? (int16_t)MOFF_OFF
+                                                 : (int16_t)(off[i] + (off[i] >= 0.0f ? 0.5f : -0.5f));
         v = heard(i);
         if (v != par[i]) {
             par[i] = (int16_t)v;
@@ -690,6 +829,7 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
     mac_dirty = 0;
 }
 
+float dr_wander(void) { return wand_st; }
 int dr_heard(int p) { return p >= 0 && p < DR_NPARAMS ? par[p] : 0; }
 float dr_mac_pitch(int g) { return g >= 0 && g < DR_NGROUPS ? mac_p[g] : 0.0f; }
 
@@ -707,11 +847,20 @@ static void drain(void)
                 mac_dirty = 1;
             }
             break;
+        case C_GTYPE:
+            if (a < DR_NGEST && b >= 0 && b < DR_NGTYPE && gtype[a] != (uint8_t)b) {
+                int k;
+                gtype[a] = (uint8_t)b;
+                for (k = 0; k < MV_N; k++)         /* the new one from nothing (the old one's levels meant others) */
+                    mv_lvl[a][k] = 0.0f;
+                mac_dirty = 1;
+            }
+            break;
         case C_SET:
             if (a < DR_NPARAMS) {
                 base[a] = (int16_t)(b < PARAMS[a].lo ? PARAMS[a].lo : b > PARAMS[a].hi ? PARAMS[a].hi : b);
                 par[a] = (int16_t)heard(a);    /* with the macros' offset on it, if any */
-                if (a >= P_GD_WEIGHT && a <= P_GD_WASH)
+                if (a >= P_WANDER && a <= P_GD_3)
                     mac_dirty = 1;             /* an amount or a depth: the offsets again */
                 {   /* its glide: a step a sample, to arrive over the time asked for (or 25 ms) */
                     float ms = pslide_ms[a] ? (float)pslide_ms[a] : 25.0f;
