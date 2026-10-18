@@ -324,11 +324,31 @@ in the panel's groups. It steps aside while you turn a knob or hold a white key.
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, over the Morph time. Press it again on the way back and you pick up from there |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down (lifting your finger can't move it), and **stays** when you let go: a sound of its own between the two |
-| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're read-only (pick bank A, B or C first: SEL + D5, E5 or F5) |
-| **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (the starting sound and a deep bass sound for now; more to come). The screen names scenes by bank: "B5" |
+| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Into the Presets too, except P12 (Clean), which is locked |
+| **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
 | **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The macros](#the-macros)) |
 | **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it |
 | **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
+
+### The Presets
+
+Twelve sounds to start from on the Presets bank (SEL + G5), each showing a part of what Niagara Drift does. Save
+over any of them with your own sound (SAVE + the key), except P12.
+
+| Key | Preset | What it shows |
+|---|---|---|
+| P1 | **Niagara** | the starting sound: two drones breathing slowly, like a calm Lyra-8 |
+| P2 | **Deep** | low drones, the subs two octaves down, dark and driven |
+| P3 | **Just fifths** | pure (just) intervals that don't beat, triangles, little movement |
+| P4 | **Glass** | high sines an octave apart, beating a little, in a long bright reverb |
+| P5 | **Choir** | a minor third, each drone a detuned unison, a band of noise, the chorus hall |
+| P6 | **Wanderer** | drone II wandering a major pentatonic over drone I, gliding |
+| P7 | **Tape** | worn: Age and Character, a tape delay, a little hiss |
+| P8 | **Pulse** | the Swell in time, deep and swung, ping-pong echoes |
+| P9 | **Howl** | low, the feedback near its edge, resonant and driven |
+| P10 | **Cathedral** | soft waves an octave apart in a long, dark reverb, almost a freeze |
+| P11 | **Metal** | cross-mod and hard sync, a square on drone II, resonant |
+| P12 | **Clean** (locked) | one oscillator, everything else off: a plain saw to build from |
 
 ### MIDI
 

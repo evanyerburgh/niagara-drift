@@ -118,7 +118,7 @@ void plat_midi_out(uint32_t pkt)
 
 /* flash: one buffer per object, kept across a simulated reboot */
 static uint8_t store[OBJ_NOBJ][PLAT_STORE_MAX];
-static int store_len[OBJ_NOBJ] = {-1, -1, -1, -1};
+static int store_len[OBJ_NOBJ] = {-1, -1, -1, -1, -1};
 static uint32_t store_writes;
 int plat_store_load(uint32_t obj, void *dst, uint32_t max)
 {

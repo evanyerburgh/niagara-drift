@@ -67,9 +67,10 @@ class FakeFM1:
     """a MIDI backend with one FM-1 on it"""
 
     def __init__(self, image, identity="FM-1_015", name="FM-1", unplug_after=None, after_write="FM-1_900",
-                 stall_after=None, bad_addr=None, stored=None):
+                 stall_after=None, bad_addr=None, stored=None, nobj=5):
         self.image, self.unplug_after, self.after_write = image, unplug_after, after_write
         self.stored = stored                  # Niagara Drift's objects {obj: bytes}; None: no backup commands
+        self.nobj = nobj                      # objects this firmware knows (older ones: 4, no Presets bank)
         self.buf, self.restarted = bytearray(3840), 0
         self.stall_after, self.bad_addr = stall_after, bad_addr
         self.served = self.bad = self.upgrades = 0
@@ -105,6 +106,8 @@ class FakeFM1:
             return False
         cmd, b = u[2], u[6:-1]
         if cmd == 0x70:
+            if b[0] >= self.nobj:
+                return True                   # an object it doesn't know: no answer (main_fm1.c)
             data = self.stored.get(b[0], b"")
             off = b[1] | b[2] << 8
             self.tx(I.nd_msg(0x70, bytes([b[0], b[1], b[2], len(data) & 0xFF, len(data) >> 8]) + data[off:off + 24]))
@@ -309,7 +312,7 @@ def against_js():
 
 def backups():
     image = I.logical_image(package())
-    objs = {0: bytes(range(256)) * 5 + b"proj", 1: b"panel-cal", 2: b"", 3: b"bank C " * 40}
+    objs = {0: bytes(range(256)) * 5 + b"proj", 1: b"panel-cal", 2: b"", 3: b"bank C " * 40, 4: b"presets " * 30}
     dev = FakeFM1(image, identity="FM-1_800", stored=dict(objs))
     f = TMP / "b.json"
     rc, out, err = cli(["--backup", str(f)], dev)
@@ -321,6 +324,10 @@ def backups():
     ok(rc == 0 and {k: v for k, v in dev2.stored.items()} == {k: v for k, v in objs.items() if v},
        "--restore writes them back (empty ones skipped)")
     ok(dev2.restarted == 1, "... and restarts the FM-1")
+    old = {k: v for k, v in objs.items() if k < 4}
+    rc, out, err = cli(["--backup", str(TMP / "old.json")], FakeFM1(image, identity="FM-1_800", stored=dict(old), nobj=4))
+    ok(rc == 0 and I.read_backup(str(TMP / "old.json")) == old,
+       "--backup of a firmware before the Presets bank: the four it has, no error")
     rc, out, err = cli(["--backup", str(TMP / "x.json")], FakeFM1(image))
     ok(rc != 0 and "can't make a backup" in err, "--backup on another firmware: refused, no file")
     old = I.BACKUP_DIR

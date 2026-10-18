@@ -1,10 +1,12 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 /* Niagara Drift project (from FoMni's): the sound and bank A in one flash object (OBJ_PROJ), banks B and C in
- * one each (OBJ_BANKB, OBJ_BANKC); the Presets bank is in the firmware. A project of another format, or none,
+ * one each (OBJ_BANKB, OBJ_BANKC); the Presets bank is the firmware's, each saved over in OBJ_BANKP (all but
+ * PRESET_LOCKED, the clean sound: Evan, 2026-10-18). A project of another format, or none,
  * gives the defaults; 0.1's (19) and v0.2's first (20) are converted. Part of the unity build, after app.h. */
 project_t proj;
-static bank_t bank_bc[2];                  /* banks B, C */
-static uint8_t bank_dirty;                 /* bit 1 B, bit 2 C: to be written with the next save */
+static bank_t bank_bc[3];                  /* banks B, C, and the Presets saved over (used: which are) */
+static uint8_t bank_dirty;                 /* bit 1 B, bit 2 C, bit 3 the Presets: to be written with the next save */
+static const uint8_t BANK_OBJ[3] = {OBJ_BANKB, OBJ_BANKC, OBJ_BANKP};
 static uint32_t proj_h;                    /* a hash of the project as on the flash, 0 = unknown: a save that
                                             * would write the same bytes skips it (each write is a late block) */
 static uint32_t proj_hash(void)
@@ -16,13 +18,59 @@ static uint32_t proj_hash(void)
     return h | 1u;                             /* never 0 */
 }
 
-/* the Presets bank: the starting sound, and the bass test (both drones an octave down, the filters darker,
- * resonance 100); the rest to be made by ear. Each a list of changes from the defaults, ended by -1 */
-static const int16_t PRESET_CHANGES[][9] = {
+/* the Presets bank (Evan, 2026-10-18): P1 the starting sound, then sounds each showing a part of the range, P12 the
+ * clean one (one oscillator, everything off; locked). Each a list of changes from the defaults, ended by -1; any
+ * of them but P12 can be saved over (OBJ_BANKP) */
+#define I_(p) DR_GP(0, p)
+#define II_(p) DR_GP(1, p)
+#define PRESET_N 64
+static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
+    /* P1 NIAGARA: the starting sound */
     {-1},
-    {DR_GP(0, GP_PITCH), 3800, DR_GP(1, GP_PITCH), 4500, DR_GP(0, GP_CUTOFF), 450, DR_GP(1, GP_CUTOFF), 430, -1},
+    /* P2 DEEP: low, the subs up two octaves down, dark and driven, slow */
+    {I_(GP_PITCH), 3800, II_(GP_PITCH), 4500, I_(GP_MIX), 55, II_(GP_MIX), 40, I_(GP_SUBOCT), 2,
+     I_(GP_CUTOFF), 600, II_(GP_CUTOFF), 560, I_(GP_RESO), 150, II_(GP_RESO), 150, I_(GP_DRIVE), 55, II_(GP_DRIVE), 50,
+     P_CHAR, 20, P_LFO_RATE, 4, P_PULSE_DEPTH, 25, P_REV_MIX, 28, P_DLY_MIX, 12,  I_(GP_LEVEL), 100, II_(GP_LEVEL), 100, -1},
+    /* P3 JUST FIFTHS: pure intervals that don't beat, triangles, open, little movement */
+    {I_(GP_WAVE), 33, II_(GP_WAVE), 33, I_(GP_INTERVAL), 13, II_(GP_INTERVAL), 14, I_(GP_DETUNE), 0, II_(GP_DETUNE), 0,
+     I_(GP_CUTOFF), 820, II_(GP_CUTOFF), 780, P_DRIFT, 12, P_PULSE, 0, P_MOVE, 30, P_REV_TYPE, 1, P_REV_MIX, 45,  I_(GP_LEVEL), 44, II_(GP_LEVEL), 39, -1},
+    /* P4 GLASS: high sines an octave apart, beating a little, a long bright cathedral */
+    {I_(GP_PITCH), 7200, II_(GP_PITCH), 7900, I_(GP_WAVE), 0, II_(GP_WAVE), 0, I_(GP_INTERVAL), 14, I_(GP_DETUNE), 20,
+     II_(GP_DETUNE), 25, I_(GP_CUTOFF), 900, II_(GP_CUTOFF), 900, I_(GP_RESO), 100, II_(GP_RESO), 100, I_(GP_MIX), 0,
+     II_(GP_MIX), 0, P_PULSE, 0, P_REV_LEN, 85, P_REV_MIX, 60, P_REV_DAMP, 15, P_DLY_TIME, 70, P_DLY_MIX, 30,
+     P_DLY_REPEATS, 60,  I_(GP_LEVEL), 33, II_(GP_LEVEL), 29, -1},
+    /* P5 CHOIR: a minor third, each drone a detuned unison, a band of pink noise, the chorus hall */
+    {II_(GP_PITCH), 5300, I_(GP_WAVE), 60, II_(GP_WAVE), 60, I_(GP_DETUNE), 45, II_(GP_DETUNE), 50, I_(GP_CUTOFF), 560,
+     II_(GP_CUTOFF), 600, I_(GP_RESO), 320, II_(GP_RESO), 320, I_(GP_NOISE), 12, II_(GP_NOISE), 12, II_(GP_INTERVAL), 5,
+     P_CHAR, 15, P_REV_TYPE, 3, P_REV_MIX, 50,  I_(GP_LEVEL), 100, II_(GP_LEVEL), 90, -1},
+    /* P6 WANDERER: drone II wanders a major pentatonic over drone I, gliding; no Swell */
+    {I_(GP_PITCH), 4800, II_(GP_PITCH), 5500, P_WANDER, 45, P_WSCALE, 1, P_GLIDE, 35, P_PULSE, 0, P_DLY_MIX, 35,
+     P_DLY_REPEATS, 55,  I_(GP_LEVEL), 46, II_(GP_LEVEL), 40, -1},
+    /* P7 TAPE: worn: Age and Character, a tape delay, a little hiss, darker */
+    {P_AGE, 70, P_CHAR, 50, P_DLY_TYPE, 0, P_DLY_MIX, 35, P_DLY_REPEATS, 55, I_(GP_CUTOFF), 600, II_(GP_CUTOFF), 580,
+     I_(GP_NOISE), 15, II_(GP_NOISE), 10,  I_(GP_LEVEL), 100, II_(GP_LEVEL), 100, -1},
+    /* P8 PULSE: the Swell in time, deep and swung, ping-pong echoes */
+    {P_PULSE_RATE, 40, P_PULSE_DEPTH, 70, P_PULSE_SHAPE, 60, P_PULSE_SWING, 20, P_DLY_TYPE, 2, P_DLY_TIME, 45,
+     P_DLY_MIX, 30, -1},
+    /* P9 HOWL: low, the feedback near its edge, resonant and driven, dark */
+    {I_(GP_PITCH), 3800, II_(GP_PITCH), 4500, P_FEEDBACK, 70, P_CHAR, 30, I_(GP_CUTOFF), 560, II_(GP_CUTOFF), 540,
+     I_(GP_RESO), 500, II_(GP_RESO), 500, I_(GP_DRIVE), 50, II_(GP_DRIVE), 50, P_DLY_REPEATS, 65, P_DLY_MIX, 35,
+     I_(GP_LEVEL), 100, II_(GP_LEVEL), 100,
+     P_REV_MIX, 40, P_MOVE, 40, -1},
+    /* P10 CATHEDRAL: soft waves an octave apart in a long dark reverb, almost a freeze */
+    {I_(GP_WAVE), 20, II_(GP_WAVE), 20, II_(GP_PITCH), 6200, I_(GP_CUTOFF), 650, II_(GP_CUTOFF), 650, P_PULSE, 0,
+     P_REV_TYPE, 2, P_REV_LEN, 98, P_REV_MIX, 75, P_REV_DAMP, 55, P_DLY_MIX, 20,  I_(GP_LEVEL), 27, II_(GP_LEVEL), 24, -1},
+    /* P11 METAL: cross-mod and hard sync, a square on drone II, resonant, in a small room */
+    {I_(GP_PITCH), 4300, II_(GP_PITCH), 6200, P_XMOD, 1, P_XMOD_AMT, 60, P_SYNC, 1, II_(GP_WAVE), 100,
+     I_(GP_CUTOFF), 750, II_(GP_CUTOFF), 750, I_(GP_RESO), 400, II_(GP_RESO), 400, I_(GP_DRIVE), 40, II_(GP_DRIVE), 40,
+     P_REV_TYPE, 0, P_REV_MIX, 25,  I_(GP_LEVEL), 100, II_(GP_LEVEL), 92, -1},
+    /* P12 CLEAN (locked): one oscillator, drone I's saw alone through an open filter, everything else off */
+    {II_(GP_LEVEL), 0, I_(GP_PARTNER), 0, II_(GP_PARTNER), 0, I_(GP_MIX), 0, I_(GP_CUTOFF), 1000, I_(GP_RESO), 0,
+     I_(GP_DRIVE), 0, I_(GP_OLFO_DEPTH), 0, I_(GP_FLFO_DEPTH), 0, II_(GP_FLFO_DEPTH), 0, P_DRIFT, 0, P_PULSE, 0,
+     P_DLY_MIX, 0, P_REV_MIX, 0, P_DLY_LFO_DEPTH, 0, P_MOVE, 0,  I_(GP_LEVEL), 67, -1},
 };
 #define NPRESETS ((int)(sizeof PRESET_CHANGES / sizeof PRESET_CHANGES[0]))
+_Static_assert(NPRESETS == NSCENES && PRESET_LOCKED < NPRESETS, "a Preset for every key, the clean one locked");
 static int16_t preset[NPRESETS][DR_NPARAMS];
 
 static void presets_init(void)
@@ -31,14 +79,8 @@ static void presets_init(void)
     for (n = 0; n < NPRESETS; n++) {
         for (k = 0; k < DR_NPARAMS; k++)
             preset[n][k] = dr_param_info(k)->def;
-        for (k = 0; PRESET_CHANGES[n][k] >= 0 && k < 8; k += 2)
+        for (k = 0; k < PRESET_N && PRESET_CHANGES[n][k] >= 0; k += 2)
             preset[n][PRESET_CHANGES[n][k]] = PRESET_CHANGES[n][k + 1];
-    }
-    for (n = 0; n < NPRESETS; n++) {           /* the bass test's resonance, low */
-        if (n == 1) {
-            preset[n][DR_GP(0, GP_RESO)] = 100;
-            preset[n][DR_GP(1, GP_RESO)] = 100;
-        }
     }
 }
 
@@ -62,6 +104,8 @@ void project_defaults(void)
     proj.mtime = MTIME_DEF;
     bank_blank(&bank_bc[0]);
     bank_blank(&bank_bc[1]);
+    bank_blank(&bank_bc[2]);
+    proj.bank = BANK_PRESETS;                  /* a new FM-1: the keys play the Presets */
 }
 
 const int16_t *scene_get(int bank, int n)
@@ -71,7 +115,10 @@ const int16_t *scene_get(int bank, int n)
     switch (bank) {
     case 0: return proj.scene_used >> n & 1u ? proj.scene[n] : 0;
     case 1: case 2: return bank_bc[bank - 1].used >> n & 1u ? bank_bc[bank - 1].scene[n] : 0;
-    case BANK_PRESETS: return n < NPRESETS ? preset[n] : 0;
+    case BANK_PRESETS:                         /* saved over, or the firmware's */
+        if (n != PRESET_LOCKED && (bank_bc[2].used >> n & 1u))
+            return bank_bc[2].scene[n];
+        return n < NPRESETS ? preset[n] : 0;
     default: return 0;
     }
 }
@@ -80,7 +127,7 @@ int scene_put(int bank, int n)
 {
     int16_t *d;
     int k;
-    if (n < 0 || n >= NSCENES || bank < 0 || bank > 2)
+    if (n < 0 || n >= NSCENES || bank < 0 || bank > BANK_PRESETS || (bank == BANK_PRESETS && n == PRESET_LOCKED))
         return -1;
     if (bank == 0) {
         d = proj.scene[n];
@@ -210,13 +257,13 @@ static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old s
     convert(dst, from);
 }
 
-static void bank_load(int b)                   /* B (1) or C (2): from its object, if it's sound */
+static void bank_load(int b)                   /* B (1), C (2) or the Presets (3): from its object, if it's sound */
 {
     bank_t *k = &bank_bc[b - 1];
     int i;
     bank_blank(k);
     memset(ld.raw, 0, sizeof ld.raw);
-    if (plat_store_load(b == 1 ? OBJ_BANKB : OBJ_BANKC, ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
+    if (plat_store_load(BANK_OBJ[b - 1], ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
         return;
     if (ld.b.format == PROJ_FORMAT || (ld.b.format >= 23u && ld.b.format <= 29u)) {
         uint32_t f = ld.b.format;
@@ -253,6 +300,7 @@ int project_load(void)
     bank_dirty = 0;
     bank_blank(&bank_bc[0]);
     bank_blank(&bank_bc[1]);
+    bank_blank(&bank_bc[2]);
     memset(ld.raw, 0, sizeof ld.raw);
     n = plat_store_load(OBJ_PROJ, ld.raw, sizeof ld.raw);
     from = ld.p.format;
@@ -308,6 +356,7 @@ int project_load(void)
         bank_load(1);
         bank_load(2);
     }
+    bank_load(3);
     proj.magic = PROJ_MAGIC;
     proj.format = PROJ_FORMAT;
     if (proj.bank >= NBANKS)
@@ -331,9 +380,9 @@ int project_save(void)                         /* the banks first: a converted 0
 {
     int rc = 0, b;
     uint32_t h;
-    for (b = 1; b <= 2; b++)
+    for (b = 1; b <= 3; b++)
         if (!rc && (bank_dirty >> b & 1u)) {
-            rc = plat_store_save(b == 1 ? OBJ_BANKB : OBJ_BANKC, &bank_bc[b - 1], sizeof bank_bc[b - 1]);
+            rc = plat_store_save(BANK_OBJ[b - 1], &bank_bc[b - 1], sizeof bank_bc[b - 1]);
             if (!rc)
                 bank_dirty &= (uint8_t)~(1u << b);
         }

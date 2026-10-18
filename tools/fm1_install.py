@@ -221,7 +221,8 @@ def pair_output(name, outs):
 # -------------------------------------------------------- backup / restore ---
 # Niagara Drift's stored objects (firmware/src/app/main_fm1.c, backup_cmd): the sound and bank A, the panel
 # calibration, banks B and C, read and written as they lie on the flash.
-OBJECTS = {0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C"}
+OBJECTS = {0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C", 4: "presets saved over"}
+OPTIONAL = {4}                     # firmware older than the Presets bank (v0.2) has no such object: none to keep
 BACKUP_DIR = os.path.join(os.path.expanduser("~"), "niagara-drift-backups")
 
 
@@ -266,6 +267,9 @@ def nd_backup(link):
             if r is None:
                 if obj == 0 and off == 0:
                     return None
+                if obj in OPTIONAL and off == 0:
+                    data = None               # this firmware hasn't got it: nothing to keep
+                    break
                 raise InstallError("lost", f"backup: no answer reading the {OBJECTS[obj]}")
             total, chunk = r[3] | r[4] << 8, r[5:]
             if total and not chunk:
@@ -274,7 +278,8 @@ def nd_backup(link):
             off += len(chunk)
             if not total:
                 break
-        objs[obj] = data
+        if data is not None:
+            objs[obj] = data
     return objs
 
 

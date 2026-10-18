@@ -4,6 +4,12 @@
 # macros (cents). 7 drone I's cutoff, 5 its osc mix, 11 its level, 25 drone II's detune, 63 the reverb mix, 42
 # cross-mod, 60-62 the delay's time, repeats, mix, 66 the delay LFO's depth, 17 drone I's filter LFO depth, 77
 # Character; 78 Wander, 79 Age, 80 Shift's move, 81 Wander's scale; 90-93 the keys' latches.
+# a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
+expect bank 3
+press SEL
+tapkey w12
+release SEL
+expect bank 0
 tap PLAY
 wait 1000
 expect heard7 700

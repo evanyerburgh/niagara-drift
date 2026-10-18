@@ -11,6 +11,12 @@ classic
 # depth.
 # Pages: 0 Play 1 1 Play 2 2 Tone 1 3 Tone 2 4 Osc 5 Source 6 LFO depths 7 LFO mods 8 Partner 9 Moves
 # 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
+# a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
+expect bank 3
+press SEL
+tapkey w12
+release SEL
+expect bank 0
 wav drone.wav
 wait 300
 shot stopped.png
@@ -505,17 +511,18 @@ expect scenes 1
 # a top key alone: a gesture (to come); the bank stays
 tapkey w12
 expect bank 1
-# the Presets: two so far (the starting sound, the bass test); read-only
+# the Presets: twelve; all but P12 (Clean) can be saved over (and picking the bank doesn't play G5's gesture)
 press SEL
 tapkey w15
 release SEL
 expect bank 3
-expect bscenes 3
+expect par93 0
+expect bscenes 4095
 press SAVE
-tapkey w5
+tapkey w11
 release SAVE
 wait 300
-expect bscenes 3
+expect bscenes 4095
 tapkey w1
 wait 6000
 expect par0 3800
