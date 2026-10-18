@@ -226,6 +226,7 @@ html { scroll-behavior: smooth; } @media (prefers-reduced-motion: reduce) { html
 .g-page .k { font-size: .85rem; font-weight: 500; line-height: 1.15; padding: .35rem .35rem; border-radius: 6px; text-align: center; min-height: 2.1rem; box-shadow: inset 0 0 0 1px #ffffff1f;
              display: grid; place-items: center; border-left: 3px solid currentColor; background: var(--ground); border-radius: 10px; }
 .k.d1 { color: var(--d1); } .k.d2 { color: var(--d2); }
+.g-page .k.none { color: var(--muted); box-shadow: none; background: transparent; border-color: transparent; }
 /* LFO depths: per drone, so its row says whose (the waves are I and II too: these are the drones) */
 .g-page.drones .dl { grid-row: 2; grid-column: 1 / 3; text-align: center; font: 600 .85rem "Inter Tight", sans-serif; margin-bottom: -.15rem; }
 .g-page.drones .dl.d2 { grid-column: 3 / 5; } .g-page.drones .k { grid-row: 3; }
@@ -352,7 +353,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
         <div class="g-btn">HOME</div>
         <div class="pstack">
         <div class="g-page"><i>Play 1</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Pitch</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Cutoff</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Pitch</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Cutoff</span></div>
-        <div class="g-page"><i>Play 2</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Reso</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Level</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Reso</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Level</span></div>
+        <div class="g-page"><i>Play 2</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Level</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Reso</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Level</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Reso</span></div>
         <p class="pnote combos"><span>Start or stop drone II alone: <span class="cap">SEL</span> + <span class="cap">PLAY</span></span></p>
         </div>
       </div>
@@ -369,7 +370,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
         <div class="g-btn">ENV</div>
         <div class="pstack">
         <div class="g-page"><i>Tone 1</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Noise</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Colour<small>white ↔ pink</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Noise</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Colour<small>white ↔ pink</small></span></div>
-        <div class="g-page"><i>Tone 2</i><span class="k both"><span class="sr">Knob 1: </span>Character<small>clean → vintage</small></span><span class="k both"><span class="sr">Knob 2: </span>Feedback</span><span class="k both"><span class="sr">Knob 3: </span>Speaker<small>low cut</small></span><span class="k both"><span class="sr">Knob 4: </span>Pressure<small>light ↔ firm</small></span></div>
+        <div class="g-page"><i>Tone 2</i><span class="k both"><span class="sr">Knob 1: </span>Character<small>clean → vintage</small></span><span class="k both"><span class="sr">Knob 2: </span>Feedback</span><span class="k both none"><span class="sr">Knob 3: </span>–</span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
         </div>
       </div>
       <div class="pblock">
@@ -527,6 +528,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
         <div class="pstack">
         <div class="g-page"><i>Setup 1</i><span class="k both"><span class="sr">Knob 1: </span>Glide</span><span class="k both"><span class="sr">Knob 2: </span>Fade<small>PLAY’s fade</small></span><span class="k both"><span class="sr">Knob 3: </span>Drift<small>slow wander</small></span><span class="k both"><span class="sr">Knob 4: </span>Stereo<small>width</small></span></div>
         <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Morph<small>switch time</small></span><span class="k both"><span class="sr">Knob 2: </span>Scene switch<small>switch time</small></span><span class="k both"><span class="sr">Knob 3: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 4: </span>Tuning<small>equal · just</small></span></div>
+        <div class="g-page"><i>Setup 3</i><span class="k both"><span class="sr">Knob 1: </span>Speaker<small>low cut</small></span><span class="k both"><span class="sr">Knob 2: </span>Pressure<small>light ↔ firm</small></span><span class="k both none"><span class="sr">Knob 3: </span>–</span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
         </div>
       </div>
     </div>
@@ -661,9 +663,9 @@ function hit(c, cls) {
 }
 // what each control does, on hover (the Buttons list below says the same)
 const TIP = { FX: "Delay: type, time, repeats, mix (again: Reverb: type, length to Inf, damp, mix)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths)",
-  ENV: "Tone 1: noise and its colour, white to pink (again: Tone 2: character, feedback, speaker, pressure); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: LFO mods: rate mod, cross-mod amount, delay LFO)",
-  EDIT: "Osc: X-Wave, pulse width (again: Source: osc mix, drive); hold to peek", GLO: "Setup 1: glide, fade, drift, stereo width (again: Setup 2: morph, scene switch, tune, tuning)",
-  HOME: "Play 1: pitch, cutoff (again: Play 2: resonance, levels)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Macros: Bloom, Weight, Tide, Tear (again: Partner: interval, detune)",
+  ENV: "Tone 1: noise and its colour, white to pink (again: Tone 2: character, feedback); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: LFO mods: rate mod, cross-mod amount, delay LFO)",
+  EDIT: "Osc: X-Wave, pulse width (again: Source: osc mix, drive); hold to peek", GLO: "Setup 1: glide, fade, drift, stereo width (again: Setup 2: morph, scene switch, tune, tuning; again: Setup 3: speaker, pressure)",
+  HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Macros: Bloom, Weight, Tide, Tear (again: Partner: interval, detune)",
   PLAY: "Drone in / out", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "A macro: Bloom to start (hold SEL and turn to pick another)", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };

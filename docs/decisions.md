@@ -181,3 +181,6 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-18: during a crossfade, SEL down holds the blend where it is; letting go of the key then keeps it (a
   finger's pressure falls on the way up, which had carried the blend back first).
 - 2026-10-18: the drones' pictures blend each new capture in over ~0.1 s.
+- 2026-10-18: Play 2 is level, then resonance (KNOB 1 / 3 level, 2 / 4 resonance); its picture shows the level above
+  the filter curve. Speaker and Pressure move from Tone 2 to a new GLO page, Setup 3; Tone 2 keeps character and
+  feedback (KNOB 3-4 nothing).
