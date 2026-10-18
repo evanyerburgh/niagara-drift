@@ -71,8 +71,10 @@ still works. If an FM-1 won't start at all, a Mac can still put the stock firmwa
 
 ## Playing it
 
-**KNOB 1–2 are always drone I, KNOB 3–4 always drone II.** The page buttons change what they do;
-the screen shows each page's settings as a picture, and the value of the knob you're turning.
+**On the drone pages, KNOB 1–2 are drone I and KNOB 3–4 drone II** (Play, Tone 1, Osc, Source, Partner, LFO
+depths: their names underlined amber and teal). The other pages hold settings for the whole sound, a knob each.
+The page buttons change what they do; the screen shows each page's settings as a picture, and the value of the
+knob you're turning.
 
 | | |
 |---|---|

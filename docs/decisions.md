@@ -278,3 +278,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   Presets levelled to P1 within about 2.4 dB A-weighted and through a 200 Hz high-pass (a small speaker); the screen
   names a Preset as it's chosen ("SCENE P3 EERIE"; not once it's saved over). Clean holds the loudness: the output's
   slow level (30 s while Clean is out, 3 s while in) eases down to match, as far as Clean is in, 12 dB at most.
+- 2026-10-18 (from review 4, no design change): the top bar's badges (SWELL, VISIT, II OUT) show only where they fit
+  beside the left-encoder pill; holding SAVE says "KEY: STORE  LET GO: SAVE"; the panel picture shows 12 scenes and
+  the four gestures; the README says the drone-I / drone-II knob rule holds on the drone pages.

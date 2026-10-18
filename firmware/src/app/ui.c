@@ -1182,6 +1182,17 @@ static void input(void)
             ui.rst_done = 1;
         }
     }
+    {   /* SAVE held a moment, no key yet: say what it does (the review: holding it gave no hint) */
+        static uint32_t save_dn;
+        if (btn >> B_SAVE & 1u) {
+            if (!save_dn)
+                save_dn = plat_ms() | 1u;
+            if (plat_ms() - save_dn >= HOLD_MS && !(ui.btn_used >> B_SAVE & 1u))
+                say_c("KEY: STORE", "LET GO: SAVE", K_GOLD);
+        } else {
+            save_dn = 0;
+        }
+    }
     for (i = 0; i < NSCENES; i++) {                    /* the white keys: scenes (SAVE held: store) */
         if ((ch & keys) >> WHITE_K[i] & 1u) {
             if (btn >> B_SAVE & 1u) {
@@ -1415,15 +1426,28 @@ static void draw_bar(void)
         }
         x = cv_text(x, 2, &FONT_XS, ui.loop == L_REC ? t : "LOOP", K_DRONE[0]) + 6;
     }
-    if (proj.par[P_PULSE] && ui.view != V_PULSE)  /* on its own page, its name says it */
-        x = cv_text(x, 2, &FONT_XS, "SWELL", K_PULSE) + 6;
-    if (visiting) {                            /* "VISIT B3": let go and it goes back */
-        char t[12] = "VISIT ";
-        scene_name(t + 6, proj.bank, ui.visit);
-        x = cv_text(x, 2, &FONT_XS, t, K_GOLD) + 6;
+    {   /* the badges, each only where it fits whole: left of the pill when a left encoder turns (the review: it
+         * cut "SWELL" to "SW") */
+        char t[34], v[12] = "VISIT ";
+        int32_t lim = rx;
+        if (gl) {
+            char *q = scopy(t, ui.glab[0]);
+            *q++ = ' ';
+            *q++ = ' ';
+            scopy(q, ui.glab[1]);
+            lim = rx - (text_w(&FONT_XS, t) + 12) - 4;
+        }
+        if (proj.par[P_PULSE] && ui.view != V_PULSE && x + text_w(&FONT_XS, "SWELL") <= lim)   /* on its own page,
+                                                                                                * its name says it */
+            x = cv_text(x, 2, &FONT_XS, "SWELL", K_PULSE) + 6;
+        if (visiting) {                        /* "VISIT B3": let go and it goes back */
+            scene_name(v + 6, proj.bank, ui.visit);
+            if (x + text_w(&FONT_XS, v) <= lim)
+                x = cv_text(x, 2, &FONT_XS, v, K_GOLD) + 6;
+        }
+        if (proj.par[P_II_OUT] && x + text_w(&FONT_XS, "II OUT") <= lim)   /* drone II out on its own (SEL + PLAY) */
+            x = cv_text(x, 2, &FONT_XS, "II OUT", K_DRONE[1]) + 6;
     }
-    if (proj.par[P_II_OUT])                    /* drone II faded out on its own (SEL + PLAY) */
-        x = cv_text(x, 2, &FONT_XS, "II OUT", K_DRONE[1]) + 6;
     if (gl) {                                  /* SELECT / ALGORITHM / PRESETS: a pill by the lights */
         char t[34];
         int32_t w;
