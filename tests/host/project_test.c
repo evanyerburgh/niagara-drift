@@ -84,7 +84,7 @@ int main(void)
     proj.par[DR_GP(0, GP_PITCH)] = 5000;
     check("a scene into C3", scene_put(2, 2) == 0 && scene_get(2, 2) && project_save() == 0 && store_n[OBJ_BANKC]);
     check("P12 (Clean) can't be saved over", scene_put(BANK_PRESETS, PRESET_LOCKED) != 0 &&
-                                                 scene_get(BANK_PRESETS, PRESET_LOCKED)[DR_GP(1, GP_LEVEL)] == 0);
+                                                 scene_get(BANK_PRESETS, PRESET_LOCKED)[P_II_OUT] == 1);
     proj.par[DR_GP(0, GP_PITCH)] = 4321;
     check("P3 can: saved into its own object", scene_put(BANK_PRESETS, 2) == 0 &&
                                                scene_get(BANK_PRESETS, 2)[DR_GP(0, GP_PITCH)] == 4321 &&
@@ -130,12 +130,12 @@ int main(void)
         p29.format = 29u;
         p29.par[DR_GP(0, GP_INTERVAL)] = 7;    /* +5th then */
         p29.par[DR_GP(1, GP_INTERVAL)] = 3;    /* unison then */
-        p29.par[P_JUST] = 1;
+        p29.par[P_II_OUT] = 1;
         memcpy(store[OBJ_PROJ], &p29, sizeof p29);
         store_n[OBJ_PROJ] = (int)sizeof p29;
         check("PR #24's project (29) loads: a just +5th stays just, unison stays unison, Tuning folded in",
               project_load() == 0 && proj.par[DR_GP(0, GP_INTERVAL)] == 13 &&
-                  proj.par[DR_GP(1, GP_INTERVAL)] == DR_IV_UNISON && proj.par[P_JUST] == 0);
+                  proj.par[DR_GP(1, GP_INTERVAL)] == DR_IV_UNISON && proj.par[P_II_OUT] == 0);
     }
     {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */
         static proj_v21_t p21;

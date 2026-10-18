@@ -257,3 +257,17 @@ at the end. The current state is in the [README](../README.md) and the code.
   saved); P12 is locked ("CLEAN IS LOCKED"). Levelled to P1 within about 2 dB (K-weighted). A new FM-1 starts on the
   Presets bank. The installer backs up the saved-over Presets too. SEL + a top key no longer latches that key's
   gesture as it's let go.
+- 2026-10-18 (Evan): the Presets get more range: P2 Abyss, P3 Eerie, P5 Heaven replace Deep, Just fifths, Choir;
+  P6-P11 redone. The drones sit a minor third, tritone, major tenth, minor seventh, whole tone, semitone, major sixth
+  and an inharmonic gap apart; sines to squares, LP/BP/HP, subharmonic subs, Character 0-70, Feedback 0-85, resonance
+  to 720; each its own reverb (Room, Hall, Cathedral, Chorus hall) and delay (Tape, Wide, Ping-pong, Clean; 70-450
+  ms). P4 Glass kept. Levelled to P1 within about 3 dB (Abyss -3.3, Howl -3.8, the dark ones). Drone II out (SEL +
+  PLAY) is a sound's value (P_II_OUT, Tuning's old slot): P12 Clean has it out, and turning drone II's knobs on any
+  page says "II OFF  SEL + PLAY". A scene key let go under 500 ms is a tap (was 250), as a gesture key; the
+  pressure crossfade still starts at 250 ms.
+- 2026-10-18 (Evan): each Preset moves its own way with the LFOs (before, all shared the starting sound's cutoff
+  sweep): Abyss the filter LFOs on resonance (+-55, rate 3); Eerie drone II's osc LFO on pitch (12) and rate mod 40
+  by Wave I; Heaven the osc LFOs on X-Wave (65); Wanderer Wave I Roundtooth, rate 12, filter +-60; Tape osc LFO on
+  both pitches (7, 6), rate 40 (a tape wow), filter +-40; Pulse the LFO locked to the Swell's bars, rate 35; Howl Wave
+  I random steps on drone I's resonance (50), rate 20; Cathedral filter +-15, Movement 25; Metal osc LFOs on X-Wave
+  (45), rate 45, filter +-50. A preset holds up to 40 changes.

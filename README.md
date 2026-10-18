@@ -320,7 +320,7 @@ in the panel's groups. It steps aside while you turn a knob or hold a white key.
 
 | | |
 |---|---|
-| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). A tap is anything under a quarter of a second, however hard. A scene keeps the sound, not the room: Speaker, Pressure, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
+| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Speaker, Pressure, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, over the Morph time. Press it again on the way back and you pick up from there |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down (lifting your finger can't move it), and **stays** when you let go: a sound of its own between the two |
@@ -337,18 +337,18 @@ over any of them with your own sound (SAVE + the key), except P12.
 
 | Key | Preset | What it shows |
 |---|---|---|
-| P1 | **Niagara** | the starting sound: two drones breathing slowly, like a calm Lyra-8 |
-| P2 | **Deep** | low drones, the subs two octaves down, dark and driven |
-| P3 | **Just fifths** | pure (just) intervals that don't beat, triangles, little movement |
+| P1 | **Niagara** | the starting sound: two drones a fifth apart, breathing slowly, like a calm Lyra-8 |
+| P2 | **Abyss** | dark: low, a minor third apart, a saw and a narrow square, a subharmonic sub, closed resonant filters, character and feedback, a dark hall, faint wide echoes; the LFOs on the resonance, very slowly: it swells and rings |
+| P3 | **Eerie** | a tritone apart, near-sines, drone II through a ringing band-pass with a breath of white noise, wandering a whole-tone scale; long clean echoes, a chorus hall; drone II's pitch wavers, the LFO's rate uneven |
 | P4 | **Glass** | high sines an octave apart, beating a little, in a long bright reverb |
-| P5 | **Choir** | a minor third, each drone a detuned unison, a band of noise, the chorus hall |
-| P6 | **Wanderer** | drone II wandering a major pentatonic over drone I, gliding |
-| P7 | **Tape** | worn: Age and Character, a tape delay, a little hiss |
-| P8 | **Pulse** | the Swell in time, deep and swung, ping-pong echoes |
-| P9 | **Howl** | low, the feedback near its edge, resonant and driven |
-| P10 | **Cathedral** | soft waves an octave apart in a long, dark reverb, almost a freeze |
-| P11 | **Metal** | cross-mod and hard sync, a square on drone II, resonant |
-| P12 | **Clean** (locked) | one oscillator, everything else off: a plain saw to build from |
+| P5 | **Heaven** | a major tenth apart, sines with just thirds and fifths, open and bright, a long light cathedral, wide echoes; the sines bloom slowly toward triangles and back |
+| P6 | **Wanderer** | a minor seventh apart, warm resonant saws, drone II wandering Dorian, gliding; wide echoes, a hall; a gentler sweep |
+| P7 | **Tape** | worn: a minor third apart, a wide square and a saw, Age and lots of Character, a tape delay, hiss, a small room; tape wow on both pitches |
+| P8 | **Pulse** | a whole tone apart, the Swell in time, deep and swung, drone II high-passed and resonant, ping-pong echoes; the LFO locked to the Swell's bars |
+| P9 | **Howl** | low, a semitone apart so they grind, the feedback high, drone II band-passed, driven; a short slap in a small room; the LFO in random steps on the resonance: it flares |
+| P10 | **Cathedral** | a major sixth apart, soft waves, a subharmonic far below, a long dark reverb, almost a freeze; almost no LFO: still and huge |
+| P11 | **Metal** | cross-mod and hard sync, squares an inharmonic gap apart, drone I high-passed and resonant, a clean slapback; the waves shimmer, a quicker sweep |
+| P12 | **Clean** (locked) | one oscillator, everything else off: a plain saw to build from. Drone II is out: SEL + PLAY brings it in |
 
 ### MIDI
 

@@ -139,7 +139,6 @@ static struct {
     uint32_t save_t;                   /* ... asked then */
     uint32_t arp_t;                    /* the last ARP tap (two quick taps: stay on the Swell page) */
     uint32_t sel_t;                    /* when SEL went down (held 0.4 s: the black keys' map) */
-    uint8_t v2_out;                    /* drone II faded out on its own (SEL + PLAY) */
     uint32_t rst_t;                    /* when the LFO reset key went down (a hold locks the LFO to the pulse) */
     uint8_t rst_done;                  /* that hold has acted */
     char msg[2][24];
@@ -360,8 +359,8 @@ static void knob_turn(int i, int32_t e)
     knob_t k = VIEW_KNOB[ui.view][i];
     if (p < 0)
         return;
-    if (ui.v2_out && k.g == 1 && (ui.view == V_PLAY || ui.view == V_PLAY2))   /* drone II out: say how it comes */
-        say_c("II OFF", "SEL + PLAY", K_DRONE[1]);                           /* back (Evan, 2026-10-18) */
+    if (proj.par[P_II_OUT] && k.g == 1)        /* drone II out: say how it comes back, on any page (Evan, 2026-10-18) */
+        say_c("II OFF", "SEL + PLAY", K_DRONE[1]);
     if (k.p == GP_PITCH && k.g < G)
         pitch_turn(k.g, p, EN_K1 + i, e);
     else if (dr_param_info(p)->hi - dr_param_info(p)->lo > 24)
@@ -824,13 +823,15 @@ static void scene_morph(void)
 
 /* THE PRESSURE CROSSFADE (v0.2, option D): a scene key held is a fader into its scene. Under PR_DEAD nothing
  * moves; PR_FULL is all the way; held at PR_COMMIT for PR_COMMIT_MS the scene is taken (the key flashes);
- * a tap (under PR_TAP_MS, however hard) goes there as before. Let go: back to where it began over the Morph
+ * a tap (let go under PR_TAP_MS, however hard) goes there to stay. Let go: back to where it began over the Morph
  * time; with SEL held, the blend stays. Pressing it again on the way back picks up from there. */
 #define PR_DEAD 0.08f
 #define PR_FULL 0.90f
 #define PR_COMMIT 0.90f
 #define PR_COMMIT_MS 300u
-#define PR_TAP_MS 250u
+#define PR_TAP_MS 500u                 /* a scene key let go sooner: a tap, there to stay, as a gesture key (Evan,
+                                        * 2026-10-18: 250 was too quick, a relaxed tap became a visit and went BACK) */
+#define PR_WAIT_MS 250u                /* ... held this long, the pressure starts to move the sound (a crossfade) */
 static void press_start(int n, const int16_t *sc)
 {
     int k;
@@ -865,7 +866,7 @@ static void press_run(void)                            /* each frame, while a sc
     uint32_t now = plat_ms();
     if (ui.press < 0)
         return;
-    if ((ui.btn >> B_SEL & 1u) && !ui.press_done && now - ui.press_t0 >= PR_TAP_MS) {
+    if ((ui.btn >> B_SEL & 1u) && !ui.press_done && now - ui.press_t0 >= PR_WAIT_MS) {
         /* SEL down during a crossfade: the blend holds where it is, so lifting the finger (its pressure falls
          * on the way up, before the key lets go) can't take it back; let go to keep it */
         ui.btn_used |= 1u << B_SEL;
@@ -890,7 +891,7 @@ static void press_run(void)                            /* each frame, while a sc
     if ((float)p / 127.0f >= PR_COMMIT) {
         if (!ui.press_hi_t)
             ui.press_hi_t = now;
-        if (!ui.press_done && now - ui.press_hi_t >= PR_COMMIT_MS && now - ui.press_t0 >= PR_TAP_MS) {
+        if (!ui.press_done && now - ui.press_hi_t >= PR_COMMIT_MS && now - ui.press_t0 >= PR_WAIT_MS) {
             ui.press_done = 1;
             ui.flash_t = now;
         }
@@ -900,7 +901,7 @@ static void press_run(void)                            /* each frame, while a sc
     if (ui.press_done)
         x = 1.0f;
     ui.press_x += (x - ui.press_x) * 0.35f;            /* ~50 ms at the frame rate: calm, not slow */
-    if (now - ui.press_t0 < PR_TAP_MS && !ui.press_done)
+    if (now - ui.press_t0 < PR_WAIT_MS && !ui.press_done)
         return;                                        /* a tap so far: nothing moves yet */
     sound_blend(ui.visit_back, ui.press_to, ui.press_x);
     t[0] = 0;
@@ -929,7 +930,8 @@ static void press_end(void)                            /* the key let go */
     ui.press = -1;
     if (n < 0)
         return;
-    if (!ui.press_done && now - ui.press_t0 < PR_TAP_MS) {   /* a tap: there, over the Scene switch time */
+    if (!ui.press_done && now - ui.press_t0 < PR_TAP_MS && !(ui.btn >> B_SEL & 1u)) {
+        /* a tap (however far a crossfade had begun): there, over the Scene switch time */
         scene_recall(n);
         return;
     }
@@ -993,7 +995,7 @@ static void midi_in(void)
  * tapping a latched one lets it go (over its own time); SEL held as you let go keeps it where it is. No depth or
  * time of its own to set (Evan, 2026-10-18: how you play it sets them); Shift's move is on Moves. Latched
  * levels are values (P_GL_*): scenes keep them. */
-#define GEST_TAP_MS 500u               /* a gesture key let go sooner: a tap (Evan, 2026-10-18: 250 was too quick) */
+#define GEST_TAP_MS PR_TAP_MS          /* a gesture key let go sooner: a tap, as a scene key */
 static void gesture_down(int g)
 {
     if (proj.par[P_GL_0 + g]) {                     /* latched: let go of it, whatever the press */
@@ -1143,9 +1145,8 @@ static void input(void)
             }
             if (i == B_PLAY && (btn >> B_SEL & 1u)) {  /* SEL + PLAY: drone II alone, out / in */
                 ui.btn_used |= 1u << B_SEL;
-                ui.v2_out = (uint8_t)!ui.v2_out;
-                dr_voice(1, !ui.v2_out);
-                say_c("DRONE II", ui.v2_out ? "OUT" : "IN", K_DRONE[1]);
+                param_set(P_II_OUT, !proj.par[P_II_OUT]);   /* a sound's: scenes keep it */
+                say_c("DRONE II", proj.par[P_II_OUT] ? "OUT" : "IN", K_DRONE[1]);
             } else if (i == B_PLAY) {                  /* PLAY on the press */
                 static uint8_t seeded;
                 if (!seeded) {                         /* the random ones from when the hand first pressed
@@ -1371,7 +1372,7 @@ static void draw_bar(void)
     uint32_t rec_s = ui.loop == L_REC ? (plat_ms() - ui.loop_t0) / 1000u : 0u;   /* REC: how long so far */
     uint32_t h = hash(hash(hash(2166136261u ^ rec_s, ui.view | ui.playing << 5 | ui.loop << 7 |
                                                   (uint32_t)proj.par[P_PULSE] << 9 | (uint32_t)gl << 10 |
-                                                  (uint32_t)ui.v2_out << 12),
+                                                  (uint32_t)proj.par[P_II_OUT] << 12),
                            (uint32_t)fade_q()),
                       gl ? (uint32_t)ui.glab[1][0] << 16 | (uint32_t)ui.glab[1][1] << 8 | ui.glab[1][2] |
                                (uint32_t)ui.glab[1][3] << 24 | (uint32_t)ui.glab[0][0] << 4
@@ -1421,7 +1422,7 @@ static void draw_bar(void)
         scene_name(t + 6, proj.bank, ui.visit);
         x = cv_text(x, 2, &FONT_XS, t, K_GOLD) + 6;
     }
-    if (ui.v2_out)                             /* drone II faded out on its own (SEL + PLAY) */
+    if (proj.par[P_II_OUT])                    /* drone II faded out on its own (SEL + PLAY) */
         x = cv_text(x, 2, &FONT_XS, "II OUT", K_DRONE[1]) + 6;
     if (gl) {                                  /* SELECT / ALGORITHM / PRESETS: a pill by the lights */
         char t[34];

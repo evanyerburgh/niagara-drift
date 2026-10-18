@@ -101,7 +101,8 @@ enum {
                                      * the sound to its new setting: OCT, filter mode, pulse, partner, sub, the
                                      * links, the LFO routes */
     P_SCENE_T,                      /* 0..100 = 0.1 s .. 5 min: a scene's morph (the white keys) */
-    P_JUST,                         /* unused since 30 (Tuning: now in each drone's Interval) */
+    P_II_OUT,                       /* drone II faded out on its own (1; SEL + PLAY), a sound's (P12 Clean: one
+                                     * oscillator); was Tuning until 30, 0 since */
     P_SPEAKER,                      /* 0..100: a low cut for a small speaker, 0 off (headphones) .. 240 Hz */
     P_PLOCK,                        /* the pitches locked (1): the pitch knobs do nothing (a switch) */
     P_MOVE,                         /* MOVEMENT, 0..100 = every LFO depth x 0 .. x 2 (50: as set) */

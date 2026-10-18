@@ -523,10 +523,32 @@ tapkey w11
 release SAVE
 wait 300
 expect bscenes 4095
+# P12 (Clean): one oscillator, drone II out on its own; SEL + PLAY brings it in, and out again (playing)
+tap PLAY
+wait 1600
+expect playing 1
+tapkey w11
+wait 2500
+expect par72 1
+expect level1 <2
+press SEL
+tap PLAY
+release SEL
+wait 2500
+expect par72 0
+expect level1 >3
+press SEL
+tap PLAY
+release SEL
+wait 2500
+expect par72 1
+tap PLAY
+wait 1600
+expect playing 0
 tapkey w1
 wait 6000
-expect par0 3800
-expect par21 4500
+expect par0 3600
+expect par21 3900
 # pitch lock on: a scene leaves the pitches where they are
 tapkey w0
 wait 6000

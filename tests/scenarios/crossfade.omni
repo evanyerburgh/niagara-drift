@@ -25,10 +25,21 @@ key w0 up
 wait 1200
 expect par7 300
 expect scene_at -1
-# a tap, however hard: there, over the Scene switch time (1.1 s), and stay
+# a tap (let go under half a second), however hard: there, over the Scene switch time (1.1 s), and stay
 key w0 down
 pressure w0 127
 wait 100
+key w0 up
+wait 1600
+expect par7 700
+expect scene_at 0
+# a relaxed tap (0.4 s, a light press): the scene too, to stay (Evan, 2026-10-18: it went BACK)
+spin K2 -40
+wait 300
+expect scene_at -1
+key w0 down
+pressure w0 40
+wait 400
 key w0 up
 wait 1600
 expect par7 700
@@ -77,7 +88,7 @@ key w0 up
 wait 150
 key w0 down
 pressure w0 64
-wait 400
+wait 600
 expect par7 >480
 key w0 up
 wait 1200
