@@ -257,3 +257,11 @@ at the end. The current state is in the [README](../README.md) and the code.
   saved); P12 is locked ("CLEAN IS LOCKED"). Levelled to P1 within about 2 dB (K-weighted). A new FM-1 starts on the
   Presets bank. The installer backs up the saved-over Presets too. SEL + a top key no longer latches that key's
   gesture as it's let go.
+- 2026-10-18 (Evan): the Presets get more range: P2 Abyss, P3 Eerie, P5 Heaven replace Deep, Just fifths, Choir;
+  P6-P11 redone. The drones sit a minor third, tritone, major tenth, minor seventh, whole tone, semitone, major sixth
+  and an inharmonic gap apart; sines to squares, LP/BP/HP, subharmonic subs, Character 0-70, Feedback 0-85, resonance
+  to 720; each its own reverb (Room, Hall, Cathedral, Chorus hall) and delay (Tape, Wide, Ping-pong, Clean; 70-450
+  ms). P4 Glass kept. Levelled to P1 within about 3 dB (Abyss -3.3, Howl -3.8, the dark ones). Drone II out (SEL +
+  PLAY) is a sound's value (P_II_OUT, Tuning's old slot): P12 Clean has it out, and turning drone II's knobs on any
+  page says "II OFF  SEL + PLAY". A scene key let go under 500 ms is a tap (was 250), as a gesture key; the
+  pressure crossfade still starts at 250 ms.
