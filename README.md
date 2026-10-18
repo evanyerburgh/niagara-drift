@@ -71,8 +71,10 @@ still works. If an FM-1 won't start at all, a Mac can still put the stock firmwa
 
 ## Playing it
 
-**KNOB 1–2 are always drone I, KNOB 3–4 always drone II.** The page buttons change what they do;
-the screen shows each page's settings as a picture, and the value of the knob you're turning.
+**On the drone pages, KNOB 1–2 are drone I and KNOB 3–4 drone II** (Play, Tone 1, Osc, Source, Partner, LFO
+depths: their names underlined amber and teal). The other pages hold settings for the whole sound, a knob each.
+The page buttons change what they do; the screen shows each page's settings as a picture, and the value of the
+knob you're turning.
 
 | | |
 |---|---|
@@ -84,7 +86,9 @@ the screen shows each page's settings as a picture, and the value of the knob yo
 ### Pages
 
 Tap a page button and the knobs stay on that page. Hold it to peek: turn a knob, let go, and you're
-back. Tap it again for its second page; "1/2" by the page's name shows which of its pages you're on.
+back. Tap it again for its second page; "1/2" by the page's name shows which of its pages you're on. A page
+button opens the page you last used there (HOME always opens Play 1), so after visiting Reverb, holding FX
+peeks at Reverb.
 Each page's screen shows a picture of what its knobs do, and the four values below it. Every knob
 glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
@@ -237,7 +241,7 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
 
 | Knob | Sets |
 |---|---|
-| SELECT | the rate, from one cycle in 50 seconds to 70 Hz (below 0.1 Hz the screen shows a cycle's length, "21s") |
+| SELECT | the rate, from one cycle in 50 seconds to 70 Hz (below 0.1 Hz the screen shows a cycle's length, "21s"). While SELECT, ALGORITHM or PRESETS turns, its value fills the bottom of the screen, large |
 | ALGORITHM | the **Movement**: every LFO depth together, from still (0%) to double (200%) |
 | OCT− · OCT+ | Wave I's · Wave II's shape: tap for the next (or off), round and round; SEL + OCT for the one before |
 
@@ -267,7 +271,7 @@ parts come in one after another, and go in their own order when you let go. Scen
 |---|---|---|
 | **Weight** | a full, warm bass: the sub comes up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. Let go: the brightness comes back first, the sub lingers | D5 |
 | **Shift** | a new chord, a voice at a time: drone I glides to the move you set (anywhere from a fifth down to a fifth up, in cents), drone II follows. Let go: drone I comes back first | E5 |
-| **Clean** | back to a clean sound, your notes kept: the grit leaves first (drive, character, feedback, noise, cross-mod, hard sync), then the movement (Movement, Drift, the Swell), then the effects (the repeats, both mixes, the reverb's length). Let go: the effects come back first, the grit last | F5 |
+| **Clean** | back to a clean sound, your notes kept: the grit leaves first (drive, character, feedback, noise, cross-mod, hard sync), then the movement (Movement, Drift, the Swell), then the effects (the repeats, both mixes, the reverb's length). Let go: the effects come back first, the grit last. It holds the loudness: with the dips of the Swell gone the sound would jump up, so the level eases down to where it was | F5 |
 | **Wash** | the delay first, then the reverb opens and grows longer and darker (toward Inf), each only up to where Wash aims (if your own effects are already further up, it leaves them be; the repeats stop short of the delay's howl), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5 |
 
 - **The gestures** are the top four white keys, always the same: D5 Weight, E5 Shift, F5 Clean, G5 Wash (they
@@ -327,27 +331,30 @@ in the panel's groups. It steps aside while you turn a knob or hold a white key.
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Into the Presets too, except P12 (Clean), which is locked |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
 | **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The macros](#the-macros)) |
-| **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it |
+| **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it (the Swell isn't touched then: a single tap
+switches it a moment later, once no second tap comes) |
 | **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 
 ### The Presets
 
-Twelve sounds to start from on the Presets bank (SEL + G5), each showing a part of what Niagara Drift does. Save
-over any of them with your own sound (SAVE + the key), except P12.
+Twelve sounds to start from on the Presets bank (SEL + G5), each showing a part of what Niagara Drift does. Most
+have drone I on D, so moving between them keeps the root and changes the interval and the sound; they're levelled to
+sound alike in loudness. The screen names the one you pick ("SCENE P3 EERIE"). Save over any of them with your own
+sound (SAVE + the key), except P12.
 
 | Key | Preset | What it shows |
 |---|---|---|
-| P1 | **Niagara** | the starting sound: two drones a fifth apart, breathing slowly, like a calm Lyra-8 |
-| P2 | **Abyss** | dark: low, a minor third apart, a saw and a narrow square, a subharmonic sub, closed resonant filters, character and feedback, a dark hall, faint wide echoes; the LFOs on the resonance, very slowly: it swells and rings |
-| P3 | **Eerie** | a tritone apart, near-sines, drone II through a ringing band-pass with a breath of white noise, wandering a whole-tone scale; long clean echoes, a chorus hall; drone II's pitch wavers, the LFO's rate uneven |
-| P4 | **Glass** | high sines an octave apart, beating a little, in a long bright reverb |
-| P5 | **Heaven** | a major tenth apart, sines with just thirds and fifths, open and bright, a long light cathedral, wide echoes; the sines bloom slowly toward triangles and back |
-| P6 | **Wanderer** | a minor seventh apart, warm resonant saws, drone II wandering Dorian, gliding; wide echoes, a hall; a gentler sweep |
-| P7 | **Tape** | worn: a minor third apart, a wide square and a saw, Age and lots of Character, a tape delay, hiss, a small room; tape wow on both pitches |
-| P8 | **Pulse** | a whole tone apart, the Swell in time, deep and swung, drone II high-passed and resonant, ping-pong echoes; the LFO locked to the Swell's bars |
-| P9 | **Howl** | low, a semitone apart so they grind, the feedback high, drone II band-passed, driven; a short slap in a small room; the LFO in random steps on the resonance: it flares |
-| P10 | **Cathedral** | a major sixth apart, soft waves, a subharmonic far below, a long dark reverb, almost a freeze; almost no LFO: still and huge |
-| P11 | **Metal** | cross-mod and hard sync, squares an inharmonic gap apart, drone I high-passed and resonant, a clean slapback; the waves shimmer, a quicker sweep |
+| P1 | **Niagara** | the starting sound: D and A a fifth apart, breathing slowly, like a calm Lyra-8 |
+| P2 | **Abyss** | dark: D over B a minor third below, a saw and a narrow square, a subharmonic sub, closed resonant filters, character and feedback, a dark hall; the resonance swells and rings |
+| P3 | **Eerie** | D and G♯, a tritone: near-sines, drone II through a ringing band-pass with a breath of white noise, wandering a whole-tone scale, its pitch wavering; long clean echoes, a chorus hall |
+| P4 | **Glass** | high sines a fifth apart (D5, A5), drone I's partner an octave up, beating a little, a long bright reverb |
+| P5 | **Heaven** | D and F♯ a tenth apart, sines with just thirds and fifths blooming toward triangles, a long light cathedral |
+| P6 | **Tanpura** | Sa and Pa: D with its high octave over the A below, bright buzzing strings, plucked about once a second |
+| P7 | **Tape** | worn: D and F, a wide square and a saw, Age and lots of Character, tape wow, a tape delay, hiss |
+| P8 | **Whistle** | the filters at the edge of resonance sing as sines of their own (D5, A5) over soft low drones; long clean echoes |
+| P9 | **Howl** | low, D and E♭ a semitone apart so they grind, the feedback high, drone II band-passed; flares at random |
+| P10 | **Cathedral** | D and B a sixth apart, soft waves, a sub below, a long dark reverb, almost a freeze; nearly still |
+| P11 | **Metal** | cross-mod and hard sync, squares an inharmonic gap apart, drone I high-passed, shimmering; a clean slapback |
 | P12 | **Clean** (locked) | one oscillator, everything else off: a plain saw to build from. Drone II is out: SEL + PLAY brings it in |
 
 ### MIDI

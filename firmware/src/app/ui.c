@@ -138,6 +138,8 @@ static struct {
     int8_t save_q;                     /* a save waiting for the dip (playing): -2 none, -1 the sound, N scene N */
     uint32_t save_t;                   /* ... asked then */
     uint32_t arp_t;                    /* the last ARP tap (two quick taps: stay on the Swell page) */
+    uint8_t arp_pend;                  /* ... its on / off still to come (if no second tap) */
+    uint8_t page_last[8];              /* each page button's page last shown (0: its first): opened again there */
     uint32_t sel_t;                    /* when SEL went down (held 0.4 s: the black keys' map) */
     uint32_t rst_t;                    /* when the LFO reset key went down (a hold locks the LFO to the pulse) */
     uint8_t rst_done;                  /* that hold has acted */
@@ -459,12 +461,16 @@ static void sw_toggle(sw_t w)
 }
 
 /* ------------------------------------------------------------ buttons --- */
+static int on_pages(int i) { return ui.view >= PAGE_BTN[i].first && ui.view < PAGE_BTN[i].first + PAGE_BTN[i].n; }
 static void set_view(int v)
 {
-    int i;
+    uint32_t i;
     ui.view = (uint8_t)v;
     for (i = 0; i < 4; i++)
         ui.touch_t[i] = 0;
+    for (i = 0; i < NPAGE_BTN; i++)                    /* remembered: the button opens it next time */
+        if (on_pages((int)i))
+            ui.page_last[i] = (uint8_t)(v - PAGE_BTN[i].first);
 }
 
 static int page_btn(int b)                             /* the index in PAGE_BTN, or -1 */
@@ -475,9 +481,9 @@ static int page_btn(int b)                             /* the index in PAGE_BTN,
             return (int)i;
     return -1;
 }
-static int on_pages(int i) { return ui.view >= PAGE_BTN[i].first && ui.view < PAGE_BTN[i].first + PAGE_BTN[i].n; }
 
-/* a page button pressed: its first page at once, unless already on its pages (then the next on a tap) */
+/* a page button pressed: the page of its last shown at once (the review: Reverb, Tone 2, Moves couldn't be peeked;
+ * HOME always Play 1, home), unless already on its pages (then the next on a tap) */
 static void page_down(int b)
 {
     int i = page_btn(b);
@@ -487,7 +493,16 @@ static void page_down(int b)
     ui.hold_from = ui.view;
     ui.hold_cycle = (uint8_t)on_pages(i);
     if (!ui.hold_cycle)
-        set_view(PAGE_BTN[i].first);
+        set_view(PAGE_BTN[i].first + (b == B_HOME ? 0 : ui.page_last[i]));
+}
+#define ARP_TAPS_MS 350u               /* two ARP taps this close: the Swell's page */
+static void arp_run(void)                              /* each frame: a lone ARP tap, once it's alone */
+{
+    if (ui.arp_pend && plat_ms() - ui.arp_t >= ARP_TAPS_MS) {
+        ui.arp_pend = 0;
+        param_set(P_PULSE, !proj.par[P_PULSE]);
+        say("SWELL", proj.par[P_PULSE] ? "ON" : "OFF");
+    }
 }
 /* let go: after a hold (or a knob turned while held), back where it was; after a tap, stay (or step on) */
 static void page_up(int b)
@@ -497,18 +512,17 @@ static void page_up(int b)
         return;
     peek = ui.hold_turned || plat_ms() - ui.hold_t >= HOLD_MS;
     if (b == B_ARP) {                                  /* ARP: a tap is the pulse on / off; its page only */
-        if (!peek) {                                   /* a tap: the swell on / off; two quick taps: */
-            uint32_t now = plat_ms();                  /* its page, to stay (the first tap undone) */
-            param_set(P_PULSE, !proj.par[P_PULSE]);
-            if (now - ui.arp_t < 350u) {
-                ui.arp_t = 0;
+        if (!peek) {                                   /* a tap: the swell on / off, once no second tap */
+            uint32_t now = plat_ms();                  /* follows; two quick taps: its page, to stay, the */
+            if (ui.arp_pend && now - ui.arp_t < ARP_TAPS_MS) {   /* Swell untouched (the review: it dipped) */
+                ui.arp_pend = 0;
                 set_view(V_PULSE);
                 ui.hold_btn = -1;
                 say("SWELL", "PAGE");
                 return;
             }
             ui.arp_t = now;
-            say("SWELL", proj.par[P_PULSE] ? "ON" : "OFF");
+            ui.arp_pend = 1;                           /* arp_run switches it */
         }
         if (!ui.hold_cycle)
             set_view(ui.hold_from);
@@ -762,7 +776,7 @@ static void scene_recall(int n)                        /* a white key: morph the
     ui.scene_at = (int8_t)n;
     ui.morph_t0 = plat_ms();
     ui.morph_ms = (uint32_t)(scene_s() * 1000.0f);
-    say(t, 0);
+    say(t, proj.bank == BANK_PRESETS ? preset_name(n) : 0);   /* "SCENE P3" / "EERIE" */
 }
 
 /* a visit let go: morph back to the sound before it, over the Scene switch time */
@@ -1182,6 +1196,17 @@ static void input(void)
             ui.rst_done = 1;
         }
     }
+    {   /* SAVE held a moment, no key yet: say what it does (the review: holding it gave no hint) */
+        static uint32_t save_dn;
+        if (btn >> B_SAVE & 1u) {
+            if (!save_dn)
+                save_dn = plat_ms() | 1u;
+            if (plat_ms() - save_dn >= HOLD_MS && !(ui.btn_used >> B_SAVE & 1u))
+                say_c("KEY: STORE", "LET GO: SAVE", K_GOLD);
+        } else {
+            save_dn = 0;
+        }
+    }
     for (i = 0; i < NSCENES; i++) {                    /* the white keys: scenes (SAVE held: store) */
         if ((ch & keys) >> WHITE_K[i] & 1u) {
             if (btn >> B_SAVE & 1u) {
@@ -1368,15 +1393,12 @@ static uint16_t page_col(void)
  * SELECT / ALGORITHM / PRESETS while one turns), the LFO's two lights */
 static void draw_bar(void)
 {
-    int gl = plat_ms() < ui.glab_until;
     uint32_t rec_s = ui.loop == L_REC ? (plat_ms() - ui.loop_t0) / 1000u : 0u;   /* REC: how long so far */
     uint32_t h = hash(hash(hash(2166136261u ^ rec_s, ui.view | ui.playing << 5 | ui.loop << 7 |
-                                                  (uint32_t)proj.par[P_PULSE] << 9 | (uint32_t)gl << 10 |
+                                                  (uint32_t)proj.par[P_PULSE] << 9 |
                                                   (uint32_t)proj.par[P_II_OUT] << 12),
                            (uint32_t)fade_q()),
-                      gl ? (uint32_t)ui.glab[1][0] << 16 | (uint32_t)ui.glab[1][1] << 8 | ui.glab[1][2] |
-                               (uint32_t)ui.glab[1][3] << 24 | (uint32_t)ui.glab[0][0] << 4
-                         : 0);
+                      0);
     int32_t x, i, rx = 234;
     int visiting = ui.visit >= 0 && plat_ms() - ui.visit_t >= HOLD_MS;          /* a scene key held: a visit */
     h = hash(h, (uint32_t)(visiting ? ui.visit + 1 : 0));
@@ -1418,24 +1440,14 @@ static void draw_bar(void)
     if (proj.par[P_PULSE] && ui.view != V_PULSE)  /* on its own page, its name says it */
         x = cv_text(x, 2, &FONT_XS, "SWELL", K_PULSE) + 6;
     if (visiting) {                            /* "VISIT B3": let go and it goes back */
-        char t[12] = "VISIT ";
-        scene_name(t + 6, proj.bank, ui.visit);
-        x = cv_text(x, 2, &FONT_XS, t, K_GOLD) + 6;
+        char v[12] = "VISIT ";
+        scene_name(v + 6, proj.bank, ui.visit);
+        x = cv_text(x, 2, &FONT_XS, v, K_GOLD) + 6;
     }
     if (proj.par[P_II_OUT])                    /* drone II faded out on its own (SEL + PLAY) */
         x = cv_text(x, 2, &FONT_XS, "II OUT", K_DRONE[1]) + 6;
-    if (gl) {                                  /* SELECT / ALGORITHM / PRESETS: a pill by the lights */
-        char t[34];
-        int32_t w;
-        char *q = scopy(t, ui.glab[0]);
-        *q++ = ' ';
-        *q++ = ' ';
-        scopy(q, ui.glab[1]);
-        w = text_w(&FONT_XS, t) + 12;
-        cv_round(rx - w, 1, w, BAR_H - 2, 6, K_CARD);
-        cv_frame(rx - w, 1, w, BAR_H - 2, K_LFO);
-        cv_text(rx - w + 6, 2, &FONT_XS, t, K_LFO);
-    } else {                                   /* stopped: say what PLAY does (the panel has no label); fading. Only
+    /* (SELECT / ALGORITHM / PRESETS turning: big in the values row, draw_values) */
+    {                                          /* stopped: say what PLAY does (the panel has no label); fading. Only
                                                 * where the badges on the left leave room (II OUT covered it), else
                                                 * a short form, else nothing */
         const char *st = !ui.playing ? (fade_q() > 0 ? "FADING OUT" : "PLAY to start") : fade_q() < 20 ? "FADING IN" : 0;
@@ -2168,7 +2180,7 @@ static void pic_setup(int32_t y0)
 /* Moves: SHIFT's move (KNOB 1) on the left: where Shift (E5) takes the drones (the line home, the mark the move, a
  * fifth up or down at the edges; lit while Shift is in); WANDER (KNOB 3, its scale KNOB 4) on the right:
  * drone II's walk around its own pitch, the line its home, the dot where it is now (an octave up or down at the
- * edges) and how far, in semitones (beside the scale) */
+ * edges) and how far, in semitones (under the scale) */
 static void pic_moves(int32_t y0)
 {
     float w = dr_wander();
@@ -2202,7 +2214,8 @@ static void pic_moves(int32_t y0)
             q++;
         scopy(q, " st");
     }
-    cv_text(222 - text_w(&FONT_XS, t), y0 + 22, &FONT_XS, t, K_TEXT2);
+    if (wa || w != 0.0f)                       /* off and home: "0: drone II still" says it (no overlap) */
+        cv_text(222 - text_w(&FONT_XS, t), y0 + 34, &FONT_XS, t, K_TEXT2);   /* under the scale's name */
 }
 
 static void draw_pic(void)
@@ -2266,6 +2279,30 @@ static void draw_pic(void)
     cv_blit(0, PIC_Y);
 }
 
+/* a value as large as it goes: its figures in the big face, its letters ("17s", "x1.1") in the next, on one line,
+ * centred on cx (the big face has no lower case) */
+static void big_value(int32_t cx, int32_t y, const char *s, uint16_t c)
+{
+    char run[24];
+    int32_t w = 0, x, pass, n;
+    const char *q;
+    for (pass = 0; pass < 2; pass++) {
+        x = cx - w / 2;
+        w = 0;
+        for (q = s; *q;) {
+            int low = *q >= 'a' && *q <= 'z';
+            const felucca_font_t *f = low ? &FONT_B : &FONT_M;
+            for (n = 0; q[n] && (q[n] >= 'a' && q[n] <= 'z') == low && n < 23; n++)
+                run[n] = q[n];
+            run[n] = 0;
+            q += n;
+            if (pass)
+                cv_text(x + w, low ? y + (int32_t)(FONT_M.h - FONT_B.h) - 2 : y, f, run, c);
+            w += text_w(f, run);
+        }
+    }
+}
+
 /* the page's four values: KNOB 1-2 under drone I, KNOB 3-4 under drone II. At rest, quiet; while a knob
  * moves (and a moment after), its value lights: a card in its colour, the value large, its bar */
 static void draw_values(void)
@@ -2287,6 +2324,26 @@ static void draw_values(void)
         cv_round(6, 0, WIDE_W, 70, 4, K_PANEL);
         keymap_rows(-4, 3, 5);
         cv_text(10, 72, &FONT_XS, "with SEL:  D5-G5 bank   OCT wave back", K_DIM);
+        cv_blit(0, VAL_Y);
+        return;
+    }
+    if (plat_ms() < ui.glab_until) {           /* SELECT / ALGORITHM / PRESETS turning: its name and value, big, the
+                                                * whole row (the review: a top-bar tag was too small to play by) */
+        const char *q;
+        h = hash(h, 0x474Cu);
+        for (q = ui.glab[0]; *q; q++)
+            h = hash(h, (uint32_t)*q);
+        for (q = ui.glab[1]; *q; q++)
+            h = hash(h, (uint32_t)*q << 8);
+        if (h == ui.sig[2])
+            return;
+        ui.sig[2] = h;
+        cv_begin(240, VAL_H, K_BG);
+        cv_rect(0, 0, 240, 1, K_GRID);
+        cv_round(6, 3, WIDE_W, 79, 6, K_CARD);
+        cv_frame(6, 3, WIDE_W, 79, K_LFO);
+        text_c(120, 9, &FONT_S, ui.glab[0], K_LFO);
+        big_value(120, 32, ui.glab[1], K_TEXT);
         cv_blit(0, VAL_Y);
         return;
     }
@@ -2534,6 +2591,7 @@ void ui_frame(void)
     input();
     press_run();
     gesture_run();
+    arp_run();
     scene_morph();
     autosave();
     if (!ui.splash_done) {

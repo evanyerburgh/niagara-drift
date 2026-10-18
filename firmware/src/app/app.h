@@ -63,6 +63,7 @@ void project_defaults(void);
 int project_load(void);                  /* 0 = loaded; else defaults are in place */
 int project_save(void);                  /* 0 = saved and verified */
 const int16_t *scene_get(int bank, int n);   /* scene n of a bank, or 0 if empty */
+const char *preset_name(int n);          /* the Preset's name (P1 "NIAGARA" ..), or 0 once it's saved over */
 int scene_put(int bank, int n);         /* the sound now into scene n of bank A..C (marks it to save); 0 ok */
 void project_apply(void);                /* every value to the engine (boot, load) */
 

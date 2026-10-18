@@ -98,7 +98,8 @@ def panel(play_png):
     for i in range(16):
         x = x0 + 12 + i * pitch + (pitch - kw) / 2
         rect(x, y0 + h * .43, kw, h * .52, kw / 2, KEY_W)
-        d.text((P(x + kw / 2), P(y0 + h * .43 + h * .52 - 22)), str(i + 1), font=f(16), fill=(60, 62, 68),
+        label = str(i + 1) if i < 12 else ("Weight", "Shift", "Clean", "Wash")[i - 12]   # 12 scenes, 4 gestures
+        d.text((P(x + kw / 2), P(y0 + h * .43 + h * .52 - 22)), label, font=f(16 if i < 12 else 12), fill=(60, 62, 68),
                anchor="mm")
     for k, a in enumerate(BLACK_AFTER):
         x = x0 + 12 + (a + 1) * pitch - kw / 2
@@ -110,7 +111,9 @@ def panel(play_png):
         for j, wd in enumerate(words):
             d.text((P(x + kw / 2), P(y0 + h * .06 + h * .33 / 2 + (j - (len(words) - 1) / 2) * 16 + 5)), wd,
                    font=f(15 if len(wd) < 7 else 13.5), fill=INK, anchor="mm")
-    pill(500, y0 + h * .43 + h * .24, "16 scenes · Tap: go there · Hold SAVE, then tap: save", INK, PALE, 17)
+    pill(x0 + 12 + 6 * pitch, y0 + h * .43 + h * .24, "12 scenes · Tap: go there · Hold SAVE, then tap: store", INK,
+         PALE, 17)
+    pill(x0 + 12 + 14 * pitch, y0 + h * .43 + h * .24, "Gestures · SEL + key: bank", INK, LILAC, 14)
     return img
 
 

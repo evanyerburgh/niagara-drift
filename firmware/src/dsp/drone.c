@@ -1727,6 +1727,33 @@ static inline float outclip(float x)
     return x < 0.0f ? -a : a;
 }
 
+/* CLEAN holds the loudness (Evan, 2026-10-18; the review: it took the Swell's dips and the LFO's dark sweeps out,
+ * and came in 2-8 dB louder). The sound's slow loudness is followed (over about 30 s, longer than its breath) while Clean is out; while it's
+ * in, the level eases down (over about 3 s) to match it, as far as Clean is in: down only, by 12 dB at most */
+static float cl_ref = -1.0f, cl_now, cl_g = 1.0f;
+static void clean_hold(float *l, float *r, uint32_t k)
+{
+    float ms = 0.0f, a = gam[DR_G_CLEAN], to, s;
+    uint32_t j;
+    for (j = 0; j < k; j++)
+        ms += l[j] * l[j] + r[j] * r[j];
+    ms /= (float)(2u * (k ? k : 1u));
+    if (cl_ref < 0.0f)
+        cl_ref = cl_now = ms;
+    cl_now += (ms - cl_now) * fm_minf((float)k / (3.0f * DR_SR), 1.0f);
+    if (a <= 0.0f)
+        cl_ref += (ms - cl_ref) * fm_minf((float)k / (30.0f * DR_SR), 1.0f);
+    to = cl_now > cl_ref && cl_now > 1e-9f ? fm_maxf(fm_sqrtf(cl_ref / cl_now), 0.25f) : 1.0f;
+    to = 1.0f + (to - 1.0f) * a;
+    s = fm_minf((float)k / (1.0f * DR_SR), 1.0f);
+    cl_g += (to - cl_g) * s;
+    if (cl_g < 0.9999f)
+        for (j = 0; j < k; j++) {
+            l[j] *= cl_g;
+            r[j] *= cl_g;
+        }
+}
+
 void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
 {
     /* MASTER: a volume up to 4/5 of its turn (there as loud as the old full turn); past that it drives the
@@ -1786,6 +1813,7 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
         if (fade > 0.0f || fade_target > 0.0f || fx_quiet < 160u) {
             float pk = 0.0f;
             fx_run(mixl, mixr, k);
+            clean_hold(mixl, mixr, k);
             for (j = 0; j < k; j++)
                 pk = fm_maxf(pk, fm_maxf(fm_fabsf(mixl[j]), fm_fabsf(mixr[j])));
             fx_quiet = pk < 1e-6f ? fx_quiet + 1u : 0u;
