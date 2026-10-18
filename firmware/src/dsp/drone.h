@@ -112,13 +112,13 @@ enum {
     /* THE MACROS (v0.2): offsets on top of the sound (drone.c MACRO_MV), the sound's own values untouched. These
      * four were the set macros (Bloom, Weight, Tide, Tear) until 2026-10-18 */
     P_WANDER,                       /* WANDER, 0..100: drone II plays a slow random melody, jumping between the
-                                     * notes of a scale on drone I (P_WSCALE; how far and how often; GLO's Glide
-                                     * glides it); 0 still (Partner 2) */
+                                     * notes of a scale on drone I (P_WSCALE), up to an octave away; how often:
+                                     * 25-30 s apart at 1 .. 0.5-2 s at 100 (GLO's Glide glides it); 0 still (Pitch) */
     P_AGE,                          /* AGE, 0..100: the sound worn, like an old tape: darker, a slow wow, hiss,
                                      * more character; it wears in (and out) slowly (Tone 2) */
     P_SHIFT_MOVE,                   /* Shift's move in cents, 0..1400 = a fifth down .. none (700) .. a fifth up (a
                                      * detent 10, with SEL held 1) */
-    P_WSCALE,                       /* Wander's scale (DR_WSCALE_NAME), 0 minor pentatonic (Partner 2) */
+    P_WSCALE,                       /* Wander's scale (DR_WSCALE_NAME), 0 minor pentatonic (Moves) */
     P_GD_0, P_GD_1, P_GD_2, P_GD_3,      /* unused since 2026-10-18 (each key's depth: now DR_GEST_DEPTH) */
     P_GR_0, P_GR_1, P_GR_2, P_GR_3,      /* unused since 2026-10-18 (each key's time: now DR_GEST_TIME) */
     P_GL_0, P_GL_1, P_GL_2, P_GL_3,      /* ... latched at, 0..100 (0: not latched) */
@@ -136,14 +136,13 @@ enum { DR_LFO_OFF, DR_LFO_I, DR_LFO_II, DR_LFO_BOTH };   /* a route's wave; BOTH
 enum { DR_TO_PITCH, DR_TO_XWAVE };
 enum { DR_TO_CUTOFF, DR_TO_RESO };
 #define DR_NGEST 4                             /* the gesture keys, D5-G5 */
-enum { DR_G_WEIGHT, DR_G_SHIFT, DR_G_CONVERGE, DR_G_WASH, DR_G_CLEAN, DR_G_GLITCH, DR_NGTYPE };   /* what a key plays */
+enum { DR_G_WEIGHT, DR_G_SHIFT, DR_G_CLEAN, DR_G_WASH, DR_NGTYPE };   /* what each key plays, D5-G5 (fixed) */
 #define DR_SHIFT_MID 700                       /* Shift's move: none (cents + 700) */
 extern const char *const DR_GEST_NAME[DR_NGTYPE];
 extern const uint8_t DR_GEST_DEPTH[DR_NGTYPE], DR_GEST_TIME[DR_NGTYPE];   /* each one's full depth and its time */
 #define DR_NWSCALE 6                           /* Wander's scales */
 extern const char *const DR_WSCALE_NAME[DR_NWSCALE];
 void dr_gesture(int g, int amt);               /* gesture key g's amount now, 0..1000 (the UI swells it) */
-void dr_gesture_type(int g, int type);         /* what gesture key g plays (DR_G_*) */
 float dr_wander(void);                         /* Wander's move of drone II now, semitones (the screen) */
 int dr_heard(int p);                           /* a value as heard: the sound's own plus the macros (tests) */
 float dr_mac_pitch(int g);                     /* drone g's pitch move by the macros now, semitones (tests) */

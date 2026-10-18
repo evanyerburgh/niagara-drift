@@ -134,19 +134,19 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Partner · SEQ
 
-<img src="docs/img/page-seq.png" width="488" alt="The Partner page; Partner 2: Shift's move and which key plays it, Wander, drone II's melody, and its scale">
+<img src="docs/img/page-seq.png" width="488" alt="The Partner page; Moves: Shift's move, Wander, drone II's melody, and its scale">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Partner | I interval | I detune | II interval | II detune |
-| Partner 2 | Shift's move | | II wander | Wander's scale |
+| Moves | Shift's move | | II wander | Wander's scale |
 
 - **Shift's move** is where the Shift gesture takes the drones: from a fifth down through none in the middle to a
-  fifth up, 10 cents a detent, 1 with SEL held. The screen shows which gesture key plays Shift. See [The macros](#the-macros).
+  fifth up, 10 cents a detent, 1 with SEL held; it lights while Shift (E5) is in. See [The macros](#the-macros).
 - **Wander** gives drone II a slow random melody: it jumps from note to note in no order, the notes of a scale on
-  drone I (in any octave, within a fifth of its own pitch at the bottom of the knob, an octave at the top), and
-  only now and then comes home. A note every 10–30 s low on the knob, every 2–4 s at the top. It doesn't glide by
-  itself: **Glide** (Setup 1) slides it. At 0 it stays still.
+  drone I (in any octave, up to an octave from its own pitch), and only now and then comes home. The knob is **how
+  often**, at random times within a range: 25–30 s apart at the bottom, 0.5–2 s at the top; the screen shows the
+  range. It doesn't glide by itself: **Glide** (Setup 1) slides it. At 0 it's off.
 - **Wander's scale**: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just (the
   harmonics 1–8 of drone I, pure: the root, the pure major third, fifth and the seventh harmonic).
 
@@ -265,22 +265,19 @@ parts come in one after another, and go in their own order when you let go. Scen
 |---|---|---|
 | **Weight** | a full, warm bass: the sub comes up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. Let go: the brightness comes back first, the sub lingers | D5 |
 | **Shift** | a new chord, a voice at a time: drone I glides to the move you set (anywhere from a fifth down to a fifth up, in cents), drone II follows. Let go: drone I comes back first | E5 |
-| **Converge** | drone II's pitch toward the nearest unison, fourth, fifth or octave of drone I (drone I steps back, quieter and darker, while it moves), never quite arriving: it stays a few cents short and wavers, so the two pulse; the partners' beating and Drift ease, cross-mod last. Let go: cross-mod goes first, the pitch drifts back last. It takes the swell time however far drone II has to go | F5 |
-| **Wash** | the delay first, then the reverb opens and grows longer and darker (to Inf, a freeze, at full depth), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5 |
-| **Clean** | back to a clean sound, your notes kept: the grit leaves first (drive, character, feedback, noise, cross-mod, hard sync), then the movement (Movement, Drift, the Swell), then the effects (the repeats, both mixes, the reverb's length). Let go: the effects come back first, the grit last | pick it |
-| **Glitch** | a little more delay, its time wandering slowly so the echoes lean a semitone or two off the drone and back, now and then a small quick snag; the dry sound stays as it is | pick it |
+| **Clean** | back to a clean sound, your notes kept: the grit leaves first (drive, character, feedback, noise, cross-mod, hard sync), then the movement (Movement, Drift, the Swell), then the effects (the repeats, both mixes, the reverb's length). Let go: the effects come back first, the grit last | F5 |
+| **Wash** | the delay first, then the reverb opens and grows longer and darker (toward Inf), each only up to where Wash aims (if your own effects are already further up, it leaves them be; the repeats stop short of the delay's howl), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5 |
 
-- **The gestures** are the top four white keys (they don't sense pressure). **Hold** one and it comes in while you
+- **The gestures** are the top four white keys, always the same: D5 Weight, E5 Shift, F5 Clean, G5 Wash (they
+  don't sense pressure). **Hold** one and it comes in while you
   hold; **let go** and it goes, over as long as you held it (hold 2 s, it leaves in 2 s; hold 10 s, it drifts out
-  over 10 s). **Tap** it and it goes all the way and stays; tap again and it goes. **SEL held as you let go** keeps
+  over 10 s). **Tap** it (a press under half a second) and it goes all the way and stays; tap again and it goes. **SEL held as you let go** keeps
   it where it is. Its key glows dimly, and lights as it comes in.
-- **Pick what a key plays**: hold the key and turn **SELECT**: Weight, Shift, Converge, Wash, Clean, Glitch. Your
-  pick is kept.
 - **PRESETS is Macro time**: it speeds up or slows down every gesture, coming in and going out, from 10 times faster
   to 10 times slower (the middle: each gesture's own time: Weight 2.8 s, Shift 3.9 s, the others 3.3 s). Turn it
   while a gesture moves to change it on the way.
 - **The LFOs step aside**: while a gesture is in, the LFO that moves the same thing eases off (the filter LFO for
-  Weight's cutoff, the oscillator LFO for Shift's and Converge's pitch, the delay LFO for Glitch's delay time), so
+  Weight's cutoff, the oscillator LFO for Shift's pitch), so
   a high **Movement** doesn't wobble what the gesture is doing. **Wash** also eases the filter LFOs to a third, so
   their sweeps don't pile up in the reverb as surges. They come back as the gesture goes.
 - Turning a knob while a scene switch is on its way lets go of that setting; the rest still lands.
@@ -327,7 +324,7 @@ in the panel's groups. It steps aside while you turn a knob or hold a white key.
 | **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down (lifting your finger can't move it), and **stays** when you let go: a sound of its own between the two |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're read-only (pick bank A, B or C first: SEL + D5, E5 or F5) |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (the starting sound and a deep bass sound for now; more to come). The screen names scenes by bank: "B5" |
-| **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Converge, Wash (see [The macros](#the-macros)) |
+| **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The macros](#the-macros)) |
 | **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it |
 | **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 
