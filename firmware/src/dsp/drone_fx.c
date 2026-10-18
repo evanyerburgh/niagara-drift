@@ -40,6 +40,7 @@ static uint32_t fx_quiet;                /* blocks the effects' output has been 
 static int16_t dly_buf[2][DLY_N] DR_POOL;
 static uint32_t dly_w;
 static float dly_t = 0.177f * DR_SR;    /* the left's time, in samples, smoothed */
+volatile float dr_dly_ms;               /* ... in ms, each block (the host's probe) */
 static float dly_lp[2], dly_hp[2], dly_olp[2];
 static float dly_ph1, dly_ph2;           /* the wow's two sines */
 enum { DT_TAPE, DT_WIDE, DT_PING, DT_CLEAN, DT_NTYPES };
@@ -388,6 +389,7 @@ static void fx_run(float *l, float *r, uint32_t n)
         mono = 1;
     }
     rv_coefs(ease);
+    dr_dly_ms = dly_t * (1000.0f / DR_SR);
     /* DELAY */
     for (j = 0; j < n; j++) {
         float x, yl, yr, fl, fr, t, wow, pp = dly_c.ping;

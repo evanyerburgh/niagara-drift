@@ -400,6 +400,8 @@ static int expect(const char *what, const char *val)
         got = (int)(dr_mac_pitch(atoi(what + 6)) * 100.0f + (dr_mac_pitch(atoi(what + 6)) >= 0.0f ? 0.5f : -0.5f));
     else if (!strncmp(what, "pitch", 5))          /* pitchG: group G's pitch now (gliding), in cents */
         got = (int)(dr_pitch[atoi(what + 5)] * 100.0f + 0.5f);
+    else if (!strcmp(what, "dlyt"))               /* the delay's time now, with its LFO, ms x 10 */
+        got = (int)(dr_dly_ms * 10.0f + 0.5f);
     else if (!strncmp(what, "cut", 3))            /* cutG: group G's cutoff now (gliding), knob units x 100 */
         got = (int)(dr_cut[atoi(what + 3)] * 100.0f + 0.5f);
     else if (!strncmp(what, "level", 5))          /* levelG: group G's output level x 100 */

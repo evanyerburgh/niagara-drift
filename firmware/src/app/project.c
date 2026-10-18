@@ -117,7 +117,7 @@ static void convert(int16_t *v, uint32_t from)
     if (from <= 26u) {                          /* the set macros (Bloom, Weight, Tide, Tear) gone: their values 0 (now
                                                  * Wander, Age, Shift's move: 0 is their start); Shift's move was E5's depth */
         v[P_SHIFT_MOVE] = (unsigned)v[P_GD_1] < 4u ? v[P_GD_1] : 0;   /* 0..3 then, as in 27 */
-        for (g = P_WANDER; g <= P_OLD_M3; g++)
+        for (g = P_WANDER; g <= P_WSCALE; g++)
             if (g != P_SHIFT_MOVE)
                 v[g] = 0;
         v[P_GD_1] = dr_param_info(P_GD_1)->def;

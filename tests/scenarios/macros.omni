@@ -2,8 +2,8 @@
 # values untouched; each part comes in over its own stretch of the way in and goes over its own on the way out.
 # heardN is what's heard (the sound plus the macros), parN the sound's own, mpitchG a drone's pitch move by the
 # macros (cents). 7 drone I's cutoff, 5 its osc mix, 11 its level, 25 drone II's detune, 63 the reverb mix, 42
-# cross-mod, 60-62 the delay's time, repeats, mix, 77 Character; 78 Wander, 79 Age, 80 Shift's move; 82-85 the
-# keys' depths, 86-89 their own times, 90-93 their latches. What each key plays: gkeyN (0 Weight .. 4 Clean, 5 Glitch).
+# cross-mod, 60-62 the delay's time, repeats, mix, 66 the delay LFO's depth, 17 drone I's filter LFO depth, 77
+# Character; 78 Wander, 79 Age, 80 Shift's move, 81 Wander's scale; 90-93 the keys' latches. What each key plays: gkeyN (0 Weight .. 4 Clean, 5 Glitch).
 tap PLAY
 wait 1000
 expect heard7 700
@@ -21,6 +21,8 @@ expect heard5 >50
 expect heard5 <70
 wait 1500
 expect heard5 >62
+# ... and the filter LFO eases off the cutoff it moves (Movement would wobble it)
+expect heard17 0
 key w12 up
 wait 1000
 expect heard7 >680
@@ -28,6 +30,7 @@ expect heard5 >38
 wait 2500
 expect heard5 30
 expect heard7 700
+expect heard17 85
 # let go after a short hold: it goes over as long as it was held (1 s), not its own time
 key w12 down
 wait 1000
@@ -74,16 +77,21 @@ expect par90 <60
 tapkey w12
 wait 4000
 expect par90 0
-# SHIFT: held, ALGORITHM picks its move (80, in cents + 700: a 5th up to start, 120 detents down: a 4th down), PRESETS
-# its own time (3.9 s, 4 shorter: 3.4 s)
+# SHIFT: its move on Partner 2's KNOB 1 (80, in cents + 700: a 5th up to start, 120 detents down: a 4th down); a
+# gesture key held, ALGORITHM is still the Movement and PRESETS Macro time (3.9 s)
+tap SEQ
+tap SEQ
+expect view 9
+spin K1 -120
+expect par80 200
+tap HOME
 key w13 down
-spin ALGO -120
-spin PRESET -4
+spin ALGO 2
+spin ALGO -2
 wait 300
 key w13 up
-expect par80 200
-expect par87 36
 expect par75 50
+expect par80 200
 wait 4000
 expect mpitch0 0
 expect mpitch1 0
@@ -116,12 +124,11 @@ key w14 up
 wait 4500
 expect heard42 0
 expect mpitch1 0
-# a key plays what you pick: D5 held, SELECT on four: Clean (its depth and time to Clean's)
+# a key plays what you pick: D5 held, SELECT on four: Clean
 key w12 down
 spin SELECT 4
 key w12 up
 expect gkey0 4
-expect par82 100
 wait 3000
 # CLEAN held (3.3 s): a dirty sound comes clean, the grit first; the notes stay
 set 77 60
@@ -153,9 +160,12 @@ key w13 down
 wait 5000
 expect heard62 45
 expect heard11 80
+# the delay LFO off the delay time it leans
+expect heard66 0
 key w13 up
 wait 6000
 expect heard62 25
+expect heard66 20
 # back as they were
 key w12 down
 spin SELECT -4
@@ -171,6 +181,15 @@ set 78 60
 wait 7000
 expect wander >150
 set 78 0
+wait 30000
+expect wander 0
+# ... on fifths and octaves (81 = 2): each note a fifth or an octave from drone I
+set 81 2
+set 78 100
+wait 7000
+expect wander >150
+set 78 0
+set 81 0
 wait 30000
 expect wander 0
 # AGE (Tone 2): wears in over 20 s: darker, more character

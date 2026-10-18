@@ -49,7 +49,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
     {"Morph", 0, 100, 47}, {"Scene switch", 0, 100, 30}, {"Tuning", 0, 1, 0}, {"Speaker", 0, 100, 0},
     {"Pitch lock", 0, 1, 0}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
-    {"Wander", 0, 100, 0}, {"Age", 0, 100, 0}, {"Shift move", 0, 2 * DR_SHIFT_MID, 2 * DR_SHIFT_MID}, {"-", 0, 100, 0},
+    {"Wander", 0, 100, 0}, {"Age", 0, 100, 0}, {"Shift move", 0, 2 * DR_SHIFT_MID, 2 * DR_SHIFT_MID}, {"Scale", 0, DR_NWSCALE - 1, 0},
     {"D5 depth", 0, 100, 70}, {"E5 depth", 0, 100, 100}, {"F5 depth", 0, 100, 100}, {"G5 depth", 0, 100, 70},
     {"D5 time", 0, 100, 30}, {"E5 time", 0, 100, 40}, {"F5 time", 0, 100, 35}, {"G5 time", 0, 100, 35},
     {"D5 latch", 0, 100, 0}, {"E5 latch", 0, 100, 0}, {"F5 latch", 0, 100, 0}, {"G5 latch", 0, 100, 0},
@@ -57,6 +57,8 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
 const char *const DR_DLY_NAME[DR_NDLY] = {"Tape", "Wide", "Ping-pong", "Clean"};
+const char *const DR_WSCALE_NAME[DR_NWSCALE] = {"Minor pent", "Major pent", "5ths + 8ves", "Whole tone", "Dorian",
+                                                "Just 1-8"};
 
 /* the Ultra LFO's shapes, after the DS-2's names; how each moves is ours (the DS-2 doesn't say) */
 const char *const DR_LFO_W1_NAME[DR_LFO_NSHAPES] = {"Off", "Triangle", "Square", "Saw", "Roundtooth",
@@ -246,6 +248,8 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_REV_NAME[(unsigned)v < DR_NREV ? v : 0]);
     else if (i == P_DLY_TYPE)
         copy_s(b, DR_DLY_NAME[(unsigned)v < DR_NDLY ? v : 0]);
+    else if (i == P_WSCALE)
+        copy_s(b, DR_WSCALE_NAME[(unsigned)v < DR_NWSCALE ? v : 0]);
     else if (i == P_SHIFT_MOVE) {                /* "5th up", "+340c", "none" */
         int c = v - DR_SHIFT_MID;
         if (c == 700 || c == -700 || c == 500 || c == -500)
@@ -271,10 +275,9 @@ void dr_param_text(int i, int v, char *b)
     }
     else if (i == P_DLY_LFO || i == P_LFO_RMOD_SRC)
         copy_s(b, TAP[(unsigned)v < 4u ? v : 1]);
-    else if (i == P_MORPH || i == P_FADE || i == P_SCENE_T || (i >= P_GR_0 && i <= P_GR_3)) {
-        /* a time: "0.62s", "4.2s", "25s", "2m30"; a gesture's swell 1 .. 30 s */
-        float t = i >= P_GR_0 ? fm_exp2f((float)v * 0.0490689f)
-                : i == P_MORPH ? 0.02f * fm_exp2f((float)v * 0.105507f)
+    else if (i == P_MORPH || i == P_FADE || i == P_SCENE_T) {
+        /* a time: "0.62s", "4.2s", "25s", "2m30" */
+        float t = i == P_MORPH ? 0.02f * fm_exp2f((float)v * 0.105507f)
                 : i == P_FADE ? 0.05f * fm_exp2f((float)v * 0.102288f) : 0.1f * fm_exp2f((float)v * 0.115507f);
         secs_text(t, b);
     } else if (i == P_DLY_TIME) {                  /* "177ms" */
@@ -539,7 +542,7 @@ void dr_init(void)
 
 /* THE MACROS (v0.2, option D; two performer reviews; staged 2026-10-18 after the macro research). The four gesture
  * keys (D5-G5) each play one gesture (gtype: Weight, Shift, Converge, Wash, Clean, Glitch; the player picks), by the
- * UI's swell (gam) times the key's depth (P_GD_*). Two slow states on knobs: AGE (Tone 2) and WANDER (Partner 2).
+ * UI's swell (gam) times the gesture's full depth (DR_GEST_DEPTH); while one is in, the LFOs ease off what it moves. Two slow states on knobs: AGE (Tone 2) and WANDER (Partner 2).
  * The sound's own values (base) stay as they are; what's heard is base + the sum, clamped to each value's range.
  * Each move comes in over its own part of the macro's way in (in0 .. in1 of the amount, eased) and goes over
  * its own part of the way out (out0 .. out1), so a macro's parts arrive in order and leave in their own order
@@ -562,8 +565,8 @@ typedef struct {
                                                   * turn back half way doesn't jump; Macro time can be quick) */
 #define MOFF_OFF 0x7FFE                          /* moff[]: a switch held off */
 const char *const DR_GEST_NAME[DR_NGTYPE] = {"Weight", "Shift", "Converge", "Wash", "Clean", "Glitch"};
-const uint8_t DR_GEST_DEPTH[DR_NGTYPE] = {70, 100, 100, 70, 100, 70};
-const uint8_t DR_GEST_TIME[DR_NGTYPE] = {30, 40, 35, 35, 35, 35};      /* 2.8 s, 3.9 s, 3.3 s ... */
+const uint8_t DR_GEST_DEPTH[DR_NGTYPE] = {70, 100, 100, 70, 100, 70};   /* a tap, or a hold all the way in */
+const uint8_t DR_GEST_TIME[DR_NGTYPE] = {30, 40, 35, 35, 35, 35};      /* 0..100 = 1 .. 30 s: 2.8 s, 3.9 s, 3.3 s ... */
 static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
     /* WEIGHT: a full, warm bass (Evan, 2026-10-18): the sub comes up through most of the swell, the resonance and
      * the noise give way and the cutoffs ease down a little (warm, not dark), then drive and the vintage character
@@ -658,8 +661,7 @@ static void macro_reset(void)
 }
 static float mac_amt(int m)                      /* a key's amount now, 0..1 */
 {
-    return gtype[m] == DR_G_SHIFT ? gam[m]       /* Shift: its depth is its move */
-                                  : gam[m] * (float)base[P_GD_0 + m] * 0.01f;
+    return gam[m] * (float)DR_GEST_DEPTH[gtype[m] < DR_NGTYPE ? gtype[m] : 0] * 0.01f;
 }
 static float mv_ease(float a, int lo, int hi)    /* the amount a through the window lo .. hi %, eased */
 {
@@ -708,13 +710,19 @@ static void slip_run(uint32_t n)
     slip_snag_n = slip_snag_n > n ? slip_snag_n - n : 0;
 }
 /* WANDER, n samples on: a slow random melody for drone II (Evan, 2026-10-18): it jumps from note to note in no
- * order, the notes of a minor pentatonic on drone I (its root, the minor third, the fourth, the fifth, the minor
- * seventh, in any octave) within reach of drone II's own pitch (a fifth either way at the bottom of the knob, an
- * octave at the top), only now and then home. A note every 1.5 .. 30 s (sooner further up), each a little apart.
- * It doesn't glide by itself: GLO's Glide does that, as for a pitch knob */
+ * order, the notes of a scale on drone I (P_WSCALE: minor or major pentatonic, fifths and octaves, whole tone,
+ * Dorian, or just: harmonics 1-8 folded into an octave; in any octave) within reach of drone II's own pitch (a fifth
+ * either way at the bottom of the knob, an octave at the top), only now and then home. A note every 1.5 .. 30 s
+ * (sooner further up), each a little apart. It doesn't glide by itself: GLO's Glide does that, as for a pitch knob */
+#define WS_MAX 7
+static const float WSCALE[DR_NWSCALE][WS_MAX] = {   /* semitones over drone I; -1 ends a shorter one */
+    {0.0f, 3.0f, 5.0f, 7.0f, 10.0f, -1.0f}, {0.0f, 2.0f, 4.0f, 7.0f, 9.0f, -1.0f}, {0.0f, 7.0f, -1.0f},
+    {0.0f, 2.0f, 4.0f, 6.0f, 8.0f, 10.0f, -1.0f}, {0.0f, 2.0f, 3.0f, 5.0f, 7.0f, 9.0f, 10.0f},
+    {0.0f, 3.8631f, 7.0196f, 9.6883f, -1.0f},   /* harmonics 1-8: 1 (2, 4, 8), 5, 3 (6), 7 */
+};
 static void wander_run(uint32_t n)
 {
-    static const float SCALE[5] = {0.0f, 3.0f, 5.0f, 7.0f, 10.0f};
+    const float *sc = WSCALE[(unsigned)base[P_WSCALE] < DR_NWSCALE ? base[P_WSCALE] : 0];
     float a = (float)base[P_WANDER] * 0.01f, gs;
     if (a <= 0.0f) {
         wand_to = 0.0f;
@@ -727,8 +735,8 @@ static void wander_run(uint32_t n)
         } else {
             float rel = grp[0].ps2 - grp[1].ps2;   /* drone I's root, from drone II's own pitch */
             for (o = -2; o <= 2; o++)
-                for (i = 0; i < 5; i++) {
-                    float x = rel + SCALE[i] + 12.0f * (float)o;
+                for (i = 0; i < WS_MAX && sc[i] >= 0.0f; i++) {
+                    float x = rel + sc[i] + 12.0f * (float)o;
                     if (fm_fabsf(x) <= reach && fm_fabsf(x - wand_to) > 0.5f && fm_fabsf(x) > 0.5f && nc < 40)
                         cand[nc++] = x;
                 }
@@ -767,9 +775,26 @@ static void mv_add(const move_t *v, float l, float *off, uint8_t *on, float *pm,
     default: off[v->p] += (float)v->d * l; break;
     }
 }
+/* what a gesture's move calms: the LFO moving the same thing (Evan, 2026-10-18: with Movement up, the LFOs kept
+ * moving what a gesture moves), as far as the move or the gesture is in. The oscillator LFO when it moves pitch and the move is a
+ * pitch move; the filter LFO when it moves what the move does (cutoff or resonance); the delay LFO for the delay's time */
+static void calm_note(const move_t *v, float l, float *co, float *cf, float *cd)
+{
+    int g = v->p / GP_N, gp = v->p % GP_N;
+    if (v->kind == MK_SHIFT || v->kind == MK_CONV) {
+        if (par[DR_GP(v->p, GP_OLFO_DEST)] == DR_TO_PITCH)
+            co[v->p] = fm_maxf(co[v->p], l);
+    } else if (v->p == P_DLY_TIME) {
+        *cd = fm_maxf(*cd, l);
+    } else if (v->p < P_XMOD && (gp == GP_CUTOFF || gp == GP_RESO) &&
+               (par[DR_GP(g, GP_FLFO_DEST)] == DR_TO_RESO) == (gp == GP_RESO)) {
+        cf[g] = fm_maxf(cf[g], l);
+    }
+}
 static void macro_apply(uint32_t n)              /* the offsets again, n samples on; what changes glides 25 ms */
 {
     float off[DR_NPARAMS], pm[DR_NGROUPS] = {0.0f, 0.0f}, step = (float)n / (MOVE_S * DR_SR);
+    float co[DR_NGROUPS] = {0.0f, 0.0f}, cf[DR_NGROUPS] = {0.0f, 0.0f}, cd = 0.0f;   /* the LFOs calmed */
     uint8_t on[DR_NPARAMS];
     int m, k, i, flags = 0;
     for (i = 0; i < DR_NPARAMS; i++) {
@@ -793,10 +818,17 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
                 *l = *l < to ? fm_minf(*l + step, to) : fm_maxf(*l - step, to);
                 mv_moving = 1;
             }
-            if (*l > 0.0f)
+            if (*l > 0.0f) {
                 mv_add(v, *l, off, on, pm, &flags);
+                calm_note(v, fm_maxf(*l, gam[m]), co, cf, &cd);   /* all off with the gesture all the way in */
+            }
         }
     }
+    for (i = 0; i < DR_NGROUPS; i++) {           /* the LFO depths toward 0, as far as calmed */
+        off[DR_GP(i, GP_OLFO_DEPTH)] -= ((float)base[DR_GP(i, GP_OLFO_DEPTH)] + off[DR_GP(i, GP_OLFO_DEPTH)]) * co[i];
+        off[DR_GP(i, GP_FLFO_DEPTH)] -= ((float)base[DR_GP(i, GP_FLFO_DEPTH)] + off[DR_GP(i, GP_FLFO_DEPTH)]) * cf[i];
+    }
+    off[P_DLY_LFO_DEPTH] -= ((float)base[P_DLY_LFO_DEPTH] + off[P_DLY_LFO_DEPTH]) * cd;
     {   /* AGE: toward its knob, slowly */
         float to = (float)base[P_AGE] * 0.01f, s = (float)n / (AGE_S * DR_SR);
         if (age_l != to) {
