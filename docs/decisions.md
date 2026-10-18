@@ -184,3 +184,7 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-18: Play 2 is level, then resonance (KNOB 1 / 3 level, 2 / 4 resonance); its picture shows the level above
   the filter curve. Speaker and Pressure move from Tone 2 to a new GLO page, Setup 3; Tone 2 keeps character and
   feedback (KNOB 3-4 nothing).
+- 2026-10-18: the screen takes the site's palette: plum black (20, 0, 15), aubergine panels, the site's card for a lit
+  value, pale pink ink; amber drone I, teal drone II, lilac the LFO, everything else in the ink (no blue, pink or
+  gold). All text 4.5:1 or more on its background. No dots: page dots become "1/3", the unsaved dot becomes a dim
+  SAVE light, the LFO rate lights go (OCT- / OCT+ pulse), Setup 1's stereo dots become two bars. Barlow stays.

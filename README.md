@@ -78,13 +78,13 @@ the screen shows each page's settings as a picture, and the value of the knob yo
 |---|---|
 | **PLAY** | fade the drones in or out; **SEL + PLAY** fades drone II alone out or back in |
 | **OCT− / OCT+** | the LFO's **Wave I** / **Wave II**: tap for the next shape, round and round; **SEL + OCT** for the one before. Each light pulses with its wave |
-| **SAVE** | save the sound, at once. While the drone plays, the sound dips out and back over about 50 ms around the write; the dot by the page name means not yet written |
+| **SAVE** | save the sound, at once. While the drone plays, the sound dips out and back over about 50 ms around the write; SAVE glows dimly while something isn't written yet |
 | **SEL** (hold) | fine: a pitch knob moves in single cents, cutoff and resonance in tenths |
 
 ### Pages
 
 Tap a page button and the knobs stay on that page. Hold it to peek: turn a knob, let go, and you're
-back. Tap it again for its second page; dots by the page's name show which of its pages you're on.
+back. Tap it again for its second page; "1/2" by the page's name shows which of its pages you're on.
 Each page's screen shows a picture of what its knobs do, and the four values below it. Every knob
 glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 

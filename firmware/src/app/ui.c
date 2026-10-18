@@ -107,22 +107,25 @@ static const sw_t SW_LFO[11] = {{S_OTAP, 0}, {S_ODEST, 0}, {S_FDEST, 0}, {S_FTAP
                                 {S_OTAP, 1}, {S_ODEST, 1}, {S_FDEST, 1}, {S_FTAP, 1}, {S_DTAP, 1},
                                 {S_XMOD, 1}};
 
-/* the screen's colours: dark, glowing (Evan, 2026-10-09; Figma "Screen concepts", concept D) */
-#define K_BG RGB(10, 12, 16)                 /* near black */
-#define K_PANEL RGB(18, 22, 28)              /* the pictures' panels */
-#define K_CARD RGB(21, 27, 35)               /* a lit value, a banner */
-#define K_GRID RGB(28, 34, 43)               /* bars' tracks, lines */
-#define K_FAINT RGB(58, 65, 76)
-#define K_DIM RGB(107, 115, 128)
-#define K_TEXT RGB(233, 230, 223)            /* ink */
-#define K_TEXT2 RGB(186, 184, 178)           /* values at rest */
-#define K_LFO RGB(183, 145, 255)
-#define K_FX RGB(159, 180, 255)
-#define K_PULSE RGB(255, 122, 168)
-#define K_SETUP RGB(201, 196, 186)
-#define K_GOLD RGB(255, 196, 92)             /* messages without a drone */
-static const uint16_t K_DRONE[DR_NGROUPS] = {RGB(255, 176, 74), RGB(69, 227, 211)};   /* amber, cyan */
-static const uint16_t K_DRONE_DIM[DR_NGROUPS] = {RGB(92, 66, 34), RGB(30, 84, 80)};   /* their glow */
+/* the screen's colours: dark, glowing (Evan, 2026-10-09; Figma "Screen concepts", concept D), in the site's palette
+ * (2026-10-18, web/emu/index.html :root): a plum black, aubergine panels, a pale pink ink; amber drone I, teal
+ * drone II, lilac the LFO, everything else in the ink */
+#define K_BG RGB(20, 0, 15)                  /* the site's black */
+#define K_PANEL RGB(38, 10, 34)              /* the pictures' panels */
+#define K_CARD RGB(58, 18, 53)               /* a lit value, a banner: the site's card */
+#define K_GRID RGB(70, 30, 64)               /* bars' tracks, lines */
+#define K_FAINT RGB(104, 66, 96)
+#define K_DIM RGB(160, 128, 148)
+#define K_TEXT RGB(251, 233, 242)            /* ink */
+#define K_TEXT2 RGB(211, 179, 196)           /* values at rest: the site's muted */
+#define K_LFO RGB(220, 188, 255)             /* lilac */
+#define K_PALE RGB(255, 214, 240)            /* the site's pale pink: page names, accents */
+#define K_FX K_PALE
+#define K_PULSE K_PALE
+#define K_SETUP K_PALE
+#define K_GOLD K_PALE                        /* messages without a drone */
+static const uint16_t K_DRONE[DR_NGROUPS] = {RGB(255, 176, 74), RGB(69, 227, 211)};   /* amber, teal */
+static const uint16_t K_DRONE_DIM[DR_NGROUPS] = {RGB(96, 52, 36), RGB(36, 72, 76)};   /* their glow, on plum */
 
 static struct {
     uint8_t view;
@@ -1321,8 +1324,6 @@ static int fade_q(void) { return (int)(dr_fade * 20.0f + 0.5f); }   /* the fade 
 
 static int lit(int i) { return plat_ms() < ui.touch_t[i]; }          /* knob i moving (or just moved) */
 
-/* a tap's light: dark at -1, bright at 1, in 8 steps; unlit when the tap is off */
-static int lfo_q(int i) { return proj.par[i ? P_LFO_W2 : P_LFO_W1] ? (int)((dr_lfo[i] + 1.0f) * 3.5f + 0.5f) : -1; }
 static uint16_t blend(uint16_t a, uint16_t b, int q, int n)          /* a -> b, q of n */
 {
     int r = ((a >> 11) * (n - q) + (b >> 11) * q) / n, g = (((a >> 5) & 63) * (n - q) + ((b >> 5) & 63) * q) / n,
@@ -1349,15 +1350,14 @@ static void draw_bar(void)
 {
     int gl = plat_ms() < ui.glab_until;
     uint32_t rec_s = ui.loop == L_REC ? (plat_ms() - ui.loop_t0) / 1000u : 0u;   /* REC: how long so far */
-    uint32_t h = hash(hash(hash(hash(2166136261u ^ rec_s, ui.view | ui.playing << 5 | ui.dirty << 6 | ui.loop << 7 |
-                                                       (uint32_t)proj.par[P_PULSE] << 9 | (uint32_t)gl << 10 |
-                                                       (uint32_t)ui.v2_out << 12),
-                                (uint32_t)fade_q()),
-                           (uint32_t)(lfo_q(0) + 1) | (uint32_t)(lfo_q(1) + 1) << 4),
+    uint32_t h = hash(hash(hash(2166136261u ^ rec_s, ui.view | ui.playing << 5 | ui.loop << 7 |
+                                                  (uint32_t)proj.par[P_PULSE] << 9 | (uint32_t)gl << 10 |
+                                                  (uint32_t)ui.v2_out << 12),
+                           (uint32_t)fade_q()),
                       gl ? (uint32_t)ui.glab[1][0] << 16 | (uint32_t)ui.glab[1][1] << 8 | ui.glab[1][2] |
                                (uint32_t)ui.glab[1][3] << 24 | (uint32_t)ui.glab[0][0] << 4
                          : 0);
-    int32_t x, i, rx = 216;
+    int32_t x, i, rx = 234;
     int visiting = ui.visit >= 0 && plat_ms() - ui.visit_t >= HOLD_MS;          /* a scene key held: a visit */
     h = hash(h, (uint32_t)(visiting ? ui.visit + 1 : 0));
     if (h == ui.sig[0])
@@ -1372,17 +1372,16 @@ static void draw_bar(void)
         t[i] = 0;
         x = cv_text(6, 0, &FONT_B, t, page_col() == K_DIM ? K_TEXT2 : page_col());
     }
-    for (i = 0; i < (int32_t)NPAGE_BTN; i++)   /* a button's pages: a dot each, this one lit ("tap again") */
+    for (i = 0; i < (int32_t)NPAGE_BTN; i++)   /* a button's pages: which of them, "2/3" ("tap again") */
         if (on_pages((int)i) && PAGE_BTN[i].n > 1) {
-            int32_t k;
-            for (k = 0; k < PAGE_BTN[i].n; k++)
-                cv_round(x + 5 + 8 * k, 6, 5, 5, 2,
-                         ui.view == PAGE_BTN[i].first + k ? (page_col() == K_DIM ? K_TEXT2 : page_col()) : K_FAINT);
-            x += 5 + 8 * PAGE_BTN[i].n;
+            char t[6];
+            t[0] = (char)('1' + ui.view - PAGE_BTN[i].first);
+            t[1] = '/';
+            t[2] = (char)('0' + PAGE_BTN[i].n);
+            t[3] = 0;
+            x = cv_text(x + 6, 2, &FONT_XS, t, K_DIM);
         }
-    if (ui.dirty)
-        cv_round(x + 4, 6, 5, 5, 2, K_GOLD);   /* not yet written: amber (grey, it read as a page dot) */
-    x += 12;
+    x += 10;
     if (ui.loop != L_IDLE) {                  /* REC and its time ("REC 1:05"; it stops at 5:00), or LOOP */
         char t[12] = "REC ", *q = t + 4;
         if (ui.loop == L_REC) {
@@ -1405,10 +1404,6 @@ static void draw_bar(void)
     }
     if (ui.v2_out)                             /* drone II faded out on its own (SEL + PLAY) */
         x = cv_text(x, 2, &FONT_XS, "II OUT", K_DRONE[1]) + 6;
-    for (i = 0; i < 2; i++) {                  /* the LFO's rate lights, as the DS-2's: Wave I, Wave II */
-        int q = lfo_q((int)i);
-        cv_round(222 + 10 * i, 5, 7, 7, 3, q < 0 ? K_GRID : blend(K_GRID, K_LFO, q, 7));
-    }
     if (gl) {                                  /* SELECT / ALGORITHM / PRESETS: a pill by the lights */
         char t[34];
         int32_t w;
@@ -1779,7 +1774,7 @@ static void pic_lfo(int32_t y0)
             col = K_FX;
         }
         ax = 222 - text_w(&FONT_S, t) - 6;
-        text_r(222, ny, t, route == DR_LFO_OFF ? K_FAINT : depth ? col : blend(K_PANEL, col, 1, 2));
+        text_r(222, ny, t, route == DR_LFO_OFF ? K_DIM : depth ? col : blend(K_PANEL, col, 3, 4));   /* AA: 5:1 and up */
         for (w = 0; w < 2; w++) {                  /* a line from each wave the route takes */
             int sh = proj.par[w ? P_LFO_W2 : P_LFO_W1];
             if (route != w + 1 && route != DR_LFO_BOTH)
@@ -2186,11 +2181,11 @@ static void pic_setup(int32_t y0)
     scopy(q, "c");
     cv_text(126, yb + 4, &FONT_XS, "Drift", K_DIM);
     cv_text(126, yb + 20, &FONT_S, t, K_TEXT2);
-    /* STEREO: drone I and II, as far apart as Width puts them */
+    /* STEREO: drone I and II, as far apart as Width puts them: two short upright bars on a line */
     cx = 204;
     cv_rect(cx - 22, yb - 20, 45, 1, K_GRID);
-    cv_round(cx - 3 - (int32_t)(wid * 20.0f), yb - 24, 9, 9, 4, K_DRONE[0]);
-    cv_round(cx - 5 + (int32_t)(wid * 20.0f), yb - 24, 9, 9, 4, K_DRONE[1]);
+    cv_rect(cx - 2 - (int32_t)(wid * 20.0f), yb - 30, 3, 20, K_DRONE[0]);
+    cv_rect(cx + (int32_t)(wid * 20.0f), yb - 30, 3, 20, K_DRONE[1]);
     if (wid <= 0.0f)
         scopy(t, "mono");
     else {
@@ -2393,6 +2388,8 @@ static void leds(void)
             b[PAGE_BTN[i].btn] = 255;
     if (ui.playing)
         b[B_PLAY] = 255;
+    if (ui.dirty)                                      /* SAVE: a dim glow while something isn't saved yet */
+        b[B_SAVE] = 90;
     if (proj.par[P_LFO_W1])                            /* OCT- / OCT+: each wave, pulsing with it */
         b[B_OCTDN] = wave_lvl(dr_lfo[0]);
     if (proj.par[P_LFO_W2])
