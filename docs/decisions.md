@@ -281,3 +281,7 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-18 (from review 4, no design change): the top bar's badges (SWELL, VISIT, II OUT) show only where they fit
   beside the left-encoder pill; holding SAVE says "KEY: STORE  LET GO: SAVE"; the panel picture shows 12 scenes and
   the four gestures; the README says the drone-I / drone-II knob rule holds on the drone pages.
+- 2026-10-18 (Evan, from review 4): two quick ARP taps open the Swell page without touching the Swell (a lone tap
+  switches it 350 ms later); a page button opens the page last used there (HOME always Play 1); while SELECT,
+  ALGORITHM or PRESETS turns, its name and value fill the values row, large (the top-bar pill is gone). PRESETS stays
+  Macro time.

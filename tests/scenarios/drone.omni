@@ -276,8 +276,11 @@ expect pitch1 5640
 tapkey b8
 expect par45 0
 expect par21 5640
-# ARP: a tap is the pulse on / off (and the page stays); held, its page, without toggling
+# ARP: a tap is the pulse on / off (once no second tap follows: 350 ms), and the page stays; held, its page,
+# without toggling
 tap ARP
+expect par55 0
+wait 400
 expect par55 1
 expect view 0
 press ARP
@@ -290,12 +293,15 @@ expect par55 1
 wait 400
 shot pulse.png
 tap ARP
-expect par55 0
-# two quick taps: the Swell page, to stay (the swell as it was); another page button leaves it
 wait 400
+expect par55 0
+# two quick taps: the Swell page, to stay, the swell never touched (no dip); another page button leaves it
 tap ARP
+expect par55 0
 tap ARP
 expect view 12
+expect par55 0
+wait 400
 expect par55 0
 wait 600
 expect view 12
@@ -385,6 +391,29 @@ spin K4 10
 expect par97 50
 tap GLO
 expect view 10
+# a page button opens the page last shown there: Reverb, then home, then FX held (a peek) shows Reverb; HOME is
+# always Play 1
+tap HOME
+expect view 0
+tap FX
+tap FX
+expect view 14
+tap HOME
+expect view 0
+press FX
+wait 500
+expect view 14
+release FX
+expect view 0
+tap HOME
+expect view 1
+tap FX
+tap HOME
+expect view 0
+tap FX
+tap FX
+expect view 13
+tap HOME
 # SELECT: the LFO rate; PRESETS: nothing yet (the macro to come), the waves stay
 spin SELECT 10
 expect par47 40

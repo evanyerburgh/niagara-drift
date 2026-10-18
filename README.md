@@ -86,7 +86,9 @@ knob you're turning.
 ### Pages
 
 Tap a page button and the knobs stay on that page. Hold it to peek: turn a knob, let go, and you're
-back. Tap it again for its second page; "1/2" by the page's name shows which of its pages you're on.
+back. Tap it again for its second page; "1/2" by the page's name shows which of its pages you're on. A page
+button opens the page you last used there (HOME always opens Play 1), so after visiting Reverb, holding FX
+peeks at Reverb.
 Each page's screen shows a picture of what its knobs do, and the four values below it. Every knob
 glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
@@ -239,7 +241,7 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
 
 | Knob | Sets |
 |---|---|
-| SELECT | the rate, from one cycle in 50 seconds to 70 Hz (below 0.1 Hz the screen shows a cycle's length, "21s") |
+| SELECT | the rate, from one cycle in 50 seconds to 70 Hz (below 0.1 Hz the screen shows a cycle's length, "21s"). While SELECT, ALGORITHM or PRESETS turns, its value fills the bottom of the screen, large |
 | ALGORITHM | the **Movement**: every LFO depth together, from still (0%) to double (200%) |
 | OCT− · OCT+ | Wave I's · Wave II's shape: tap for the next (or off), round and round; SEL + OCT for the one before |
 
@@ -329,7 +331,8 @@ in the panel's groups. It steps aside while you turn a knob or hold a white key.
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Into the Presets too, except P12 (Clean), which is locked |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
 | **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The macros](#the-macros)) |
-| **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it |
+| **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it (the Swell isn't touched then: a single tap
+switches it a moment later, once no second tap comes) |
 | **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 
 ### The Presets
