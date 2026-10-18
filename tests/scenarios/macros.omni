@@ -19,23 +19,20 @@ expect heard63 65
 spin K1 -100
 wait 700
 expect heard7 700
-# PRESETS plays the live macro (Bloom to start); SEL + PRESETS picks another (Weight)
-spin PRESET 50
-wait 700
-expect par78 50
-expect heard7 810
-spin PRESET -50
-press SEL
-spin PRESET 1
-release SEL
-expect mlive 1
-spin PRESET 100
+# the page's Weight at 100: the sub +45
+spin K2 100
 wait 700
 expect par79 100
 expect heard5 75
-spin PRESET -100
+spin K2 -100
 wait 700
 expect heard5 30
+# PRESETS: Macro time (50: each gesture's own time); no macro's amount moves
+spin PRESET 10
+expect mtime 60
+expect par78 0
+spin PRESET -10
+expect mtime 50
 # Tear: hard sync on from its first step
 spin K4 1
 wait 100
@@ -59,6 +56,32 @@ expect heard5 >38
 wait 2500
 expect heard5 30
 expect heard7 700
+# let go after a short hold: it goes over as long as it was held (1 s), not its own time
+key w12 down
+wait 1000
+key w12 up
+expect heard5 >38
+wait 1100
+expect heard5 30
+# let go after a long hold (5 s, in by 2.8 s): it drifts out over 5 s
+key w12 down
+wait 5000
+key w12 up
+wait 2500
+expect heard5 >38
+wait 3000
+expect heard5 30
+# Macro time x0.1 (PRESETS all the way down): in by about 0.3 s
+spin PRESET -50
+expect mtime 0
+key w12 down
+wait 400
+expect heard5 >70
+key w12 up
+wait 600
+expect heard5 30
+spin PRESET 50
+expect mtime 50
 # a tap: to its depth, and it stays; a tap again: it goes
 tapkey w12
 wait 4000
@@ -79,10 +102,10 @@ expect par90 <60
 tapkey w12
 wait 4000
 expect par90 0
-# SHIFT: held, PRESETS picks its move (a 4th down), ALGORITHM its swell (3.9 s, 4 shorter: 3.4 s)
+# SHIFT: held, ALGORITHM picks its move (a 4th down), PRESETS its own time (3.9 s, 4 shorter: 3.4 s)
 key w13 down
-spin PRESET 2
-spin ALGO -4
+spin ALGO 2
+spin PRESET -4
 wait 300
 key w13 up
 expect par83 2

@@ -543,7 +543,8 @@ typedef struct {
 } move_t;
 #define MV_N 12
 #define PULSE_HZ 0.15f                           /* a PULSE move's breath: about 7 s */
-#define MOVE_S 0.6f                              /* a move's level: the whole way in this long, at most */
+#define MOVE_S 0.15f                             /* a move's level: the whole way in this long, at most (a
+                                                  * turn back half way doesn't jump; Macro time can be quick) */
 static const move_t MACRO_MV[DR_NSETM + DR_NGEST][MV_N] = {
     /* Bloom (page): open the sound */
     {{DR_GP(0, GP_CUTOFF), MK_ADD, 220, 0, 100, 0, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, 220, 0, 100, 0, 100},

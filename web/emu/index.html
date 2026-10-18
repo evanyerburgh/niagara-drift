@@ -494,9 +494,10 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
   <div class="g-card mid">
     <h3>Macros <span class="g-sub">several settings at once, on top of your sound</span></h3>
     <dl class="acts">
-      <div><dt>Bloom · Weight · Tide · Tear</dt><dd><span class="cap">SEQ</span>: the Macros page, KNOB 1–4 · <span class="cap">PRESETS</span> plays one (Bloom to start; hold <span class="cap">SEL</span> and turn it to pick)</dd></div>
-      <div><dt>Weight · Shift · Converge · Wash</dt><dd>The top four <span class="cap white">white keys</span>: hold to swell in, let go to swell out, tap to latch</dd></div>
-      <div><dt>Set a gesture</dt><dd>Hold its key: <span class="cap">PRESETS</span> its depth (Shift: its move), <span class="cap">ALGORITHM</span> its swell</dd></div>
+      <div><dt>Bloom · Weight · Tide · Tear</dt><dd><span class="cap">SEQ</span>: the Macros page, KNOB 1–4</dd></div>
+      <div><dt>Weight · Shift · Converge · Wash</dt><dd>The top four <span class="cap white">white keys</span>: hold to bring in, let go and it leaves as slowly as you held it; tap to stay</dd></div>
+      <div><dt>Macro time</dt><dd><span class="cap">PRESETS</span>: every gesture faster or slower, even while it moves</dd></div>
+      <div><dt>Set a gesture</dt><dd>Hold its key: <span class="cap">ALGORITHM</span> its depth (Shift: its move), <span class="cap">PRESETS</span> its own time</dd></div>
     </dl>
   </div>
 
@@ -667,7 +668,7 @@ const TIP = { FX: "Delay: type, time, repeats, mix (again: Reverb: type, length 
   EDIT: "Osc: X-Wave, pulse width (again: Source: osc mix, drive); hold to peek", GLO: "Setup 1: glide, fade, drift, stereo width (again: Setup 2: morph, scene switch, tune, tuning; again: Setup 3: speaker, pressure)",
   HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Macros: Bloom, Weight, Tide, Tear (again: Partner: interval, detune)",
   PLAY: "Drone in / out", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
-  SELECT: "LFO rate", PRESETS: "A macro: Bloom to start (hold SEL and turn to pick another)", ALGORITHM: "Movement: every LFO depth together",
+  SELECT: "LFO rate", PRESETS: "Macro time: every gesture faster or slower", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
 for (const [n, c] of [...Object.entries(buttons), ...Object.entries(knobs)]) if (TIP[n]) c.g.setAttribute("aria-description", TIP[n]);
 // the keys: the black ones as switches (and what they do on the LFO pages), the white ones as scenes

@@ -132,7 +132,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Macros and Partner · SEQ
 
-<img src="docs/img/page-seq.png" width="488" alt="The Macros page: four set macros as meters, the one PRESETS plays marked, and the four gestures under them; the Partner page">
+<img src="docs/img/page-seq.png" width="488" alt="The Macros page: four set macros as meters and the four gestures under them; the Partner page">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
@@ -244,7 +244,7 @@ and slowly, so Movement is heard at once; set an osc depth to hear it move the p
 | | the LFO's rate, its shapes, and where the waves go (the black keys on the LFO pages) |
  Turning a
 depth that can't be heard says why on the screen (Movement at 0%, or its wave off).
-**PRESETS** plays a macro, Bloom to start (see below).
+**PRESETS** is **Macro time**: how fast every gesture moves (see below).
 
 ### The macros
 
@@ -254,7 +254,7 @@ own order when you let go.
 
 | Macro | What it moves | Played on |
 |---|---|---|
-| **Bloom** | both cutoffs up, resonance a little down, more reverb: the sound opens | SEQ, KNOB 1; **PRESETS** to start |
+| **Bloom** | both cutoffs up, resonance a little down, more reverb: the sound opens | SEQ, KNOB 1 |
 | **Weight** | a full, warm bass: the sub comes up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. Let go: the brightness comes back first, the sub lingers | SEQ, KNOB 2; D5, held |
 | **Tide** | more Movement while the LFO slows: bigger and slower together | SEQ, KNOB 3 |
 | **Tear** | hard sync on, drone II's pitch up to an octave and its resonance up: the sync sweep | SEQ, KNOB 4 |
@@ -262,14 +262,15 @@ own order when you let go.
 | **Converge** | drone II's pitch toward the nearest unison, fourth, fifth or octave of drone I (drone I steps back, quieter and darker, while it moves), never quite arriving: it stays a few cents short and wavers, so the two pulse; the partners' beating and Drift ease, cross-mod last. Let go: cross-mod goes first, the pitch drifts back last. It takes the swell time however far drone II has to go | F5, held |
 | **Wash** | the delay first, then the reverb opens and grows longer and darker (to Inf, a freeze, at full depth), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5, held |
 
-- **The set macros** (SEQ's Macros page) stay where you leave them. **PRESETS** plays one of them, always at
-  hand: Bloom to start; hold **SEL** and turn PRESETS to pick another.
+- **The set macros** (SEQ's Macros page) stay where you leave them.
 - **The gestures** are the top four white keys (they don't sense pressure). **Hold** one and it comes in while you
-  hold; **let go** and it goes. **Tap** it and it goes to its depth and stays; tap again and it goes. **SEL held as
-  you let go** keeps it where it is.
-  While you hold one, **PRESETS** sets how deep it goes (for Shift: its move, a fifth or fourth up or down) and
-  **ALGORITHM** how long it takes to swell (1–30 s; to start Weight 2.8 s, Shift 3.9 s, Converge 3.3 s, Wash 3.3 s; going takes as long as coming in).
-  Its key glows dimly, and lights as it comes in.
+  hold; **let go** and it goes, over as long as you held it (hold 2 s, it leaves in 2 s; hold 10 s, it drifts out
+  over 10 s). **Tap** it and it goes to its depth and stays; tap again and it goes. **SEL held as you let go** keeps
+  it where it is. Its key glows dimly, and lights as it comes in.
+- **PRESETS is Macro time**: it speeds up or slows down every gesture, coming in and going out, from 10 times faster
+  to 10 times slower (the middle: each gesture's own time). Turn it while a gesture moves to change it on the way.
+- **While you hold a gesture key**, **ALGORITHM** sets how deep it goes (for Shift: its move, a fifth or fourth up
+  or down) and **PRESETS** that gesture's own time (to start Weight 2.8 s, Shift 3.9 s, Converge 3.3 s, Wash 3.3 s).
 - Turning a knob while a scene switch is on its way lets go of that setting; the rest still lands.
 
 ### Black keys: switches

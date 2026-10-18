@@ -206,3 +206,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   depth on PRESETS while held. Swells shorter: Weight 30 (2.8 s), Shift 40 (3.9 s), Converge 35 (3.3 s), Wash 35
   (3.3 s); letting go takes as long as the swell (Wash's 2.5x release gone; its tails are the reverb's own). PROJ_FORMAT
   25 (24's swells reset to these). Clean, when built, keeps the notes (no unison or sync).
+- 2026-10-18: the player times the gestures (Evan: "not just on-off effects"). PRESETS is Macro time: every
+  gesture's time x0.1 .. x10 (50: as set), live, kept in the project (not scenes; PROJ_FORMAT 26, in the byte that
+  held the macro PRESETS played, which is gone). Let go after a hold: out over as long as it was held, x Macro time.
+  Holding a gesture key: ALGORITHM its depth (Shift: its move), PRESETS its own time. A move's level glides over
+  0.15 s at most (was 0.6).
