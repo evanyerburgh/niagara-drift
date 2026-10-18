@@ -198,3 +198,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   cutoffs -100, the sub over 20-100 %. Converge: drone I dips (level -25, cutoff -60) while drone II moves (a bump, in
   over 0-20 %, out over 45-75 %, both ways). Wash: its release is 2.5x its swell; at the top (85-100 %) the dry levels
   breathe -14 at 0.15 Hz.
+- 2026-10-18 (Evan's listening, round 3): Weight is a full, warm bass, not focused: osc mix +45 (0-70 %), cutoffs -30,
+  resonance -40, drive +35, Character +25, noise -40, drone I's level +8; the width, detune and Movement moves are gone.
+  Converge never quite converges: drone II stays 0.09 semitone short of the consonance, wavering by 0.05 at 0.07 Hz
+  (about 1.3 beats a second at A3); the partners' detune and Drift ease by 60 %, not to 0.

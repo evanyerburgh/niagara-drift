@@ -531,7 +531,7 @@ void dr_init(void)
  * Each move comes in over its own part of the macro's way in (in0 .. in1 of the amount, eased) and goes over
  * its own part of the way out (out0 .. out1), so a macro's parts arrive in order and leave in their own order
  * (Strymon Deco's auto-flange: "the controls are smoothly returned"); a move's level glides (MOVE_S) so turning
- * back half way doesn't jump. Kinds: ADD an offset; SW a switch on while the move is in; ZERO the value toward 0;
+ * back half way doesn't jump. Kinds: ADD an offset; SW a switch on while the move is in; ZERO the value toward 0 (by d %, all the way when d is 0);
  * P_SHIFT / P_CONV / P_OCT a drone's pitch (Shift's move; Converge's pull to the nearest unison, fourth, fifth or
  * octave of drone I; Tear's octave); BUMP an offset that rises over in0 .. in1 and falls again over out0 .. out1,
  * both ways (a dip while something else moves); PULSE an offset breathing slowly (PULSE_HZ) while it's in. */
@@ -550,34 +550,37 @@ static const move_t MACRO_MV[DR_NSETM + DR_NGEST][MV_N] = {
      {DR_GP(0, GP_RESO), MK_ADD, -100, 0, 100, 0, 100}, {DR_GP(1, GP_RESO), MK_ADD, -100, 0, 100, 0, 100},
      {P_REV_MIX, MK_ADD, 30, 0, 100, 0, 100}},
     /* Weight (page): as the key's */
-    {{DR_GP(0, GP_MIX), MK_ADD, 50, 20, 100, 0, 50}, {DR_GP(1, GP_MIX), MK_ADD, 50, 20, 100, 0, 50},
-     {DR_GP(0, GP_CUTOFF), MK_ADD, -100, 0, 50, 50, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -100, 0, 50, 50, 100},
-     {DR_GP(0, GP_RESO), MK_ADD, -80, 0, 50, 50, 100}, {DR_GP(1, GP_RESO), MK_ADD, -80, 0, 50, 50, 100},
-     {DR_GP(0, GP_DRIVE), MK_ADD, 30, 30, 100, 30, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 30, 30, 100, 30, 100},
-     {P_WIDTH, MK_ZERO, 0, 0, 60, 40, 100}, {DR_GP(0, GP_DETUNE), MK_ZERO, 0, 0, 60, 40, 100},
-     {DR_GP(1, GP_DETUNE), MK_ZERO, 0, 0, 60, 40, 100}, {P_MOVE, MK_ADD, -25, 0, 60, 40, 100}},
+    {{DR_GP(0, GP_MIX), MK_ADD, 45, 0, 70, 0, 60}, {DR_GP(1, GP_MIX), MK_ADD, 45, 0, 70, 0, 60},
+     {DR_GP(0, GP_CUTOFF), MK_ADD, -30, 0, 50, 40, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -30, 0, 50, 40, 100},
+     {DR_GP(0, GP_RESO), MK_ADD, -40, 0, 50, 40, 100}, {DR_GP(1, GP_RESO), MK_ADD, -40, 0, 50, 40, 100},
+     {DR_GP(0, GP_DRIVE), MK_ADD, 35, 20, 100, 20, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 35, 20, 100, 20, 100},
+     {P_CHAR, MK_ADD, 25, 30, 100, 30, 100}, {DR_GP(0, GP_NOISE), MK_ADD, -40, 0, 50, 50, 100},
+     {DR_GP(1, GP_NOISE), MK_ADD, -40, 0, 50, 50, 100}, {DR_GP(0, GP_LEVEL), MK_ADD, 8, 20, 100, 0, 60}},
     /* Tide (page): bigger and slower together */
     {{P_MOVE, MK_ADD, 40, 0, 100, 0, 100}, {P_LFO_RATE, MK_ADD, -25, 0, 100, 0, 100}},
     /* Tear (page): the sync sweep, drone II up an octave */
     {{P_SYNC, MK_SW, 0, 0, 100, 0, 100}, {DR_GP(1, GP_RESO), MK_ADD, 300, 0, 100, 0, 100}, {1, MK_OCT, 0, 0, 100, 0, 100}},
-    /* WEIGHT (D5): focused and heavy: the drones close in (to the middle, the partners' detune to 0, less LFO
-     * movement) and darken, then the sub comes up, a little drive so a small speaker hears it heavier, not just
-     * duller. Let go: the brightness and the spread come back first, the sub lingers */
-    {{DR_GP(0, GP_MIX), MK_ADD, 50, 20, 100, 0, 50}, {DR_GP(1, GP_MIX), MK_ADD, 50, 20, 100, 0, 50},
-     {DR_GP(0, GP_CUTOFF), MK_ADD, -100, 0, 50, 50, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -100, 0, 50, 50, 100},
-     {DR_GP(0, GP_RESO), MK_ADD, -80, 0, 50, 50, 100}, {DR_GP(1, GP_RESO), MK_ADD, -80, 0, 50, 50, 100},
-     {DR_GP(0, GP_DRIVE), MK_ADD, 30, 30, 100, 30, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 30, 30, 100, 30, 100},
-     {P_WIDTH, MK_ZERO, 0, 0, 60, 40, 100}, {DR_GP(0, GP_DETUNE), MK_ZERO, 0, 0, 60, 40, 100},
-     {DR_GP(1, GP_DETUNE), MK_ZERO, 0, 0, 60, 40, 100}, {P_MOVE, MK_ADD, -25, 0, 60, 40, 100}},
+    /* WEIGHT (D5): a full, warm bass (Evan, 2026-10-18): the sub comes up through most of the swell, the
+     * resonance and the noise give way and the cutoffs ease down a little (warm, not dark), then drive and the
+     * vintage character round it off, so a small speaker hears it fuller. Let go: the brightness comes back first,
+     * the sub lingers */
+    {{DR_GP(0, GP_MIX), MK_ADD, 45, 0, 70, 0, 60}, {DR_GP(1, GP_MIX), MK_ADD, 45, 0, 70, 0, 60},
+     {DR_GP(0, GP_CUTOFF), MK_ADD, -30, 0, 50, 40, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -30, 0, 50, 40, 100},
+     {DR_GP(0, GP_RESO), MK_ADD, -40, 0, 50, 40, 100}, {DR_GP(1, GP_RESO), MK_ADD, -40, 0, 50, 40, 100},
+     {DR_GP(0, GP_DRIVE), MK_ADD, 35, 20, 100, 20, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 35, 20, 100, 20, 100},
+     {P_CHAR, MK_ADD, 25, 30, 100, 30, 100}, {DR_GP(0, GP_NOISE), MK_ADD, -40, 0, 50, 50, 100},
+     {DR_GP(1, GP_NOISE), MK_ADD, -40, 0, 50, 50, 100}, {DR_GP(0, GP_LEVEL), MK_ADD, 8, 20, 100, 0, 60}},
     /* SHIFT (E5): a new chord, a voice at a time (the Lyra-8 manual's chord changes): drone I glides there
      * first, drone II follows; let go, drone I comes back first */
     {{0, MK_SHIFT, 0, 0, 60, 40, 100}, {1, MK_SHIFT, 0, 40, 100, 0, 60}},
-    /* CONVERGE (F5): drone II's pitch to the nearest consonance with drone I (drone I stepping back, quieter and
-     * darker, while it moves, so the move is heard), then the beating slows (detune, drift to 0), cross-mod last.
+    /* CONVERGE (F5): drone II's pitch toward the nearest consonance with drone I (drone I stepping back, quieter
+     * and darker, while it moves, so the move is heard), never quite there: it stays a few cents short, wavering,
+     * so the two pulse as it tries to hold drone I's pitch (Evan, 2026-10-18); the beating of the partners and
+     * Drift eases (by 60 %), cross-mod last.
      * Let go: cross-mod leaves first, the pitch drifts back last (drone I stepping back again) */
     {{1, MK_CONV, 0, 0, 50, 0, 70}, {DR_GP(0, GP_LEVEL), MK_BUMP, -25, 0, 20, 45, 75},
-     {DR_GP(0, GP_CUTOFF), MK_BUMP, -60, 0, 20, 45, 75}, {DR_GP(0, GP_DETUNE), MK_ZERO, 0, 30, 80, 20, 70},
-     {DR_GP(1, GP_DETUNE), MK_ZERO, 0, 30, 80, 20, 70}, {P_DRIFT, MK_ZERO, 0, 30, 80, 20, 70},
+     {DR_GP(0, GP_CUTOFF), MK_BUMP, -60, 0, 20, 45, 75}, {DR_GP(0, GP_DETUNE), MK_ZERO, 60, 30, 80, 20, 70},
+     {DR_GP(1, GP_DETUNE), MK_ZERO, 60, 30, 80, 20, 70}, {P_DRIFT, MK_ZERO, 60, 30, 80, 20, 70},
      {P_XMOD, MK_SW, 0, 60, 100, 70, 100}, {P_XMOD_AMT, MK_ADD, 60, 60, 100, 70, 100}},
     /* WASH (G5): the delay first, then the reverb opens (Length to Inf at full), darker as it grows, the dry
      * dips last; at the top the dry breathes slowly in and out of the cloud. Let go (slowly: the UI's release is
@@ -621,8 +624,12 @@ static int heard(int i)                          /* the sound's own value with t
     int v = moff[i] == MOFF_ON ? PARAMS[i].hi : base[i] + moff[i];
     return v < PARAMS[i].lo ? PARAMS[i].lo : v > PARAMS[i].hi ? PARAMS[i].hi : v;
 }
+static float conv_ph;                            /* Converge's waver, cycles */
+#define CONV_SHORT 0.09f                         /* how far short it stays, semitones (about 1.3 beats a second at A3) */
+#define CONV_WAVER 0.05f                         /* ... wavering by this much */
+#define CONV_HZ 0.07f                            /* ... this slowly */
 static float conv_st(void)                       /* Converge: drone II to the nearest unison, 4th, 5th or octave */
-{                                                /* of drone I, in semitones (at most 2.5) */
+{                                                /* of drone I, in semitones (at most 2.5), less how short it stays */
     static const float C[4] = {0.0f, 5.0f, 7.0f, 12.0f};
     float x = grp[1].ps2 - grp[0].ps2, o, best = 99.0f;
     int i;
@@ -632,13 +639,16 @@ static float conv_st(void)                       /* Converge: drone II to the ne
         if (fm_fabsf(d) < fm_fabsf(best))
             best = d;
     }
-    return best;
+    {   /* short of it, on the side it comes from (from below if it's there already) */
+        float sh = CONV_SHORT + CONV_WAVER * fm_sinf(6.2831853f * conv_ph);
+        return best >= 0.0f ? best - sh : best + sh;
+    }
 }
 static void macro_apply(uint32_t n)              /* the offsets again, n samples on; what changes glides 25 ms */
 {
     float off[DR_NPARAMS], pm[DR_NGROUPS] = {0.0f, 0.0f}, step = (float)n / (MOVE_S * DR_SR);
     uint8_t on[DR_NPARAMS];
-    int m, k, i, pulsing = 0;
+    int m, k, i, pulsing = 0, conving = 0;
     for (i = 0; i < DR_NPARAMS; i++) {
         off[i] = 0.0f;
         on[i] = 0;
@@ -663,9 +673,9 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
                 continue;
             switch (v->kind) {
             case MK_SW: on[v->p] = 1; break;
-            case MK_ZERO: off[v->p] -= (float)base[v->p] * *l; break;
+            case MK_ZERO: off[v->p] -= (float)base[v->p] * *l * (v->d ? (float)v->d * 0.01f : 1.0f); break;
             case MK_SHIFT: pm[v->p] += (float)SHIFT_ST[(unsigned)base[P_GD_SHIFT] < DR_NSHIFT ? base[P_GD_SHIFT] : 0] * *l; break;
-            case MK_CONV: pm[v->p] += conv_st() * *l; mv_moving = 1; break;    /* follows drone I */
+            case MK_CONV: pm[v->p] += conv_st() * *l; mv_moving = 1; conving = 1; break;    /* follows drone I */
             case MK_OCT: pm[v->p] += 12.0f * *l; break;
             case MK_PULSE: off[v->p] += (float)v->d * *l * (0.5f - 0.5f * fm_cosf(6.2831853f * mac_ph)); pulsing = 1; break;
             default: off[v->p] += (float)v->d * *l; break;
@@ -674,6 +684,10 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
     }
     mac_p[0] = pm[0];
     mac_p[1] = pm[1];
+    if (conving) {                               /* Converge wavering */
+        conv_ph += (float)n * (CONV_HZ / DR_SR);
+        conv_ph -= (float)(int)conv_ph;
+    }
     if (pulsing) {                               /* breathing: on, and on again next block */
         mac_ph += (float)n * (PULSE_HZ / DR_SR);
         mac_ph -= (float)(int)mac_ph;

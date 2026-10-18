@@ -32,7 +32,7 @@ expect mlive 1
 spin PRESET 100
 wait 700
 expect par79 100
-expect heard5 80
+expect heard5 75
 spin PRESET -100
 wait 700
 expect heard5 30
@@ -43,11 +43,13 @@ expect heard44 1
 spin K4 -1
 wait 700
 expect heard44 0
-# WEIGHT held swells in (4.6 s), the cutoff first: half way, the cutoff most of the way down, the sub not yet
+# WEIGHT held swells in (4.6 s), a warm bass: half way, the cutoff most of the way down (by 30 at most), the sub
+# half way up
 key w12 down
 wait 2300
-expect heard7 <640
-expect heard5 <52
+expect heard7 <690
+expect heard5 >50
+expect heard5 <70
 wait 3000
 expect heard5 >62
 key w12 up
@@ -101,8 +103,8 @@ tapkey w13
 wait 12000
 expect mpitch0 0
 expect mpitch1 0
-# CONVERGE: drone II's pitch to a consonance with drone I first (drone I stepping back, quieter, meanwhile),
-# cross-mod last (7.7 s)
+# CONVERGE: drone II's pitch toward a consonance with drone I first (drone I stepping back, quieter, meanwhile),
+# never quite there (a few cents short, so they pulse; here they're a fifth already), cross-mod last (7.7 s)
 expect heard11 80
 key w14 down
 wait 2000
@@ -110,7 +112,9 @@ expect heard42 0
 expect heard11 <72
 wait 7000
 expect heard42 1
-expect heard25 0
+expect heard25 5
+expect mpitch1 <-3
+expect mpitch1 >-16
 expect heard11 80
 key w14 up
 wait 9000

@@ -255,11 +255,11 @@ own order when you let go.
 | Macro | What it moves | Played on |
 |---|---|---|
 | **Bloom** | both cutoffs up, resonance a little down, more reverb: the sound opens | SEQ, KNOB 1; **PRESETS** to start |
-| **Weight** | focused and heavy: the drones close in (to the middle, the partners in tune, less LFO movement) and darken, then the sub comes up, with a little drive so a small speaker hears it. Let go: the brightness and spread come back first, the sub lingers | SEQ, KNOB 2; D5, held |
+| **Weight** | a full, warm bass: the sub comes up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. Let go: the brightness comes back first, the sub lingers | SEQ, KNOB 2; D5, held |
 | **Tide** | more Movement while the LFO slows: bigger and slower together | SEQ, KNOB 3 |
 | **Tear** | hard sync on, drone II's pitch up to an octave and its resonance up: the sync sweep | SEQ, KNOB 4 |
 | **Shift** | a new chord, a voice at a time: drone I glides a fifth or fourth up or down, drone II follows. Let go: drone I comes back first | E5, held |
-| **Converge** | drone II's pitch to the nearest unison, fourth, fifth or octave of drone I (drone I steps back, quieter and darker, while it moves), then the beating slows (detune and drift to 0), cross-mod last. Let go: cross-mod goes first, the pitch drifts back last. It takes the swell time however far drone II has to go | F5, held |
+| **Converge** | drone II's pitch toward the nearest unison, fourth, fifth or octave of drone I (drone I steps back, quieter and darker, while it moves), never quite arriving: it stays a few cents short and wavers, so the two pulse; the partners' beating and Drift ease, cross-mod last. Let go: cross-mod goes first, the pitch drifts back last. It takes the swell time however far drone II has to go | F5, held |
 | **Wash** | the delay first, then the reverb opens and grows longer and darker (to Inf, a freeze, at full depth), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: it returns slowly (2.5 times the swell), the dry first, the tails last | G5, held |
 
 - **The set macros** (SEQ's Macros page) stay where you leave them. **PRESETS** plays one of them, always at
