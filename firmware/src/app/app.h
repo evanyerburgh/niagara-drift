@@ -16,7 +16,7 @@
                                           * let go, a key may play something else now); 28: Shift's move in cents (27's four to theirs); Noise's top
                                           * 6 dB up (27's values halved);
                                           * 27: the set macros gone (their four values zeroed; now Wander, Age,
-                                          * Shift's move); what each gesture key plays; 26: Macro time (the byte of the macro PRESETS played: 25's reset);
+                                          * Shift's move); what each gesture key plays; 26: Gesture time (the byte of the macro PRESETS played: 25's reset);
                                           * 25: the gestures' swells shorter (24's reset to the new defaults);
                                           * 24: the gestures Weight, Shift, Converge, Wash (23's gesture values
                                           * reset: Beat and Heat are gone); 23: the effects (delay type, reverb length and damp, pressure; 19-22
@@ -31,14 +31,14 @@
 #define NSCENES 12                       /* a bank: the 12 lower white keys (F3 .. C5, which sense pressure) */
 #define NBANKS 4                         /* A, B, C (yours), and the Presets (fixed, in the firmware) */
 #define BANK_PRESETS 3
-#define PRESET_LOCKED 11                 /* P12, the clean sound: the one Preset that can't be saved over */
+#define PRESET_LOCKED 11                 /* P12, the clean sound */
 
 typedef struct {
     uint32_t magic, format;
     int16_t par[DR_NPARAMS];             /* drone.h parameters */
     uint8_t leds;                        /* key lights on */
     uint8_t bank;                        /* the bank the scene keys play (0 A .. 3 Presets) */
-    uint8_t mtime;                       /* MACRO TIME, 0..100 (PRESETS): every gesture's speed x0.1 .. x10, 50 as set
+    uint8_t mtime;                       /* GESTURE TIME, 0..100 (PRESETS): every gesture's speed x0.1 .. x10, 50 as set
                                           * (the player's, not a scene's; was the macro PRESETS played, format <= 25) */
     uint8_t gkey_old[4];                 /* unused since 29 (what each gesture key played, 27-28) */
     uint8_t rsv[9];                      /* room to grow: an older, shorter project loads (zeros here) */
@@ -47,14 +47,14 @@ typedef struct {
 } project_t;
 _Static_assert(sizeof(project_t) <= PLAT_STORE_MAX, "the project must fit one flash object");
 
-typedef struct {                         /* banks B and C, and the Presets saved over: an object each */
+typedef struct {                         /* banks B and C, and the Presets saved over (before 2026-10-19): an object each */
     uint32_t magic, format;
     uint16_t used;
     uint16_t rsv;
     int16_t scene[NSCENES][DR_NPARAMS];
 } bank_t;
 _Static_assert(sizeof(bank_t) <= PLAT_STORE_MAX, "a bank must fit one flash object");
-#define MTIME_DEF 50                     /* Macro time to start: the gestures' own swells */
+#define MTIME_DEF 50                     /* Gesture time to start: the gestures' own swells */
 #define BANK_MAGIC 0x314B4E42u           /* "BNK1" */
 
 extern project_t proj;
@@ -63,7 +63,7 @@ void project_defaults(void);
 int project_load(void);                  /* 0 = loaded; else defaults are in place */
 int project_save(void);                  /* 0 = saved and verified */
 const int16_t *scene_get(int bank, int n);   /* scene n of a bank, or 0 if empty */
-const char *preset_name(int n);          /* the Preset's name (P1 "NIAGARA" ..), or 0 once it's saved over */
+const char *preset_name(int n);          /* the Preset's name (P1 "NIAGARA" ..) */
 int scene_put(int bank, int n);         /* the sound now into scene n of bank A..C (marks it to save); 0 ok */
 void project_apply(void);                /* every value to the engine (boot, load) */
 

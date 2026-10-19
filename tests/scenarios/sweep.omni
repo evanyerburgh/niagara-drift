@@ -2,6 +2,8 @@
 # its filter fairly open. A slow full turn of KNOB 1 (20 detents, 150 ms apart: an octave in 3 s), back
 # down at a medium speed, a quick spin up, then fine tuning with SEL held. Every part should sound like
 # a continuous slide, never steps.
+# Pitch lock off (on at start since 2026-10-19): these move the pitch
+set 74 0
 tap EDIT
 tap EDIT
 spin K4 -100

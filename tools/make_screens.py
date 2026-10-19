@@ -42,7 +42,7 @@ BODY, TRAY, KNOB, BTN, LABEL = (58, 61, 66), (38, 40, 44), (31, 33, 36), (46, 49
 KEY_W, KEY_B = (217, 218, 220), (201, 202, 205)
 AMBER, TEAL, LILAC, PALE, INK = (255, 176, 74), (69, 227, 211), (201, 155, 255), (255, 214, 240), (20, 0, 15)
 KNOBS = [(105, 100, "MASTER", "Volume", PALE), (215, 100, "SELECT", "LFO rate", LILAC),
-         (105, 205, "PRESETS", "Macro time", PALE), (215, 205, "ALGORITHM", "Movement", LILAC)] + \
+         (105, 205, "PRESETS", "Gesture time", PALE), (215, 205, "ALGORITHM", "Movement", LILAC)] + \
         [(610 + i * 104, 100, "KNOB%d" % (i + 1), "Drone I" if i < 2 else "Drone II", AMBER if i < 2 else TEAL)
          for i in range(4)]
 ROW1 = [("FX", "Delay · Rev"), ("SEL", "Fine"), ("ENV", "Tone"), ("LFO", "LFO"), ("EDIT", "Osc · Src"), ("GLO", "Setup")]

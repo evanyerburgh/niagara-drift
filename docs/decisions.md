@@ -285,3 +285,11 @@ at the end. The current state is in the [README](../README.md) and the code.
   switches it 350 ms later); a page button opens the page last used there (HOME always Play 1); while SELECT,
   ALGORITHM or PRESETS turns, its name and value fill the values row, large (the top-bar pill is gone). PRESETS stays
   Macro time.
+- 2026-10-19 (Evan, after trying #28 on the FM-1): Macro time is **Gesture time**. Pitch lock is on at start (the
+  room's, not a scene's). The Presets are fixed (SAVE + a key there says "PRESETS ARE FIXED"); any saved over before
+  move to the first empty slots of C, then B, then A. The sine and the triangle ~4 dB louder (x1.6, x1.7; the
+  presets' and the starting sound's levels lowered to match: within 0.1 dB of before). Morph is **Key glide** (black
+  keys, LFO waves); **Scene time** (default 46, ~4 s) is every scene move: a tap, a crossfade's glide (the pressure
+  is where it heads, at most the whole way a Scene time), its way back. SEL during a crossfade holds it until the
+  key lets go. OCT doesn't show the wave on LFO depths. The autosave waits 4 s after the last change (not only the
+  last touch) and writes at most every 30 s (a long scene switch wrote 660 times in 20 s).

@@ -36,9 +36,9 @@ banks you pick with SEL and the top four.*
   a reverb of four (Room, Hall, Cathedral, Chorus hall) whose length goes to Inf, a freeze.
 - **Feedback** (the finished sound fed back into the drones) and **Character** (clean to vintage).
 - **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
-- **Morph**: buttons and keys never jump: the sound moves to a new setting over a time you set.
+- **Key glide**: buttons and keys never jump: the sound moves to a new setting over a time you set.
 - **Scenes**: 12 on the white keys in each of three banks (36 of yours), plus a Presets bank, recalled
-  with a morph, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob
+  gliding over the Scene time, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob
   moves.
 
 ## Installing
@@ -136,7 +136,8 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Osc | I X-Wave | I PW (pulse width) | II X-Wave | II PW |
 | Source | I osc mix | I drive | II osc mix | II drive |
 
-- **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width.
+- **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width. The sine and the triangle are a
+  little louder than the saw and the square, so they still carry on a small speaker.
 - **Osc mix** goes from the oscillators to the sub; **drive** pushes each drone into its filter.
 
 #### Partner · SEQ
@@ -149,7 +150,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Moves | Shift's move | glide | II wander | Wander's scale |
 
 - **Shift's move** is where the Shift gesture takes the drones: from a fifth down through none in the middle to a
-  fifth up, 10 cents a detent, 1 with SEL held; it lights while Shift (E5) is in. See [The macros](#the-macros).
+  fifth up, 10 cents a detent, 1 with SEL held; it lights while Shift (E5) is in. See [The gestures](#the-gestures).
 - **Wander** gives drone II a slow random melody: it jumps from note to note in no order, the notes of a scale on
   drone I (in any octave, up to an octave from its own pitch), and only now and then comes home. The knob is **how
   often**, at random times within a range: 25–30 s apart at the bottom, 0.5–2 s at the top; the screen shows the
@@ -219,18 +220,18 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Setup · GLO
 
-<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, Morph and scene switch times; the tune, stereo width, the speaker's low cut and the keys' pressure">
+<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, key glide and scene times; the tune, stereo width, the speaker's low cut and the keys' pressure">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Setup 1 | fade | morph | scene switch | |
+| Setup 1 | fade | key glide | scene time | |
 | Setup 2 | tune | stereo | speaker (low cut) | pressure |
 
 Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't change it.
 
-- **Fade** is how long PLAY takes (up to 60 s); **Morph** is the switch time for buttons and keys: how long they
-  take to move the sound to its new setting (0.02–30 s); **scene switch** how long the switch to a scene takes
-  (0.1 s to 5 minutes).
+- **Fade** is how long PLAY takes (up to 60 s); **Key glide** is how long a black key or a new LFO wave (OCT) takes
+  to move the sound to its new setting (0.02–30 s); **Scene time** is how long every scene move takes: a tap, a
+  crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about 4 s to start).
 - **Tune** moves everything up or down by up to 50 cents. **Stereo** spreads the drones from mono to drone I
   left, drone II right.
 - **Speaker** cuts the deep bass a small speaker can't play (40–240 Hz); leave it off on headphones.
@@ -259,9 +260,9 @@ and slowly, so Movement is heard at once; set an osc depth to hear it move the p
 | | the LFO's rate, its shapes, and where the waves go (the black keys on the LFO pages) |
  Turning a
 depth that can't be heard says why on the screen (Movement at 0%, or its wave off).
-**PRESETS** is **Macro time**: how fast every gesture moves (see below).
+**PRESETS** is **Gesture time**: how fast every gesture moves (see below).
 
-### The macros
+### The gestures
 
 The top four white keys are gestures, each a few settings together, by set amounts, on top of your sound.
 Your own settings stay as they are underneath: when a gesture has gone, it's gone without a trace. A gesture's
@@ -279,7 +280,7 @@ parts come in one after another, and go in their own order when you let go. Scen
   hold; **let go** and it goes, over as long as you held it (hold 2 s, it leaves in 2 s; hold 10 s, it drifts out
   over 10 s). **Tap** it (a press under half a second) and it goes all the way and stays; tap again and it goes. **SEL held as you let go** keeps
   it where it is. Its key glows dimly, and lights as it comes in.
-- **PRESETS is Macro time**: it speeds up or slows down every gesture, coming in and going out, from 10 times faster
+- **PRESETS is Gesture time**: it speeds up or slows down every gesture, coming in and going out, from 10 times faster
   to 10 times slower (the middle: each gesture's own time: Weight 2.8 s, Shift 3.9 s, the others 3.3 s). Turn it
   while a gesture moves to change it on the way.
 - **The LFOs step aside**: while a gesture is in, the LFO that moves the same thing eases off (the filter LFO for
@@ -303,7 +304,7 @@ in the panel's groups. It steps aside while you turn a knob or hold a white key.
 | 1 | I partner | I osc wave (I, II, both) |
 | 2 | I sub: −1 oct, −2 oct, ⅓, ⅕ | I osc LFO → X-Wave (instead of pitch) |
 | 3 | I filter: LP, BP, HP | I filter LFO → resonance (instead of cutoff) |
-| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are) | I filter wave (I, II, both) |
+| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are; on when you first start: turn a pitch knob and the screen says "PITCH LOCKED · KEY 4") | I filter wave (I, II, both) |
 | 5 | LFO reset | LFO reset |
 | 6 | II partner | II osc wave (I, II, both) |
 | 7 | II sub: −1 oct, −2 oct, ⅓, ⅕ | II osc LFO → X-Wave |
@@ -324,13 +325,13 @@ in the panel's groups. It steps aside while you turn a knob or hold a white key.
 
 | | |
 |---|---|
-| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the scene switch time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Speaker, Pressure, Stereo, Tune, Pitch lock, Fade, Morph and Scene switch stay as they are |
-| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, over the Morph time. Press it again on the way back and you pick up from there |
+| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Speaker, Pressure, Stereo, Tune, Pitch lock, Fade, Key glide and Scene time stay as they are |
+| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, at the same speed. Press it again on the way back and you pick up from there |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
-| **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down (lifting your finger can't move it), and **stays** when you let go: a sound of its own between the two |
+| **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down until you let go of the scene key (lifting your finger can't move it, and nor can letting go of SEL first), and **stays**: a sound of its own between the two |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Into the Presets too, except P12 (Clean), which is locked |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
-| **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The macros](#the-macros)) |
+| **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The gestures](#the-gestures)) |
 | **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it (the Swell isn't touched then: a single tap
 switches it a moment later, once no second tap comes) |
 | **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
@@ -339,8 +340,8 @@ switches it a moment later, once no second tap comes) |
 
 Twelve sounds to start from on the Presets bank (SEL + G5), each showing a part of what Niagara Drift does. Most
 have drone I on D, so moving between them keeps the root and changes the interval and the sound; they're levelled to
-sound alike in loudness. The screen names the one you pick ("SCENE P3 EERIE"). Save over any of them with your own
-sound (SAVE + the key), except P12.
+sound alike in loudness. The screen names the one you pick ("SCENE P3 EERIE"). They're fixed: to keep a sound you
+made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE + a key).
 
 | Key | Preset | What it shows |
 |---|---|---|

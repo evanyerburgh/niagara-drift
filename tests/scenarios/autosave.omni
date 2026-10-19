@@ -1,0 +1,16 @@
+# the autosave (drones stopped): once, after the last change has settled, not on every step of a glide.
+# A preset picked with a long scene switch (Setup 1 KNOB 3 at 70, ~27 s) once wrote the flash 660 times in
+# 20 s on the FM-1 (Evan, 2026-10-19), each write flickering the lights.
+pressure w1 0
+set 71 70
+wait 6000
+expect store_writes 0
+tapkey w1
+wait 20000
+# still gliding: nothing written yet
+expect store_writes 0
+wait 15000
+# settled (and 4 s quiet): one write
+expect store_writes 1
+wait 10000
+expect store_writes 1

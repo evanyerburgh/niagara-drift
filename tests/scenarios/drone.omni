@@ -1,5 +1,11 @@
 # from the starting sound before 2026-10-17 (these checks were made on it)
 classic
+# scenes switch in 1.1 s here (the Scene time at 30; 46, ~4 s, on a new FM-1 since 2026-10-19)
+set 71 30
+# Pitch lock starts on (Evan, 2026-10-19: a turned pitch knob says where its key is); off for what follows
+expect par74 1
+tapkey b3
+expect par74 0
 # Niagara Drift, the control map: two drones. KNOB 1-2 drone I, KNOB 3-4 drone II on every page; page
 # buttons (tap to stay, hold to peek); OCT- / OCT+; the black keys as switches, following the page; pitch
 # link; the LFO on SELECT / ALGORITHM / PRESETS; MIDI; scenes on the white keys; save and reboot.
@@ -70,7 +76,7 @@ wait 100
 tap HOME
 expect view 1
 spin K3 -20
-expect par32 50
+expect par32 32
 spin K4 10
 expect par29 450
 spin K4 -10
@@ -540,7 +546,7 @@ expect scenes 1
 # a top key alone: a gesture (to come); the bank stays
 tapkey w12
 expect bank 1
-# the Presets: twelve; all but P12 (Clean) can be saved over (and picking the bank doesn't play G5's gesture)
+# the Presets: twelve, fixed: none can be saved over (and picking the bank doesn't play G5's gesture)
 press SEL
 tapkey w15
 release SEL

@@ -290,7 +290,9 @@ int main(void)
             lo = fminf(lo, rms());
             hi = fmaxf(hi, rms());
         }
-        check("the X-WAVE sounds all along, within 3 dB (blends don't cancel)", finite_ok && lo > 0.05f && hi < 1.41f * lo);
+        /* within 6 dB: the sine and the triangle ~4.6 dB over the saw and the square on purpose (2026-10-19:
+         * level with them they were ~7 dB quieter on the FM-1's speaker); a blend never dips under the four */
+        check("the X-WAVE sounds all along, within 6 dB (blends don't cancel)", finite_ok && lo > 0.05f && hi < 2.0f * lo);
         dr_set(DR_GP(0, GP_WAVE), 33);
     }
     {   /* OSC MIX at the sub's end: the square an octave down, alone */
@@ -1545,6 +1547,7 @@ int main(void)
         int k, d, bad = 0;
         pure_tone();
         dr_set(DR_GP(0, GP_WAVE), 0);
+        dr_set(DR_GP(0, GP_LEVEL), 48);              /* the sine as loud as before its lift (x 0.95 / 1.6) */
         dr_set(P_WIDTH, 0);
         run(secs(1.0f));
         capture(w, 2646, 0);
