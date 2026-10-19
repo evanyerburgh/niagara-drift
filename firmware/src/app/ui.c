@@ -8,18 +8,18 @@
  *                  Pitch and Cutoff. A pitch is continuous, 27 Hz .. 1.6 kHz, a slow full turn an octave;
  *                  hold SEL for a cent a detent. With PITCH LINK on, KNOB 3 moves drone II's offset.
  *   SELECT         LFO rate      ALGORITHM   MOVEMENT: every LFO depth together, 0 .. 200 %
- *   PRESETS        MACRO TIME: every gesture's speed, x0.1 .. x10 (v0.2)
+ *   PRESETS        GESTURE TIME: every gesture's speed, x0.1 .. x10 (v0.2)
  *   PLAY           the drone fades in / out      MASTER   volume      SAVE   saves
  * One button away (tap: the knobs stay on its page, pressed again its second page; hold: they switch
  * only while it's held, and the page you were on comes back when it's let go):
  *   HOME Play, Play 2 (Level, Reso) · ENV Tone (Noise, Colour: white .. pink) · EDIT Osc (X-Wave, PW), Source
  *   (Osc mix, Drive) · LFO LFO (depths), Mod (Rate mod, Mod by, X-mod amount, Delay LFO depth) · SEQ Partner ·
- *   GLO Setup, Setup 2 (Morph, Scene switch, Tune, Tuning), Setup 3 (Speaker,
+ *   GLO Setup, Setup 2 (Key glide, Scene time, Tune, Tuning), Setup 3 (Speaker,
  *   Pressure) (global). The top bar shows a dot for each of a
  *   button's pages.
  *   OCT- / OCT+    the LFO's Wave I / Wave II: a tap is the next shape, round and round; SEL + OCT the one
  *                  before; lit while its wave is up
- * White keys: 16 scenes. Tap: recall (every value morphs there over the Scene switch time; a knob turned stops
+ * White keys: 16 scenes. Tap: recall (every value morphs there over the Scene time; a knob turned stops
  *   it); hold (a visit): there while held, back to where it was when let go (a knob turned: it stays);
  *   hold SAVE and tap: store. Lit: the slot holds a scene; blinking slowly: the sound is that scene (stored or
  *   recalled, and no knob, switch or LFO control touched since).
@@ -86,7 +86,7 @@ static const struct {
 /* the black keys (key numbers, F3 = 0) and what each does: normally, and on the LFO page */
 static const uint8_t BLACK_K[11] = {1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25};
 /* the white keys: the first NSCENES (F3 .. C5, which sense pressure) the scenes of the bank; the top four
- * (D5 .. G5, no pressure) SEL + key: the bank, alone: the gesture macros (Weight, Shift, Clean, Wash) */
+ * (D5 .. G5, no pressure) SEL + key: the bank, alone: the gestures (Weight, Shift, Clean, Wash) */
 #define NWHITE 16
 static const uint8_t WHITE_K[NWHITE] = {0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26};
 static const char BANK_L[NBANKS] = {'A', 'B', 'C', 'P'};
@@ -135,6 +135,8 @@ static struct {
     uint32_t hold_t;
     uint8_t dirty;                     /* the project changed since the last save */
     uint32_t act_t;
+    uint32_t chg_t;                    /* the last change to the project, by a hand or not (a scene gliding, the loop) */
+    uint32_t saved_t;                  /* the last autosave tried */
     int8_t save_q;                     /* a save waiting for the dip (playing): -2 none, -1 the sound, N scene N */
     uint32_t save_t;                   /* ... asked then */
     uint32_t arp_t;                    /* the last ARP tap (two quick taps: stay on the Swell page) */
@@ -165,13 +167,15 @@ static struct {
     int16_t morph_to[DR_NPARAMS];      /* the scene being morphed to, as it was when its key was pressed */
     int8_t press;                      /* the scene key held in a pressure crossfade (v0.2), or -1 */
     uint8_t press_done;                /* ... pressed through: the scene is taken */
+    uint8_t press_held;                /* ... SEL pressed during it: held where it is until the key lets go */
     uint32_t press_t0, press_hi_t;     /* ... since; above the commit level since (0: not) */
-    float press_x;                     /* ... how far into the scene, 0..1, smoothed */
+    uint32_t press_ft;                 /* ... the last frame's time (its glide toward the pressure) */
+    float press_x;                     /* ... how far into the scene, 0..1 */
     uint32_t flash_t;                  /* a scene taken: its key flashes from then */
     uint8_t g_held;                    /* the gesture keys held: bit g (Weight, Shift, Clean, Wash) */
     uint8_t g_rel;                     /* ... pressed to release a latch: the let-go does nothing more */
     uint32_t g_t0[DR_NGEST];           /* ... since */
-    float g_out[DR_NGEST];             /* ... let go after a hold: how far in it was, and over how long (s, at Macro
+    float g_out[DR_NGEST];             /* ... let go after a hold: how far in it was, and over how long (s, at Gesture
                                         * time x1) it goes: as long as it was held (Evan, 2026-10-18); 0: the swell */
     float g_out_s[DR_NGEST];
     float g_amt[DR_NGEST];             /* ... how far in each is, 0..1 */
@@ -203,7 +207,7 @@ static void say_c(const char *a, const char *b, uint16_t col)
 }
 void ui_say(const char *a, const char *b) { say(a, b); }
 
-static void mark_dirty(void) { ui.dirty = 1; }
+static void mark_dirty(void) { ui.dirty = 1; ui.chg_t = plat_ms(); }
 int ui_dirty(void) { return ui.dirty != 0; }
 
 static void itoa_u(uint32_t v, char *b)
@@ -541,7 +545,7 @@ static void page_up(int b)
 static float morph_ms(void) { return 20.0f * fm_exp2f((float)proj.par[P_MORPH] * 0.105507f); }
 
 /* OCT- / OCT+: the LFO's two waves (v0.2): a tap is the next shape, round and round (Off, the seven, random);
- * SEL + OCT the one before. The engine glides a new shape in over the Morph time. Shown in the top bar */
+ * SEL + OCT the one before. The engine glides a new shape in over the Key glide time. Shown in the top bar */
 static void hands_on(int p) { ui.hands[p / 64] |= (uint64_t)1 << (p % 64); }
 static int hands_has(int p) { return (int)(ui.hands[p / 64] >> (p % 64) & 1u); }
 static void hands_clear(void) { memset(ui.hands, 0, sizeof ui.hands); }
@@ -555,6 +559,8 @@ static void wave_step(int w, int dir)
     param_set(p, v);
     ui.scene_at = -1;
     loop_note(p, v, 0);
+    if (ui.view == V_LFO)                      /* LFO depths draws both waves, named: no need to say it (Evan) */
+        return;
     dr_param_text(p, v, t);
     scopy(ui.glab[0], w ? "WAVE II" : "WAVE I");
     scopy(ui.glab[1], t);
@@ -617,7 +623,7 @@ static void loop_apply(int p, int v, uint32_t slide)
 }
 
 static void loop_rewind(void)                  /* the start of a pass: what the loop moves, back to how it */
-{                                              /* began, gliding over the Morph time (no seam) */
+{                                              /* began, gliding over the Key glide time (no seam) */
     int p;
     uint32_t back = (uint32_t)morph_ms();
     for (p = 0; p < DR_NPARAMS; p++)
@@ -744,8 +750,8 @@ static void save_run(void)                             /* each look at the input
 
 static void scene_store(int n)                         /* SAVE held + a white key: and into the flash */
 {
-    if (proj.bank == BANK_PRESETS && n == PRESET_LOCKED) {   /* the clean sound stays as it is */
-        say_c("CLEAN", "IS LOCKED", K_GOLD);
+    if (proj.bank == BANK_PRESETS) {                   /* the Presets stay as they are (Evan, 2026-10-19) */
+        say_c("PRESETS ARE FIXED", "SEL+D5-G5: BANK", K_GOLD);
         return;
     }
     scene_put(proj.bank, n);
@@ -757,7 +763,7 @@ static void scene_store(int n)                         /* SAVE held + a white ke
 static float fade_s(void) { return 0.05f * fm_exp2f((float)proj.par[P_FADE] * 0.102288f); }
 static float scene_s(void) { return 0.1f * fm_exp2f((float)proj.par[P_SCENE_T] * 0.115507f); }
 
-static void scene_recall(int n)                        /* a white key: morph there over the Fade time */
+static void scene_recall(int n)                        /* a white key: morph there over the Scene time */
 {
     char t[12] = "SCENE ";
     const int16_t *sc = scene_get(proj.bank, n);
@@ -779,7 +785,7 @@ static void scene_recall(int n)                        /* a white key: morph the
     say(t, proj.bank == BANK_PRESETS ? preset_name(n) : 0);   /* "SCENE P3" / "EERIE" */
 }
 
-/* a visit let go: morph back to the sound before it, over the Scene switch time */
+/* a visit let go: morph back to the sound before it, over the Scene time */
 #define VISIT_BACK NSCENES
 static void scene_back(void)
 {
@@ -837,8 +843,11 @@ static void scene_morph(void)
 
 /* THE PRESSURE CROSSFADE (v0.2, option D): a scene key held is a fader into its scene. Under PR_DEAD nothing
  * moves; PR_FULL is all the way; held at PR_COMMIT for PR_COMMIT_MS the scene is taken (the key flashes);
- * a tap (let go under PR_TAP_MS, however hard) goes there to stay. Let go: back to where it began over the Morph
- * time; with SEL held, the blend stays. Pressing it again on the way back picks up from there. */
+ * a tap (let go under PR_TAP_MS, however hard) goes there to stay. The pressure is where the sound heads, not
+ * where it is: it glides there no faster than the whole way in a Scene time, so a hard press glides in as a tap
+ * does and a slow one follows the finger (Evan, 2026-10-19: a quick press to 100 was a jump). Let go: back to
+ * where it began at that speed; SEL pressed on the way holds the blend (until the key lets go: lifting the
+ * finger, or SEL first, doesn't move it), and it stays. Pressing it again on the way back picks up from there. */
 #define PR_DEAD 0.08f
 #define PR_FULL 0.90f
 #define PR_COMMIT 0.90f
@@ -849,10 +858,14 @@ static void scene_morph(void)
 static void press_start(int n, const int16_t *sc)
 {
     int k;
+    float x0 = 0.0f;
     if (!(ui.morph == VISIT_BACK && ui.visit == -2 - n)) {  /* not already gliding back from this key: */
         for (k = 0; k < DR_NPARAMS; k++)                   /* where letting go comes back to */
             ui.visit_back[k] = proj.par[k];
         hands_clear();
+    } else if (ui.morph_ms) {                              /* on the way back: from where it is now */
+        float p = fm_clampf((float)(plat_ms() - ui.morph_t0) / (float)ui.morph_ms, 0.0f, 1.0f);
+        x0 = ui.press_x * (1.0f - p);
     }
     ui.visit_from = ui.scene_at;
     for (k = 0; k < DR_NPARAMS; k++)
@@ -860,9 +873,11 @@ static void press_start(int n, const int16_t *sc)
     ui.morph = -1;
     ui.press = (int8_t)n;
     ui.press_done = 0;
+    ui.press_held = 0;
+    ui.press_ft = plat_ms();
     ui.press_t0 = plat_ms();
     ui.press_hi_t = 0;
-    ui.press_x = 0.0f;
+    ui.press_x = x0;
 }
 
 /* a key's pressure at the player's sensitivity (Setup 3, KNOB 2): x 0.5 .. x 2, 50 as tuned */
@@ -880,9 +895,11 @@ static void press_run(void)                            /* each frame, while a sc
     uint32_t now = plat_ms();
     if (ui.press < 0)
         return;
-    if ((ui.btn >> B_SEL & 1u) && !ui.press_done && now - ui.press_t0 >= PR_WAIT_MS) {
+    if (!ui.press_done && now - ui.press_t0 >= PR_WAIT_MS && (ui.press_held || (ui.btn >> B_SEL & 1u))) {
         /* SEL down during a crossfade: the blend holds where it is, so lifting the finger (its pressure falls
-         * on the way up, before the key lets go) can't take it back; let go to keep it */
+         * on the way up, before the key lets go) can't take it back, SEL let go first or not; let go to keep it */
+        ui.press_held = 1;
+        ui.press_ft = now;
         ui.btn_used |= 1u << B_SEL;
         ui.press_hi_t = 0;
         scene_name(t, proj.bank, ui.press);
@@ -914,9 +931,15 @@ static void press_run(void)                            /* each frame, while a sc
     }
     if (ui.press_done)
         x = 1.0f;
-    ui.press_x += (x - ui.press_x) * 0.35f;            /* ~50 ms at the frame rate: calm, not slow */
-    if (now - ui.press_t0 < PR_WAIT_MS && !ui.press_done)
+    if (now - ui.press_t0 < PR_WAIT_MS && !ui.press_done) {
+        ui.press_ft = now;
         return;                                        /* a tap so far: nothing moves yet */
+    }
+    {                                                  /* toward the pressure, at most the whole way a Scene time */
+        float step = (float)(now - ui.press_ft) / (scene_s() * 1000.0f);
+        ui.press_ft = now;
+        ui.press_x += fm_clampf(x - ui.press_x, -step, step);
+    }
     sound_blend(ui.visit_back, ui.press_to, ui.press_x);
     t[0] = 0;
     scene_name(t, proj.bank, ui.press);
@@ -944,23 +967,24 @@ static void press_end(void)                            /* the key let go */
     ui.press = -1;
     if (n < 0)
         return;
-    if (!ui.press_done && now - ui.press_t0 < PR_TAP_MS && !(ui.btn >> B_SEL & 1u)) {
-        /* a tap (however far a crossfade had begun): there, over the Scene switch time */
+    if (!ui.press_done && !ui.press_held && now - ui.press_t0 < PR_TAP_MS && !(ui.btn >> B_SEL & 1u)) {
+        /* a tap (however far a crossfade had begun): there, over the Scene time */
         scene_recall(n);
         return;
     }
     scene_name(t + 6, proj.bank, n);
     for (k = 0; k < DR_NPARAMS; k++)
         ui.morph_from[k] = proj.par[k];
-    ui.morph_t0 = now;
-    ui.morph_ms = (uint32_t)morph_ms();
+    ui.morph_t0 = now;                                 /* the rest of the way, at the same speed (a Scene time
+                                                        * the whole way) */
+    ui.morph_ms = (uint32_t)(scene_s() * 1000.0f * (ui.press_done ? 1.0f - ui.press_x : ui.press_x));
     if (ui.press_done) {                               /* taken: the rest of the way, and it's the scene now */
         for (k = 0; k < DR_NPARAMS; k++)
             ui.morph_to[k] = ui.press_to[k];
         ui.morph = (int8_t)n;
         ui.scene_at = (int8_t)n;
         say_c(t, "TAKEN", K_GOLD);
-    } else if (ui.btn >> B_SEL & 1u) {                 /* SEL held: the blend stays, a sound of its own */
+    } else if (ui.press_held || (ui.btn >> B_SEL & 1u)) {   /* SEL: the blend stays, a sound of its own */
         ui.btn_used |= 1u << B_SEL;
         ui.scene_at = -1;
         say_c("KEPT", 0, K_GOLD);
@@ -1003,8 +1027,8 @@ static void midi_in(void)
 
 /* THE GESTURES (v0.2): Weight, Shift, Clean, Wash on the top four white keys (always these: Evan, 2026-10-18, you
  * learn where they are), which sense no pressure, so
- * time stands in: held, a gesture comes in (over its own time x Macro time), its parts in order; let go, it goes
- * over as long as it was held (x Macro time, turned live: Evan, 2026-10-18). A tap (under GEST_TAP_MS: a press
+ * time stands in: held, a gesture comes in (over its own time x Gesture time), its parts in order; let go, it goes
+ * over as long as it was held (x Gesture time, turned live: Evan, 2026-10-18). A tap (under GEST_TAP_MS: a press
  * needn't be quick) latches it on, all the way;
  * tapping a latched one lets it go (over its own time); SEL held as you let go keeps it where it is. No depth or
  * time of its own to set (Evan, 2026-10-18: how you play it sets them); Shift's move is on Moves. Latched
@@ -1049,11 +1073,11 @@ static void gesture_up(int g)
     }
 }
 static char *dec1(float v, char *b);                   /* below */
-static float mtime_k(void)                             /* MACRO TIME: the gestures' times x 0.1 .. x 10 */
+static float mtime_k(void)                             /* GESTURE TIME: the gestures' times x 0.1 .. x 10 */
 {
     return fm_exp2f(((float)proj.mtime - 50.0f) * 0.0664386f);
 }
-static void mtime_turn(int32_t e)                      /* PRESETS: Macro time */
+static void mtime_turn(int32_t e)                      /* PRESETS: Gesture time */
 {
     int v = (int)proj.mtime + (int)e;
     float k;
@@ -1061,7 +1085,7 @@ static void mtime_turn(int32_t e)                      /* PRESETS: Macro time */
     proj.mtime = (uint8_t)(v < 0 ? 0 : v > 100 ? 100 : v);
     mark_dirty();
     k = mtime_k();
-    scopy(ui.glab[0], "MACRO TIME");
+    scopy(ui.glab[0], "GESTURE TIME");
     q = ui.glab[1];
     *q++ = 'x';
     if (k < 9.95f)
@@ -1202,7 +1226,7 @@ static void input(void)
             if (!save_dn)
                 save_dn = plat_ms() | 1u;
             if (plat_ms() - save_dn >= HOLD_MS && !(ui.btn_used >> B_SAVE & 1u))
-                say_c("KEY: STORE", "LET GO: SAVE", K_GOLD);
+                say_c(proj.bank == BANK_PRESETS ? "PRESETS ARE FIXED" : "KEY: STORE", "LET GO: SAVE", K_GOLD);
         } else {
             save_dn = 0;
         }
@@ -1250,7 +1274,7 @@ static void input(void)
             }
             say_c("BANK", BANK_N[i], K_GOLD);
         } else {
-            gesture_down((int)i);                      /* the gesture macros (v0.2) */
+            gesture_down((int)i);                      /* the gestures (v0.2) */
         }
     }
     for (i = 0; i < 4u; i++)                         /* ... and let go */
@@ -1264,7 +1288,7 @@ static void input(void)
         global_turn(EN_SELECT, P_LFO_RATE, "LFO RATE", e);
     if ((e = plat_enc(EN_ALGO)) != 0)                /* ALGORITHM: the Movement, every LFO depth 0 .. 200 % */
         global_turn(EN_ALGO, P_MOVE, "MOVEMENT", e);
-    if ((e = plat_enc(EN_PRESET)) != 0)              /* PRESETS: Macro time, every gesture's speed */
+    if ((e = plat_enc(EN_PRESET)) != 0)              /* PRESETS: Gesture time, every gesture's speed */
         mtime_turn(e);
     for (i = 0; i < 4; i++)
         if ((e = plat_enc(EN_K1 + (int)i)) != 0) {
@@ -1359,8 +1383,8 @@ static const char *card_name(int p)
     const char *n = p == P_PLINK_OFF ? "Link ofs" : dr_param_info(p)->name;
     if (p == P_SHIFT_MOVE)
         return "Shift";
-    if (n[0] == 'S' && n[1] == 'c' && n[2] == 'e')
-        return "Scenes";                       /* Scene switch */
+    if (p == P_SCENE_T)
+        return "Scenes";                       /* Scene time */
     if (n[0] == 'X' && n[1] == '-' && n[2] == 'm')
         return "X-mod";                        /* X-mod amt */
     return n;
@@ -2155,12 +2179,13 @@ static void keymap_rows(int32_t y0, int r0, int r1)
     }
 }
 
-/* Setup 1: the three times, a row each: FADE (KNOB 1, PLAY's fade in and out), MORPH (KNOB 2, a switch's move to
- * its new setting), SCENES (KNOB 3, a scene switch); each a bar as far as its knob and its time. None is in scenes */
+/* Setup 1: the three times, a row each: FADE (KNOB 1, PLAY's fade in and out), KEY GLIDE (KNOB 2, a black key's or
+ * a wave's move to its new setting), SCENE TIME (KNOB 3, every scene move); each a bar as far as its knob and its time. None is in scenes */
 static void pic_setup(int32_t y0)
 {
     static const uint8_t P[3] = {P_FADE, P_MORPH, P_SCENE_T};
-    static const char *const N[3] = {"FADE", "MORPH", "SCENES"}, *const W[3] = {"PLAY in, out", "a switch", "a scene"};
+    static const char *const N[3] = {"FADE", "KEY GLIDE", "SCENE TIME"},
+                             *const W[3] = {"PLAY in, out", "keys, waves", "a scene key"};
     int r;
     for (r = 0; r < 3; r++) {
         int32_t y = y0 + 4 + r * 38, w = 120 * proj.par[P[r]] / 100;
@@ -2459,13 +2484,20 @@ static void leds(void)
     plat_leds(b, k);
 }
 
-/* AUTOSAVE: a few seconds after a change, while the drone is stopped and nothing is touched */
+/* AUTOSAVE: a few seconds after the last change, while the drone is stopped and nothing is touched. "The last
+ * change", not the last touch: a scene still gliding (or the loop playing) changes values every few frames, and
+ * each would be a flash write (Evan's FM-1, 2026-10-19: a long scene switch wrote 660 times in 20 s, the lights
+ * flickering with each). And never more often than AUTOSAVE_EVERY, whatever happens, nor again soon after a fail */
 #define AUTOSAVE_QUIET 4000u
+#define AUTOSAVE_EVERY 30000u
 static void autosave(void)
 {
     uint32_t now = plat_ms();
-    if (!ui.dirty || ui.playing || dr_fade > 0.0f || ui.btn || ui.keys || now - ui.act_t < AUTOSAVE_QUIET)
+    if (!ui.dirty || ui.playing || dr_fade > 0.0f || ui.btn || ui.keys || now - ui.act_t < AUTOSAVE_QUIET ||
+        now - ui.chg_t < AUTOSAVE_QUIET || ui.morph >= 0 || ui.press >= 0 ||
+        (ui.saved_t && now - ui.saved_t < AUTOSAVE_EVERY))
         return;
+    ui.saved_t = now;
     if (project_save() == 0)
         ui.dirty = 0;
 }

@@ -13,7 +13,7 @@ expect bank 0
 tap PLAY
 wait 1000
 expect heard7 700
-# PRESETS: Macro time (50: each gesture's own time)
+# PRESETS: Gesture time (50: each gesture's own time)
 spin PRESET 10
 expect mtime 60
 spin PRESET -10
@@ -52,7 +52,7 @@ wait 2500
 expect heard5 >38
 wait 3000
 expect heard5 30
-# Macro time x0.1 (PRESETS all the way down): in by about 0.3 s (held 0.6 s: under 0.5 s would be a tap)
+# Gesture time x0.1 (PRESETS all the way down): in by about 0.3 s (held 0.6 s: under 0.5 s would be a tap)
 spin PRESET -50
 expect mtime 0
 key w12 down
@@ -84,7 +84,7 @@ tapkey w12
 wait 4000
 expect par90 0
 # SHIFT: its move on Moves' KNOB 1 (80, in cents + 700: a 5th up to start, 120 detents down: a 4th down); a
-# gesture key held, ALGORITHM is still the Movement and PRESETS Macro time (3.9 s)
+# gesture key held, ALGORITHM is still the Movement and PRESETS Gesture time (3.9 s)
 tap SEQ
 tap SEQ
 expect view 9

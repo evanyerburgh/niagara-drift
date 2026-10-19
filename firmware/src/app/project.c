@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 /* Niagara Drift project (from FoMni's): the sound and bank A in one flash object (OBJ_PROJ), banks B and C in
- * one each (OBJ_BANKB, OBJ_BANKC); the Presets bank is the firmware's, each saved over in OBJ_BANKP (all but
- * PRESET_LOCKED, the clean sound: Evan, 2026-10-18). A project of another format, or none,
+ * one each (OBJ_BANKB, OBJ_BANKC); the Presets bank is the firmware's, fixed (Evan, 2026-10-19; OBJ_BANKP held
+ * the ones saved over before, moved to the banks at load). A project of another format, or none,
  * gives the defaults; 0.1's (19) and v0.2's first (20) are converted. Part of the unity build, after app.h. */
 project_t proj;
-static bank_t bank_bc[3];                  /* banks B, C, and the Presets saved over (used: which are) */
+static bank_t bank_bc[3];                  /* banks B, C, and the Presets saved over before 2026-10-19 */
 static uint8_t bank_dirty;                 /* bit 1 B, bit 2 C, bit 3 the Presets: to be written with the next save */
 static const uint8_t BANK_OBJ[3] = {OBJ_BANKB, OBJ_BANKC, OBJ_BANKP};
 static uint32_t proj_h;                    /* a hash of the project as on the flash, 0 = unknown: a save that
@@ -19,8 +19,7 @@ static uint32_t proj_hash(void)
 }
 
 /* the Presets bank (Evan, 2026-10-18): P1 the starting sound, then sounds each showing a part of the range, P12 the
- * clean one (one oscillator, everything off; locked). Each a list of changes from the defaults, ended by -1; any
- * of them but P12 can be saved over (OBJ_BANKP) */
+ * clean one (one oscillator, everything off). Each a list of changes from the defaults, ended by -1; all fixed */
 #define I_(p) DR_GP(0, p)
 #define II_(p) DR_GP(1, p)
 #define PRESET_N 80
@@ -49,15 +48,15 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     {I_(GP_PITCH), 7400, II_(GP_PITCH), 8100, I_(GP_WAVE), 0, II_(GP_WAVE), 0, I_(GP_INTERVAL), 14, I_(GP_DETUNE), 20,
      II_(GP_DETUNE), 25, I_(GP_CUTOFF), 900, II_(GP_CUTOFF), 900, I_(GP_RESO), 100, II_(GP_RESO), 100, I_(GP_MIX), 0,
      II_(GP_MIX), 0, P_PULSE, 0, P_REV_LEN, 85, P_REV_MIX, 60, P_REV_DAMP, 15, P_DLY_TIME, 70, P_DLY_MIX, 30,
-     P_DLY_REPEATS, 60, I_(GP_LEVEL), 20, II_(GP_LEVEL), 17, -1},
+     P_DLY_REPEATS, 60, I_(GP_LEVEL), 15, II_(GP_LEVEL), 13, -1},
     /* P5 HEAVEN: a major tenth apart (D4 and F#5), sines, their partners a just third and a just fifth, gently
      * beating, open and bright, a long light cathedral, the delay high and soft; no Swell.
      * The oscillator LFOs on X-Wave: the sines bloom slowly toward triangles and back */
     {I_(GP_PITCH), 6200, II_(GP_PITCH), 7800, I_(GP_WAVE), 0, II_(GP_WAVE), 10, I_(GP_INTERVAL), 9,
      II_(GP_INTERVAL), 13, I_(GP_DETUNE), 15, II_(GP_DETUNE), 15, I_(GP_MIX), 0, II_(GP_MIX), 0, I_(GP_CUTOFF), 950,
      II_(GP_CUTOFF), 950, I_(GP_RESO), 50, II_(GP_RESO), 50, P_PULSE, 0, P_MOVE, 35, P_REV_TYPE, 2, P_REV_LEN, 92,
-     P_REV_DAMP, 20, P_REV_MIX, 65, P_DLY_TIME, 80, P_DLY_MIX, 25, P_DLY_REPEATS, 60, I_(GP_LEVEL), 22,
-     II_(GP_LEVEL), 19, P_DLY_TYPE, 1, I_(GP_OLFO_DEST), DR_TO_XWAVE, I_(GP_OLFO_DEPTH), 65, II_(GP_OLFO), DR_LFO_II,
+     P_REV_DAMP, 20, P_REV_MIX, 65, P_DLY_TIME, 80, P_DLY_MIX, 25, P_DLY_REPEATS, 60, I_(GP_LEVEL), 16,
+     II_(GP_LEVEL), 14, P_DLY_TYPE, 1, I_(GP_OLFO_DEST), DR_TO_XWAVE, I_(GP_OLFO_DEPTH), 65, II_(GP_OLFO), DR_LFO_II,
      II_(GP_OLFO_DEST), DR_TO_XWAVE, II_(GP_OLFO_DEPTH), 65, -1},
     /* P6 TANPURA: Sa and Pa: drone I on D3 with its high Sa (the partner an octave up), drone II on the Pa below
      * (A2), bright buzzing strings (the jawari: character, drive, an open resonant filter), plucked: the Swell about
@@ -81,7 +80,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     {I_(GP_PITCH), 3800, II_(GP_PITCH), 4500, I_(GP_WAVE), 20, II_(GP_WAVE), 20, I_(GP_CUTOFF), 497,
      II_(GP_CUTOFF), 556, I_(GP_RESO), 960, II_(GP_RESO), 960, I_(GP_DRIVE), 10, II_(GP_DRIVE), 10, I_(GP_MIX), 0,
      II_(GP_MIX), 0, I_(GP_FLFO_DEPTH), 12, II_(GP_FLFO_DEPTH), -12, P_PULSE, 0, P_MOVE, 40, P_DLY_TYPE, 3,
-     P_DLY_TIME, 90, P_DLY_REPEATS, 55, P_DLY_MIX, 25, P_REV_TYPE, 2, P_REV_LEN, 80, P_REV_MIX, 50, I_(GP_LEVEL), 61, II_(GP_LEVEL), 54, -1},
+     P_DLY_TIME, 90, P_DLY_REPEATS, 55, P_DLY_MIX, 25, P_REV_TYPE, 2, P_REV_LEN, 80, P_REV_MIX, 50, I_(GP_LEVEL), 43, II_(GP_LEVEL), 38, -1},
     /* P9 HOWL: low, a semitone apart (they grind), the feedback high, resonant, drone II band-passed, driven, dark;
      * a short tape slap in a small room.
      * The LFO in random steps on drone I's resonance: the howl flares unpredictably */
@@ -95,7 +94,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      * Almost no LFO: still and huge */
     {I_(GP_PITCH), 5000, II_(GP_PITCH), 5900, I_(GP_WAVE), 20, II_(GP_WAVE), 20, I_(GP_MIX), 35, I_(GP_SUBOCT), 3,
      I_(GP_CUTOFF), 650, II_(GP_CUTOFF), 650, P_PULSE, 0, P_REV_TYPE, 2, P_REV_LEN, 98, P_REV_MIX, 75, P_REV_DAMP, 55,
-     P_DLY_MIX, 10, I_(GP_LEVEL), 34, II_(GP_LEVEL), 30, I_(GP_FLFO_DEPTH), 15, II_(GP_FLFO_DEPTH), -15, P_MOVE, 25, -1},
+     P_DLY_MIX, 10, I_(GP_LEVEL), 25, II_(GP_LEVEL), 22, I_(GP_FLFO_DEPTH), 15, II_(GP_FLFO_DEPTH), -15, P_MOVE, 25, -1},
     /* P11 METAL: cross-mod and hard sync, an inharmonic gap (a tritone and a bit), squares, drone I high-passed,
      * resonant, in a small room.
      * The oscillator LFOs on X-Wave and a quicker filter sweep: a moving, metallic shimmer */
@@ -115,11 +114,9 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
 static const char *const PRESET_NAME[] = {"NIAGARA", "ABYSS", "EERIE", "GLASS", "HEAVEN", "TANPURA", "TAPE", "WHISTLE",
                                           "HOWL", "CATHEDRAL", "METAL", "CLEAN"};
 _Static_assert(sizeof PRESET_NAME / sizeof PRESET_NAME[0] == NSCENES, "a name for each Preset");
-const char *preset_name(int n)             /* a Preset's name, or 0 once it's saved over (it's yours then) */
+const char *preset_name(int n)             /* a Preset's name */
 {
-    if (n < 0 || n >= NPRESETS || (n != PRESET_LOCKED && (bank_bc[2].used >> n & 1u)))
-        return 0;
-    return PRESET_NAME[n];
+    return n >= 0 && n < NPRESETS ? PRESET_NAME[n] : 0;
 }
 _Static_assert(NPRESETS == NSCENES && PRESET_LOCKED < NPRESETS, "a Preset for every key, the clean one locked");
 static int16_t preset[NPRESETS][DR_NPARAMS];
@@ -166,9 +163,7 @@ const int16_t *scene_get(int bank, int n)
     switch (bank) {
     case 0: return proj.scene_used >> n & 1u ? proj.scene[n] : 0;
     case 1: case 2: return bank_bc[bank - 1].used >> n & 1u ? bank_bc[bank - 1].scene[n] : 0;
-    case BANK_PRESETS:                         /* saved over, or the firmware's */
-        if (n != PRESET_LOCKED && (bank_bc[2].used >> n & 1u))
-            return bank_bc[2].scene[n];
+    case BANK_PRESETS:                         /* the firmware's, fixed (2026-10-19) */
         return n < NPRESETS ? preset[n] : 0;
     default: return 0;
     }
@@ -178,7 +173,7 @@ int scene_put(int bank, int n)
 {
     int16_t *d;
     int k;
-    if (n < 0 || n >= NSCENES || bank < 0 || bank > BANK_PRESETS || (bank == BANK_PRESETS && n == PRESET_LOCKED))
+    if (n < 0 || n >= NSCENES || bank < 0 || bank >= BANK_PRESETS)   /* the Presets are fixed */
         return -1;
     if (bank == 0) {
         d = proj.scene[n];
@@ -343,6 +338,38 @@ static void bank_load(int b)                   /* B (1), C (2) or the Presets (3
             k->used &= (uint16_t)~(1u << i);
 }
 
+/* The Presets are fixed since 2026-10-19: any saved over before (OBJ_BANKP) move to the first empty slots of C,
+ * then B, then A, so nothing is lost; one with no room left stays in OBJ_BANKP (the installer backs it up) */
+static int moved_a;
+static void presets_move(void)
+{
+    int n, b, i, k;
+    bank_t *p = &bank_bc[2];
+    for (n = 0; n < NSCENES; n++) {
+        if (!(p->used >> n & 1u))
+            continue;
+        for (b = 2; b >= 0; b--) {             /* C, B, A */
+            uint16_t used = b ? bank_bc[b - 1].used : proj.scene_used;
+            for (i = 0; i < NSCENES && (used >> i & 1u); i++)
+                ;
+            if (i == NSCENES)
+                continue;
+            for (k = 0; k < DR_NPARAMS; k++)
+                (b ? bank_bc[b - 1].scene[i] : proj.scene[i])[k] = p->scene[n][k];
+            if (b) {
+                bank_bc[b - 1].used |= (uint16_t)(1u << i);
+                bank_dirty |= (uint8_t)(1u << b);
+            } else {
+                proj.scene_used |= (uint16_t)(1u << i);
+                moved_a = 1;                   /* not yet on the flash (proj_h below) */
+            }
+            p->used &= (uint16_t)~(1u << n);
+            bank_dirty |= 1u << 3;
+            break;
+        }
+    }
+}
+
 int project_load(void)
 {
     int n, i;
@@ -408,6 +435,8 @@ int project_load(void)
         bank_load(2);
     }
     bank_load(3);
+    moved_a = 0;
+    presets_move();
     proj.magic = PROJ_MAGIC;
     proj.format = PROJ_FORMAT;
     if (proj.bank >= NBANKS)
@@ -422,7 +451,7 @@ int project_load(void)
     for (i = 0; i < NSCENES; i++)              /* a scene out of range is dropped, not the project */
         if ((proj.scene_used >> i & 1u) && !in_range(proj.scene[i]))
             proj.scene_used &= (uint16_t)~(1u << i);
-    proj_h = from == PROJ_FORMAT ? proj_hash() : 0u;   /* converted: not yet on the flash in this format */
+    proj_h = from == PROJ_FORMAT && !moved_a ? proj_hash() : 0u;   /* converted: not yet on the flash in this format */
     return 0;
 }
 

@@ -39,7 +39,7 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
  * some delay with a gentle wobble, a little more reverb; the oscillators' depths start at 0 */
 static const dr_param_t PARAMS[DR_NPARAMS] = {
     VOICE_PARAMS(5000, 67, 5, 30, 700, 80, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
-    VOICE_PARAMS(5700, 33, 14, 15, 680, 70, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
+    VOICE_PARAMS(5700, 33, 14, 15, 680, 52, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
     {"Cross-mod", 0, 1, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
@@ -48,8 +48,8 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Time", 0, 100, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
     {"Type", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Dly LFO", -100, 100, 20},
     {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
-    {"Morph", 0, 100, 47}, {"Scene switch", 0, 100, 30}, {"II out", 0, 1, 0}, {"Speaker", 0, 100, 0},
-    {"Pitch lock", 0, 1, 0}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
+    {"Key glide", 0, 100, 47}, {"Scene time", 0, 100, 46}, {"II out", 0, 1, 0}, {"Speaker", 0, 100, 0},
+    {"Pitch lock", 0, 1, 1}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
     {"Wander", 0, 100, 0}, {"Age", 0, 100, 0}, {"Shift move", 0, 2 * DR_SHIFT_MID, 2 * DR_SHIFT_MID}, {"Scale", 0, DR_NWSCALE - 1, 0},
     {"D5 depth", 0, 100, 70}, {"E5 depth", 0, 100, 100}, {"F5 depth", 0, 100, 100}, {"G5 depth", 0, 100, 70},
     {"D5 time", 0, 100, 30}, {"E5 time", 0, 100, 40}, {"F5 time", 0, 100, 35}, {"G5 time", 0, 100, 35},
@@ -597,7 +597,7 @@ typedef struct {
 #define MV_N 16
 #define PULSE_HZ 0.15f                           /* a PULSE move's breath: about 7 s */
 #define MOVE_S 0.15f                             /* a move's level: the whole way in this long, at most (a
-                                                  * turn back half way doesn't jump; Macro time can be quick) */
+                                                  * turn back half way doesn't jump; Gesture time can be quick) */
 #define MOFF_OFF 0x7FFE                          /* moff[]: a switch held off */
 const char *const DR_GEST_NAME[DR_NGTYPE] = {"Weight", "Shift", "Clean", "Wash"};
 const uint8_t DR_GEST_DEPTH[DR_NGTYPE] = {70, 100, 100, 70};   /* a tap, or a hold all the way in */
@@ -962,14 +962,18 @@ static inline float blep(float t, float dt)
 /* one cycle of the wave at phase ph (turns), dt the phase step a sample; pw the square's high fraction.
  * The four are in phase (their fundamentals all rise from 0 at ph = 0: the triangle peaks at 1/4, the
  * saw falls), so an X-WAVE blend of two never cancels. The sine is scaled to the others' loudness. */
+/* the sine and the triangle lifted: alike in level they sounded ~7 dB under the saw on the FM-1's speaker (nothing
+ * above 200 Hz, where it starts to work); met half way, ~4 dB (Evan, 2026-10-19), a little louder on headphones */
+#define OSC_SINE_K 1.6f
+#define OSC_TRI_K 1.7f
 static inline float osc(int wave, float ph, float dt, float pw)
 {
     switch (wave) {
     case DR_SINE:
-        return 0.95f * fm_sin_turns(ph);     /* ~1.3 dB over the triangle (1.2 was 3.4: the clips hid it) */
+        return OSC_SINE_K * fm_sin_turns(ph);
     case DR_TRI: {
         float t = ph + 0.25f;
-        return 1.0f - 4.0f * fm_fabsf((t >= 1.0f ? t - 1.0f : t) - 0.5f);
+        return OSC_TRI_K * (1.0f - 4.0f * fm_fabsf((t >= 1.0f ? t - 1.0f : t) - 0.5f));
     }
     case DR_SAW:
         return 1.0f - 2.0f * ph + blep(ph, dt);

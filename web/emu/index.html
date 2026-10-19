@@ -398,7 +398,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <h4>Normal</h4>
       <div class="krow">
       <div class="g-grp d1" data-label="Drone I"><span><span class="sr">Key 1: </span>Partner<small>on · off</small></span><span><span class="sr">Key 2: </span>Sub<small>−1 −2 ⅓ ⅕</small></span><span><span class="sr">Key 3: </span>Filter<small>LP BP HP</small></span></div>
-      <div class="g-grp both"><span><span class="sr">Key 4: </span>Pitch lock</span><span><span class="sr">Key 5: </span>LFO reset<small>hold: lock</small></span></div>
+      <div class="g-grp both"><span><span class="sr">Key 4: </span>Pitch lock<small>on at start</small></span><span><span class="sr">Key 5: </span>LFO reset<small>hold: lock</small></span></div>
       <div class="g-grp d2" data-label="Drone II"><span><span class="sr">Key 6: </span>Partner<small>on · off</small></span><span><span class="sr">Key 7: </span>Sub<small>−1 −2 ⅓ ⅕</small></span><span><span class="sr">Key 8: </span>Filter<small>LP BP HP</small></span></div>
       <div class="g-grp both"><span><span class="sr">Key 9: </span>Pitch link<small>II follows I</small></span><span><span class="sr">Key 10: </span>Hard sync</span></div>
       <div class="g-grp both"><span><span class="sr">Key 11: </span>I → II<small>cutoff</small></span></div>
@@ -493,10 +493,10 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
   </div>
 
   <div class="g-card mid">
-    <h3>Macros <span class="g-sub">several settings at once, on top of your sound</span></h3>
+    <h3>Gestures <span class="g-sub">several settings at once, on top of your sound</span></h3>
     <dl class="acts">
       <div><dt>Weight · Shift · Clean · Wash</dt><dd>The top four <span class="cap white">white keys</span>: hold to bring in, let go and it leaves as slowly as you held it; tap: all the way, to stay</dd></div>
-      <div><dt>Macro time</dt><dd><span class="cap">PRESETS</span>: every gesture faster or slower, even while it moves</dd></div>
+      <div><dt>Gesture time</dt><dd><span class="cap">PRESETS</span>: every gesture faster or slower, even while it moves</dd></div>
       <div><dt>Shift’s move</dt><dd><span class="cap">SEQ</span> twice (Moves), <span class="cap">KNOB 1</span>: a fifth down to a fifth up</dd></div>
     </dl>
   </div>
@@ -514,7 +514,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div><dt>Visit, then come back</dt><dd>Hold a <span class="cap white">white key</span>, let go (on the FM‑1: press harder to go further in, all the way to take it, <span class="cap">SEL</span> while holding, then let go, to keep the blend)</dd></div>
       <div><dt>Save a sound to a scene</dt><dd>Hold <span class="cap">SAVE</span> first, then tap a <span class="cap white">white key</span></dd></div>
       <div><dt>Pick a bank</dt><dd>Hold <span class="cap">SEL</span>, tap one of the top four <span class="cap white">white keys</span>: A · B · C · Presets (alone they’re the gestures)</dd></div>
-      <div><dt>Presets</dt><dd>Twelve to start from (SEL + G5): Niagara · Abyss · Eerie · Glass · Heaven · Tanpura · Tape · Whistle · Howl · Cathedral · Metal · Clean. Save over any but Clean</dd></div>
+      <div><dt>Presets</dt><dd>Twelve to start from (SEL + G5): Niagara · Abyss · Eerie · Glass · Heaven · Tanpura · Tape · Whistle · Howl · Cathedral · Metal · Clean. Fixed: store your own in A, B or C</dd></div>
       <div><dt>Save everything</dt><dd>Tap <span class="cap">SAVE</span></dd></div>
     </dl>
   </div>
@@ -528,7 +528,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">GLO</div>
         <div class="pstack">
-        <div class="g-page"><i>Setup 1</i><span class="k both"><span class="sr">Knob 1: </span>Fade<small>PLAY’s fade</small></span><span class="k both"><span class="sr">Knob 2: </span>Morph<small>switch time</small></span><span class="k both"><span class="sr">Knob 3: </span>Scene switch<small>switch time</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
+        <div class="g-page"><i>Setup 1</i><span class="k both"><span class="sr">Knob 1: </span>Fade<small>PLAY’s fade</small></span><span class="k both"><span class="sr">Knob 2: </span>Key glide<small>keys, waves</small></span><span class="k both"><span class="sr">Knob 3: </span>Scene time<small>every scene move</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
         <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 2: </span>Stereo<small>width</small></span><span class="k both"><span class="sr">Knob 3: </span>Speaker<small>low cut</small></span><span class="k both"><span class="sr">Knob 4: </span>Pressure<small>light ↔ firm</small></span></div>
         </div>
       </div>
@@ -665,10 +665,10 @@ function hit(c, cls) {
 // what each control does, on hover (the Buttons list below says the same)
 const TIP = { FX: "Delay: type, time, repeats, mix (again: Reverb: type, length to Inf, damp, mix)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths)",
   ENV: "Tone 1: noise and its colour, white to pink (again: Tone 2: character, feedback, age, drift); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: LFO mods: rate mod, cross-mod amount, delay LFO)",
-  EDIT: "Osc: X-Wave, pulse width (again: Source: osc mix, drive); hold to peek", GLO: "Setup 1: fade, morph, scene switch (again: Setup 2: tune, stereo width, speaker, pressure)",
+  EDIT: "Osc: X-Wave, pulse width (again: Source: osc mix, drive); hold to peek", GLO: "Setup 1: fade, key glide, scene time (again: Setup 2: tune, stereo width, speaker, pressure)",
   HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Partner: interval, detune (again: Moves: Shift's move, glide, Wander, its scale)",
   PLAY: "Drone in / out", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
-  SELECT: "LFO rate", PRESETS: "Macro time: every gesture faster or slower", ALGORITHM: "Movement: every LFO depth together",
+  SELECT: "LFO rate", PRESETS: "Gesture time: every gesture faster or slower", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
 for (const [n, c] of [...Object.entries(buttons), ...Object.entries(knobs)]) if (TIP[n]) c.g.setAttribute("aria-description", TIP[n]);
 // the keys: the black ones as switches (and what they do on the LFO pages), the white ones as scenes

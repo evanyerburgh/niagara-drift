@@ -83,21 +83,34 @@ int main(void)
                                                        store_n[OBJ_BANKB] == (int)sizeof(bank_t) && !store_n[OBJ_BANKC]);
     proj.par[DR_GP(0, GP_PITCH)] = 5000;
     check("a scene into C3", scene_put(2, 2) == 0 && scene_get(2, 2) && project_save() == 0 && store_n[OBJ_BANKC]);
-    check("P12 (Clean) can't be saved over", scene_put(BANK_PRESETS, PRESET_LOCKED) != 0 &&
-                                                 scene_get(BANK_PRESETS, PRESET_LOCKED)[P_II_OUT] == 1);
-    proj.par[DR_GP(0, GP_PITCH)] = 4321;
-    check("P3 can: saved into its own object", scene_put(BANK_PRESETS, 2) == 0 &&
-                                               scene_get(BANK_PRESETS, 2)[DR_GP(0, GP_PITCH)] == 4321 &&
-                                               project_save() == 0 && store_n[OBJ_BANKP] == (int)sizeof(bank_t));
+    check("no Preset can be saved over (P3, P12)", scene_put(BANK_PRESETS, 2) != 0 &&
+                                                       scene_put(BANK_PRESETS, PRESET_LOCKED) != 0 &&
+                                                       scene_get(BANK_PRESETS, PRESET_LOCKED)[P_II_OUT] == 1);
     proj.bank = 2;
     project_save();
+    {   /* a P3 saved over before 2026-10-19 (OBJ_BANKP): moved to C's first empty slot (C1), P3 the firmware's */
+        static bank_t bp;
+        int i;
+        memset(&bp, 0, sizeof bp);
+        bp.magic = BANK_MAGIC;
+        bp.format = PROJ_FORMAT;
+        bp.used = 1u << 2;
+        for (i = 0; i < DR_NPARAMS; i++)
+            bp.scene[2][i] = dr_param_info(i)->def;
+        bp.scene[2][DR_GP(0, GP_PITCH)] = 4321;
+        memcpy(store[OBJ_BANKP], &bp, sizeof bp);
+        store_n[OBJ_BANKP] = (int)sizeof bp;
+    }
     memset(&proj, 0, sizeof proj);
     check("reloaded: as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
                                     scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 3015 && scene_get(2, 2) &&
                                     scene_get(2, 2)[DR_GP(0, GP_PITCH)] == 5000 && scene_get(0, 11));
-    check("... P3 as saved over, P1 the firmware's", scene_get(BANK_PRESETS, 2)[DR_GP(0, GP_PITCH)] == 4321 &&
-                                                     scene_get(BANK_PRESETS, 0)[DR_GP(0, GP_PITCH)] ==
-                                                         dr_param_info(DR_GP(0, GP_PITCH))->def);
+    check("... the P3 saved over now in C1, P3 the firmware's", scene_get(2, 0) &&
+                                                     scene_get(2, 0)[DR_GP(0, GP_PITCH)] == 4321 &&
+                                                     scene_get(BANK_PRESETS, 2)[DR_GP(0, GP_PITCH)] != 4321);
+    check("... and saved: C and the emptied Presets object", project_save() == 0 &&
+                                                     ((bank_t *)store[OBJ_BANKP])->used == 0 &&
+                                                     (((bank_t *)store[OBJ_BANKC])->used & 1u));
     {   /* PR #14's (23): the same layout, the gestures Beat, Heat, Converge, Wash */
         static project_t p23;
         p23 = proj;
@@ -194,7 +207,7 @@ int main(void)
         store_n[OBJ_PROJ] = (int)sizeof p22;
         memcpy(store[OBJ_BANKC], &b22, sizeof b22);
         store_n[OBJ_BANKC] = (int)sizeof b22;
-        check("PR #12's project (22) loads: its sound, reverb type and bank kept, the set macros gone, Macro time at its default",
+        check("PR #12's project (22) loads: its sound, reverb type and bank kept, the set macros gone, Gesture time at its default",
               project_load() == 0 && proj.par[P_FEEDBACK] == 60 && proj.par[P_WANDER] == 0 && proj.par[P_REV_TYPE] == 1 && proj.bank == 2 &&
                   proj.mtime == MTIME_DEF && proj.par[P_REV_LEN] == dr_param_info(P_REV_LEN)->def);
         check("... A2 and C1 as they were, the new values and the gestures at their defaults",
