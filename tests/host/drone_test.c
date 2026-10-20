@@ -25,6 +25,7 @@ static int32_t buf[2 * 256];
  * reverb): these checks were made on it, and test the engine, not the starting sound */
 static void classic(void)
 {
+    dr_phones = 1;                                  /* headphones: no Speaker cut (it follows the jack since 2026-10-20) */
     dr_set(DR_GP(0, GP_FLFO_DEPTH), 25);
     dr_set(DR_GP(1, GP_FLFO_DEPTH), -25);
     dr_set(DR_GP(0, GP_RESO), 350);
@@ -1262,22 +1263,22 @@ int main(void)
         dr_set(DR_GP(0, GP_SUBOCT), 1);
         dr_set(DR_GP(0, GP_MIX), 0);
     }
-    {   /* the SPEAKER low cut: a 55 Hz sine down 12 dB or more at its top (240 Hz); off, untouched */
+    {   /* the SPEAKER low cut (the speaker playing, ~120 Hz): a 41 Hz sine down 12 dB or more; headphones, untouched */
         static float w[44100];
         float off, on;
         pure_tone();
         dr_set(DR_GP(0, GP_WAVE), 0);
-        dr_set(DR_GP(0, GP_PITCH), 3300);
+        dr_set(DR_GP(0, GP_PITCH), 2800);
         run(secs(0.5f));
         capture(w, 44100, 0);
-        off = tone_level(w, 44100, 55.0f);
-        dr_set(P_SPEAKER, 100);
+        off = tone_level(w, 44100, 41.2f);
+        dr_phones = 0;
         run(secs(0.3f));
         capture(w, 44100, 0);
-        on = tone_level(w, 44100, 55.0f);
-        printf("    speaker low cut: 55 Hz %.3f off, %.3f at 240 Hz\n", (double)off, (double)on);
+        on = tone_level(w, 44100, 41.2f);
+        printf("    speaker low cut: 41 Hz %.3f on headphones, %.3f on the speaker\n", (double)off, (double)on);
         check("speaker low cut: the deep bass down 12 dB or more", on < 0.25f * off);
-        dr_set(P_SPEAKER, 0);
+        dr_phones = 1;
     }
     {   /* MASTER past 4/5: it drives (more harmonics) at about the same loudness, inside full scale */
         float r8 = 0.0f, r10 = 0.0f, p10 = 0.0f;
@@ -1560,7 +1561,10 @@ int main(void)
             p2 = w[2558];
             p1 = w[2559];
             for (d = 1; d <= 12; d++) {
-                dr_set(KN[k], k == 4 ? (d < 12 ? 30 : 0) : d * 4);   /* the Speaker on, then off at the end */
+                if (k == 4)                         /* the speaker playing, then headphones in at the end */
+                    dr_phones = d < 12 ? 0 : 1;
+                else
+                    dr_set(KN[k], d * 4);
                 capture(w, 2560, 0);                /* the step lands on its first sample: from the last two */
                 for (i = 0; i < 2560; i++) {
                     worst[k] = fmaxf(worst[k], fabsf(w[i] - 2.0f * p1 + p2));

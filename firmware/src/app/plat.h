@@ -46,5 +46,6 @@ enum { OBJ_PROJ, OBJ_PANEL, OBJ_BANKB, OBJ_BANKC, OBJ_BANKP, OBJ_NOBJ };
  * Felucca's data areas; our installer writes only 0x4000..0x93000 and 0xE0000..0xE5000) */
 
 /* audio load in % of the render budget, and xruns since boot (device: from the ISR) */
+int plat_headphones(void);              /* 1: headphones in (the speaker off) */
 uint32_t plat_cpu_pct(void);
 uint32_t plat_xruns(void);

@@ -1,0 +1,11 @@
+# the headphone jack (2026-10-20): the speaker's low cut (~120 Hz) only while the speaker plays. A plug counts
+# once settled for 150 ms
+expect phones 0
+phones 1
+wait 50
+expect phones 0
+wait 200
+expect phones 1
+phones 0
+wait 300
+expect phones 0

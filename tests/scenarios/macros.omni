@@ -18,21 +18,21 @@ spin PRESET 10
 expect mtime 60
 spin PRESET -10
 expect mtime 50
-# WEIGHT held swells in (2.8 s), a warm bass: half way, the cutoff most of the way down (by 30 at most), the sub
-# half way up
+# WEIGHT held swells in (2.8 s), a warm bass: half way, the cutoff most of the way down (by 10 at most), the sub
+# half way up (by 15 at most, 2026-10-20: the main oscillator stays, for the speaker)
 key w12 down
 wait 1400
-expect heard7 <690
-expect heard5 >50
-expect heard5 <70
+expect heard7 <698
+expect heard5 >34
+expect heard5 <46
 wait 1500
-expect heard5 >62
+expect heard5 >42
 # ... and the filter LFO eases off the cutoff it moves (Movement would wobble it)
 expect heard17 0
 key w12 up
 wait 1000
 expect heard7 >680
-expect heard5 >38
+expect heard5 >31
 wait 2500
 expect heard5 30
 expect heard7 700
@@ -41,7 +41,7 @@ expect heard17 85
 key w12 down
 wait 1000
 key w12 up
-expect heard5 >38
+expect heard5 >31
 wait 1100
 expect heard5 30
 # let go after a long hold (5 s, in by 2.8 s): it drifts out over 5 s
@@ -49,7 +49,7 @@ key w12 down
 wait 5000
 key w12 up
 wait 2500
-expect heard5 >38
+expect heard5 >31
 wait 3000
 expect heard5 30
 # Gesture time x0.1 (PRESETS all the way down): in by about 0.3 s (held 0.6 s: under 0.5 s would be a tap)
@@ -57,7 +57,7 @@ spin PRESET -50
 expect mtime 0
 key w12 down
 wait 600
-expect heard5 >70
+expect heard5 >42
 key w12 up
 wait 600
 expect heard5 30
@@ -67,7 +67,7 @@ expect mtime 50
 tapkey w12
 wait 4000
 expect par90 100
-expect heard5 >62
+expect heard5 >42
 tapkey w12
 wait 4000
 expect par90 0

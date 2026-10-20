@@ -98,19 +98,17 @@ spin K2 20
 spin K3 20
 wait 300
 shot setup.png
-# Setup 2: tuned a little sharp, wider, the speaker's low cut on, the keys a little more sensitive (then back)
+# Setup 2: tuned a little sharp, wider, the keys a little more sensitive (then back)
 tap GLO
 expect view 11
 spin K1 6
 spin K2 30
-spin K3 30
-spin K4 20
+spin K3 20
 wait 300
 shot setup2.png
 spin K1 -6
 spin K2 -30
-spin K3 -30
-spin K4 -20
+spin K3 -20
 # Pulse (hold ARP for its page; a tap starts it): some swing
 expect par55 1
 press ARP

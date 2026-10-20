@@ -13,6 +13,7 @@ uint32_t plat_buttons(void)
     return out;
 }
 
+int plat_headphones(void) { return fm1_jack_phones(); }
 uint32_t plat_keys(void) { return fm1_in.notes & ((1u << NKEYS) - 1u); }
 
 int32_t plat_enc(int role)

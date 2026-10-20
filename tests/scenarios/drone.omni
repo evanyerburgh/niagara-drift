@@ -395,12 +395,12 @@ spin K1 10
 expect par51 52
 wait 100
 shot setup.png
-# GLO again: Setup 2, the room's: Tune, Stereo, Speaker, Pressure; again: Setup 1
+# GLO again: Setup 2, the room's: Tune, Stereo, Pressure (KNOB 4 nothing: the speaker's cut is automatic); again: Setup 1
 tap GLO
 expect view 11
-spin K4 -10
+spin K3 -10
 expect par97 40
-spin K4 10
+spin K3 10
 expect par97 50
 tap GLO
 expect view 10
@@ -484,12 +484,12 @@ expect scene_at -1
 expect par0 5577
 spin K2 20
 expect par7 850
-# a scene doesn't carry the room's settings: the speaker set after storing stays when it's recalled
+# a scene doesn't carry the room's settings: the stereo width set after storing stays when it's recalled
 tap GLO
 tap GLO
 expect view 11
-spin K3 30
-expect par73 30
+spin K2 30
+expect par53 90
 tap HOME
 expect view 0
 # white key 1: back to the scene, morphing over the Scene switch time (1.1 s)
@@ -501,7 +501,7 @@ expect par0 >5000
 expect par0 <5550
 wait 900
 expect par7 650
-expect par73 30
+expect par53 90
 expect par0 4977
 expect scene_at 0
 # an empty slot: nothing changes
