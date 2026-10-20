@@ -303,3 +303,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   top keys stay. Fix: Age's wow no longer freezes once Age has worn in.
 - 2026-10-20 (Evan): Key glide is **Switch time** ("black keys, LFO waves"; card "Switch"); Scene time's hint is
   "between scenes"; Glide is **Pitch glide** (card "Glide").
+- 2026-10-20 (Evan, from review 3): the headphone jack is read (PB5: 1 speaker, 0 headphones; a plug settles for
+  150 ms): the speaker always gets a fixed ~120 Hz low cut, headphones never do. The Speaker knob is gone (P_SPEAKER
+  unused); Setup 2 is Tune, Stereo, Pressure (KNOB 3), KNOB 4 empty; no message on a plug. Weight: sub +15 (was 45),
+  cutoffs -10 (was -30), drive +25 (was 35), both drones' levels +40 (was drone I +8): +1 dB on the speaker (was
+  -2.4), +1.9 dB full range. The README says MASTER's top quarter flattens the breathing. Movement and the presets
+  stay as they are.

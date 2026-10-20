@@ -476,6 +476,8 @@ static float mac_p[DR_NGROUPS];                   /* each drone's pitch move, se
 static float fb_ring[FB_N];
 static uint32_t fb_w;
 static float spk[2][2];                          /* the speaker low cut's states, left and right */
+volatile uint8_t dr_phones;
+#define SPK_CUT 61.0f                            /* the speaker's low cut, fixed (2026-10-20: ~120 Hz; P_SPEAKER unused) */
 static float spk_x, spk_f;                       /* ... how far it's in (0..1), its knob (the corner) */
 /* every parameter as it sounds: gliding to its setting. A knob's detent glides over the time until the
  * next is due (dr_pslide, as a pitch's); anything else (a scene's morph, MIDI, a load) over 25 ms. The
@@ -569,8 +571,8 @@ void dr_init(void)
     dly_rt = dly_rp = (uint8_t)par[P_DLY_LFO];
     dly_rw = 1.0f;
     dr_pulse = 1.0f;
-    spk_x = par[P_SPEAKER] ? 1.0f : 0.0f;
-    spk_f = (float)par[P_SPEAKER];
+    spk_x = dr_phones ? 0.0f : 1.0f;
+    spk_f = SPK_CUT;
     fx_clear();
     q_r = q_w;
 }
@@ -603,15 +605,18 @@ const char *const DR_GEST_NAME[DR_NGTYPE] = {"Weight", "Shift", "Clean", "Wash"}
 const uint8_t DR_GEST_DEPTH[DR_NGTYPE] = {70, 100, 100, 70};   /* a tap, or a hold all the way in */
 const uint8_t DR_GEST_TIME[DR_NGTYPE] = {30, 40, 35, 35};      /* 0..100 = 1 .. 30 s: 2.8 s, 3.9 s, 3.3 s, 3.3 s */
 static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
-    /* WEIGHT: a full, warm bass (Evan, 2026-10-18): the sub comes up through most of the swell, the resonance and
-     * the noise give way and the cutoffs ease down a little (warm, not dark), then drive and the vintage character
-     * round it off, so a small speaker hears it fuller. Let go: the brightness comes back first, the sub lingers */
-    {{DR_GP(0, GP_MIX), MK_ADD, 45, 0, 70, 0, 60}, {DR_GP(1, GP_MIX), MK_ADD, 45, 0, 70, 0, 60},
-     {DR_GP(0, GP_CUTOFF), MK_ADD, -30, 0, 50, 40, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -30, 0, 50, 40, 100},
+    /* WEIGHT: a full, warm bass (Evan, 2026-10-18): the sub comes up through most of the swell (a little: the main
+     * oscillator's fundamental is the low-mids a small speaker plays), the drones come up, the resonance and the
+     * noise give way and the cutoffs ease down a little (warm, not dark), then drive and the vintage character
+     * round it off. 2026-10-20 (review 3: it was 2.4 dB quieter on the speaker, the sub crossfading the low-mids
+     * away): now +1 dB there, +2 on headphones. Let go: the brightness comes back first, the sub lingers */
+    {{DR_GP(0, GP_MIX), MK_ADD, 15, 0, 70, 0, 60}, {DR_GP(1, GP_MIX), MK_ADD, 15, 0, 70, 0, 60},
+     {DR_GP(0, GP_CUTOFF), MK_ADD, -10, 0, 50, 40, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -10, 0, 50, 40, 100},
      {DR_GP(0, GP_RESO), MK_ADD, -40, 0, 50, 40, 100}, {DR_GP(1, GP_RESO), MK_ADD, -40, 0, 50, 40, 100},
-     {DR_GP(0, GP_DRIVE), MK_ADD, 35, 20, 100, 20, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 35, 20, 100, 20, 100},
+     {DR_GP(0, GP_DRIVE), MK_ADD, 25, 20, 100, 20, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 25, 20, 100, 20, 100},
      {P_CHAR, MK_ADD, 25, 30, 100, 30, 100}, {DR_GP(0, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100},
-     {DR_GP(1, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100}, {DR_GP(0, GP_LEVEL), MK_ADD, 8, 20, 100, 0, 60}},
+     {DR_GP(1, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100}, {DR_GP(0, GP_LEVEL), MK_ADD, 40, 20, 100, 0, 60},
+     {DR_GP(1, GP_LEVEL), MK_ADD, 40, 20, 100, 0, 60}},
     /* SHIFT: a new chord, a voice at a time (the Lyra-8 manual's chord changes): drone I glides there first, drone
      * II follows; let go, drone I comes back first. Its move: P_SHIFT_MOVE */
     {{0, MK_SHIFT, 0, 0, 60, 40, 100}, {1, MK_SHIFT, 0, 40, 100, 0, 60}},
@@ -1845,13 +1850,12 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
                 }
             }
         }
-        if (par[P_SPEAKER] || spk_x > 0.0f) {   /* the SPEAKER low cut: 12 dB, 40 .. 240 Hz (TPT state-variable) */
+        if (!dr_phones || spk_x > 0.0f) {   /* the SPEAKER low cut: 12 dB, ~120 Hz (TPT state-variable), while the
+                                             * speaker plays; never with headphones in */
             /* on and off it crossfades (~20 ms: switched at once, its phase shift made a step, a click); its
              * corner follows the knob as it glides, and stays where it was while it fades out */
-            const float on = par[P_SPEAKER] ? 1.0f : 0.0f, xs = 1.0f / (0.02f * DR_SR);
+            const float on = dr_phones ? 0.0f : 1.0f, xs = 1.0f / (0.02f * DR_SR);
             float gc, a1, a2, a3;
-            if (par[P_SPEAKER])
-                spk_f = fm_maxf(pfs[P_SPEAKER], 1.0f);
             gc = fm_tanf(FM_PI * 40.0f * fm_exp2f(spk_f * 0.0258496f) * (1.0f / DR_SR));
             a1 = 1.0f / (1.0f + gc * (gc + 1.41421356f));
             a2 = gc * a1;

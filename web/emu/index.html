@@ -529,7 +529,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
         <div class="g-btn">GLO</div>
         <div class="pstack">
         <div class="g-page"><i>Setup 1</i><span class="k both"><span class="sr">Knob 1: </span>Fade<small>PLAY’s fade</small></span><span class="k both"><span class="sr">Knob 2: </span>Switch time<small>black keys, LFO waves</small></span><span class="k both"><span class="sr">Knob 3: </span>Scene time<small>between scenes</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
-        <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 2: </span>Stereo<small>width</small></span><span class="k both"><span class="sr">Knob 3: </span>Speaker<small>low cut</small></span><span class="k both"><span class="sr">Knob 4: </span>Pressure<small>light ↔ firm</small></span></div>
+        <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 2: </span>Stereo<small>width</small></span><span class="k both"><span class="sr">Knob 3: </span>Pressure<small>light ↔ firm</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
         </div>
       </div>
     </div>
@@ -665,7 +665,7 @@ function hit(c, cls) {
 // what each control does, on hover (the Buttons list below says the same)
 const TIP = { FX: "Delay: type, time, repeats, mix (again: Reverb: type, length to Inf, damp, mix)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths)",
   ENV: "Tone 1: noise and its colour, white to pink (again: Life: character, feedback, age, drift); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: Mods: rate mod, cross-mod amount, delay LFO)",
-  EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, speaker, pressure)",
+  EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure)",
   HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
   PLAY: "Drone in / out", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "Gesture time: every gesture faster or slower", ALGORITHM: "Movement: every LFO depth together",

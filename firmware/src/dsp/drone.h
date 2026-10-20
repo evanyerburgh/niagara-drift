@@ -191,6 +191,7 @@ void dr_render(int32_t *out_lr, uint32_t n, uint32_t gain_q12);
 /* state for the screen (UI) */
 extern volatile float dr_level[DR_NGROUPS];    /* each drone's output level, 0..~1 (peak, decaying) */
 extern volatile float dr_fade;                 /* the PLAY fade, 0..1 */
+extern volatile uint8_t dr_phones;             /* headphones in: the Speaker low cut stays out (the UI sets it) */
 extern volatile float dr_duck_level;           /* the dip now, 1 (none) .. 0 (out) */
 extern volatile float dr_lfo[2];               /* the LFO taps now, -1..1 (the DS-2's rate lights) */
 extern volatile float dr_pulse;                /* the pulse's gain now, 0..1 (1: open, or off) */

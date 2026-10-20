@@ -63,6 +63,12 @@ static uint32_t lit_btn, lit_keys;
 
 uint32_t plat_ms(void) { return now_ms; }
 uint32_t plat_buttons(void) { return held_btn; }
+#ifdef OM_WEB
+static int phones = 1;                     /* the browser: a computer's output, no speaker cut */
+#else
+static int phones;                         /* the scenarios: the speaker, unless "phones 1" */
+#endif
+int plat_headphones(void) { return phones; }
 uint32_t plat_keys(void) { return held_keys; }
 int32_t plat_enc(int role)
 {
@@ -384,6 +390,8 @@ static int expect(const char *what, const char *val)
     }
     else if (!strcmp(what, "lfo0"))                /* the LFO's Wave I now, x 100 */
         got = (int)(dr_lfo[0] * 100.0f);
+    else if (!strcmp(what, "phones"))             /* the engine told: headphones in (no Speaker cut) */
+        got = (int)dr_phones;
     else if (!strcmp(what, "store_writes"))
         got = (int)store_writes;
     else if (!strncmp(what, "heard", 5))          /* heardN: parameter N as heard (with the macros) */
@@ -533,7 +541,9 @@ int main(int argc, char **argv)
                 dr_set(p, v);
             }
             run_ms(1);
-        } else if (!strcmp(cmd, "master"))
+        } else if (!strcmp(cmd, "phones"))         /* phones 1: headphones in (the Speaker cut out) */
+            phones = atoi(a);
+        else if (!strcmp(cmd, "master"))
             master = (uint32_t)atoi(a);
         else if (!strcmp(cmd, "midi")) {
             uint32_t s = (uint32_t)strtoul(a, 0, 16), d1 = (uint32_t)strtoul(b, 0, 16), d2 = (uint32_t)strtoul(c, 0, 16);

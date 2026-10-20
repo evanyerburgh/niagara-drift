@@ -68,7 +68,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{G, P_SHIFT_MOVE}, {G, P_GLIDE}, {G, P_WANDER}, {G, P_WSCALE}},   /* Shift's move, Glide; Wander, its scale */
     /* GLO: the room's settings only, none in a sound (Evan, 2026-10-18): the times, then the unit and the room */
     {{G, P_FADE}, {G, P_MORPH}, {G, P_SCENE_T}, {NONE, 0}},
-    {{G, P_TUNE}, {G, P_WIDTH}, {G, P_SPEAKER}, {G, P_PRESS_SENS}},
+    {{G, P_TUNE}, {G, P_WIDTH}, {G, P_PRESS_SENS}, {NONE, 0}},   /* the Speaker cut is automatic (2026-10-20) */
     {{G, P_PULSE_RATE}, {G, P_PULSE_DEPTH}, {G, P_PULSE_SHAPE}, {G, P_PULSE_SWING}},
     {{G, P_DLY_TYPE}, {G, P_DLY_TIME}, {G, P_DLY_REPEATS}, {G, P_DLY_MIX}},
     {{G, P_REV_TYPE}, {G, P_REV_LEN}, {G, P_REV_DAMP}, {G, P_REV_MIX}},
@@ -144,6 +144,8 @@ static struct {
     uint8_t page_last[8];              /* each page button's page last shown (0: its first): opened again there */
     uint32_t sel_t;                    /* when SEL went down (held 0.4 s: the black keys' map) */
     int8_t km_key;                     /* the black key touched while SEL is held (named, not switched), or -1 */
+    uint8_t jack;                      /* the headphone jack as last read (1: in), and since when */
+    uint32_t jack_t;
     uint32_t rst_t;                    /* when the LFO reset key went down (a hold locks the LFO to the pulse) */
     uint8_t rst_done;                  /* that hold has acted */
     char msg[2][24];
@@ -881,7 +883,7 @@ static void press_start(int n, const int16_t *sc)
     ui.press_x = x0;
 }
 
-/* a key's pressure at the player's sensitivity (Setup 3, KNOB 2): x 0.5 .. x 2, 50 as tuned */
+/* a key's pressure at the player's sensitivity (Setup 2, KNOB 3): x 0.5 .. x 2, 50 as tuned */
 static float press_gain(void) { return fm_exp2f(((float)proj.par[P_PRESS_SENS] - 50.0f) * 0.02f); }
 static int press_scaled(int p)
 {
@@ -1166,6 +1168,16 @@ static void input(void)
         ui.sel_t = plat_ms();
     if (!(btn >> B_SEL & 1u))
         ui.km_key = -1;
+    {   /* THE HEADPHONE JACK: the Speaker low cut only while the speaker plays (Evan, 2026-10-20); a plug settled
+         * for 150 ms (its contacts bounce) */
+        int ph = plat_headphones();
+        if (ph != ui.jack) {
+            ui.jack = (uint8_t)ph;
+            ui.jack_t = plat_ms();
+        } else if (ph != dr_phones && plat_ms() - ui.jack_t >= 150u) {
+            dr_phones = (uint8_t)ph;                   /* (no message: you hear which it is, Evan) */
+        }
+    }
     for (i = 0; i < NB; i++) {
         uint32_t m = 1u << i;
         if (!(ch & m))
@@ -1968,11 +1980,11 @@ static void pic_lfo2(int32_t y0)
 }
 
 /* Setup 2: the unit and the room, a corner each: TUNE (KNOB 1) a needle, -50 .. +50 cents; STEREO (KNOB 2) the
- * drones as far apart as it puts them; SPEAKER (KNOB 3) its low cut, 20 Hz .. 1 kHz; PRESSURE (KNOB 4) what a key's
- * press gives, light .. firm. None is in scenes */
+ * drones as far apart as it puts them; PRESSURE (KNOB 3) what a key's press gives, light .. firm; KNOB 4 nothing (the
+ * speaker's low cut follows the headphone jack). None is in scenes */
 static void pic_setup2(int32_t y0)
 {
-    int tn = proj.par[P_TUNE], sp = proj.par[P_SPEAKER], i;
+    int tn = proj.par[P_TUNE], i;
     float wid = (float)proj.par[P_WIDTH] * 0.01f;
     char t[16];
     {   /* TUNE */
@@ -1992,25 +2004,13 @@ static void pic_setup2(int32_t y0)
         cv_rect(cx + (int32_t)(wid * 28.0f), y0 + 24, 3, 20, K_DRONE[1]);
     }
     cv_rect(12, y0 + 54, 210, 1, K_GRID);
-    {   /* SPEAKER: 12 dB an octave under its corner, 0 dB .. -30 dB */
-        float fc = 40.0f * fm_exp2f((float)sp * 0.0258496f);
-        int16_t y[46];
-        for (i = 0; i < 46; i++) {
-            float f = 20.0f * fm_exp2f((float)i * (5.643856f / 45.0f)), r4 = f / fc;   /* 20 Hz .. 1 kHz */
-            float db = sp ? 10.0f * 0.30103f * fm_log2f(r4 * r4 * r4 * r4 / (1.0f + r4 * r4 * r4 * r4)) : 0.0f;
-            y[i] = (int16_t)(y0 + 84 - (int32_t)(fm_maxf(db, -30.0f) * 0.9f));
-        }
-        cv_text(12, y0 + 60, &FONT_S, "SPEAKER", sp ? K_SETUP : K_DIM);
-        plot(12, 2, y, 46, sp ? K_SETUP : K_FAINT);
-        cv_text(12, y0 + 110, &FONT_XS, sp ? "low cut" : "off: all the bass", K_TEXT2);
-    }
     {   /* PRESSURE: what a press gives, light .. firm */
         float g = press_gain();
         int16_t y[46];
         for (i = 0; i < 46; i++)
             y[i] = (int16_t)(y0 + 112 - (int32_t)(fm_minf((float)i / 45.0f * g, 1.0f) * 30.0f));
-        cv_text(128, y0 + 60, &FONT_S, "PRESSURE", K_SETUP);
-        plot(128, 2, y, 46, K_SETUP);
+        cv_text(12, y0 + 60, &FONT_S, "PRESSURE", K_SETUP);
+        plot(12, 2, y, 46, K_SETUP);
     }
 }
 
@@ -2589,6 +2589,7 @@ void ui_init(void)
     ui.press = -1;
     ui.scene_at = -1;
     ui.km_key = -1;
+    ui.jack = dr_phones = (uint8_t)plat_headphones();
     ui.save_q = -2;
     ui.splash_t0 = plat_ms();
     lcd_fill(0, 0, 240, 240, K_BG);

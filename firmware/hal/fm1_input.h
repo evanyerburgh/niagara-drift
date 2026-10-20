@@ -513,6 +513,10 @@ static void fm1_input_tick(void)
 
 /* main-loop critical section against fm1_input_tick (main loop only: it
  * re-enables interrupts unconditionally) */
+/* the headphone jack (found 2026-10-20 by watching every input pin while plugging in and out): PB5 reads 1 while
+ * the speaker plays, 0 with headphones in (the jack's switch, which also mutes the speaker) */
+static inline int fm1_jack_phones(void) { return !(FM1_PR(FM1_PB, FM1_IN) >> 5 & 1u); }
+
 static inline uint32_t fm1__lock(void)
 {
     __asm__ volatile("cli" ::: "memory");

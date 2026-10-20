@@ -101,7 +101,8 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Play 1 | I pitch | I cutoff | II pitch | II cutoff |
 | Play 2 | I level | I resonance | II level | II resonance |
 
-- **MASTER**: past about four-fifths of its turn it drives into overdrive, at about the same loudness.
+- **MASTER**: past about four-fifths of its turn it drives into overdrive, at about the same loudness: thicker,
+  but the breathing flattens (the swells and dips get much smaller).
 
 #### Tone · ENV
 
@@ -221,12 +222,12 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Setup · GLO
 
-<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, switch and scene times; the tune, stereo width, the speaker's low cut and the keys' pressure">
+<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, switch and scene times; the tune, stereo width and the keys' pressure">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Setup 1 | fade | switch time | scene time | |
-| Setup 2 | tune | stereo | speaker (low cut) | pressure |
+| Setup 2 | tune | stereo | pressure | |
 
 Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't change it.
 
@@ -235,7 +236,8 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
   crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about 4 s to start).
 - **Tune** moves everything up or down by up to 50 cents. **Stereo** spreads the drones from mono to drone I
   left, drone II right.
-- **Speaker** cuts the deep bass a small speaker can't play (40–240 Hz); leave it off on headphones.
+- **The speaker** gets a low cut (about 120 Hz) for the deep bass it can't play, so it doesn't waste its loudness
+  there. It's automatic: plug in headphones and the cut goes out, unplug and it comes back.
 - **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
   tuned).
 
@@ -271,7 +273,7 @@ parts come in one after another, and go in their own order when you let go. Scen
 
 | Gesture | What it moves | Key to start |
 |---|---|---|
-| **Weight** | a full, warm bass: the sub comes up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. Let go: the brightness comes back first, the sub lingers | D5 |
+| **Weight** | a full, warm bass: the drones and a little of the sub come up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. It sounds heavier on the speaker too. Let go: the brightness comes back first, the sub lingers | D5 |
 | **Shift** | a new chord, a voice at a time: drone I glides to the move you set (anywhere from a fifth down to a fifth up, in cents), drone II follows. Let go: drone I comes back first | E5 |
 | **Clean** | back to a clean sound, your notes kept: the grit leaves first (drive, character, feedback, noise, cross-mod, hard sync), then the movement (Movement, Drift, the Swell), then the effects (the repeats, both mixes, the reverb's length). Let go: the effects come back first, the grit last. It holds the loudness: with the dips of the Swell gone the sound would jump up, so the level eases down to where it was | F5 |
 | **Wash** | the delay first, then the reverb opens and grows longer and darker (toward Inf), each only up to where Wash aims (if your own effects are already further up, it leaves them be; the repeats stop short of the delay's howl), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5 |
@@ -328,7 +330,7 @@ key.
 
 | | |
 |---|---|
-| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Speaker, Pressure, Stereo, Tune, Pitch lock, Fade, Switch time and Scene time stay as they are |
+| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Pitch lock, Fade, Switch time and Scene time stay as they are |
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, at the same speed. Press it again on the way back and you pick up from there |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down until you let go of the scene key (lifting your finger can't move it, and nor can letting go of SEL first), and **stays**: a sound of its own between the two |
