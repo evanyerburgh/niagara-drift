@@ -83,7 +83,7 @@ expect par90 <60
 tapkey w12
 wait 4000
 expect par90 0
-# SHIFT: its move on Moves' KNOB 1 (80, in cents + 700: a 5th up to start, 120 detents down: a 4th down); a
+# SHIFT: its move on Pitch moves' KNOB 1 (80, in cents + 700: a 5th up to start, 120 detents down: a 4th down); a
 # gesture key held, ALGORITHM is still the Movement and PRESETS Gesture time (3.9 s)
 tap SEQ
 tap SEQ
@@ -157,7 +157,7 @@ expect heard61 70
 set 61 50
 set 62 25
 wait 300
-# WANDER (Moves): drone II walks off its pitch, gliding; at 0 it comes home
+# WANDER (Pitch moves): drone II walks off its pitch, gliding; at 0 it comes home
 set 78 60
 wait 7000
 expect wander >150
@@ -173,11 +173,12 @@ set 78 0
 set 81 0
 wait 30000
 expect wander 0
-# AGE (Tone 2): wears in over 20 s: darker, more character
+# AGE (Life): wears in over 20 s: darker, a wow
 set 79 100
 wait 21000
 expect heard7 630
-expect heard77 35
+# not Character any more (2026-10-20: the tape's wear, not the oscillators')
+expect heard77 0
 set 79 0
 wait 21000
 expect heard7 700

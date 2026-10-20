@@ -296,3 +296,8 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-19 (Evan): the SEL key map draws the 11 black keys where they sit (3-2-3-2-1), lit as the panel's, with
   only the groups named (I, BOTH, II, LINKS; on the LFO pages I, BOTH, II, DLY, XMOD). A black key touched while SEL
   is held names itself and its setting, large, and doesn't switch.
+- 2026-10-20 (Evan, from review 4): pages renamed Tone 2 → **Life**, Source → **Sub · Drive**, Moves → **Pitch moves**,
+  LFO mods → **Mods** (knobs unchanged). Age is the tape alone (darker, hiss, wow, and a flutter of ±4 cents at
+  5.7 and 8.9 Hz), no longer adding Character (P7 Tape's Character 70 → 98). Card labels one size up (FONT_S), with
+  Char., Feedbk, Press., Keys, R. mod, and Osc / Filter on LFO depths on the cards. The LFO key layer and SEL on the
+  top keys stay. Fix: Age's wow no longer freezes once Age has worn in.

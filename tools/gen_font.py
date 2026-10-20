@@ -86,7 +86,7 @@ def render(ttf, px, scale, pixel, first, last):
     h = asc + desc - top
     glyphs = []
     for c in range(first, last + 1):
-        ch = chr(c)
+        ch = "\u00b7" if c == 0x60 else chr(c)          # the backtick's slot holds a middle dot (UTF-8 "·", gfx.c)
         adv = int(round(font.getlength(ch, features=feats)))
         bw = adv + 2 * PAD
         img = Image.new("L", (bw, asc + desc), 0)

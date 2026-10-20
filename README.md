@@ -71,7 +71,7 @@ still works. If an FM-1 won't start at all, a Mac can still put the stock firmwa
 
 ## Playing it
 
-**On the drone pages, KNOB 1–2 are drone I and KNOB 3–4 drone II** (Play, Tone 1, Osc, Source, Partner, LFO
+**On the drone pages, KNOB 1–2 are drone I and KNOB 3–4 drone II** (Play, Tone 1, Osc, Sub · Drive, Partner, LFO
 depths: their names underlined amber and teal). The other pages hold settings for the whole sound, a knob each.
 The page buttons change what they do; the screen shows each page's settings as a picture, and the value of the
 knob you're turning.
@@ -105,12 +105,12 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Tone · ENV
 
-<img src="docs/img/page-tone.png" width="488" alt="The Tone 1 and Tone 2 pages: each drone's noise through its filter, and its colour; the character, the feedback, Age and Drift">
+<img src="docs/img/page-tone.png" width="488" alt="The Tone 1 and Life pages: each drone's noise through its filter, and its colour; the character, the feedback, Age and Drift">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Tone 1 | I noise | I colour | II noise | II colour |
-| Tone 2 | character | feedback | age | drift |
+| Life | character | feedback | age | drift |
 
 - **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
   It's heard all along the knob, and at the top it's as loud as them (100 is level with them, 50 −6 dB, 25 −12). It
@@ -121,20 +121,21 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
   thickening colour that grows with the knob (more with the delay up), rough at the top but never louder than
   the sound without it; it fades with the drones when you stop.
-- **Age** wears the sound like an old tape: darker, a slow wow in the pitch, a little hiss, more character. It
-  wears in slowly (about 20 s from none to full) and wears out as slowly when you turn it back.
+- **Age** wears the sound like an old tape: darker, a little hiss, a slow wow and a little flutter in the pitch.
+  It wears in slowly (about 20 s from none to full) and wears out as slowly when you turn it back. Character is
+  the oscillators' own wear; Age is the tape's.
 - **Drift** keeps the drones from ever being quite still: besides a little pitch wander, each drone's
   cutoff, timbre (X-Wave), level and partner detune slowly wander on their own, around where you've set
   them, never repeating. Gentle by default; 0 holds everything exactly where you put it.
 
 #### Osc · EDIT
 
-<img src="docs/img/page-osc.png" width="488" alt="The Osc and Source pages: each drone's waveform on the sine to square scale, and its pulse width; each drone's sound through its drive">
+<img src="docs/img/page-osc.png" width="488" alt="The Osc and Sub · Drive pages: each drone's waveform on the sine to square scale, and its pulse width; each drone's sound through its drive">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Osc | I X-Wave | I PW (pulse width) | II X-Wave | II PW |
-| Source | I osc mix | I drive | II osc mix | II drive |
+| Sub · Drive | I osc mix | I drive | II osc mix | II drive |
 
 - **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width. The sine and the triangle are a
   little louder than the saw and the square, so they still carry on a small speaker.
@@ -142,12 +143,12 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Partner · SEQ
 
-<img src="docs/img/page-seq.png" width="488" alt="The Partner page; Moves: Shift's move, Wander, drone II's melody, and its scale">
+<img src="docs/img/page-seq.png" width="488" alt="The Partner page; Pitch moves: Shift's move, Wander, drone II's melody, and its scale">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Partner | I interval | I detune | II interval | II detune |
-| Moves | Shift's move | glide | II wander | Wander's scale |
+| Pitch moves | Shift's move | glide | II wander | Wander's scale |
 
 - **Shift's move** is where the Shift gesture takes the drones: from a fifth down through none in the middle to a
   fifth up, 10 cents a detent, 1 with SEL held; it lights while Shift (E5) is in. See [The gestures](#the-gestures).
@@ -166,15 +167,15 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### LFO · LFO
 
-<img src="docs/img/page-lfo.png" width="488" alt="The LFO depths and LFO mods pages: the two waves and where they go; the rate modulation, cross-mod and delay LFO">
+<img src="docs/img/page-lfo.png" width="488" alt="The LFO depths and Mods pages: the two waves and where they go; the rate modulation, cross-mod and delay LFO">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | LFO depths | I osc depth | I filter depth | II osc depth | II filter depth |
-| LFO mods | rate mod | mod by (wave) | I → II cutoff amount | delay LFO depth |
+| Mods | rate mod | mod by (wave) | I → II cutoff amount | delay LFO depth |
 
 - **Depths** and **rate mod** are centred: the middle is none.
-- **LFO mods**, the LFO moving other things:
+- **Mods**, the LFO moving other things, and cross-mod's amount:
   - **Rate mod**: the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
   - **Mod by**: which wave does that (I, II or both).
   - **X-mod amt**: how much drone I's sound moves drone II's filter, while the cross-mod switch (black key 11) is on.
@@ -255,8 +256,8 @@ and slowly, so Movement is heard at once; set an osc depth to hear it move the p
 
 | Movement scales | Movement leaves alone |
 |---|---|
-| **LFO depths**: all four knobs (each drone's osc depth and filter depth) | **LFO mods: Rate mod** (how much the LFO speeds itself up) |
-| **LFO mods: Dly LFO** (the delay's wobble) | **LFO mods: X-mod amt** (drone I moving drone II's filter: that's sound, not the LFO) |
+| **LFO depths**: all four knobs (each drone's osc depth and filter depth) | **Mods: Rate mod** (how much the LFO speeds itself up) |
+| **Mods: Dly LFO** (the delay's wobble) | **Mods: X-mod amt** (drone I moving drone II's filter: that's sound, not the LFO) |
 | | the LFO's rate, its shapes, and where the waves go (the black keys on the LFO pages) |
  Turning a
 depth that can't be heard says why on the screen (Movement at 0%, or its wave off).

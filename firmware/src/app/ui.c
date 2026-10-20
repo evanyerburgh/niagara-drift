@@ -46,8 +46,8 @@
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
 enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_MOVES, V_SETUP, V_SETUP2,
        V_PULSE, V_FX, V_FX2, NVIEWS };
-static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone 1", "Tone 2", "Osc", "Source", "LFO depths", "LFO mods",
-                                              "Partner", "Moves", "Setup 1", "Setup 2", "Swell", "Delay", "Reverb"};
+static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone 1", "Life", "Osc", "Sub · Drive", "LFO depths",
+                                              "Mods", "Partner", "Pitch moves", "Setup 1", "Setup 2", "Swell", "Delay", "Reverb"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
  * nothing (g NONE) */
 #define G 2
@@ -1399,6 +1399,18 @@ static const char *card_name(int p)
         return "Scenes";                       /* Scene time */
     if (n[0] == 'X' && n[1] == '-' && n[2] == 'm')
         return "X-mod";                        /* X-mod amt */
+    switch (p) {                               /* too long at the cards' size (FONT_S, 2026-10-20) */
+    case P_CHAR: return "Char.";
+    case P_FEEDBACK: return "Feedbk";
+    case P_LFO_RMOD: return "R. mod";
+    case P_MORPH: return "Keys";               /* Key glide */
+    case P_PRESS_SENS: return "Press.";
+    default: break;
+    }
+    if (p < P_XMOD && p % GP_N == GP_OLFO_DEPTH)
+        return "Osc";                          /* LFO depths: the oscillator's, the filter's */
+    if (p < P_XMOD && p % GP_N == GP_FLFO_DEPTH)
+        return "Filter";
     return n;
 }
 
@@ -2461,7 +2473,7 @@ static void draw_values(void)
             cv_round(x - 2, 3, w + 4, 79, 6, K_CARD);
             cv_frame(x - 2, 3, w + 4, 79, accent);
         }
-        text_fit(cx, 8, w + 2, &FONT_XS, card_name(p), on ? accent : K_DIM);
+        text_fit(cx, 5, w + 2, &FONT_S, card_name(p), on ? accent : K_DIM);
         if (p == P_PLINK_OFF) {                /* the link offset in semitones and cents: "+7.00" */
             int a = v < 0 ? -v : v;
             char *q = t;
@@ -2478,7 +2490,7 @@ static void draw_values(void)
         }
         {   /* the value: large while lit, else as large as fits */
             const felucca_font_t *f = fit_face(t, w + 2, on);
-            text_fit(cx, f == &FONT_M ? 24 : f == &FONT_XS ? 32 : 28, w + 2, f, t, on ? K_TEXT : K_TEXT2);
+            text_fit(cx, f == &FONT_M ? 27 : f == &FONT_XS ? 34 : 30, w + 2, f, t, on ? K_TEXT : K_TEXT2);
         }
         if (is_pitch) {                        /* a pitch: no bar; while it moves, how to fine-tune */
             if (on)

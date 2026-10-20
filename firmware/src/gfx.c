@@ -138,6 +138,8 @@ static void cv_line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint16_t c)
  * has none, anything missing (and C1 controls) draws as '?' */
 static uint32_t glyph(const felucca_font_t *f, uint32_t ch)
 {
+    if (ch == 0xB7u)                          /* "·" (UTF-8 C2 B7; the C2 is skipped): drawn in the backtick's slot */
+        ch = f->last >= 0x60u ? 0x60u : '.';
     if (ch >= 'a' && ch <= 'z' && f->last < 'a')
         ch -= 32u;
     if (ch < f->first || ch > f->last || (ch >= 127u && ch < 160u))
@@ -153,7 +155,10 @@ static int32_t cv_text(int32_t x, int32_t y, const felucca_font_t *f, const char
 {
     uint32_t r = c >> 11, g = (c >> 5) & 63u, b = c & 31u;
     for (; *s; s++) {
-        uint32_t gi = glyph(f, (uint8_t)*s), gx, gy, w, bpr;
+        uint32_t gi, gx, gy, w, bpr;
+        if ((uint8_t)*s == 0xC2u)                /* a UTF-8 lead byte ("·"): its second byte is the glyph */
+            continue;
+        gi = glyph(f, (uint8_t)*s);
         const uint8_t *gd;
         w = f->bw[gi];
         bpr = (w + 1u) / 2u;
@@ -184,7 +189,8 @@ static int32_t text_w(const felucca_font_t *f, const char *s)
 {
     int32_t w = 0;
     for (; *s; s++)
-        w += f->adv[glyph(f, (uint8_t)*s)] + (*s == ' ' ? 0 : cv_track);
+        if ((uint8_t)*s != 0xC2u)
+            w += f->adv[glyph(f, (uint8_t)*s)] + (*s == ' ' ? 0 : cv_track);
     return w;
 }
 

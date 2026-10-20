@@ -70,7 +70,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      * hiss, darker, the sub an octave down.
      * Tape wow: the oscillator LFO on both pitches, slow and small (about 2 s, +-12 cents) */
     {I_(GP_PITCH), 5000, II_(GP_PITCH), 5300, I_(GP_WAVE), 100, I_(GP_WIDTH), 35, II_(GP_WAVE), 67, I_(GP_MIX), 30,
-     P_AGE, 80, P_CHAR, 70, P_DLY_TYPE, 0, P_DLY_MIX, 35, P_DLY_REPEATS, 55, I_(GP_CUTOFF), 720,
+     P_AGE, 80, P_CHAR, 98, P_DLY_TYPE, 0, P_DLY_MIX, 35, P_DLY_REPEATS, 55, I_(GP_CUTOFF), 720,
      II_(GP_CUTOFF), 700, I_(GP_NOISE), 18, II_(GP_NOISE), 12, I_(GP_LEVEL), 49, II_(GP_LEVEL), 49, P_REV_TYPE, 0,
      P_REV_LEN, 35, P_REV_MIX, 25, I_(GP_OLFO_DEPTH), 7, II_(GP_OLFO), DR_LFO_I, II_(GP_OLFO_DEPTH), 6, P_LFO_RATE, 40,
      I_(GP_FLFO_DEPTH), 40, II_(GP_FLFO_DEPTH), -40, -1},
