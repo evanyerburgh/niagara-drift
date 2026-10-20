@@ -120,8 +120,8 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 - **Character** takes the oscillators from clean to vintage: softer edges, a bent saw, a little pitch
   jitter, the two drones slightly apart, a whisper of noise.
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
-  thickening colour that grows with the knob (more with the delay up), rough at the top but never louder than
-  the sound without it; it fades with the drones when you stop.
+  thickening colour that grows with the knob (more with the delay up), rough at the top but about as loud as the
+  sound without it. It rings in key, on drone I's harmonics, and fades with the drones when you stop.
 - **Age** wears the sound like an old tape: darker, a little hiss, a slow wow and a little flutter in the pitch.
   It wears in slowly (about 20 s from none to full) and wears out as slowly when you turn it back. Character is
   the oscillators' own wear; Age is the tape's.

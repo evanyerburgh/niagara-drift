@@ -316,6 +316,11 @@ void dr_param_text(int i, int v, char *b)
         float t = i == P_MORPH ? 0.02f * fm_exp2f((float)v * 0.105507f)
                 : i == P_FADE ? 0.05f * fm_exp2f((float)v * 0.102288f) : 0.1f * fm_exp2f((float)v * 0.115507f);
         secs_text(t, b);
+    } else if (i == P_GLIDE) {                     /* "Off", "2.5s": 0 .. 10 s, quadratic (QA 2026-10-20: it showed "50") */
+        if (!v)
+            copy_s(b, "Off");
+        else
+            secs_text(10.0f * (float)v * (float)v * 0.0001f, b);
     } else if (i == P_DLY_TIME) {                  /* "177ms" */
         itoa_s((int)(70.0f * fm_exp2f((float)v * 0.026845f) + 0.5f), b);
         while (*b)
@@ -471,10 +476,16 @@ static float mac_p[DR_NGROUPS];                   /* each drone's pitch move, se
  * back into the drones' filters: a loop of the same length whatever the block size */
 #define FB_N 512u
 #define DRV_REF 0.6f                              /* DRIVE's make-up: the size it keeps as loud */
-#define FB_MAX 0.9f                               /* the loop's gain at 100: strong, not singing */
+#define FB_MAX 0.7f                               /* the loop's gain at 100: strong, not singing (0.9 sang up on a still
+                                                   * sound, +5 dB: QA 2026-10-20) */
 #define FB_CEIL 0.45f                             /* the most it adds to an oscillator's +-1 (what keeps it bounded) */
 static float fb_ring[FB_N];
 static uint32_t fb_w;
+/* the loop's length, in key (QA 2026-10-20: a fixed 256 samples rang at ~172 Hz, an F over a D chord, and took
+ * over): a whole number of drone I's periods, or a period over a whole number, within 256 .. 510 samples (a block
+ * is read back, never the one being made), gliding as drone I's pitch moves; and the loudness it adds, measured
+ * (the energy fed in against the oscillators'), taken off the output: never louder than without it */
+static float fb_d = 300.0f, fb_c = 1.0f, fb_ein, fb_eosc;
 static float spk[2][2];                          /* the speaker low cut's states, left and right */
 volatile uint8_t dr_phones;
 #define SPK_CUT 61.0f                            /* the speaker's low cut, fixed (2026-10-20: ~120 Hz; P_SPEAKER unused) */
@@ -964,6 +975,7 @@ static void drain(void)
                 grp[g].ic1 = grp[g].ic2 = grp[g].bc = 0.0f;
             for (g = 0; g < (int)FB_N; g++)      /* and nothing left to feed back */
                 fb_ring[g] = 0.0f;
+            fb_c = 1.0f;
             for (g = 0; g < 2; g++)              /* and the output filters' memories */
                 spk[g][0] = spk[g][1] = 0.0f;
             break;
@@ -1594,10 +1606,17 @@ static void render_group(int g, uint32_t n)
                 v->rlp += (y2 - v->rlp) * rk;
                 x = v->rlp;
             }
-            if (fbk > 0.0f) {                   /* FEEDBACK: the sound of 256 samples ago, its lows cut */
-                float fv = fb_ring[(fb_w + j + FB_N - 256u) & (FB_N - 1u)];
+            if (fbk > 0.0f) {                   /* FEEDBACK: the sound fb_d samples ago (drone I's period), lows cut */
+                float rp = (float)(fb_w + j + FB_N) - fb_d, fr, fv, in;
+                uint32_t ri;
+                ri = (uint32_t)rp;
+                fr = rp - (float)ri;
+                fv = fb_ring[ri & (FB_N - 1u)] + (fb_ring[(ri + 1u) & (FB_N - 1u)] - fb_ring[ri & (FB_N - 1u)]) * fr;
                 v->fbh += (fv - v->fbh) * 0.011f;        /* ~80 Hz */
-                x += FB_CEIL * fm_tanhf(fbk * (fv - v->fbh) * (1.0f / FB_CEIL));   /* capped: it can't take over */
+                in = FB_CEIL * fm_tanhf(fbk * (fv - v->fbh) * (1.0f / FB_CEIL));   /* capped: it can't take over */
+                fb_eosc += x * x;
+                fb_ein += in * in;
+                x += in;
             }
             x = sat(x * drv) * mk;
             {                                   /* the bass makeup (low-pass, as weighted) */
@@ -1800,9 +1819,11 @@ static void clean_hold(float *l, float *r, uint32_t k)
 void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
 {
     /* MASTER: a volume up to 4/5 of its turn (there as loud as the old full turn); past that it drives the
-     * soft clip harder (up to 5x) at about the same loudness, as the DS-2's volume knobs push into overdrive */
+     * soft clip harder (up to 5x) at about the same loudness, as the DS-2's volume knobs push into overdrive: the
+     * output comes down by the drive^0.72 (QA 2026-10-20: 1/(1 + 0.6 x) left the top fifth 3-8 dB louder; now the
+     * six presets measured are within +-2.3 dB, 0 on average) */
     const float m = (float)gain_q12 * (1.0f / 4096.0f), over = fm_maxf((m - 0.8f) * 5.0f, 0.0f);
-    const float gain = fm_minf(m, 0.8f) * 1.78f * (1.0f + 4.0f * over), mout = 1.0f / (1.0f + 0.6f * over);
+    const float gain = fm_minf(m, 0.8f) * 1.78f * (1.0f + 4.0f * over), mout = fm_exp2f(-0.72f * fm_log2f(1.0f + 4.0f * over));
     drain();
     if (mac_dirty || mv_moving)
         macro_apply(n);
@@ -1872,12 +1893,24 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
             }
             fb_w = (fb_w + k) & (FB_N - 1u);
             dr_fb = fm_maxf(dr_fb * 0.95f, pk * pfs[P_FEEDBACK] * FB_MAX * 0.01f);
-            if (pfs[P_FEEDBACK] > 0.0f) {        /* what you hear, turned down as the feedback rises */
-                float c = 1.0f / (1.0f + 0.4f * pfs[P_FEEDBACK] * FB_MAX * 0.01f);
-                for (j = 0; j < k; j++) {
-                    mixl[j] *= c;
-                    mixr[j] *= c;
-                }
+            {   /* what you hear, turned down by as much as the feedback adds (smoothed, ~60 ms) */
+                float to = pfs[P_FEEDBACK] > 0.0f && fb_eosc > 1e-9f ? fm_sqrtf(fb_eosc / (fb_eosc + fb_ein)) : 1.0f;
+                float c0 = fb_c, dc;
+                fb_c += (to - fb_c) * fm_minf((float)k / (0.06f * DR_SR), 1.0f);
+                dc = (fb_c - c0) / (float)k;
+                if (c0 < 1.0f || fb_c < 1.0f)
+                    for (j = 0; j < k; j++) {
+                        c0 += dc;
+                        mixl[j] *= c0;
+                        mixr[j] *= c0;
+                    }
+                fb_ein = fb_eosc = 0.0f;
+            }
+            {   /* the next block's loop length: drone I's period, a multiple or a fraction of it, 256 .. 510 */
+                float per = DR_SR / (440.0f * fm_exp2f((grp[0].ps2 - 69.0f) * (1.0f / 12.0f))), d;
+                d = per >= 256.0f ? per / (float)(int)(per * (1.0f / 256.0f)) : per * (float)(int)(256.0f / per + 0.999f);
+                d = fm_clampf(d, 256.0f, 510.0f);
+                fb_d += (d - fb_d) * fm_minf((float)k / (0.05f * DR_SR), 1.0f);
             }
         }
         if (!dr_phones || spk_x > 0.0f) {   /* the SPEAKER low cut: 12 dB, ~120 Hz (TPT state-variable), while the

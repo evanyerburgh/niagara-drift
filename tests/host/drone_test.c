@@ -818,7 +818,10 @@ int main(void)
                 run(secs(0.3f));
                 dr_play(1);
                 run((int)(0.05f * DR_SR / 256.0f));     /* ~50 ms of sound */
-                dr_play(0);                             /* (Fade 0: 50 ms out) */
+                if (rep)                                /* playing on, the drone silent (stopped, the repeats */
+                    dr_set(DR_GP(0, GP_LEVEL), 0);      /* wind down since 2026-10-20) */
+                else
+                    dr_play(0);                         /* (Fade 0: 50 ms out) */
                 capture(cap, 44100, 0);
                 for (k = 0; k < 12; k++) {              /* each echo's RMS, a 40 ms window on it */
                     int c = (int)((float)(k + 1) * 0.0997f * DR_SR) - (int)(0.05f * DR_SR) + 1500;
@@ -839,6 +842,16 @@ int main(void)
                     }
                 } else {
                     printf("    repeats 100: echo 1 %.3f, echo 8 %.3f\n", (double)e[0], (double)e[7]);
+                    {   /* ... and stopped, they wind down (QA 2026-10-20: they howled on after PLAY) */
+                        float tail = 0.0f;
+                        dr_play(0);
+                        run(secs(12.0f));
+                        capture(cap, 44100, 0);
+                        for (i = 0; i < 44100; i++)
+                            tail = fmaxf(tail, fabsf(cap[i]));
+                        printf("    repeats 100, stopped 12 s: peak %.4f\n", (double)tail);
+                        check("delay repeats 100: stopped, they wind down (under -50 dB in 12 s)", tail < 0.003f);
+                    }
                     check("delay repeats 100: it runs on (echo 8 still half of echo 1 or more), finite",
                           e[7] > 0.5f * e[0] && finite_ok);
                 }
@@ -1302,8 +1315,10 @@ int main(void)
             }
         }
         printf("    MASTER 4/5 vs full: RMS ratio %.2f, peak at full %.3f\n", (double)sqrtf(r10 / r8), (double)p10);
-        check("MASTER's top drives at about the same loudness (within 3 dB), inside full scale",
-              sqrtf(r10 / r8) > 0.7f && sqrtf(r10 / r8) < 1.42f && p10 < 1.0f);
+        /* this sound already clips at 4/5, the hardest case: within 6 dB (QA 2026-10-20: on six presets the top fifth
+         * is within +-2.3 dB, 0 on average; it was 3-8 dB louder) */
+        check("MASTER's top drives at about the same loudness (within 6 dB here), inside full scale",
+              sqrtf(r10 / r8) > 0.5f && sqrtf(r10 / r8) < 1.42f && p10 < 1.0f);
     }
 
     {   /* MOVEMENT: every LFO depth scaled together. The filter LFO at depth 80 swings the sound; at Movement
