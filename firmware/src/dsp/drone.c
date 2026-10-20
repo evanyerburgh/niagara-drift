@@ -38,8 +38,8 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
  * slow LFO (a cycle in ~25 s; Wave II a random glide), the Swell on as a slow breath (one in ~35 s, 12 dB),
  * some delay with a gentle wobble, a little more reverb; the oscillators' depths start at 0 */
 static const dr_param_t PARAMS[DR_NPARAMS] = {
-    VOICE_PARAMS(5000, 67, 5, 30, 700, 80, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
-    VOICE_PARAMS(5700, 33, 14, 15, 680, 52, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
+    VOICE_PARAMS(5000, 67, 5, 30, 700, 57, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
+    VOICE_PARAMS(5700, 33, 14, 15, 680, 37, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
     {"Cross-mod", 0, 1, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
@@ -316,6 +316,11 @@ void dr_param_text(int i, int v, char *b)
         float t = i == P_MORPH ? 0.02f * fm_exp2f((float)v * 0.105507f)
                 : i == P_FADE ? 0.05f * fm_exp2f((float)v * 0.102288f) : 0.1f * fm_exp2f((float)v * 0.115507f);
         secs_text(t, b);
+    } else if (i == P_GLIDE) {                     /* "Off", "2.5s": 0 .. 10 s, quadratic (QA 2026-10-20: it showed "50") */
+        if (!v)
+            copy_s(b, "Off");
+        else
+            secs_text(10.0f * (float)v * (float)v * 0.0001f, b);
     } else if (i == P_DLY_TIME) {                  /* "177ms" */
         itoa_s((int)(70.0f * fm_exp2f((float)v * 0.026845f) + 0.5f), b);
         while (*b)
@@ -471,10 +476,16 @@ static float mac_p[DR_NGROUPS];                   /* each drone's pitch move, se
  * back into the drones' filters: a loop of the same length whatever the block size */
 #define FB_N 512u
 #define DRV_REF 0.6f                              /* DRIVE's make-up: the size it keeps as loud */
-#define FB_MAX 0.9f                               /* the loop's gain at 100: strong, not singing */
+#define FB_MAX 0.7f                               /* the loop's gain at 100: strong, not singing (0.9 sang up on a still
+                                                   * sound, +5 dB: QA 2026-10-20) */
 #define FB_CEIL 0.45f                             /* the most it adds to an oscillator's +-1 (what keeps it bounded) */
 static float fb_ring[FB_N];
 static uint32_t fb_w;
+/* the loop's length, in key (QA 2026-10-20: a fixed 256 samples rang at ~172 Hz, an F over a D chord, and took
+ * over): a whole number of drone I's periods, or a period over a whole number, within 256 .. 510 samples (a block
+ * is read back, never the one being made), gliding as drone I's pitch moves; and the loudness it adds, measured
+ * (the energy fed in against the oscillators'), taken off the output: never louder than without it */
+static float fb_d = 300.0f, fb_c = 1.0f, fb_ein, fb_eosc;
 static float spk[2][2];                          /* the speaker low cut's states, left and right */
 volatile uint8_t dr_phones;
 #define SPK_CUT 61.0f                            /* the speaker's low cut, fixed (2026-10-20: ~120 Hz; P_SPEAKER unused) */
@@ -497,6 +508,9 @@ static float pulse_ph, pulse_g = 1.0f;           /* the pulse: phase over two be
 static float pulse_a;                            /* the pulse coming in / going out (Morph), 0..1 */
 static uint8_t dly_rt, dly_rp;                   /* the delay LFO's route: now, the one before (Morph) */
 static float dly_rw;
+static float lfo_rj[2], lfo_rk;                  /* a restart's jump, eased out over ~120 ms (QA 2026-10-20: locked to
+                                                  * the Swell, the filter jumped an octave every bar) */
+static int lfo_rnew;                             /* ... a restart to ease, at the next tick */
 static float lfo_ph, lfo_s[2];                  /* the LFO's phase (cycles) and its taps, slewed */
 static uint32_t lfo_q;                          /* ... its phase in 32 bits (a float lost ~2 % at the slowest rate) */
 static int lfo_wc[2], lfo_wp[2];                 /* each tap's shape now, and the one before (Morph) */
@@ -558,6 +572,8 @@ void dr_init(void)
     rng = 0x12345678u;                           /* the random ones from the same start: every init sounds the same */
     lfo_seed = 0x9E3779B9u;
     lfo_ph = lfo_s[0] = lfo_s[1] = 0.0f;
+    lfo_rk = 0.0f;
+    lfo_rnew = 0;
     lfo_q = 0u;
     lfo_wc[0] = lfo_wp[0] = par[P_LFO_W1];
     lfo_wc[1] = lfo_wp[1] = par[P_LFO_W2];
@@ -634,14 +650,14 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
      {P_REV_LEN, MK_ZERO, 50, 30, 100, 30, 100}},
     /* WASH: the delay first, then the reverb opens (Length toward Inf), darker as it grows, the dry dips
      * last; each effect up toward its aim, not past what the sound has already (Evan, 2026-10-18: with the effects
-     * up it went wild; the repeats stop at 80, under the delay's own howl at 87); at the top the dry breathes slowly in and out of the cloud; the filter LFOs ease to a third as it opens
+     * up it went wild; the repeats stop at 80, under the delay's own howl at 87); at the top the dry breathes slowly in and out of the cloud (55 .. 70 %: its depth is 70); the filter LFOs ease to a third as it opens
      * (Evan, 2026-10-18: with Movement up, their sweeps piled up in the tails as surges). Let go: the dry comes
      * back first, the filter LFOs with it, the tails ring on (the reverb's own length) and go last */
     {{P_DLY_MIX, MK_TO, 70, 0, 40, 0, 30}, {P_DLY_REPEATS, MK_TO, 80, 0, 40, 0, 30},
      {P_REV_MIX, MK_TO, 80, 30, 80, 0, 30}, {P_REV_LEN, MK_TO, 100, 50, 100, 20, 60},
      {P_REV_DAMP, MK_ADD, 15, 50, 100, 20, 60}, {DR_GP(0, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100},
-     {DR_GP(1, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100},
-     {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100},
+     {DR_GP(1, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -14, 55, 70, 55, 70},
+     {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 55, 70, 55, 70},
      {DR_GP(0, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}, {DR_GP(1, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}},
 };
 /* AGE (Life), a state: as the old tape wears, darker, a little hiss, the pitch wavering slowly (wow) and a little
@@ -660,6 +676,7 @@ static float mac_ph;                             /* the PULSE moves' phase, cycl
 static float age_l, age_ph;                      /* Age as heard now (gliding), 0..1; its wow's phase */
 static float wand_st, wand_to;                   /* WANDER: drone II's move now and aimed at, semitones */
 static uint32_t wand_n;                          /* samples to its next step */
+static int wand_v;                               /* the Wander setting the countdown was drawn for */
 static uint32_t mac_rng = 0x6D2B79F5u;           /* the macros' own random steps */
 static float mac_rand(void)                      /* 0..1 */
 {
@@ -681,6 +698,7 @@ static void macro_reset(void)
     mac_ph = age_l = age_ph = 0.0f;
     wand_st = wand_to = 0.0f;
     wand_n = 0;
+    wand_v = 0;
 }
 static float mac_amt(int m)                      /* a key's amount now, 0..1 */
 {
@@ -711,6 +729,14 @@ static void wander_run(uint32_t n)
 {
     const float *sc = WSCALE[(unsigned)base[P_WSCALE] < DR_NWSCALE ? base[P_WSCALE] : 0];
     float a = (float)base[P_WANDER] * 0.01f, gs;
+    if (a > 0.0f && base[P_WANDER] > wand_v && wand_n > n) {   /* turned up: no waiting out the slower gap drawn
+                                                                * before (QA 2026-10-20: 26 s from off to 100) */
+        float lo, hi;
+        wander_gap(base[P_WANDER], &lo, &hi);
+        if ((float)wand_n > hi * DR_SR)
+            wand_n = (uint32_t)((lo + (hi - lo) * mac_rand()) * DR_SR);
+    }
+    wand_v = base[P_WANDER];
     if (a <= 0.0f) {
         wand_to = 0.0f;
         wand_n = 0;
@@ -803,6 +829,10 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
             const move_t *v = &row[k];
             float to = v->kind == MK_BUMP ? mv_ease(a, v->in0, v->in1) * (1.0f - mv_ease(a, v->out0, v->out1))
                      : mac_out >> m & 1u ? mv_ease(a, v->out0, v->out1) : mv_ease(a, v->in0, v->in1), *l = &mv_lvl[m][k];
+            if (v->kind != MK_BUMP && (mac_out >> m & 1u))
+                to = fm_minf(to, *l);            /* on the way out only down from where it got to (QA 2026-10-20: a
+                                                  * gesture at its 70 % depth had some out windows fuller than the
+                                                  * in windows reached: Wash's reverb went to Inf, Weight louder) */
             if (*l != to) {
                 *l = *l < to ? fm_minf(*l + step, to) : fm_maxf(*l - step, to);
                 mv_moving = 1;
@@ -945,6 +975,7 @@ static void drain(void)
                 grp[g].ic1 = grp[g].ic2 = grp[g].bc = 0.0f;
             for (g = 0; g < (int)FB_N; g++)      /* and nothing left to feed back */
                 fb_ring[g] = 0.0f;
+            fb_c = 1.0f;
             for (g = 0; g < 2; g++)              /* and the output filters' memories */
                 spk[g][0] = spk[g][1] = 0.0f;
             break;
@@ -970,7 +1001,7 @@ static inline float blep(float t, float dt)
 
 /* one cycle of the wave at phase ph (turns), dt the phase step a sample; pw the square's high fraction.
  * The four are in phase (their fundamentals all rise from 0 at ph = 0: the triangle peaks at 1/4, the
- * saw falls), so an X-WAVE blend of two never cancels. The sine is scaled to the others' loudness. */
+ * saw falls), so an X-WAVE blend of two never cancels. The sine and triangle are lifted (OSC_*_K, below). */
 /* the sine and the triangle lifted: alike in level they sounded ~7 dB under the saw on the FM-1's speaker (nothing
  * above 200 Hz, where it starts to work); met half way, ~4 dB (Evan, 2026-10-19), a little louder on headphones */
 #define OSC_SINE_K 1.6f
@@ -1166,8 +1197,17 @@ static void lfo_run(uint32_t n)
                 a = b + (a - b) * lfo_wx[i];
                 lfo_wx[i] = fm_minf(lfo_wx[i] + mstep, 1.0f);
             }
+            if (lfo_rnew)                        /* a restart: what it jumped by, eased out */
+                lfo_rj[i] = lfo_s[i] - a;
+            if (lfo_rk > 0.0f)
+                a += lfo_rj[i] * lfo_rk * lfo_rk * (3.0f - 2.0f * lfo_rk);
             lfo_s[i] += (a - lfo_s[i]) * 0.5f;
             lfo_tick[i][t] = lfo_s[i];
+        }
+        if (lfo_rnew)
+            lfo_rnew = 0;
+        else if (lfo_rk > 0.0f) {
+            lfo_rk = fm_maxf(lfo_rk - (float)CR / (0.12f * DR_SR), 0.0f);
         }
         inc = rm != 0.0f ? step * rk * fm_exp2f(rm * fm_clampf(lfo_at_now(rsrc), -1.0f, 1.0f)) : step;
         lfo_q += (uint32_t)(int32_t)(fm_minf(inc, 0.99f) * 2147483648.0f) << 1;   /* turns, in 32 bits */
@@ -1187,6 +1227,8 @@ static void lfo_run(uint32_t n)
  * random shapes draw a new level (they froze, locked to a bar shorter than the LFO's cycle) */
 static void lfo_restart(void)
 {
+    lfo_rnew = 1;
+    lfo_rk = 1.0f;
     lfo_q = 0u;
     lfo_ph = 0.0f;
     lfo_rnd[0] = lfo_rnd[1];
@@ -1564,10 +1606,17 @@ static void render_group(int g, uint32_t n)
                 v->rlp += (y2 - v->rlp) * rk;
                 x = v->rlp;
             }
-            if (fbk > 0.0f) {                   /* FEEDBACK: the sound of 256 samples ago, its lows cut */
-                float fv = fb_ring[(fb_w + j + FB_N - 256u) & (FB_N - 1u)];
+            if (fbk > 0.0f) {                   /* FEEDBACK: the sound fb_d samples ago (drone I's period), lows cut */
+                float rp = (float)(fb_w + j + FB_N) - fb_d, fr, fv, in;
+                uint32_t ri;
+                ri = (uint32_t)rp;
+                fr = rp - (float)ri;
+                fv = fb_ring[ri & (FB_N - 1u)] + (fb_ring[(ri + 1u) & (FB_N - 1u)] - fb_ring[ri & (FB_N - 1u)]) * fr;
                 v->fbh += (fv - v->fbh) * 0.011f;        /* ~80 Hz */
-                x += FB_CEIL * fm_tanhf(fbk * (fv - v->fbh) * (1.0f / FB_CEIL));   /* capped: it can't take over */
+                in = FB_CEIL * fm_tanhf(fbk * (fv - v->fbh) * (1.0f / FB_CEIL));   /* capped: it can't take over */
+                fb_eosc += x * x;
+                fb_ein += in * in;
+                x += in;
             }
             x = sat(x * drv) * mk;
             {                                   /* the bass makeup (low-pass, as weighted) */
@@ -1770,9 +1819,11 @@ static void clean_hold(float *l, float *r, uint32_t k)
 void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
 {
     /* MASTER: a volume up to 4/5 of its turn (there as loud as the old full turn); past that it drives the
-     * soft clip harder (up to 5x) at about the same loudness, as the DS-2's volume knobs push into overdrive */
+     * soft clip harder (up to 5x) at about the same loudness, as the DS-2's volume knobs push into overdrive: the
+     * output comes down by the drive^0.72 (QA 2026-10-20: 1/(1 + 0.6 x) left the top fifth 3-8 dB louder; now the
+     * six presets measured are within +-2.3 dB, 0 on average) */
     const float m = (float)gain_q12 * (1.0f / 4096.0f), over = fm_maxf((m - 0.8f) * 5.0f, 0.0f);
-    const float gain = fm_minf(m, 0.8f) * 1.78f * (1.0f + 4.0f * over), mout = 1.0f / (1.0f + 0.6f * over);
+    const float gain = fm_minf(m, 0.8f) * 1.78f * (1.0f + 4.0f * over), mout = fm_exp2f(-0.72f * fm_log2f(1.0f + 4.0f * over));
     drain();
     if (mac_dirty || mv_moving)
         macro_apply(n);
@@ -1842,12 +1893,24 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
             }
             fb_w = (fb_w + k) & (FB_N - 1u);
             dr_fb = fm_maxf(dr_fb * 0.95f, pk * pfs[P_FEEDBACK] * FB_MAX * 0.01f);
-            if (pfs[P_FEEDBACK] > 0.0f) {        /* what you hear, turned down as the feedback rises */
-                float c = 1.0f / (1.0f + 0.4f * pfs[P_FEEDBACK] * FB_MAX * 0.01f);
-                for (j = 0; j < k; j++) {
-                    mixl[j] *= c;
-                    mixr[j] *= c;
-                }
+            {   /* what you hear, turned down by as much as the feedback adds (smoothed, ~60 ms) */
+                float to = pfs[P_FEEDBACK] > 0.0f && fb_eosc > 1e-9f ? fm_sqrtf(fb_eosc / (fb_eosc + fb_ein)) : 1.0f;
+                float c0 = fb_c, dc;
+                fb_c += (to - fb_c) * fm_minf((float)k / (0.06f * DR_SR), 1.0f);
+                dc = (fb_c - c0) / (float)k;
+                if (c0 < 1.0f || fb_c < 1.0f)
+                    for (j = 0; j < k; j++) {
+                        c0 += dc;
+                        mixl[j] *= c0;
+                        mixr[j] *= c0;
+                    }
+                fb_ein = fb_eosc = 0.0f;
+            }
+            {   /* the next block's loop length: drone I's period, a multiple or a fraction of it, 256 .. 510 */
+                float per = DR_SR / (440.0f * fm_exp2f((grp[0].ps2 - 69.0f) * (1.0f / 12.0f))), d;
+                d = per >= 256.0f ? per / (float)(int)(per * (1.0f / 256.0f)) : per * (float)(int)(256.0f / per + 0.999f);
+                d = fm_clampf(d, 256.0f, 510.0f);
+                fb_d += (d - fb_d) * fm_minf((float)k / (0.05f * DR_SR), 1.0f);
             }
         }
         if (!dr_phones || spk_x > 0.0f) {   /* the SPEAKER low cut: 12 dB, ~120 Hz (TPT state-variable), while the

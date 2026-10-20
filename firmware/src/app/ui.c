@@ -883,11 +883,13 @@ static void press_start(int n, const int16_t *sc)
     ui.press_x = x0;
 }
 
-/* a key's pressure at the player's sensitivity (Setup 2, KNOB 3): x 0.5 .. x 2, 50 as tuned */
+/* a key's pressure at the player's sensitivity (Setup 2, KNOB 3): a curve, light .. firm, 50 as tuned; a full press
+ * is always all the way (QA 2026-10-20: as a gain, at 0 a full press went only 38 % in) */
 static float press_gain(void) { return fm_exp2f(((float)proj.par[P_PRESS_SENS] - 50.0f) * 0.02f); }
+static float press_curve(float x) { return x > 0.0f ? fm_exp2f(fm_log2f(x) / press_gain()) : 0.0f; }   /* 0..1 */
 static int press_scaled(int p)
 {
-    return p < 0 ? p : (int)fm_clampf((float)p * press_gain() + 0.5f, 0.0f, 127.0f);
+    return p < 0 ? p : (int)fm_clampf(127.0f * press_curve((float)p * (1.0f / 127.0f)) + 0.5f, 0.0f, 127.0f);
 }
 
 static void press_run(void)                            /* each frame, while a scene key is held */
@@ -1068,7 +1070,8 @@ static void gesture_up(int g)
         hands_on(P_GL_0 + g);
         say_c(GESTURE[g], "LATCHED", K_LFO);
     } else if (ui.btn >> B_SEL & 1u) {                 /* SEL held: latched where it is */
-        int v = (int)(ui.g_amt[g] * 100.0f + 0.5f);
+        int v = (int)(ui.g_amt[g] * 100.0f + 0.999f);   /* rounded up: a hair less would read as letting go
+                                                          * (QA 2026-10-20: Shift's chord swapped, Weight jumped) */
         ui.btn_used |= 1u << B_SEL;
         param_set(P_GL_0 + g, v < 1 ? 1 : v);
         hands_on(P_GL_0 + g);
@@ -1240,7 +1243,10 @@ static void input(void)
             int on = !proj.par[P_LFO_LOCK];            /* held: the LFO locked to the pulse's bars, or free */
             param_set(P_LFO_LOCK, on);
             ui.scene_at = -1;
-            say_c("LFO TO SWELL", on ? (proj.par[P_PULSE] ? "LOCKED" : "LOCKED (SWELL OFF)") : "FREE", K_LFO);
+            if (on && !proj.par[P_PULSE])              /* (shorter: "LOCKED (SWELL OFF)" ran off the screen) */
+                say_c("LFO LOCKED", "SWELL OFF", K_LFO);
+            else
+                say_c("LFO TO SWELL", on ? "LOCKED" : "FREE", K_LFO);
             ui.rst_done = 1;
         }
     }
@@ -1728,7 +1734,7 @@ static void pic_tone(int g, int32_t x0, int32_t y0)
 static void pic_osc(int g, int32_t x0, int32_t y0)
 {
     static const char *const W[4] = {"Sin", "Tri", "Saw", "Sqr"};
-    int x = gpar(g, GP_WAVE), k, sq = x * 3 > 200;
+    int x = gpar(g, GP_WAVE), k, sq = x >= 70;   /* PW heard (a tenth of square or more; at Saw, 67, it isn't) */
     int32_t tx0 = x0 + 12, tw = PAN_W - 24;
     char t[16], *q;
     draw_xwave(g, x, x0 + 6, y0 + 42, PAN_W - 12, 22, 1.0f, 0.0f, K_DRONE[g]);
@@ -2005,10 +2011,9 @@ static void pic_setup2(int32_t y0)
     }
     cv_rect(12, y0 + 54, 210, 1, K_GRID);
     {   /* PRESSURE: what a press gives, light .. firm */
-        float g = press_gain();
         int16_t y[46];
         for (i = 0; i < 46; i++)
-            y[i] = (int16_t)(y0 + 112 - (int32_t)(fm_minf((float)i / 45.0f * g, 1.0f) * 30.0f));
+            y[i] = (int16_t)(y0 + 112 - (int32_t)(press_curve((float)i / 45.0f) * 30.0f));
         cv_text(12, y0 + 60, &FONT_S, "PRESSURE", K_SETUP);
         plot(12, 2, y, 46, K_SETUP);
     }
@@ -2391,6 +2396,8 @@ static void big_value(int32_t cx, int32_t y, const char *s, uint16_t c)
     char run[24];
     int32_t w = 0, x, pass, n;
     const char *q;
+    if (s[0] == 'O' && s[1] == 'f' && s[2] == 'f' && !s[3])
+        s = "OFF";                             /* (a big O and a small "ff" read as "0ff": QA 2026-10-20) */
     for (pass = 0; pass < 2; pass++) {
         x = cx - w / 2;
         w = 0;

@@ -1,0 +1,27 @@
+# gestures, from the 0.2 QA (2026-10-20): SEL as you let go keeps a gesture where it is (it had jumped: Shift's
+# drones swapped); letting go only brings things back (Wash's reverb length had jumped to Inf on the way out)
+set 74 0
+tap PLAY
+set 55 0
+set 75 0
+set 52 0
+wait 2000
+# Shift held 2.7 s (drone I there, drone II on its way), kept with SEL: drone I stays a fifth up
+key w13 down
+wait 2700
+press SEL
+key w13 up
+release SEL
+wait 1500
+expect mpitch0 >650
+tapkey w13
+wait 8000
+# Wash held 6 s, let go: the reverb's length goes back down, never up to Inf (100)
+key w15 down
+wait 6000
+expect heard95 <90
+key w15 up
+wait 300
+expect heard95 <90
+wait 20000
+expect heard95 <80

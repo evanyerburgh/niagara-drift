@@ -57,8 +57,8 @@ enum {
     GP_FLFO,        /* the filter's LFO tap: DR_LFO_OFF, _I, _II, _BOTH (a switch) */
     GP_FLFO_DEPTH,  /* -100..100: up to +-5 octaves of cutoff, or the whole resonance range; 0 none */
     GP_FLFO_DEST,   /* what the filter's LFO moves: DR_TO_CUTOFF, DR_TO_RESO (a switch) */
-    GP_NOISE,       /* NOISE, 0..100: its level, added to the oscillators (they stay as they are); 100 is 6 dB
-                     * under them, 50 -12 dB, 25 -18 */
+    GP_NOISE,       /* NOISE, 0..100: its level, added to the oscillators (they stay as they are); 100 is level
+                     * with a saw, 50 about -7 dB, 25 -12 */
     GP_NCOLOR,      /* the noise's COLOUR, 0..100: white .. pink (-3 dB/oct), a blend (v0.2; it was 0 / 1) */
     GP_N
 };

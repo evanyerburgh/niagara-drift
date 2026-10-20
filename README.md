@@ -114,14 +114,14 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Life | character | feedback | age | drift |
 
 - **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
-  It's heard all along the knob, and at the top it's as loud as them (100 is level with them, 50 −6 dB, 25 −12). It
+  It's heard all along the knob, and at the top it's about as loud as them (100 is level with a saw, 50 about −7 dB, 25 −12; a sine is quieter). It
   goes through the drone's filter with them, so the cutoff, resonance, LFO and Drift shape it.
 - **Colour** blends from white (left) to pink (right).
 - **Character** takes the oscillators from clean to vintage: softer edges, a bent saw, a little pitch
   jitter, the two drones slightly apart, a whisper of noise.
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
-  thickening colour that grows with the knob (more with the delay up), rough at the top but never louder than
-  the sound without it; it fades with the drones when you stop.
+  thickening colour that grows with the knob (more with the delay up), rough at the top but about as loud as the
+  sound without it. It rings in key, on drone I's harmonics, and fades with the drones when you stop.
 - **Age** wears the sound like an old tape: darker, a little hiss, a slow wow and a little flutter in the pitch.
   It wears in slowly (about 20 s from none to full) and wears out as slowly when you turn it back. Character is
   the oscillators' own wear; Age is the tape's.
@@ -334,7 +334,7 @@ key.
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, at the same speed. Press it again on the way back and you pick up from there |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down until you let go of the scene key (lifting your finger can't move it, and nor can letting go of SEL first), and **stays**: a sound of its own between the two |
-| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Into the Presets too, except P12 (Clean), which is locked |
+| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A, B or C) |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
 | **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The gestures](#the-gestures)) |
 | **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it (the Swell isn't touched then: a single tap
@@ -344,8 +344,10 @@ switches it a moment later, once no second tap comes) |
 ### The Presets
 
 Twelve sounds to start from on the Presets bank (SEL + G5), each showing a part of what Niagara Drift does. Most
-have drone I on D, so moving between them keeps the root and changes the interval and the sound; they're levelled to
-sound alike in loudness. The screen names the one you pick ("SCENE P3 EERIE"). They're fixed: to keep a sound you
+have drone I on D, so moving between them keeps the root and changes the interval and the sound. With **Pitch lock**
+on (as a new FM-1 starts) they keep the pitch you're on, so you hear the textures first; turn it off (black key 4)
+and each plays at its own pitches, as described below. They're levelled to sound alike in loudness with the lock on,
+and within about 3 dB at their own pitches. The screen names the one you pick ("SCENE P3 EERIE"). They're fixed: to keep a sound you
 made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE + a key).
 
 | Key | Preset | What it shows |
@@ -366,7 +368,8 @@ made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE
 ### MIDI
 
 Over USB or the TRS jack, a note on **channel 1** tunes drone I to it, a note on **channel 2** drone II
-(with Pitch link on, a channel 2 note sets the interval instead). It tunes; it doesn't start or stop the drones.
+(with Pitch link on, a channel 2 note sets the interval instead). It tunes, even with Pitch lock on; it doesn't start
+or stop the drones.
 
 ### Trying it in the browser
 

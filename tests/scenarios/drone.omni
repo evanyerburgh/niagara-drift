@@ -76,7 +76,7 @@ wait 100
 tap HOME
 expect view 1
 spin K3 -20
-expect par32 32
+expect par32 17
 spin K4 10
 expect par29 450
 spin K4 -10
