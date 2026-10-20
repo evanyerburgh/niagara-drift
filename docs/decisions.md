@@ -301,3 +301,5 @@ at the end. The current state is in the [README](../README.md) and the code.
   5.7 and 8.9 Hz), no longer adding Character (P7 Tape's Character 70 → 98). Card labels one size up (FONT_S), with
   Char., Feedbk, Press., Keys, R. mod, and Osc / Filter on LFO depths on the cards. The LFO key layer and SEL on the
   top keys stay. Fix: Age's wow no longer freezes once Age has worn in.
+- 2026-10-20 (Evan): Key glide is **Switch time** ("black keys, LFO waves"; card "Switch"); Scene time's hint is
+  "between scenes"; Glide is **Pitch glide** (card "Glide").

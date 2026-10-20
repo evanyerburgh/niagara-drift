@@ -14,7 +14,7 @@
  * only while it's held, and the page you were on comes back when it's let go):
  *   HOME Play, Play 2 (Level, Reso) · ENV Tone (Noise, Colour: white .. pink) · EDIT Osc (X-Wave, PW), Source
  *   (Osc mix, Drive) · LFO LFO (depths), Mod (Rate mod, Mod by, X-mod amount, Delay LFO depth) · SEQ Partner ·
- *   GLO Setup, Setup 2 (Key glide, Scene time, Tune, Tuning), Setup 3 (Speaker,
+ *   GLO Setup, Setup 2 (Switch time, Scene time, Tune, Tuning), Setup 3 (Speaker,
  *   Pressure) (global). The top bar shows a dot for each of a
  *   button's pages.
  *   OCT- / OCT+    the LFO's Wave I / Wave II: a tap is the next shape, round and round; SEL + OCT the one
@@ -546,7 +546,7 @@ static void page_up(int b)
 static float morph_ms(void) { return 20.0f * fm_exp2f((float)proj.par[P_MORPH] * 0.105507f); }
 
 /* OCT- / OCT+: the LFO's two waves (v0.2): a tap is the next shape, round and round (Off, the seven, random);
- * SEL + OCT the one before. The engine glides a new shape in over the Key glide time. Shown in the top bar */
+ * SEL + OCT the one before. The engine glides a new shape in over the Switch time. Shown in the top bar */
 static void hands_on(int p) { ui.hands[p / 64] |= (uint64_t)1 << (p % 64); }
 static int hands_has(int p) { return (int)(ui.hands[p / 64] >> (p % 64) & 1u); }
 static void hands_clear(void) { memset(ui.hands, 0, sizeof ui.hands); }
@@ -624,7 +624,7 @@ static void loop_apply(int p, int v, uint32_t slide)
 }
 
 static void loop_rewind(void)                  /* the start of a pass: what the loop moves, back to how it */
-{                                              /* began, gliding over the Key glide time (no seam) */
+{                                              /* began, gliding over the Switch time (no seam) */
     int p;
     uint32_t back = (uint32_t)morph_ms();
     for (p = 0; p < DR_NPARAMS; p++)
@@ -1403,7 +1403,8 @@ static const char *card_name(int p)
     case P_CHAR: return "Char.";
     case P_FEEDBACK: return "Feedbk";
     case P_LFO_RMOD: return "R. mod";
-    case P_MORPH: return "Keys";               /* Key glide */
+    case P_MORPH: return "Switch";             /* Switch time */
+    case P_GLIDE: return "Glide";              /* Pitch glide */
     case P_PRESS_SENS: return "Press.";
     default: break;
     }
@@ -2259,24 +2260,24 @@ static void keymap_values(void)                /* the values' place: the key tou
     cv_text(10, 72, &FONT_XS, "with SEL:  D5-G5 bank   OCT wave back", K_DIM);
 }
 
-/* Setup 1: the three times, a row each: FADE (KNOB 1, PLAY's fade in and out), KEY GLIDE (KNOB 2, a black key's or
+/* Setup 1: the three times, a row each: FADE (KNOB 1, PLAY's fade in and out), SWITCH TIME (KNOB 2, a black key's or
  * a wave's move to its new setting), SCENE TIME (KNOB 3, every scene move); each a bar as far as its knob and its time. None is in scenes */
 static void pic_setup(int32_t y0)
 {
     static const uint8_t P[3] = {P_FADE, P_MORPH, P_SCENE_T};
-    static const char *const N[3] = {"FADE", "KEY GLIDE", "SCENE TIME"},
-                             *const W[3] = {"PLAY in, out", "keys, waves", "a scene key"};
+    static const char *const N[3] = {"FADE", "SWITCH TIME", "SCENE TIME"},
+                             *const W[3] = {"PLAY in, out", "black keys, LFO waves", "between scenes"};
     int r;
     for (r = 0; r < 3; r++) {
-        int32_t y = y0 + 4 + r * 38, w = 120 * proj.par[P[r]] / 100;
+        int32_t y = y0 + 4 + r * 38, w = 76 * proj.par[P[r]] / 100;   /* the bars right of the hints */
         char t[16];
         cv_text(12, y, &FONT_S, N[r], K_SETUP);
         cv_text(12, y + 18, &FONT_XS, W[r], K_DIM);
         dr_param_text(P[r], proj.par[P[r]], t);
         text_r(222, y, t, K_TEXT2);
-        cv_round(102, y + 24, 120, 6, 3, K_GRID);
+        cv_round(146, y + 24, 76, 6, 3, K_GRID);
         if (w > 3)
-            cv_round(102, y + 24, w, 6, 3, K_SETUP);
+            cv_round(146, y + 24, w, 6, 3, K_SETUP);
     }
 }
 

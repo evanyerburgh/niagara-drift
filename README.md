@@ -36,7 +36,7 @@ banks you pick with SEL and the top four.*
   a reverb of four (Room, Hall, Cathedral, Chorus hall) whose length goes to Inf, a freeze.
 - **Feedback** (the finished sound fed back into the drones) and **Character** (clean to vintage).
 - **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
-- **Key glide**: buttons and keys never jump: the sound moves to a new setting over a time you set.
+- **Switch time**: buttons and keys never jump: the sound moves to a new setting over a time you set.
 - **Scenes**: 12 on the white keys in each of three banks (36 of yours), plus a Presets bank, recalled
   gliding over the Scene time, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob
   moves.
@@ -148,15 +148,15 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Partner | I interval | I detune | II interval | II detune |
-| Pitch moves | Shift's move | glide | II wander | Wander's scale |
+| Pitch moves | Shift's move | pitch glide | II wander | Wander's scale |
 
 - **Shift's move** is where the Shift gesture takes the drones: from a fifth down through none in the middle to a
   fifth up, 10 cents a detent, 1 with SEL held; it lights while Shift (E5) is in. See [The gestures](#the-gestures).
 - **Wander** gives drone II a slow random melody: it jumps from note to note in no order, the notes of a scale on
   drone I (in any octave, up to an octave from its own pitch), and only now and then comes home. The knob is **how
   often**, at random times within a range: 25–30 s apart at the bottom, 0.5–2 s at the top; the screen shows the
-  range. It doesn't glide by itself: **Glide** slides it. At 0 it's off.
-- **Glide** is how long a drone takes to reach a new pitch (up to 10 s; off by default): a pitch knob, a scene,
+  range. It doesn't glide by itself: **Pitch glide** slides it. At 0 it's off.
+- **Pitch glide** is how long a drone takes to reach a new pitch (up to 10 s; off by default): a pitch knob, a scene,
   Wander's notes.
 - **Wander's scale**: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just (the
   harmonics 1–8 of drone I, pure: the root, the pure major third, fifth and the seventh harmonic).
@@ -221,16 +221,16 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 
 #### Setup · GLO
 
-<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, key glide and scene times; the tune, stereo width, the speaker's low cut and the keys' pressure">
+<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, switch and scene times; the tune, stereo width, the speaker's low cut and the keys' pressure">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Setup 1 | fade | key glide | scene time | |
+| Setup 1 | fade | switch time | scene time | |
 | Setup 2 | tune | stereo | speaker (low cut) | pressure |
 
 Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't change it.
 
-- **Fade** is how long PLAY takes (up to 60 s); **Key glide** is how long a black key or a new LFO wave (OCT) takes
+- **Fade** is how long PLAY takes (up to 60 s); **Switch time** is how long a black key or a new LFO wave (OCT) takes
   to move the sound to its new setting (0.02–30 s); **Scene time** is how long every scene move takes: a tap, a
   crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about 4 s to start).
 - **Tune** moves everything up or down by up to 50 cents. **Stereo** spreads the drones from mono to drone I
@@ -328,7 +328,7 @@ key.
 
 | | |
 |---|---|
-| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Speaker, Pressure, Stereo, Tune, Pitch lock, Fade, Key glide and Scene time stay as they are |
+| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Speaker, Pressure, Stereo, Tune, Pitch lock, Fade, Switch time and Scene time stay as they are |
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, at the same speed. Press it again on the way back and you pick up from there |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down until you let go of the scene key (lifting your finger can't move it, and nor can letting go of SEL first), and **stays**: a sound of its own between the two |
