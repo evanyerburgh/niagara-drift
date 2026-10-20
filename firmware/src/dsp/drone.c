@@ -38,8 +38,8 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
  * slow LFO (a cycle in ~25 s; Wave II a random glide), the Swell on as a slow breath (one in ~35 s, 12 dB),
  * some delay with a gentle wobble, a little more reverb; the oscillators' depths start at 0 */
 static const dr_param_t PARAMS[DR_NPARAMS] = {
-    VOICE_PARAMS(5000, 67, 5, 30, 700, 80, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
-    VOICE_PARAMS(5700, 33, 14, 15, 680, 52, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
+    VOICE_PARAMS(5000, 67, 5, 30, 700, 57, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
+    VOICE_PARAMS(5700, 33, 14, 15, 680, 37, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
     {"Cross-mod", 0, 1, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
@@ -1001,7 +1001,7 @@ static inline float blep(float t, float dt)
 
 /* one cycle of the wave at phase ph (turns), dt the phase step a sample; pw the square's high fraction.
  * The four are in phase (their fundamentals all rise from 0 at ph = 0: the triangle peaks at 1/4, the
- * saw falls), so an X-WAVE blend of two never cancels. The sine is scaled to the others' loudness. */
+ * saw falls), so an X-WAVE blend of two never cancels. The sine and triangle are lifted (OSC_*_K, below). */
 /* the sine and the triangle lifted: alike in level they sounded ~7 dB under the saw on the FM-1's speaker (nothing
  * above 200 Hz, where it starts to work); met half way, ~4 dB (Evan, 2026-10-19), a little louder on headphones */
 #define OSC_SINE_K 1.6f

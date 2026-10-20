@@ -309,3 +309,12 @@ at the end. The current state is in the [README](../README.md) and the code.
   cutoffs -10 (was -30), drive +25 (was 35), both drones' levels +40 (was drone I +8): +1 dB on the speaker (was
   -2.4), +1.9 dB full range. The README says MASTER's top quarter flattens the breathing. Movement and the presets
   stay as they are.
+- 2026-10-20 (the 0.2 QA pass): presets keep the pitch you're on while Pitch lock is on (Evan) and are levelled for
+  that: within ±2.1 dB of P1 at D3/A3 (−3.4..+2.7 at their own pitches); the starting sound 3 dB quieter (levels 57 /
+  37, were 80 / 52). MASTER's top fifth at the same loudness (the output down by the drive^0.72; six presets within
+  ±2.3 dB, 0 on average; Evan). Feedback's loop is a multiple of drone I's period (256..510 samples, was 256), its
+  gain at 100 0.7 (was 0.9), the loudness it adds taken off: ~+1 dB at 100 (was +5..7, ringing an F). Fixes: a kept
+  gesture (SEL) no longer jumps; letting go of a gesture only brings things back; Wash breathes (55..70 %); the LFO's
+  restart eases over 120 ms; Wander re-times when turned up; delay repeats wind down when stopped (≤ 0.85); the Wide
+  delay's spread per sample; pressure sensitivity a curve (a full press always all the way); PW shown from X-Wave 70;
+  Pitch glide in seconds; "OFF" in capitals; the lock-to-Swell message shorter.

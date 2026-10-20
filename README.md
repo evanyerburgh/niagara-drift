@@ -114,7 +114,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
 | Life | character | feedback | age | drift |
 
 - **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
-  It's heard all along the knob, and at the top it's as loud as them (100 is level with them, 50 −6 dB, 25 −12). It
+  It's heard all along the knob, and at the top it's about as loud as them (100 is level with a saw, 50 about −7 dB, 25 −12; a sine is quieter). It
   goes through the drone's filter with them, so the cutoff, resonance, LFO and Drift shape it.
 - **Colour** blends from white (left) to pink (right).
 - **Character** takes the oscillators from clean to vintage: softer edges, a bent saw, a little pitch
@@ -344,8 +344,10 @@ switches it a moment later, once no second tap comes) |
 ### The Presets
 
 Twelve sounds to start from on the Presets bank (SEL + G5), each showing a part of what Niagara Drift does. Most
-have drone I on D, so moving between them keeps the root and changes the interval and the sound; they're levelled to
-sound alike in loudness. The screen names the one you pick ("SCENE P3 EERIE"). They're fixed: to keep a sound you
+have drone I on D, so moving between them keeps the root and changes the interval and the sound. With **Pitch lock**
+on (as a new FM-1 starts) they keep the pitch you're on, so you hear the textures first; turn it off (black key 4)
+and each plays at its own pitches, as described below. They're levelled to sound alike in loudness with the lock on,
+and within about 3 dB at their own pitches. The screen names the one you pick ("SCENE P3 EERIE"). They're fixed: to keep a sound you
 made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE + a key).
 
 | Key | Preset | What it shows |
@@ -366,7 +368,8 @@ made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE
 ### MIDI
 
 Over USB or the TRS jack, a note on **channel 1** tunes drone I to it, a note on **channel 2** drone II
-(with Pitch link on, a channel 2 note sets the interval instead). It tunes; it doesn't start or stop the drones.
+(with Pitch link on, a channel 2 note sets the interval instead). It tunes, even with Pitch lock on; it doesn't start
+or stop the drones.
 
 ### Trying it in the browser
 

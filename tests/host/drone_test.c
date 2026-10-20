@@ -788,6 +788,7 @@ int main(void)
         for (t = 0; t < 3; t++) {                       /* the delay's time: the first echo, on time */
             dry_init();
             dr_set(P_FADE, 0);
+            dr_set(DR_GP(0, GP_LEVEL), 80);             /* (the level it was measured at: the default is 57 now) */
             dr_set(DR_GP(1, GP_LEVEL), 0);
             dr_set(DR_GP(0, GP_WAVE), 67);
             dr_set(P_DLY_MIX, 100);
