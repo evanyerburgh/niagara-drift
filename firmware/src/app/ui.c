@@ -143,6 +143,7 @@ static struct {
     uint8_t arp_pend;                  /* ... its on / off still to come (if no second tap) */
     uint8_t page_last[8];              /* each page button's page last shown (0: its first): opened again there */
     uint32_t sel_t;                    /* when SEL went down (held 0.4 s: the black keys' map) */
+    int8_t km_key;                     /* the black key touched while SEL is held (named, not switched), or -1 */
     uint32_t rst_t;                    /* when the LFO reset key went down (a hold locks the LFO to the pulse) */
     uint8_t rst_done;                  /* that hold has acted */
     char msg[2][24];
@@ -1163,6 +1164,8 @@ static void input(void)
     ui.btn = btn;
     if ((ch & btn) >> B_SEL & 1u)
         ui.sel_t = plat_ms();
+    if (!(btn >> B_SEL & 1u))
+        ui.km_key = -1;
     for (i = 0; i < NB; i++) {
         uint32_t m = 1u << i;
         if (!(ch & m))
@@ -1203,6 +1206,15 @@ static void input(void)
     ui.keys = keys;
     for (i = 0; i < 11u; i++) {
         sw_t w = sw_layer()[i];
+        if (ui.btn >> B_SEL & 1u) {                   /* SEL held: a key touched names itself on the map, and
+                                                        * stays as it is (Evan, 2026-10-19) */
+            if ((ch & keys) >> BLACK_K[i] & 1u) {
+                ui.km_key = (int8_t)i;
+                ui.btn_used |= 1u << B_SEL;
+                ui.rst_done = 1;                       /* LFO reset: no lock from this hold either */
+            }
+            continue;
+        }
         if ((ch & keys) >> BLACK_K[i] & 1u) {
             sw_toggle(w);                              /* LFO reset: at once, on the press */
             if (w.s != S_LFORESET)
@@ -2115,16 +2127,17 @@ static void pic_tone2(int32_t y0)
 }
 
 /* THE BLACK KEYS' MAP (SEL held 0.4 s, nothing else asking for the screen: a knob turning, a white key held): the
- * eleven keys as the panel groups them, each row a group (drone I | the global two | drone II | the links |
- * cross-mod), its keys lit as the panel's are, each key's name and setting. The LFO pages' layer on those pages */
+ * eleven keys drawn where they sit on the keyboard (3-2-3-2-1), lit as the panel's are, and only their groups
+ * named. A key touched while SEL is held names itself and its setting, large, and doesn't switch (Evan, 2026-10-19:
+ * the eleven names and settings at once were too crowded to read). The LFO pages' layer on those pages */
 #define KEYMAP_MS 400u
 static int keymap_on(void)
 {
     uint32_t white = 0, i;
     for (i = 0; i < NWHITE; i++)
         white |= 1u << WHITE_K[i];
-    return (ui.btn >> B_SEL & 1u) && plat_ms() - ui.sel_t >= KEYMAP_MS && !lit(0) && !lit(1) && !lit(2) &&
-           !lit(3) && !(ui.keys & white) && ui.press < 0;
+    return (ui.btn >> B_SEL & 1u) && (plat_ms() - ui.sel_t >= KEYMAP_MS || ui.km_key >= 0) && !lit(0) && !lit(1) &&
+           !lit(2) && !lit(3) && !(ui.keys & white) && ui.press < 0;
 }
 static void sw_text(sw_t w, const char **name, const char **st)
 {
@@ -2150,33 +2163,88 @@ static void sw_text(sw_t w, const char **name, const char **st)
     default: *name = ""; *st = ""; break;
     }
 }
-/* rows r0 .. r1 - 1 of the map from y0 (38 px a row): the picture holds the first three, the values' place the
- * last two and the line about SEL's other uses */
-#define KEYMAP_ROW 38
-static void keymap_rows(int32_t y0, int r0, int r1)
+/* the map's groups, each layer's: first key, how many, its name, its colour (0 drone I, 1 drone II, 2 the ink) */
+typedef struct {
+    uint8_t k0, n;
+    const char *name;
+    uint8_t col;
+} km_group_t;
+static const km_group_t KM_NORMAL[4] = {{0, 3, "I", 0}, {3, 2, "BOTH", 2}, {5, 3, "II", 1}, {8, 3, "LINKS", 2}};
+static const km_group_t KM_LFO[4] = {{0, 4, "I", 0}, {4, 1, "BOTH", 2}, {5, 4, "II", 1}, {9, 2, "DLY, XMOD", 2}};
+static const uint8_t KM_CX[11] = {15, 30, 45, 75, 90, 120, 135, 150, 180, 195, 225};   /* key centres, 15 px a white */
+static const km_group_t *km_group(int k)
 {
-    static const uint8_t GROUP[5][2] = {{0, 3}, {3, 2}, {5, 3}, {8, 2}, {10, 1}};   /* first key, how many */
-    const sw_t *layer = sw_layer();
-    int r, k;
-    for (r = r0; r < r1; r++) {
-        int32_t y = y0 + (r - r0) * KEYMAP_ROW;
-        uint16_t c = r == 0 ? K_DRONE[0] : r == 2 ? K_DRONE[1] : K_TEXT2;
-        if (r == 0 || r == 2)
-            cv_text(10, y + 8, &FONT_S, r ? "II" : "I", c);
-        for (k = 0; k < GROUP[r][1]; k++) {
-            sw_t w = layer[GROUP[r][0] + k];
-            int on = sw_get(w);
-            const char *name, *st;
-            int32_t kx = 28 + k * 8, cx = 56 + k * 62;
-            if (on)                            /* the key: lit as the panel's (a third choice: half) */
-                cv_round(kx, y + 6, 5, 18, 2, on == 2 ? blend(K_PANEL, c, 1, 2) : c);
-            else
-                cv_frame(kx, y + 6, 5, 18, K_FAINT);
-            sw_text(w, &name, &st);
-            cv_text(cx, y + 1, &FONT_XS, name, K_DIM);
-            cv_text(cx, y + 14, &FONT_S, st, on ? c : K_TEXT2);
+    const km_group_t *g = sw_layer() == SW_LFO ? KM_LFO : KM_NORMAL;
+    int i;
+    for (i = 0; i < 3; i++)
+        if (k < g[i].k0 + g[i].n)
+            return &g[i];
+    return &g[3];
+}
+static uint16_t km_colour(const km_group_t *g) { return g->col < 2 ? K_DRONE[g->col] : K_PALE; }
+
+static void keymap_pic(void)                   /* the keyboard, in the picture's place */
+{
+    const int32_t y = 6, h = 104, bh = 64;
+    const km_group_t *gs = sw_layer() == SW_LFO ? KM_LFO : KM_NORMAL;
+    int i;
+    for (i = 0; i < 16; i++) {                                    /* the white keys, dark */
+        cv_rect(i * 15, y, 15, h, K_PANEL);
+        cv_rect(i * 15, y, 1, h, K_BG);
+    }
+    for (i = 0; i < 11; i++) {
+        int32_t x = KM_CX[i] - 4;
+        uint16_t c = km_colour(km_group(i));
+        int on = sw_get(sw_layer()[i]);
+        if (sw_layer()[i].s == S_LFORESET)
+            on = proj.par[P_LFO_LOCK] != 0;
+        if (on)                                                    /* lit as the panel's (a third choice: half) */
+            cv_round(x, y, 9, bh, 2, on == 2 ? blend(K_PANEL, c, 1, 2) : c);
+        else {
+            cv_rect(x, y, 9, bh, K_BG);
+            cv_frame(x, y, 9, bh, K_FAINT);
+        }
+        if (i == ui.km_key) {                                      /* the one touched: outlined, marked */
+            cv_frame(x - 1, y, 11, bh + 1, K_TEXT);
+            cv_round(x - 2, y + bh + 4, 13, 3, 1, K_TEXT);
         }
     }
+    for (i = 0; i < 4; i++) {                                      /* the groups: a line under each, its name */
+        int32_t a = KM_CX[gs[i].k0] - 6, b = KM_CX[gs[i].k0 + gs[i].n - 1] + 6;
+        int32_t cx = (a + b) / 2, hw = (int32_t)text_w(&FONT_XS, gs[i].name) / 2;
+        cv_round(a, y + h + 6, b - a, 2, 1, km_colour(&gs[i]));
+        if (cx + hw > 237)                                         /* the last name inside the screen */
+            cx = 237 - hw;
+        text_c(cx, y + h + 10, &FONT_XS, gs[i].name, km_colour(&gs[i]));
+    }
+}
+
+static void big_value(int32_t cx, int32_t y, const char *s, uint16_t c);
+static void keymap_values(void)                /* the values' place: the key touched, or how to ask */
+{
+    if (ui.km_key < 0) {
+        text_c(120, 22, &FONT_S, "touch a key: what it does", K_TEXT2);
+    } else {
+        const km_group_t *g = km_group(ui.km_key);
+        const char *name, *st;
+        char t[32], v[16], *q = t;
+        uint16_t c = km_colour(g);
+        int i;
+        sw_text(sw_layer()[ui.km_key], &name, &st);
+        if (g->col < 2)                                            /* "I: PARTNER", "PITCH LOCK" */
+            q = scopy(scopy(q, g->name), ": ");
+        for (; *name && q < t + sizeof t - 1; name++)
+            *q++ = (char)(*name >= 'a' && *name <= 'z' ? *name - 32 : *name);
+        *q = 0;
+        cv_round(6, 2, WIDE_W, 66, 6, K_CARD);
+        cv_frame(6, 2, WIDE_W, 66, c);
+        text_c(120, 7, &FONT_XS, t, c);
+        for (i = 0; st[i] && i < (int)sizeof v - 1; i++)           /* the setting in capitals: all of it large */
+            v[i] = (char)(st[i] >= 'a' && st[i] <= 'z' ? st[i] - 32 : st[i]);
+        v[i] = 0;
+        big_value(120, 26, v, K_TEXT);
+    }
+    cv_text(10, 72, &FONT_XS, "with SEL:  D5-G5 bank   OCT wave back", K_DIM);
 }
 
 /* Setup 1: the three times, a row each: FADE (KNOB 1, PLAY's fade in and out), KEY GLIDE (KNOB 2, a black key's or
@@ -2253,8 +2321,7 @@ static void draw_pic(void)
     ui.sig[1] = h;
     cv_begin(240, PIC_H, K_BG);
     if (keymap_on()) {
-        cv_round(6, 4, WIDE_W, PAN_H + 8, 4, K_PANEL);
-        keymap_rows(8, 0, 3);
+        keymap_pic();
     } else if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 ||
         ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_TONE2 ||
         ui.view == V_MOVES) {
@@ -2339,16 +2406,14 @@ static void draw_values(void)
                         (uint32_t)(ui.btn >> B_SEL & 1u) << 17 | (uint32_t)(proj.par[P_PLOCK] != 0) << 18);
     }
     if (keymap_on()) {                         /* SEL held: the map's last two rows here */
-        h = hash(h, 0x4B4Du);
+        h = hash(h, 0x4B4Du | (uint32_t)(uint8_t)ui.km_key << 16);
         for (i = 0; i < 11u; i++)
             h = hash(h, (uint32_t)sw_get(sw_layer()[i]) | (uint32_t)proj.par[P_LFO_LOCK] << 4);
         if (h == ui.sig[2])
             return;
         ui.sig[2] = h;
         cv_begin(240, VAL_H, K_BG);
-        cv_round(6, 0, WIDE_W, 70, 4, K_PANEL);
-        keymap_rows(-4, 3, 5);
-        cv_text(10, 72, &FONT_XS, "with SEL:  D5-G5 bank   OCT wave back", K_DIM);
+        keymap_values();
         cv_blit(0, VAL_Y);
         return;
     }
@@ -2510,6 +2575,7 @@ void ui_init(void)
     ui.visit = -1;
     ui.press = -1;
     ui.scene_at = -1;
+    ui.km_key = -1;
     ui.save_q = -2;
     ui.splash_t0 = plat_ms();
     lcd_fill(0, 0, 240, 240, K_BG);

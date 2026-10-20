@@ -257,6 +257,13 @@ spin K1 5
 expect par0 5037
 tapkey b3
 expect par74 0
+# with SEL held, a black key names itself on the map and doesn't switch (2026-10-19)
+press SEL
+tapkey b3
+expect par74 0
+tapkey b1
+expect par6 2
+release SEL
 # the filter key (drone I's third) goes round: LP, BP, HP
 tapkey b2
 expect par9 1

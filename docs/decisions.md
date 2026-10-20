@@ -293,3 +293,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   is where it heads, at most the whole way a Scene time), its way back. SEL during a crossfade holds it until the
   key lets go. OCT doesn't show the wave on LFO depths. The autosave waits 4 s after the last change (not only the
   last touch) and writes at most every 30 s (a long scene switch wrote 660 times in 20 s).
+- 2026-10-19 (Evan): the SEL key map draws the 11 black keys where they sit (3-2-3-2-1), lit as the panel's, with
+  only the groups named (I, BOTH, II, LINKS; on the LFO pages I, BOTH, II, DLY, XMOD). A black key touched while SEL
+  is held names itself and its setting, large, and doesn't switch.

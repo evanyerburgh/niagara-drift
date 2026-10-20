@@ -294,10 +294,12 @@ parts come in one after another, and go in their own order when you let go. Scen
 Lit means on. They follow the page: on the LFO pages they set the LFO's routing. Normally they're grouped
 by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8), the links (9–11).
 
-**Hold SEL** for a moment and the screen shows what every black key does on this page, and how each is set,
-in the panel's groups. It steps aside while you turn a knob or hold a white key.
+**Hold SEL** for a moment and the screen draws the black keys as they sit on the keyboard, lit as on the panel,
+with their groups named. **Touch a black key while SEL is held** and the screen names it and its setting ("I: SUB
+-1 OCT"), without switching it: let go of SEL to play it. The map steps aside while you turn a knob or hold a white
+key.
 
-<img src="docs/img/page-keys.png" width="244" alt="The black keys' map while SEL is held: each group of keys, lit as on the panel, with its name and setting">
+<img src="docs/img/page-keys.png" width="244" alt="The black keys' map while SEL is held: the keyboard with its black keys lit as on the panel and their groups named, and the key touched named with its setting">
 
 | Key | Normally | On the LFO pages |
 |---|---|---|
