@@ -639,12 +639,12 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
      {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100},
      {DR_GP(0, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}, {DR_GP(1, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}},
 };
-/* AGE (Tone 2), a state: as the old tape wears, darker, a little hiss, more character, the pitch wavering slowly;
- * it wears in (and out) over AGE_S */
+/* AGE (Life), a state: as the old tape wears, darker, a little hiss, the pitch wavering slowly (wow) and a little
+ * quickly (flutter); it wears in (and out) over AGE_S. Not Character (Evan, 2026-10-20: the two knobs overlapped) */
 static const move_t AGE_MV[MV_N] = {
     {DR_GP(0, GP_CUTOFF), MK_ADD, -70, 0, 100, 0, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -70, 0, 100, 0, 100},
     {DR_GP(0, GP_NOISE), MK_ADD, 15, 0, 100, 0, 100}, {DR_GP(1, GP_NOISE), MK_ADD, 15, 0, 100, 0, 100},
-    {P_CHAR, MK_ADD, 35, 0, 100, 0, 100}, {0, MK_WOW, 14, 0, 100, 0, 100}, {1, MK_WOW, 14, 0, 100, 0, 100},
+    {0, MK_WOW, 14, 0, 100, 0, 100}, {1, MK_WOW, 14, 0, 100, 0, 100},
 };
 #define AGE_S 20.0f                              /* Age wears in from none to full this long */
 static float mv_lvl[DR_NGEST][MV_N];             /* each key's moves' levels now, 0..1 (gliding) */
@@ -748,9 +748,11 @@ static void mv_add(const move_t *v, float l, float *off, uint8_t *on, float *pm,
     case MK_TO: off[v->p] += fm_maxf((float)(v->d - base[v->p]), 0.0f) * l; break;
     case MK_SHIFT: pm[v->p] += (float)(base[P_SHIFT_MOVE] - DR_SHIFT_MID) * 0.01f * l; break;
     case MK_PULSE: off[v->p] += (float)v->d * l * (0.5f - 0.5f * fm_cosf(6.2831853f * mac_ph)); *flags |= 2; break;
-    case MK_WOW: {                               /* two slow sines a drone, apart */
+    case MK_WOW: {                               /* two slow sines a drone, apart (wow: +-14 cents at full), and two
+                                                  * quick ones (flutter, 5.7 and 8.9 Hz: +-4 cents) */
         float ph = 6.2831853f * age_ph, g = (float)v->p;
         pm[v->p] += (float)v->d * 0.01f * l * (0.6f * fm_sinf(ph * 0.21f + 2.0f * g) + 0.4f * fm_sinf(ph * (0.13f + 0.04f * g)));
+        pm[v->p] += 0.04f * l * (0.7f * fm_sinf(ph * 5.7f + 1.3f * g) + 0.3f * fm_sinf(ph * 8.9f + 2.9f * g));
         *flags |= 8;
         break;
     }
@@ -835,7 +837,9 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
     } else {
         mac_ph = 0.0f;                           /* the next breath starts from the top (no dip at once) */
     }
-    if (flags & 8) {                             /* Age's wow */
+    if (flags & 8) {                             /* Age's wow: on, and on again next block (it froze once Age had worn
+                                                  * in, until 2026-10-20) */
+        mv_moving = 1;
         age_ph += (float)n / DR_SR;
         if (age_ph > 1000.0f)
             age_ph -= 1000.0f;

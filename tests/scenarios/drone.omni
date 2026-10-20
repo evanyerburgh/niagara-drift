@@ -15,7 +15,7 @@ expect par74 0
 # 44 hard sync, 45 pitch link, 46 link offset, 47 LFO rate, 48 Wave I, 49 Wave II, 50 Glide, 51 Fade, 55 Pulse,
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
 # depth.
-# Pages: 0 Play 1 1 Play 2 2 Tone 1 3 Tone 2 4 Osc 5 Source 6 LFO depths 7 LFO mods 8 Partner 9 Moves
+# Pages: 0 Play 1 1 Play 2 2 Tone 1 3 Life 4 Osc 5 Sub · Drive 6 LFO depths 7 Mods 8 Partner 9 Pitch moves
 # 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
 # a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
 expect bank 3
@@ -148,7 +148,7 @@ spin K1 -25
 spin K3 -100
 expect par19 0
 expect par40 0
-# ENV again: Tone 2: Character, Feedback (KNOB 3-4 nothing)
+# ENV again: Life: Character, Feedback (KNOB 3-4 nothing)
 tap ENV
 expect view 3
 spin K1 10
@@ -159,7 +159,7 @@ spin K4 -10
 expect par97 50
 tap ENV
 expect view 2
-# EDIT: Osc (X-Wave, PW); again: Source (osc mix, drive); again: Osc
+# EDIT: Osc (X-Wave, PW); again: Sub · Drive (osc mix, drive); again: Osc
 tap EDIT
 expect view 4
 spin K1 -67
@@ -216,7 +216,7 @@ key b4 down
 wait 700
 key b4 up
 expect par67 0
-# LFO again: LFO mods, the rate mod (KNOB 1 its depth, KNOB 2 the wave that moves it); again: LFO
+# LFO again: Mods, the rate mod (KNOB 1 its depth, KNOB 2 the wave that moves it); again: LFO
 tap LFO
 expect view 7
 spin K1 50
@@ -351,7 +351,7 @@ wait 600
 expect par7 750
 spin K2 -10
 expect par7 650
-# FX: Delay: type, time, repeats, mix; again: Reverb: type, length, damp, mix (the delay LFO depth is on LFO mods)
+# FX: Delay: type, time, repeats, mix; again: Reverb: type, length, damp, mix (the delay LFO depth is on Mods)
 tap FX
 expect view 13
 spin K1 1
@@ -384,7 +384,7 @@ tapkey b9
 expect par65 2
 tap HOME
 expect view 0
-# SEQ: Partner, again: Moves; GLO: Setup
+# SEQ: Partner, again: Pitch moves; GLO: Setup
 tap SEQ
 expect view 8
 tap SEQ
