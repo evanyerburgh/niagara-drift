@@ -497,6 +497,9 @@ static float pulse_ph, pulse_g = 1.0f;           /* the pulse: phase over two be
 static float pulse_a;                            /* the pulse coming in / going out (Morph), 0..1 */
 static uint8_t dly_rt, dly_rp;                   /* the delay LFO's route: now, the one before (Morph) */
 static float dly_rw;
+static float lfo_rj[2], lfo_rk;                  /* a restart's jump, eased out over ~120 ms (QA 2026-10-20: locked to
+                                                  * the Swell, the filter jumped an octave every bar) */
+static int lfo_rnew;                             /* ... a restart to ease, at the next tick */
 static float lfo_ph, lfo_s[2];                  /* the LFO's phase (cycles) and its taps, slewed */
 static uint32_t lfo_q;                          /* ... its phase in 32 bits (a float lost ~2 % at the slowest rate) */
 static int lfo_wc[2], lfo_wp[2];                 /* each tap's shape now, and the one before (Morph) */
@@ -558,6 +561,8 @@ void dr_init(void)
     rng = 0x12345678u;                           /* the random ones from the same start: every init sounds the same */
     lfo_seed = 0x9E3779B9u;
     lfo_ph = lfo_s[0] = lfo_s[1] = 0.0f;
+    lfo_rk = 0.0f;
+    lfo_rnew = 0;
     lfo_q = 0u;
     lfo_wc[0] = lfo_wp[0] = par[P_LFO_W1];
     lfo_wc[1] = lfo_wp[1] = par[P_LFO_W2];
@@ -634,14 +639,14 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
      {P_REV_LEN, MK_ZERO, 50, 30, 100, 30, 100}},
     /* WASH: the delay first, then the reverb opens (Length toward Inf), darker as it grows, the dry dips
      * last; each effect up toward its aim, not past what the sound has already (Evan, 2026-10-18: with the effects
-     * up it went wild; the repeats stop at 80, under the delay's own howl at 87); at the top the dry breathes slowly in and out of the cloud; the filter LFOs ease to a third as it opens
+     * up it went wild; the repeats stop at 80, under the delay's own howl at 87); at the top the dry breathes slowly in and out of the cloud (55 .. 70 %: its depth is 70); the filter LFOs ease to a third as it opens
      * (Evan, 2026-10-18: with Movement up, their sweeps piled up in the tails as surges). Let go: the dry comes
      * back first, the filter LFOs with it, the tails ring on (the reverb's own length) and go last */
     {{P_DLY_MIX, MK_TO, 70, 0, 40, 0, 30}, {P_DLY_REPEATS, MK_TO, 80, 0, 40, 0, 30},
      {P_REV_MIX, MK_TO, 80, 30, 80, 0, 30}, {P_REV_LEN, MK_TO, 100, 50, 100, 20, 60},
      {P_REV_DAMP, MK_ADD, 15, 50, 100, 20, 60}, {DR_GP(0, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100},
-     {DR_GP(1, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100},
-     {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 85, 100, 85, 100},
+     {DR_GP(1, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -14, 55, 70, 55, 70},
+     {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 55, 70, 55, 70},
      {DR_GP(0, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}, {DR_GP(1, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}},
 };
 /* AGE (Life), a state: as the old tape wears, darker, a little hiss, the pitch wavering slowly (wow) and a little
@@ -660,6 +665,7 @@ static float mac_ph;                             /* the PULSE moves' phase, cycl
 static float age_l, age_ph;                      /* Age as heard now (gliding), 0..1; its wow's phase */
 static float wand_st, wand_to;                   /* WANDER: drone II's move now and aimed at, semitones */
 static uint32_t wand_n;                          /* samples to its next step */
+static int wand_v;                               /* the Wander setting the countdown was drawn for */
 static uint32_t mac_rng = 0x6D2B79F5u;           /* the macros' own random steps */
 static float mac_rand(void)                      /* 0..1 */
 {
@@ -681,6 +687,7 @@ static void macro_reset(void)
     mac_ph = age_l = age_ph = 0.0f;
     wand_st = wand_to = 0.0f;
     wand_n = 0;
+    wand_v = 0;
 }
 static float mac_amt(int m)                      /* a key's amount now, 0..1 */
 {
@@ -711,6 +718,14 @@ static void wander_run(uint32_t n)
 {
     const float *sc = WSCALE[(unsigned)base[P_WSCALE] < DR_NWSCALE ? base[P_WSCALE] : 0];
     float a = (float)base[P_WANDER] * 0.01f, gs;
+    if (a > 0.0f && base[P_WANDER] > wand_v && wand_n > n) {   /* turned up: no waiting out the slower gap drawn
+                                                                * before (QA 2026-10-20: 26 s from off to 100) */
+        float lo, hi;
+        wander_gap(base[P_WANDER], &lo, &hi);
+        if ((float)wand_n > hi * DR_SR)
+            wand_n = (uint32_t)((lo + (hi - lo) * mac_rand()) * DR_SR);
+    }
+    wand_v = base[P_WANDER];
     if (a <= 0.0f) {
         wand_to = 0.0f;
         wand_n = 0;
@@ -803,6 +818,10 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
             const move_t *v = &row[k];
             float to = v->kind == MK_BUMP ? mv_ease(a, v->in0, v->in1) * (1.0f - mv_ease(a, v->out0, v->out1))
                      : mac_out >> m & 1u ? mv_ease(a, v->out0, v->out1) : mv_ease(a, v->in0, v->in1), *l = &mv_lvl[m][k];
+            if (v->kind != MK_BUMP && (mac_out >> m & 1u))
+                to = fm_minf(to, *l);            /* on the way out only down from where it got to (QA 2026-10-20: a
+                                                  * gesture at its 70 % depth had some out windows fuller than the
+                                                  * in windows reached: Wash's reverb went to Inf, Weight louder) */
             if (*l != to) {
                 *l = *l < to ? fm_minf(*l + step, to) : fm_maxf(*l - step, to);
                 mv_moving = 1;
@@ -1166,8 +1185,17 @@ static void lfo_run(uint32_t n)
                 a = b + (a - b) * lfo_wx[i];
                 lfo_wx[i] = fm_minf(lfo_wx[i] + mstep, 1.0f);
             }
+            if (lfo_rnew)                        /* a restart: what it jumped by, eased out */
+                lfo_rj[i] = lfo_s[i] - a;
+            if (lfo_rk > 0.0f)
+                a += lfo_rj[i] * lfo_rk * lfo_rk * (3.0f - 2.0f * lfo_rk);
             lfo_s[i] += (a - lfo_s[i]) * 0.5f;
             lfo_tick[i][t] = lfo_s[i];
+        }
+        if (lfo_rnew)
+            lfo_rnew = 0;
+        else if (lfo_rk > 0.0f) {
+            lfo_rk = fm_maxf(lfo_rk - (float)CR / (0.12f * DR_SR), 0.0f);
         }
         inc = rm != 0.0f ? step * rk * fm_exp2f(rm * fm_clampf(lfo_at_now(rsrc), -1.0f, 1.0f)) : step;
         lfo_q += (uint32_t)(int32_t)(fm_minf(inc, 0.99f) * 2147483648.0f) << 1;   /* turns, in 32 bits */
@@ -1187,6 +1215,8 @@ static void lfo_run(uint32_t n)
  * random shapes draw a new level (they froze, locked to a bar shorter than the LFO's cycle) */
 static void lfo_restart(void)
 {
+    lfo_rnew = 1;
+    lfo_rk = 1.0f;
     lfo_q = 0u;
     lfo_ph = 0.0f;
     lfo_rnd[0] = lfo_rnd[1];

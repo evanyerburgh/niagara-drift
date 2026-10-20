@@ -1068,7 +1068,8 @@ static void gesture_up(int g)
         hands_on(P_GL_0 + g);
         say_c(GESTURE[g], "LATCHED", K_LFO);
     } else if (ui.btn >> B_SEL & 1u) {                 /* SEL held: latched where it is */
-        int v = (int)(ui.g_amt[g] * 100.0f + 0.5f);
+        int v = (int)(ui.g_amt[g] * 100.0f + 0.999f);   /* rounded up: a hair less would read as letting go
+                                                          * (QA 2026-10-20: Shift's chord swapped, Weight jumped) */
         ui.btn_used |= 1u << B_SEL;
         param_set(P_GL_0 + g, v < 1 ? 1 : v);
         hands_on(P_GL_0 + g);
@@ -1240,7 +1241,10 @@ static void input(void)
             int on = !proj.par[P_LFO_LOCK];            /* held: the LFO locked to the pulse's bars, or free */
             param_set(P_LFO_LOCK, on);
             ui.scene_at = -1;
-            say_c("LFO TO SWELL", on ? (proj.par[P_PULSE] ? "LOCKED" : "LOCKED (SWELL OFF)") : "FREE", K_LFO);
+            if (on && !proj.par[P_PULSE])              /* (shorter: "LOCKED (SWELL OFF)" ran off the screen) */
+                say_c("LFO LOCKED", "SWELL OFF", K_LFO);
+            else
+                say_c("LFO TO SWELL", on ? "LOCKED" : "FREE", K_LFO);
             ui.rst_done = 1;
         }
     }

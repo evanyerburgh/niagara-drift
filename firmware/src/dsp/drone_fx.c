@@ -354,7 +354,10 @@ static void fx_run(float *l, float *r, uint32_t n)
 {
     /* the mixes and the repeats as they glide (pfs), and in a straight line across the block from where the
      * last one ended: read raw (par), each detent was a step, a click on a soft sound */
-    const float ms = dly_ms(par[P_DLY_TIME]), fbg1 = rep_g(pfs[P_DLY_REPEATS]);
+    /* stopped or stopping, the repeats can't run away: they ring out (QA 2026-10-20: at 90+ the howl went on after
+     * PLAY, with "PLAY to start" on the screen) */
+    const float ms = dly_ms(par[P_DLY_TIME]),
+                fbg1 = fade_target <= 0.0f ? fm_minf(rep_g(pfs[P_DLY_REPEATS]), 0.85f) : rep_g(pfs[P_DLY_REPEATS]);
     const float dm = pfs[P_DLY_MIX] * 0.01f, dry1e = fm_sqrtf(1.0f - dm), wet1e = fm_sqrtf(dm);
     const float rm = pfs[P_REV_MIX] * 0.01f, dry2e = fm_sqrtf(1.0f - rm), wet2e = fm_sqrtf(rm);
     const float dn = 1.0f / (float)(n ? n : 1u);
@@ -376,6 +379,8 @@ static void fx_run(float *l, float *r, uint32_t n)
         dly_rt = (uint8_t)par[P_DLY_LFO];
         dly_rw = 0.0f;
     }
+    float sp = dly_c.spread, dsp;        /* the right side's spread across the block, sample by sample (QA
+                                          * 2026-10-20: stepped each block, Wide crackled as it came and went) */
     dly_c.spread += (dt->spread - dly_c.spread) * ease;
     dly_c.tone += (dt->tone - dly_c.tone) * ease;
     dly_c.out += (dt->out - dly_c.out) * ease;
@@ -388,11 +393,13 @@ static void fx_run(float *l, float *r, uint32_t n)
         dly_c.ping = 0.0f;
         mono = 1;
     }
+    dsp = (dly_c.spread - sp) * dn;
     rv_coefs(ease);
     dr_dly_ms = dly_t * (1000.0f / DR_SR);
     /* DELAY */
     for (j = 0; j < n; j++) {
         float x, yl, yr, fl, fr, t, wow, pp = dly_c.ping;
+        sp += dsp;
         fbg += dfb;
         dry1 += dd1;
         wet1 += dw1;
@@ -424,7 +431,7 @@ static void fx_run(float *l, float *r, uint32_t n)
             dly_hp[1] = dly_hp[0];
             fr = fl;
         } else {
-            yr = dly_read(dly_buf[1], fm_clampf(dly_t * dly_c.spread + wow + dly_c.wow, 4.0f, (float)(DLY_N - 4u)));
+            yr = dly_read(dly_buf[1], fm_clampf(dly_t * sp + wow + dly_c.wow, 4.0f, (float)(DLY_N - 4u)));
             dly_olp[1] += (yr - dly_olp[1]) * dly_c.out;
             dly_lp[1] += (sat(yr * fbg) - dly_lp[1]) * dly_c.tone;
             dly_hp[1] += (dly_lp[1] - dly_hp[1]) * 0.0114f;
