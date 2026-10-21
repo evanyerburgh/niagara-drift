@@ -22,7 +22,7 @@
 @font-face { font-family: "IBM Plex Mono"; src: url("fonts/ibm-plex-mono-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
 @font-face { font-family: "Barlow Semi Condensed"; src: url("fonts/barlow-semi-condensed-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
 @font-face { font-family: "Barlow Semi Condensed"; src: url("fonts/barlow-semi-condensed-700.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
-:root { --red: #fe0000; --violet: #760595; --shade: #3a0254; --black: #14000f; --pale: #ffd6f0;
+:root { --red: #fe0000; --violet: #760595; --shade: #3a0254; --black: #14000f; --pale: #ffd6f0; --d1: #ffb04a; --d2: #45e3d3; --lfo: #dcbcff;
         --ground: #ffffff14; --ink: #fbe9f2; --muted: #d3b3c4; --rule: #ffffff2e; --accent: #ffd6f0; --card: #3a1235;
         --card-violet: #601690; --card-dark: #060007; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace; color-scheme: dark; }
 body { background: var(--red); color: var(--black); margin: 0; padding-inline: 16px; padding-block: 0; position: relative; overflow-x: hidden;
@@ -71,7 +71,7 @@ a { color: var(--accent); }
 .ctl.knob { cursor: ns-resize; }
 .btnface { transition: fill .06s; }
 .lit .btnface { fill: #f28a5a; }
-.lit text.btn, .lit text.job { fill: #2a140a; }
+.lit text.btn, .lit text.job { fill: #2a140a !important; }   /* over the labels' own colours */
 .held .btnface, .held .keyface { stroke: #f28a5a; stroke-width: 3; }
 .latched .btnface { stroke: #6fc3ff; stroke-width: 3; }
 .keyface { transition: fill .06s; }
@@ -602,20 +602,20 @@ function el(tag, attrs, parent = svg) {
 }
 function text(parent, x, y, s, size, fill = LABEL, weight = 600, cls = "btn") {
   const t = el("text", { x, y, "text-anchor": "middle", "font-family": "'Barlow Semi Condensed', 'Arial Narrow', Arial, sans-serif",
-                         "font-size": size, "font-weight": weight, fill, "letter-spacing": ".05em", class: cls, "pointer-events": "none" }, parent);
+                         "font-size": size, "font-weight": weight, style: `fill: ${fill}`, "letter-spacing": ".05em", class: cls, "pointer-events": "none" }, parent);
   t.textContent = s;
   return t;
 }
 
 // what each control does in Niagara Drift, written on the panel as in the README's picture (tools/make_screens.py)
-const AMBER = "#ffb04a", TEAL = "#45e3d3", LILAC = "#c99bff", PALE = "#ffd6f0", INK = "#14000f";
+const AMBER = "var(--d1)", TEAL = "var(--d2)", LILAC = "var(--lfo)", PALE = "var(--pale)", INK = "var(--black)", ON_KEY = "var(--violet)";   // the site's palette
 const pills = [];
 function pill(x, y, s, bg, size = 15) {            // a job in a rounded label, centred on (x, y)
-  const g = el("g", { "aria-hidden": "true" }), r = el("rect", { y: y - size * .7, height: size * 1.4, rx: size * .7, fill: bg }, g);
+  const g = el("g", { "aria-hidden": "true" }), r = el("rect", { y: y - size * .7, height: size * 1.4, rx: size * .7, style: `fill: ${bg}` }, g);
   pills.push({ r, t: text(g, x, y + size * .35, s, size, INK, 700, "job"), x });
 }
 function fitPills() {                               // each label as wide as its words, once the font is in
-  for (const p of pills) { const w = p.t.getComputedTextLength() + 12; p.r.setAttribute("x", p.x - w / 2); p.r.setAttribute("width", w); }
+  for (const p of pills) { const w = p.t.getBBox().width + 12; p.r.setAttribute("x", p.x - w / 2); p.r.setAttribute("width", w); }
 }
 
 // ---------------------------------------------------------------- the panel
@@ -658,28 +658,42 @@ for (let i = 0; i < 6; i++) {
   button(582 + i * 63, 236, 54, 48, ...ROW2[i]);
 }
 
-const keys = [], GESTURES = ["Weight", "Shift", "Clean", "Wash"];
+const keys = [], GESTURES = ["Weight", "Shift", "Clean", "Wash"], BANKS = ["A", "B", "C", "Presets"];
 const BLACK_JOB = [["Partner", AMBER], ["Sub", AMBER], ["Filter", AMBER], ["Pitch lock"], ["LFO reset"],
   ["Partner", TEAL], ["Sub", TEAL], ["Filter", TEAL], ["Pitch link"], ["Hard sync"], ["X-mod"]];
+const BLACK_LFO = ["Osc wave", "Osc to", "Filter to", "Filter wave", "LFO reset", "Osc wave", "Osc to", "Filter to",   // on the LFO pages
+  "Filter wave", "Delay wave", "X-mod"];
+const blackNames = [];                                // each key's two names: [normal, LFO pages]
 (function keybed(x0, y0, w, h) {
   el("rect", { x: x0, y: y0, width: w, height: h, rx: 18, fill: TRAY });
   const pitch = (w - 24) / 16, kw = pitch * 0.78;
   for (let i = 0; i < 16; i++) {
     const g = el("g", { class: "ctl", role: "button", "aria-label": `white key ${i + 1}` });
     el("rect", { x: x0 + 12 + i * pitch + (pitch - kw) / 2, y: y0 + h * 0.43, width: kw, height: h * 0.52, rx: kw / 2, fill: KEY_W, class: "keyface white" }, g);
-    text(g, x0 + 12 + i * pitch + pitch / 2, y0 + h * 0.95 - 16, i < 12 ? String(i + 1) : GESTURES[i - 12], i < 12 ? 16 : 12, "#3c3e44", 700, "job");
+    const kx = x0 + 12 + i * pitch + pitch / 2, kb = y0 + h * 0.95;
+    if (i < 12) text(g, kx, kb - 16, String(i + 1), 16, "#3c3e44", 700, "job");
+    else {                                          // a gesture, and with SEL the bank it picks
+      text(g, kx, kb - 42, GESTURES[i - 12], 12, "#3c3e44", 700, "job");
+      text(g, kx, kb - 26, "SEL:", 10.5, ON_KEY, 700, "job");
+      text(g, kx, kb - 13, BANKS[i - 12], 11.5, ON_KEY, 700, "job");
+    }
     keys[WHITE_K[i]] = { g };
   }
   BLACK_AFTER.forEach((a, k) => {
     const g = el("g", { class: "ctl", role: "button", "aria-label": `black key ${k + 1}` });
     el("rect", { x: x0 + 12 + (a + 1) * pitch - kw / 2, y: y0 + h * 0.06, width: kw, height: h * 0.33, rx: kw / 2, fill: KEY_B, class: "keyface black" }, g);
     const [job, col] = BLACK_JOB[k], cx = x0 + 12 + (a + 1) * pitch, words = job.split(" ");
-    if (col) el("rect", { x: cx - 9, y: y0 + h * 0.06 + 10, width: 18, height: 6, rx: 3, fill: col }, g);
-    words.forEach((wd, j) => text(g, cx, y0 + h * 0.06 + h * 0.165 + (j - (words.length - 1) / 2) * 16 + 10, wd, wd.length < 7 ? 15 : 12.5, INK, 700, "job"));
+    if (col) el("rect", { x: cx - 9, y: y0 + h * 0.06 + 10, width: 18, height: 6, rx: 3, style: `fill: ${col}` }, g);
+    const names = [job, BLACK_LFO[k]].map((nm, l) => {
+      const n = el("g", l ? { class: "lfo", display: "none" } : {}, g), ws = nm.split(" ");
+      ws.forEach((wd, j) => text(n, cx, y0 + h * 0.06 + h * 0.165 + (j - (ws.length - 1) / 2) * 16 + 10, wd, wd.length < 7 ? 15 : 12.5, l ? ON_KEY : INK, 700, "job"));
+      return n;
+    });
+    blackNames.push(names);
     keys[BLACK_K[k]] = { g };
   });
-  pill(x0 + 12 + 6 * pitch, y0 + h * 0.67, "12 scenes · Tap: go there · Hold SAVE, then tap: store", PALE, 17);
-  pill(x0 + 12 + 14 * pitch, y0 + h * 0.67, "Gestures · SEL + key: bank", LILAC, 14);
+  pill(x0 + 12 + 6 * pitch, y0 + h * 0.6, "Presets & scenes · Tap: go there · In A, B, C: SAVE + tap: store", PALE, 15);
+  pill(x0 + 12 + 14 * pitch, y0 + h * 0.6, "Gestures", LILAC, 15);
 })(36, 340, 928, 270);
 
 // ---------------------------------------------------------------- touch targets
@@ -700,11 +714,11 @@ function hit(c, cls) {
   c.hit = d;
 }
 // what each control does, on hover (the Buttons list below says the same)
-const TIP = { FX: "Delay: type, time, repeats, mix (again: Reverb: type, length to Inf, damp, mix)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths)",
-  ENV: "Tone 1: noise and its colour, white to pink (again: Life: character, feedback, age, drift); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: Mods: rate mod, cross-mod amount, delay LFO)",
+const TIP = { FX: "Delay: type, time, repeats, mix (again: Reverb: type, length to Inf, damp, mix)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
+  ENV: "Tone 1: noise and its colour, white to pink (again: Life: character, feedback, age, drift); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: Mods: rate mod, mod by, X-mod amount, delay LFO)",
   EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure)",
-  HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
-  PLAY: "Drone in / out", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
+  HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in bank A, B or C)", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
+  PLAY: "Drones in / out (with SEL: drone II alone)", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "Gesture time: every gesture faster or slower", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
 for (const [n, c] of [...Object.entries(buttons), ...Object.entries(knobs)]) if (TIP[n]) c.g.setAttribute("aria-description", TIP[n]);
@@ -712,7 +726,7 @@ for (const [n, c] of [...Object.entries(buttons), ...Object.entries(knobs)]) if 
 const BLACK_TIP = [["drone I's partner on / off", "drone I's osc wave: I, II, both"],
   ["drone I's sub: −1 oct, −2 oct, ⅓, ⅕", "drone I's osc LFO to X-Wave (instead of pitch)"],
   ["drone I's filter: LP, BP, HP", "drone I's filter LFO to resonance (instead of cutoff)"],
-  ["pitch lock: the pitch knobs do nothing", "drone I's filter wave: I, II, both"],
+  ["pitch lock: the pitch knobs do nothing, and scenes keep your pitch (on at start)", "drone I's filter wave: I, II, both"],
   ["LFO reset (hold: lock the LFO to the Swell)", "LFO reset (hold: lock the LFO to the Swell)"],
   ["drone II's partner on / off", "drone II's osc wave: I, II, both"],
   ["drone II's sub: −1 oct, −2 oct, ⅓, ⅕", "drone II's osc LFO to X-Wave (instead of pitch)"],
@@ -722,8 +736,11 @@ const BLACK_TIP = [["drone I's partner on / off", "drone I's osc wave: I, II, bo
   ["I → II cutoff: drone I's sound moves drone II's filter", "I → II cutoff: drone I's sound moves drone II's filter"]];
 BLACK_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", `Key ${k + 1} (${"1234567890-"[k]}): ${BLACK_TIP[k][0]}` +
   (BLACK_TIP[k][1] !== BLACK_TIP[k][0] ? `; on the LFO pages: ${BLACK_TIP[k][1]}` : "")));
-WHITE_K.forEach((n, k) => keys[n].g.setAttribute("aria-description",
-  `Scene ${k + 1} (${"QWERTYUIASDFGHJK"[k]}): tap to go there, hold to visit; hold SAVE first, then this key, to store; blinks while it's the sound`));
+WHITE_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", k < 12
+  ? `Scene ${k + 1} (${"QWERTYUIASDFGHJK"[k]}): tap to go there, hold to visit and let go to come back (on the FM-1, press harder to blend in); ` +
+    `in bank A, B or C, hold SAVE first, then this key, to store (the Presets are fixed); blinks while it's the sound`
+  : `${GESTURES[k - 12]} (${"QWERTYUIASDFGHJK"[k]}): a gesture: hold to bring it in, let go and it leaves as slowly as you held it; ` +
+    `tap: all the way, to stay. With SEL: bank ${BANKS[k - 12]}`));
 fitPills();
 document.fonts.ready.then(fitPills);
 for (const k of Object.values(knobs)) hit(k, "knob");
@@ -894,6 +911,12 @@ function drawLights(b, k, lv) {
   }
   keys.forEach((x, i) => x.g.classList.toggle("lit", !!(k & (1 << i))));
 }
+let lfoLayer = 0;
+function drawLayer(lfo) {                           // the black keys' names follow the page, as the keys do
+  if (!!lfo === !!lfoLayer) return;
+  lfoLayer = lfo;
+  for (const [n, l] of blackNames) { n.setAttribute("display", lfo ? "none" : "inline"); l.setAttribute("display", lfo ? "inline" : "none"); }
+}
 
 // ---------------------------------------------------------------- storage
 function loadStore() {
@@ -935,6 +958,7 @@ async function switchOn() {
         else if (m.type === "frame") {
           if (m.fb) drawScreen(m.fb);
           drawLights(m.buttons, m.keys, m.levels);
+          drawLayer(m.lfo);
           window.omniLast = m;
           if (m.load !== undefined) cpu.textContent = `Niagara Drift uses ${m.load}% of this computer's time`;
           if (m.store) saveStore(m.store);

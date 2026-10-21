@@ -40,7 +40,8 @@ def main():
 # the panel, in the emulator's units (web/emu/index.html: a 1000 x 640 drawing)
 BODY, TRAY, KNOB, BTN, LABEL = (58, 61, 66), (38, 40, 44), (31, 33, 36), (46, 49, 53), (232, 232, 234)
 KEY_W, KEY_B = (217, 218, 220), (201, 202, 205)
-AMBER, TEAL, LILAC, PALE, INK = (255, 176, 74), (69, 227, 211), (201, 155, 255), (255, 214, 240), (20, 0, 15)
+AMBER, TEAL, LILAC, PALE, INK = (255, 176, 74), (69, 227, 211), (220, 188, 255), (255, 214, 240), (20, 0, 15)   # the site's
+VIOLET = (118, 5, 149)                                       # the site's violet: the banks on the gesture keys
 KNOBS = [(105, 100, "MASTER", "Volume", PALE), (215, 100, "SELECT", "LFO rate", LILAC),
          (105, 205, "PRESETS", "Gesture time", PALE), (215, 205, "ALGORITHM", "Movement", LILAC)] + \
         [(610 + i * 104, 100, "KNOB%d" % (i + 1), "Drone I" if i < 2 else "Drone II", AMBER if i < 2 else TEAL)
@@ -98,9 +99,15 @@ def panel(play_png):
     for i in range(16):
         x = x0 + 12 + i * pitch + (pitch - kw) / 2
         rect(x, y0 + h * .43, kw, h * .52, kw / 2, KEY_W)
-        label = str(i + 1) if i < 12 else ("Weight", "Shift", "Clean", "Wash")[i - 12]   # 12 scenes, 4 gestures
-        d.text((P(x + kw / 2), P(y0 + h * .43 + h * .52 - 22)), label, font=f(16 if i < 12 else 12), fill=(60, 62, 68),
-               anchor="mm")
+        kb = y0 + h * .95                                       # 12 scenes; 4 gestures, each with SEL a bank
+        if i < 12:
+            d.text((P(x + kw / 2), P(kb - 22)), str(i + 1), font=f(16), fill=(60, 62, 68), anchor="mm")
+        else:
+            d.text((P(x + kw / 2), P(kb - 46)), ("Weight", "Shift", "Clean", "Wash")[i - 12], font=f(12), fill=(60, 62, 68),
+                   anchor="mm")
+            d.text((P(x + kw / 2), P(kb - 30)), "SEL:", font=f(10.5), fill=VIOLET, anchor="mm")
+            d.text((P(x + kw / 2), P(kb - 17)), ("A", "B", "C", "Presets")[i - 12], font=f(11.5), fill=VIOLET,
+                   anchor="mm")
     for k, a in enumerate(BLACK_AFTER):
         x = x0 + 12 + (a + 1) * pitch - kw / 2
         job, col = BLACK[k]
@@ -111,9 +118,9 @@ def panel(play_png):
         for j, wd in enumerate(words):
             d.text((P(x + kw / 2), P(y0 + h * .06 + h * .33 / 2 + (j - (len(words) - 1) / 2) * 16 + 5)), wd,
                    font=f(15 if len(wd) < 7 else 13.5), fill=INK, anchor="mm")
-    pill(x0 + 12 + 6 * pitch, y0 + h * .43 + h * .24, "12 scenes · Tap: go there · Hold SAVE, then tap: store", INK,
-         PALE, 17)
-    pill(x0 + 12 + 14 * pitch, y0 + h * .43 + h * .24, "Gestures · SEL + key: bank", INK, LILAC, 14)
+    pill(x0 + 12 + 6 * pitch, y0 + h * .6, "Presets & scenes · Tap: go there · In A, B, C: SAVE + tap: store", INK,
+         PALE, 15)
+    pill(x0 + 12 + 14 * pitch, y0 + h * .6, "Gestures", INK, LILAC, 15)
     return img
 
 
