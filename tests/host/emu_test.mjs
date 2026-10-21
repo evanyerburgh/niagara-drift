@@ -21,5 +21,10 @@ for (let i = 0; i < 1200; i++) {                     // 128 frames a call: ~3.5 
     else peak = Math.max(peak, Math.abs(v));
   }
 }
-console.log("before PLAY", silent.toFixed(3), "after", peak.toFixed(3), "blits", ex.web_blits());
-process.exit(silent === 0 && peak > 0.05 && peak < 1 && ex.web_blits() > 10 ? 0 : 1);
+// the black keys' names follow the page: the LFO layer on the LFO pages (the page's labels read web_keys_lfo)
+const tap = (bit) => { ex.web_buttons(1 << bit); for (let i = 0; i < 10; i++) ex.web_render(128); ex.web_buttons(0); for (let i = 0; i < 60; i++) ex.web_render(128); };
+const LFO = 3, HOME = 6, before = ex.web_keys_lfo();
+tap(LFO); const onLfo = ex.web_keys_lfo();
+tap(HOME); const back = ex.web_keys_lfo();
+console.log("before PLAY", silent.toFixed(3), "after", peak.toFixed(3), "blits", ex.web_blits(), "keys' LFO layer", before, onLfo, back);
+process.exit(silent === 0 && peak > 0.05 && peak < 1 && ex.web_blits() > 10 && !before && onLfo && !back ? 0 : 1);

@@ -2,9 +2,8 @@
 
 **A drone synth for the M-VAVE FM-1.**
 
-> **This page describes v0.2, in development.** The version you can download is the 0.1 beta: its manual is
-> [the README of 0.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.1-beta/README.md), and the
-> [website](https://evanyerburgh.github.io/niagara-drift/) matches it until v0.2 is released.
+> **This is the manual for 0.2.** For 0.1 beta, see
+> [the README of 0.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.1-beta/README.md).
 
 Niagara Drift is open-source firmware that turns the M-VAVE
 FM-1 into a drone synthesizer: two always-on drones you tune, shape and move rather than play note by
@@ -17,11 +16,19 @@ teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO 
 LFO's routing, and X-mod lets drone I move drone II's filter); the lower 12 white keys hold scenes, in
 banks you pick with SEL and the top four.*
 
-**Status: 0.1 beta.** It runs on the FM-1 (tested on one unit so far) and in the browser:
+**Status: 0.2.** It runs on the FM-1 (tested on one unit so far) and in the browser:
 [try it](https://evanyerburgh.github.io/niagara-drift/) without an FM-1, the same code with sound.
 
 ## What it does
 
+- **Twelve presets** to start from, one on each white key, each a different side of the instrument: Niagara,
+  Abyss, Eerie, Glass, Heaven, Tanpura, Tape, Whistle, Howl, Cathedral, Metal, Clean.
+- **Four gestures** on the top white keys: **Weight**, **Shift**, **Clean** and **Wash**, each several settings moving
+  together on top of your sound, in while you hold and out as slowly as you held (or tapped in to stay).
+- **Scenes**: 12 on the white keys in each of three banks (36 of yours), plus the Presets, recalled gliding over the
+  Scene time, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob moves.
+- **It moves on its own**: the LFO, the Swell, **Drift**, **Wander** (drone II's slow random melody on a scale) and
+  **Age** (tape wear) keep it breathing without a hand on it.
 - **Two drones**, each a main oscillator that blends sine → triangle → saw → square (X-WAVE), a
   partner oscillator at an interval (tempered or just) with detune, a sub one or two octaves down
   or a subharmonic (⅓, ⅕ of the pitch), and a white or pink noise, into its own self-oscillating
@@ -37,9 +44,6 @@ banks you pick with SEL and the top four.*
 - **Feedback** (the finished sound fed back into the drones) and **Character** (clean to vintage).
 - **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
 - **Switch time**: buttons and keys never jump: the sound moves to a new setting over a time you set.
-- **Scenes**: 12 on the white keys in each of three banks (36 of yours), plus a Presets bank, recalled
-  gliding over the Scene time, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob
-  moves.
 
 ## Installing
 
@@ -50,7 +54,7 @@ banks you pick with SEL and the top four.*
    or the FM-1 until it says Done. Then press PLAY.
 
 Or from a terminal, with the file from the [releases](https://github.com/evanyerburgh/niagara-drift/releases):
-`pip3 install mido python-rtmidi`, then `python3 tools/fm1_install.py niagara-drift-0.1-beta.fwsc`.
+`pip3 install mido python-rtmidi`, then `python3 tools/fm1_install.py niagara-drift-0.2.fwsc`.
 
 **What it replaces:** Niagara Drift takes the place of M-VAVE's firmware, so the FM-1's own sounds and
 sequencer are gone until you go back (below).
@@ -58,18 +62,97 @@ sequencer are gone until you go back (below).
 **Updating:** when there's a new version, run the installer again the same way. Your sound and scenes are
 kept, unless that version's notes in the [changelog](CHANGELOG.md) say otherwise.
 
-**Backing up:** from v0.2, `python3 tools/fm1_install.py --backup` saves your sound, scenes and settings to a
+**Backing up:** `python3 tools/fm1_install.py --backup` saves your sound, scenes and settings to a
 file (in `~/niagara-drift-backups/`), and `--restore FILE` puts them back (the FM-1 restarts). The terminal
-installer saves one by itself before every install. Back up before trying another firmware, and restore
+installer saves one by itself before it installs over Niagara Drift (the web installer doesn't yet).
+Back up before trying another firmware, and restore
 when you come back. A backup is for the same FM-1: it carries that unit's knob calibration too.
 
 **Going back:** the installer's "Back to M-VAVE's firmware" writes M-VAVE's own FM-1 V15 back over the
 same cable (or use M-VAVE's updater, M-UPGRADE, from [m-vave.com/download](https://www.m-vave.com/download)).
 If it ever fails to start twice in a row it comes up in **safe mode** (no sound, USB on), where the installer
 still works. If an FM-1 won't start at all, a Mac can still put the stock firmware back: see
-[BUILDING.md](BUILDING.md#install). Installing firmware is at your own risk; it's a beta.
+[BUILDING.md](BUILDING.md#install). Installing firmware is at your own risk.
 
 ## Playing it
+
+### Start here
+
+1. **PLAY**: the drones fade in.
+2. **Tap the white keys 1–12**: a new FM-1 starts on the Presets, a sound on each key ([The Presets](#the-presets)).
+3. **Hold a top white key** (Weight, Shift, Clean, Wash) and let go: a gesture ([The gestures](#the-gestures)).
+4. **Tune each drone**: black key 4 turns Pitch lock off, then KNOB 1 and KNOB 3 on the Play page.
+5. **Change the sound**: the page buttons (ENV, EDIT, LFO, …) and KNOB 1–4 ([Pages](#pages)).
+6. **Save your sound**: SEL + D5 picks bank A, then hold SAVE and tap a white key.
+7. **PLAY** again: the drones fade out.
+
+The keys aren't notes: the drones play on their own. The lower 12 white keys hold presets and scenes, the top four
+are gestures, the black keys are switches.
+
+### The Presets
+
+Twelve sounds to start from on the Presets bank (SEL + G5), each showing a part of what Niagara Drift does. Most
+have drone I on D, so moving between them keeps the root and changes the interval and the sound. With **Pitch lock**
+on (as a new FM-1 starts) they keep the pitch you're on, so you hear the textures first; turn it off (black key 4)
+and each plays at its own pitches, as described below. They're levelled to sound alike in loudness with the lock on,
+and within about 3 dB at their own pitches. The screen names the one you pick ("SCENE P3 EERIE"). They're fixed: to keep a sound you
+made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE + a key).
+
+| Key | Preset | What it shows |
+|---|---|---|
+| P1 | **Niagara** | the starting sound: D and A a fifth apart, breathing slowly, like a calm Lyra-8 |
+| P2 | **Abyss** | dark: D over B a minor third below, a saw and a narrow square, a subharmonic sub, closed resonant filters, character and feedback, a dark hall; the resonance swells and rings |
+| P3 | **Eerie** | D and G♯, a tritone: near-sines, drone II through a ringing band-pass with a breath of white noise, wandering a whole-tone scale, its pitch wavering; long clean echoes, a chorus hall |
+| P4 | **Glass** | high sines a fifth apart (D5, A5), drone I's partner an octave up, beating a little, a long bright reverb |
+| P5 | **Heaven** | D and F♯ a tenth apart, sines with just thirds and fifths blooming toward triangles, a long light cathedral |
+| P6 | **Tanpura** | Sa and Pa: D with its high octave over the A below, bright buzzing strings, plucked about once a second |
+| P7 | **Tape** | worn: D and F, a wide square and a saw, Age and lots of Character, tape wow, a tape delay, hiss |
+| P8 | **Whistle** | the filters at the edge of resonance sing as sines of their own (D5, A5) over soft low drones; long clean echoes |
+| P9 | **Howl** | low, D and E♭ a semitone apart so they grind, the feedback high, drone II band-passed; flares at random |
+| P10 | **Cathedral** | D and B a sixth apart, soft waves, a sub below, a long dark reverb, almost a freeze; nearly still |
+| P11 | **Metal** | cross-mod and hard sync, squares an inharmonic gap apart, drone I high-passed, shimmering; a clean slapback |
+| P12 | **Clean** (locked) | one oscillator, everything else off: a plain saw to build from. Drone II is out: SEL + PLAY brings it in |
+
+### White keys: scenes
+
+| | |
+|---|---|
+| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Pitch lock, Fade, Switch time and Scene time stay as they are |
+| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, at the same speed. Press it again on the way back and you pick up from there |
+| **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
+| **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down until you let go of the scene key (lifting your finger can't move it, and nor can letting go of SEL first), and **stays**: a sound of its own between the two |
+| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A, B or C) |
+| **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
+| **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The gestures](#the-gestures)) |
+
+### The gestures
+
+The top four white keys are gestures, each a few settings together, by set amounts, on top of your sound.
+Your own settings stay as they are underneath: when a gesture has gone, it's gone without a trace. A gesture's
+parts come in one after another, and go in their own order when you let go. Scenes remember which are latched.
+
+| Gesture | What it moves | Key to start |
+|---|---|---|
+| **Weight** | a full, warm bass: the drones and a little of the sub come up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. It sounds heavier on the speaker too. Let go: the brightness comes back first, the sub lingers | D5 |
+| **Shift** | a new chord, a voice at a time: drone I glides to the move you set (anywhere from a fifth down to a fifth up, in cents), drone II follows. Let go: drone I comes back first | E5 |
+| **Clean** | back to a clean sound, your notes kept: the grit leaves first (drive, character, feedback, noise, cross-mod, hard sync), then the movement (Movement, Drift, the Swell), then the effects (the repeats, both mixes, the reverb's length). Let go: the effects come back first, the grit last. It holds the loudness: with the dips of the Swell gone the sound would jump up, so the level eases down to where it was | F5 |
+| **Wash** | the delay first, then the reverb opens and grows longer and darker (toward Inf), each only up to where Wash aims (if your own effects are already further up, it leaves them be; the repeats stop short of the delay's howl), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5 |
+
+- **The gestures** are the top four white keys, always the same: D5 Weight, E5 Shift, F5 Clean, G5 Wash (they
+  don't sense pressure). **Hold** one and it comes in while you
+  hold; **let go** and it goes, over as long as you held it (hold 2 s, it leaves in 2 s; hold 10 s, it drifts out
+  over 10 s). **Tap** it (a press under half a second) and it goes all the way and stays; tap again and it goes. **SEL held as you let go** keeps
+  it where it is. Its key glows dimly, and lights as it comes in.
+- **PRESETS is Gesture time**: it speeds up or slows down every gesture, coming in and going out, from 10 times faster
+  to 10 times slower (the middle: each gesture's own time: Weight 2.8 s, Shift 3.9 s, the others 3.3 s). Turn it
+  while a gesture moves to change it on the way.
+- **The LFOs step aside**: while a gesture is in, the LFO that moves the same thing eases off (the filter LFO for
+  Weight's cutoff, the oscillator LFO for Shift's pitch), so
+  a high **Movement** doesn't wobble what the gesture is doing. **Wash** also eases the filter LFOs to a third, so
+  their sweeps don't pile up in the reverb as surges. They come back as the gesture goes.
+- Turning a knob while a scene switch is on its way lets go of that setting; the rest still lands.
+
+### The controls
 
 **On the drone pages, KNOB 1–2 are drone I and KNOB 3–4 drone II** (Play, Tone 1, Osc, Sub · Drive, Partner, LFO
 depths: their names underlined amber and teal). The other pages hold settings for the whole sound, a knob each.
@@ -82,6 +165,8 @@ knob you're turning.
 | **OCT− / OCT+** | the LFO's **Wave I** / **Wave II**: tap for the next shape, round and round; **SEL + OCT** for the one before. Each light pulses with its wave |
 | **SAVE** | save the sound, at once. While the drone plays, the sound dips out and back over about 50 ms around the write; SAVE glows dimly while something isn't written yet |
 | **SEL** (hold) | fine: a pitch knob moves in single cents, cutoff and resonance in tenths |
+| **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it (the Swell isn't touched then: a single tap switches it a moment later, once no second tap comes) |
+| **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 
 ### Pages
 
@@ -265,33 +350,6 @@ and slowly, so Movement is heard at once; set an osc depth to hear it move the p
 depth that can't be heard says why on the screen (Movement at 0%, or its wave off).
 **PRESETS** is **Gesture time**: how fast every gesture moves (see below).
 
-### The gestures
-
-The top four white keys are gestures, each a few settings together, by set amounts, on top of your sound.
-Your own settings stay as they are underneath: when a gesture has gone, it's gone without a trace. A gesture's
-parts come in one after another, and go in their own order when you let go. Scenes remember which are latched.
-
-| Gesture | What it moves | Key to start |
-|---|---|---|
-| **Weight** | a full, warm bass: the drones and a little of the sub come up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. It sounds heavier on the speaker too. Let go: the brightness comes back first, the sub lingers | D5 |
-| **Shift** | a new chord, a voice at a time: drone I glides to the move you set (anywhere from a fifth down to a fifth up, in cents), drone II follows. Let go: drone I comes back first | E5 |
-| **Clean** | back to a clean sound, your notes kept: the grit leaves first (drive, character, feedback, noise, cross-mod, hard sync), then the movement (Movement, Drift, the Swell), then the effects (the repeats, both mixes, the reverb's length). Let go: the effects come back first, the grit last. It holds the loudness: with the dips of the Swell gone the sound would jump up, so the level eases down to where it was | F5 |
-| **Wash** | the delay first, then the reverb opens and grows longer and darker (toward Inf), each only up to where Wash aims (if your own effects are already further up, it leaves them be; the repeats stop short of the delay's howl), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5 |
-
-- **The gestures** are the top four white keys, always the same: D5 Weight, E5 Shift, F5 Clean, G5 Wash (they
-  don't sense pressure). **Hold** one and it comes in while you
-  hold; **let go** and it goes, over as long as you held it (hold 2 s, it leaves in 2 s; hold 10 s, it drifts out
-  over 10 s). **Tap** it (a press under half a second) and it goes all the way and stays; tap again and it goes. **SEL held as you let go** keeps
-  it where it is. Its key glows dimly, and lights as it comes in.
-- **PRESETS is Gesture time**: it speeds up or slows down every gesture, coming in and going out, from 10 times faster
-  to 10 times slower (the middle: each gesture's own time: Weight 2.8 s, Shift 3.9 s, the others 3.3 s). Turn it
-  while a gesture moves to change it on the way.
-- **The LFOs step aside**: while a gesture is in, the LFO that moves the same thing eases off (the filter LFO for
-  Weight's cutoff, the oscillator LFO for Shift's pitch), so
-  a high **Movement** doesn't wobble what the gesture is doing. **Wash** also eases the filter LFOs to a third, so
-  their sweeps don't pile up in the reverb as surges. They come back as the gesture goes.
-- Turning a knob while a scene switch is on its way lets go of that setting; the rest still lands.
-
 ### Black keys: switches
 
 Lit means on. They follow the page: on the LFO pages they set the LFO's routing. Normally they're grouped
@@ -326,45 +384,6 @@ key.
 - A **sub key** goes round with each tap: −1 octave (dark), −2 octaves (lit), then the subharmonics ⅓
   and ⅕ of the pitch (winking).
 
-### White keys, ARP and REC
-
-| | |
-|---|---|
-| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Pitch lock, Fade, Switch time and Scene time stay as they are |
-| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, at the same speed. Press it again on the way back and you pick up from there |
-| **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
-| **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down until you let go of the scene key (lifting your finger can't move it, and nor can letting go of SEL first), and **stays**: a sound of its own between the two |
-| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A, B or C) |
-| **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
-| **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The gestures](#the-gestures)) |
-| **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it (the Swell isn't touched then: a single tap
-switches it a moment later, once no second tap comes) |
-| **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
-
-### The Presets
-
-Twelve sounds to start from on the Presets bank (SEL + G5), each showing a part of what Niagara Drift does. Most
-have drone I on D, so moving between them keeps the root and changes the interval and the sound. With **Pitch lock**
-on (as a new FM-1 starts) they keep the pitch you're on, so you hear the textures first; turn it off (black key 4)
-and each plays at its own pitches, as described below. They're levelled to sound alike in loudness with the lock on,
-and within about 3 dB at their own pitches. The screen names the one you pick ("SCENE P3 EERIE"). They're fixed: to keep a sound you
-made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE + a key).
-
-| Key | Preset | What it shows |
-|---|---|---|
-| P1 | **Niagara** | the starting sound: D and A a fifth apart, breathing slowly, like a calm Lyra-8 |
-| P2 | **Abyss** | dark: D over B a minor third below, a saw and a narrow square, a subharmonic sub, closed resonant filters, character and feedback, a dark hall; the resonance swells and rings |
-| P3 | **Eerie** | D and G♯, a tritone: near-sines, drone II through a ringing band-pass with a breath of white noise, wandering a whole-tone scale, its pitch wavering; long clean echoes, a chorus hall |
-| P4 | **Glass** | high sines a fifth apart (D5, A5), drone I's partner an octave up, beating a little, a long bright reverb |
-| P5 | **Heaven** | D and F♯ a tenth apart, sines with just thirds and fifths blooming toward triangles, a long light cathedral |
-| P6 | **Tanpura** | Sa and Pa: D with its high octave over the A below, bright buzzing strings, plucked about once a second |
-| P7 | **Tape** | worn: D and F, a wide square and a saw, Age and lots of Character, tape wow, a tape delay, hiss |
-| P8 | **Whistle** | the filters at the edge of resonance sing as sines of their own (D5, A5) over soft low drones; long clean echoes |
-| P9 | **Howl** | low, D and E♭ a semitone apart so they grind, the feedback high, drone II band-passed; flares at random |
-| P10 | **Cathedral** | D and B a sixth apart, soft waves, a sub below, a long dark reverb, almost a freeze; nearly still |
-| P11 | **Metal** | cross-mod and hard sync, squares an inharmonic gap apart, drone I high-passed, shimmering; a clean slapback |
-| P12 | **Clean** (locked) | one oscillator, everything else off: a plain saw to build from. Drone II is out: SEL + PLAY brings it in |
-
 ### MIDI
 
 Over USB or the TRS jack, a note on **channel 1** tunes drone I to it, a note on **channel 2** drone II
@@ -388,7 +407,7 @@ builds the same page from your checkout, serves it at http://localhost:8765 and 
 
 ## Problems and ideas
 
-It's a beta, tested on one FM-1 so far. If something goes wrong, sounds wrong or could be better, please
+It's tested on one FM-1 so far. If something goes wrong, sounds wrong or could be better, please
 [open an issue](https://github.com/evanyerburgh/niagara-drift/issues): say what you did, what happened, and
 what the startup screen says the version is.
 
@@ -419,8 +438,10 @@ Niagara Drift is the next link in a chain of FM-1 firmwares:
 - [X0X](https://github.com/charlesvestal/fm1-x0x) and [FoMni](https://github.com/charlesvestal/fm1-fomni)
   by Charles Vestal: the platform reshaped for a single instrument, the host simulator and the
   browser emulator. Niagara Drift started from FoMni's code.
+- [MONK-1](https://github.com/charlesvestal/fm1-monk) by Charles Vestal: reading key pressure (from
+  [Velo](https://github.com/charlesvestal/fm1-velocity)'s sensing), which plays the scene crossfade.
 - [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) by Quixotic7: the design of the delay and the
-  reverb, written anew here.
+  reverb, written anew here; the idea of crossfading between scenes, and of a backup before installing.
 
 GPL-3.0-only; see [LICENSING.md](LICENSING.md).
 

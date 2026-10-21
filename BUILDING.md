@@ -114,10 +114,10 @@ mode. If the FM-1 no longer starts but reaches the chip's update mode (4C4A:8057
 
 ## Publishing a release
 
-1. `./build.sh --release X.Y-beta` (for example 0.1-beta): `build/niagara-drift-X.Y-beta.fwsc`, identity
+1. `./build.sh --release X.Y` (for example 0.2, or 0.1-beta): `build/niagara-drift-X.Y.fwsc`, identity
    FM-1_8XXYYZZ (what the installer checks, and what the FM-1 reports after an install).
-2. `tools/publish_pages.sh X.Y-beta`: builds the emulator with that version, then the site with
+2. `tools/publish_pages.sh X.Y`: builds the emulator with that version, then the site with
    `tools/make_pages.py` (the emulator page as the front page, with Install / Download / Full manual / Source;
    the web installer at `install/`; the firmware at `firmware/`) and pushes it to the `gh-pages` branch,
    which GitHub Pages serves at <https://evanyerburgh.github.io/niagara-drift/>.
-3. `gh release create vX.Y-beta build/niagara-drift-X.Y-beta.fwsc --prerelease` for the download on GitHub.
+3. `gh release create vX.Y build/niagara-drift-X.Y.fwsc` for the download on GitHub (`--prerelease` for a beta).

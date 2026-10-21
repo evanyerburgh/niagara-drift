@@ -330,3 +330,14 @@ at the end. The current state is in the [README](../README.md) and the code.
   are as approved at any level (within 0.1 dB of before #34). The encoders learn a detent only from a knob at rest
   ~0.5 s (was 25 ms), and a state outside the learned ones must be rested on twice in a row to join them (three times
   to replace them): slow turns missed clicks. The site has a link preview (og.png, 1200×630).
+- 2026-10-21 (Evan, after trying #33-#35 on the FM-1): released as **0.2**, not a beta: a normal GitHub release
+  (v0.2, niagara-drift-0.2.fwsc, identity FM-1_8000200); the README is 0.2's manual, linking 0.1's.
+- 2026-10-21 (Evan): the emulator page and the README follow how a player meets it: Start here (PLAY, the presets,
+  a gesture, Pitch lock off to tune, save in bank A), then Scenes, Gestures, Play, Tone, Switches, Movement, Effects,
+  Setup. The emulator's FM-1 carries the README picture's labels, always. The site's top right has a "0.2 · What's
+  new" pill (the changelog at the release's tag); the note under the FM-1 is "Version 0.2." and the risk.
+- 2026-10-21 (Evan, after a designer's review): the emulator's FM-1 is black with light keys; a lit key is pale pink with a
+  violet glow (dark text), a lit button pale pink. Its labels have three roles: the printed name 11 u grey, what it does 14 u in colour
+  (no pills; Drone I / II as brackets over KNOB1-2 / 3-4), on the keys 12.5 u ink, at most two lines (violet: the LFO
+  pages' name). Buttons name the page they open (FX Delay, LFO Depths, EDIT Osc, SAVE Store, PLAY On/off). Captions in a
+  strip between the key rows; the gesture keys show their bank at the top. The README picture is drawn the same way.
