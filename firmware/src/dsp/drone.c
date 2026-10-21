@@ -631,8 +631,8 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
      {DR_GP(0, GP_RESO), MK_ADD, -40, 0, 50, 40, 100}, {DR_GP(1, GP_RESO), MK_ADD, -40, 0, 50, 40, 100},
      {DR_GP(0, GP_DRIVE), MK_ADD, 25, 20, 100, 20, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 25, 20, 100, 20, 100},
      {P_CHAR, MK_ADD, 25, 30, 100, 30, 100}, {DR_GP(0, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100},
-     {DR_GP(1, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100}, {DR_GP(0, GP_LEVEL), MK_ADD, 27, 20, 100, 0, 60},
-     {DR_GP(1, GP_LEVEL), MK_ADD, 27, 20, 100, 0, 60}},
+     {DR_GP(1, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100}, {DR_GP(0, GP_LEVEL), MK_ADD, 40, 20, 100, 0, 60},
+     {DR_GP(1, GP_LEVEL), MK_ADD, 40, 20, 100, 0, 60}},
     /* SHIFT: a new chord, a voice at a time (the Lyra-8 manual's chord changes): drone I glides there first, drone
      * II follows; let go, drone I comes back first. Its move: P_SHIFT_MOVE */
     {{0, MK_SHIFT, 0, 0, 60, 40, 100}, {1, MK_SHIFT, 0, 40, 100, 0, 60}},
@@ -655,9 +655,9 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
      * back first, the filter LFOs with it, the tails ring on (the reverb's own length) and go last */
     {{P_DLY_MIX, MK_TO, 70, 0, 40, 0, 30}, {P_DLY_REPEATS, MK_TO, 80, 0, 40, 0, 30},
      {P_REV_MIX, MK_TO, 80, 30, 80, 0, 30}, {P_REV_LEN, MK_TO, 100, 50, 100, 20, 60},
-     {P_REV_DAMP, MK_ADD, 15, 50, 100, 20, 60}, {DR_GP(0, GP_LEVEL), MK_ADD, -11, 60, 100, 60, 100},
-     {DR_GP(1, GP_LEVEL), MK_ADD, -11, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -11, 55, 70, 55, 70},
-     {DR_GP(1, GP_LEVEL), MK_PULSE, -11, 55, 70, 55, 70},
+     {P_REV_DAMP, MK_ADD, 15, 50, 100, 20, 60}, {DR_GP(0, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100},
+     {DR_GP(1, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -14, 55, 70, 55, 70},
+     {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 55, 70, 55, 70},
      {DR_GP(0, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}, {DR_GP(1, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}},
 };
 /* AGE (Life), a state: as the old tape wears, darker, a little hiss, the pitch wavering slowly (wow) and a little
@@ -712,6 +712,12 @@ static float mv_ease(float a, int lo, int hi)    /* the amount a through the win
 static int heard(int i)                          /* the sound's own value with the macros' offset, in range */
 {
     int v = moff[i] == MOFF_ON ? PARAMS[i].hi : moff[i] == MOFF_OFF ? PARAMS[i].lo : base[i] + moff[i];
+    if (i < P_XMOD && i % GP_N == GP_LEVEL && moff[i] && moff[i] != MOFF_ON && moff[i] != MOFF_OFF) {
+        /* a level's moves are in the knob's units before its taper (v^2 / 100): the same dips and lifts in dB as
+         * Evan approved (Weight +40, Wash -15 and its breath -14), at any level */
+        float l = fm_clampf((float)(base[i] * base[i]) * 0.01f + (float)moff[i], 0.0f, 100.0f);
+        v = (int)(10.0f * fm_sqrtf(l) + 0.5f);
+    }
     return v < PARAMS[i].lo ? PARAMS[i].lo : v > PARAMS[i].hi ? PARAMS[i].hi : v;
 }
 /* WANDER, n samples on: a slow random melody for drone II (Evan, 2026-10-18): it jumps from note to note in no

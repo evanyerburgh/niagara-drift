@@ -82,7 +82,8 @@
 #endif
 #define FM1_DEBOUNCE 8u           /* frames (~0.6 ms each) */
 #define FM1_SETTLE_US 10u
-#define FM1_REST_FRAMES 40u       /* ~25 ms still = a detent position */
+#define FM1_REST_FRAMES 800u      /* ~0.5 s still = a detent position (the knob let go: 25 ms, a slow finger's pause
+                                   * between detents taught it a wrong one, and turns missed clicks) */
 #define FM1_NCOL 11u
 #define FM1_NKEY 41u              /* ids: 0..13 buttons, 14..40 note keys */
 #define FM1_NENC 7u
@@ -115,7 +116,9 @@ static volatile struct {
     uint8_t cnt[FM1_NKEY];
     uint8_t enc_prev[FM1_NENC], enc_last[FM1_NENC];
     uint8_t enc_rest[FM1_NENC];  /* learned rest (detent) states, bit per state */
-    uint8_t enc_still[FM1_NENC]; /* frames since the last state change */
+    uint8_t enc_cand[FM1_NENC];  /* a state rested on outside them, and how often running (enc_cand_n) */
+    uint8_t enc_cand_n[FM1_NENC];
+    uint16_t enc_still[FM1_NENC]; /* frames since the last state change */
     int8_t enc_sub[FM1_NENC];    /* net transitions since the last rest state */
     int8_t enc_dir[FM1_NENC];    /* the last valid transition: +1 / -1 (0: none yet) */
     int16_t enc_steps[FM1_NENC]; /* + = clockwise */
@@ -303,14 +306,29 @@ static void fm1__frame(void)
         if (fm1_in.enc_prev[e] == 0xFF) {          /* first frame: the knob rests here */
             fm1_in.enc_prev[e] = (uint8_t)cur;
             fm1_in.enc_rest[e] = (uint8_t)(1u << cur);
+            fm1_in.enc_cand[e] = 0xFF;
         }
-        if (fm1_in.enc_still[e] < 255u && ++fm1_in.enc_still[e] == FM1_REST_FRAMES) {
+        if (fm1_in.enc_still[e] < 65535u && ++fm1_in.enc_still[e] == FM1_REST_FRAMES) {
             /* learn detent states: one state, or a complementary pair (00/11 or
              * 01/10). Anything else restarts the set; with 3-4 rest states every
-             * arrival would look like a detent with |sub| < 2. */
+             * arrival would look like a detent with |sub| < 2. A state outside the
+             * set must be rested on again and again, with no other outside it in
+             * between (twice to add the pair's other half, three times to restart),
+             * as a knob let go does: a finger holding it between detents doesn't
+             * teach it a wrong one (Evan, 2026-10-21: slow turns missed clicks) */
             uint32_t r = fm1_in.enc_rest[e], bit = 1u << cur, comp = 1u << (cur ^ 3u);
-            if (!(r & bit))
-                fm1_in.enc_rest[e] = (uint8_t)(r == comp ? (r | bit) : bit);
+            if (!(r & bit)) {
+                if (fm1_in.enc_cand[e] == cur) {
+                    fm1_in.enc_cand_n[e]++;
+                } else {
+                    fm1_in.enc_cand[e] = (uint8_t)cur;
+                    fm1_in.enc_cand_n[e] = 1;
+                }
+                if (fm1_in.enc_cand_n[e] >= (r == comp ? 2u : 3u)) {
+                    fm1_in.enc_rest[e] = (uint8_t)(r == comp ? (r | bit) : bit);
+                    fm1_in.enc_cand[e] = 0xFF;
+                }
+            }
         }
         if (cur == fm1_in.enc_prev[e])
             continue;
