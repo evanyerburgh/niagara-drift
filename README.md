@@ -437,8 +437,10 @@ Niagara Drift is the next link in a chain of FM-1 firmwares:
 - [X0X](https://github.com/charlesvestal/fm1-x0x) and [FoMni](https://github.com/charlesvestal/fm1-fomni)
   by Charles Vestal: the platform reshaped for a single instrument, the host simulator and the
   browser emulator. Niagara Drift started from FoMni's code.
+- [MONK-1](https://github.com/charlesvestal/fm1-monk) by Charles Vestal: reading key pressure (from
+  [Velo](https://github.com/charlesvestal/fm1-velocity)'s sensing), which plays the scene crossfade.
 - [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) by Quixotic7: the design of the delay and the
-  reverb, written anew here.
+  reverb, written anew here; the idea of crossfading between scenes, and of a backup before every install.
 
 GPL-3.0-only; see [LICENSING.md](LICENSING.md).
 

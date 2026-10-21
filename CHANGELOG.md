@@ -15,14 +15,19 @@ bank A, 13–16 to B1–B4).
   dirt out, as loud), Wash (into the effects). Hold: in while held, out as slowly as you held it; tap: all the way,
   tap again to let go; SEL as you let go keeps it where it is. PRESETS sets **Gesture time** (x0.1–x10).
 - **Scenes in banks:** 12 a bank on F3–C5; banks A, B, C and the Presets (SEL + D5..G5). A tap goes there over the
-  Scene time; hold and press harder to crossfade into it.
+  Scene time.
+- **Crossfade by pressure:** hold a scene key and press harder to move further into its scene; let go and the sound
+  glides back. Press all the way to land in the scene (the key flashes); SEL while holding keeps the blend between
+  the two. Pressure sensitivity is on Setup 2. The crossfade was Quixotic7's idea; the key pressure is read with
+  MONK-1's method (Charles Vestal), from Velo's sensing.
 - **Pitch lock** (black key 4), on at start: the pitch knobs and scenes leave the pitch alone.
 - **The left encoders, always live:** SELECT the LFO rate, ALGORITHM Movement, PRESETS Gesture time; OCT− / OCT+
   pick LFO Wave I / II. Two pages on most page buttons (a button opens the one you last used).
 - **New sounds and moves:** Age (tape: darker, hiss, wow and flutter), Wander (drone II's slow random melody on a
   scale), Pitch glide, Shift's move, the 17 partner intervals (each tempered, then just), a noise colour blend.
-- **New effects:** a stereo delay (Tape, Wide, Ping-pong, Clean) and an eight-line reverb (Room, Hall, Cathedral,
-  Chorus hall; length to Inf, a freeze). Feedback rings in key and holds its loudness.
+- **New effects,** after ChoralRoot's (Quixotic7), written anew: a stereo delay (Tape, Wide, Ping-pong, Clean) and
+  an eight-line reverb (Room, Hall, Cathedral, Chorus hall; length to Inf, a freeze). Feedback rings in key and holds
+  its loudness.
 - **The speaker and headphones:** the FM-1 hears which is in use; the speaker gets a low cut, headphones the full
   range. MASTER's top fifth drives the output harder at the same loudness.
 - **Level** is an audio taper (saved sounds keep their loudness; the numbers read higher). Band-pass and high-pass
@@ -32,8 +37,13 @@ bank A, 13–16 to B1–B4).
   breathes with the Swell.
 - **Knobs** catch every click on slow, paused turns.
 - **Saving:** autosave 4 s after the last change, at most every 30 s. `fm1_install.py --backup` / `--restore FILE`,
-  and a backup in `~/niagara-drift-backups/` before every install.
-- The website: a link preview and an icon.
+  and a backup in `~/niagara-drift-backups/` before every install (after ChoralRoot's installer).
+- **The website:** the emulator's FM-1 labelled with what every control does, the manual in the order you meet it
+  (presets, gestures, scenes first), a link preview and an icon.
+
+Thanks to [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) (Quixotic7) for the effects' design, the crossfade
+idea and the installer backup, and to [MONK-1](https://github.com/charlesvestal/fm1-monk) (Charles Vestal) for
+reading key pressure.
 
 ## 0.1 beta (2026-10)
 
