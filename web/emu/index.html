@@ -22,7 +22,7 @@
 @font-face { font-family: "IBM Plex Mono"; src: url("fonts/ibm-plex-mono-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
 @font-face { font-family: "Barlow Semi Condensed"; src: url("fonts/barlow-semi-condensed-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
 @font-face { font-family: "Barlow Semi Condensed"; src: url("fonts/barlow-semi-condensed-700.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
-:root { --key-lit: var(--red); --key-lit-text: var(--black); --legend: #a6a6ad; --red: #fe0000; --violet: #760595; --shade: #3a0254; --black: #14000f; --pale: #ffd6f0; --d1: #ffb04a; --d2: #45e3d3; --lfo: #dcbcff;
+:root { --key-lit: var(--pale); --key-lit-text: var(--black); --key-glow: #b04fd0; --key-glow-soft: #c070ff; --legend: #a6a6ad; --red: #fe0000; --violet: #760595; --shade: #3a0254; --black: #14000f; --pale: #ffd6f0; --d1: #ffb04a; --d2: #45e3d3; --lfo: #dcbcff;
         --ground: #ffffff14; --ink: #fbe9f2; --muted: #d3b3c4; --rule: #ffffff2e; --accent: #ffd6f0; --card: #3a1235;
         --card-violet: #601690; --card-dark: #060007; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace; color-scheme: dark; }
 body { background: var(--red); color: var(--black); margin: 0; padding-inline: 16px; padding-block: 0; position: relative; overflow-x: hidden;
@@ -72,11 +72,13 @@ a { color: var(--accent); }
 .btnface { transition: fill .06s; }
 .lit .btnface { fill: var(--pale); }
 .lit text.btn, .lit text.job { fill: var(--black) !important; }   /* over the labels' own colours */
-.held .btnface, .held .keyface { stroke: var(--pale); stroke-width: 3; }
+.held .btnface { stroke: var(--pale); stroke-width: 3; }
+.held .keyface { stroke: var(--violet); stroke-width: 3; }
 .latched .btnface { stroke: var(--lfo); stroke-width: 3; }
 .keyface { transition: fill .06s; }
 .lit .keyface.white { fill: var(--key-lit); }
 .lit .keyface.black { fill: var(--key-lit); }
+.lit .keyface { stroke: var(--key-glow); stroke-width: 3; filter: drop-shadow(0 0 6px var(--key-glow-soft)); }   /* lit: a light behind the key */
 .lit text.job.on-key { fill: var(--key-lit-text) !important; }
 .start { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; background: rgba(20, 0, 15, .45); border-radius: 4.4% / 6.9%; }
 .start button { font: 500 1.05rem "IBM Plex Mono", monospace; letter-spacing: .14em; text-transform: uppercase; padding: .9em 1.8em;
@@ -123,8 +125,11 @@ body.drawn .g-card, body.drawn .foot, body.drawn .actions a, body.drawn .actions
 .full { grid-column: 1 / -1; }
 .mid { grid-column: 4 / span 6; }
 /* a tap sequence: each tap's button, what it does under it, arrows between */
+/* a short card's words to its right, so a band can cross the card without crossing them */
+.push-r > .inner { width: fit-content; margin-left: auto; }
+@media (max-width: 900px) { .push-r > .inner { margin-left: 0; } }
 .seq { list-style: none; display: flex; align-items: flex-start; gap: 1.6rem; margin: 1.1rem 0 .3rem; padding: 0; }
-.seq li { display: flex; flex-direction: column; align-items: center; gap: .45rem; position: relative; }
+.seq li { display: flex; flex-direction: column; align-items: flex-start; gap: .45rem; position: relative; }
 .seq li + li::before { content: "→"; position: absolute; left: -1.25rem; top: .1rem; color: var(--muted); }
 .seq li > span:last-child { font-size: .95rem; }
 .mid .acts > div { grid-template-columns: 13rem 1fr; }
@@ -508,14 +513,14 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     </dl>
   </div>
 
-  <div class="g-card one-l">
+  <div class="g-card one-l push-r"><div class="inner">
     <h3>Motion loop <span class="g-sub">tap REC three times</span></h3>
     <ol class="seq">
       <li><span class="cap">REC</span><span>record</span></li>
       <li><span class="cap">REC</span><span>play in a loop</span></li>
       <li><span class="cap">REC</span><span>stop</span></li>
     </ol>
-  </div>
+  </div></div>
 
   <h2 class="sec"><span>Effects</span></h2>
 
@@ -591,7 +596,7 @@ const ENC = { SELECT: 0, ALGORITHM: 1, PRESETS: 2, KNOB1: 3, KNOB2: 4, KNOB3: 5,
 const WHITE_K = [0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26];
 const BLACK_K = [1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25];
 const BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14];
-// the FM-1 in black with light keys (after M-VAVE's charcoal one with mint keys); a lit key in --key-lit
+// the FM-1 in black with light keys (after M-VAVE's charcoal one with mint keys); a lit key pale pink with a violet glow
 const BODY = "#1d1d20", TRAY = "#0e0e10", KEY_W = "#d9dadc", KEY_B = "#c9cacd", KNOB = "#0a0a0b", BTNC = "#2a2a2e", LABEL = "#e8e8ea";
 const STORE_KEY = "fm1-drone-emu-store";
 
