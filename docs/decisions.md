@@ -325,3 +325,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   at full resonance (was 4..8). A continuous knob's speed-up: 1 step a detent up to 6 a second, 6 steps from 26 a
   second (one brisk turn of 20 detents goes 0..100; was 1 step at 20 a second); Gesture time the same. The link offset
   reads "+8 st +20" (Evan; was "+8.20"). The emulator page has a favicon.
+- 2026-10-21 (Evan, after trying #34): the knobs' speed-up is as before #34 (up to 4x, from ~40 detents a second).
+  Gestures move a level in the knob's units before its taper (v²/100), so Weight (+40) and Wash (−15, its breath −14)
+  are as approved at any level (within 0.1 dB of before #34). The encoders learn a detent only from a knob at rest
+  ~0.5 s (was 25 ms), and a state outside the learned ones must be rested on twice in a row to join them (three times
+  to replace them): slow turns missed clicks. The site has a link preview (og.png, 1200×630).

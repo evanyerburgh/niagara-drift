@@ -81,14 +81,11 @@ spin K4 10
 expect par29 450
 spin K4 -10
 expect par29 350
-# a knob's speed (2026-10-21): a slow turn is a step a detent; one brisk turn (20 detents, 25 a second) all the way
+# a slow turn is a step a detent
 set 11 0
 wait 500
 turn K1 5 300
 expect par11 5
-wait 500
-turn K1 20 40
-expect par11 100
 wait 500
 set 11 75
 wait 100
