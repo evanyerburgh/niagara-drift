@@ -309,9 +309,18 @@ static void pitch_turn(int g, int p, int role, int32_t s)
     loop_note(p, proj.par[p], slide);
 }
 
-/* a continuous knob (cutoff, resonance, X-Wave, a depth, a level...: a range over 24 steps), as a pitch
- * knob: a detent is a step, more when turned quickly (up to 4x, on the same smooth curve), and each glides
- * over the time since the last detent (15..600 ms; 300 after a pause), so a slow turn is a sweep */
+/* a continuous knob's speed-up: a detent is a step up to 6 detents a second (slow and exact), rising on a smooth
+ * curve to 6 steps at 26 a second, so one brisk turn (about 20 detents) goes from 0 to 100 (2026-10-21: the
+ * curve before, 4x only at 70 a second, left a brisk turn at 1 step a detent: five turns end to end) */
+static int speed_steps(uint32_t dt)
+{
+    float v = 1000.0f / (float)(dt ? dt : 1u), x = fm_clampf((v - 6.0f) * (1.0f / 20.0f), 0.0f, 1.0f);
+    return accel_off ? 1 : (int)(1.0f + 5.0f * x * x + 0.5f);
+}
+
+/* a continuous knob (cutoff, resonance, X-Wave, a depth, a level...: a range over 24 steps): a detent is a step,
+ * more when turned quickly (speed_steps), and each glides over the time since the last detent (15..600 ms; 300
+ * after a pause), so a slow turn is a sweep */
 static void cont_turn(int p, int role, int32_t s)
 {
     uint32_t now = plat_ms(), dt = now - ui.enc_t[role], a = (uint32_t)(s < 0 ? -s : s), slide;
@@ -320,10 +329,7 @@ static void cont_turn(int p, int role, int32_t s)
     if (a > 1)
         dt /= a;
     slide = accel_off ? 15u : dt < 15u ? 15u : dt > 600u ? 300u : dt;
-    {
-        float v = 1000.0f / (float)(dt ? dt : 1u), x = fm_clampf((v - 10.0f) * (1.0f / 60.0f), 0.0f, 1.0f);
-        steps = (int)s * (int)(accel_off ? 1.0f : 1.0f + 3.0f * x * x + 0.5f);
-    }
+    steps = (int)s * speed_steps(dt);
     {   /* cutoff and resonance run 0..1000, Shift's move in cents: a detent is 10, with SEL held 1 (fine, as a
          * pitch's cent) */
         int gp = p < P_XMOD ? p % GP_N : -1;
@@ -1085,7 +1091,10 @@ static float mtime_k(void)                             /* GESTURE TIME: the gest
 }
 static void mtime_turn(int32_t e)                      /* PRESETS: Gesture time */
 {
-    int v = (int)proj.mtime + (int)e;
+    uint32_t now = plat_ms(), dt = now - ui.enc_t[EN_PRESET], a = (uint32_t)(e < 0 ? -e : e);
+    int v;
+    ui.enc_t[EN_PRESET] = now;
+    v = (int)proj.mtime + (int)e * speed_steps(a > 1 ? dt / a : dt);
     float k;
     char *q;
     proj.mtime = (uint8_t)(v < 0 ? 0 : v > 100 ? 100 : v);
@@ -2482,16 +2491,24 @@ static void draw_values(void)
             cv_frame(x - 2, 3, w + 4, 79, accent);
         }
         text_fit(cx, 5, w + 2, &FONT_S, card_name(p), on ? accent : K_DIM);
-        if (p == P_PLINK_OFF) {                /* the link offset in semitones and cents: "+7.00" */
-            int a = v < 0 ? -v : v;
+        if (p == P_PLINK_OFF) {                /* the link offset as the pitch knobs: the nearest semitone and the
+                                                * cents from it, "+8 st +20" (Evan, 2026-10-21) */
+            int a = v < 0 ? -v : v, n = (a + 50) / 100, d = (v < 0 ? -1 : 1) * (a - 100 * n);
             char *q = t;
             *q++ = v < 0 ? '-' : '+';
-            itoa_u((uint32_t)(a / 100), q);
+            itoa_u((uint32_t)n, q);
             while (*q)
                 q++;
-            *q++ = '.';
-            *q++ = (char)('0' + a % 100 / 10);
-            *q++ = (char)('0' + a % 10);
+            *q++ = ' ';
+            *q++ = 's';
+            *q++ = 't';
+            if (d) {
+                *q++ = ' ';
+                *q++ = d > 0 ? '+' : '-';
+                itoa_u((uint32_t)(d > 0 ? d : -d), q);
+                while (*q)
+                    q++;
+            }
             *q = 0;
         } else {
             dr_param_text(p, v, t);
