@@ -22,7 +22,7 @@
 @font-face { font-family: "IBM Plex Mono"; src: url("fonts/ibm-plex-mono-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
 @font-face { font-family: "Barlow Semi Condensed"; src: url("fonts/barlow-semi-condensed-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
 @font-face { font-family: "Barlow Semi Condensed"; src: url("fonts/barlow-semi-condensed-700.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
-:root { --red: #fe0000; --violet: #760595; --shade: #3a0254; --black: #14000f; --pale: #ffd6f0; --d1: #ffb04a; --d2: #45e3d3; --lfo: #dcbcff;
+:root { --key-lit: var(--red); --key-lit-text: var(--black); --legend: #a6a6ad; --red: #fe0000; --violet: #760595; --shade: #3a0254; --black: #14000f; --pale: #ffd6f0; --d1: #ffb04a; --d2: #45e3d3; --lfo: #dcbcff;
         --ground: #ffffff14; --ink: #fbe9f2; --muted: #d3b3c4; --rule: #ffffff2e; --accent: #ffd6f0; --card: #3a1235;
         --card-violet: #601690; --card-dark: #060007; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace; color-scheme: dark; }
 body { background: var(--red); color: var(--black); margin: 0; padding-inline: 16px; padding-block: 0; position: relative; overflow-x: hidden;
@@ -75,8 +75,9 @@ a { color: var(--accent); }
 .held .btnface, .held .keyface { stroke: var(--pale); stroke-width: 3; }
 .latched .btnface { stroke: var(--lfo); stroke-width: 3; }
 .keyface { transition: fill .06s; }
-.lit .keyface.white { fill: var(--pale); }
-.lit .keyface.black { fill: var(--pale); }
+.lit .keyface.white { fill: var(--key-lit); }
+.lit .keyface.black { fill: var(--key-lit); }
+.lit text.job.on-key { fill: var(--key-lit-text) !important; }
 .start { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; background: rgba(20, 0, 15, .45); border-radius: 4.4% / 6.9%; }
 .start button { font: 500 1.05rem "IBM Plex Mono", monospace; letter-spacing: .14em; text-transform: uppercase; padding: .9em 1.8em;
                 border: 0; border-radius: 999px; background: var(--black); color: var(--pale); cursor: pointer; }
@@ -481,18 +482,18 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
   <div class="g-card narrow-r">
     <h3>The LFO <span class="g-sub">the three knobs at the top left, and OCT− · OCT+ below them</span></h3>
     <svg class="minimap" viewBox="0 0 1000 640" role="img" aria-label="The FM‑1 from above: SELECT (rate) and ALGORITHM (Movement) are knobs at the top left, OCT− and OCT+ (Wave I and Wave II) the buttons below them">
-      <rect x="4" y="4" width="992" height="632" rx="44" fill="#451640"/>
-      <rect x="318" y="62" width="200" height="200" rx="14" fill="#0c0009"/>
+      <rect x="4" y="4" width="992" height="632" rx="44" fill="#1d1d20"/>
+      <rect x="318" y="62" width="200" height="200" rx="14" fill="#0a0a0b"/>
       <circle cx="105" cy="100" r="26" fill="#14000f"/>
       <g fill="#14000f"><circle cx="610" cy="100" r="22"/><circle cx="714" cy="100" r="22"/><circle cx="818" cy="100" r="22"/><circle cx="922" cy="100" r="22"/></g>
-      <g fill="#4e1c5c"><rect x="582" y="174" width="54" height="48" rx="8"/><rect x="582" y="236" width="54" height="48" rx="8"/><rect x="645" y="174" width="54" height="48" rx="8"/><rect x="645" y="236" width="54" height="48" rx="8"/><rect x="708" y="174" width="54" height="48" rx="8"/><rect x="708" y="236" width="54" height="48" rx="8"/><rect x="771" y="174" width="54" height="48" rx="8"/><rect x="771" y="236" width="54" height="48" rx="8"/><rect x="834" y="174" width="54" height="48" rx="8"/><rect x="834" y="236" width="54" height="48" rx="8"/><rect x="897" y="174" width="54" height="48" rx="8"/><rect x="897" y="236" width="54" height="48" rx="8"/></g>
-      <g fill="#dcbcff" fill-opacity=".35" stroke="#dcbcff" stroke-width="6"><rect x="72" y="268" width="82" height="38" rx="8"/><rect x="170" y="268" width="82" height="38" rx="8"/></g>
-      <rect x="36" y="340" width="928" height="270" rx="18" fill="#26071f"/>
-      <g fill="#6e2e80"><rect x="54.0" y="456" width="44" height="140" rx="22"/><rect x="110.5" y="456" width="44" height="140" rx="22"/><rect x="167.0" y="456" width="44" height="140" rx="22"/><rect x="223.5" y="456" width="44" height="140" rx="22"/><rect x="280.0" y="456" width="44" height="140" rx="22"/><rect x="336.5" y="456" width="44" height="140" rx="22"/><rect x="393.0" y="456" width="44" height="140" rx="22"/><rect x="449.5" y="456" width="44" height="140" rx="22"/><rect x="506.0" y="456" width="44" height="140" rx="22"/><rect x="562.5" y="456" width="44" height="140" rx="22"/><rect x="619.0" y="456" width="44" height="140" rx="22"/><rect x="675.5" y="456" width="44" height="140" rx="22"/><rect x="732.0" y="456" width="44" height="140" rx="22"/><rect x="788.5" y="456" width="44" height="140" rx="22"/><rect x="845.0" y="456" width="44" height="140" rx="22"/><rect x="901.5" y="456" width="44" height="140" rx="22"/></g>
+      <g fill="#2a2a2e"><rect x="582" y="174" width="54" height="48" rx="8"/><rect x="582" y="236" width="54" height="48" rx="8"/><rect x="645" y="174" width="54" height="48" rx="8"/><rect x="645" y="236" width="54" height="48" rx="8"/><rect x="708" y="174" width="54" height="48" rx="8"/><rect x="708" y="236" width="54" height="48" rx="8"/><rect x="771" y="174" width="54" height="48" rx="8"/><rect x="771" y="236" width="54" height="48" rx="8"/><rect x="834" y="174" width="54" height="48" rx="8"/><rect x="834" y="236" width="54" height="48" rx="8"/><rect x="897" y="174" width="54" height="48" rx="8"/><rect x="897" y="236" width="54" height="48" rx="8"/></g>
+      <g fill="#dcbcff" fill-opacity=".35" stroke="#dcbcff" stroke-width="6"><rect x="72" y="272" width="82" height="38" rx="8"/><rect x="170" y="272" width="82" height="38" rx="8"/></g>
+      <rect x="36" y="340" width="928" height="270" rx="18" fill="#0e0e10"/>
+      <g fill="#d9dadc"><rect x="54.0" y="456" width="44" height="140" rx="22"/><rect x="110.5" y="456" width="44" height="140" rx="22"/><rect x="167.0" y="456" width="44" height="140" rx="22"/><rect x="223.5" y="456" width="44" height="140" rx="22"/><rect x="280.0" y="456" width="44" height="140" rx="22"/><rect x="336.5" y="456" width="44" height="140" rx="22"/><rect x="393.0" y="456" width="44" height="140" rx="22"/><rect x="449.5" y="456" width="44" height="140" rx="22"/><rect x="506.0" y="456" width="44" height="140" rx="22"/><rect x="562.5" y="456" width="44" height="140" rx="22"/><rect x="619.0" y="456" width="44" height="140" rx="22"/><rect x="675.5" y="456" width="44" height="140" rx="22"/><rect x="732.0" y="456" width="44" height="140" rx="22"/><rect x="788.5" y="456" width="44" height="140" rx="22"/><rect x="845.0" y="456" width="44" height="140" rx="22"/><rect x="901.5" y="456" width="44" height="140" rx="22"/></g>
       <g fill="none" stroke="#dcbcff" stroke-width="9">
-        <circle cx="215" cy="100" r="30"/><circle cx="215" cy="205" r="30"/>
+        <circle cx="215" cy="100" r="30"/><circle cx="215" cy="210" r="30"/>
       </g>
-      <g fill="#dcbcff"><circle cx="215" cy="100" r="18"/><circle cx="215" cy="205" r="18"/></g>
+      <g fill="#dcbcff"><circle cx="215" cy="100" r="18"/><circle cx="215" cy="210" r="18"/></g>
     </svg>
     <div class="g-trio">
       <div><b>SELECT</b><span>Rate</span></div>
@@ -590,8 +591,8 @@ const ENC = { SELECT: 0, ALGORITHM: 1, PRESETS: 2, KNOB1: 3, KNOB2: 4, KNOB3: 5,
 const WHITE_K = [0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26];
 const BLACK_K = [1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25];
 const BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14];
-// the FM-1 in a colourway of the site's own (as M-VAVE's: the keys and buttons a shade of the body): plum, violet keys
-const BODY = "#451640", TRAY = "#26071f", KEY_W = "#6e2e80", KEY_B = "#5c2270", KNOB = "#14000f", BTNC = "#4e1c5c", LABEL = "#e3bfd8";
+// the FM-1 in black with light keys (after M-VAVE's charcoal one with mint keys); a lit key in --key-lit
+const BODY = "#1d1d20", TRAY = "#0e0e10", KEY_W = "#d9dadc", KEY_B = "#c9cacd", KNOB = "#0a0a0b", BTNC = "#2a2a2e", LABEL = "#e8e8ea";
 const STORE_KEY = "fm1-drone-emu-store";
 
 const svg = document.getElementById("panel");
@@ -601,106 +602,114 @@ function el(tag, attrs, parent = svg) {
   parent.appendChild(e);
   return e;
 }
-function text(parent, x, y, s, size, fill = LABEL, weight = 600, cls = "btn") {
+function text(parent, x, y, s, size, fill = LABEL, weight = 600, cls = "btn", track = 0) {
   const t = el("text", { x, y, "text-anchor": "middle", "font-family": "'Barlow Semi Condensed', 'Arial Narrow', Arial, sans-serif",
-                         "font-size": size, "font-weight": weight, style: `fill: ${fill}`, "letter-spacing": ".05em", class: cls, "pointer-events": "none" }, parent);
+                         "font-size": size, "font-weight": weight, style: `fill: ${fill}`, "letter-spacing": track ? `${track}em` : 0, class: cls,
+                         "pointer-events": "none" }, parent);
   t.textContent = s;
   return t;
 }
 
-// what each control does in Niagara Drift, written on the panel as in the README's picture (tools/make_screens.py)
-const AMBER = "var(--d1)", TEAL = "var(--d2)", LILAC = "var(--lfo)", PALE = "var(--pale)", INK = "var(--black)", ON_KEY = "var(--pale)", ON_KEY_LFO = "var(--lfo)";   // the site's palette
-const pills = [];
-function pill(x, y, s, bg, size = 15) {            // a job in a rounded label, centred on (x, y)
-  const g = el("g", { "aria-hidden": "true" }), r = el("rect", { y: y - size * .7, height: size * 1.4, rx: size * .7, style: `fill: ${bg}` }, g);
-  pills.push({ r, t: text(g, x, y + size * .35, s, size, INK, 700, "job"), x });
+// the labels, in three roles (a designer's review, 2026-10-21): the printed M-VAVE name small and grey (a legend), what
+// the control does in Niagara Drift under it in colour (a job: amber drone I, teal drone II, lilac the LFO, else pale),
+// and on the keys one size in ink (violet: what a key does instead on the LFO pages). No size depends on a word's length.
+const AMBER = "var(--d1)", TEAL = "var(--d2)", LILAC = "var(--lfo)", PALE = "var(--pale)", LEGEND = "var(--legend)";
+const ON_KEY = "var(--black)", ON_KEY_LFO = "var(--violet)", MUTED_KEY = "#55555b";
+const legend = (g, x, y, s) => text(g, x, y, s, 11, LEGEND, 600, "btn", .08);
+const job = (g, x, y, s, col) => text(g, x, y, s, 14, col, 600, "job");
+const brackets = [];
+function bracket(x1, x2, y, s, col, size, tick) {   // a caption between two rules that span x1..x2, ticks at the ends
+  const g = el("g", { "aria-hidden": "true" }), t = text(g, (x1 + x2) / 2, y + size * .35, s, size, col, 600, "brk");
+  const path = el("path", { style: `stroke: ${col}`, "stroke-width": 1.2, fill: "none", "stroke-linecap": "round" }, g);
+  brackets.push({ t, path, x1, x2, y, tick });
 }
-function fitPills() {                               // each label as wide as its words, once the font is in
-  for (const p of pills) { const w = p.t.getBBox().width + 12; p.r.setAttribute("x", p.x - w / 2); p.r.setAttribute("width", w); }
+function fitBrackets() {                            // the rules stop 8 units short of the words, once the font is in
+  for (const b of brackets) {
+    const w = b.t.getBBox().width / 2, m = (b.x1 + b.x2) / 2;
+    b.path.setAttribute("d", `M${b.x1},${b.y + b.tick}V${b.y}H${m - w - 8}M${m + w + 8},${b.y}H${b.x2}V${b.y + b.tick}`);
+  }
 }
 
 // ---------------------------------------------------------------- the panel
 el("rect", { x: 4, y: 4, width: 992, height: 632, rx: 44, fill: BODY });
 const knobs = {};
-function knob(x, y, r, label, role, job, col) {
+function knob(x, y, r, label, role, what, col) {
   const g = el("g", { class: "ctl knob", tabindex: 0, role: "slider", "aria-label": label });
   el("circle", { cx: x, cy: y, r: r + 5, fill: TRAY }, g);
-  el("circle", { cx: x, cy: y, r, fill: KNOB, stroke: "#6a3a64", "stroke-width": 2 }, g);
+  el("circle", { cx: x, cy: y, r, fill: KNOB, stroke: "#3a3a40", "stroke-width": 2 }, g);
   const ind = el("line", { x1: x, y1: y - r + 5, x2: x, y2: y - r + 15, stroke: LABEL, "stroke-width": 3, "stroke-linecap": "round" }, g);
-  text(g, x, y - r - 12, label, 17);
+  legend(g, x, y - r - 10, label);
+  if (what) job(g, x, y + r + 20, what, col);
   el("circle", { cx: x, cy: y, r: r + 14, fill: "transparent" }, g);
   knobs[label] = { g, ind, x, y, angle: 0, role };
-  pill(x, y + 40, job, col);
   return knobs[label];
 }
 knob(105, 100, 24, "MASTER", "master", "Volume", PALE);
 knob(215, 100, 24, "SELECT", ENC.SELECT, "LFO rate", LILAC);
-knob(105, 205, 24, "PRESETS", ENC.PRESETS, "Gesture time", PALE);
-knob(215, 205, 24, "ALGORITHM", ENC.ALGORITHM, "Movement", LILAC);
-for (let i = 0; i < 4; i++) knob(610 + i * 104, 100, 22, `KNOB${i + 1}`, ENC[`KNOB${i + 1}`], i < 2 ? "Drone I" : "Drone II", i < 2 ? AMBER : TEAL);
+knob(105, 210, 24, "PRESETS", ENC.PRESETS, "Gesture time", PALE);
+knob(215, 210, 24, "ALGORITHM", ENC.ALGORITHM, "Movement", LILAC);
+for (let i = 0; i < 4; i++) knob(610 + i * 104, 100, 22, `KNOB${i + 1}`, ENC[`KNOB${i + 1}`]);
+bracket(580, 744, 143, "Drone I", AMBER, 14, -4);   // KNOB1-2 are drone I's, KNOB3-4 drone II's (on the drone pages)
+bracket(788, 952, 143, "Drone II", TEAL, 14, -4);
 
 const buttons = {};
-function button(x, y, w, h, label, job) {          // the printed name, and under it its job (in pale)
+function button(x, y, w, h, label, what, col = PALE) {   // the printed name, and under it the page it opens
   const g = el("g", { class: "ctl", role: "button", "aria-label": label });
-  el("rect", { x, y, width: w, height: h, rx: 9, fill: BTNC, stroke: "#6e3a7a", "stroke-width": 1.5, class: "btnface" }, g);
-  if (job) { text(g, x + w / 2, y + 20, label, label.length < 5 ? 15 : 13.5); text(g, x + w / 2, y + 39, job, job.length < 8 ? 14 : 12.5, PALE, 700, "job"); }
-  else text(g, x + w / 2, y + h / 2 + 5, label, 15);
+  el("rect", { x, y, width: w, height: h, rx: 9, fill: BTNC, stroke: "#46464c", "stroke-width": 1.5, class: "btnface" }, g);
+  const top = h < 44 ? 15 : 17;
+  legend(g, x + w / 2, y + top, label.replace("-", "−"));
+  job(g, x + w / 2, y + top + (h < 44 ? 16 : 19), what, col);
   buttons[label] = { g, bit: BTN[label] };
 }
-el("rect", { x: 58, y: 258, width: 210, height: 58, rx: 14, fill: TRAY });
-button(72, 268, 82, 38, "OCT-"); button(170, 268, 82, 38, "OCT+");
-pill(162, 326, "LFO wave I · wave II", LILAC, 14);
-el("rect", { x: 300, y: 44, width: 236, height: 236, rx: 26, fill: "#0c0009" });
+el("rect", { x: 58, y: 262, width: 210, height: 58, rx: 14, fill: TRAY });
+button(72, 272, 82, 38, "OCT-", "Wave I", LILAC); button(170, 272, 82, 38, "OCT+", "Wave II", LILAC);
+el("rect", { x: 300, y: 44, width: 236, height: 236, rx: 26, fill: "#0a0a0b" });
 el("rect", { x: 568, y: 160, width: 400, height: 140, rx: 18, fill: TRAY });
-const ROW1 = [["FX", "Delay · Rev"], ["SEL", "Fine"], ["ENV", "Tone"], ["LFO", "LFO"], ["EDIT", "Osc · Drive"], ["GLO", "Setup"]],
-      ROW2 = [["HOME", "Play"], ["SAVE", "Save"], ["ARP", "Swell"], ["SEQ", "Partner"], ["PLAY", "On · off"], ["REC", "Loop"]];
+const ROW1 = [["FX", "Delay"], ["SEL", "Fine"], ["ENV", "Tone"], ["LFO", "Depths"], ["EDIT", "Osc"], ["GLO", "Setup"]],
+      ROW2 = [["HOME", "Play"], ["SAVE", "Store"], ["ARP", "Swell"], ["SEQ", "Partner"], ["PLAY", "On/off"], ["REC", "Loop"]];
 for (let i = 0; i < 6; i++) {
   button(582 + i * 63, 174, 54, 48, ...ROW1[i]);
   button(582 + i * 63, 236, 54, 48, ...ROW2[i]);
 }
 
 const keys = [], GESTURES = ["Weight", "Shift", "Clean", "Wash"], BANKS = ["A", "B", "C", "Presets"];
-const BLACK_JOB = [["Partner", AMBER], ["Sub", AMBER], ["Filter", AMBER], ["Pitch lock"], ["LFO reset"],
-  ["Partner", TEAL], ["Sub", TEAL], ["Filter", TEAL], ["Pitch link"], ["Hard sync"], ["X-mod"]];
-const BLACK_LFO = [["Osc wave", "I·II·both"], ["Osc to", "pitch / X-Wave"], ["Filter to", "cutoff / reso"], ["Filter wave", "I·II·both"],
-  ["LFO reset", ""], ["Osc wave", "I·II·both"], ["Osc to", "pitch / X-Wave"], ["Filter to", "cutoff / reso"],      // on the LFO pages: the
-  ["Filter wave", "I·II·both"], ["Delay wave", "I·II·both"], ["X-mod", ""]];                                    // name, and what it picks
-const blackNames = [];                                // each key's two names: [normal, LFO pages]
+const BLACK_JOB = [[["Partner"], AMBER], [["Sub"], AMBER], [["Filter"], AMBER], [["Pitch", "lock"]], [["LFO", "reset"]],
+  [["Partner"], TEAL], [["Sub"], TEAL], [["Filter"], TEAL], [["Pitch", "link"]], [["Hard", "sync"]], [["X-mod"]]];
+const BLACK_LFO = [["Osc", "wave"], ["Osc to", "X-Wave"], ["Filter to", "reso"], ["Filter", "wave"], null,   // on the LFO pages: what the
+  ["Osc", "wave"], ["Osc to", "X-Wave"], ["Filter to", "reso"], ["Filter", "wave"], ["Delay", "wave"], null];     // key switches to (null: as ever)
+const blackNames = [];                                // each changing key's two names: [normal, LFO pages]
 (function keybed(x0, y0, w, h) {
   el("rect", { x: x0, y: y0, width: w, height: h, rx: 18, fill: TRAY });
-  const pitch = (w - 24) / 16, kw = pitch * 0.78;
+  const pitch = (w - 24) / 16, kw = pitch * 0.78, wy = y0 + h * 0.46, wh = h * 0.49, by = y0 + h * 0.05, bh = h * 0.31;
+  const left = (i) => x0 + 12 + i * pitch + (pitch - kw) / 2;
   for (let i = 0; i < 16; i++) {
     const g = el("g", { class: "ctl", role: "button", "aria-label": `white key ${i + 1}` });
-    el("rect", { x: x0 + 12 + i * pitch + (pitch - kw) / 2, y: y0 + h * 0.43, width: kw, height: h * 0.52, rx: kw / 2, fill: KEY_W, class: "keyface white" }, g);
-    const kx = x0 + 12 + i * pitch + pitch / 2, kb = y0 + h * 0.95;
-    if (i < 12) text(g, kx, kb - 16, String(i + 1), 16, PALE, 700, "job");
-    else {                                          // a gesture, and with SEL the bank it picks
-      text(g, kx, kb - 42, GESTURES[i - 12], 12, PALE, 700, "job");
-      el("line", { x1: kx - 13, y1: kb - 37, x2: kx + 13, y2: kb - 37, style: `stroke: ${ON_KEY_LFO}`, "stroke-width": 1.2, "stroke-linecap": "round", opacity: .6 }, g);
-      text(g, kx, kb - 26, "SEL:", 10.5, ON_KEY_LFO, 700, "job");
-      text(g, kx, kb - 13, BANKS[i - 12], 11.5, ON_KEY_LFO, 700, "job");
-    }
+    el("rect", { x: left(i), y: wy, width: kw, height: wh, rx: kw / 2, fill: KEY_W, class: "keyface white" }, g);
+    const kx = left(i) + kw / 2;                    // one label line along the bottom: scene numbers, gesture names
+    text(g, kx, wy + wh - 14, i < 12 ? String(i + 1) : GESTURES[i - 12], i < 12 ? 14 : 12.5, ON_KEY, 700, "job on-key");
+    if (i >= 12) text(g, kx, wy + 22, BANKS[i - 12], 10.5, MUTED_KEY, 600, "job on-key");   // with SEL: this bank
     keys[WHITE_K[i]] = { g };
   }
   BLACK_AFTER.forEach((a, k) => {
     const g = el("g", { class: "ctl", role: "button", "aria-label": `black key ${k + 1}` });
-    el("rect", { x: x0 + 12 + (a + 1) * pitch - kw / 2, y: y0 + h * 0.06, width: kw, height: h * 0.33, rx: kw / 2, fill: KEY_B, class: "keyface black" }, g);
-    const [job, col] = BLACK_JOB[k], cx = x0 + 12 + (a + 1) * pitch, words = job.split(" ");
-    if (col) el("rect", { x: cx - 9, y: y0 + h * 0.06 + 10, width: 18, height: 6, rx: 3, style: `fill: ${col}` }, g);
-    const names = [[job, ""], BLACK_LFO[k]].map(([nm, what], l) => {
-      const n = el("g", l ? { class: "lfo", display: "none" } : {}, g), ws = nm.split(" "), sub = what ? what.split(" / ") : [];
-      const lines = [...ws.map((wd) => [wd, wd.length < 7 ? 15 : 12.5, 16, 700]), ...sub.map((wd, j) => [wd + (j < sub.length - 1 ? " /" : ""), wd.length > 5 ? 10.5 : 11.5, 12.5, 700])];
-      const tall = lines.reduce((a, [, , lh]) => a + lh, 0);
-      let y = y0 + h * 0.06 + h * 0.165 + 8 - tall / 2 + (sub.length ? 6 : 0);
-      for (const [wd, size, lh, weight] of lines) { y += lh; text(n, cx, y - 4, wd, size, l ? ON_KEY_LFO : ON_KEY, weight, "job"); }
+    el("rect", { x: x0 + 12 + (a + 1) * pitch - kw / 2, y: by, width: kw, height: bh, rx: kw / 2, fill: KEY_B, class: "keyface black" }, g);
+    const [words, col] = BLACK_JOB[k], cx = x0 + 12 + (a + 1) * pitch;
+    if (col) el("rect", { x: cx - 9, y: by + 9, width: 18, height: 5, rx: 2.5, style: `fill: ${col}` }, g);
+    const name = (ws, col, attrs) => {              // at most two lines, around one centre on every key
+      const n = el("g", attrs, g);
+      ws.forEach((wd, j) => text(n, cx, by + 52 + (j - (ws.length - 1) / 2) * 14 + 4.5, wd, 12.5, col, 700, "job on-key"));
       return n;
-    });
-    blackNames.push(names);
+    };
+    const normal = name(words, ON_KEY, {});
+    if (BLACK_LFO[k]) blackNames.push([normal, name(BLACK_LFO[k], ON_KEY_LFO, { class: "lfo", display: "none" })]);
     keys[BLACK_K[k]] = { g };
   });
-  pill(x0 + 12 + 6 * pitch, y0 + h * 0.6, "Presets & scenes · Tap: go there · In A, B, C: SAVE + tap: store", PALE, 15);
-  pill(x0 + 12 + 14 * pitch, y0 + h * 0.6, "Gestures", LILAC, 15);
+  const capY = 451;                                 // the captions, in the strip between the rows
+  bracket(left(0), left(11) + kw, capY, "Presets & scenes · tap: go · SAVE + tap: store", LEGEND, 11.5, 4);
+  bracket(left(12), left(15) + kw, capY, "Gestures · with SEL: bank", LEGEND, 11.5, 4);
 })(36, 340, 928, 270);
+fitBrackets();
+document.fonts.ready.then(fitBrackets);
 
 // ---------------------------------------------------------------- touch targets
 // The drawing is only a picture (pointer-events: none). Each control gets an invisible HTML target
@@ -747,8 +756,6 @@ WHITE_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", k < 12
     `in bank A, B or C, hold SAVE first, then this key, to store (the Presets are fixed); blinks while it's the sound`
   : `${GESTURES[k - 12]} (${"QWERTYUIASDFGHJK"[k]}): a gesture: hold to bring it in, let go and it leaves as slowly as you held it; ` +
     `tap: all the way, to stay. With SEL: bank ${BANKS[k - 12]}`));
-fitPills();
-document.fonts.ready.then(fitPills);
 for (const k of Object.values(knobs)) hit(k, "knob");
 for (const b of Object.values(buttons)) hit(b);
 keys.forEach((k) => hit(k));
