@@ -64,7 +64,8 @@ kept, unless that version's notes in the [changelog](CHANGELOG.md) say otherwise
 
 **Backing up:** `python3 tools/fm1_install.py --backup` saves your sound, scenes and settings to a
 file (in `~/niagara-drift-backups/`), and `--restore FILE` puts them back (the FM-1 restarts). The terminal
-installer saves one by itself before every install. Back up before trying another firmware, and restore
+installer saves one by itself before it installs over Niagara Drift (the web installer doesn't yet).
+Back up before trying another firmware, and restore
 when you come back. A backup is for the same FM-1: it carries that unit's knob calibration too.
 
 **Going back:** the installer's "Back to M-VAVE's firmware" writes M-VAVE's own FM-1 V15 back over the
@@ -440,7 +441,7 @@ Niagara Drift is the next link in a chain of FM-1 firmwares:
 - [MONK-1](https://github.com/charlesvestal/fm1-monk) by Charles Vestal: reading key pressure (from
   [Velo](https://github.com/charlesvestal/fm1-velocity)'s sensing), which plays the scene crossfade.
 - [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) by Quixotic7: the design of the delay and the
-  reverb, written anew here; the idea of crossfading between scenes, and of a backup before every install.
+  reverb, written anew here; the idea of crossfading between scenes, and of a backup before installing.
 
 GPL-3.0-only; see [LICENSING.md](LICENSING.md).
 

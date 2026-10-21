@@ -36,13 +36,14 @@ bank A, 13–16 to B1–B4).
   keyboard, and touching one names it. Lights at several brightnesses: the OCT lights pulse with the LFO waves, ARP
   breathes with the Swell.
 - **Knobs** catch every click on slow, paused turns.
-- **Saving:** autosave 4 s after the last change, at most every 30 s. `fm1_install.py --backup` / `--restore FILE`,
-  and a backup in `~/niagara-drift-backups/` before every install (after ChoralRoot's installer).
+- **Saving and backups:** autosave 4 s after the last change, at most every 30 s. `fm1_install.py --backup` saves
+  your sound, scenes and settings to a file and `--restore FILE` puts them back; installing over Niagara Drift from
+  the terminal saves a backup first, in `~/niagara-drift-backups/` (the web installer doesn't yet).
 - **The website:** the emulator's FM-1 labelled with what every control does, the manual in the order you meet it
   (presets, gestures, scenes first), a link preview and an icon.
 
 Thanks to [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) (Quixotic7) for the effects' design, the crossfade
-idea and the installer backup, and to [MONK-1](https://github.com/charlesvestal/fm1-monk) (Charles Vestal) for
+idea and the idea of a backup before installing, and to [MONK-1](https://github.com/charlesvestal/fm1-monk) (Charles Vestal) for
 reading key pressure.
 
 ## 0.1 beta (2026-10)
