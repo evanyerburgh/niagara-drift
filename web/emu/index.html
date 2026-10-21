@@ -661,8 +661,9 @@ for (let i = 0; i < 6; i++) {
 const keys = [], GESTURES = ["Weight", "Shift", "Clean", "Wash"], BANKS = ["A", "B", "C", "Presets"];
 const BLACK_JOB = [["Partner", AMBER], ["Sub", AMBER], ["Filter", AMBER], ["Pitch lock"], ["LFO reset"],
   ["Partner", TEAL], ["Sub", TEAL], ["Filter", TEAL], ["Pitch link"], ["Hard sync"], ["X-mod"]];
-const BLACK_LFO = ["Osc wave", "Osc to", "Filter to", "Filter wave", "LFO reset", "Osc wave", "Osc to", "Filter to",   // on the LFO pages
-  "Filter wave", "Delay wave", "X-mod"];
+const BLACK_LFO = [["Osc wave", "I·II·both"], ["Osc to", "pitch / X-Wave"], ["Filter to", "cutoff / reso"], ["Filter wave", "I·II·both"],
+  ["LFO reset", ""], ["Osc wave", "I·II·both"], ["Osc to", "pitch / X-Wave"], ["Filter to", "cutoff / reso"],      // on the LFO pages: the
+  ["Filter wave", "I·II·both"], ["Delay wave", "I·II·both"], ["X-mod", ""]];                                    // name, and what it picks
 const blackNames = [];                                // each key's two names: [normal, LFO pages]
 (function keybed(x0, y0, w, h) {
   el("rect", { x: x0, y: y0, width: w, height: h, rx: 18, fill: TRAY });
@@ -685,9 +686,12 @@ const blackNames = [];                                // each key's two names: [
     el("rect", { x: x0 + 12 + (a + 1) * pitch - kw / 2, y: y0 + h * 0.06, width: kw, height: h * 0.33, rx: kw / 2, fill: KEY_B, class: "keyface black" }, g);
     const [job, col] = BLACK_JOB[k], cx = x0 + 12 + (a + 1) * pitch, words = job.split(" ");
     if (col) el("rect", { x: cx - 9, y: y0 + h * 0.06 + 10, width: 18, height: 6, rx: 3, style: `fill: ${col}` }, g);
-    const names = [job, BLACK_LFO[k]].map((nm, l) => {
-      const n = el("g", l ? { class: "lfo", display: "none" } : {}, g), ws = nm.split(" ");
-      ws.forEach((wd, j) => text(n, cx, y0 + h * 0.06 + h * 0.165 + (j - (ws.length - 1) / 2) * 16 + 10, wd, wd.length < 7 ? 15 : 12.5, l ? ON_KEY : INK, 700, "job"));
+    const names = [[job, ""], BLACK_LFO[k]].map(([nm, what], l) => {
+      const n = el("g", l ? { class: "lfo", display: "none" } : {}, g), ws = nm.split(" "), sub = what ? what.split(" / ") : [];
+      const lines = [...ws.map((wd) => [wd, wd.length < 7 ? 15 : 12.5, 16, 700]), ...sub.map((wd, j) => [wd + (j < sub.length - 1 ? " /" : ""), wd.length > 5 ? 10.5 : 11.5, 12.5, 700])];
+      const tall = lines.reduce((a, [, , lh]) => a + lh, 0);
+      let y = y0 + h * 0.06 + h * 0.165 + 8 - tall / 2 + (sub.length ? 6 : 0);
+      for (const [wd, size, lh, weight] of lines) { y += lh; text(n, cx, y - 4, wd, size, l ? ON_KEY : INK, weight, "job"); }
       return n;
     });
     blackNames.push(names);
