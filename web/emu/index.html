@@ -126,8 +126,9 @@ body.drawn .g-card, body.drawn .foot, body.drawn .actions a, body.drawn .actions
 .mid { grid-column: 4 / span 6; }
 /* a tap sequence: each tap's button, what it does under it, arrows between */
 /* a short card's words to its right, so a band can cross the card without crossing them */
-.push-r > .inner { width: fit-content; margin-left: auto; }
+.push-r > .inner { width: fit-content; margin-left: auto; } .push-l > .inner { width: fit-content; margin-right: auto; }
 @media (max-width: 900px) { .push-r > .inner { margin-left: 0; } }
+.float-card { grid-column: 1 / span 7; }          /* placed where the bands pass at its height (the bands' script) */
 .seq { list-style: none; display: flex; align-items: flex-start; gap: 1.6rem; margin: 1.1rem 0 .3rem; padding: 0; }
 .seq li { display: flex; flex-direction: column; align-items: flex-start; gap: .45rem; position: relative; }
 .seq li + li::before { content: "→"; position: absolute; left: -1.25rem; top: .1rem; color: var(--muted); }
@@ -513,7 +514,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     </dl>
   </div>
 
-  <div class="g-card one-l push-r"><div class="inner">
+  <div class="g-card float-card push-r"><div class="inner">
     <h3>Motion loop <span class="g-sub">tap REC three times</span></h3>
     <ol class="seq">
       <li><span class="cap">REC</span><span>record</span></li>
@@ -1041,6 +1042,7 @@ document.getElementById("reset").addEventListener("click", () => {
   function draw(now) {
     bands.style.height = "0";                  // the page as tall as its content, not as the last drawing
     const W = document.documentElement.clientWidth, H = document.documentElement.scrollHeight, V = innerHeight;
+    if (!W || !V) return;                      // a hidden or zero-size window: nothing to draw
     const t = T0 + (still.matches ? 0 : (now - t1) / 1000);
     bands.setAttribute("viewBox", `0 0 ${W} ${H}`);
     bands.style.height = H + "px";
@@ -1063,10 +1065,49 @@ document.getElementById("reset").addEventListener("click", () => {
   }
   let last = 0;
   function tick(now) { if (now - last > 80) { draw(now); last = now; } if (!still.matches) requestAnimationFrame(tick); }
+  // a short card (.float-card, 7 columns) goes where the bands pass at its height, which depends on the window's size:
+  // of every column and side for its words, the one where, over a whole drift, the bands cross the card most and its
+  // words (.inner) least (.push-r / .push-l)
+  const floats = [...document.querySelectorAll(".float-card")], guide = document.querySelector(".guide");
+  function place() {
+    const W = document.documentElement.clientWidth, V = innerHeight, g = guide.getBoundingClientRect();
+    if (!W || !V) return;
+    for (const f of floats) {
+      if (matchMedia("(max-width: 900px)").matches) { f.style.gridColumn = ""; continue; }
+      const gap = parseFloat(getComputedStyle(guide).columnGap), step = (g.width + gap) / 12, span = 7, cw = span * step - gap;
+      const r = f.getBoundingClientRect(), pad = parseFloat(getComputedStyle(f).paddingLeft), ww = f.querySelector(".inner").getBoundingClientRect().width;
+      const ys = [0, .25, .5, .75, 1].map((k) => r.top + scrollY + k * r.height), spans = [];   // the bands' extent at each, over time
+      for (let k = 0; k < 64; k++) {
+        const t = k * 2 * Math.PI / SPEED / 64, row = [];
+        for (const b of B) for (const y of ys) {
+          const a = 2 * Math.PI * y / (V * b.len) + b.ph + t * SPEED;
+          const cx = W * (.5 + SWING * Math.cos(2 * Math.PI * y / (V * SWING_LEN) + SWING_PH) + b.amp * Math.sin(a)) - g.left;
+          const hw = W * b.w / 2 * (1 + .2 * Math.sin(2 * Math.PI * y / (V * b.len * .7) + b.ph * 1.3 - t * SPEED * .8));
+          row.push([cx - hw, cx + hw]);
+        }
+        spans.push(row);
+      }
+      let best = null;
+      for (let start = 0; start <= 12 - span; start++) for (const right of [true, false]) {
+        const L = start * step, wl = right ? L + cw - pad - ww : L + pad;
+        let cross = 0, touch = 0;
+        for (const row of spans) {
+          cross += row.some(([a, z]) => z > L && a < L + cw);
+          touch += row.some(([a, z]) => z > wl - 8 && a < wl + ww + 8);
+        }
+        const score = Math.min(cross, 48) - 3 * touch;   // crossed three quarters of the time is plenty; the words matter more
+        if (!best || score > best.score) best = { score, start, right };
+      }
+      f.style.gridColumn = `${best.start + 1} / span ${span}`;
+      f.classList.toggle("push-r", best.right); f.classList.toggle("push-l", !best.right);
+    }
+  }
+  place();
+  document.fonts.ready.then(() => { place(); draw(performance.now()); });
   draw(t1);
   requestAnimationFrame(tick);
   still.addEventListener("change", () => requestAnimationFrame(tick));
-  addEventListener("resize", () => draw(performance.now()));
+  addEventListener("resize", () => { place(); draw(performance.now()); });
 })();
 </script>
 </body>
