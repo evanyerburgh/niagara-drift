@@ -318,3 +318,10 @@ at the end. The current state is in the [README](../README.md) and the code.
   restart eases over 120 ms; Wander re-times when turned up; delay repeats wind down when stopped (≤ 0.85); the Wide
   delay's spread per sample; pressure sensitivity a curve (a full press always all the way); PW shown from X-Wave 70;
   Pitch glide in seconds; "OFF" in capitals; the lock-to-Swell message shorter.
+- 2026-10-21 (the 0.2 polish): **Level** is an audio taper (squared: 50 is −12 dB); saved sounds and scenes convert
+  to the same loudness (10·√v; PROJ_FORMAT 31), as do the presets and the starting sound (75 / 61). Weight's level move
+  +27 (was +40), Wash's dip −11 and its breath −11 (were −15, −14): on the starting sound within 0.2 dB of before.
+  Band-pass and high-pass get back about half the input the resonance takes (+4 dB at 100): 0..4 dB under low-pass
+  at full resonance (was 4..8). A continuous knob's speed-up: 1 step a detent up to 6 a second, 6 steps from 26 a
+  second (one brisk turn of 20 detents goes 0..100; was 1 step at 20 a second); Gesture time the same. The link offset
+  reads "+8 st +20" (Evan; was "+8.20"). The emulator page has a favicon.

@@ -90,7 +90,8 @@ back. Tap it again for its second page; "1/2" by the page's name shows which of 
 button opens the page you last used there (HOME always opens Play 1), so after visiting Reverb, holding FX
 peeks at Reverb.
 Each page's screen shows a picture of what its knobs do, and the four values below it. Every knob
-glides: a slow turn is a smooth sweep, never steps; turn faster to go further.
+glides: a slow turn is a smooth sweep, never steps; turn faster to go further (one brisk turn takes a level
+or a depth from one end to the other). The levels follow your ear: halfway is about a quarter as loud.
 
 #### Play · HOME
 
@@ -321,7 +322,7 @@ key.
 - A **wave key** goes round with each tap: Wave I (dark), Wave II (lit), both (winking).
 - **LFO reset:** tap to restart the LFO. Hold it half a second to lock the LFO to the Swell (it then
   restarts every bar; the key stays lit). Hold again to free it.
-- With **pitch link** on, KNOB 3 sets the gap between the drones.
+- With **pitch link** on, KNOB 3 sets the gap between the drones, in semitones and cents ("+7 st", "+8 st +20").
 - A **filter key** goes round with each tap: low-pass (dark), band-pass (winking), high-pass (lit).
 - A **sub key** goes round with each tap: −1 octave (dark), −2 octaves (lit), then the subharmonics ⅓
   and ⅕ of the pitch (winking).

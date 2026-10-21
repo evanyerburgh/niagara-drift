@@ -38,8 +38,8 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
  * slow LFO (a cycle in ~25 s; Wave II a random glide), the Swell on as a slow breath (one in ~35 s, 12 dB),
  * some delay with a gentle wobble, a little more reverb; the oscillators' depths start at 0 */
 static const dr_param_t PARAMS[DR_NPARAMS] = {
-    VOICE_PARAMS(5000, 67, 5, 30, 700, 57, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
-    VOICE_PARAMS(5700, 33, 14, 15, 680, 37, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
+    VOICE_PARAMS(5000, 67, 5, 30, 700, 75, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
+    VOICE_PARAMS(5700, 33, 14, 15, 680, 61, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
     {"Cross-mod", 0, 1, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
@@ -559,7 +559,7 @@ void dr_init(void)
         v->pitch = v->ps1 = v->ps2 = v->st = (float)par[DR_GP(g, GP_PITCH)] * 0.01f;
         v->cut = 4.32192809f + (float)par[DR_GP(g, GP_CUTOFF)] * 0.00981378f;
         v->gf = v->gtarget = g == 1 && par[P_II_OUT] ? 0.0f : 1.0f;   /* drone II out on its own: out */
-        v->lv = (float)par[DR_GP(g, GP_LEVEL)] * 0.01f * 0.4f;
+        v->lv = (float)(par[DR_GP(g, GP_LEVEL)] * par[DR_GP(g, GP_LEVEL)]) * 0.0001f * 0.4f;
         v->ph = 0.25f * (float)g;                  /* not all edges together */
         v->pph = 0.5f + 0.13f * (float)g;
         v->nn = 0x9E3779B9u * (uint32_t)(g + 1);  /* each drone its own noise: two noises, not one twice */
@@ -631,8 +631,8 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
      {DR_GP(0, GP_RESO), MK_ADD, -40, 0, 50, 40, 100}, {DR_GP(1, GP_RESO), MK_ADD, -40, 0, 50, 40, 100},
      {DR_GP(0, GP_DRIVE), MK_ADD, 25, 20, 100, 20, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 25, 20, 100, 20, 100},
      {P_CHAR, MK_ADD, 25, 30, 100, 30, 100}, {DR_GP(0, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100},
-     {DR_GP(1, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100}, {DR_GP(0, GP_LEVEL), MK_ADD, 40, 20, 100, 0, 60},
-     {DR_GP(1, GP_LEVEL), MK_ADD, 40, 20, 100, 0, 60}},
+     {DR_GP(1, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100}, {DR_GP(0, GP_LEVEL), MK_ADD, 27, 20, 100, 0, 60},
+     {DR_GP(1, GP_LEVEL), MK_ADD, 27, 20, 100, 0, 60}},
     /* SHIFT: a new chord, a voice at a time (the Lyra-8 manual's chord changes): drone I glides there first, drone
      * II follows; let go, drone I comes back first. Its move: P_SHIFT_MOVE */
     {{0, MK_SHIFT, 0, 0, 60, 40, 100}, {1, MK_SHIFT, 0, 40, 100, 0, 60}},
@@ -655,9 +655,9 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
      * back first, the filter LFOs with it, the tails ring on (the reverb's own length) and go last */
     {{P_DLY_MIX, MK_TO, 70, 0, 40, 0, 30}, {P_DLY_REPEATS, MK_TO, 80, 0, 40, 0, 30},
      {P_REV_MIX, MK_TO, 80, 30, 80, 0, 30}, {P_REV_LEN, MK_TO, 100, 50, 100, 20, 60},
-     {P_REV_DAMP, MK_ADD, 15, 50, 100, 20, 60}, {DR_GP(0, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100},
-     {DR_GP(1, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -14, 55, 70, 55, 70},
-     {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 55, 70, 55, 70},
+     {P_REV_DAMP, MK_ADD, 15, 50, 100, 20, 60}, {DR_GP(0, GP_LEVEL), MK_ADD, -11, 60, 100, 60, 100},
+     {DR_GP(1, GP_LEVEL), MK_ADD, -11, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -11, 55, 70, 55, 70},
+     {DR_GP(1, GP_LEVEL), MK_PULSE, -11, 55, 70, 55, 70},
      {DR_GP(0, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}, {DR_GP(1, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}},
 };
 /* AGE (Life), a state: as the old tape wears, darker, a little hiss, the pitch wavering slowly (wow) and a little
@@ -1380,7 +1380,7 @@ static void render_group(int g, uint32_t n)
      * octave under the cutoff, times (1 - rin), so the passband stays level and the peak is left alone */
     const float r0 = pv[GP_RESO] * 0.001f;
     float k = 2.0f - 2.1f * r0, rin = 1.0f - 0.6f * r0 * r0;    /* per tick, when the LFO moves the resonance */
-    const float lvl = pv[GP_LEVEL] * 0.01f * 0.6f;
+    const float lvl = pv[GP_LEVEL] * pv[GP_LEVEL] * 0.0001f * 0.6f;   /* an audio taper: squared (50 is -12 dB) */
     /* drone I left, drone II right, as far apart as Width says (as it glides: read raw, each detent clicked) */
     const float width = pfs[P_WIDTH] * 0.01f, pan = g ? 0.5f + 0.5f * width : 0.5f - 0.5f * width;
     const float gl1 = fm_sqrtf(1.0f - pan) * 1.41421356f, gr1 = fm_sqrtf(pan) * 1.41421356f;
@@ -1509,8 +1509,6 @@ static void render_group(int g, uint32_t n)
         sg = sub * v->sg;
         xd = xamt * v->xm;
         wl = v->wm[DR_LP];
-        wb = v->wm[DR_BP];
-        wh = v->wm[DR_HP];
         sy = v->sy;
         sync = v->sync;
         /* the LFO: the oscillator's (pitch, up to +-24 semitones, or X-WAVE) and the filter's (cutoff, up
@@ -1521,6 +1519,11 @@ static void render_group(int g, uint32_t n)
         r = fm_clampf(r0 + v->dw[1] * fl * ramt, 0.0f, 1.0f);
         k = 2.0f - 2.1f * r;
         rin = 1.0f - 0.6f * r * r;
+        /* band-pass and high-pass get half of that input loss back (~1/sqrt(rin): +4 dB at 100), as the low-pass
+         * gets its bass back: at full resonance they were 6-7 dB under it */
+        wb = 1.0f + r * r * (0.3f + 0.28f * r * r);
+        wh = v->wm[DR_HP] * wb;
+        wb *= v->wm[DR_BP];
         pmod = (1.0f - v->dw[0]) * 24.0f * om;
         xw = fm_clampf(xw0 + v->dw[0] * om + dw * 0.12f * v->wn[1], 0.0f, 1.0f) * 3.0f;
         wi = (int)(xw + 0.025f);                 /* within 0.02 of a wave (2 of the knob's 300ths): that */

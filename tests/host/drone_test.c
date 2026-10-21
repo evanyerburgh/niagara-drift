@@ -788,7 +788,7 @@ int main(void)
         for (t = 0; t < 3; t++) {                       /* the delay's time: the first echo, on time */
             dry_init();
             dr_set(P_FADE, 0);
-            dr_set(DR_GP(0, GP_LEVEL), 80);             /* (the level it was measured at: the default is 57 now) */
+            dr_set(DR_GP(0, GP_LEVEL), 89);             /* (the level it was measured at, 80 before the taper) */
             dr_set(DR_GP(1, GP_LEVEL), 0);
             dr_set(DR_GP(0, GP_WAVE), 67);
             dr_set(P_DLY_MIX, 100);
@@ -1564,7 +1564,7 @@ int main(void)
         int k, d, bad = 0;
         pure_tone();
         dr_set(DR_GP(0, GP_WAVE), 0);
-        dr_set(DR_GP(0, GP_LEVEL), 48);              /* the sine as loud as before its lift (x 0.95 / 1.6) */
+        dr_set(DR_GP(0, GP_LEVEL), 69);              /* the sine as loud as before its lift (x 0.95 / 1.6; 48 before the taper) */
         dr_set(P_WIDTH, 0);
         run(secs(1.0f));
         capture(w, 2646, 0);

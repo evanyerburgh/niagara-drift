@@ -64,7 +64,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 30, on bank A", proj.format == 30u && PROJ_FORMAT == 30u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 31, on bank A", proj.format == 31u && PROJ_FORMAT == 31u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -149,6 +149,21 @@ int main(void)
         check("PR #24's project (29) loads: a just +5th stays just, unison stays unison, Tuning folded in",
               project_load() == 0 && proj.par[DR_GP(0, GP_INTERVAL)] == 13 &&
                   proj.par[DR_GP(1, GP_INTERVAL)] == DR_IV_UNISON && proj.par[P_II_OUT] == 0);
+    }
+    {   /* 0.2-beta's (30): Level was linear; now squared, the same loudness at 10 sqrt(v), the scenes' too */
+        static project_t p30;
+        p30 = proj;
+        p30.format = 30u;
+        p30.par[DR_GP(0, GP_LEVEL)] = 57;
+        p30.par[DR_GP(1, GP_LEVEL)] = 37;
+        p30.scene_used |= 1u;
+        p30.scene[0][DR_GP(0, GP_LEVEL)] = 100;
+        p30.scene[0][DR_GP(1, GP_LEVEL)] = 1;
+        memcpy(store[OBJ_PROJ], &p30, sizeof p30);
+        store_n[OBJ_PROJ] = (int)sizeof p30;
+        check("0.2-beta's project (30) loads: Level 57 / 37 is 75 / 61 on the new taper, a scene's 100 / 1 is 100 / 10",
+              project_load() == 0 && proj.par[DR_GP(0, GP_LEVEL)] == 75 && proj.par[DR_GP(1, GP_LEVEL)] == 61 &&
+                  proj.scene[0][DR_GP(0, GP_LEVEL)] == 100 && proj.scene[0][DR_GP(1, GP_LEVEL)] == 10);
     }
     {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */
         static proj_v21_t p21;
