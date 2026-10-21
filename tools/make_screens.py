@@ -105,6 +105,7 @@ def panel(play_png):
         else:
             d.text((P(x + kw / 2), P(kb - 46)), ("Weight", "Shift", "Clean", "Wash")[i - 12], font=f(12), fill=(60, 62, 68),
                    anchor="mm")
+            d.line([P(x + kw / 2 - 13), P(kb - 38), P(x + kw / 2 + 13), P(kb - 38)], fill=(175, 125, 190), width=P(1.2))   # the gesture, then its bank
             d.text((P(x + kw / 2), P(kb - 30)), "SEL:", font=f(10.5), fill=VIOLET, anchor="mm")
             d.text((P(x + kw / 2), P(kb - 17)), ("A", "B", "C", "Presets")[i - 12], font=f(11.5), fill=VIOLET,
                    anchor="mm")

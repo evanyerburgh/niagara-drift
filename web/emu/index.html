@@ -674,6 +674,7 @@ const blackNames = [];                                // each key's two names: [
     if (i < 12) text(g, kx, kb - 16, String(i + 1), 16, "#3c3e44", 700, "job");
     else {                                          // a gesture, and with SEL the bank it picks
       text(g, kx, kb - 42, GESTURES[i - 12], 12, "#3c3e44", 700, "job");
+      el("line", { x1: kx - 13, y1: kb - 37, x2: kx + 13, y2: kb - 37, style: `stroke: ${ON_KEY}`, "stroke-width": 1.2, "stroke-linecap": "round", opacity: .6 }, g);
       text(g, kx, kb - 26, "SEL:", 10.5, ON_KEY, 700, "job");
       text(g, kx, kb - 13, BANKS[i - 12], 11.5, ON_KEY, 700, "job");
     }
