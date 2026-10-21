@@ -31,8 +31,7 @@ ACTIONS = """<nav class="actions" aria-label="Get Niagara Drift">
   <a href="__REPO__#readme"><b>Full manual</b><span>every page, knob and key</span></a>
   <a href="__REPO__"><b>Source</b><span>on GitHub, GPL-3.0</span></a>
 </nav>
-<p class="actions-note">Version __VERSION__, tested on one FM-1 so far. Installing is at your own risk; the installer can also put
-  M-VAVE's own firmware back.</p>"""
+<p class="actions-note">Version __VERSION__. Installing is at your own risk; the installer can also put M-VAVE's own firmware back.</p>"""
 
 
 def main(pkg, version, out):
@@ -56,7 +55,8 @@ def main(pkg, version, out):
         if front.count(mark) != 1:
             raise SystemExit(f"web/emu/index.html must contain {mark} once")
     acts = ACTIONS.replace("__PKG__", name).replace("__REPO__", REPO).replace("__VERSION__", html.escape(label))
-    front = front.replace("<!--NAV-->", '<a href="install/">Install</a>')     # beside Source, top right
+    news = f'<a class="ver" href="{REPO}/blob/v{html.escape(version)}/CHANGELOG.md">{html.escape(label)} · What’s new</a>'
+    front = front.replace("<!--NAV-->", news + '<a href="install/">Install</a>')     # beside Source, top right
     (out / "index.html").write_text(front.replace("<!--ACTIONS-->", acts), encoding="utf-8")
     for d in ("install", "firmware"):
         (out / d).mkdir(parents=True)

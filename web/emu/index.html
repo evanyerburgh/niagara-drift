@@ -52,6 +52,7 @@ header p.play { max-width: none; text-align: right; margin-top: .7em; }
 header nav { position: absolute; top: 5vh; right: 0; z-index: 1; display: flex; gap: .5rem; font: 500 .95rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
 header nav a { color: var(--pale); background: var(--black); padding: .35em .9em; border-radius: 999px; text-decoration: none; }
 header nav a:hover, header nav a:focus-visible { text-decoration: underline; }
+header nav a.ver { background: var(--pale); color: var(--black); text-transform: none; letter-spacing: .02em; }   /* the release, put in by tools/make_pages.py */
 /* a phone: the pills (Install, Source) above the title, not beside it */
 @media (max-width: 560px) { header, .over { padding-top: 3.8rem; } header nav { top: 1rem; } }
 a:focus-visible, button:focus-visible { outline: 3px solid var(--pale); outline-offset: 3px; }
@@ -70,7 +71,7 @@ a { color: var(--accent); }
 .ctl.knob { cursor: ns-resize; }
 .btnface { transition: fill .06s; }
 .lit .btnface { fill: #f28a5a; }
-.lit text.btn { fill: #2a140a; }
+.lit text.btn, .lit text.job { fill: #2a140a; }
 .held .btnface, .held .keyface { stroke: #f28a5a; stroke-width: 3; }
 .latched .btnface { stroke: #6fc3ff; stroke-width: 3; }
 .keyface { transition: fill .06s; }
@@ -332,14 +333,45 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     <h3>Start here</h3>
     <ol class="steps">
       <li><span class="dir">Start the drones</span><span class="ctls"><span class="cap">Switch on</span> <span class="cap">PLAY</span></span></li>
-      <li><span class="dir">Tune each drone</span><span class="ctls"><span class="cap knob d1">KNOB 1</span> <span class="cap knob d2">KNOB 3</span></span></li>
+      <li><span class="dir">Try the presets</span><span class="ctls"><span class="how">tap</span> <span class="cap white">white keys 1–12</span></span></li>
+      <li><span class="dir">Try a gesture</span><span class="ctls"><span class="how">hold</span> <span class="cap white">Weight</span> <span class="cap white">Shift</span> <span class="cap white">Clean</span> <span class="cap white">Wash</span><span class="how">, let go</span></span></li>
+      <li><span class="dir">Tune each drone</span><span class="ctls"><span class="cap">Pitch lock</span> <span class="how">off, then</span> <span class="cap knob d1">KNOB 1</span> <span class="cap knob d2">KNOB 3</span></span></li>
       <li><span class="dir">Change the sound</span><span class="ctls"><span class="cap">ENV</span> <span class="cap">EDIT</span> <span class="cap">LFO</span> …</span></li>
-      <li><span class="dir">Save a sound to a scene</span><span class="ctls"><span class="how">hold</span> <span class="cap">SAVE</span> <span class="how">first, then</span> <span class="cap white">white key</span></span></li>
+      <li><span class="dir">Save your sound</span><span class="ctls"><span class="cap">SEL</span> + <span class="cap white">Weight</span> <span class="how">(bank A), then hold</span> <span class="cap">SAVE</span> <span class="how">and tap a</span> <span class="cap white">white key</span></span></li>
       <li><span class="dir">Stop the drones</span><span class="ctls"><span class="cap">PLAY</span></span></li>
     </ol>
-    <p class="pnote">The keys aren’t notes: the drones play on their own. Black keys are switches, white keys hold scenes.</p>
+    <p class="pnote">The keys aren’t notes: the drones play on their own. White keys 1–12 hold presets and scenes, the top four are gestures, the black keys are switches.</p>
   </div>
 
+  <h2 class="sec"><span>Scenes</span></h2>
+  <div class="g-card one-r">
+    <h3>White keys <span class="g-sub">12 scenes a bank · lit: a sound is there · blinking: the one you’re on</span></h3>
+    <div class="g-scenes" aria-hidden="true">
+      <span class="on at">1</span><span class="on">2</span><span class="on">3</span><span class="on">4</span><span class="on">5</span><span class="on">6</span><span class="on">7</span><span class="on">8</span>
+      <span class="on">9</span><span class="on">10</span><span class="on">11</span><span class="on">12</span><span class="bank">Weight</span><span class="bank">Shift</span><span class="bank">Clean</span><span class="bank">Wash</span>
+    </div>
+    <dl class="acts">
+      <div><dt>Presets</dt><dd>Twelve sounds to start from, one on each key: Niagara · Abyss · Eerie · Glass · Heaven · Tanpura · Tape · Whistle · Howl · Cathedral · Metal · Clean. Your first bank</dd></div>
+      <div><dt>Go to a scene</dt><dd>Tap a <span class="cap white">white key</span>: the sound glides there</dd></div>
+      <div><dt>Blend into a scene</dt><dd>On the FM‑1: hold a <span class="cap white">white key</span> and press harder to go further in; all the way to take it; <span class="cap">SEL</span> while holding, then let go, keeps the blend. Here: hold to visit, let go to come back</dd></div>
+      <div><dt>Pick a bank</dt><dd>Hold <span class="cap">SEL</span>, tap one of the top four <span class="cap white">white keys</span>: A · B · C · Presets (alone they’re the gestures)</dd></div>
+      <div><dt>Save a sound to a scene</dt><dd>In bank A, B or C (the Presets are fixed): hold <span class="cap">SAVE</span> first, then tap a <span class="cap white">white key</span></dd></div>
+      <div><dt>Save everything</dt><dd>Tap <span class="cap">SAVE</span></dd></div>
+    </dl>
+  </div>
+
+  <h2 class="sec"><span>Gestures</span></h2>
+  <div class="g-card one-l">
+    <h3>Gestures <span class="g-sub">the top four white keys: several settings at once, on top of your sound</span></h3>
+    <dl class="acts">
+      <div><dt>Weight · Shift · Clean · Wash</dt><dd>The top four <span class="cap white">white keys</span>: hold to bring in, let go and it leaves as slowly as you held it; tap: all the way, to stay</dd></div>
+      <div><dt>Gesture time</dt><dd><span class="cap">PRESETS</span>: every gesture faster or slower, even while it moves</dd></div>
+      <div><dt>Shift’s move</dt><dd><span class="cap">SEQ</span> twice (Pitch moves), <span class="cap">KNOB 1</span>: a fifth down to a fifth up</dd></div>
+    </dl>
+  </div>
+
+
+  <h2 class="sec"><span>Play</span></h2>
   <div class="g-card one-r">
     <h3>Knobs and pages</h3>
     <dl class="acts">
@@ -353,9 +385,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     </dl>
   </div>
 
-  <h2 class="sec"><span>Play</span></h2>
-
-  <div class="g-card one-r">
+  <div class="g-card one-l">
     <h3>The Play page</h3>
     <div class="pmap">
       <div class="khdr" aria-hidden="true"><span></span><div class="kcols"><b class="d1 two">Drone I</b><b class="d2 two">Drone II</b><span class="cap knob d1">KNOB 1</span><span class="cap knob d1">KNOB 2</span><span class="cap knob d2">KNOB 3</span><span class="cap knob d2">KNOB 4</span></div></div>
@@ -370,9 +400,9 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     </div>
   </div>
 
-  <h2 class="sec"><span>Tone</span></h2>
 
-  <div class="g-card one-l">
+  <h2 class="sec"><span>Tone</span></h2>
+  <div class="g-card one-r">
     <h3>Tone pages</h3>
     <div class="pmap">
       <div class="khdr" aria-hidden="true"><span></span><div class="kcols"><b class="d1 two">Drone I</b><b class="d2 two">Drone II</b><span class="cap knob d1">KNOB 1</span><span class="cap knob d1">KNOB 2</span><span class="cap knob d2">KNOB 3</span><span class="cap knob d2">KNOB 4</span></div></div>
@@ -477,7 +507,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     </dl>
   </div>
 
-  <div class="g-card mid">
+  <div class="g-card one-l">
     <h3>Motion loop <span class="g-sub">tap REC three times</span></h3>
     <ol class="seq">
       <li><span class="cap">REC</span><span>record</span></li>
@@ -502,36 +532,9 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     </div>
   </div>
 
-  <div class="g-card mid">
-    <h3>Gestures <span class="g-sub">several settings at once, on top of your sound</span></h3>
-    <dl class="acts">
-      <div><dt>Weight · Shift · Clean · Wash</dt><dd>The top four <span class="cap white">white keys</span>: hold to bring in, let go and it leaves as slowly as you held it; tap: all the way, to stay</dd></div>
-      <div><dt>Gesture time</dt><dd><span class="cap">PRESETS</span>: every gesture faster or slower, even while it moves</dd></div>
-      <div><dt>Shift’s move</dt><dd><span class="cap">SEQ</span> twice (Pitch moves), <span class="cap">KNOB 1</span>: a fifth down to a fifth up</dd></div>
-    </dl>
-  </div>
-
-  <h2 class="sec"><span>Scenes</span></h2>
-
-  <div class="g-card one-l">
-    <h3>White keys <span class="g-sub">12 scenes a bank · lit: a sound is saved there · blinking: the one you’re on</span></h3>
-    <div class="g-scenes" aria-hidden="true">
-      <span class="on at">1</span><span class="on">2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
-      <span>9</span><span>10</span><span>11</span><span>12</span><span class="bank">Weight</span><span class="bank">Shift</span><span class="bank">Clean</span><span class="bank">Wash</span>
-    </div>
-    <dl class="acts">
-      <div><dt>Go to a scene</dt><dd>Tap a <span class="cap white">white key</span> (under half a second)</dd></div>
-      <div><dt>Visit, then come back</dt><dd>Hold a <span class="cap white">white key</span>, let go (on the FM‑1: press harder to go further in, all the way to take it, <span class="cap">SEL</span> while holding, then let go, to keep the blend)</dd></div>
-      <div><dt>Save a sound to a scene</dt><dd>Hold <span class="cap">SAVE</span> first, then tap a <span class="cap white">white key</span></dd></div>
-      <div><dt>Pick a bank</dt><dd>Hold <span class="cap">SEL</span>, tap one of the top four <span class="cap white">white keys</span>: A · B · C · Presets (alone they’re the gestures)</dd></div>
-      <div><dt>Presets</dt><dd>Twelve to start from (SEL + G5): Niagara · Abyss · Eerie · Glass · Heaven · Tanpura · Tape · Whistle · Howl · Cathedral · Metal · Clean. Fixed: store your own in A, B or C</dd></div>
-      <div><dt>Save everything</dt><dd>Tap <span class="cap">SAVE</span></dd></div>
-    </dl>
-  </div>
-
   <h2 class="sec"><span>Setup</span></h2>
 
-  <div class="g-card one-r">
+  <div class="g-card one-l">
     <h3>Setup pages</h3>
     <div class="pmap">
       <div class="khdr" aria-hidden="true"><span></span><div class="kcols"><span class="cap knob">KNOB 1</span><span class="cap knob">KNOB 2</span><span class="cap knob">KNOB 3</span><span class="cap knob">KNOB 4</span></div></div>
@@ -544,6 +547,8 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       </div>
     </div>
   </div>
+
+
 
   <div class="g-card mid keys-card" id="keys">
     <h3>Computer keys <span class="g-sub">in this browser</span></h3>
@@ -595,17 +600,28 @@ function el(tag, attrs, parent = svg) {
   parent.appendChild(e);
   return e;
 }
-function text(parent, x, y, s, size, fill = LABEL, weight = 600) {
+function text(parent, x, y, s, size, fill = LABEL, weight = 600, cls = "btn") {
   const t = el("text", { x, y, "text-anchor": "middle", "font-family": "'Barlow Semi Condensed', 'Arial Narrow', Arial, sans-serif",
-                         "font-size": size, "font-weight": weight, fill, "letter-spacing": ".05em", class: "btn", "pointer-events": "none" }, parent);
+                         "font-size": size, "font-weight": weight, fill, "letter-spacing": ".05em", class: cls, "pointer-events": "none" }, parent);
   t.textContent = s;
   return t;
+}
+
+// what each control does in Niagara Drift, written on the panel as in the README's picture (tools/make_screens.py)
+const AMBER = "#ffb04a", TEAL = "#45e3d3", LILAC = "#c99bff", PALE = "#ffd6f0", INK = "#14000f";
+const pills = [];
+function pill(x, y, s, bg, size = 15) {            // a job in a rounded label, centred on (x, y)
+  const g = el("g", { "aria-hidden": "true" }), r = el("rect", { y: y - size * .7, height: size * 1.4, rx: size * .7, fill: bg }, g);
+  pills.push({ r, t: text(g, x, y + size * .35, s, size, INK, 700, "job"), x });
+}
+function fitPills() {                               // each label as wide as its words, once the font is in
+  for (const p of pills) { const w = p.t.getComputedTextLength() + 12; p.r.setAttribute("x", p.x - w / 2); p.r.setAttribute("width", w); }
 }
 
 // ---------------------------------------------------------------- the panel
 el("rect", { x: 4, y: 4, width: 992, height: 632, rx: 44, fill: BODY });
 const knobs = {};
-function knob(x, y, r, label, role) {
+function knob(x, y, r, label, role, job, col) {
   const g = el("g", { class: "ctl knob", tabindex: 0, role: "slider", "aria-label": label });
   el("circle", { cx: x, cy: y, r: r + 5, fill: TRAY }, g);
   el("circle", { cx: x, cy: y, r, fill: KNOB, stroke: "#44474c", "stroke-width": 2 }, g);
@@ -613,46 +629,57 @@ function knob(x, y, r, label, role) {
   text(g, x, y - r - 12, label, 17);
   el("circle", { cx: x, cy: y, r: r + 14, fill: "transparent" }, g);
   knobs[label] = { g, ind, x, y, angle: 0, role };
+  pill(x, y + 40, job, col);
   return knobs[label];
 }
-knob(105, 100, 24, "MASTER", "master");
-knob(215, 100, 24, "SELECT", ENC.SELECT);
-knob(105, 205, 24, "PRESETS", ENC.PRESETS);
-knob(215, 205, 24, "ALGORITHM", ENC.ALGORITHM);
-for (let i = 0; i < 4; i++) knob(610 + i * 104, 100, 22, `KNOB${i + 1}`, ENC[`KNOB${i + 1}`]);
+knob(105, 100, 24, "MASTER", "master", "Volume", PALE);
+knob(215, 100, 24, "SELECT", ENC.SELECT, "LFO rate", LILAC);
+knob(105, 205, 24, "PRESETS", ENC.PRESETS, "Gesture time", PALE);
+knob(215, 205, 24, "ALGORITHM", ENC.ALGORITHM, "Movement", LILAC);
+for (let i = 0; i < 4; i++) knob(610 + i * 104, 100, 22, `KNOB${i + 1}`, ENC[`KNOB${i + 1}`], i < 2 ? "Drone I" : "Drone II", i < 2 ? AMBER : TEAL);
 
 const buttons = {};
-function button(x, y, w, h, label, two) {
+function button(x, y, w, h, label, job) {          // the printed name, and under it its job (in pale)
   const g = el("g", { class: "ctl", role: "button", "aria-label": label });
   el("rect", { x, y, width: w, height: h, rx: 9, fill: BTNC, stroke: "#4a4d52", "stroke-width": 1.5, class: "btnface" }, g);
-  if (two) { text(g, x + w / 2, y + h / 2 - 1, label, 12); text(g, x + w / 2, y + h / 2 + 12, two, 12); }
+  if (job) { text(g, x + w / 2, y + 20, label, label.length < 5 ? 15 : 13.5); text(g, x + w / 2, y + 39, job, job.length < 8 ? 14 : 12.5, PALE, 700, "job"); }
   else text(g, x + w / 2, y + h / 2 + 5, label, 15);
   buttons[label] = { g, bit: BTN[label] };
 }
 el("rect", { x: 58, y: 258, width: 210, height: 58, rx: 14, fill: TRAY });
 button(72, 268, 82, 38, "OCT-"); button(170, 268, 82, 38, "OCT+");
+pill(162, 326, "LFO wave I · wave II", LILAC, 14);
 el("rect", { x: 300, y: 44, width: 236, height: 236, rx: 26, fill: "#111214" });
 el("rect", { x: 568, y: 160, width: 400, height: 140, rx: 18, fill: TRAY });
-const ROW1 = ["FX", "SEL", "ENV", "LFO", "EDIT", "GLO"], ROW2 = ["HOME", "SAVE", "ARP", "SEQ", "PLAY", "REC"];
+const ROW1 = [["FX", "Delay · Rev"], ["SEL", "Fine"], ["ENV", "Tone"], ["LFO", "LFO"], ["EDIT", "Osc · Drive"], ["GLO", "Setup"]],
+      ROW2 = [["HOME", "Play"], ["SAVE", "Save"], ["ARP", "Swell"], ["SEQ", "Partner"], ["PLAY", "On · off"], ["REC", "Loop"]];
 for (let i = 0; i < 6; i++) {
-  button(582 + i * 63, 174, 54, 48, ROW1[i]);
-  if (ROW2[i] === "PLAY") button(582 + i * 63, 236, 54, 48, "PLAY", "STOP"); else button(582 + i * 63, 236, 54, 48, ROW2[i]);
+  button(582 + i * 63, 174, 54, 48, ...ROW1[i]);
+  button(582 + i * 63, 236, 54, 48, ...ROW2[i]);
 }
 
-const keys = [];
+const keys = [], GESTURES = ["Weight", "Shift", "Clean", "Wash"];
+const BLACK_JOB = [["Partner", AMBER], ["Sub", AMBER], ["Filter", AMBER], ["Pitch lock"], ["LFO reset"],
+  ["Partner", TEAL], ["Sub", TEAL], ["Filter", TEAL], ["Pitch link"], ["Hard sync"], ["X-mod"]];
 (function keybed(x0, y0, w, h) {
   el("rect", { x: x0, y: y0, width: w, height: h, rx: 18, fill: TRAY });
   const pitch = (w - 24) / 16, kw = pitch * 0.78;
   for (let i = 0; i < 16; i++) {
     const g = el("g", { class: "ctl", role: "button", "aria-label": `white key ${i + 1}` });
     el("rect", { x: x0 + 12 + i * pitch + (pitch - kw) / 2, y: y0 + h * 0.43, width: kw, height: h * 0.52, rx: kw / 2, fill: KEY_W, class: "keyface white" }, g);
+    text(g, x0 + 12 + i * pitch + pitch / 2, y0 + h * 0.95 - 16, i < 12 ? String(i + 1) : GESTURES[i - 12], i < 12 ? 16 : 12, "#3c3e44", 700, "job");
     keys[WHITE_K[i]] = { g };
   }
   BLACK_AFTER.forEach((a, k) => {
     const g = el("g", { class: "ctl", role: "button", "aria-label": `black key ${k + 1}` });
     el("rect", { x: x0 + 12 + (a + 1) * pitch - kw / 2, y: y0 + h * 0.06, width: kw, height: h * 0.33, rx: kw / 2, fill: KEY_B, class: "keyface black" }, g);
+    const [job, col] = BLACK_JOB[k], cx = x0 + 12 + (a + 1) * pitch, words = job.split(" ");
+    if (col) el("rect", { x: cx - 9, y: y0 + h * 0.06 + 10, width: 18, height: 6, rx: 3, fill: col }, g);
+    words.forEach((wd, j) => text(g, cx, y0 + h * 0.06 + h * 0.165 + (j - (words.length - 1) / 2) * 16 + 10, wd, wd.length < 7 ? 15 : 12.5, INK, 700, "job"));
     keys[BLACK_K[k]] = { g };
   });
+  pill(x0 + 12 + 6 * pitch, y0 + h * 0.67, "12 scenes · Tap: go there · Hold SAVE, then tap: store", PALE, 17);
+  pill(x0 + 12 + 14 * pitch, y0 + h * 0.67, "Gestures · SEL + key: bank", LILAC, 14);
 })(36, 340, 928, 270);
 
 // ---------------------------------------------------------------- touch targets
@@ -697,6 +724,8 @@ BLACK_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", `Key ${k + 
   (BLACK_TIP[k][1] !== BLACK_TIP[k][0] ? `; on the LFO pages: ${BLACK_TIP[k][1]}` : "")));
 WHITE_K.forEach((n, k) => keys[n].g.setAttribute("aria-description",
   `Scene ${k + 1} (${"QWERTYUIASDFGHJK"[k]}): tap to go there, hold to visit; hold SAVE first, then this key, to store; blinks while it's the sound`));
+fitPills();
+document.fonts.ready.then(fitPills);
 for (const k of Object.values(knobs)) hit(k, "knob");
 for (const b of Object.values(buttons)) hit(b);
 keys.forEach((k) => hit(k));

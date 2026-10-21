@@ -332,3 +332,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   to replace them): slow turns missed clicks. The site has a link preview (og.png, 1200×630).
 - 2026-10-21 (Evan, after trying #33-#35 on the FM-1): released as **0.2**, not a beta: a normal GitHub release
   (v0.2, niagara-drift-0.2.fwsc, identity FM-1_8000200); the README is 0.2's manual, linking 0.1's.
+- 2026-10-21 (Evan): the emulator page and the README follow how a player meets it: Start here (PLAY, the presets,
+  a gesture, Pitch lock off to tune, save in bank A), then Scenes, Gestures, Play, Tone, Switches, Movement, Effects,
+  Setup. The emulator's FM-1 carries the README picture's labels, always. The site's top right has a "0.2 · What's
+  new" pill (the changelog at the release's tag); the note under the FM-1 is "Version 0.2." and the risk.
