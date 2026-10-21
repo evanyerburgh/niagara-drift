@@ -330,3 +330,5 @@ at the end. The current state is in the [README](../README.md) and the code.
   are as approved at any level (within 0.1 dB of before #34). The encoders learn a detent only from a knob at rest
   ~0.5 s (was 25 ms), and a state outside the learned ones must be rested on twice in a row to join them (three times
   to replace them): slow turns missed clicks. The site has a link preview (og.png, 1200×630).
+- 2026-10-21 (Evan, after trying #33-#35 on the FM-1): released as **0.2**, not a beta: a normal GitHub release
+  (v0.2, niagara-drift-0.2.fwsc, identity FM-1_8000200); the README is 0.2's manual, linking 0.1's.

@@ -2,9 +2,8 @@
 
 **A drone synth for the M-VAVE FM-1.**
 
-> **This page describes v0.2, in development.** The version you can download is the 0.1 beta: its manual is
-> [the README of 0.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.1-beta/README.md), and the
-> [website](https://evanyerburgh.github.io/niagara-drift/) matches it until v0.2 is released.
+> **This is the manual for 0.2.** For 0.1 beta, see
+> [the README of 0.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.1-beta/README.md).
 
 Niagara Drift is open-source firmware that turns the M-VAVE
 FM-1 into a drone synthesizer: two always-on drones you tune, shape and move rather than play note by
@@ -17,7 +16,7 @@ teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO 
 LFO's routing, and X-mod lets drone I move drone II's filter); the lower 12 white keys hold scenes, in
 banks you pick with SEL and the top four.*
 
-**Status: 0.1 beta.** It runs on the FM-1 (tested on one unit so far) and in the browser:
+**Status: 0.2.** It runs on the FM-1 (tested on one unit so far) and in the browser:
 [try it](https://evanyerburgh.github.io/niagara-drift/) without an FM-1, the same code with sound.
 
 ## What it does
@@ -50,7 +49,7 @@ banks you pick with SEL and the top four.*
    or the FM-1 until it says Done. Then press PLAY.
 
 Or from a terminal, with the file from the [releases](https://github.com/evanyerburgh/niagara-drift/releases):
-`pip3 install mido python-rtmidi`, then `python3 tools/fm1_install.py niagara-drift-0.1-beta.fwsc`.
+`pip3 install mido python-rtmidi`, then `python3 tools/fm1_install.py niagara-drift-0.2.fwsc`.
 
 **What it replaces:** Niagara Drift takes the place of M-VAVE's firmware, so the FM-1's own sounds and
 sequencer are gone until you go back (below).
@@ -58,7 +57,7 @@ sequencer are gone until you go back (below).
 **Updating:** when there's a new version, run the installer again the same way. Your sound and scenes are
 kept, unless that version's notes in the [changelog](CHANGELOG.md) say otherwise.
 
-**Backing up:** from v0.2, `python3 tools/fm1_install.py --backup` saves your sound, scenes and settings to a
+**Backing up:** `python3 tools/fm1_install.py --backup` saves your sound, scenes and settings to a
 file (in `~/niagara-drift-backups/`), and `--restore FILE` puts them back (the FM-1 restarts). The terminal
 installer saves one by itself before every install. Back up before trying another firmware, and restore
 when you come back. A backup is for the same FM-1: it carries that unit's knob calibration too.
@@ -67,7 +66,7 @@ when you come back. A backup is for the same FM-1: it carries that unit's knob c
 same cable (or use M-VAVE's updater, M-UPGRADE, from [m-vave.com/download](https://www.m-vave.com/download)).
 If it ever fails to start twice in a row it comes up in **safe mode** (no sound, USB on), where the installer
 still works. If an FM-1 won't start at all, a Mac can still put the stock firmware back: see
-[BUILDING.md](BUILDING.md#install). Installing firmware is at your own risk; it's a beta.
+[BUILDING.md](BUILDING.md#install). Installing firmware is at your own risk.
 
 ## Playing it
 
@@ -388,7 +387,7 @@ builds the same page from your checkout, serves it at http://localhost:8765 and 
 
 ## Problems and ideas
 
-It's a beta, tested on one FM-1 so far. If something goes wrong, sounds wrong or could be better, please
+It's tested on one FM-1 so far. If something goes wrong, sounds wrong or could be better, please
 [open an issue](https://github.com/evanyerburgh/niagara-drift/issues): say what you did, what happened, and
 what the startup screen says the version is.
 
