@@ -1,0 +1,1122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Niagara Drift</title>
+<meta name="description" content="A drone synth inspired by the SOMA Lyra-8, Moog Subharmonicon and Stylophone CPM DS-2. Two virtual-analog drones that breathe and drift on their own, with presets for instant ambient textures and full controls to push them into harsh, beating, self-oscillating sound.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Niagara Drift">
+<meta property="og:description" content="A drone synth inspired by the SOMA Lyra-8, Moog Subharmonicon and Stylophone CPM DS-2. Two virtual-analog drones that breathe and drift on their own, with presets for instant ambient textures and full controls to push them into harsh, beating, self-oscillating sound.">
+<meta property="og:url" content="https://evanyerburgh.github.io/niagara-drift/">
+<meta property="og:image" content="https://evanyerburgh.github.io/niagara-drift/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Niagara Drift: the title on a red poster with two violet bands, beside the FM-1 as the emulator draws it, its screen showing two drones">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><clipPath id='a'><path d='M-2 9 34 21v7L-2 16z'/></clipPath><rect width='32' height='32' rx='6' fill='%23fe0000'/><path d='M-2 9 34 21v7L-2 16z' fill='%23760595'/><path d='M-2 22 34 6v7L-2 29z' fill='%23760595'/><path d='M-2 22 34 6v7L-2 29z' fill='%23ffd6f0' clip-path='url(%23a)'/></svg>">
+<link rel="preload" href="fonts/inter-tight-var.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* the fonts, served with the page (no third party sees the visitor); all SIL OFL 1.1, licences in fonts/ */
+@font-face { font-family: "Inter Tight"; src: url("fonts/inter-tight-var.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "IBM Plex Mono"; src: url("fonts/ibm-plex-mono-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Barlow Semi Condensed"; src: url("fonts/barlow-semi-condensed-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: "Barlow Semi Condensed"; src: url("fonts/barlow-semi-condensed-700.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+:root { --key-lit: var(--pale); --key-lit-text: var(--black); --key-glow: #b04fd0; --key-glow-soft: #c070ff; --legend: #a6a6ad; --red: #fe0000; --violet: #760595; --shade: #3a0254; --black: #14000f; --pale: #ffd6f0; --d1: #ffb04a; --d2: #45e3d3; --lfo: #dcbcff;
+        --ground: #ffffff14; --ink: #fbe9f2; --muted: #d3b3c4; --rule: #ffffff2e; --accent: #ffd6f0; --card: #3a1235;
+        --card-violet: #601690; --card-dark: #060007; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace; color-scheme: dark; }
+body { background: var(--red); color: var(--black); margin: 0; padding-inline: 16px; padding-block: 0; position: relative; overflow-x: hidden;
+       font: 400 16px/1.55 "Inter Tight", "Helvetica Neue", Arial, sans-serif; }
+main { max-width: 1040px; margin: 0 auto; position: relative; z-index: 2; }
+/* the page: a red field, two slow bands (violet, and one that darkens what it crosses: black on red, black-violet
+ * on the violet) curving down it, a fine grain; the name in near-black (5:1 on the red), pale pink where a band
+ * crosses it (7:1 and more) */
+.bands { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; z-index: 0; }
+.bands path { fill: var(--violet); }
+.bands path.dark { fill: var(--shade); mix-blend-mode: multiply; }
+.grain { position: absolute; inset: 0; pointer-events: none; z-index: 1; opacity: .35; mix-blend-mode: multiply;
+         -webkit-mask-image: linear-gradient(#0000 0 var(--clear, 60vh), #000 calc(var(--clear, 60vh) + 200px));
+         mask-image: linear-gradient(#0000 0 var(--clear, 60vh), #000 calc(var(--clear, 60vh) + 200px));
+         background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); }
+header { position: relative; padding: 5vh 0 1.2rem; --h1: clamp(3.2rem, 11vw, 9.5rem); --tag: clamp(1.1rem, 2vw, 1.55rem); }
+.words { color: var(--black); }
+.over { position: absolute; inset: 0; padding-top: 5vh; color: var(--pale); pointer-events: none; clip-path: url(#bandclip); }
+h1, .over .h1 { font: 500 var(--h1)/.92 "Inter Tight", sans-serif; letter-spacing: -.035em; margin: 0; }
+header p { font: 500 clamp(1.1rem, 2vw, 1.55rem)/1.3 "Inter Tight", sans-serif; margin: 1.1rem 0 0; max-width: 32ch; }
+/* the tagline on one line, its first letter's edge under the title's (Inter Tight's side bearing, 0.0586 em,
+ * is wider at the title's size) */
+header p.tag { font-size: var(--tag); max-width: none; padding-left: calc(0.0586 * (var(--h1) - var(--tag))); }
+@media (min-width: 700px) { header p.tag { white-space: nowrap; } }
+header p.spec { font: 500 clamp(1.05rem, 1.7vw, 1.35rem)/1.4 "Inter Tight", sans-serif; max-width: 44ch; margin: .7rem auto 0; text-align: center; text-wrap: balance; }
+header p.play { max-width: none; text-align: right; margin-top: .7em; }
+header nav { position: absolute; top: 5vh; right: 0; z-index: 1; display: flex; gap: .5rem; font: 500 .95rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+header nav a { color: var(--pale); background: var(--black); padding: .35em .9em; border-radius: 999px; text-decoration: none; }
+header nav a:hover, header nav a:focus-visible { text-decoration: underline; }
+header nav a.ver { background: var(--pale); color: var(--black); text-transform: none; letter-spacing: .02em; }   /* the release, put in by tools/make_pages.py */
+/* a phone: the pills (Install, Source) above the title, not beside it */
+@media (max-width: 560px) { header, .over { padding-top: 3.8rem; } header nav { top: 1rem; } }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--pale); outline-offset: 3px; }
+.vcap { position: absolute; right: .2rem; top: calc(5vh + 3.6rem); writing-mode: vertical-rl; font: 500 .95rem var(--mono);
+        letter-spacing: .14em; text-transform: uppercase; }
+@media (max-width: 700px) { .vcap { display: none; } }
+a { color: var(--accent); }
+.device { position: relative; width: 100%; filter: drop-shadow(0 28px 36px #14000f59); aspect-ratio: 1000 / 640; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
+.device svg { pointer-events: none; }
+.hit { position: absolute; touch-action: none; cursor: pointer; -webkit-tap-highlight-color: transparent; border-radius: 12px; }
+.hit.knob { cursor: ns-resize; border-radius: 50%; }
+.hit:focus-visible { outline: 3px solid var(--pale); outline-offset: 2px; }
+.device svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.device canvas { position: absolute; left: 31.8%; top: 9.6875%; width: 20%; height: 31.25%; image-rendering: pixelated; background: #000; border-radius: 2px; }
+.ctl { cursor: pointer; }
+.ctl.knob { cursor: ns-resize; }
+.btnface { transition: fill .06s; }
+.lit .btnface { fill: var(--pale); }
+.lit text.btn, .lit text.job { fill: var(--black) !important; }   /* over the labels' own colours */
+.held .btnface { stroke: var(--pale); stroke-width: 3; }
+.held .keyface { stroke: var(--violet); stroke-width: 3; }
+.latched .btnface { stroke: var(--lfo); stroke-width: 3; }
+.keyface { transition: fill .06s; }
+.lit .keyface.white { fill: var(--key-lit); }
+.lit .keyface.black { fill: var(--key-lit); }
+.lit .keyface { stroke: var(--key-glow); stroke-width: 3; filter: drop-shadow(0 0 6px var(--key-glow-soft)); }   /* lit: a light behind the key */
+.lit text.job.on-key { fill: var(--key-lit-text) !important; }
+.start { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; background: rgba(20, 0, 15, .45); border-radius: 4.4% / 6.9%; }
+.start button { font: 500 1.05rem "IBM Plex Mono", monospace; letter-spacing: .14em; text-transform: uppercase; padding: .9em 1.8em;
+                border: 0; border-radius: 999px; background: var(--black); color: var(--pale); cursor: pointer; }
+.start button:focus-visible { outline: 3px solid var(--pale); outline-offset: 3px; }
+.start[hidden] { display: none; }
+@media (max-width: 700px) { .start { place-items: end center; padding-bottom: 5%; } }   /* over the keys, not the buttons */
+.turn { display: none; margin: 0 0 .8rem; font-size: .95rem; }
+@media (orientation: portrait) and (max-width: 700px) { .turn { display: block; } }
+.start button:disabled { opacity: .6; cursor: progress; }
+.bar { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: 1.1rem 0 0; font-size: .95rem; }
+.bar .state, .turn { background: var(--black); color: var(--ink); padding: .4em 1em; border-radius: 999px; font: 500 .85rem/1.4 var(--mono); }   /* a band may pass behind */
+.bar button { font: 600 .95rem "Inter Tight", sans-serif; color: var(--black); background: var(--pale); border: 0; padding: .45em 1.1em; border-radius: 999px; cursor: pointer; }
+.bar .cpu { font-variant-numeric: tabular-nums; }
+.guide { --muted: #e2c8d5; --d1: #ffb04a; --d2: #45e3d3; --lfo: #dcbcff; --fx: var(--ink); --pulse: var(--ink); --setup: var(--ink);
+         display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2.4rem; margin: 3.2rem 0 0; }
+/* the cards drift: one to a row, left then right; two to a row, the wider one swapping sides */
+.one-l { grid-column: 1 / span 9; } .one-r { grid-column: 4 / span 9; }
+.wide-l { grid-column: 1 / span 7; } .narrow-r { grid-column: 8 / span 5; }
+.narrow-l { grid-column: 1 / span 5; } .wide-r { grid-column: 6 / span 7; }
+@media (max-width: 900px) { .guide { grid-template-columns: minmax(0, 1fr); } .guide .g-card { grid-column: 1; } }
+.g-card { container-type: inline-size; position: relative; background: var(--card); color: var(--ink); padding: 1.6rem 1.7rem 1.7rem; min-width: 0; border-radius: 32px; }
+.g-wide { grid-column: 1 / -1; }
+/* the published site's row of ways in (tools/make_pages.py puts it in at the ACTIONS mark): four black pills */
+.actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 1.6rem 0 .6rem; position: relative; z-index: 2; }
+.actions a { display: block; background: var(--card); color: var(--pale); border-radius: 18px; padding: 14px 18px; text-decoration: none; }
+.actions a:hover b, .actions a:focus-visible b { text-decoration: underline; }
+.actions b { display: block; font: 600 1.2rem "Inter Tight", sans-serif; }
+.actions span { display: block; font: 500 .8rem/1.4 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.actions-note { position: relative; z-index: 2; margin: 0 0 1rem; display: inline-block; background: var(--card); color: var(--ink);
+                padding: .4em 1em; border-radius: 14px; font: 500 .85rem/1.5 var(--mono); }
+@media (max-width: 760px) { .actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.foot { position: relative; z-index: 2; margin: 5rem -16px 0; padding: 2.4rem max(16px, calc(50vw - 520px)) 2.8rem; background: var(--card);
+        color: var(--ink); border-radius: 48px 48px 0 0; font-size: .95rem; }
+.foot p { margin: 0 0 .6rem; max-width: 70ch; } .foot a { color: var(--pale); }
+.foot p { font-size: .95rem; line-height: 1.55; }
+.foot-nod { font: 500 .8rem/1.6 var(--mono) !important; letter-spacing: .03em; color: var(--muted); }
+body.drawn .g-card, body.drawn .foot, body.drawn .actions a, body.drawn .actions-note { background: transparent; }   /* the bands tint them */
+.bands .ground { fill: var(--card); }
+.bands .on-card { fill: var(--card-violet); }
+.bands .on-card.dark { fill: var(--card-dark); }
+.guide h3 { font: 600 1.45rem/1.15 "Inter Tight", sans-serif; letter-spacing: -.015em; margin: 0 0 .9rem; color: var(--ink); }
+/* a section's title on the red: large, on a black label (a band may pass behind) */
+.full { grid-column: 1 / -1; }
+.mid { grid-column: 4 / span 6; }
+/* a tap sequence: each tap's button, what it does under it, arrows between */
+/* a short card's words to its right, so a band can cross the card without crossing them */
+.push-r > .inner { width: fit-content; margin-left: auto; } .push-l > .inner { width: fit-content; margin-right: auto; }
+@media (max-width: 900px) { .push-r > .inner { margin-left: 0; } }
+.float-card { grid-column: 1 / span 7; }          /* placed where the bands pass at its height (the bands' script) */
+.seq { list-style: none; display: flex; align-items: flex-start; gap: 1.6rem; margin: 1.1rem 0 .3rem; padding: 0; }
+.seq li { display: flex; flex-direction: column; align-items: flex-start; gap: .45rem; position: relative; }
+.seq li + li::before { content: "→"; position: absolute; left: -1.25rem; top: .1rem; color: var(--muted); }
+.seq li > span:last-child { font-size: .95rem; }
+.mid .acts > div { grid-template-columns: 13rem 1fr; }
+.mid .acts.two > div { grid-template-columns: 1fr; }
+@media (hover: none) and (pointer: coarse) { .keys-card, .keys-link { display: none; } }
+.keys-link { margin-left: .6rem; font: 500 .6em var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--pale);
+             background: var(--black); padding: .3em .8em; border-radius: 999px; text-decoration: none; white-space: nowrap; }
+a.keys-link:hover, a.keys-link:focus-visible { text-decoration: underline; }
+html { scroll-behavior: smooth; } @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+.keys-card { scroll-margin-top: 2rem; }   /* no computer keyboard on a phone */
+.acts .note { font-size: .85rem; color: var(--muted); margin-left: .3rem; }
+.krow small.w { color: var(--lfo); }
+.krow .g-grp span.d1 { box-shadow: inset 0 3px 0 var(--d1); } .krow .g-grp span.d2 { box-shadow: inset 0 3px 0 var(--d2); }
+.k.both { border-left-color: transparent; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* the page maps: each button, its page, its second page under it; drone I and II named above the columns */
+.pmap { margin-top: 1rem; }
+/* over each map, the four knobs (and on the drones' pages, which drone): each column reads down to its knob */
+.khdr { display: grid; grid-template-columns: 4.6rem 1fr; gap: .6rem; margin-bottom: .5rem; }
+.kcols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .35rem .5rem; align-items: end; }
+.kcols .two { grid-column: span 2; text-align: center; font: 600 .95rem "Inter Tight", sans-serif; }
+.kcols .d1 { color: var(--d1); } .kcols .d2 { color: var(--d2); }
+.kcols .cap { justify-self: center; }
+.pblock { display: grid; grid-template-columns: 4.6rem 1fr; gap: .6rem; padding: 1.1rem 0; border-top: 1px solid var(--rule); }
+.pblock .g-btn { align-self: start; min-height: 4rem; }
+.pstack { display: grid; gap: .9rem; }
+.pstack .g-page { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; gap: .5rem; }
+.pstack .g-page i { grid-column: 1 / -1; font-style: normal; font-weight: 600; font-size: .9rem; color: var(--muted); margin-bottom: -.1rem; }
+.pstack .k { display: flex; flex-direction: column; justify-content: center; gap: .15rem; min-height: 3.6rem; }
+.k small { font: 500 .8rem/1.2 var(--mono); color: var(--muted); letter-spacing: .02em; }
+.pnote { margin: 0; font-size: .9rem; color: var(--muted); }
+@container (max-width: 440px) {   /* two knobs a row: each tile names its knob */
+  .pstack .k { min-height: 4.8rem; }
+  .pstack .g-page { grid-template-columns: repeat(2, minmax(0, 1fr)); } .khdr { display: none; }
+  .pstack .g-page.drones .dl, .pstack .g-page.drones .k { grid-row: auto; }
+  .pstack .g-page.drones .dl, .pstack .g-page.drones .dl.d2 { grid-column: 1 / -1; }   /* d2's own 3 / 5 made two thin extra columns */
+  .pstack .k::before { font: 700 .76rem "Barlow Semi Condensed", sans-serif; letter-spacing: .05em; opacity: .8; }
+  .pstack .k:nth-of-type(1)::before { content: "KNOB 1"; } .pstack .k:nth-of-type(2)::before { content: "KNOB 2"; }
+  .pstack .k:nth-of-type(3)::before { content: "KNOB 3"; } .pstack .k:nth-of-type(4)::before { content: "KNOB 4"; } }
+/* the black keys: a row each, its title above */
+.kmap h4 { font: 600 1rem "Inter Tight", sans-serif; margin: 1rem 0 .5rem; color: var(--ink); }
+.kmap h4.lfo { color: var(--lfo); }
+.kmap .h4note { font-weight: 400; font-size: .9rem; }
+.g-grp[data-label] { position: relative; margin-top: 1.5rem; }
+.g-grp[data-label]::before { content: attr(data-label); position: absolute; left: .2rem; top: -1.55rem; font: 600 .95rem "Inter Tight", sans-serif; }
+.krow { display: grid; grid-template-columns: 3fr 2fr 3fr 2fr 1fr; gap: .6rem; align-items: end; }
+.krow .g-grp span { display: flex; flex-direction: column; justify-content: center; gap: .2rem; min-height: 4.2rem; padding: .5rem .3rem;
+                    font-size: .9rem; font-weight: 600; line-height: 1.15; }
+.krow .g-grp span small { font: 500 .78rem/1.2 var(--mono); color: var(--muted); }
+@container (max-width: 760px) { .krow { grid-template-columns: 3fr 2fr; } .krow .g-grp.both:last-child { grid-column: 1 / -1; } }
+.sec { grid-column: 1 / -1; margin: 2.4rem 0 -.6rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: .4rem 1rem; }
+.sec span { font: 500 clamp(2rem, 5vw, 3.4rem)/1 "Inter Tight", sans-serif; letter-spacing: -.03em; color: var(--ink);
+            background: var(--black); padding: .18em .5em .24em; border-radius: 999px; }
+.sec small { font: 500 .85rem var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink);
+             background: var(--black); padding: .35em .9em; border-radius: 999px; }
+/* the controls, left; what they do, right */
+.acts { margin: .9rem 0 0; border-bottom: 1px solid var(--rule); }
+.acts > div { display: grid; grid-template-columns: minmax(8.5rem, 34%) 1fr; gap: .2rem 1rem; padding: .55rem 0; border-top: 1px solid var(--rule); }
+.acts dt { display: flex; flex-wrap: wrap; align-items: center; align-content: flex-start; gap: .3rem; font-weight: 600; }
+.acts dd { margin: 0; line-height: 1.45; }
+@container (max-width: 420px) { .acts > div { grid-template-columns: 1fr; } }
+.acts.two { columns: 2; column-gap: 1.4rem; border-bottom: 0; }
+.acts.two > div { grid-template-columns: 1fr; break-inside: avoid; }
+.pnote .cap { margin-right: .2rem; }
+.pnote.combos { display: flex; flex-wrap: wrap; gap: .7rem 2.4rem; color: var(--ink); }
+.pnote.lead { margin-bottom: .2rem; }
+.cap { display: inline-block; font: 700 .8rem/1 "Barlow Semi Condensed", sans-serif; letter-spacing: .05em; padding: .32rem .6rem;
+       border-radius: 8px; background: #2e3135; color: #e8e8ea; box-shadow: inset 0 0 0 1px #44474c, 0 0 0 1px #9a9da4; white-space: nowrap; }
+/* a knob, drawn as the emulator draws it (dark, its edge, a short white pointer, in its recess); its name beside it,
+ * or above it in a map's header, as printed on the FM-1, in its drone's colour */
+.cap.knob { display: inline-flex; align-items: center; gap: .4rem; padding: 0; background: transparent; box-shadow: none; color: var(--ink); }
+.cap.knob::before { content: ""; flex: none; width: 1.5rem; height: 1.5rem; border-radius: 50%;   /* as the emulator's: */
+                    background: linear-gradient(#e8e8ea, #e8e8ea) 50% 14% / 2.5px 23% no-repeat, #1f2124;   /* knob r, its pointer r-5 .. r-15 */
+                    box-shadow: 0 0 0 1px #44474c, 0 0 0 4px #26282c, 0 0 0 5px #9a9da4; margin: 5px; }                  /* its edge, the recess r+5; a fine light rim so it shows on the dark card (5.8:1) */
+.kcols .cap.knob { flex-direction: column-reverse; gap: .3rem; }
+.cap.knob.d1 { color: var(--d1); } .cap.knob.d2 { color: var(--d2); }
+.cap.key { background: #c9cacd; color: var(--black); border-radius: 999px; box-shadow: none; font-weight: 600; letter-spacing: .02em; }
+.cap.white { background: #d9dadc; color: var(--black); border-radius: 999px; box-shadow: none; }
+.cap.pale { background: var(--pale); font-family: "Inter Tight", sans-serif; font-weight: 600; letter-spacing: 0; }
+.how { font: 500 .78rem var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+/* Start here: numbered, the controls first */
+.steps { list-style: none; counter-reset: st; margin: 1rem 0 0; padding: 0; }
+.steps li { counter-increment: st; display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .4rem; padding: .7rem 0 .7rem 2.8rem;
+            position: relative; border-top: 1px solid var(--rule); }
+.steps li::before { content: counter(st); position: absolute; left: 0; top: .55rem; width: 2rem; height: 2rem; border-radius: 50%;
+                    display: grid; place-items: center; font: 600 1rem "Inter Tight", sans-serif; background: var(--pale); color: var(--black); }
+.steps li { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+.steps .dir { font-weight: 600; }
+.steps .ctls { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: .35rem; }
+@container (max-width: 440px) {   /* a phone: each step's controls on their own line, under its words */
+  .steps li { grid-template-columns: minmax(0, 1fr); } .steps .ctls { justify-content: flex-start; } }
+
+.g-sub { display: block; font: 500 .78rem/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: .45rem 0 0; }
+.g-note { color: var(--muted); font-size: .92rem; margin: .7rem 0 0; }
+.g-chips { margin-top: .9rem; border-bottom: 1px solid var(--rule); }
+.chip { display: block; border-top: 1px solid var(--rule); padding: .55rem 0; font-size: .95rem; line-height: 1.45; }
+.chip b { font-weight: 600; }
+.g-knobrow { display: flex; flex-wrap: wrap; gap: 1rem; }
+.g-knobs { display: flex; align-items: center; gap: .5rem; border-radius: 999px; padding: .5rem .9rem; border: 2px solid currentColor; }
+.g-knobs.d1 { color: var(--d1); } .g-knobs.d2 { color: var(--d2); }
+.g-knobs .dot { width: 2.1rem; height: 2.1rem; border-radius: 50%; display: grid; place-items: center; font-weight: 600;
+                color: var(--card); }
+.g-knobs.d1 .dot { background: var(--d1); } .g-knobs.d2 .dot { background: var(--d2); }
+.g-knobs b { margin-left: .3rem; font: 600 1.05rem "Barlow Semi Condensed", sans-serif; }
+.g-pages { display: grid; grid-template-columns: 4.2rem minmax(0, 1fr) minmax(0, 1fr); gap: .4rem .6rem; align-items: stretch; }
+.g-btn { display: grid; place-items: center; font: 700 .95rem "Barlow Semi Condensed", sans-serif; border-radius: 14px;
+         background: #2e3135; color: #e8e8ea; box-shadow: inset 0 0 0 1px #44474c, 0 0 0 1px #9a9da4; letter-spacing: .03em; }
+.g-page { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .25rem; align-items: center; }
+.g-page i { grid-column: 1 / -1; font-style: normal; font-weight: 600; font-size: .85rem; color: var(--muted); }
+.g-again i::before { content: "again → "; font-weight: 400; }
+.g-page .k { font-size: .85rem; font-weight: 500; line-height: 1.15; padding: .35rem .35rem; border-radius: 6px; text-align: center; min-height: 2.1rem; box-shadow: inset 0 0 0 1px #ffffff1f;
+             display: grid; place-items: center; border-left: 3px solid currentColor; background: var(--ground); border-radius: 10px; }
+.k.d1 { color: var(--d1); } .k.d2 { color: var(--d2); }
+.g-page .k.none { color: var(--muted); box-shadow: none; background: transparent; border-color: transparent; }
+/* LFO depths: per drone, so its row says whose (the waves are I and II too: these are the drones) */
+.g-page.drones .dl { grid-row: 2; grid-column: 1 / 3; text-align: center; font: 600 .85rem "Inter Tight", sans-serif; margin-bottom: -.15rem; }
+.g-page.drones .dl.d2 { grid-column: 3 / 5; } .g-page.drones .k { grid-row: 3; }
+.dl.d1 { color: var(--d1); } .dl.d2 { color: var(--d2); } .k.lfo { color: var(--lfo); } .k.fx { color: var(--fx); }
+.k.pulse { color: var(--pulse); } .k.setup { color: var(--setup); } .k.both { color: var(--ink); }
+.k.off { border-left-color: transparent; background: transparent; outline: 1px dashed var(--rule); outline-offset: -1px; }
+.g-tapnote { display: block; font-size: .9rem; align-self: center; color: var(--ink); }
+.g-tapnote small { color: var(--muted); }
+.g-empty { }
+@container (max-width: 640px) {
+  .g-pages { grid-template-columns: 3.6rem minmax(0, 1fr); }
+  .g-pages .g-again, .g-pages .g-tapnote { grid-column: 2; }
+  .g-pages .g-empty { display: none; }
+}
+.minimap { display: block; width: 100%; max-width: 360px; height: auto; margin: .2rem 0 .9rem; }
+.g-trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+.g-trio div { border-radius: 18px; border: 1px solid var(--rule); padding: .5rem; text-align: center; background: var(--ground); }
+.g-trio b { display: block; font: 600 .78rem "Barlow Semi Condensed", sans-serif; color: var(--muted); letter-spacing: .04em; }
+.g-trio span { display: block; font: 600 1.15rem "Barlow Semi Condensed", sans-serif; color: var(--lfo); }
+.g-trio small { color: var(--muted); }
+.g-steps { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; }
+.g-steps b { background: var(--ink); color: var(--ground); border-radius: 999px; padding: .25rem .7rem; font-family: "Barlow Semi Condensed", sans-serif; }
+.g-steps span { font-size: .95rem; }
+.g-keys { display: grid; grid-template-columns: 7.5rem 3fr 2fr 3fr 2fr 1fr; gap: .35rem; align-items: stretch; }
+.g-layer { font: 600 .85rem "Barlow Semi Condensed", sans-serif; color: var(--muted); align-self: center; }
+.g-layer.lfo { color: var(--lfo); }
+.g-grp { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: .2rem; padding: .3rem; border-radius: 16px;
+         border: 2px solid currentColor; }
+.g-grp.d1 { color: var(--d1); } .g-grp.d2 { color: var(--d2); } .g-grp.both { color: var(--muted); }
+.g-grp span { background: var(--ground); color: var(--ink); border-radius: 11px; font-size: .8rem; line-height: 1.15; text-align: center;
+              padding: .45rem .15rem; display: grid; place-items: center; min-height: 2.6rem; }
+.g-grp span.lfo { box-shadow: inset 0 -3px 0 var(--lfo); } .g-grp span.fx { box-shadow: inset 0 -3px 0 var(--fx); }
+.g-grp span.off { color: var(--muted); }
+@container (max-width: 620px) {
+  .g-keys { grid-template-columns: 3fr 2fr; }
+  .g-layer { grid-column: 1 / -1; margin-top: .3rem; }
+  .g-grp.both { grid-column: 1 / -1; }
+}
+.sw { display: inline-block; width: .7rem; height: .7rem; border-radius: 3px; margin-right: .35rem; vertical-align: -.05rem; }
+.sw.lfo { background: var(--lfo); }
+.g-scenes { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 3px; }
+.g-scenes span { background: var(--ground); border: 1px solid var(--rule); border-radius: 0 0 12px 12px; height: 3.2rem;
+                 display: grid; align-items: end; justify-items: center; font-size: .75rem; color: var(--muted); padding-bottom: .2rem; }
+.g-scenes span.on { background: var(--pale); color: var(--black); border-color: var(--pale); }
+.g-scenes span.bank { border-style: dashed; color: var(--muted, inherit); }
+.g-scenes span.at { animation: scene-at 1s step-end infinite; }   /* as the key: 0.6 s lit, 0.4 s dark */
+@keyframes scene-at { 60% { background: var(--ground); color: inherit; border-color: var(--rule); } }
+@media (prefers-reduced-motion: reduce) { .g-scenes span.at { animation: none; outline: 2px solid #f6b48e; outline-offset: 2px; } }
+@media (max-width: 760px) { .g-scenes { grid-template-columns: repeat(8, minmax(0, 1fr)); } .g-scenes span { height: 2.6rem; } }
+.g-kbd { border-collapse: collapse; width: 100%; font-size: .92rem; }
+.g-kbd td { padding: .28rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.g-kbd td:first-child { color: var(--muted); padding-right: .8rem; }
+kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 0 .3em; color: var(--ink); }
+</style>
+</head>
+<body>
+<svg class="bands" id="bands" aria-hidden="true"><defs><clipPath id="bandclip" clipPathUnits="userSpaceOnUse"></clipPath></defs></svg>
+<div class="grain" aria-hidden="true"></div>
+<main>
+<header>
+  <div class="words"><h1>Niagara<br>Drift</h1>
+  <p class="tag">Drone synthesizer firmware for the M-VAVE FM-1.</p>
+  <p class="spec">A drone synth inspired by the SOMA Lyra-8, Moog Subharmonicon and Stylophone CPM DS-2.
+    Two virtual-analog drones that breathe and drift on their own, with presets for instant ambient textures and full controls to push them into harsh, beating, self-oscillating sound.</p>
+  <p class="play">Play it here: the same code the FM-1 runs. <a class="keys-link" href="#keys">Computer keys ↓</a></p>
+  <span class="vcap" aria-hidden="true">Niagara Drift · FM-1</span></div>
+  <div class="over" aria-hidden="true"><div class="h1">Niagara<br>Drift</div>
+  <p class="tag">Drone synthesizer firmware for the M-VAVE FM-1.</p>
+  <p class="spec">A drone synth inspired by the SOMA Lyra-8, Moog Subharmonicon and Stylophone CPM DS-2.
+    Two virtual-analog drones that breathe and drift on their own, with presets for instant ambient textures and full controls to push them into harsh, beating, self-oscillating sound.</p>
+  <p class="play">Play it here: the same code the FM-1 runs. <span class="keys-link">Computer keys ↓</span></p>
+  <span class="vcap">Niagara Drift · FM-1</span></div>
+  <nav><a class="ver" href="https://github.com/evanyerburgh/niagara-drift/blob/v0.2/CHANGELOG.md">0.2 · What’s new</a><a href="install/">Install</a><a href="https://github.com/evanyerburgh/niagara-drift">Source</a></nav>
+</header>
+
+<div class="device" id="device">
+  <div class="start" id="start"><button id="go">Switch on</button></div>
+  <svg id="panel" viewBox="0 0 1000 640" role="application" aria-label="The FM-1: knobs, buttons, screen and keys"></svg>
+  <canvas id="screen" width="240" height="240" aria-label="The FM-1 screen"></canvas>
+</div>
+
+<div class="bar">
+  <span class="state"><span id="status">Off. Sound starts when you switch it on.</span> <span class="cpu" id="cpu"></span></span>
+  <button id="reset" type="button" title="Forget your sound and scenes, and start again from the factory settings">Factory reset</button>
+</div>
+<nav class="actions" aria-label="Get Niagara Drift">
+  <a href="install/"><b>Install</b><span>on your FM-1, from Chrome or Edge</span></a>
+  <a href="firmware/niagara-drift-0.2.fwsc" download><b>Download</b><span>niagara-drift-0.2.fwsc</span></a>
+  <a href="https://github.com/evanyerburgh/niagara-drift#readme"><b>Full manual</b><span>every page, knob and key</span></a>
+  <a href="https://github.com/evanyerburgh/niagara-drift"><b>Source</b><span>on GitHub, GPL-3.0</span></a>
+</nav>
+<p class="actions-note">Version 0.2. Installing is at your own risk; the installer can also put M-VAVE's own firmware back.</p>
+
+<section class="guide" aria-label="How to play">
+
+  <h2 class="sec"><span>Basics</span></h2>
+
+  <div class="g-card one-l first">
+    <h3>Start here</h3>
+    <ol class="steps">
+      <li><span class="dir">Start the drones</span><span class="ctls"><span class="cap">Switch on</span> <span class="cap">PLAY</span></span></li>
+      <li><span class="dir">Try the presets</span><span class="ctls"><span class="how">tap</span> <span class="cap white">white keys 1–12</span></span></li>
+      <li><span class="dir">Try a gesture</span><span class="ctls"><span class="how">hold</span> <span class="cap white">Weight</span> <span class="cap white">Shift</span> <span class="cap white">Clean</span> <span class="cap white">Wash</span><span class="how">, let go</span></span></li>
+      <li><span class="dir">Tune each drone</span><span class="ctls"><span class="cap">Pitch lock</span> <span class="how">off, then</span> <span class="cap knob d1">KNOB 1</span> <span class="cap knob d2">KNOB 3</span></span></li>
+      <li><span class="dir">Change the sound</span><span class="ctls"><span class="cap">ENV</span> <span class="cap">EDIT</span> <span class="cap">LFO</span> …</span></li>
+      <li><span class="dir">Save your sound</span><span class="ctls"><span class="cap">SEL</span> + <span class="cap white">Weight</span> <span class="how">(bank A), then hold</span> <span class="cap">SAVE</span> <span class="how">and tap a</span> <span class="cap white">white key</span></span></li>
+      <li><span class="dir">Stop the drones</span><span class="ctls"><span class="cap">PLAY</span></span></li>
+    </ol>
+    <p class="pnote">The keys aren’t notes: the drones play on their own. White keys 1–12 hold presets and scenes, the top four are gestures, the black keys are switches.</p>
+  </div>
+
+  <h2 class="sec"><span>Scenes</span></h2>
+  <div class="g-card one-r">
+    <h3>White keys <span class="g-sub">12 scenes a bank · lit: a sound is there · blinking: the one you’re on</span></h3>
+    <div class="g-scenes" aria-hidden="true">
+      <span class="on at">1</span><span class="on">2</span><span class="on">3</span><span class="on">4</span><span class="on">5</span><span class="on">6</span><span class="on">7</span><span class="on">8</span>
+      <span class="on">9</span><span class="on">10</span><span class="on">11</span><span class="on">12</span><span class="bank">Weight</span><span class="bank">Shift</span><span class="bank">Clean</span><span class="bank">Wash</span>
+    </div>
+    <dl class="acts">
+      <div><dt>Presets</dt><dd>Twelve sounds to start from, one on each key: Niagara · Abyss · Eerie · Glass · Heaven · Tanpura · Tape · Whistle · Howl · Cathedral · Metal · Clean. Your first bank</dd></div>
+      <div><dt>Go to a scene</dt><dd>Tap a <span class="cap white">white key</span>: the sound glides there</dd></div>
+      <div><dt>Blend into a scene</dt><dd>On the FM‑1: hold a <span class="cap white">white key</span> and press harder to go further in; all the way to take it; <span class="cap">SEL</span> while holding, then let go, keeps the blend. Here: hold to visit, let go to come back</dd></div>
+      <div><dt>Pick a bank</dt><dd>Hold <span class="cap">SEL</span>, tap one of the top four <span class="cap white">white keys</span>: A · B · C · Presets (alone they’re the gestures)</dd></div>
+      <div><dt>Save a sound to a scene</dt><dd>In bank A, B or C (the Presets are fixed): hold <span class="cap">SAVE</span> first, then tap a <span class="cap white">white key</span></dd></div>
+      <div><dt>Save everything</dt><dd>Tap <span class="cap">SAVE</span></dd></div>
+    </dl>
+  </div>
+
+  <h2 class="sec"><span>Gestures</span></h2>
+  <div class="g-card one-l">
+    <h3>Gestures <span class="g-sub">the top four white keys: several settings at once, on top of your sound</span></h3>
+    <dl class="acts">
+      <div><dt>Weight · Shift · Clean · Wash</dt><dd>The top four <span class="cap white">white keys</span>: hold to bring in, let go and it leaves as slowly as you held it; tap: all the way, to stay</dd></div>
+      <div><dt>Gesture time</dt><dd><span class="cap">PRESETS</span>: every gesture faster or slower, even while it moves</dd></div>
+      <div><dt>Shift’s move</dt><dd><span class="cap">SEQ</span> twice (Pitch moves), <span class="cap">KNOB 1</span>: a fifth down to a fifth up</dd></div>
+    </dl>
+  </div>
+
+
+  <h2 class="sec"><span>Play</span></h2>
+  <div class="g-card one-r">
+    <h3>Knobs and pages</h3>
+    <dl class="acts">
+      <div><dt>Shape drone I</dt><dd><span class="cap knob d1">KNOB 1</span> <span class="cap knob d1">KNOB 2</span> <span class="note">on the drone pages</span></dd></div>
+      <div><dt>Shape drone II</dt><dd><span class="cap knob d2">KNOB 3</span> <span class="cap knob d2">KNOB 4</span> <span class="note">on the drone pages</span></dd></div>
+      <div><dt>Volume</dt><dd><span class="cap knob">MASTER</span> <span class="note">past ⅘ it overdrives</span></dd></div>
+      <div><dt>Go to a page</dt><dd>Tap a button, e.g. <span class="cap">ENV</span></dd></div>
+      <div><dt>Preview a page</dt><dd>Hold a button, e.g. <span class="cap">ENV</span></dd></div>
+      <div><dt>Go to page 2</dt><dd>Tap it again</dd></div>
+      <div><dt>Make a micro adjustment</dt><dd>Hold <span class="cap">SEL</span> and turn a knob</dd></div>
+    </dl>
+  </div>
+
+  <div class="g-card one-l">
+    <h3>The Play page</h3>
+    <div class="pmap">
+      <div class="khdr" aria-hidden="true"><span></span><div class="kcols"><b class="d1 two">Drone I</b><b class="d2 two">Drone II</b><span class="cap knob d1">KNOB 1</span><span class="cap knob d1">KNOB 2</span><span class="cap knob d2">KNOB 3</span><span class="cap knob d2">KNOB 4</span></div></div>
+      <div class="pblock">
+        <div class="g-btn">HOME</div>
+        <div class="pstack">
+        <div class="g-page"><i>Play 1</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Pitch</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Cutoff</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Pitch</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Cutoff</span></div>
+        <div class="g-page"><i>Play 2</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Level</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Reso</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Level</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Reso</span></div>
+        <p class="pnote combos"><span>Start or stop drone II alone: <span class="cap">SEL</span> + <span class="cap">PLAY</span></span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <h2 class="sec"><span>Tone</span></h2>
+  <div class="g-card one-r">
+    <h3>Tone pages</h3>
+    <div class="pmap">
+      <div class="khdr" aria-hidden="true"><span></span><div class="kcols"><b class="d1 two">Drone I</b><b class="d2 two">Drone II</b><span class="cap knob d1">KNOB 1</span><span class="cap knob d1">KNOB 2</span><span class="cap knob d2">KNOB 3</span><span class="cap knob d2">KNOB 4</span></div></div>
+      <div class="pblock">
+        <div class="g-btn">ENV</div>
+        <div class="pstack">
+        <div class="g-page"><i>Tone 1</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Noise</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Colour<small>white ↔ pink</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Noise</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Colour<small>white ↔ pink</small></span></div>
+        <div class="g-page"><i>Life</i><span class="k both"><span class="sr">Knob 1: </span>Character<small>clean → vintage</small></span><span class="k both"><span class="sr">Knob 2: </span>Feedback</span><span class="k both"><span class="sr">Knob 3: </span>Age<small>tape wear, slowly</small></span><span class="k both"><span class="sr">Knob 4: </span>Drift<small>slow wander</small></span></div>
+        </div>
+      </div>
+      <div class="pblock">
+        <div class="g-btn">EDIT</div>
+        <div class="pstack">
+        <div class="g-page"><i>Osc</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>X‑Wave<small>sine → square</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>PW<small>square width</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>X‑Wave<small>sine → square</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>PW<small>square width</small></span></div>
+        <div class="g-page"><i>Sub · Drive</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Osc mix<small>osc ↔ sub</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Drive</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Osc mix<small>osc ↔ sub</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Drive</span></div>
+        </div>
+      </div>
+      <div class="pblock">
+        <div class="g-btn">SEQ</div>
+        <div class="pstack">
+        <div class="g-page"><i>Partner</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Interval<small>its gap, tempered or just</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Detune</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Interval<small>its gap, tempered or just</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Detune</span></div>
+        <div class="g-page"><i>Pitch moves</i><span class="k both"><span class="sr">Knob 1: </span>Shift<small>its move, a 5th down–up</small></span><span class="k both"><span class="sr">Knob 2: </span>Pitch glide<small>pitch slides</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Wander<small>a random melody: how often</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Scale<small>Wander’s notes</small></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec"><span>Switches</span></h2>
+
+  <div class="g-card full">
+    <h3>Black keys <span class="g-sub">some step through settings: dark → lit → winking · hold <span class="cap">SEL</span>: the map on screen; touch a key with it held to see what it does</span></h3>
+    <div class="kmap">
+      <h4>Normal</h4>
+      <div class="krow">
+      <div class="g-grp d1" data-label="Drone I"><span><span class="sr">Key 1: </span>Partner<small>on · off</small></span><span><span class="sr">Key 2: </span>Sub<small>−1 −2 ⅓ ⅕</small></span><span><span class="sr">Key 3: </span>Filter<small>LP BP HP</small></span></div>
+      <div class="g-grp both"><span><span class="sr">Key 4: </span>Pitch lock<small>on at start</small></span><span><span class="sr">Key 5: </span>LFO reset<small>hold: lock</small></span></div>
+      <div class="g-grp d2" data-label="Drone II"><span><span class="sr">Key 6: </span>Partner<small>on · off</small></span><span><span class="sr">Key 7: </span>Sub<small>−1 −2 ⅓ ⅕</small></span><span><span class="sr">Key 8: </span>Filter<small>LP BP HP</small></span></div>
+      <div class="g-grp both"><span><span class="sr">Key 9: </span>Pitch link<small>II follows I</small></span><span><span class="sr">Key 10: </span>Hard sync</span></div>
+      <div class="g-grp both"><span><span class="sr">Key 11: </span>I → II<small>cutoff</small></span></div>
+      </div>
+      <h4 class="lfo">On LFO pages <span class="h4note">· in lilac, I and II are the LFO’s two waves</span></h4>
+      <div class="krow">
+      <div class="g-grp d1" data-label="Drone I"><span><span class="sr">Key 1: </span>Osc wave<small class="w">I · II · both</small></span><span><span class="sr">Key 2: </span>Osc to<small>pitch · X‑Wave</small></span><span><span class="sr">Key 3: </span>Filter to<small>cutoff · reso</small></span></div>
+      <div class="g-grp both"><span class="d1"><span class="sr">Key 4: </span>Filter wave<small class="w">I · II · both</small></span><span><span class="sr">Key 5: </span>LFO reset</span></div>
+      <div class="g-grp d2" data-label="Drone II"><span><span class="sr">Key 6: </span>Osc wave<small class="w">I · II · both</small></span><span><span class="sr">Key 7: </span>Osc to<small>pitch · X‑Wave</small></span><span><span class="sr">Key 8: </span>Filter to<small>cutoff · reso</small></span></div>
+      <div class="g-grp both"><span class="d2"><span class="sr">Key 9: </span>Filter wave<small class="w">I · II · both</small></span><span><span class="sr">Key 10: </span>Delay wave<small class="w">I · II · both</small></span></div>
+      <div class="g-grp both"><span><span class="sr">Key 11: </span>I → II<small>cutoff</small></span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec"><span>Movement</span></h2>
+
+  <div class="g-card wide-l">
+    <h3>Movement pages</h3>
+    <div class="pmap">
+      <div class="khdr" aria-hidden="true"><span></span><div class="kcols"><span class="cap knob">KNOB 1</span><span class="cap knob">KNOB 2</span><span class="cap knob">KNOB 3</span><span class="cap knob">KNOB 4</span></div></div>
+      <div class="pblock">
+        <div class="g-btn">LFO</div>
+        <div class="pstack">
+        <div class="g-page drones"><i>LFO depths</i><b class="dl d1">Drone I</b><span class="k d1"><span class="sr">Knob 1, drone I: </span>Osc depth</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Filt depth</span><b class="dl d2">Drone II</b><span class="k d2"><span class="sr">Knob 3, drone II: </span>Osc depth</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Filt depth</span></div>
+        <div class="g-page"><i>Mods</i><span class="k both"><span class="sr">Knob 1: </span>Rate mod<small>LFO speed</small></span><span class="k both"><span class="sr">Knob 2: </span>Mod by<small>which wave</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>X-mod amt<small>I → II</small></span><span class="k both"><span class="sr">Knob 4: </span>Dly LFO<small>LFO on delay time</small></span></div>
+        <p class="pnote">Depths: the middle is none; either side moves the opposite way</p>
+        </div>
+      </div>
+      <div class="pblock">
+        <div class="g-btn">ARP</div>
+        <div class="pstack">
+        <p class="pnote combos lead"><span>Swell on · off: tap <span class="cap">ARP</span></span><span>See the Swell menu: tap <span class="cap">ARP</span> twice</span></p>
+        <div class="g-page"><i>Swell</i><span class="k both"><span class="sr">Knob 1: </span>Rate</span><span class="k both"><span class="sr">Knob 2: </span>Depth</span><span class="k both"><span class="sr">Knob 3: </span>Shape<small>swell → gate</small></span><span class="k both"><span class="sr">Knob 4: </span>Swing</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g-card narrow-r">
+    <h3>The LFO <span class="g-sub">the three knobs at the top left, and OCT− · OCT+ below them</span></h3>
+    <svg class="minimap" viewBox="0 0 1000 640" role="img" aria-label="The FM‑1 from above: SELECT (rate) and ALGORITHM (Movement) are knobs at the top left, OCT− and OCT+ (Wave I and Wave II) the buttons below them">
+      <rect x="4" y="4" width="992" height="632" rx="44" fill="#1d1d20"/>
+      <rect x="318" y="62" width="200" height="200" rx="14" fill="#0a0a0b"/>
+      <circle cx="105" cy="100" r="26" fill="#14000f"/>
+      <g fill="#14000f"><circle cx="610" cy="100" r="22"/><circle cx="714" cy="100" r="22"/><circle cx="818" cy="100" r="22"/><circle cx="922" cy="100" r="22"/></g>
+      <g fill="#2a2a2e"><rect x="582" y="174" width="54" height="48" rx="8"/><rect x="582" y="236" width="54" height="48" rx="8"/><rect x="645" y="174" width="54" height="48" rx="8"/><rect x="645" y="236" width="54" height="48" rx="8"/><rect x="708" y="174" width="54" height="48" rx="8"/><rect x="708" y="236" width="54" height="48" rx="8"/><rect x="771" y="174" width="54" height="48" rx="8"/><rect x="771" y="236" width="54" height="48" rx="8"/><rect x="834" y="174" width="54" height="48" rx="8"/><rect x="834" y="236" width="54" height="48" rx="8"/><rect x="897" y="174" width="54" height="48" rx="8"/><rect x="897" y="236" width="54" height="48" rx="8"/></g>
+      <g fill="#dcbcff" fill-opacity=".35" stroke="#dcbcff" stroke-width="6"><rect x="72" y="272" width="82" height="38" rx="8"/><rect x="170" y="272" width="82" height="38" rx="8"/></g>
+      <rect x="36" y="340" width="928" height="270" rx="18" fill="#0e0e10"/>
+      <g fill="#d9dadc"><rect x="54.0" y="456" width="44" height="140" rx="22"/><rect x="110.5" y="456" width="44" height="140" rx="22"/><rect x="167.0" y="456" width="44" height="140" rx="22"/><rect x="223.5" y="456" width="44" height="140" rx="22"/><rect x="280.0" y="456" width="44" height="140" rx="22"/><rect x="336.5" y="456" width="44" height="140" rx="22"/><rect x="393.0" y="456" width="44" height="140" rx="22"/><rect x="449.5" y="456" width="44" height="140" rx="22"/><rect x="506.0" y="456" width="44" height="140" rx="22"/><rect x="562.5" y="456" width="44" height="140" rx="22"/><rect x="619.0" y="456" width="44" height="140" rx="22"/><rect x="675.5" y="456" width="44" height="140" rx="22"/><rect x="732.0" y="456" width="44" height="140" rx="22"/><rect x="788.5" y="456" width="44" height="140" rx="22"/><rect x="845.0" y="456" width="44" height="140" rx="22"/><rect x="901.5" y="456" width="44" height="140" rx="22"/></g>
+      <g fill="none" stroke="#dcbcff" stroke-width="9">
+        <circle cx="215" cy="100" r="30"/><circle cx="215" cy="210" r="30"/>
+      </g>
+      <g fill="#dcbcff"><circle cx="215" cy="100" r="18"/><circle cx="215" cy="210" r="18"/></g>
+    </svg>
+    <div class="g-trio">
+      <div><b>SELECT</b><span>Rate</span></div>
+      <div><b>ALGORITHM</b><span>Movement</span></div>
+      <div><b>OCT− · OCT+</b><span>Wave I · II</span></div>
+    </div>
+    <dl class="acts">
+      <div><dt>Movement</dt><dd>scales every LFO depth you’ve set (LFO depths, and Dly LFO on Mods): still (0%), as set (100%), double (200%)</dd></div>
+      <div><dt>Wave I</dt><dd>triangle · square · saw · roundtooth · 2× tri · 2× exp · 4× pattern · random</dd></div>
+      <div><dt>Wave II</dt><dd>tri 90° · square 90° · exp saw · log tri · 2× saw · 2× pattern · 4× exp · random glide</dd></div>
+      <div><dt><span class="cap">OCT−</span> <span class="cap">OCT+</span></dt><dd>Tap: the next shape, round and round · with <span class="cap">SEL</span>: the one before</dd></div>
+    </dl>
+  </div>
+
+  <div class="g-card float-card push-r"><div class="inner">
+    <h3>Motion loop <span class="g-sub">tap REC three times</span></h3>
+    <ol class="seq">
+      <li><span class="cap">REC</span><span>record</span></li>
+      <li><span class="cap">REC</span><span>play in a loop</span></li>
+      <li><span class="cap">REC</span><span>stop</span></li>
+    </ol>
+  </div></div>
+
+  <h2 class="sec"><span>Effects</span></h2>
+
+  <div class="g-card one-r">
+    <h3>Effects pages</h3>
+    <div class="pmap">
+      <div class="khdr" aria-hidden="true"><span></span><div class="kcols"><span class="cap knob">KNOB 1</span><span class="cap knob">KNOB 2</span><span class="cap knob">KNOB 3</span><span class="cap knob">KNOB 4</span></div></div>
+      <div class="pblock">
+        <div class="g-btn">FX</div>
+        <div class="pstack">
+        <div class="g-page"><i>Delay</i><span class="k both"><span class="sr">Knob 1: </span>Type<small>tape · wide · ping-pong · clean</small></span><span class="k both"><span class="sr">Knob 2: </span>Time<small>70–450 ms</small></span><span class="k both"><span class="sr">Knob 3: </span>Repeats</span><span class="k both"><span class="sr">Knob 4: </span>Dly mix</span></div>
+        <div class="g-page"><i>Reverb</i><span class="k both"><span class="sr">Knob 1: </span>Type<small>room · hall · cathedral · chorus</small></span><span class="k both"><span class="sr">Knob 2: </span>Length<small>to Inf: a freeze</small></span><span class="k both"><span class="sr">Knob 3: </span>Damp</span><span class="k both"><span class="sr">Knob 4: </span>Rev mix</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec"><span>Setup</span></h2>
+
+  <div class="g-card one-l">
+    <h3>Setup pages</h3>
+    <div class="pmap">
+      <div class="khdr" aria-hidden="true"><span></span><div class="kcols"><span class="cap knob">KNOB 1</span><span class="cap knob">KNOB 2</span><span class="cap knob">KNOB 3</span><span class="cap knob">KNOB 4</span></div></div>
+      <div class="pblock">
+        <div class="g-btn">GLO</div>
+        <div class="pstack">
+        <div class="g-page"><i>Setup 1</i><span class="k both"><span class="sr">Knob 1: </span>Fade<small>PLAY’s fade</small></span><span class="k both"><span class="sr">Knob 2: </span>Switch time<small>black keys, LFO waves</small></span><span class="k both"><span class="sr">Knob 3: </span>Scene time<small>between scenes</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
+        <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 2: </span>Stereo<small>width</small></span><span class="k both"><span class="sr">Knob 3: </span>Pressure<small>light ↔ firm</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="g-card mid keys-card" id="keys">
+    <h3>Computer keys <span class="g-sub">in this browser</span></h3>
+    <dl class="acts two">
+      <div><dt>Turn a knob</dt><dd>drag or scroll</dd></div>
+      <div><dt>Hold a button</dt><dd><kbd>Shift</kbd>-click or right-click; click again to let go</dd></div>
+      <div><dt>Start or stop</dt><dd><kbd>Space</kbd></dd></div>
+      <div><dt>Black keys</dt><dd><kbd>1</kbd>…<kbd>0</kbd> <kbd>-</kbd></dd></div>
+      <div><dt>White keys</dt><dd><kbd>Q</kbd>…<kbd>I</kbd> <kbd>A</kbd>…<kbd>K</kbd></dd></div>
+      <div><dt>SAVE · SEL (hold)</dt><dd><kbd>Enter</kbd> · <kbd>C</kbd></dd></div>
+      <div><dt>HOME · EDIT</dt><dd><kbd>Esc</kbd> · <kbd>V</kbd></dd></div>
+      <div><dt>OCT− · OCT+</dt><dd><kbd>Z</kbd> · <kbd>X</kbd></dd></div>
+      <div><dt>LFO rate · Movement</dt><dd><kbd>↑</kbd><kbd>↓</kbd> · <kbd>←</kbd><kbd>→</kbd></dd></div>
+      <div><dt>Any knob</dt><dd><kbd>Tab</kbd> to it, then <kbd>↑</kbd><kbd>↓</kbd></dd></div>
+    </dl>
+  </div>
+
+</section>
+</main>
+<footer class="foot">
+  <p><b>Niagara Drift</b> is free, open-source firmware (GPL‑3.0) for the M-VAVE FM‑1, made by Evan Yerburgh; not made or endorsed by M-VAVE.
+    <a href="https://github.com/evanyerburgh/niagara-drift">Source on GitHub</a></p>
+  <p>Named for <i>Day of Niagara</i> (the Theatre of Eternal Music, 1965) and La Monte Young’s <i>Drift Studies</i>.
+    As an instrument it’s inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the Soma Lyra‑8.</p>
+  <p>Built on <a href="https://github.com/charlesvestal/fm1-fomni">FoMni</a> and
+    <a href="https://github.com/charlesvestal/fm1-x0x">X0X</a> by Charles Vestal, and on
+    <a href="https://github.com/hugelton/Felucca">Felucca</a>’s FM‑1 platform by Leo Kuroshita (Hügelton Instruments), all GPL‑3.0.
+    Key pressure is read as in <a href="https://github.com/charlesvestal/fm1-monk">MONK-1</a> by Charles Vestal; the delay and reverb
+    follow <a href="https://github.com/Quixotic7/ChoralRootFM1">ChoralRoot</a>’s design by Quixotic7, whose idea the scene crossfade was.
+    This page is set in Inter Tight, IBM Plex Mono and Barlow Semi Condensed (SIL OFL).
+    <a href="https://github.com/evanyerburgh/niagara-drift/blob/main/LICENSING.md">Licensing and credits</a></p>
+  <p class="foot-nod">This is the firmware itself running at the FM‑1’s 44.1 kHz, not a recording; SAVE keeps your sound in this browser.
+    The idea of running FM‑1 firmware in a browser comes from <a href="https://www.groove-os.com/">Groove OS</a>.</p>
+</footer>
+
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const BTN = { FX: 0, SEL: 1, ENV: 2, LFO: 3, EDIT: 4, GLO: 5, HOME: 6, SAVE: 7, ARP: 8, SEQ: 9, PLAY: 10, REC: 11, "OCT-": 12, "OCT+": 13 };
+const ENC = { SELECT: 0, ALGORITHM: 1, PRESETS: 2, KNOB1: 3, KNOB2: 4, KNOB3: 5, KNOB4: 6 };
+const WHITE_K = [0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26];
+const BLACK_K = [1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25];
+const BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14];
+// the FM-1 in black with light keys (after M-VAVE's charcoal one with mint keys); a lit key pale pink with a violet glow
+const BODY = "#1d1d20", TRAY = "#0e0e10", KEY_W = "#d9dadc", KEY_B = "#c9cacd", KNOB = "#0a0a0b", BTNC = "#2a2a2e", LABEL = "#e8e8ea";
+const STORE_KEY = "fm1-drone-emu-store";
+
+const svg = document.getElementById("panel");
+function el(tag, attrs, parent = svg) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  parent.appendChild(e);
+  return e;
+}
+function text(parent, x, y, s, size, fill = LABEL, weight = 600, cls = "btn", track = 0) {
+  const t = el("text", { x, y, "text-anchor": "middle", "font-family": "'Barlow Semi Condensed', 'Arial Narrow', Arial, sans-serif",
+                         "font-size": size, "font-weight": weight, style: `fill: ${fill}`, "letter-spacing": track ? `${track}em` : 0, class: cls,
+                         "pointer-events": "none" }, parent);
+  t.textContent = s;
+  return t;
+}
+
+// the labels, in three roles (a designer's review, 2026-10-21): the printed M-VAVE name small and grey (a legend), what
+// the control does in Niagara Drift under it in colour (a job: amber drone I, teal drone II, lilac the LFO, else pale),
+// and on the keys one size in ink (violet: what a key does instead on the LFO pages). No size depends on a word's length.
+const AMBER = "var(--d1)", TEAL = "var(--d2)", LILAC = "var(--lfo)", PALE = "var(--pale)", LEGEND = "var(--legend)";
+const ON_KEY = "var(--black)", ON_KEY_LFO = "var(--violet)", MUTED_KEY = "#55555b";
+const legend = (g, x, y, s) => text(g, x, y, s, 11, LEGEND, 600, "btn", .08);
+const job = (g, x, y, s, col) => text(g, x, y, s, 14, col, 600, "job");
+const brackets = [];
+function bracket(x1, x2, y, s, col, size, tick) {   // a caption between two rules that span x1..x2, ticks at the ends
+  const g = el("g", { "aria-hidden": "true" }), t = text(g, (x1 + x2) / 2, y + size * .35, s, size, col, 600, "brk");
+  const path = el("path", { style: `stroke: ${col}`, "stroke-width": 1.2, fill: "none", "stroke-linecap": "round" }, g);
+  brackets.push({ t, path, x1, x2, y, tick });
+}
+function fitBrackets() {                            // the rules stop 8 units short of the words, once the font is in
+  for (const b of brackets) {
+    const w = b.t.getBBox().width / 2, m = (b.x1 + b.x2) / 2;
+    b.path.setAttribute("d", `M${b.x1},${b.y + b.tick}V${b.y}H${m - w - 8}M${m + w + 8},${b.y}H${b.x2}V${b.y + b.tick}`);
+  }
+}
+
+// ---------------------------------------------------------------- the panel
+el("rect", { x: 4, y: 4, width: 992, height: 632, rx: 44, fill: BODY });
+const knobs = {};
+function knob(x, y, r, label, role, what, col) {
+  const g = el("g", { class: "ctl knob", tabindex: 0, role: "slider", "aria-label": label });
+  el("circle", { cx: x, cy: y, r: r + 5, fill: TRAY }, g);
+  el("circle", { cx: x, cy: y, r, fill: KNOB, stroke: "#3a3a40", "stroke-width": 2 }, g);
+  const ind = el("line", { x1: x, y1: y - r + 5, x2: x, y2: y - r + 15, stroke: LABEL, "stroke-width": 3, "stroke-linecap": "round" }, g);
+  legend(g, x, y - r - 10, label);
+  if (what) job(g, x, y + r + 20, what, col);
+  el("circle", { cx: x, cy: y, r: r + 14, fill: "transparent" }, g);
+  knobs[label] = { g, ind, x, y, angle: 0, role };
+  return knobs[label];
+}
+knob(105, 100, 24, "MASTER", "master", "Volume", PALE);
+knob(215, 100, 24, "SELECT", ENC.SELECT, "LFO rate", LILAC);
+knob(105, 210, 24, "PRESETS", ENC.PRESETS, "Gesture time", PALE);
+knob(215, 210, 24, "ALGORITHM", ENC.ALGORITHM, "Movement", LILAC);
+for (let i = 0; i < 4; i++) knob(610 + i * 104, 100, 22, `KNOB${i + 1}`, ENC[`KNOB${i + 1}`]);
+bracket(580, 744, 143, "Drone I", AMBER, 14, -4);   // KNOB1-2 are drone I's, KNOB3-4 drone II's (on the drone pages)
+bracket(788, 952, 143, "Drone II", TEAL, 14, -4);
+
+const buttons = {};
+function button(x, y, w, h, label, what, col = PALE) {   // the printed name, and under it the page it opens
+  const g = el("g", { class: "ctl", role: "button", "aria-label": label });
+  el("rect", { x, y, width: w, height: h, rx: 9, fill: BTNC, stroke: "#46464c", "stroke-width": 1.5, class: "btnface" }, g);
+  const top = h < 44 ? 15 : 17;
+  legend(g, x + w / 2, y + top, label.replace("-", "−"));
+  job(g, x + w / 2, y + top + (h < 44 ? 16 : 19), what, col);
+  buttons[label] = { g, bit: BTN[label] };
+}
+el("rect", { x: 58, y: 262, width: 210, height: 58, rx: 14, fill: TRAY });
+button(72, 272, 82, 38, "OCT-", "Wave I", LILAC); button(170, 272, 82, 38, "OCT+", "Wave II", LILAC);
+el("rect", { x: 300, y: 44, width: 236, height: 236, rx: 26, fill: "#0a0a0b" });
+el("rect", { x: 568, y: 160, width: 400, height: 140, rx: 18, fill: TRAY });
+const ROW1 = [["FX", "Delay"], ["SEL", "Fine"], ["ENV", "Tone"], ["LFO", "Depths"], ["EDIT", "Osc"], ["GLO", "Setup"]],
+      ROW2 = [["HOME", "Play"], ["SAVE", "Store"], ["ARP", "Swell"], ["SEQ", "Partner"], ["PLAY", "On/off"], ["REC", "Loop"]];
+for (let i = 0; i < 6; i++) {
+  button(582 + i * 63, 174, 54, 48, ...ROW1[i]);
+  button(582 + i * 63, 236, 54, 48, ...ROW2[i]);
+}
+
+const keys = [], GESTURES = ["Weight", "Shift", "Clean", "Wash"], BANKS = ["A", "B", "C", "Presets"];
+const BLACK_JOB = [[["Partner"], AMBER], [["Sub"], AMBER], [["Filter"], AMBER], [["Pitch", "lock"]], [["LFO", "reset"]],
+  [["Partner"], TEAL], [["Sub"], TEAL], [["Filter"], TEAL], [["Pitch", "link"]], [["Hard", "sync"]], [["X-mod"]]];
+const BLACK_LFO = [["Osc", "wave"], ["Osc to", "X-Wave"], ["Filter to", "reso"], ["Filter", "wave"], null,   // on the LFO pages: what the
+  ["Osc", "wave"], ["Osc to", "X-Wave"], ["Filter to", "reso"], ["Filter", "wave"], ["Delay", "wave"], null];     // key switches to (null: as ever)
+const blackNames = [];                                // each changing key's two names: [normal, LFO pages]
+(function keybed(x0, y0, w, h) {
+  el("rect", { x: x0, y: y0, width: w, height: h, rx: 18, fill: TRAY });
+  const pitch = (w - 24) / 16, kw = pitch * 0.78, wy = y0 + h * 0.46, wh = h * 0.49, by = y0 + h * 0.05, bh = h * 0.31;
+  const left = (i) => x0 + 12 + i * pitch + (pitch - kw) / 2;
+  for (let i = 0; i < 16; i++) {
+    const g = el("g", { class: "ctl", role: "button", "aria-label": `white key ${i + 1}` });
+    el("rect", { x: left(i), y: wy, width: kw, height: wh, rx: kw / 2, fill: KEY_W, class: "keyface white" }, g);
+    const kx = left(i) + kw / 2;                    // one label line along the bottom: scene numbers, gesture names
+    text(g, kx, wy + wh - 14, i < 12 ? String(i + 1) : GESTURES[i - 12], i < 12 ? 14 : 12.5, ON_KEY, 700, "job on-key");
+    if (i >= 12) text(g, kx, wy + 22, BANKS[i - 12], 10.5, MUTED_KEY, 600, "job on-key");   // with SEL: this bank
+    keys[WHITE_K[i]] = { g };
+  }
+  BLACK_AFTER.forEach((a, k) => {
+    const g = el("g", { class: "ctl", role: "button", "aria-label": `black key ${k + 1}` });
+    el("rect", { x: x0 + 12 + (a + 1) * pitch - kw / 2, y: by, width: kw, height: bh, rx: kw / 2, fill: KEY_B, class: "keyface black" }, g);
+    const [words, col] = BLACK_JOB[k], cx = x0 + 12 + (a + 1) * pitch;
+    if (col) el("rect", { x: cx - 9, y: by + 9, width: 18, height: 5, rx: 2.5, style: `fill: ${col}` }, g);
+    const name = (ws, col, attrs) => {              // at most two lines, around one centre on every key
+      const n = el("g", attrs, g);
+      ws.forEach((wd, j) => text(n, cx, by + 52 + (j - (ws.length - 1) / 2) * 14 + 4.5, wd, 12.5, col, 700, "job on-key"));
+      return n;
+    };
+    const normal = name(words, ON_KEY, {});
+    if (BLACK_LFO[k]) blackNames.push([normal, name(BLACK_LFO[k], ON_KEY_LFO, { class: "lfo", display: "none" })]);
+    keys[BLACK_K[k]] = { g };
+  });
+  const capY = 451;                                 // the captions, in the strip between the rows
+  bracket(left(0), left(11) + kw, capY, "Presets & scenes · tap: go · SAVE + tap: store", LEGEND, 11.5, 4);
+  bracket(left(12), left(15) + kw, capY, "Gestures · with SEL: bank", LEGEND, 11.5, 4);
+})(36, 340, 928, 270);
+fitBrackets();
+document.fonts.ready.then(fitBrackets);
+
+// ---------------------------------------------------------------- touch targets
+// The drawing is only a picture (pointer-events: none). Each control gets an invisible HTML target
+// over it: browsers (iOS Safari above all) honour touch-action and touchstart on HTML elements but
+// not on SVG ones, so the controls keep their touches while a finger anywhere else on the device
+// scrolls the page natively.
+const device = document.getElementById("device");
+function hit(c, cls) {
+  const b = c.g.getBBox(), d = document.createElement("div");
+  d.className = "hit" + (cls ? " " + cls : "");
+  Object.assign(d.style, { left: `${b.x / 10}%`, top: `${b.y / 6.4}%`, width: `${b.width / 10}%`, height: `${b.height / 6.4}%` });
+  for (const a of ["role", "aria-label", "tabindex"]) if (c.g.hasAttribute(a)) { d.setAttribute(a, c.g.getAttribute(a)); c.g.removeAttribute(a); }
+  if (c.g.hasAttribute("aria-description")) { d.title = c.g.getAttribute("aria-description"); d.setAttribute("aria-description", d.title); }
+  c.g.setAttribute("aria-hidden", "true");
+  d.addEventListener("touchstart", (e) => e.preventDefault(), { passive: false });
+  device.appendChild(d);
+  c.hit = d;
+}
+// what each control does, on hover (the Buttons list below says the same)
+const TIP = { FX: "Delay: type, time, repeats, mix (again: Reverb: type, length to Inf, damp, mix)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
+  ENV: "Tone 1: noise and its colour, white to pink (again: Life: character, feedback, age, drift); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: Mods: rate mod, mod by, X-mod amount, delay LFO)",
+  EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure)",
+  HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in bank A, B or C)", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
+  PLAY: "Drones in / out (with SEL: drone II alone)", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
+  SELECT: "LFO rate", PRESETS: "Gesture time: every gesture faster or slower", ALGORITHM: "Movement: every LFO depth together",
+  KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
+for (const [n, c] of [...Object.entries(buttons), ...Object.entries(knobs)]) if (TIP[n]) c.g.setAttribute("aria-description", TIP[n]);
+// the keys: the black ones as switches (and what they do on the LFO pages), the white ones as scenes
+const BLACK_TIP = [["drone I's partner on / off", "drone I's osc wave: I, II, both"],
+  ["drone I's sub: −1 oct, −2 oct, ⅓, ⅕", "drone I's osc LFO to X-Wave (instead of pitch)"],
+  ["drone I's filter: LP, BP, HP", "drone I's filter LFO to resonance (instead of cutoff)"],
+  ["pitch lock: the pitch knobs do nothing, and scenes keep your pitch (on at start)", "drone I's filter wave: I, II, both"],
+  ["LFO reset (hold: lock the LFO to the Swell)", "LFO reset (hold: lock the LFO to the Swell)"],
+  ["drone II's partner on / off", "drone II's osc wave: I, II, both"],
+  ["drone II's sub: −1 oct, −2 oct, ⅓, ⅕", "drone II's osc LFO to X-Wave (instead of pitch)"],
+  ["drone II's filter: LP, BP, HP", "drone II's filter LFO to resonance (instead of cutoff)"],
+  ["pitch link: drone II follows drone I (KNOB 3 sets the gap)", "drone II's filter wave: I, II, both"],
+  ["hard sync: drone II to drone I", "the delay's LFO wave: I, II, both"],
+  ["I → II cutoff: drone I's sound moves drone II's filter", "I → II cutoff: drone I's sound moves drone II's filter"]];
+BLACK_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", `Key ${k + 1} (${"1234567890-"[k]}): ${BLACK_TIP[k][0]}` +
+  (BLACK_TIP[k][1] !== BLACK_TIP[k][0] ? `; on the LFO pages: ${BLACK_TIP[k][1]}` : "")));
+WHITE_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", k < 12
+  ? `Scene ${k + 1} (${"QWERTYUIASDFGHJK"[k]}): tap to go there, hold to visit and let go to come back (on the FM-1, press harder to blend in); ` +
+    `in bank A, B or C, hold SAVE first, then this key, to store (the Presets are fixed); blinks while it's the sound`
+  : `${GESTURES[k - 12]} (${"QWERTYUIASDFGHJK"[k]}): a gesture: hold to bring it in, let go and it leaves as slowly as you held it; ` +
+    `tap: all the way, to stay. With SEL: bank ${BANKS[k - 12]}`));
+for (const k of Object.values(knobs)) hit(k, "knob");
+for (const b of Object.values(buttons)) hit(b);
+keys.forEach((k) => hit(k));
+
+// ---------------------------------------------------------------- state and input
+let node = null, btnMask = 0, keyMask = 0, latched = 0, masterPos = 0.74;
+// MASTER's turn (0..1) to the engine's level, as the device maps its pot (main_fm1.c): a square law over the
+// first 4/5 up to the clean top (3277), then the drive in a straight line to 4096
+const masterQ = t => Math.round(t < 0.8 ? 3277 * (t / 0.8) ** 2 : 3277 + (t - 0.8) / 0.2 * 819);
+const btnHeldBy = new Map(), keyHeldBy = new Map();      // pointer / key id -> bit
+function send(m) { if (node) node.port.postMessage(m); }
+function syncButtons() {
+  let m = latched;
+  for (const b of btnHeldBy.values()) m |= 1 << b;
+  if (m !== btnMask) { btnMask = m; send({ type: "buttons", mask: m }); }
+  for (const b of Object.values(buttons)) {
+    b.g.classList.toggle("held", !!(m & (1 << b.bit)));
+    b.g.classList.toggle("latched", !!(latched & (1 << b.bit)));
+    b.hit.classList.toggle("latched", !!(latched & (1 << b.bit)));
+    b.hit.setAttribute("aria-pressed", m & (1 << b.bit) ? "true" : "false");
+  }
+}
+function syncKeys() {
+  let m = 0;
+  for (const k of keyHeldBy.values()) m |= 1 << k;
+  if (m !== keyMask) { keyMask = m; send({ type: "keys", mask: m }); }
+  keys.forEach((k, i) => k.g.classList.toggle("held", !!(m & (1 << i))));
+}
+
+for (const b of Object.values(buttons)) {
+  b.hit.addEventListener("contextmenu", (e) => e.preventDefault());
+  b.hit.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    if (e.shiftKey || e.button === 2) { latched ^= 1 << b.bit; syncButtons(); return; }
+    if (latched & (1 << b.bit)) { latched &= ~(1 << b.bit); syncButtons(); return; }
+    b.hit.setPointerCapture(e.pointerId);
+    btnHeldBy.set("p" + e.pointerId, b.bit);
+    syncButtons();
+  });
+}
+keys.forEach((k, i) => {
+  k.hit.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    k.hit.setPointerCapture(e.pointerId);
+    keyHeldBy.set("p" + e.pointerId, i);
+    syncKeys();
+  });
+  // the strum plate: a finger that went down on a white key moves the held key as it slides
+  if (WHITE_K.includes(i)) k.hit.addEventListener("pointermove", (e) => {
+    const id = "p" + e.pointerId;
+    if (!keyHeldBy.has(id)) return;
+    for (const w of WHITE_K) {
+      const r = keys[w].hit.getBoundingClientRect();
+      if (e.clientX >= r.left && e.clientX < r.right && e.clientY >= r.top - 40 && e.clientY < r.bottom + 40) {
+        if (keyHeldBy.get(id) !== w) { keyHeldBy.set(id, w); syncKeys(); }
+        return;
+      }
+    }
+  });
+});
+function pointerUp(e) {
+  const id = "p" + e.pointerId;
+  if (btnHeldBy.delete(id)) syncButtons();
+  if (keyHeldBy.delete(id)) syncKeys();
+}
+device.addEventListener("pointerup", pointerUp);
+device.addEventListener("pointercancel", pointerUp);
+device.addEventListener("lostpointercapture", pointerUp);
+
+function drawKnob(k) {
+  k.ind.setAttribute("transform", `rotate(${k.angle} ${k.x} ${k.y})`);
+}
+function turn(k, n) {
+  if (!n) return;
+  if (k.role === "master") {
+    masterPos = Math.max(0, Math.min(1, masterPos + n / 64));
+    k.angle = -135 + 270 * masterPos;
+    send({ type: "master", value: masterQ(masterPos) });
+  } else {
+    k.angle = (k.angle + n * 18) % 360;
+    send({ type: "enc", role: k.role, n });
+  }
+  drawKnob(k);
+}
+for (const k of Object.values(knobs)) {
+  if (k.role === "master") { k.angle = -135 + 270 * masterPos; drawKnob(k); }
+  let drag = null, wheel = 0;
+  k.hit.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    k.hit.setPointerCapture(e.pointerId);
+    drag = { y: e.clientY, acc: 0 };
+  });
+  k.hit.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    drag.acc += drag.y - e.clientY;
+    drag.y = e.clientY;
+    const step = k.role === "master" ? 3 : 7;
+    const n = Math.trunc(drag.acc / step);
+    if (n) { drag.acc -= n * step; turn(k, n); }
+  });
+  const end = () => { drag = null; };
+  k.hit.addEventListener("pointerup", end);
+  k.hit.addEventListener("pointercancel", end);
+  k.hit.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const dy = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+    if (Math.abs(dy) >= 50) { turn(k, dy < 0 ? 1 : -1); wheel = 0; return; }   // a mouse wheel notch: one detent
+    wheel -= dy;                                                                   // a trackpad: by distance
+    const n = Math.trunc(wheel / 25);
+    if (n) { wheel -= n * 25; turn(k, n); }
+  }, { passive: false });
+  k.hit.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowUp" || e.key === "ArrowRight") { turn(k, 1); e.preventDefault(); e.stopPropagation(); }
+    if (e.key === "ArrowDown" || e.key === "ArrowLeft") { turn(k, -1); e.preventDefault(); e.stopPropagation(); }
+  });
+}
+
+const KEYMAP = {};   // the black keys are the switches, the white keys the scenes
+"qwertyui".split("").forEach((c, i) => KEYMAP["Key" + c.toUpperCase()] = { key: WHITE_K[i] });
+"asdfghjk".split("").forEach((c, i) => KEYMAP["Key" + c.toUpperCase()] = { key: WHITE_K[8 + i] });
+"1234567890".split("").forEach((c, i) => KEYMAP["Digit" + c] = { key: BLACK_K[i] });
+KEYMAP.Minus = { key: BLACK_K[10] };
+Object.assign(KEYMAP, { Space: { btn: BTN.PLAY }, Enter: { btn: BTN.SAVE }, KeyC: { btn: BTN.SEL }, KeyV: { btn: BTN.EDIT },
+                        Escape: { btn: BTN.HOME }, KeyZ: { btn: BTN["OCT-"] }, KeyX: { btn: BTN["OCT+"] } });
+addEventListener("keydown", (e) => {
+  if (!node || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.code === "ArrowUp" || e.code === "ArrowDown") { turn(knobs.SELECT, e.code === "ArrowUp" ? 1 : -1); e.preventDefault(); return; }
+  if (e.code === "ArrowLeft" || e.code === "ArrowRight") { turn(knobs.ALGORITHM, e.code === "ArrowRight" ? 1 : -1); e.preventDefault(); return; }
+  const m = KEYMAP[e.code];
+  if (!m) return;
+  e.preventDefault();
+  if (e.repeat) return;
+  if (m.key !== undefined) { keyHeldBy.set("k" + e.code, m.key); syncKeys(); }
+  else { btnHeldBy.set("k" + e.code, m.btn); syncButtons(); }
+});
+addEventListener("keyup", (e) => {
+  const id = "k" + e.code;
+  if (keyHeldBy.delete(id)) syncKeys();
+  if (btnHeldBy.delete(id)) syncButtons();
+});
+addEventListener("blur", () => {
+  for (const id of [...btnHeldBy.keys()]) if (id[0] === "k") btnHeldBy.delete(id);
+  for (const id of [...keyHeldBy.keys()]) if (id[0] === "k") keyHeldBy.delete(id);
+  syncButtons(); syncKeys();
+});
+
+// ---------------------------------------------------------------- screen and lights
+const ctx = document.getElementById("screen").getContext("2d");
+const img = ctx.createImageData(240, 240);
+function drawScreen(fb) {
+  const d = img.data;
+  for (let i = 0; i < 240 * 240; i++) {
+    const v = fb[i], p = ((v >> 8) | (v << 8)) & 0xFFFF;
+    d[i * 4] = ((p >> 11) & 31) * 255 / 31;
+    d[i * 4 + 1] = ((p >> 5) & 63) * 255 / 63;
+    d[i * 4 + 2] = (p & 31) * 255 / 31;
+    d[i * 4 + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+function drawLights(b, k, lv) {
+  for (const x of Object.values(buttons)) {
+    const l = lv ? lv[x.bit] : (b & (1 << x.bit) ? 255 : 0), face = x.face || (x.face = x.g.querySelector(".btnface"));
+    x.g.classList.toggle("lit", l >= 128);
+    if (face) face.style.fill = l > 0 && l < 255 ? `color-mix(in srgb, var(--pale) ${Math.round(100 * (l / 255) ** 2)}%, ${BTNC})` : "";
+  }
+  keys.forEach((x, i) => x.g.classList.toggle("lit", !!(k & (1 << i))));
+}
+let lfoLayer = 0;
+function drawLayer(lfo) {                           // the black keys' names follow the page, as the keys do
+  if (!!lfo === !!lfoLayer) return;
+  lfoLayer = lfo;
+  for (const [n, l] of blackNames) { n.setAttribute("display", lfo ? "none" : "inline"); l.setAttribute("display", lfo ? "inline" : "none"); }
+}
+
+// ---------------------------------------------------------------- storage
+function loadStore() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORE_KEY) || "{}"), out = {};
+    for (const [o, b64] of Object.entries(raw)) out[o] = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)).buffer;
+    return out;
+  } catch { return {}; }
+}
+function saveStore(store) {
+  try {
+    const raw = {};
+    for (const [o, u8] of Object.entries(store)) { let s = ""; for (const c of u8) s += String.fromCharCode(c); raw[o] = btoa(s); }
+    localStorage.setItem(STORE_KEY, JSON.stringify(raw));
+  } catch { /* storage unavailable: this session only */ }
+}
+
+// ---------------------------------------------------------------- switching on
+const status = document.getElementById("status"), cpu = document.getElementById("cpu");
+async function switchOn() {
+  const go = document.getElementById("go");
+  go.disabled = true;
+  go.textContent = "Starting...";
+  try {
+    // iPhone: Safari mutes a page's Web Audio in silent mode unless the page says it's playback, as a music
+    // app's (iOS 17's audio session; other browsers have none and ignore it); and sound may only start in the
+    // tap itself, so the context is resumed here, before anything is awaited
+    if (navigator.audioSession) navigator.audioSession.type = "playback";
+    const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });
+    ac.resume();
+    const [wasm] = await Promise.all([fetch("omni.wasm").then((r) => { if (!r.ok) throw new Error(`omni.wasm: ${r.status}`); return r.arrayBuffer(); }),
+                                      ac.audioWorklet.addModule("worklet.js")]);
+    node = new AudioWorkletNode(ac, "omni", { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] });
+    node.connect(ac.destination);
+    const ready = new Promise((res) => {
+      node.port.onmessage = (e) => {
+        const m = e.data;
+        if (m.type === "ready") res();
+        else if (m.type === "frame") {
+          if (m.fb) drawScreen(m.fb);
+          drawLights(m.buttons, m.keys, m.levels);
+          drawLayer(m.lfo);
+          window.omniLast = m;
+          if (m.load !== undefined) cpu.textContent = `Niagara Drift uses ${m.load}% of this computer's time`;
+          if (m.store) saveStore(m.store);
+        }
+      };
+    });
+    node.port.postMessage({ type: "load", wasm, store: loadStore(), master: masterQ(masterPos) }, [wasm]);
+    await ready;
+    await ac.resume();
+    document.getElementById("start").hidden = true;
+    status.textContent = ac.sampleRate === 44100 ? "On." : `On (the browser runs audio at ${ac.sampleRate} Hz).`;
+    syncButtons(); syncKeys();
+  } catch (err) {
+    go.disabled = false;
+    go.textContent = "Switch on";
+    status.textContent = "Could not start: " + (err && err.message || err) + ". Chrome, Edge, Firefox and Safari should all work.";
+  }
+}
+document.getElementById("go").addEventListener("click", switchOn);
+document.getElementById("reset").addEventListener("click", () => {
+  if (document.getElementById("reset").dataset.armed) {
+    try { localStorage.removeItem(STORE_KEY); } catch {}
+    location.reload();
+  } else {
+    document.getElementById("reset").dataset.armed = "1";
+    document.getElementById("reset").textContent = "Click again to forget everything";
+  }
+});
+// ---------------------------------------------------------------- the bands
+// two thick waves from the top of the page down, slightly apart in length so they cross and part like two drones
+// beating; together they swing slowly from side to side down the page, across the name, and drift (a cycle about two
+// minutes; still if the reader asks for less motion). The name's pale copy is cut to them, so it reads wherever they
+// pass. The cards' ground is drawn here too, so the bands print over it: lighter violet, or darker, where they cross
+(function () {
+  const bands = document.getElementById("bands"), clip = document.getElementById("bandclip");
+  const head = document.querySelector("header");
+  const B = [{ w: .1, amp: .1, len: .9, ph: 0, dark: 0 }, { w: .1, amp: .1, len: .8, ph: .5, dark: 1 }];
+  const SWING = .3, SWING_LEN = 2.6, SWING_PH = 1.98;   // the swing: +-30 % of the width, once every 2.6 screens,
+                                                // starting a little left of the middle (through the name)
+  const SPEED = .045, T0 = 45;                 // where it starts: the shape chosen
+  const paths = B.map((b) => el("path", b.dark ? { class: "dark" } : {}, bands));
+  const cuts = B.map(() => el("path", {}, clip));
+  const cards = [...document.querySelectorAll(".g-card, .foot, .actions a, .actions-note")], grain = document.querySelector(".grain");
+  const ground = el("g", {}, bands), cardclip = el("clipPath", { id: "cardclip" }, bands.querySelector("defs"));
+  const tiles = cards.map(() => el("rect", { class: "ground" }, ground));
+  const tclip = cards.map(() => el("rect", {}, cardclip));
+  const over = B.map((b) => el("path", { class: "on-card" + (b.dark ? " dark" : ""), "clip-path": "url(#cardclip)" }, bands));
+  document.body.classList.add("drawn");
+  const still = matchMedia("(prefers-reduced-motion: reduce)");
+  const t1 = performance.now();
+  function shape(b, W, H, V, t) {
+    const L = [], R = [], n = Math.ceil(H / 12);
+    for (let i = 0; i <= n; i++) {
+      const y = H * i / n, a = 2 * Math.PI * y / (V * b.len) + b.ph + t * SPEED;
+      const cx = W * (.5 + SWING * Math.cos(2 * Math.PI * y / (V * SWING_LEN) + SWING_PH) + b.amp * Math.sin(a));
+      const hw = W * b.w / 2 * (1 + .2 * Math.sin(2 * Math.PI * y / (V * b.len * .7) + b.ph * 1.3 - t * SPEED * .8));
+      L.push((cx - hw).toFixed(1) + "," + y.toFixed(1));
+      R.push((cx + hw).toFixed(1) + "," + y.toFixed(1));
+    }
+    return "M" + L.join("L") + "L" + R.reverse().join("L") + "Z";
+  }
+  function draw(now) {
+    bands.style.height = "0";                  // the page as tall as its content, not as the last drawing
+    const W = document.documentElement.clientWidth, H = document.documentElement.scrollHeight, V = innerHeight;
+    if (!W || !V) return;                      // a hidden or zero-size window: nothing to draw
+    const t = T0 + (still.matches ? 0 : (now - t1) / 1000);
+    bands.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    bands.style.height = H + "px";
+    const top = head.getBoundingClientRect().top + scrollY, left = head.getBoundingClientRect().left;
+    B.forEach((b, i) => {
+      const d = shape(b, W, H, V, t);
+      paths[i].setAttribute("d", d);
+      cuts[i].setAttribute("d", d);
+      cuts[i].setAttribute("transform", `translate(${-left} ${-top})`);   // the clip in the header's own space
+      over[i].setAttribute("d", d);
+    });
+    cards.forEach((c, i) => {                   // each card's ground, where it is now, as round as it is
+      const r = c.getBoundingClientRect(), cs = getComputedStyle(c);
+      const a = { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height,
+                  rx: parseFloat(cs.borderTopLeftRadius) || 0 };
+      if (c.classList.contains("foot")) a.height += a.rx;   // its square foot
+      for (const e of [tiles[i], tclip[i]]) for (const k in a) e.setAttribute(k, a[k]);
+    });
+    grain.style.setProperty("--clear", Math.round(head.getBoundingClientRect().bottom + scrollY) + "px");
+  }
+  let last = 0;
+  function tick(now) { if (now - last > 80) { draw(now); last = now; } if (!still.matches) requestAnimationFrame(tick); }
+  // a short card (.float-card, 7 columns) goes where the bands pass at its height, which depends on the window's size:
+  // of every column and side for its words, the one where, over a whole drift, the bands cross the card most and its
+  // words (.inner) least (.push-r / .push-l)
+  const floats = [...document.querySelectorAll(".float-card")], guide = document.querySelector(".guide");
+  function place() {
+    const W = document.documentElement.clientWidth, V = innerHeight, g = guide.getBoundingClientRect();
+    if (!W || !V) return;
+    for (const f of floats) {
+      if (matchMedia("(max-width: 900px)").matches) { f.style.gridColumn = ""; continue; }
+      const gap = parseFloat(getComputedStyle(guide).columnGap), step = (g.width + gap) / 12, span = 7, cw = span * step - gap;
+      const r = f.getBoundingClientRect(), pad = parseFloat(getComputedStyle(f).paddingLeft), ww = f.querySelector(".inner").getBoundingClientRect().width;
+      const ys = [0, .25, .5, .75, 1].map((k) => r.top + scrollY + k * r.height), spans = [];   // the bands' extent at each, over time
+      for (let k = 0; k < 64; k++) {
+        const t = k * 2 * Math.PI / SPEED / 64, row = [];
+        for (const b of B) for (const y of ys) {
+          const a = 2 * Math.PI * y / (V * b.len) + b.ph + t * SPEED;
+          const cx = W * (.5 + SWING * Math.cos(2 * Math.PI * y / (V * SWING_LEN) + SWING_PH) + b.amp * Math.sin(a)) - g.left;
+          const hw = W * b.w / 2 * (1 + .2 * Math.sin(2 * Math.PI * y / (V * b.len * .7) + b.ph * 1.3 - t * SPEED * .8));
+          row.push([cx - hw, cx + hw]);
+        }
+        spans.push(row);
+      }
+      let best = null;
+      for (let start = 0; start <= 12 - span; start++) for (const right of [true, false]) {
+        const L = start * step, wl = right ? L + cw - pad - ww : L + pad;
+        let cross = 0, touch = 0;
+        for (const row of spans) {
+          cross += row.some(([a, z]) => z > L && a < L + cw);
+          touch += row.some(([a, z]) => z > wl - 8 && a < wl + ww + 8);
+        }
+        const score = Math.min(cross, 48) - 3 * touch;   // crossed three quarters of the time is plenty; the words matter more
+        if (!best || score > best.score) best = { score, start, right };
+      }
+      f.style.gridColumn = `${best.start + 1} / span ${span}`;
+      f.classList.toggle("push-r", best.right); f.classList.toggle("push-l", !best.right);
+    }
+  }
+  place();
+  document.fonts.ready.then(() => { place(); draw(performance.now()); });
+  draw(t1);
+  requestAnimationFrame(tick);
+  still.addEventListener("change", () => requestAnimationFrame(tick));
+  addEventListener("resize", () => { place(); draw(performance.now()); });
+})();
+</script>
+</body>
+</html>

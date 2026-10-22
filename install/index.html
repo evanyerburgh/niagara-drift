@@ -1,0 +1,456 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only
+     Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments
+     Niagara Drift's web installer: Felucca's installer page (web/index_pkg.html, by way of X0X and FoMni), in
+     Niagara Drift's look, English only. tools/make_pages.py inlines fm1pkg.js and fm1ota.js and the package's
+     metadata; it is served at install/, beside the emulator page (its fonts in ../fonts). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install Niagara Drift</title>
+<meta name="description" content="Install Niagara Drift on an M-VAVE FM-1 from Chrome or Edge, over USB; or put M-VAVE's firmware back.">
+<style>
+@font-face { font-family: "Inter Tight"; src: url("../fonts/inter-tight-var.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "IBM Plex Mono"; src: url("../fonts/ibm-plex-mono-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+:root { --red: #fe0000; --black: #14000f; --pale: #ffd6f0; --ink: #fbe9f2; --muted: #d3b3c4; --rule: #ffffff2e;
+        --card: #3a1235; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace; color-scheme: dark; }
+body { margin: 0; background: var(--red); color: var(--ink); padding: 0 16px;
+       font: 400 16px/1.6 "Inter Tight", "Helvetica Neue", Arial, sans-serif; }
+main { max-width: 600px; margin: 0 auto; padding: 6vh 0 64px; }
+.top { font: 500 .9rem var(--mono); letter-spacing: .08em; text-transform: uppercase; margin: 0 0 1rem; }
+.top a { color: var(--pale); background: var(--black); padding: .35em .9em; border-radius: 999px; text-decoration: none; }
+.top a:hover, .top a:focus-visible { text-decoration: underline; }
+h1 { font: 500 clamp(2.4rem, 8vw, 3.6rem)/1 "Inter Tight", sans-serif; letter-spacing: -.03em; color: var(--black); margin: 0 0 1.4rem; }
+.card { background: var(--card); border-radius: 22px; padding: 22px 24px; margin: 0 0 16px; }
+h2 { font: 600 1.25rem "Inter Tight", sans-serif; margin: 0 0 .8rem; color: var(--pale); }
+p { margin: 0 0 .8rem; }
+ol { margin: 0 0 1rem; padding-left: 1.3rem; } li { margin: 0 0 .35rem; }
+.small { color: var(--muted); font-size: .92rem; }
+a { color: var(--pale); }
+button { font: 600 1rem "Inter Tight", sans-serif; background: var(--pale); color: var(--black); border: 0; border-radius: 999px;
+         padding: .6em 1.6em; cursor: pointer; }
+button:disabled { opacity: .35; cursor: default; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--pale); outline-offset: 3px; }
+#status { margin: 1rem 0 0; min-height: 1.6em; font-weight: 600; }
+progress { width: 100%; height: 6px; margin-top: 1rem; accent-color: var(--pale); }
+pre { color: var(--muted); font: 500 .75rem/1.5 var(--mono); white-space: pre-wrap; margin: 1rem 0 0; max-height: 12rem; overflow: auto; }
+pre:empty { display: none; }
+input[type=file] { font: inherit; font-size: .9rem; color: var(--muted); max-width: 100%; }
+.foot { color: var(--black); font-size: .9rem; margin-top: 2rem; } .foot a { color: var(--black); }
+</style>
+</head>
+<body>
+<main>
+  <p class="top"><a href="../" data-t="manual"></a></p>
+  <h1>Install<br>Niagara Drift</h1>
+  <div class="card">
+    <h2 data-t="installh"></h2>
+    <ol>
+      <li data-t="step1"></li>
+      <li data-t="step2"></li>
+      <li data-t="step3"></li>
+    </ol>
+    <p><button id="go" disabled data-t="install"></button></p>
+    <progress id="bar" max="100" value="0"></progress>
+    <p id="status" role="status"></p>
+    <pre id="log"></pre>
+  </div>
+  <div class="card">
+    <h2 data-t="riskh"></h2>
+    <p class="small" data-t="beta"></p>
+    <p class="small" data-t="safe"></p>
+    <p class="small"><span data-t="brick"></span>
+      <a href="https://github.com/evanyerburgh/niagara-drift/blob/main/BUILDING.md#install" data-t="bricklink"></a></p>
+  </div>
+  <div class="card">
+    <h2 data-t="stockh"></h2>
+    <p class="small" data-t="stockwhy"></p>
+    <ol class="small">
+      <li><span data-t="stock1"></span> <a id="stocklink" href="https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc">FM-1.fwsc</a>
+        <span data-t="stockalt"></span> <a href="https://www.m-vave.com/download" target="_blank" rel="noopener">m-vave.com/download</a>)</li>
+      <li><span data-t="stock2"></span><br><input type="file" id="stockfile" accept=".fwsc"></li>
+      <li data-t="stock3"></li>
+    </ol>
+    <p><button id="stockgo" disabled data-t="stockinstall"></button></p>
+  </div>
+  <p class="foot">Niagara Drift is free, open-source firmware (GPL-3.0, no warranty), not made or endorsed by M-VAVE. This installer
+    is Felucca's, by Leo Kuroshita (<a href="https://hugelton.com" target="_blank" rel="noopener">Hügelton Instruments</a>), by way of
+    X0X and FoMni by Charles Vestal. M-VAVE and FM-1 are trademarks of their owners.
+    <a href="https://github.com/evanyerburgh/niagara-drift">Source</a></p>
+</main>
+<script type="module">
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments
+//
+// FM-1 .fwsc packages in the browser: the package identity and the image the
+// device reads during an update.
+
+const BLOCKS = 20, BLK = 0x30, KEEP = 0x2F;
+
+// the package identity ("FM-1_904"): one marker byte after each of the first 20 blocks
+function productOf(fwsc) {
+  if (fwsc.length < BLOCKS * BLK) throw new Error("not an FM-1 package (too short)");
+  let s = "";
+  for (let i = 0; i < BLOCKS; i++) {
+    const m = fwsc[i * BLK + KEEP];
+    if (m !== 0x7D) s += String.fromCharCode((m - i - 1) & 0xFF);
+  }
+  return s;
+}
+
+// the image the device addresses during an update: the .fwsc without the 20 marker bytes
+function logicalImage(fwsc) {
+  const out = new Uint8Array(fwsc.length - BLOCKS);
+  for (let i = 0; i < BLOCKS; i++) out.set(fwsc.subarray(i * BLK, i * BLK + KEEP), i * KEEP);
+  out.set(fwsc.subarray(BLOCKS * BLK), BLOCKS * KEEP);
+  return out;
+}
+
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments
+//
+// The FM-1 USB-MIDI update protocol (M-UPGRADE compatible) over WebMIDI.
+// Step 1: the running firmware reads parts of the package and stages the update
+// loader. Step 2: the loader reads the whole image and writes it. In both steps
+// the device sends cmd 0x30 read requests on the logical image and we answer.
+
+const HS_QUERY = [0xF0, 0x00, 0x32, 0x45, 0x00, 0x00, 0x00, 0x40, 0x7F, 0xF7];
+const UPGRADE = [0xF0, 0x22, 0x24, 0x35, 0x7F, 0xF7];
+const MAXDATA = 512;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const IS_OTA = (id) => /^ota-/i.test(id.model);
+
+// errors carry a code the pages translate: notfound, model, stopped, noloader, lost, noreturn,
+// mismatch (detail: the identity the device reports), badreq
+function fail(code, msg, detail = "") { const e = new Error(msg); e.code = code; e.detail = detail; return e; }
+
+function pack7(data) {
+  const out = []; let acc = 0, nb = 0;
+  for (const b of data) {
+    acc |= b << nb; nb += 8;
+    while (nb >= 7) { out.push(acc & 0x7F); acc >>>= 7; nb -= 7; }
+  }
+  if (nb) out.push(acc & 0x7F);
+  return out;
+}
+
+function unpack7(s) {
+  const out = []; let acc = 0, nb = 0;
+  for (const b of s) {
+    acc |= (b & 0x7F) << nb; nb += 7;
+    while (nb >= 8) { out.push(acc & 0xFF); acc >>>= 8; nb -= 8; }
+  }
+  return out;
+}
+
+function response(addr, data, fl = 0) {
+  const len = data.length;
+  const body = [0x00, 0x59, 0x30, (len + 8) & 0xFF, ((len + 8) >> 8) & 0xFF, 0, fl,
+    addr & 0xFF, (addr >>> 8) & 0xFF, (addr >>> 16) & 0xFF, (addr >>> 24) & 0xFF,
+    len & 0xFF, (len >> 8) & 0xFF, 0, ...data];
+  let s = 0;
+  for (let i = 6; i < body.length; i++) s += body[i];
+  body.push(~s & 0xFF);
+  return [0xF0, ...pack7(body), 0xF7];
+}
+
+function parseRequest(pkt) {
+  if (pkt[0] !== 0xF0 || pkt[pkt.length - 1] !== 0xF7) return null;
+  const u = unpack7(pkt.slice(1, -1));
+  if (u.length !== 15 || u[0] !== 0 || u[1] !== 0x59 || u[2] !== 0x30) return null;
+  let s = 0;
+  for (let i = 6; i < 14; i++) s += u[i];
+  if ((~s & 0xFF) !== u[14]) return null;
+  return { fl: u[6], addr: (u[7] | (u[8] << 8) | (u[9] << 16) | (u[10] << 24)) >>> 0, len: u[11] | (u[12] << 8) | (u[13] << 16) };
+}
+
+function parseIdentity(pkt) {
+  const d = unpack7(pkt.slice(1, -1));
+  if (d.length !== 34 || d[0] !== 0 || d[1] !== 0x59 || d[2] !== 0x11) return null;
+  const txt = String.fromCharCode(...d.slice(6, 33)).replace(/\0+$/, "");
+  const m = /^([^_]+)_(\d+)$/.exec(txt);
+  return m ? { text: txt, model: m[1], version: parseInt(m[2], 10) } : null;
+}
+
+// one MIDI in/out pair with a SysEx queue
+class Link {
+  constructor(input, output) {
+    this.input = input; this.output = output; this.q = []; this.waiter = null;
+    input.onmidimessage = (ev) => {
+      if (ev.data[0] !== 0xF0) return;
+      this.q.push(Array.from(ev.data));
+      if (this.waiter) { const w = this.waiter; this.waiter = null; w(); }
+    };
+  }
+  get lost() { return this.input.state === "disconnected" || this.output.state === "disconnected"; }
+  // false when the port is gone (unplugged): WebMIDI throws on a disconnected output
+  send(bytes) {
+    try { this.output.send(bytes); return true; } catch (_) { return false; }
+  }
+  drain() { this.q.length = 0; }
+  async read(ms) {
+    if (!this.q.length) {
+      let tm;
+      await Promise.race([new Promise((r) => { this.waiter = r; }), new Promise((r) => { tm = setTimeout(r, ms); })]);
+      clearTimeout(tm);
+      this.waiter = null;
+    }
+    return this.q.shift() || null;
+  }
+  close() { this.input.onmidimessage = null; }
+}
+
+async function handshake(link, tries = 3) {
+  link.drain();
+  for (let t = 0; t < tries; t++) {
+    if (!link.send(HS_QUERY)) return null;
+    const end = Date.now() + 1000;
+    while (Date.now() < end) {
+      const p = await link.read(end - Date.now());
+      if (!p) break;
+      const id = parseIdentity(p);
+      if (id) return id;
+    }
+  }
+  return null;
+}
+
+class Updater {
+  constructor(access, log) {
+    this.access = access;
+    this.log = log || (() => {});
+  }
+
+  // every in/out pair with the same port name that answers the handshake
+  async find(filter) {
+    const outs = [...this.access.outputs.values()];
+    for (const input of this.access.inputs.values()) {
+      if (input.state === "disconnected") continue;
+      if (!/fm-1|felucca|ota|composite|sinco|usb-midi/i.test(input.name || "")) continue;   // never probe other gear
+      const output = outs.find((o) => o.name === input.name) || (outs.length === 1 ? outs[0] : null);
+      if (!output) continue;
+      try { await input.open(); await output.open(); } catch (_) { continue; }
+      const link = new Link(input, output);
+      const id = await handshake(link, 2);
+      if (id && (!filter || filter(id))) return { link, id, name: input.name };
+      link.close();
+    }
+    return null;
+  }
+
+  async waitFor(filter, ms) {
+    const end = Date.now() + ms;
+    while (Date.now() < end) {
+      const dev = await this.find(filter);
+      if (dev) return dev;
+      await sleep(1000);
+    }
+    return null;
+  }
+
+  // serve read requests until the device asks for one of the finish addresses; stops early
+  // when the port disappears (lost: true) instead of waiting out idleMs
+  async serve(link, image, finishAddr, idleMs, onProgress) {
+    let served = 0, last = Date.now();
+    for (;;) {
+      const pkt = await link.read(1000);
+      if (!pkt) {
+        if (link.lost) return { served, finished: false, lost: true };
+        if (Date.now() - last > idleMs) return { served, finished: false };
+        continue;
+      }
+      const r = parseRequest(pkt);
+      if (!r) continue;
+      last = Date.now();
+      if (r.addr === 0xE0000000 || r.addr === 0xF0000000) {
+        link.send(response(r.addr, [...new TextEncoder().encode("success"), 0]));
+        if (r.addr === finishAddr) return { served, finished: true };
+        continue;
+      }
+      if (r.len > MAXDATA || r.addr + r.len > image.length) throw fail("badreq", `bad request ${r.addr.toString(16)}+${r.len}`);
+      await sleep(10);
+      if (!link.send(response(r.addr, Array.from(image.subarray(r.addr, r.addr + r.len)), r.fl))) {
+        return { served, finished: false, lost: true };
+      }
+      served++;
+      if (onProgress) onProgress(served, r.addr);
+    }
+  }
+
+  // full install: running firmware -> loader -> new firmware
+  async install(image, product, onStep) {
+    const step = onStep || (() => {});
+    const dev = await this.find((id) => !IS_OTA(id));
+    if (!dev) throw fail("notfound", "FM-1 not found (USB cable, and no other app using it?)");
+    const [model] = product.split("_");
+    if (dev.id.model !== model) { dev.link.close(); throw fail("model", `the device is ${dev.id.text}, the package is for ${product}`); }
+    step("start", dev.id.text);
+    dev.link.send(UPGRADE);
+    await sleep(2000);
+    const s1 = await this.serve(dev.link, image, 0xE0000000, 8000, (n) => step("verify", n));
+    dev.link.close();
+    if (!s1.finished) throw fail(s1.lost ? "lost" : "stopped", `the device ${s1.lost ? "was disconnected" : "stopped"} after ${s1.served} requests: nothing was written`);
+    step("loader");
+    await sleep(3000);
+    const ota = await this.waitFor(IS_OTA, 30000);
+    if (!ota) throw fail("noloader", "the update loader did not appear. Replug the USB cable and press Install again: the device stays in update mode until it is finished.");
+    const s2 = await this.write(ota, image, step);
+    if (!s2.finished) throw fail(s2.lost ? "lost" : "stopped", `the loader ${s2.lost ? "was disconnected" : "stopped"} after ${s2.served} requests. Replug and press Install again to resume.`);
+    step("reboot");
+    await sleep(3000);
+    const back = await this.waitFor((id) => !IS_OTA(id), 40000);
+    if (!back) throw fail("noreturn", "the device did not come back: power-cycle it");
+    back.link.close();
+    if (back.id.text !== product) throw fail("mismatch", `installed, but the device reports ${back.id.text}`, back.id.text);
+    step("done", back.id.text);
+    return back.id.text;
+  }
+
+  // step 2 with the loader found by find()/waitFor()
+  async write(ota, image, step) {
+    ota.link.send(UPGRADE);
+    await sleep(2000);
+    const s2 = await this.serve(ota.link, image, 0xF0000000, 180000, (n) => step("write", n));
+    ota.link.close();
+    return s2;
+  }
+
+  // resume: the device is already in update mode (loader) -> true when the write finished
+  async resume(image, onStep) {
+    const ota = await this.find(IS_OTA);
+    if (!ota) return false;
+    return (await this.write(ota, image, onStep || (() => {}))).finished;
+  }
+}
+
+const $ = (id) => document.getElementById(id);
+const TEXT = {
+  en: {
+    manual: "← Niagara Drift",
+    installh: "Install",
+    step1: "Open this page in Chrome or Edge (they can talk to the FM-1 over USB; Safari and Firefox can't).",
+    step2: "Connect the FM-1 straight to the computer with a USB data cable (no hub) and switch it on. Close any other app that uses MIDI.",
+    step3: "Press Install and allow MIDI when the browser asks. It takes about two minutes: don't unplug or touch the FM-1 until it says Done.",
+    install: "Install",
+    riskh: "Before you start",
+    beta: "Tested on one FM-1 so far. Installing is at your own risk: no one involved can be responsible if your FM-1 is damaged or misbehaves.",
+    safe: "If it ever fails to start twice in a row, it comes up in safe mode (no sound, USB on), where this page can install again or put the stock firmware back.",
+    brick: "If an FM-1 won't start at all, a Mac can still put M-VAVE's firmware back:",
+    bricklink: "recovering an FM-1 that won't start",
+    stockh: "Back to M-VAVE's firmware",
+    stockwhy: "This writes M-VAVE's own FM-1 V15 back, over the same cable, from Niagara Drift or its safe mode. Your Niagara Drift sound and scenes are lost.",
+    stock1: "Download M-VAVE's FM-1 V15:",
+    stockalt: "(or from",
+    stock2: "Choose the file you downloaded:",
+    stock3: "Connect the FM-1 by USB and press the button below.",
+    stockinstall: "Install M-VAVE's firmware",
+    stockok: "That is M-VAVE's FM-1 V15. Press the button to install it.",
+    stockbad: "That isn't M-VAVE's FM-1 V15 file. Choose the file from the link above.",
+    stockdone: "Done. The FM-1 has restarted with M-VAVE's firmware.",
+    nomidi: "This browser can't do it. Open the page in Chrome or Edge.", loadfail: "Couldn't load the firmware: ",
+    start: "Starting", verify: "Checking", loader: "Switching to update mode", write: "Writing",
+    reboot: "Restarting", done: "Done: the FM-1 runs Niagara Drift. Press PLAY.", stopped: "Stopped. Replug the USB cable and press Install again.",
+    error: "Error: ",
+    denied: "MIDI access wasn't allowed. Allow MIDI in the site settings (the address bar) and press Install again.",
+    notfound: "No FM-1 found. Check the cable is a data cable, straight into the computer, close other apps that use MIDI, and press Install again.",
+    model: "The connected device isn't an FM-1.",
+    lost: "The USB connection was lost. Replug it and press Install again.",
+    noloader: "The FM-1 in update mode wasn't found. Replug the USB cable and press Install again (it stays in update mode until it's finished).",
+    noreturn: "The FM-1 didn't come back. Switch it off and on.",
+    mismatch: "Written, but the FM-1 reports another version: ",
+    badpkg: "The firmware file is damaged. Reload the page.",
+    leave: "Writing. Don't close the page.",
+  },
+};
+const lang = "en";
+const t = (k) => TEXT[lang][k];
+let lastKey = null, lastArg = "";
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach((e) => { e.textContent = t(e.dataset.t); });
+  if (lastKey) $("status").textContent = t(lastKey) + lastArg;
+}
+applyLang();
+const sayK = (k, arg = "") => { lastKey = k; lastArg = arg; $("status").textContent = t(k) + arg; };
+const say = (txt) => { lastKey = null; $("status").textContent = txt; };
+const log = (t) => { $("log").textContent += t + "\n"; };
+let image = null;
+const meta = {"version": "0.2", "product": "FM-1_8000200", "pkg": "../firmware/niagara-drift-0.2.fwsc"};
+
+let writing = false;
+window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault(); e.returnValue = t("leave"); } });
+
+(async () => {
+  if (!navigator.requestMIDIAccess) { sayK("nomidi"); return; }
+  try {
+    const r = await fetch(meta.pkg);
+    if (!r.ok) throw new Error(`${meta.pkg}: HTTP ${r.status}`);
+    const pkg = new Uint8Array(await r.arrayBuffer());
+    if (productOf(pkg) !== meta.product) { sayK("badpkg"); return; }
+    image = logicalImage(pkg);
+    say(`Niagara Drift ${meta.version}: ready`);
+    $("go").disabled = false;
+  } catch (e) { sayK("loadfail", e.message); }
+})();
+
+/* stock firmware: M-VAVE's FM-1 V15, chosen by the user (M-VAVE's server allows no cross-site
+   download) and checked against its SHA-256 before anything is written */
+const STOCK_SHA256 = "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a";
+let stock = null;
+$("stockfile").addEventListener("change", async (e) => {
+  stock = null;
+  $("stockgo").disabled = true;
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  try {
+    const raw = new Uint8Array(await f.arrayBuffer());
+    const hex = [...new Uint8Array(await crypto.subtle.digest("SHA-256", raw))].map((b) => b.toString(16).padStart(2, "0")).join("");
+    if (hex !== STOCK_SHA256) { sayK("stockbad"); return; }
+    stock = { image: logicalImage(raw), product: productOf(raw) };
+    $("stockgo").disabled = writing;
+    sayK("stockok");
+  } catch (err) { sayK("error", err && err.message); }
+});
+
+async function run(img, product, isStock) {
+  let midi;
+  try { midi = await navigator.requestMIDIAccess({ sysex: true }); }
+  catch (e) { sayK("denied"); return; }
+  writing = true;
+  $("go").disabled = $("stockgo").disabled = true;
+  try {
+    const up = new Updater(midi, log);
+    const total = 74 + 1167;
+    const step = (k, a) => {
+      log(`${k} ${a ?? ""}`);
+      if (k === "start") sayK("start");
+      if (k === "verify") { sayK("verify"); $("bar").value = (a / total) * 100; }
+      if (k === "loader") sayK("loader");
+      if (k === "write") { sayK("write"); $("bar").value = ((74 + a) / total) * 100; }
+      if (k === "reboot") sayK("reboot");
+      if (k === "done") { $("bar").value = 100; sayK(isStock ? "stockdone" : "done"); }
+    };
+    const ota = await up.find((id) => /^ota-/i.test(id.model));
+    if (ota) {
+      ota.link.close();
+      sayK((await up.resume(img, step)) ? (isStock ? "stockdone" : "done") : "stopped");
+    } else {
+      await up.install(img, product, step);
+    }
+  } catch (e) {
+    if (isStock && e && e.code === "mismatch") { $("bar").value = 100; sayK("stockdone"); }   /* stock names itself its own way */
+    else if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
+    else sayK("error", e && e.message);
+    log(String(e && e.stack || e));
+  }
+  writing = false;
+  $("go").disabled = !image;
+  $("stockgo").disabled = !stock;
+}
+
+$("go").addEventListener("click", () => run(image, meta.product, false));
+$("stockgo").addEventListener("click", () => { if (stock) run(stock.image, stock.product, true); });
+</script>
+</body>
+</html>
