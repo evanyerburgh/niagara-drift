@@ -430,7 +430,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">SEQ</div>
         <div class="pstack">
-        <div class="g-page"><i>Partner</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Interval<small>its gap, tempered or just</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Detune</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Interval<small>its gap, tempered or just</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Detune</span></div>
+        <div class="g-page"><i>Partner</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Interval<small>its gap, tempered or just; to -4 Oct</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Detune</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Interval<small>its gap, tempered or just; to -4 Oct</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Detune</span></div>
         <div class="g-page"><i>Pitch moves</i><span class="k both"><span class="sr">Knob 1: </span>Shift<small>its move, a 5th down–up</small></span><span class="k both"><span class="sr">Knob 2: </span>Pitch glide<small>pitch slides</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Wander<small>a random melody: how often</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Scale<small>Wander’s notes</small></span></div>
         </div>
       </div>
@@ -444,9 +444,9 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     <div class="kmap">
       <h4>Normal</h4>
       <div class="krow">
-      <div class="g-grp d1" data-label="Drone I"><span><span class="sr">Key 1: </span>Partner<small>on · off</small></span><span><span class="sr">Key 2: </span>Sub<small>−1 −2 ⅓ ⅕</small></span><span><span class="sr">Key 3: </span>Filter<small>LP BP HP</small></span></div>
+      <div class="g-grp d1" data-label="Drone I"><span><span class="sr">Key 1: </span>Partner<small>on · off</small></span><span><span class="sr">Key 2: </span>Sub<small>−1 −2 ⅓ ⅕ −3 −4</small></span><span><span class="sr">Key 3: </span>Filter<small>LP BP HP</small></span></div>
       <div class="g-grp both"><span><span class="sr">Key 4: </span>Pitch lock<small>on at start</small></span><span><span class="sr">Key 5: </span>LFO reset<small>hold: lock</small></span></div>
-      <div class="g-grp d2" data-label="Drone II"><span><span class="sr">Key 6: </span>Partner<small>on · off</small></span><span><span class="sr">Key 7: </span>Sub<small>−1 −2 ⅓ ⅕</small></span><span><span class="sr">Key 8: </span>Filter<small>LP BP HP</small></span></div>
+      <div class="g-grp d2" data-label="Drone II"><span><span class="sr">Key 6: </span>Partner<small>on · off</small></span><span><span class="sr">Key 7: </span>Sub<small>−1 −2 ⅓ ⅕ −3 −4</small></span><span><span class="sr">Key 8: </span>Filter<small>LP BP HP</small></span></div>
       <div class="g-grp both"><span><span class="sr">Key 9: </span>Pitch link<small>II follows I</small></span><span><span class="sr">Key 10: </span>Hard sync</span></div>
       <div class="g-grp both"><span><span class="sr">Key 11: </span>I → II<small>cutoff</small></span></div>
       </div>
@@ -748,12 +748,12 @@ const TIP = { FX: "Delay: drive, time, repeats, mix (again: Reverb: length to In
 for (const [n, c] of [...Object.entries(buttons), ...Object.entries(knobs)]) if (TIP[n]) c.g.setAttribute("aria-description", TIP[n]);
 // the keys: the black ones as switches (and what they do on the LFO pages), the white ones as scenes
 const BLACK_TIP = [["drone I's partner on / off", "drone I's osc wave: I, II, both"],
-  ["drone I's sub: −1 oct, −2 oct, ⅓, ⅕", "drone I's osc LFO to X-Wave (instead of pitch)"],
+  ["drone I's sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct (these two click under a low drone)", "drone I's osc LFO to X-Wave (instead of pitch)"],
   ["drone I's filter: LP, BP, HP", "drone I's filter LFO to resonance (instead of cutoff)"],
   ["pitch lock: the pitch knobs do nothing, and scenes keep your pitch (on at start)", "drone I's filter wave: I, II, both"],
   ["LFO reset (hold: lock the LFO to the Swell)", "LFO reset (hold: lock the LFO to the Swell)"],
   ["drone II's partner on / off", "drone II's osc wave: I, II, both"],
-  ["drone II's sub: −1 oct, −2 oct, ⅓, ⅕", "drone II's osc LFO to X-Wave (instead of pitch)"],
+  ["drone II's sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct (these two click under a low drone)", "drone II's osc LFO to X-Wave (instead of pitch)"],
   ["drone II's filter: LP, BP, HP", "drone II's filter LFO to resonance (instead of cutoff)"],
   ["pitch link: drone II follows drone I (KNOB 3 sets the gap)", "drone II's filter wave: I, II, both"],
   ["hard sync: drone II to drone I", "the delay's LFO wave: I, II, both"],

@@ -15,9 +15,9 @@
 
 /* the partner's intervals, each tempered and then just (pure ratios: 2/3, 3/4, 6/5, 5/4, 4/3, 3/2, 3; a just one
  * doesn't beat, Detune still can), so Tuning is the Interval knob's (Evan, 2026-10-18); octaves and unison are both */
-const float DR_IV_SEMI[DR_NINTERVALS] = {-12.0f, -7.0f, -7.01955f, -5.0f, -4.98045f, 0.0f, 3.0f, 3.15641f, 4.0f,
+const float DR_IV_SEMI[DR_NINTERVALS] = {-48.0f, -36.0f, -24.0f, -12.0f, -7.0f, -7.01955f, -5.0f, -4.98045f, 0.0f, 3.0f, 3.15641f, 4.0f,
                                          3.86314f, 5.0f, 4.98045f, 7.0f, 7.01955f, 12.0f, 19.0f, 19.01955f};
-static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th just", "-4th", "-4th just", "Unison",
+static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-4 Oct", "-3 Oct", "-2 Oct", "-Oct", "-5th", "-5th just", "-4th", "-4th just", "Unison",
                                                          "+m3", "+m3 just", "+M3", "+M3 just", "+4th", "+4th just",
                                                          "+5th", "+5th just", "+Oct", "+Oct+5", "+Oct+5 just"};
 
@@ -25,7 +25,7 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
 #define VOICE_PARAMS(pitch, wave, ival, mix, cut, level, olfo, flfo, fdep)                                           \
     {"Pitch", DR_PITCH_LO, DR_PITCH_HI, pitch}, {"X-Wave", 0, 100, wave}, {"PW", 0, 100, 30},               \
         {"Interval", 0, DR_NINTERVALS - 1, ival}, {"Detune", 0, 100, 12}, {"Osc mix", 0, 100, mix},            \
-        {"Sub oct", 1, 4, 1}, {"Cutoff", 0, 1000, cut}, {"Reso", 0, 1000, 250}, {"Mode", DR_LP, DR_HP, DR_LP},    \
+        {"Sub oct", 1, 6, 1}, {"Cutoff", 0, 1000, cut}, {"Reso", 0, 1000, 250}, {"Mode", DR_LP, DR_HP, DR_LP},    \
         {"Drive", 0, 100, 20}, {"Level", 0, 100, level}, {"Partner", 0, 1, 1},                                 \
         {"Osc LFO", DR_LFO_OFF, DR_LFO_BOTH, olfo}, {"Osc depth", -100, 100, 0},                                \
         {"Osc LFO to", DR_TO_PITCH, DR_TO_XWAVE, DR_TO_PITCH}, {"Filter LFO", DR_LFO_OFF, DR_LFO_BOTH, flfo},     \
@@ -38,8 +38,8 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
  * slow LFO (a cycle in ~25 s; Wave II a random glide), the Swell on as a slow breath (one in ~35 s, 12 dB),
  * some delay with a gentle wobble, a little more reverb; the oscillators' depths start at 0 */
 static const dr_param_t PARAMS[DR_NPARAMS] = {
-    VOICE_PARAMS(5000, 67, 5, 30, 700, 75, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
-    VOICE_PARAMS(5700, 33, 14, 15, 680, 61, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
+    VOICE_PARAMS(5000, 67, DR_IV_UNISON, 30, 700, 75, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
+    VOICE_PARAMS(5700, 33, DR_IV_UNISON + 9, 15, 680, 61, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
     {"Cross-mod", 0, 1, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
@@ -370,7 +370,7 @@ void dr_param_text(int i, int v, char *b)
             copy_s(b, "Hz");
         }
     } else if (gp == GP_SUBOCT)
-        copy_s(b, v == 4 ? "1/5" : v == 3 ? "1/3" : v == 2 ? "-2 oct" : "-1 oct");
+        copy_s(b, v == 6 ? "-4 oct" : v == 5 ? "-3 oct" : v == 4 ? "1/5" : v == 3 ? "1/3" : v == 2 ? "-2 oct" : "-1 oct");
     else {
         if ((i == P_TUNE || i == P_PLINK_OFF || i == P_DLY_LFO_DEPTH || i == P_LFO_RMOD || gp == GP_OLFO_DEPTH || gp == GP_FLFO_DEPTH) && v > 0)
             *b++ = '+';
@@ -1293,7 +1293,10 @@ static inline float toward(float x, float t, float step)
 }
 /* the sub's frequency, a fraction of the main oscillator's: an octave or two down, or a subharmonic (a
  * third: an octave and a fifth down; a fifth: two octaves and a major third), as the Subharmonicon's */
-static float sub_div(int s) { return s == 4 ? 0.2f : s == 3 ? 1.0f / 3.0f : s == 2 ? 0.25f : 0.5f; }
+static float sub_div(int s)
+{
+    return s == 6 ? 0.0625f : s == 5 ? 0.125f : s == 4 ? 0.2f : s == 3 ? 1.0f / 3.0f : s == 2 ? 0.25f : 0.5f;
+}
 static void morph_snap(int g)                    /* all of a drone's switches where they're set */
 {
     grp_t *v = &grp[g];
@@ -1466,7 +1469,7 @@ static void render_group(int g, uint32_t n)
         return;
     }
     for (j0 = 0; j0 < n; j0 += CR) {
-        float inc, pinc, sinc, lk, ilk, gc, a1, a2, a3, gstep, gend, lend, lstep, lv = v->lv, ph = v->ph, pph = v->pph,
+        float inc, pinc, sinc, lk, ilk, mlk, plk, slk, gc, a1, a2, a3, gstep, gend, lend, lstep, lv = v->lv, ph = v->ph, pph = v->pph,
               sph = v->sph, om, fmod, fl, pmod, xw, wf, og, sg, xd, wl, wb, wh, sy, r;
         int wi, sync;
         float ic1 = v->ic1, ic2 = v->ic2, bc = v->bc, gf = v->gf, peak = v->peak, bk;
@@ -1566,19 +1569,31 @@ static void render_group(int g, uint32_t n)
         inc = note_inc(v->ps2 + tune + pmod + v->drift[0] * drift_c + chr * (0.4f * v->jit + mm) + mac_p[g]);
         pinc = note_inc(v->ps2 + tune + pmod + mac_p[g] + ival + detune + dw * 0.1f * v->wn[3] + v->drift[1] * drift_c +
                         chr * (0.4f * v->jit + mm));
-        /* LOW: under A1 (55 Hz) a drone loses ~3 dB of loudness an octave, its energy a click a cycle and those fewer
-         * (2 Hz was 18.5 dB under D3, 27 Hz 7): its oscillators made up after the filter by sqrt(55 / f), so the
-         * clicks sit as loud as A1 (Evan, 2026-10-24: +3 dB at 27 Hz, +14 at 2 Hz). The rest (the sub, which stays
-         * over 20 Hz, the noise, Character's, Feedback's) goes in that much lower, so they come out as before */
-        {
-            float fhz = inc * DR_SR;
-            lk = fhz < 55.0f ? fm_sqrtf(55.0f / fm_maxf(fhz, 0.5f)) : 1.0f;
-            ilk = 1.0f / lk;
-        }
         sinc = inc * v->sdiv;
-        while (sinc < 20.0f / DR_SR)             /* no subsonic sub: under 20 Hz, an octave up (the -2 oct
-                                                  * and 1/5 at the bottom of the range) */
+        while (sinc < 20.0f / DR_SR && v->sdiv > 0.1f)   /* no subsonic sub: under 20 Hz, an octave up (the -2 oct
+                                                          * and 1/5 at the bottom of the range); -3 and -4 oct go
+                                                          * down there and click (v0.3) */
             sinc *= 2.0f;
+        /* LOW: under A1 (55 Hz) an oscillator loses ~3 dB of loudness an octave, its energy a click a cycle and those
+         * fewer (2 Hz was 18.5 dB under D3, 27 Hz 7): made up by sqrt(55 / f), so its clicks sit as loud as A1 (Evan,
+         * 2026-10-24: +3 dB at 27 Hz, +14 at 2 Hz), the main oscillator and the partner each their own (-4 Oct under
+         * D2 clicks too, and the sub at -3 / -4 oct). The largest goes on after the filter (lk); before it, each
+         * oscillator goes in at its make-up over that, and the rest (the humming subs, which stay over 20 Hz, the noise,
+         * Character's, Feedback's) that much lower (ilk): nothing hits the filter's drive harder than before, and the rest
+         * comes out as before */
+        {
+            float fhz = inc * DR_SR, phz = pinc * DR_SR, shz = sinc * DR_SR;
+            float mk_ = fhz < 55.0f ? fm_sqrtf(55.0f / fm_maxf(fhz, 0.5f)) : 1.0f;
+            float pk_ = phz < 55.0f ? fm_sqrtf(55.0f / fm_maxf(phz, 0.5f)) : 1.0f;
+            float sk_ = v->sdiv < 0.1f && shz < 55.0f ? fm_sqrtf(55.0f / fm_maxf(shz, 0.5f)) : 1.0f;   /* -3, -4 oct */
+            lk = v->pg > 0.0f ? fm_maxf(mk_, pk_) : mk_;
+            if (sg > 0.0f)
+                lk = fm_maxf(lk, sk_);
+            ilk = 1.0f / lk;
+            mlk = mk_ * ilk;
+            plk = pk_ * ilk;
+            slk = sk_ * ilk;
+        }
         v->cut += (cut_t + dw * 0.5f * v->wn[0] - v->cut) * 0.25f;   /* the knob's glide is in pfs; this rounds
                                                                         * its blocks (and Drift wanders it) */
 
@@ -1610,11 +1625,11 @@ static void render_group(int g, uint32_t n)
                 }
             }
             if (v->pg > 0.0f)                   /* the partner, as loud as it's faded in */
-                x = (x + v->pg * xosc(wi, wf, pph, pinc, pw)) * og;
+                x = (x * mlk + v->pg * plk * xosc(wi, wf, pph, pinc, pw)) * og;
             else
-                x *= og;
+                x *= og * mlk;
             if (sg > 0.0f)
-                x += sg * ilk * ((sph < 0.5f ? 1.0f : -1.0f) + blep(sph, sinc) - blep(sph < 0.5f ? sph + 0.5f : sph - 0.5f, sinc));
+                x += sg * slk * ((sph < 0.5f ? 1.0f : -1.0f) + blep(sph, sinc) - blep(sph < 0.5f ? sph + 0.5f : sph - 0.5f, sinc));
             if (nmix > 0.0f) {                  /* NOISE, coloured, beside the oscillators */
                 float w;
                 nn = nn * 1664525u + 1013904223u;

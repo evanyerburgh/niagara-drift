@@ -45,7 +45,8 @@ enum {
     GP_INTERVAL,    /* the partner's interval: an index into DR_IV_SEMI (each tempered, then just, pure) */
     GP_DETUNE,      /* the partner's detune, 0..100 = 0..30 cents */
     GP_MIX,         /* OSC MIX, 0..100: 0 the oscillators alone .. 100 the sub alone (a crossfade) */
-    GP_SUBOCT,      /* the sub: 1 an octave below, 2 two, 3 a third of the pitch, 4 a fifth (subharmonics) */
+    GP_SUBOCT,      /* the sub: 1 an octave below, 2 two, 3 a third of the pitch, 4 a fifth (subharmonics), 5 three
+                     * octaves, 6 four (v0.3: these two go under 20 Hz and click, the others stay over it) */
     GP_CUTOFF,      /* 0..1000 = 20 Hz .. 18 kHz, exponential (a knob's detent: 10; with SEL held: 1) */
     GP_RESO,        /* 0..1000; self-oscillates near the top (a detent: 10; with SEL held: 1) */
     GP_MODE,        /* LP, BP, HP */
@@ -164,9 +165,9 @@ extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
 extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
 #define DR_NDLY 6
 extern const char *const DR_DLY_NAME[DR_NDLY];          /* "Tape", "Wide", "Ping-pong", "Clean", "Grain", "Self" */
-#define DR_NINTERVALS 17
-extern const float DR_IV_SEMI[DR_NINTERVALS];           /* semitones: -Oct, -5th, -5th just .. +Oct+5 just */
-#define DR_IV_UNISON 5
+#define DR_NINTERVALS 20
+extern const float DR_IV_SEMI[DR_NINTERVALS];           /* semitones: -4 Oct, -3 Oct, -2 Oct, -Oct, -5th .. +Oct+5 just */
+#define DR_IV_UNISON 8
 
 typedef struct {
     const char *name;

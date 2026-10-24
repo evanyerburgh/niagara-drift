@@ -83,7 +83,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 32, on bank A", proj.format == 32u && PROJ_FORMAT == 32u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 33, on bank A", proj.format == 33u && PROJ_FORMAT == 33u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -163,7 +163,7 @@ int main(void)
         p29.par[P_II_OUT] = 1;
         store_v31(&p29);
         check("PR #24's project (29) loads: a just +5th stays just, unison stays unison, Tuning folded in",
-              project_load() == 0 && proj.par[DR_GP(0, GP_INTERVAL)] == 13 &&
+              project_load() == 0 && proj.par[DR_GP(0, GP_INTERVAL)] == 16 &&
                   proj.par[DR_GP(1, GP_INTERVAL)] == DR_IV_UNISON && proj.par[P_II_OUT] == 0);
     }
     {   /* 0.2-beta's (30): Level was linear; now squared, the same loudness at 10 sqrt(v), the scenes' too */
@@ -185,6 +185,12 @@ int main(void)
         static bank_v31_t b31;
         p31 = proj;
         p31.format = 31u;
+        p31.par[DR_GP(0, GP_INTERVAL)] = 5;    /* 0.2's numbering: unison, +Oct */
+        p31.par[DR_GP(1, GP_INTERVAL)] = 14;
+        for (int q = 0; q < NSCENES; q++) {
+            p31.scene[q][DR_GP(0, GP_INTERVAL)] = 5;
+            p31.scene[q][DR_GP(1, GP_INTERVAL)] = 14;
+        }
         p31.par[P_PRESS_SENS] = 63;
         p31.par[DR_GP(1, GP_CUTOFF)] = 432;
         p31.scene_used |= 1u << 4;
@@ -202,11 +208,26 @@ int main(void)
         check("0.2's project (31) loads: its sound and A5 kept, the delay's drive off",
               project_load() == 0 && proj.par[P_PRESS_SENS] == 63 && proj.par[DR_GP(1, GP_CUTOFF)] == 432 &&
                   proj.par[P_DLY_DRIVE] == 0 && scene_get(0, 4) && scene_get(0, 4)[P_DLY_TIME] == 77 &&
-                  scene_get(0, 4)[P_PRESS_SENS] == 21 && scene_get(0, 4)[P_DLY_DRIVE] == 0);
+                  scene_get(0, 4)[P_PRESS_SENS] == 21 && scene_get(0, 4)[P_DLY_DRIVE] == 0 &&
+                  proj.par[DR_GP(0, GP_INTERVAL)] == DR_IV_UNISON && proj.par[DR_GP(1, GP_INTERVAL)] == 17);
         check("... B3 as it was, its drive off", scene_get(1, 2) && scene_get(1, 2)[P_REV_LEN] == 91 &&
                                                    scene_get(1, 2)[P_DLY_DRIVE] == 0 &&
                                                    scene_get(1, 2)[P_PRESS_SENS] == 63);
         store_n[OBJ_BANKB] = 0;
+    }
+    {   /* 0.3's first (32): -2, -3, -4 Oct came in under -Oct, so each Interval is 3 on (unison 5 is 8), A1's too */
+        static project_t p32;
+        p32 = proj;
+        p32.format = 32u;
+        p32.par[DR_GP(0, GP_INTERVAL)] = 5;
+        p32.par[DR_GP(1, GP_INTERVAL)] = 14;
+        p32.scene_used |= 1u;
+        p32.scene[0][DR_GP(0, GP_INTERVAL)] = 0;
+        memcpy(store[OBJ_PROJ], &p32, sizeof p32);
+        store_n[OBJ_PROJ] = (int)sizeof p32;
+        check("0.3's first project (32) loads: unison stays unison, +Oct +Oct, A1's -Oct -Oct (each 3 on)",
+              project_load() == 0 && proj.par[DR_GP(0, GP_INTERVAL)] == DR_IV_UNISON &&
+                  proj.par[DR_GP(1, GP_INTERVAL)] == 17 && proj.scene[0][DR_GP(0, GP_INTERVAL)] == 3);
     }
     {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */
         static proj_v21_t p21;

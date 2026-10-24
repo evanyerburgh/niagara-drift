@@ -31,8 +31,8 @@ banks you pick with SEL and the top four.*
 - **It moves on its own**: the LFO, the Swell, **Drift**, **Wander** (drone II's slow random melody on a scale) and
   **Age** (tape wear) keep it breathing without a hand on it.
 - **Two drones**, each a main oscillator that blends sine → triangle → saw → square (X-WAVE), a
-  partner oscillator at an interval (tempered or just) with detune, a sub one or two octaves down
-  or a subharmonic (⅓, ⅕ of the pitch), and a white or pink noise, into its own self-oscillating
+  partner oscillator at an interval (tempered or just) with detune, a sub one to four octaves down
+  (the lowest two click under a low drone) or a subharmonic (⅓, ⅕ of the pitch), and a white or pink noise, into its own self-oscillating
   filter (low-, band- or high-pass) with drive. Pitch is free between notes, from 2 Hz to 1.6 kHz.
 - **Links** between them: pitch link, hard sync, and drone I's sound moving drone II's cutoff.
 - **The Ultra LFO**, after the DS-2's: one rate, two waves of ten shapes each (one of them truly
@@ -256,6 +256,9 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - The partner oscillator sits an interval above or below each drone; **detune** makes them beat.
 - Each **interval** comes twice: tempered, then **just** ("+5th just"), a pure ratio (a fifth is exactly 3/2) that
   doesn't beat; detune still adds beating on purpose. Octaves and unison are both at once.
+- At the bottom of the knob, **-2 Oct, -3 Oct and -4 Oct**: under a low drone the partner falls below 20 Hz and
+  clicks instead of humming, a rhythm under the drone (drone I on D2 with its partner -4 Oct clicks about 4½ times a
+  second; a little drive makes them ping). They're made up in level, so they're heard.
 
 #### LFO · LFO
 
@@ -382,12 +385,12 @@ key.
 | Key | Normally | On the LFO pages |
 |---|---|---|
 | 1 | I partner | I osc wave (I, II, both) |
-| 2 | I sub: −1 oct, −2 oct, ⅓, ⅕ | I osc LFO → X-Wave (instead of pitch) |
+| 2 | I sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | I osc LFO → X-Wave (instead of pitch) |
 | 3 | I filter: LP, BP, HP | I filter LFO → resonance (instead of cutoff) |
 | 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are; on when you first start: turn a pitch knob and the screen says "PITCH LOCKED · KEY 4") | I filter wave (I, II, both) |
 | 5 | LFO reset | LFO reset |
 | 6 | II partner | II osc wave (I, II, both) |
-| 7 | II sub: −1 oct, −2 oct, ⅓, ⅕ | II osc LFO → X-Wave |
+| 7 | II sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | II osc LFO → X-Wave |
 | 8 | II filter: LP, BP, HP | II filter LFO → resonance |
 | 9 | pitch link (II follows I) | II filter wave (I, II, both) |
 | 10 | hard sync (II to I) | delay wave (I, II, both) |

@@ -360,3 +360,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   noise and Feedback put in that much lower so they come out as before: a bare saw keeps A1's loudness down to ~14 Hz,
   and under that its clicks reach the output's clip (2 Hz: −9 dB against D3, was −18.5). 55 Hz and up unchanged (no
   preset goes under D2).
+- 2026-10-24 (Evan): the Partner's Interval reaches **-2, -3 and -4 Oct** (under -Oct; 20 intervals; PROJ_FORMAT 33, saved
+  Intervals 3 on): under a low drone the partner clicks, a rhythm under it. Each oscillator has its own make-up under A1
+  (the larger after the filter, the other in at its share before it, so the filter's drive is hit no harder).
+- 2026-10-24 (Evan): the **Sub key's round** gets **-3 oct and -4 oct** at its end (-1, -2 oct, 1/3, 1/5, -3, -4; saved
+  values unchanged): only these two go under 20 Hz and click, with the same make-up; the others still hum over 20 Hz,
+  unmade-up (a hum there is felt, not heard: lifting it would only take headroom).

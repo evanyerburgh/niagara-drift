@@ -30,7 +30,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      * the pitch: 49 Hz, heard) down, closed resonant filters, character and a little feedback, a dark hall.
      * The LFOs on the resonance, very slowly: it swells and rings */
     {I_(GP_PITCH), 5000, II_(GP_PITCH), 4700, I_(GP_WAVE), 67, II_(GP_WAVE), 100, II_(GP_WIDTH), 70,
-     I_(GP_INTERVAL), 0, II_(GP_DETUNE), 30, I_(GP_MIX), 45, I_(GP_SUBOCT), 3, I_(GP_CUTOFF), 650, II_(GP_CUTOFF), 610,
+     I_(GP_INTERVAL), 3, II_(GP_DETUNE), 30, I_(GP_MIX), 45, I_(GP_SUBOCT), 3, I_(GP_CUTOFF), 650, II_(GP_CUTOFF), 610,
      I_(GP_RESO), 450, II_(GP_RESO), 450, I_(GP_DRIVE), 70, II_(GP_DRIVE), 60, P_CHAR, 40, P_FEEDBACK, 30,
      P_LFO_RATE, 3, P_REV_TYPE, 1, P_REV_LEN, 75, P_REV_DAMP, 80, P_REV_MIX, 40, I_(GP_NOISE), 8, I_(GP_LEVEL), 89,
      II_(GP_LEVEL), 89, P_DLY_TYPE, 1, P_DLY_TIME, 85, P_DLY_REPEATS, 45, P_DLY_MIX, 15, I_(GP_FLFO_DEST), DR_TO_RESO,
@@ -38,22 +38,22 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     /* P3 EERIE: a tritone apart, near-sines, drone II through a ringing band-pass with a breath of white noise,
      * its partner a just minor third; drone II wanders a whole-tone scale; the LFO's doubled curve, more Movement; the longest clean echoes, a chorus hall.
      * Drone II's pitch wavers a little (the oscillator LFO), the LFO's own wave bending its rate: uneven */
-    {I_(GP_PITCH), 5000, II_(GP_PITCH), 5600, I_(GP_LEVEL), 95, II_(GP_LEVEL), 76, I_(GP_WAVE), 20, II_(GP_WAVE), 33, I_(GP_INTERVAL), 1,
-     II_(GP_INTERVAL), 7, I_(GP_DETUNE), 35, II_(GP_DETUNE), 8, II_(GP_MODE), DR_BP, II_(GP_CUTOFF), 640,
+    {I_(GP_PITCH), 5000, II_(GP_PITCH), 5600, I_(GP_LEVEL), 95, II_(GP_LEVEL), 76, I_(GP_WAVE), 20, II_(GP_WAVE), 33, I_(GP_INTERVAL), 4,
+     II_(GP_INTERVAL), 10, I_(GP_DETUNE), 35, II_(GP_DETUNE), 8, II_(GP_MODE), DR_BP, II_(GP_CUTOFF), 640,
      II_(GP_RESO), 720, I_(GP_CUTOFF), 600, II_(GP_NOISE), 12, II_(GP_NCOLOR), 0, P_WANDER, 25, P_WSCALE, 3,
      P_GLIDE, 45, P_LFO_W1, 6, P_MOVE, 70, P_PULSE, 0, P_REV_TYPE, 3, P_REV_MIX, 55, P_DLY_TYPE, 3, P_DLY_TIME, 100,
      P_DLY_REPEATS, 70, P_DLY_MIX, 30, II_(GP_OLFO), DR_LFO_II, II_(GP_OLFO_DEPTH), 12, P_LFO_RMOD, 40,
      P_LFO_RMOD_SRC, DR_LFO_I, -1},
     /* P4 GLASS: high sines a fifth apart (D5, A5), drone I's partner an octave up, beating a little, a long bright cathedral */
-    {I_(GP_PITCH), 7400, II_(GP_PITCH), 8100, I_(GP_WAVE), 0, II_(GP_WAVE), 0, I_(GP_INTERVAL), 14, I_(GP_DETUNE), 20,
+    {I_(GP_PITCH), 7400, II_(GP_PITCH), 8100, I_(GP_WAVE), 0, II_(GP_WAVE), 0, I_(GP_INTERVAL), 17, I_(GP_DETUNE), 20,
      II_(GP_DETUNE), 25, I_(GP_CUTOFF), 900, II_(GP_CUTOFF), 900, I_(GP_RESO), 100, II_(GP_RESO), 100, I_(GP_MIX), 0,
      II_(GP_MIX), 0, P_PULSE, 0, P_REV_LEN, 85, P_REV_MIX, 60, P_REV_DAMP, 15, P_DLY_TIME, 70, P_DLY_MIX, 30,
      P_DLY_REPEATS, 60, I_(GP_LEVEL), 46, II_(GP_LEVEL), 42, -1},
     /* P5 HEAVEN: a major tenth apart (D4 and F#5), sines, their partners a just third and a just fifth, gently
      * beating, open and bright, a long light cathedral, the delay high and soft; no Swell.
      * The oscillator LFOs on X-Wave: the sines bloom slowly toward triangles and back */
-    {I_(GP_PITCH), 6200, II_(GP_PITCH), 7800, I_(GP_WAVE), 0, II_(GP_WAVE), 10, I_(GP_INTERVAL), 9,
-     II_(GP_INTERVAL), 13, I_(GP_DETUNE), 15, II_(GP_DETUNE), 15, I_(GP_MIX), 0, II_(GP_MIX), 0, I_(GP_CUTOFF), 950,
+    {I_(GP_PITCH), 6200, II_(GP_PITCH), 7800, I_(GP_WAVE), 0, II_(GP_WAVE), 10, I_(GP_INTERVAL), 12,
+     II_(GP_INTERVAL), 16, I_(GP_DETUNE), 15, II_(GP_DETUNE), 15, I_(GP_MIX), 0, II_(GP_MIX), 0, I_(GP_CUTOFF), 950,
      II_(GP_CUTOFF), 950, I_(GP_RESO), 50, II_(GP_RESO), 50, P_PULSE, 0, P_MOVE, 35, P_REV_TYPE, 2, P_REV_LEN, 92,
      P_REV_DAMP, 20, P_REV_MIX, 65, P_DLY_TIME, 80, P_DLY_MIX, 25, P_DLY_REPEATS, 60, I_(GP_LEVEL), 49,
      II_(GP_LEVEL), 46, P_DLY_TYPE, 1, I_(GP_OLFO_DEST), DR_TO_XWAVE, I_(GP_OLFO_DEPTH), 65, II_(GP_OLFO), DR_LFO_II,
@@ -61,7 +61,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     /* P6 TANPURA: Sa and Pa: drone I on D3 with its high Sa (the partner an octave up), drone II on the Pa below
      * (A2), bright buzzing strings (the jawari: character, drive, an open resonant filter), plucked: the Swell about
      * once a second, swung; a hall. The LFO slow and gentle */
-    {II_(GP_PITCH), 4500, I_(GP_WAVE), 67, II_(GP_WAVE), 67, I_(GP_INTERVAL), 14, II_(GP_INTERVAL), 14,
+    {II_(GP_PITCH), 4500, I_(GP_WAVE), 67, II_(GP_WAVE), 67, I_(GP_INTERVAL), 17, II_(GP_INTERVAL), 17,
      I_(GP_DETUNE), 6, II_(GP_DETUNE), 6, I_(GP_MIX), 0, II_(GP_MIX), 0, I_(GP_CUTOFF), 820, II_(GP_CUTOFF), 780,
      I_(GP_RESO), 320, II_(GP_RESO), 320, I_(GP_DRIVE), 40, II_(GP_DRIVE), 40, P_CHAR, 40, P_PULSE_RATE, 50,
      P_PULSE_DEPTH, 45, P_PULSE_SHAPE, 40, P_PULSE_SWING, 15, P_MOVE, 30, P_REV_TYPE, 1, P_REV_LEN, 55,
@@ -218,6 +218,9 @@ static void convert(int16_t *v, uint32_t from)
         }
         v[P_II_OUT] = 0;
     }
+    if (from <= 32u)                            /* -2, -3, -4 Oct came in under -Oct (v0.3): each Interval 3 on */
+        for (g = 0; g < DR_NGROUPS; g++)
+            v[DR_GP(g, GP_INTERVAL)] = (int16_t)(v[DR_GP(g, GP_INTERVAL)] + 3);
     if (from <= 28u)                            /* the keys fixed: a latch may have been another gesture's */
         for (g = P_GL_0; g <= P_GL_3; g++)
             v[g] = 0;
@@ -335,8 +338,14 @@ static void bank_load(int b)                   /* B (1), C (2) or the Presets (3
     memset(ld.raw, 0, sizeof ld.raw);
     if (plat_store_load(BANK_OBJ[b - 1], ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
         return;
-    if (ld.b.format == PROJ_FORMAT) {
+    if (ld.b.format == PROJ_FORMAT || ld.b.format == 32u) {   /* 32: the same layout */
+        uint32_t f = ld.b.format;
         *k = ld.b;
+        if (f != PROJ_FORMAT) {
+            for (i = 0; i < NSCENES; i++)
+                convert(k->scene[i], f);
+            bank_dirty |= (uint8_t)(1u << b);
+        }
     } else if (ld.b.format >= 23u && ld.b.format < PROJ_FORMAT) {   /* 23-31: 98 values a sound */
         static bank_v31_t o;
         uint32_t f = ld.b.format;
@@ -412,8 +421,13 @@ int project_load(void)
         project_defaults();
         return -1;
     }
-    if (from == PROJ_FORMAT) {
+    if (from == PROJ_FORMAT || from == 32u) {  /* 32: the same layout */
         proj = ld.p;
+        if (from != PROJ_FORMAT) {
+            convert(proj.par, from);
+            for (i = 0; i < NSCENES; i++)
+                convert(proj.scene[i], from);
+        }
     } else if (from >= 23u) {                  /* 23-31: 98 values a sound */
         static proj_v31_t o;
         o = ld.o31;

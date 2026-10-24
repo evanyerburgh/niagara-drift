@@ -1220,12 +1220,12 @@ int main(void)
         dr_set(DR_GP(0, GP_WAVE), 0);
         dr_set(DR_GP(0, GP_PITCH), 6900);
         dr_set(DR_GP(0, GP_PARTNER), 1);
-        dr_set(DR_GP(0, GP_INTERVAL), 13);              /* +5th just */
+        dr_set(DR_GP(0, GP_INTERVAL), 16);              /* +5th just */
         dr_set(DR_GP(0, GP_DETUNE), 0);
         run(secs(1.0f));
         capture(w, 88200, 0);
         j1 = tone_level(w, 88200, 660.0f);
-        dr_set(DR_GP(0, GP_INTERVAL), 12);              /* +5th, tempered */
+        dr_set(DR_GP(0, GP_INTERVAL), 15);              /* +5th, tempered */
         run(secs(0.5f));
         capture(w, 88200, 0);
         j0 = tone_level(w, 88200, 660.0f);
