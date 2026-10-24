@@ -355,3 +355,8 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-24 (Evan, after a before/after recording): a new **reverb type** moves its lines and pre-delay to their new
   lengths at once, each read at both lengths for 50 ms and crossfaded (they glided, and the tail bent up to 7.6
   semitones for 1-2 s; now within ~0.6 of a semitone, a short dip in its place).
+- 2026-10-24 (Evan, after trying 2 Hz on earbuds: the clicks too quiet at normal volume): under **A1 (55 Hz)** a drone's
+  oscillators are made up by sqrt(55 / f) after the filter (+3 dB at 27 Hz, +14 at 2 Hz), the sub, noise, Character's
+  noise and Feedback put in that much lower so they come out as before: a bare saw keeps A1's loudness down to ~14 Hz,
+  and under that its clicks reach the output's clip (2 Hz: −9 dB against D3, was −18.5). 55 Hz and up unchanged (no
+  preset goes under D2).

@@ -1466,7 +1466,7 @@ static void render_group(int g, uint32_t n)
         return;
     }
     for (j0 = 0; j0 < n; j0 += CR) {
-        float inc, pinc, sinc, gc, a1, a2, a3, gstep, gend, lend, lstep, lv = v->lv, ph = v->ph, pph = v->pph,
+        float inc, pinc, sinc, lk, ilk, gc, a1, a2, a3, gstep, gend, lend, lstep, lv = v->lv, ph = v->ph, pph = v->pph,
               sph = v->sph, om, fmod, fl, pmod, xw, wf, og, sg, xd, wl, wb, wh, sy, r;
         int wi, sync;
         float ic1 = v->ic1, ic2 = v->ic2, bc = v->bc, gf = v->gf, peak = v->peak, bk;
@@ -1566,6 +1566,15 @@ static void render_group(int g, uint32_t n)
         inc = note_inc(v->ps2 + tune + pmod + v->drift[0] * drift_c + chr * (0.4f * v->jit + mm) + mac_p[g]);
         pinc = note_inc(v->ps2 + tune + pmod + mac_p[g] + ival + detune + dw * 0.1f * v->wn[3] + v->drift[1] * drift_c +
                         chr * (0.4f * v->jit + mm));
+        /* LOW: under A1 (55 Hz) a drone loses ~3 dB of loudness an octave, its energy a click a cycle and those fewer
+         * (2 Hz was 18.5 dB under D3, 27 Hz 7): its oscillators made up after the filter by sqrt(55 / f), so the
+         * clicks sit as loud as A1 (Evan, 2026-10-24: +3 dB at 27 Hz, +14 at 2 Hz). The rest (the sub, which stays
+         * over 20 Hz, the noise, Character's, Feedback's) goes in that much lower, so they come out as before */
+        {
+            float fhz = inc * DR_SR;
+            lk = fhz < 55.0f ? fm_sqrtf(55.0f / fm_maxf(fhz, 0.5f)) : 1.0f;
+            ilk = 1.0f / lk;
+        }
         sinc = inc * v->sdiv;
         while (sinc < 20.0f / DR_SR)             /* no subsonic sub: under 20 Hz, an octave up (the -2 oct
                                                   * and 1/5 at the bottom of the range) */
@@ -1605,7 +1614,7 @@ static void render_group(int g, uint32_t n)
             else
                 x *= og;
             if (sg > 0.0f)
-                x += sg * ((sph < 0.5f ? 1.0f : -1.0f) + blep(sph, sinc) - blep(sph < 0.5f ? sph + 0.5f : sph - 0.5f, sinc));
+                x += sg * ilk * ((sph < 0.5f ? 1.0f : -1.0f) + blep(sph, sinc) - blep(sph < 0.5f ? sph + 0.5f : sph - 0.5f, sinc));
             if (nmix > 0.0f) {                  /* NOISE, coloured, beside the oscillators */
                 float w;
                 nn = nn * 1664525u + 1013904223u;
@@ -1623,12 +1632,12 @@ static void render_group(int g, uint32_t n)
                 z5 += (w - z5) * NZ_A[5];
                 w = z5 + nsh * (w - z5);
                 nh += (w - nh) * NZ_HP;
-                x += namp * (w - nh);
+                x += namp * ilk * (w - nh);
             }
             if (chr > 0.0f) {                   /* CHARACTER */
                 float y2;
                 v->ns = v->ns * 1664525u + 1013904223u;
-                x += nz * (float)(int32_t)v->ns * (1.0f / 2147483648.0f);
+                x += nz * ilk * (float)(int32_t)v->ns * (1.0f / 2147483648.0f);
                 x += asym * x * x;
                 y2 = x - v->dcx + 0.9993f * v->dcy;   /* the DC the x^2 makes, taken out (~5 Hz) */
                 v->dcx = x;
@@ -1644,6 +1653,7 @@ static void render_group(int g, uint32_t n)
                 fv = fb_ring[ri & (FB_N - 1u)] + (fb_ring[(ri + 1u) & (FB_N - 1u)] - fb_ring[ri & (FB_N - 1u)]) * fr;
                 v->fbh += (fv - v->fbh) * 0.011f;        /* ~80 Hz */
                 in = FB_CEIL * fm_tanhf(fbk * (fv - v->fbh) * (1.0f / FB_CEIL));   /* capped: it can't take over */
+                in *= ilk;
                 fb_eosc += x * x;
                 fb_ein += in * in;
                 x += in;
@@ -1670,7 +1680,7 @@ static void render_group(int g, uint32_t n)
             y += wl * v2 + wb * v1 + wh * (x - k * v1 - v2);   /* the mode, crossfading on a switch */
             gf += gstep;
             lv += lstep;
-            a = gf * gf * lv * sy;
+            a = gf * gf * lv * sy * lk;
             y *= a;
             gl += pdl;
             gr += pdr;

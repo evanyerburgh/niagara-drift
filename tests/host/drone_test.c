@@ -1624,6 +1624,43 @@ int main(void)
             }
         check("AND steps between 2 levels, OR between 4 (both taps)", bad == 0);
     }
+    {   /* under A1 a drone keeps A1's loudness (v0.3, Evan: the clicks under 20 Hz were ~18 dB under D3): a bare saw's
+         * power over ~200 Hz (what's heard of a low drone) at 27 Hz within 1.5 dB of 55 Hz's (it was 3 dB under), at 8 Hz
+         * within 4 (the clicks' tips reach the output's clip); and 55 Hz and up as before (the make-up is 1 there) */
+        static float cap[44100];
+        const int pc[3] = {3300, 2068, 0};       /* 55, 27, 8.2 Hz */
+        float pw[3];
+        int t, k;
+        for (t = 0; t < 3; t++) {
+            float h1 = 0.0f, h2 = 0.0f, x1 = 0.0f, y1 = 0.0f, e = 0.0f;
+            dry_init();
+            dr_set(P_FADE, 0);
+            dr_set(P_DRIFT, 0);
+            dr_set(DR_GP(1, GP_LEVEL), 0);
+            dr_set(DR_GP(0, GP_PARTNER), 0);
+            dr_set(DR_GP(0, GP_MIX), 0);
+            dr_set(DR_GP(0, GP_WAVE), 67);
+            dr_set(DR_GP(0, GP_CUTOFF), 900);
+            dr_set(DR_GP(0, GP_RESO), 0);
+            dr_set(DR_GP(0, GP_PITCH), pc[t]);
+            dr_play(1);
+            run(secs(2.0f));
+            capture(cap, 44100, 0);
+            for (k = 0; k < 44100; k++) {        /* two one-pole high-passes at ~200 Hz */
+                float a1 = 0.0281f;
+                h1 += (cap[k] - h1) * a1;
+                x1 = cap[k] - h1;
+                h2 += (x1 - h2) * a1;
+                y1 = x1 - h2;
+                e += y1 * y1;
+            }
+            pw[t] = 10.0f * log10f(e / 44100.0f + 1e-20f);
+        }
+        printf("    a bare saw over 200 Hz: 27 Hz %+.1f dB, 8 Hz %+.1f dB against 55 Hz\n", (double)(pw[1] - pw[0]),
+               (double)(pw[2] - pw[0]));
+        check("under A1 a drone keeps about A1's loudness (27 Hz within 1.5 dB, 8 Hz within 4)",
+              fabsf(pw[1] - pw[0]) < 1.5f && fabsf(pw[2] - pw[0]) < 4.0f);
+    }
     {   /* a new reverb type doesn't bend the tail's pitch (v0.3: its lines glided to their new lengths, and the tail
          * bent by up to 7 semitones going round): a sine at A3, fully wet, from Room to Cathedral and back; its period
          * (the autocorrelation's peak) in 0.25 s windows over the 1.5 s after each, within 60 cents of the tone's (its swing: ~30;
