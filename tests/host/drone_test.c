@@ -507,7 +507,8 @@ int main(void)
         mx = 0.0f;
         run(secs(0.5f));
         dr_lfo_reset();                             /* from the cycle's start: not wherever the tests before left it */
-        for (k = 0; k < 15; k++) {                  /* 15 windows of 0.2 s */
+        for (k = 0; k < 25; k++) {                  /* 25 windows of 0.2 s: a whole cycle (4.3 s at rate 30), wherever
+                                                     * the restart's ease began (the tests before move it) */
             float hz;
             run(secs(0.2f));
             hz = (float)upcross / ((float)frames / DR_SR);
@@ -783,7 +784,7 @@ int main(void)
     {   /* the EFFECTS. Drone I alone (a saw, filter open), into the effects only (wet), in short bursts */
         static float cap[44100];
         int k, t, first;
-        float ms_want[3] = {70.0f, 177.0f, 450.0f};
+        float ms_want[3] = {70.0f, 177.48f, 450.0f};     /* 70 x (450 / 70)^(v / 100) */
         int ms_v[3] = {0, 50, 100};
         for (t = 0; t < 3; t++) {                       /* the delay's time: the first echo, on time */
             dry_init();
@@ -802,7 +803,8 @@ int main(void)
             printf("    delay %d: first echo after %.1f ms (want %.0f)\n", ms_v[t], (double)((float)first * 1000.0f / DR_SR),
                    (double)ms_want[t]);
             check(t == 0 ? "delay: its time (70 ms at 0)" : t == 1 ? "delay: its time (177 ms at 50)" : "delay: its time (450 ms at 100)",
-                  fabsf((float)first * 1000.0f / DR_SR - ms_want[t]) < 2.0f);
+                  fabsf((float)first * 1000.0f / DR_SR - ms_want[t] - 30.0f * 1000.0f / DR_SR) < 2.0f);   /* Tape reads
+                                                    * 30 samples (0.7 ms) later, its wow's centre (it sat on the edge) */
         }
         {   /* repeats: a 50 ms burst into a 100 ms delay; echo k at k x 100 ms */
             float e[12];
@@ -1596,6 +1598,60 @@ int main(void)
                "stereo %.1f, speaker off %.1f\n", (double)(worst[0] / steady), (double)(worst[1] / steady),
                (double)(worst[2] / steady), (double)(worst[3] / steady), (double)(worst[4] / steady));
         check("the mixes, Repeats, Stereo and the Speaker turned off don't click", bad == 0);
+    }
+    {   /* AND / OR (v0.3, the Lyra-8's): AND steps between 2 levels, OR between 4, on both taps */
+        int tap, sh, bad = 0;
+        for (tap = 0; tap < 2; tap++)
+            for (sh = DR_LFO_AND; sh <= DR_LFO_OR; sh++) {
+                float lv[8];
+                int nl = 0, k, q;
+                for (k = 0; k < 4000; k++) {
+                    float v = dr_lfo_wave(tap, sh, ((float)k + 0.5f) / 4000.0f);
+                    for (q = 0; q < nl && fabsf(lv[q] - v) > 1e-4f; q++)
+                        ;
+                    if (q == nl && nl < 8)
+                        lv[nl++] = v;
+                }
+                if (nl != (sh == DR_LFO_AND ? 2 : 4)) {
+                    printf("    tap %d shape %d: %d levels\n", tap + 1, sh, nl);
+                    bad++;
+                }
+            }
+        check("AND steps between 2 levels, OR between 4 (both taps)", bad == 0);
+    }
+    {   /* the DRIVE after the delay (v0.3): a sine at A2 (drone I alone, the filter open), dry, then driven; the
+         * loudness held (within 1.5 dB, a little drive and a lot), the overtones up; off, it changes nothing */
+        static float cap[3][22050];
+        float r[3], h3[3];
+        const int dv[3] = {0, 10, 70};
+        int t;
+        for (t = 0; t < 3; t++) {
+            dry_init();
+            dr_set(P_FADE, 0);
+            dr_set(P_DRIFT, 0);
+            dr_set(P_WIDTH, 0);
+            dr_set(DR_GP(1, GP_LEVEL), 0);
+            dr_set(DR_GP(0, GP_PARTNER), 0);
+            dr_set(DR_GP(0, GP_WAVE), 0);
+            dr_set(DR_GP(0, GP_PITCH), 4500);
+            dr_set(DR_GP(0, GP_MIX), 0);
+            dr_set(DR_GP(0, GP_CUTOFF), 1000);
+            dr_set(DR_GP(0, GP_RESO), 0);
+            dr_set(P_DLY_DRIVE, dv[t]);
+            dr_play(1);
+            run(secs(1.5f));
+            capture(cap[t], 22050, 0);
+            r[t] = rms_of(cap[t], 22050);
+            h3[t] = tone_level(cap[t], 22050, 330.0f) / (tone_level(cap[t], 22050, 110.0f) + 1e-9f);
+        }
+        printf("    drive 0 / 10 / 70: %.1f / %.1f / %.1f dBFS; the 3rd harmonic %.0f / %.0f / %.0f dB under the tone\n",
+               (double)(20.0f * log10f(r[0])), (double)(20.0f * log10f(r[1])), (double)(20.0f * log10f(r[2])),
+               (double)(-20.0f * log10f(h3[0] + 1e-9f)), (double)(-20.0f * log10f(h3[1] + 1e-9f)),
+               (double)(-20.0f * log10f(h3[2] + 1e-9f)));
+        check("the drive holds the loudness (10 and 70 within 1.5 dB of none)",
+              fabsf(20.0f * log10f(r[1] / r[0])) < 1.5f && fabsf(20.0f * log10f(r[2] / r[0])) < 1.5f);
+        check("the drive distorts: at 70 the 3rd harmonic 6 dB or more above none's, near a square's (within 14 dB)",
+              h3[2] > 2.0f * h3[0] && h3[2] > 0.2f);
     }
 
     {   /* RANDOM's sequence: an init repeats it (the tests rely on that); dr_seed (the UI's, at the first PLAY)

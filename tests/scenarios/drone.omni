@@ -16,7 +16,7 @@ expect par74 0
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
 # depth.
 # Pages: 0 Play 1 1 Play 2 2 Tone 1 3 Life 4 Osc 5 Sub · Drive 6 LFO depths 7 Mods 8 Partner 9 Pitch moves
-# 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
+# 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb 15 Types.
 # a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
 expect bank 3
 press SEL
@@ -115,7 +115,7 @@ press SEL
 tap OCT+
 tap OCT+
 release SEL
-expect par49 8
+expect par49 10
 tap OCT+
 tap OCT+
 expect par49 1
@@ -358,11 +358,14 @@ wait 600
 expect par7 750
 spin K2 -10
 expect par7 650
-# FX: Delay: type, time, repeats, mix; again: Reverb: type, length, damp, mix (the delay LFO depth is on Mods)
+# FX: Delay: drive, time, repeats, mix; again: Reverb: length, damp, -, mix; again: Types: the delay's, the
+# reverb's (v0.3; the delay LFO depth is on Mods)
 tap FX
 expect view 13
-spin K1 1
-expect par94 1
+spin K1 20
+expect par98 20
+spin K1 -20
+expect par98 0
 spin K2 -10
 expect par60 40
 spin K3 15
@@ -373,16 +376,24 @@ wait 100
 shot fx.png
 tap FX
 expect view 14
-spin K1 -1
-expect par64 1
-spin K2 10
+spin K1 10
 expect par95 70
-spin K3 -10
+spin K2 -10
 expect par96 30
+spin K3 10
+expect par64 2
 spin K4 10
 expect par63 35
 wait 100
 shot fx2.png
+tap FX
+expect view 15
+spin K1 1
+expect par94 1
+spin K2 -1
+expect par64 1
+wait 100
+shot types.png
 tap FX
 expect view 13
 # the delay LFO's tap: on the LFO page, drone II's filter group, second key
@@ -432,7 +443,7 @@ tap HOME
 expect view 0
 tap FX
 tap FX
-expect view 13
+expect view 15
 tap HOME
 # SELECT: the LFO rate; PRESETS: nothing yet (the macro to come), the waves stay
 spin SELECT 10

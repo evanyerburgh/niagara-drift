@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
-/* Niagara Drift's effects: the drones -> a stereo DELAY -> a REVERB, with a dry/wet mix for each. Included by
+/* Niagara Drift's effects: the drones -> a stereo DELAY -> a DRIVE -> a REVERB, with a dry/wet mix for each. Included by
  * drone.c (one compilation unit); uses its parameters, its LFO and its helpers. Float only, no libm
  * (fastmath.h). They run while the drone is stopped too, so tails ring out.
  *
@@ -18,6 +18,12 @@
  *   Ping-pong  the input into the left; left feeds right and right left
  *   Clean      bright, no wow (just tuning stays still)
  *
+ * DRIVE (v0.3, after the Lyra-8, whose distortion comes after its delay): the drones and their repeats into one soft
+ * clip, so they distort together (ghost notes, beating, crackle on the repeats). Its knob blends it in over the first
+ * fifth (a little drive, mixed in) and then drives harder, up to 26 dB into the clip; a little bias gives it even
+ * harmonics as well (taken back out with the DC, ~5 Hz). The loudness is held: the clipped sound is turned to the
+ * level of what went in, followed over ~0.3 s (so the Swell and the LFO's slow moves keep their size).
+ *
  * REVERB: a feedback delay network of eight lines mixed by an 8 x 8 Hadamard matrix, behind a low cut, a
  * pre-delay and four all-pass diffusers, at half the rate (22.05 kHz, between two half-band filters). Each
  * line: a read at its length (SIZE; four of them swing on slow sines, MOD), a low-pass (DAMP) and the gain that
@@ -33,6 +39,51 @@
 #endif
 
 static uint32_t fx_quiet;                /* blocks the effects' output has been silent (dr_render rests them) */
+
+/* ------------------------------------------------------------- drive --- */
+#define DRV_BIAS 0.2f
+static float drv_m, drv_k = 1.0f;       /* the blend and the gain into the clip, as they ended the last block */
+static float drv_g = 1.0f, drv_pi, drv_pw;   /* the level matching: its gain, the powers in and clipped (followed) */
+static float drv_dc[2];                  /* the bias's DC, each side */
+static void drive_run(float *l, float *r, uint32_t n)
+{
+    const float v = pfs[P_DLY_DRIVE] * 0.01f;
+    const float m1 = fm_minf(v * 5.0f, 1.0f), k1 = fm_exp2f(v * 4.32192809f);   /* 20^v: up to 26 dB */
+    const float dn = 1.0f / (float)(n ? n : 1u), dm = (m1 - drv_m) * dn, dk = (k1 - drv_k) * dn;
+    const float s0 = sat(DRV_BIAS), a = fm_minf((float)n / (0.3f * DR_SR), 1.0f);
+    float m = drv_m, k = drv_k, pi = 0.0f, pw = 0.0f, g0 = drv_g, dg;
+    uint32_t j;
+    if (m1 <= 0.0f && drv_m <= 0.0f) {   /* off: nothing to do (and the matching ready for next time) */
+        drv_g = 1.0f;
+        drv_pi = drv_pw = 0.0f;
+        drv_dc[0] = drv_dc[1] = 0.0f;
+        return;
+    }
+    for (j = 0; j < n; j++) {            /* the powers this block, for the gain at its end */
+        float xl = l[j], xr = r[j], yl = sat((k + dk * (float)j) * xl + DRV_BIAS) - s0,
+              yr = sat((k + dk * (float)j) * xr + DRV_BIAS) - s0;
+        pi += xl * xl + xr * xr;
+        pw += yl * yl + yr * yr;
+    }
+    drv_pi += (pi - drv_pi) * a;
+    drv_pw += (pw - drv_pw) * a;
+    drv_g = drv_pw > 1e-12f ? fm_clampf(fm_sqrtf(drv_pi / drv_pw), 0.02f, 1.0f) : drv_g;
+    dg = (drv_g - g0) * dn;
+    for (j = 0; j < n; j++) {
+        float yl, yr;
+        m += dm;
+        k += dk;
+        g0 += dg;
+        yl = sat(k * l[j] + DRV_BIAS) - s0;
+        yr = sat(k * r[j] + DRV_BIAS) - s0;
+        drv_dc[0] += (yl - drv_dc[0]) * 0.0007f;   /* ~5 Hz */
+        drv_dc[1] += (yr - drv_dc[1]) * 0.0007f;
+        l[j] += ((yl - drv_dc[0]) * g0 - l[j]) * m;
+        r[j] += ((yr - drv_dc[1]) * g0 - r[j]) * m;
+    }
+    drv_m = m1;
+    drv_k = k1;
+}
 
 /* ------------------------------------------------------------- delay --- */
 #define DLY_N 32768u                     /* 743 ms: 450 ms + the LFO's 25 % + the wow + room */
@@ -332,6 +383,9 @@ static void fx_clear(void)
     for (k = 0; k < DLY_N; k++)
         dly_buf[0][k] = dly_buf[1][k] = 0;
     dly_lp[0] = dly_lp[1] = dly_hp[0] = dly_hp[1] = dly_olp[0] = dly_olp[1] = 0.0f;
+    dly_ph1 = dly_ph2 = 0.0f;            /* the wow from its start: a cleared delay sounds the same each time */
+    drv_m = drv_pi = drv_pw = drv_dc[0] = drv_dc[1] = 0.0f;
+    drv_k = drv_g = 1.0f;
     dly_t = dly_ms(par[P_DLY_TIME]) * 0.001f * DR_SR;    /* at its time, no glide from an old one */
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     rv_clear();
@@ -445,8 +499,10 @@ static void fx_run(float *l, float *r, uint32_t n)
         }
         l[j] = l[j] * dry1 + dly_olp[0] * wet1 * pgain;
         r[j] = r[j] * dry1 + dly_olp[1] * wet1 * pgain;
-        sl[j] = (l[j] + r[j]) * 0.5f;    /* the reverb's send */
     }
+    drive_run(l, r, n);                  /* DRIVE: the drones and their repeats together */
+    for (j = 0; j < n; j++)
+        sl[j] = (l[j] + r[j]) * 0.5f;    /* the reverb's send */
     /* REVERB at the half rate: the send down, the network, the wet up */
     rv_block(n / 2u, (float)n / DR_SR);
     for (j = 0; j + 1u < n; j += 2u) {

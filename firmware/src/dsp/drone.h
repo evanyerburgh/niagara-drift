@@ -16,15 +16,16 @@
  * dr_play() fades the whole drone in or out, dr_voice() one drone.
  *
  * The PULSE chops both drones in time, on its own clock: rate, depth, shape (swell .. gate), swing.
- * Then the EFFECTS, as the DS-2's: a dark, PT2399-style DELAY (LFO on its time, repeats up to runaway)
- * and a stereo REVERB of four types, each with a dry/wet mix (drone_fx.c).
+ * Then the EFFECTS, as the DS-2's: a dark, PT2399-style DELAY (LFO on its time, repeats up to runaway),
+ * a DRIVE after it (the Lyra-8's: the drones and their repeats distorted together) and a stereo REVERB of
+ * four types, each with a dry/wet mix (drone_fx.c).
  *
  * Between the two, as the DS-2's switches and its best-known patch: HARD SYNC (drone II's oscillator
  * restarts with drone I's), PITCH LINK (drone II follows drone I's pitch, at an offset) and CROSS-MOD
  * (drone I's sound moves drone II's cutoff, at audio rate: the DS-2's DRONE I OUT -> CUTOFF II cable).
  *
  * The ULTRA LFO (after the DS-2's): one Rate, 0.02 .. 70 Hz, two taps (Wave I, Wave II), each Off or one
- * of seven shapes, locked to the same clock. Each drone routes a tap to its oscillator (pitch or X-WAVE)
+ * of ten shapes (the DS-2's seven, random, and the Lyra-8's AND / OR), locked to the same clock. Each drone routes a tap to its oscillator (pitch or X-WAVE)
  * and a tap to its filter (cutoff or resonance), each with a bipolar depth (0: none, negative: inverted).
  *
  * Threads, as in FoMni's engine: dr_render() runs in the audio interrupt; everything else posts commands that
@@ -72,8 +73,8 @@ enum {
     P_PLINK,                        /* drone II's pitch linked to drone I's (1) / its own (0): a switch */
     P_PLINK_OFF,                    /* linked: drone II's pitch = drone I's + this, in cents (-2400..2400) */
     P_LFO_RATE,                     /* 0..100 = 0.02 (a cycle in 50 s, the DS-2's slowest) .. 70 Hz, exponential */
-    P_LFO_W1,                       /* Wave I: 0 off, 1..7 (DR_LFO_W1_NAME) (a switch) */
-    P_LFO_W2,                       /* Wave II: 0 off, 1..7 (DR_LFO_W2_NAME) (a switch) */
+    P_LFO_W1,                       /* Wave I: 0 off, 1..10 (DR_LFO_W1_NAME) (a switch) */
+    P_LFO_W2,                       /* Wave II: 0 off, 1..10 (DR_LFO_W2_NAME) (a switch) */
     P_GLIDE,                        /* 0..100 = 0 .. 10 s to reach a new pitch (quadratic); 0 by default: a pitch
                                      * knob answers at once */
     P_FADE,                         /* 0..100 = 0.05 .. 60 s, the PLAY fade and the drone fades */
@@ -128,6 +129,8 @@ enum {
     P_REV_LEN,                      /* the reverb's LENGTH: 0..99 = 0.3 .. 40 s (its decay time), 100 Inf (a freeze) */
     P_REV_DAMP,                     /* 0..100: how dark its tail gets, open .. ~600 Hz (out at Inf) */
     P_PRESS_SENS,                   /* the keys' pressure sensitivity, 0..100 (50: as tuned; a room setting) */
+    P_DLY_DRIVE,                    /* DRIVE after the delay (v0.3, the Lyra-8's): 0..100, the drones and their repeats
+                                     * distorted together, before the reverb; the loudness held */
     DR_NPARAMS
 };
 
@@ -147,8 +150,10 @@ void dr_gesture(int g, int amt);               /* gesture key g's amount now, 0.
 float dr_wander(void);                         /* Wander's move of drone II now, semitones (the screen) */
 int dr_heard(int p);                           /* a value as heard: the sound's own plus the macros (tests) */
 float dr_mac_pitch(int g);                     /* drone g's pitch move by the macros now, semitones (tests) */
-#define DR_LFO_NSHAPES 9                                /* each tap: off and eight shapes */
+#define DR_LFO_NSHAPES 11                               /* each tap: off and ten shapes */
 #define DR_LFO_RANDOM 8                                 /* the eighth: random (I: steps, II: a glide) */
+#define DR_LFO_AND 9                                    /* the Lyra-8's: two squares, both up (AND) .. */
+#define DR_LFO_OR 10                                    /* .. or added (OR), 2 or 4 steps (v0.3) */
 extern const char *const DR_LFO_W1_NAME[DR_LFO_NSHAPES];
 extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
 #define DR_PITCH_LO 2068                       /* 27 Hz, in cents over MIDI note 0 */
@@ -200,7 +205,7 @@ extern volatile float dr_dly_ms;              /* the delay's time now, with its 
 extern volatile float dr_cut[DR_NGROUPS];      /* each drone's cutoff now, gliding, with its LFO (knob units 0..100) */
 extern volatile float dr_fb;                   /* the FEEDBACK loop's level now (its gain applied), 0..~2 */
 extern volatile float dr_pulse_ph;             /* the pulse's phase now, 0..2 (its two beats) */
-float dr_lfo_wave(int tap, int shape, float ph);   /* a tap's shape (1..8; 0 off: flat) at ph, -1..1; for
+float dr_lfo_wave(int tap, int shape, float ph);   /* a tap's shape (1..10; 0 off: flat) at ph, -1..1; for
                                                     * random, ph 0..1 the last cycle, 1..2 this one */
 float dr_lfo_rmod_k(float rm, int src, int w1, int w2);  /* rate mod's speed scale (the screen's picture) */
 float dr_pulse_wave(float ph);                 /* the pulse's gain at ph (0..2) as set now, 0..1 */
