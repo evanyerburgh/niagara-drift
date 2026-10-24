@@ -248,11 +248,15 @@ tapkey b0
 expect par12 0
 tapkey b1
 expect par6 2
-# the sub key goes round: -2 oct, 1/3, 1/5, -1 oct (then -2 again, for what follows)
+# the sub key goes round: -2 oct, 1/3, 1/5, -3 oct, -4 oct (v0.3), -1 oct (then -2 again, for what follows)
 tapkey b1
 expect par6 3
 tapkey b1
 expect par6 4
+tapkey b1
+expect par6 5
+tapkey b1
+expect par6 6
 tapkey b1
 expect par6 1
 tapkey b1

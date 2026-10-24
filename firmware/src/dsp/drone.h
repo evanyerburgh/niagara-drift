@@ -45,7 +45,8 @@ enum {
     GP_INTERVAL,    /* the partner's interval: an index into DR_IV_SEMI (each tempered, then just, pure) */
     GP_DETUNE,      /* the partner's detune, 0..100 = 0..30 cents */
     GP_MIX,         /* OSC MIX, 0..100: 0 the oscillators alone .. 100 the sub alone (a crossfade) */
-    GP_SUBOCT,      /* the sub: 1 an octave below, 2 two, 3 a third of the pitch, 4 a fifth (subharmonics) */
+    GP_SUBOCT,      /* the sub: 1 an octave below, 2 two, 3 a third of the pitch, 4 a fifth (subharmonics), 5 three
+                     * octaves, 6 four (v0.3: these two go under 20 Hz and click, the others stay over it) */
     GP_CUTOFF,      /* 0..1000 = 20 Hz .. 18 kHz, exponential (a knob's detent: 10; with SEL held: 1) */
     GP_RESO,        /* 0..1000; self-oscillates near the top (a detent: 10; with SEL held: 1) */
     GP_MODE,        /* LP, BP, HP */

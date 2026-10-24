@@ -352,3 +352,17 @@ at the end. The current state is in the [README](../README.md) and the code.
   its own sound moves, ~280 Hz and under, 60 samples a unit) and **Self** (Tape whose time its own loudness stretches,
   followed at ~10 Hz against its slow mean, 25 % of the time a unit): six in all. The pitch knobs go down to **2 Hz**
   (DR_PITCH_LO -2400 cents; was 27 Hz); under 27 Hz the screen shows Hz.
+- 2026-10-24 (Evan, after a before/after recording): a new **reverb type** moves its lines and pre-delay to their new
+  lengths at once, each read at both lengths for 50 ms and crossfaded (they glided, and the tail bent up to 7.6
+  semitones for 1-2 s; now within ~0.6 of a semitone, a short dip in its place).
+- 2026-10-24 (Evan, after trying 2 Hz on earbuds: the clicks too quiet at normal volume): under **A1 (55 Hz)** a drone's
+  oscillators are made up by sqrt(55 / f) after the filter (+3 dB at 27 Hz, +14 at 2 Hz), the sub, noise, Character's
+  noise and Feedback put in that much lower so they come out as before: a bare saw keeps A1's loudness down to ~14 Hz,
+  and under that its clicks reach the output's clip (2 Hz: −9 dB against D3, was −18.5). 55 Hz and up unchanged (no
+  preset goes under D2).
+- 2026-10-24 (Evan): the **Sub key's round** gets **-3 oct and -4 oct** at its end (-1, -2 oct, 1/3, 1/5, -3, -4; saved
+  values unchanged): only these two go under 20 Hz and click (a square: steady ticks, twice a cycle), with the same
+  make-up; the others still hum over 20 Hz, unmade-up (a hum there is felt, not heard: lifting it would only take
+  headroom). Each oscillator has its own make-up under A1 (the largest after the filter, the others in at their share
+  before it, so the filter's drive is hit no harder). Lower partner intervals were tried and left out: the sub clicks
+  on any wave and stays in time.

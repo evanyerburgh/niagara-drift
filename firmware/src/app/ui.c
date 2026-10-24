@@ -25,7 +25,7 @@
  *   recalled, and no knob, switch or LFO control touched since).
  * Black keys, lit when on (or on the second choice), following the page:
  *   F#3 G#3 A#3   C#4 D#4   F#4 G#4 A#4   C#5 D#5   F#5. Normally, by meaning: drone I (Partner, Sub
- *   (round: -1, -2 oct, 1/3, 1/5), Filter (round: LP, BP, HP)) | global (Pitch lock, LFO reset) | drone II
+ *   (round: -1, -2 oct, 1/3, 1/5, -3, -4 oct), Filter (round: LP, BP, HP)) | global (Pitch lock, LFO reset) | drone II
  *   (the same) | links (Pitch link, Hard sync) | Cross-mod. On the LFO page: Osc wave, Osc LFO -> X-Wave, Filter LFO -> Reso | Filter wave,
  *   LFO reset | Osc wave, Osc LFO -> X-Wave, Filter LFO -> Reso | Filter wave, Delay wave | Cross-mod. A
  *   wave key goes round I, II, I+II (lit for II, winking for both). LFO reset (either layer): a tap restarts
@@ -397,7 +397,8 @@ static int sw_get(sw_t w)                              /* 1: lit (on, or the sec
     const int16_t *p = &proj.par[DR_GP(w.g, 0)];
     switch (w.s) {
     case S_PARTNER: return p[GP_PARTNER] != 0;
-    case S_SUBOCT: return p[GP_SUBOCT] >= 3 ? 2 : p[GP_SUBOCT] == 2;   /* -2 oct lit; a subharmonic winks */
+    case S_SUBOCT: return p[GP_SUBOCT] >= 5 ? 1 : p[GP_SUBOCT] >= 3 ? 2 : p[GP_SUBOCT] == 2;   /* -2, -3, -4 oct lit;
+                                                                                               * a subharmonic winks */
     case S_PLOCK: return proj.par[P_PLOCK] != 0;
     case S_HP: return p[GP_MODE] == DR_HP ? 1 : p[GP_MODE] == DR_BP ? 2 : 0;   /* HP lit, BP winking */
     case S_OTAP: return tap_lit(p[GP_OLFO]);
@@ -439,9 +440,9 @@ static void sw_toggle(sw_t w)
     char *q = scopy(a, DR[w.g]);
     switch (w.s) {
     case S_PARTNER: param_set(base + GP_PARTNER, on); what = "PARTNER"; st = on ? "ON" : "OFF"; break;
-    case S_SUBOCT: {                           /* round: -1 oct, -2 oct, 1/3, 1/5 */
-        static const char *const SUB[5] = {"", "-1 OCT", "-2 OCT", "1/3", "1/5"};
-        int v = proj.par[base + GP_SUBOCT] % 4 + 1;
+    case S_SUBOCT: {                           /* round: -1 oct, -2 oct, 1/3, 1/5, -3 oct, -4 oct (v0.3: clicks) */
+        static const char *const SUB[7] = {"", "-1 OCT", "-2 OCT", "1/3", "1/5", "-3 OCT", "-4 OCT"};
+        int v = proj.par[base + GP_SUBOCT] % 6 + 1;
         param_set(base + GP_SUBOCT, v);
         what = "SUB";
         st = SUB[v];
@@ -2208,14 +2209,15 @@ static int keymap_on(void)
 }
 static void sw_text(sw_t w, const char **name, const char **st)
 {
-    static const char *const SUB[5] = {"", "-1 oct", "-2 oct", "1/3", "1/5"}, *const MODE[3] = {"LP", "BP", "HP"};
+    static const char *const SUB[7] = {"", "-1 oct", "-2 oct", "1/3", "1/5", "-3 oct", "-4 oct"},
+                             *const MODE[3] = {"LP", "BP", "HP"};
     static const char *const TAP[4] = {"off", "I", "II", "I+II"};
     const int16_t *p = &proj.par[DR_GP(w.g, 0)];
     int on = sw_get(w);
     *st = on ? "on" : "off";
     switch (w.s) {
     case S_PARTNER: *name = "Partner"; break;
-    case S_SUBOCT: *name = "Sub"; *st = SUB[(unsigned)p[GP_SUBOCT] < 5u ? p[GP_SUBOCT] : 1]; break;
+    case S_SUBOCT: *name = "Sub"; *st = SUB[(unsigned)p[GP_SUBOCT] < 7u ? p[GP_SUBOCT] : 1]; break;
     case S_HP: *name = "Filter"; *st = MODE[(unsigned)p[GP_MODE] < 3u ? p[GP_MODE] : 0]; break;
     case S_PLOCK: *name = "Pitch lock"; break;
     case S_LFORESET: *name = "LFO reset"; *st = proj.par[P_LFO_LOCK] ? "locked" : "tap"; break;
