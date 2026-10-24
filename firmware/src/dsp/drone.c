@@ -15,9 +15,9 @@
 
 /* the partner's intervals, each tempered and then just (pure ratios: 2/3, 3/4, 6/5, 5/4, 4/3, 3/2, 3; a just one
  * doesn't beat, Detune still can), so Tuning is the Interval knob's (Evan, 2026-10-18); octaves and unison are both */
-const float DR_IV_SEMI[DR_NINTERVALS] = {-48.0f, -36.0f, -24.0f, -12.0f, -7.0f, -7.01955f, -5.0f, -4.98045f, 0.0f, 3.0f, 3.15641f, 4.0f,
+const float DR_IV_SEMI[DR_NINTERVALS] = {-12.0f, -7.0f, -7.01955f, -5.0f, -4.98045f, 0.0f, 3.0f, 3.15641f, 4.0f,
                                          3.86314f, 5.0f, 4.98045f, 7.0f, 7.01955f, 12.0f, 19.0f, 19.01955f};
-static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-4 Oct", "-3 Oct", "-2 Oct", "-Oct", "-5th", "-5th just", "-4th", "-4th just", "Unison",
+static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th just", "-4th", "-4th just", "Unison",
                                                          "+m3", "+m3 just", "+M3", "+M3 just", "+4th", "+4th just",
                                                          "+5th", "+5th just", "+Oct", "+Oct+5", "+Oct+5 just"};
 
@@ -1576,8 +1576,8 @@ static void render_group(int g, uint32_t n)
             sinc *= 2.0f;
         /* LOW: under A1 (55 Hz) an oscillator loses ~3 dB of loudness an octave, its energy a click a cycle and those
          * fewer (2 Hz was 18.5 dB under D3, 27 Hz 7): made up by sqrt(55 / f), so its clicks sit as loud as A1 (Evan,
-         * 2026-10-24: +3 dB at 27 Hz, +14 at 2 Hz), the main oscillator and the partner each their own (-4 Oct under
-         * D2 clicks too, and the sub at -3 / -4 oct). The largest goes on after the filter (lk); before it, each
+         * 2026-10-24: +3 dB at 27 Hz, +14 at 2 Hz), the main oscillator, the partner and the sub at -3 / -4 oct
+         * (which click under a drone) each their own. The largest goes on after the filter (lk); before it, each
          * oscillator goes in at its make-up over that, and the rest (the humming subs, which stay over 20 Hz, the noise,
          * Character's, Feedback's) that much lower (ilk): nothing hits the filter's drive harder than before, and the rest
          * comes out as before */

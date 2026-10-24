@@ -165,9 +165,9 @@ extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
 extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
 #define DR_NDLY 6
 extern const char *const DR_DLY_NAME[DR_NDLY];          /* "Tape", "Wide", "Ping-pong", "Clean", "Grain", "Self" */
-#define DR_NINTERVALS 20
-extern const float DR_IV_SEMI[DR_NINTERVALS];           /* semitones: -4 Oct, -3 Oct, -2 Oct, -Oct, -5th .. +Oct+5 just */
-#define DR_IV_UNISON 8
+#define DR_NINTERVALS 17
+extern const float DR_IV_SEMI[DR_NINTERVALS];           /* semitones: -Oct, -5th, -5th just .. +Oct+5 just */
+#define DR_IV_UNISON 5
 
 typedef struct {
     const char *name;

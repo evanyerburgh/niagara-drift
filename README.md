@@ -256,9 +256,6 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - The partner oscillator sits an interval above or below each drone; **detune** makes them beat.
 - Each **interval** comes twice: tempered, then **just** ("+5th just"), a pure ratio (a fifth is exactly 3/2) that
   doesn't beat; detune still adds beating on purpose. Octaves and unison are both at once.
-- At the bottom of the knob, **-2 Oct, -3 Oct and -4 Oct**: under a low drone the partner falls below 20 Hz and
-  clicks instead of humming, a rhythm under the drone (drone I on D2 with its partner -4 Oct clicks about 4½ times a
-  second; a little drive makes them ping). They're made up in level, so they're heard.
 
 #### LFO · LFO
 
