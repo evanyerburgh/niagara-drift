@@ -33,8 +33,9 @@
  * line: a read at its length (SIZE; four of them swing on slow sines, MOD), a low-pass (DAMP) and the gain that
  * gives every line the same decay time (LENGTH: 0.3 .. 40 s, 100 "Inf": a freeze; at Inf the damping is out of
  * the loop, so what's in it stays). Out: four lines a side with alternating signs. FOUR TYPES set the size,
- * pre-delay, swing, low cut and width: Room, Hall, Cathedral, Chorus hall (a wide swing). A new type glides its
- * lines to their new lengths: no fade, no clearing. Stopped, an Inf tail fades over about twice the Fade time. */
+ * pre-delay, swing, low cut and width: Room, Hall, Cathedral, Chorus hall (a wide swing). A new type moves its
+ * lines (and the pre-delay) to their new lengths at once, each read at both for 50 ms and crossfaded: no fade, no
+ * clearing, no pitch bend (v0.3; they glided, and the tail bent by up to 7 semitones, going round as it did). Stopped, an Inf tail fades over about twice the Fade time. */
 
 #ifdef OM_HOST
 #define DR_POOL
@@ -150,6 +151,7 @@ static const rv_type_t RV_TYPE[RV_NTYPES] = {
  * ChoralRoot's), each in its own stretch of one array with room for the swing and the interpolator */
 static const uint16_t RV_LEN[8] = {1259, 1433, 1607, 1801, 2003, 2221, 2477, 2767};
 #define RV_GUARD 24u
+#define RV_XSTEP (1.0f / (0.05f * RV_FS))   /* a new type's crossfade: 50 ms */
 #define RV_CAP (1259u + 1433u + 1607u + 1801u + 2003u + 2221u + 2477u + 2767u + 8u * RV_GUARD)
 static float rv_mem[RV_CAP] DR_POOL;
 #define RV_PRE_N 2048u                   /* the pre-delay: 92 ms at 22.05 kHz */
@@ -161,7 +163,9 @@ typedef struct { float x[4], y[4]; } hb_t;   /* a half-band filter: two paths of
 static struct {
     float *line[8], *ap[4];
     uint32_t cap[8], pos[8], app[4], pw;
-    float cur[8];                        /* each line's length now (gliding to its size) */
+    float cur[8];                        /* each line's length now (its size) */
+    float xd[8], pxd, xf;                /* a new type: each line's old length less its new, the pre-delay's; the
+                                          * crossfade from the old reads to the new, 0..1 (1: done) */
     float d[8], dd[8], pdd;              /* this block: each line's read now and its step a tick (the glide and
                                           * the swing, worked out once a block), the pre-delay's step */
     float lp[8], g[8], dk, ig;           /* the damping's states, the lines' gains, damp's k, the input gain */
@@ -270,6 +274,10 @@ static void rv_clear(void)
             rv.g[i] = 0.0f;
         }
         rv.pre = t->pre_ms * 0.001f * RV_FS;
+        rv.xf = 1.0f;
+        rv.pxd = 0.0f;
+        for (i = 0; i < 8u; i++)
+            rv.xd[i] = 0.0f;
         rv.mod = t->mod;
         rv.width = t->width;
         rv.gain = t->gain;
@@ -288,25 +296,36 @@ static void rv_clear(void)
     rv.ready = 1;
 }
 
-/* this block's ramps, nt ticks: each line's length glides to its size (at most 0.05 samples a tick), the odd four
- * swing (their slow sines worked out at the block's ends), the pre-delay glides (a quarter of a sample a tick) */
+/* this block's ramps, nt ticks: a new type's lengths (the lines', the pre-delay's) at once, crossfaded from the old
+ * over 50 ms (a turn through several: one after the other); the odd four swing (their slow sines worked out at the
+ * block's ends) */
 static void rv_block(uint32_t nt, float dt)
 {
     const rv_type_t *t = &RV_TYPE[(unsigned)par[P_REV_TYPE] < RV_NTYPES ? par[P_REV_TYPE] : RV_CATHEDRAL];
     static const float MR[4] = {0.31f, 0.43f, 0.57f, 0.71f};   /* the swings, Hz */
-    const float inv = nt ? 1.0f / (float)nt : 0.0f, lim = 0.05f * (float)nt;
+    const float inv = nt ? 1.0f / (float)nt : 0.0f, pt = t->pre_ms * 0.001f * RV_FS;
     uint32_t i;
     for (i = 0; i < 4u; i++)
         rv.mph[i] = advance(rv.mph[i], MR[i] * dt);
+    if (rv.xf >= 1.0f && fm_fabsf((float)(uint32_t)((float)RV_LEN[0] * t->size) - rv.cur[0]) > 0.5f) {
+        for (i = 0; i < 8u; i++) {           /* a new type: there now, the old reads fading out */
+            float tl = (float)(uint32_t)((float)RV_LEN[i] * t->size);
+            rv.xd[i] = rv.cur[i] - tl;
+            rv.cur[i] = tl;
+            rv.d[i] -= rv.xd[i];
+        }
+        rv.pxd = rv.pre - pt;
+        rv.pre = pt;
+        rv.xf = 0.0f;
+    }
     for (i = 0; i < 8u; i++) {
-        float tl = (float)(uint32_t)((float)RV_LEN[i] * t->size), e;
-        rv.cur[i] += fm_clampf(tl - rv.cur[i], -lim, lim);
-        e = rv.cur[i] + ((i & 1u) ? rv.mod * fm_sin_turns(rv.mph[i >> 1]) : 0.0f);
-        e = fm_clampf(e, 2.0f, (float)(rv.cap[i] - 2u));
-        rv.d[i] = fm_clampf(rv.d[i], 2.0f, (float)(rv.cap[i] - 2u));
+        float e = rv.cur[i] + ((i & 1u) ? rv.mod * fm_sin_turns(rv.mph[i >> 1]) : 0.0f);
+        float lo = 2.0f + fm_maxf(-rv.xd[i], 0.0f), hi = (float)(rv.cap[i] - 2u) - fm_maxf(rv.xd[i], 0.0f);
+        e = fm_clampf(e, lo, hi);              /* (both reads inside the line) */
+        rv.d[i] = fm_clampf(rv.d[i], lo, hi);
         rv.dd[i] = (e - rv.d[i]) * inv;
     }
-    rv.pdd = fm_clampf(t->pre_ms * 0.001f * RV_FS - rv.pre, -0.25f * (float)nt, 0.25f * (float)nt) * inv;
+    rv.pdd = 0.0f;
 }
 
 /* the soft limit in the lines: itself up to 2, a gentle knee above, 4 at most (a freeze with Feedback) */
@@ -324,7 +343,7 @@ static inline void rv_tick(float x, float *ol, float *or_)
 {
     float r[8], v[8];
     uint32_t i;
-    /* the low cut, two poles, then the pre-delay (gliding: a quarter of a sample a sample) */
+    /* the low cut, two poles, then the pre-delay (a new type's: crossfaded from the old) */
     rv.h0 += (x - rv.h0) * rv.lk;
     x -= rv.h0;
     rv.h1 += (x - rv.h1) * rv.lk;
@@ -339,6 +358,18 @@ static inline void rv_tick(float x, float *ol, float *or_)
         k = (int32_t)p;
         f = p - (float)k;
         x = rv_pre[(uint32_t)k & (RV_PRE_N - 1u)] * (1.0f - f) + rv_pre[(uint32_t)(k + 1) & (RV_PRE_N - 1u)] * f;
+        if (rv.xf < 1.0f) {
+            float xo;
+            p -= rv.pxd;
+            if (p < 0.0f)
+                p += (float)RV_PRE_N;
+            else if (p >= (float)RV_PRE_N)
+                p -= (float)RV_PRE_N;
+            k = (int32_t)p;
+            f = p - (float)k;
+            xo = rv_pre[(uint32_t)k & (RV_PRE_N - 1u)] * (1.0f - f) + rv_pre[(uint32_t)(k + 1) & (RV_PRE_N - 1u)] * f;
+            x = xo + (x - xo) * rv.xf;
+        }
     }
     rv.pw = (rv.pw + 1u) & (RV_PRE_N - 1u);
     for (i = 0; i < 4u; i++) {           /* the diffusers: all-passes, g = 5/8 */
@@ -360,7 +391,21 @@ static inline void rv_tick(float x, float *ol, float *or_)
         k = (uint32_t)p;
         f = p - (float)k;
         r[i] = rv.line[i][k] * (1.0f - f) + rv.line[i][k + 1u < n ? k + 1u : 0u] * f;
+        if (rv.xf < 1.0f) {                  /* a new type: the old length's read, fading out */
+            float ro;
+            p -= rv.xd[i];
+            if (p < 0.0f)
+                p += (float)n;
+            else if (p >= (float)n)
+                p -= (float)n;
+            k = (uint32_t)p;
+            f = p - (float)k;
+            ro = rv.line[i][k] * (1.0f - f) + rv.line[i][k + 1u < n ? k + 1u : 0u] * f;
+            r[i] = ro + (r[i] - ro) * rv.xf;
+        }
     }
+    if (rv.xf < 1.0f)
+        rv.xf = fm_minf(rv.xf + RV_XSTEP, 1.0f);
     {
         float l = r[0] - r[1] + r[4] - r[5], rr = r[2] - r[3] + r[6] - r[7], m = (l + rr) * 0.5f;
         float s = (l - rr) * 0.5f * rv.width;

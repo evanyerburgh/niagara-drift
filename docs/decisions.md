@@ -352,3 +352,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   its own sound moves, ~280 Hz and under, 60 samples a unit) and **Self** (Tape whose time its own loudness stretches,
   followed at ~10 Hz against its slow mean, 25 % of the time a unit): six in all. The pitch knobs go down to **2 Hz**
   (DR_PITCH_LO -2400 cents; was 27 Hz); under 27 Hz the screen shows Hz.
+- 2026-10-24 (Evan, after a before/after recording): a new **reverb type** moves its lines and pre-delay to their new
+  lengths at once, each read at both lengths for 50 ms and crossfaded (they glided, and the tail bent up to 7.6
+  semitones for 1-2 s; now within ~0.6 of a semitone, a short dip in its place).

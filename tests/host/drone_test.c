@@ -1624,6 +1624,38 @@ int main(void)
             }
         check("AND steps between 2 levels, OR between 4 (both taps)", bad == 0);
     }
+    {   /* a new reverb type doesn't bend the tail's pitch (v0.3: its lines glided to their new lengths, and the tail
+         * bent by up to 7 semitones going round): a sine at A3, fully wet, from Room to Cathedral and back; its period
+         * (the autocorrelation's peak) in 0.25 s windows over the 1.5 s after each, within 60 cents of the tone's (its swing: ~30;
+         * the glide bent it ~700) */
+        static float cap[66150];
+        float worst = 0.0f;
+        int sw, w;
+        dry_init();
+        dr_set(P_FADE, 0);
+        dr_set(P_DRIFT, 0);
+        dr_set(DR_GP(1, GP_LEVEL), 0);
+        dr_set(DR_GP(0, GP_PARTNER), 0);
+        dr_set(DR_GP(0, GP_WAVE), 0);
+        dr_set(DR_GP(0, GP_MIX), 0);
+        dr_set(DR_GP(0, GP_PITCH), 5700);
+        dr_set(DR_GP(0, GP_CUTOFF), 1000);
+        dr_set(DR_GP(0, GP_RESO), 0);
+        dr_set(P_REV_MIX, 100);
+        dr_set(P_REV_TYPE, 0);
+        dr_play(1);
+        run(secs(4.0f));
+        for (sw = 0; sw < 2; sw++) {
+            dr_set(P_REV_TYPE, sw ? 0 : 2);
+            capture(cap, 66150, 0);
+            for (w = 0; w < 6; w++) {
+                float hz = DR_SR / (float)period(cap + w * 11025, 11025, 150, 300);
+                worst = fmaxf(worst, fabsf(1200.0f * log2f(hz / 220.0f)));
+            }
+        }
+        printf("    reverb type changed: its pitch at most %.0f cents off (0.25 s windows)\n", (double)worst);
+        check("a new reverb type doesn't bend the tail's pitch (within 60 cents)", worst < 60.0f);
+    }
     {   /* the delay's types: Grain and Self (v0.3, Tape's with its time moved) as loud as Tape (within 1.5 dB; the others
          * printed: levelled in 0.2 on another drone), on a drone into the delay alone (mix 100, Repeats 60); and at
          * runaway (Repeats 95) each stays finite, inside full scale */
