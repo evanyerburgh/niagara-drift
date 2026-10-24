@@ -33,14 +33,15 @@ banks you pick with SEL and the top four.*
 - **Two drones**, each a main oscillator that blends sine → triangle → saw → square (X-WAVE), a
   partner oscillator at an interval (tempered or just) with detune, a sub one or two octaves down
   or a subharmonic (⅓, ⅕ of the pitch), and a white or pink noise, into its own self-oscillating
-  filter (low-, band- or high-pass) with drive. Pitch is free between notes, from 27 Hz to 1.6 kHz.
+  filter (low-, band- or high-pass) with drive. Pitch is free between notes, from 2 Hz to 1.6 kHz.
 - **Links** between them: pitch link, hard sync, and drone I's sound moving drone II's cutoff.
 - **The Ultra LFO**, after the DS-2's: one rate, two waves of ten shapes each (one of them truly
   random, two the Lyra-8's stepped AND and OR), routed to each drone's pitch or X-WAVE and cutoff or resonance, alone or summed. It can
   move its own rate and lock to the Swell.
 - **Movement** (ALGORITHM): all the LFO's depths down or up together, from still to double.
 - **The Swell**: both drones breathing in time, from a slow soft swell to a hard rhythmic gate, with swing.
-- **Effects**: a stereo delay of four types (Tape, Wide, Ping-pong, Clean; the LFO can warble its time), a drive
+- **Effects**: a stereo delay of six types (Tape, Wide, Ping-pong, Clean, and the Lyra-8-like Grain and Self, whose
+  own echoes move their time; the LFO can warble it too), a drive
   after it (the drones and their echoes distorted together, as on the Lyra-8), into a reverb of four (Room, Hall,
   Cathedral, Chorus hall) whose length goes to Inf, a freeze.
 - **Feedback** (the finished sound fed back into the drones) and **Character** (clean to vintage).
@@ -188,6 +189,9 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 | Play 1 | I pitch | I cutoff | II pitch | II cutoff |
 | Play 2 | I level | I resonance | II level | II resonance |
 
+- **Pitch** goes from 1.6 kHz down to 2 Hz. Under 27 Hz (where the screen shows Hz, not a note) a drone stops being a
+  tone and becomes a pulse of clicks, a click a cycle: rhythm, and through a drive they ping against the other drone.
+  The speaker can't play the low part: listen on headphones.
 - **MASTER**: past about four-fifths of its turn it drives into overdrive, at about the same loudness: thicker,
   but the breathing flattens (the swells and dips get much smaller).
 
@@ -302,7 +306,9 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 - **Delay types**: **Tape** (the same on both sides, warm, a gentle wow), **Wide** (stereo: the right side's
   echoes come at three-quarters of the left's time), **Ping-pong** (the echoes bounce left and right),
-  **Clean** (bright, with no wow, so a just-tuned drone stays still). Changing type glides.
+  **Clean** (bright, with no wow, so a just-tuned drone stays still), **Grain** (Tape whose time its own echoes
+  shake: grainy, metallic, wilder as they ring), **Self** (Tape whose time stretches as its echoes get louder: loud
+  echoes sag and wobble, and a runaway lurches). Changing type glides.
 - **Time** is 70–450 ms, and turning it bends the echoes' pitch, as tape does. **Repeats** past about 85 runs
   away into self-oscillation ("runaway" on the screen), held by a soft clip.
 - **Reverb types**: **Room**, **Hall**, **Cathedral** (the largest), **Chorus hall** (a hall that shimmers).

@@ -58,7 +58,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Drive", 0, 100, 0},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
-const char *const DR_DLY_NAME[DR_NDLY] = {"Tape", "Wide", "Ping-pong", "Clean"};
+const char *const DR_DLY_NAME[DR_NDLY] = {"Tape", "Wide", "Ping-pong", "Clean", "Grain", "Self"};
 const char *const DR_WSCALE_NAME[DR_NWSCALE] = {"Minor pent", "Major pent", "5ths + 8ves", "Whole tone", "Dorian",
                                                 "Just 1-8"};
 
@@ -153,7 +153,12 @@ static void pitch_text(int c, char *b)
 {
     static const char *const NN[12] = {"C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"};
     int n = (c + 50) / 100, d = c - 100 * n, o = n / 12 - 1;
-    const char *s = NN[n % 12];
+    const char *s;
+    if (c < DR_PITCH_NOTE) {                     /* under the DS-2's range (and the note names' table): in Hz */
+        hz_text(8.1757989f * fm_exp2f((float)c * (1.0f / 1200.0f)), b);
+        return;
+    }
+    s = NN[n % 12];
     while (*s)
         *b++ = *s++;
     *b++ = (char)('0' + o);

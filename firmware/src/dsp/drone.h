@@ -12,7 +12,7 @@
  *
  * mixed into the drone's own filter (12 dB/oct state-variable, LP / BP / HP, resonance up to
  * self-oscillation, soft-saturating drive). A drone's pitch is a parameter in cents, free between notes
- * (27 Hz .. 1.6 kHz, the DS-2's oscillator range), and slides or glides when it changes. There are no envelopes:
+ * (2 Hz .. 1.6 kHz: the DS-2's range from 27 Hz, and under it the Lyra-8's clicks), and slides or glides when it changes. There are no envelopes:
  * dr_play() fades the whole drone in or out, dr_voice() one drone.
  *
  * The PULSE chops both drones in time, on its own clock: rate, depth, shape (swell .. gate), swing.
@@ -39,7 +39,7 @@
 
 /* a drone's parameters; drone g's copy of GP_x is parameter DR_GP(g, GP_x) */
 enum {
-    GP_PITCH,       /* cents over MIDI note 0: 2068 (27 Hz) .. 9135 (1.6 kHz); 4500 is A2, 5700 A3 */
+    GP_PITCH,       /* cents over MIDI note 0: -2400 (2 Hz) .. 9135 (1.6 kHz); 2068 27 Hz, 4500 A2, 5700 A3 */
     GP_WAVE,        /* X-WAVE, 0..100: 0 sine, 33 triangle, 67 saw, 100 square, blended in between */
     GP_WIDTH,       /* the square's pulse width: 0 even (50 %) .. 100 narrow (5 %) */
     GP_INTERVAL,    /* the partner's interval: an index into DR_IV_SEMI (each tempered, then just, pure) */
@@ -125,7 +125,7 @@ enum {
     P_GR_0, P_GR_1, P_GR_2, P_GR_3,      /* unused since 2026-10-18 (each key's time: now DR_GEST_TIME) */
     P_GL_0, P_GL_1, P_GL_2, P_GL_3,      /* ... latched at, 0..100 (0: not latched) */
     /* THE EFFECTS (v0.2, ChoralRoot's design) */
-    P_DLY_TYPE,                     /* the delay's type: Tape, Wide, Ping-pong, Clean (DR_DLY_NAME) */
+    P_DLY_TYPE,                     /* the delay's type: Tape, Wide, Ping-pong, Clean, Grain, Self (DR_DLY_NAME) */
     P_REV_LEN,                      /* the reverb's LENGTH: 0..99 = 0.3 .. 40 s (its decay time), 100 Inf (a freeze) */
     P_REV_DAMP,                     /* 0..100: how dark its tail gets, open .. ~600 Hz (out at Inf) */
     P_PRESS_SENS,                   /* the keys' pressure sensitivity, 0..100 (50: as tuned; a room setting) */
@@ -156,12 +156,14 @@ float dr_mac_pitch(int g);                     /* drone g's pitch move by the ma
 #define DR_LFO_OR 10                                    /* .. or added (OR), 2 or 4 steps (v0.3) */
 extern const char *const DR_LFO_W1_NAME[DR_LFO_NSHAPES];
 extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
-#define DR_PITCH_LO 2068                       /* 27 Hz, in cents over MIDI note 0 */
+#define DR_PITCH_LO (-2400)                    /* 2 Hz, in cents over MIDI note 0 (v0.3, the Lyra-8's: under ~20 Hz a
+                                                * drone is a pulse of clicks; was 27 Hz) */
+#define DR_PITCH_NOTE 2068                     /* 27 Hz (A0), the DS-2's bottom: under it the screen shows Hz */
 #define DR_PITCH_HI 9135                       /* 1.6 kHz */
 #define DR_NREV 4
 extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
-#define DR_NDLY 4
-extern const char *const DR_DLY_NAME[DR_NDLY];          /* "Tape", "Wide", "Ping-pong", "Clean" */
+#define DR_NDLY 6
+extern const char *const DR_DLY_NAME[DR_NDLY];          /* "Tape", "Wide", "Ping-pong", "Clean", "Grain", "Self" */
 #define DR_NINTERVALS 17
 extern const float DR_IV_SEMI[DR_NINTERVALS];           /* semitones: -Oct, -5th, -5th just .. +Oct+5 just */
 #define DR_IV_UNISON 5

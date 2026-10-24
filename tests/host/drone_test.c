@@ -154,7 +154,7 @@ static void noise_setup(int c, int nv)
     dr_set(P_WIDTH, 0);
     dr_set(DR_GP(0, GP_PARTNER), 0);
     dr_set(DR_GP(0, GP_WAVE), 0);
-    dr_set(DR_GP(0, GP_PITCH), DR_PITCH_LO);
+    dr_set(DR_GP(0, GP_PITCH), DR_PITCH_NOTE);
     dr_set(DR_GP(0, GP_MIX), 0);
     dr_set(DR_GP(0, GP_CUTOFF), 1000);
     dr_set(DR_GP(0, GP_RESO), 0);
@@ -266,18 +266,23 @@ int main(void)
         printf("    A3 +37 cents: %.2f Hz (want %.2f)\n", (double)hz, (double)want);
         check("pitch between notes (A3 +37 cents)", fabsf(hz - want) < 1.0f);
     }
-    {   /* the pitch range's ends: 27 Hz and 1.6 kHz, the DS-2's oscillator range */
-        float lo, hi;
-        dr_set(DR_GP(0, GP_PITCH), DR_PITCH_LO);
+    {   /* the pitch range's ends: 2 Hz (v0.3; under the DS-2's 27 Hz) and 1.6 kHz */
+        float lo, a0, hi;
+        dr_set(DR_GP(0, GP_PITCH), DR_PITCH_NOTE);
         run(secs(0.3f));
         run(secs(4.0f));
+        a0 = (float)upcross / ((float)frames / DR_SR);
+        dr_set(DR_GP(0, GP_PITCH), DR_PITCH_LO);
+        run(secs(1.0f));
+        run(secs(10.0f));
         lo = (float)upcross / ((float)frames / DR_SR);
         dr_set(DR_GP(0, GP_PITCH), DR_PITCH_HI);
         run(secs(0.3f));
         run(secs(1.0f));
         hi = (float)upcross / ((float)frames / DR_SR);
-        printf("    pitch range: %.2f Hz .. %.1f Hz\n", (double)lo, (double)hi);
-        check("pitch range: 27 Hz at the bottom, 1.6 kHz at the top", fabsf(lo - 27.0f) < 0.3f && fabsf(hi - 1600.0f) < 3.0f);
+        printf("    pitch range: %.2f Hz .. %.1f Hz; A0 %.2f Hz\n", (double)lo, (double)hi, (double)a0);
+        check("pitch range: 2 Hz at the bottom, 1.6 kHz at the top; 2068 is 27 Hz",
+              fabsf(lo - 2.04f) < 0.15f && fabsf(hi - 1600.0f) < 3.0f && fabsf(a0 - 27.0f) < 0.3f);
     }
     {   /* along the X-WAVE, each wave and the blends between sound at a similar level */
         float lo = 1.0f, hi = 0.0f;
@@ -1618,6 +1623,54 @@ int main(void)
                 }
             }
         check("AND steps between 2 levels, OR between 4 (both taps)", bad == 0);
+    }
+    {   /* the delay's types: Grain and Self (v0.3, Tape's with its time moved) as loud as Tape (within 1.5 dB; the others
+         * printed: levelled in 0.2 on another drone), on a drone into the delay alone (mix 100, Repeats 60); and at
+         * runaway (Repeats 95) each stays finite, inside full scale */
+        static float cap[44100];
+        float r[DR_NDLY], pk = 0.0f;
+        int t, bad = 0, k;
+        for (t = 0; t < DR_NDLY; t++) {
+            dry_init();
+            dr_set(P_FADE, 0);
+            dr_set(P_DRIFT, 0);
+            dr_set(DR_GP(1, GP_LEVEL), 0);
+            dr_set(P_DLY_MIX, 100);
+            dr_set(P_DLY_REPEATS, 60);
+            dr_set(P_DLY_TYPE, t);
+            dr_play(1);
+            run(secs(2.0f));
+            capture(cap, 44100, 0);
+            r[t] = rms_of(cap, 44100);
+            if (t >= 4 && fabsf(20.0f * log10f(r[t] / r[0])) > 1.5f)   /* Grain, Self: Tape's, moved */
+                bad++;
+            dr_set(P_DLY_REPEATS, 95);
+            run(secs(3.0f));
+            capture(cap, 44100, 0);
+            for (k = 0; k < 44100; k++) {
+                if (!isfinite(cap[k]))
+                    bad += 100;
+                pk = fmaxf(pk, fabsf(cap[k]));
+            }
+        }
+        printf("    delay types against Tape: %+.1f %+.1f %+.1f %+.1f %+.1f dB; runaway peak %.2f\n",
+               (double)(20.0f * log10f(r[1] / r[0])), (double)(20.0f * log10f(r[2] / r[0])),
+               (double)(20.0f * log10f(r[3] / r[0])), (double)(20.0f * log10f(r[4] / r[0])),
+               (double)(20.0f * log10f(r[5] / r[0])), (double)pk);
+        check("Grain and Self as loud as Tape (within 1.5 dB); every type at runaway finite, inside full scale", bad == 0 && pk <= 1.0f);
+    }
+    {   /* a pitch under 27 Hz (v0.3: down to 2 Hz) is written in Hz, every one (the note names' table stops at
+         * MIDI note 0: a pitch under it read before the table) */
+        char t[16];
+        int c, bad = 0;
+        for (c = DR_PITCH_LO; c < DR_PITCH_NOTE; c++) {
+            dr_param_text(DR_GP(0, GP_PITCH), c, t);
+            if (!strstr(t, "Hz"))
+                bad++;
+        }
+        dr_param_text(DR_GP(0, GP_PITCH), DR_PITCH_LO, t);
+        printf("    the lowest pitch reads \"%s\"\n", t);
+        check("every pitch under 27 Hz written in Hz", bad == 0);
     }
     {   /* the DRIVE after the delay (v0.3): a sine at A2 (drone I alone, the filter open), dry, then driven; the
          * loudness held (within 1.5 dB, a little drive and a lot), the overtones up; off, it changes nothing */

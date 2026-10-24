@@ -348,3 +348,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   its loudness matched to what goes in over ~0.3 s (P1, P9, P11 within 1.1 dB, 0..100). The delay and reverb types
   move to a **Types** page (FX, third tap: KNOB 1 delay, KNOB 2 reverb); Reverb is Length, Damp, -, Mix. PROJ_FORMAT 32
   (99 values a sound; 23-31 load with the drive off).
+- 2026-10-24 (0.3, step 1, Evan after the "hear it first" recordings): two more delay types, **Grain** (Tape whose time
+  its own sound moves, ~280 Hz and under, 60 samples a unit) and **Self** (Tape whose time its own loudness stretches,
+  followed at ~10 Hz against its slow mean, 25 % of the time a unit): six in all. The pitch knobs go down to **2 Hz**
+  (DR_PITCH_LO -2400 cents; was 27 Hz); under 27 Hz the screen shows Hz.

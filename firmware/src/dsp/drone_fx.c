@@ -11,12 +11,16 @@
  * time that glides to its target (~50 ms: turning TIME bends the repeats' pitch, as tape does) plus the WOW (a
  * slow and a faster sine, the same on both sides) and the LFO's tap (+-25 % of the time). The loop: the read ->
  * a soft clip at the REPEATS gain -> a low-pass (the type's tone) -> a low cut (~80 Hz) -> back in with the
- * input. Past ~85 Repeats runs away into self-oscillation, held by the clip. FOUR TYPES, each a set of the
+ * input. Past ~85 Repeats runs away into self-oscillation, held by the clip. SIX TYPES, each a set of the
  * mode, the right side's time against the left's, the tone and the wow (gliding from one to the next):
  *   Tape       both sides alike (mono), warm, a gentle wow: 0.1's delay
  *   Wide       stereo, the right at 3/4 of the left's time, a little brighter, a light wow
  *   Ping-pong  the input into the left; left feeds right and right left
  *   Clean      bright, no wow (just tuning stays still)
+ *   Grain      Tape whose time its own sound shakes (~280 Hz and under, 60 samples a unit): grainy, metallic
+ *              echoes, wilder as they ring (v0.3, the Lyra-8's SELF)
+ *   Self       Tape whose time its own loudness stretches (followed at ~10 Hz, against its slow mean): loud
+ *              echoes sag and wobble, a runaway lurches (v0.3)
  *
  * DRIVE (v0.3, after the Lyra-8, whose distortion comes after its delay): the drones and their repeats into one soft
  * clip, so they distort together (ghost notes, beating, crackle on the repeats). Its knob blends it in over the first
@@ -94,19 +98,25 @@ static float dly_t = 0.177f * DR_SR;    /* the left's time, in samples, smoothed
 volatile float dr_dly_ms;               /* ... in ms, each block (the host's probe) */
 static float dly_lp[2], dly_hp[2], dly_olp[2];
 static float dly_ph1, dly_ph2;           /* the wow's two sines */
-enum { DT_TAPE, DT_WIDE, DT_PING, DT_CLEAN, DT_NTYPES };
+enum { DT_TAPE, DT_WIDE, DT_PING, DT_CLEAN, DT_GRAIN, DT_SELF, DT_NTYPES };
+_Static_assert(DT_NTYPES == DR_NDLY, "a name for each type");
 typedef struct {
     float spread, tone, out, wow, ping;  /* R's time / L's; the loop's low-pass k; the wet's low-pass k; the wow,
                                           * samples of swing; ping-pong 0 .. 1 */
     float gain;                          /* the wet's level: the types as loud as each other (measured on a drone) */
+    float grain, self;                   /* its own sound moving its time: samples a unit (Grain); its loudness,
+                                          * the time's share a unit (Self) */
 } dly_type_t;
 static const dly_type_t DLY_TYPE[DT_NTYPES] = {
-    {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f},   /* TAPE: ~3.5 kHz in the loop, ~5 kHz out, 0.7 ms of wow */
-    {0.75f, 0.57f, 0.70f, 14.0f, 0.0f, 1.15f},   /* WIDE: ~6 kHz, ~8.5 kHz */
-    {1.00f, 0.50f, 0.66f, 14.0f, 1.0f, 1.66f},   /* PING-PONG: each repeat on one side (3 dB of it) */
-    {1.00f, 0.86f, 1.00f, 0.0f, 0.0f, 1.08f},    /* CLEAN: ~14 kHz, nothing out */
+    {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.0f},    /* TAPE: ~3.5 kHz in the loop, ~5 kHz out, 0.7 ms of wow */
+    {0.75f, 0.57f, 0.70f, 14.0f, 0.0f, 1.15f, 0.0f, 0.0f},    /* WIDE: ~6 kHz, ~8.5 kHz */
+    {1.00f, 0.50f, 0.66f, 14.0f, 1.0f, 1.66f, 0.0f, 0.0f},    /* PING-PONG: each repeat on one side (3 dB of it) */
+    {1.00f, 0.86f, 1.00f, 0.0f, 0.0f, 1.08f, 0.0f, 0.0f},     /* CLEAN: ~14 kHz, nothing out */
+    {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 60.0f, 0.0f},   /* GRAIN: Tape, shaken by its own sound */
+    {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.25f},   /* SELF: Tape, stretched by its own loudness */
 };
-static dly_type_t dly_c = {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f};   /* the type as it glides */
+static dly_type_t dly_c = {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.0f};   /* the type as it glides */
+static float self_s, self_e, self_es;    /* Grain's sound (~280 Hz); Self's loudness (~10 Hz) and its mean (~0.2 Hz) */
 
 static float dly_ms(int v) { return 70.0f * fm_exp2f((float)v * 0.026845f); }   /* 70 * (450/70)^(v/100) */
 
@@ -384,6 +394,7 @@ static void fx_clear(void)
         dly_buf[0][k] = dly_buf[1][k] = 0;
     dly_lp[0] = dly_lp[1] = dly_hp[0] = dly_hp[1] = dly_olp[0] = dly_olp[1] = 0.0f;
     dly_ph1 = dly_ph2 = 0.0f;            /* the wow from its start: a cleared delay sounds the same each time */
+    self_s = self_e = self_es = 0.0f;
     drv_m = drv_pi = drv_pw = drv_dc[0] = drv_dc[1] = 0.0f;
     drv_k = drv_g = 1.0f;
     dly_t = dly_ms(par[P_DLY_TIME]) * 0.001f * DR_SR;    /* at its time, no glide from an old one */
@@ -441,6 +452,8 @@ static void fx_run(float *l, float *r, uint32_t n)
     dly_c.wow += (dt->wow - dly_c.wow) * ease;
     dly_c.ping += (dt->ping - dly_c.ping) * ease;
     dly_c.gain += (dt->gain - dly_c.gain) * ease;
+    dly_c.grain += (dt->grain - dly_c.grain) * ease;
+    dly_c.self += (dt->self - dly_c.self) * ease;
     pgain = dly_c.gain;
     if (dt->spread >= 1.0f && dt->ping <= 0.0f && dly_c.spread > 0.9995f && dly_c.ping < 0.0005f) {
         dly_c.spread = 1.0f;             /* settled on a mono type */
@@ -472,6 +485,12 @@ static void fx_run(float *l, float *r, uint32_t n)
             dly_ph2 = advance(dly_ph2, 3.3f * (float)CR / DR_SR);
         }
         wow = dly_c.wow * (0.75f * fm_sin_turns(dly_ph1) + 0.25f * fm_sin_turns(dly_ph2));
+        if (dly_c.grain > 0.01f || dly_c.self > 0.0001f) {   /* GRAIN, SELF: its own echoes move its time */
+            self_s += (dly_olp[0] - self_s) * 0.04f;
+            self_e += (fm_fabsf(dly_olp[0]) - self_e) * 0.0015f;
+            self_es += (self_e - self_es) * 0.00003f;
+            wow += dly_c.grain * self_s + dly_t * dly_c.self * (self_e - self_es);
+        }
         yl = dly_read(dly_buf[0], fm_clampf(dly_t + wow + dly_c.wow, 4.0f, (float)(DLY_N - 4u)));
         dly_olp[0] += (yl - dly_olp[0]) * dly_c.out;               /* the wet out */
         /* the loops: soft clip, the tone, no rumble (~80 Hz taken away) */

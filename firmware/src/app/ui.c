@@ -5,7 +5,7 @@
  *
  * Always live:
  *   KNOB 1-2       drone I's two values on the page shown, KNOB 3-4 drone II's; the Play page (HOME):
- *                  Pitch and Cutoff. A pitch is continuous, 27 Hz .. 1.6 kHz, a slow full turn an octave;
+ *                  Pitch and Cutoff. A pitch is continuous, 2 Hz .. 1.6 kHz, a slow full turn an octave;
  *                  hold SEL for a cent a detent. With PITCH LINK on, KNOB 3 moves drone II's offset.
  *   SELECT         LFO rate      ALGORITHM   MOVEMENT: every LFO depth together, 0 .. 200 %
  *   PRESETS        GESTURE TIME: every gesture's speed, x0.1 .. x10 (v0.2)
@@ -2048,6 +2048,14 @@ static void draw_tail(int type, int len, int32_t x0, int32_t yb, int32_t w, int3
     plot(x0, 2, y, n, c);
 }
 
+/* where an echo is drawn, off its time: Grain's jitter (its own sound shakes the time), Self's drift later (its
+ * loudness stretches it) */
+static int32_t echo_shift(int ty, int k)
+{
+    static const int8_t JIT[8] = {0, 2, -2, 3, -1, -3, 1, 2};
+    return ty == 4 ? JIT[k & 7] : ty == 5 ? (int32_t)(k * k) / 3 : 0;
+}
+
 /* Delay: the echoes over 2 s, the left side above the line and the right below it (Wide: the right comes
  * sooner; Ping-pong: they take turns), each as loud as Repeats leaves it, darker each time */
 static void pic_fx(int32_t y0)
@@ -2063,7 +2071,7 @@ static void pic_fx(int32_t y0)
     for (side = 0; side < 2; side++) {
         float a = 1.0f, step = ms * (side && ty == 1 ? 0.75f : 1.0f);
         for (k = 1; k < 40; k++) {
-            int32_t x = 12 + (int32_t)(step * (float)k * 0.104f), bh;   /* 208 px = 2 s */
+            int32_t x = 12 + (int32_t)(step * (float)k * 0.104f) + echo_shift(ty, k), bh;   /* 208 px = 2 s */
             int heard = ty != 2 || (k & 1) != side;   /* ping-pong: odd repeats on the left, even on the right */
             a *= fb;
             if (x > 218)
@@ -2098,7 +2106,8 @@ static void pic_types(int32_t y0)
 {
     const int dt = (unsigned)proj.par[P_DLY_TYPE] < DR_NDLY ? proj.par[P_DLY_TYPE] : 0;
     const int rt = (unsigned)proj.par[P_REV_TYPE] < DR_NREV ? proj.par[P_REV_TYPE] : 2;
-    static const char *const DLY_SAYS[DR_NDLY] = {"warm, mono", "stereo, brighter", "side to side", "bright, still"};
+    static const char *const DLY_SAYS[DR_NDLY] = {"warm, mono", "stereo, brighter", "side to side", "bright, still",
+                                                  "shaken by itself", "sways when loud"};
     static const char *const REV_SAYS[DR_NREV] = {"small, close", "a hall", "the largest", "a hall, swinging"};
     int32_t mid = y0 + 42, k, side;
     cv_text(12, y0 + 3, &FONT_S, "DELAY", K_DIM);
@@ -2107,7 +2116,8 @@ static void pic_types(int32_t y0)
     cv_rect(108, mid, 114, 1, K_GRID);
     for (side = 0; side < 2; side++)
         for (k = 1; k <= 5; k++) {
-            int32_t x = 108 + (int32_t)((float)k * 21.0f * (side && dt == 1 ? 0.75f : 1.0f)), bh = 18 - 3 * k;
+            int32_t x = 108 + (int32_t)((float)k * 21.0f * (side && dt == 1 ? 0.75f : 1.0f)) + echo_shift(dt, k),
+                    bh = 18 - 3 * k;
             if (dt == 2 && (k & 1) == side)    /* ping-pong: they take turns */
                 continue;
             cv_rect(x, side ? mid + 2 : mid - bh, 3, bh, blend(K_FX, K_PANEL, k, 9));
