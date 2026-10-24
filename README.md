@@ -2,7 +2,8 @@
 
 **A drone synth for the M-VAVE FM-1.**
 
-> **This is the manual for 0.2.** For 0.1 beta, see
+> **This is the manual for 0.3, in development** (what's on `main` now). For the released 0.2, see
+> [the README of 0.2](https://github.com/evanyerburgh/niagara-drift/blob/v0.2/README.md); for 0.1 beta,
 > [the README of 0.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.1-beta/README.md).
 
 Niagara Drift is open-source firmware that turns the M-VAVE
@@ -34,13 +35,14 @@ banks you pick with SEL and the top four.*
   or a subharmonic (⅓, ⅕ of the pitch), and a white or pink noise, into its own self-oscillating
   filter (low-, band- or high-pass) with drive. Pitch is free between notes, from 27 Hz to 1.6 kHz.
 - **Links** between them: pitch link, hard sync, and drone I's sound moving drone II's cutoff.
-- **The Ultra LFO**, after the DS-2's: one rate, two waves of eight shapes each (one of them truly
-  random), routed to each drone's pitch or X-WAVE and cutoff or resonance, alone or summed. It can
+- **The Ultra LFO**, after the DS-2's: one rate, two waves of ten shapes each (one of them truly
+  random, two the Lyra-8's stepped AND and OR), routed to each drone's pitch or X-WAVE and cutoff or resonance, alone or summed. It can
   move its own rate and lock to the Swell.
 - **Movement** (ALGORITHM): all the LFO's depths down or up together, from still to double.
 - **The Swell**: both drones breathing in time, from a slow soft swell to a hard rhythmic gate, with swing.
-- **Effects**: a stereo delay of four types (Tape, Wide, Ping-pong, Clean; the LFO can warble its time) into
-  a reverb of four (Room, Hall, Cathedral, Chorus hall) whose length goes to Inf, a freeze.
+- **Effects**: a stereo delay of four types (Tape, Wide, Ping-pong, Clean; the LFO can warble its time), a drive
+  after it (the drones and their echoes distorted together, as on the Lyra-8), into a reverb of four (Room, Hall,
+  Cathedral, Chorus hall) whose length goes to Inf, a freeze.
 - **Feedback** (the finished sound fed back into the drones) and **Character** (clean to vintage).
 - **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
 - **Switch time**: buttons and keys never jump: the sound moves to a new setting over a time you set.
@@ -171,7 +173,7 @@ knob you're turning.
 ### Pages
 
 Tap a page button and the knobs stay on that page. Hold it to peek: turn a knob, let go, and you're
-back. Tap it again for its second page; "1/2" by the page's name shows which of its pages you're on. A page
+back. Tap it again for its next page (FX has three); "1/2" by the page's name shows which of its pages you're on. A page
 button opens the page you last used there (HOME always opens Play 1), so after visiting Reverb, holding FX
 peeks at Reverb.
 Each page's screen shows a picture of what its knobs do, and the four values below it. Every knob
@@ -284,14 +286,19 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **Depth** is how far it dips, in dB (down to −30; all the way, silence). **Shape** firms the breath up into
   a pulse, and only at the top into a hard gate.
 
-#### Delay and Reverb · FX
+#### Delay, Reverb and Types · FX
 
-<img src="docs/img/page-effects.png" width="488" alt="The Delay and Reverb pages: the echoes on the left and right, and the reverb's tail">
+<img src="docs/img/page-effects.png" width="732" alt="The Delay, Reverb and Types pages: the echoes on the left and right with the drive, the reverb's tail, and the two types">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Delay | type | time | repeats | delay mix |
-| Reverb | type | length | damp | reverb mix |
+| Delay | drive | time | repeats | delay mix |
+| Reverb | length | damp | | reverb mix |
+| Types | delay type | reverb type | | |
+
+- **Drive** distorts the drones and their echoes together, after the delay and before the reverb, as the Lyra-8's
+  distortion does: ghost notes, beating and crackle on the repeats. The first fifth of its turn blends a little in;
+  past that it drives harder, up to a hard clip. It holds the loudness: turning it changes the grit, not the level.
 
 - **Delay types**: **Tape** (the same on both sides, warm, a gentle wow), **Wide** (stereo: the right side's
   echoes come at three-quarters of the left's time), **Ping-pong** (the echoes bounce left and right),
@@ -334,7 +341,11 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
 | ALGORITHM | the **Movement**: every LFO depth together, from still (0%) to double (200%) |
 | OCT− · OCT+ | Wave I's · Wave II's shape: tap for the next (or off), round and round; SEL + OCT for the one before |
 
-One clock, two waves; the OCT− and OCT+ lights pulse with them. The last shape on each is random.
+One clock, two waves; the OCT− and OCT+ lights pulse with them. After the DS-2's shapes comes a random one,
+then the Lyra-8's two: **AND** and **OR**, two square waves together, one at the LFO's rate and one inside it
+(3 times as fast on Wave I, 5 times on Wave II). AND is up only while both are, so it steps between 2 levels; OR
+adds them, 4 levels. On a drone's pitch that's the Lyra-8's "acid": the drone jumps between 2 or 4 notes in a
+pattern, as far apart as the osc depth says.
 
 **Movement** (ALGORITHM) is how much of all that you hear: it scales every LFO depth together, as you've set
 them. At 0% the LFO moves nothing, whatever the depths say; at 100% (the middle) the depths are as set; at 200%

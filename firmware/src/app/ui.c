@@ -2102,7 +2102,7 @@ static void pic_types(int32_t y0)
     static const char *const REV_SAYS[DR_NREV] = {"small, close", "a hall", "the largest", "a hall, swinging"};
     int32_t mid = y0 + 42, k, side;
     cv_text(12, y0 + 3, &FONT_S, "DELAY", K_DIM);
-    cv_text(12, y0 + 17, &FONT_B, DR_DLY_NAME[dt], K_FX);
+    cv_text(12, y0 + 25, &FONT_B, DR_DLY_NAME[dt], K_FX);
     text_r(222, y0 + 3, DLY_SAYS[dt], K_TEXT2);
     cv_rect(108, mid, 114, 1, K_GRID);
     for (side = 0; side < 2; side++)
@@ -2114,7 +2114,7 @@ static void pic_types(int32_t y0)
         }
     cv_rect(12, y0 + 66, 210, 1, K_GRID);
     cv_text(12, y0 + 72, &FONT_S, "REVERB", K_DIM);
-    cv_text(12, y0 + 86, &FONT_B, DR_REV_NAME[rt], K_FX);
+    cv_text(12, y0 + 94, &FONT_B, DR_REV_NAME[rt], K_FX);
     text_r(222, y0 + 72, REV_SAYS[rt], K_TEXT2);
     cv_rect(108, y0 + 120, 114, 1, K_GRID);
     draw_tail(rt, 75, 108, y0 + 120, 114, 26, K_FX);
