@@ -508,8 +508,8 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     </div>
     <dl class="acts">
       <div><dt>Movement</dt><dd>scales every LFO depth you’ve set (LFO depths, and Dly LFO on Mods): still (0%), as set (100%), double (200%)</dd></div>
-      <div><dt>Wave I</dt><dd>triangle · square · saw · roundtooth · 2× tri · 2× exp · 4× pattern · random</dd></div>
-      <div><dt>Wave II</dt><dd>tri 90° · square 90° · exp saw · log tri · 2× saw · 2× pattern · 4× exp · random glide</dd></div>
+      <div><dt>Wave I</dt><dd>triangle · square · saw · roundtooth · 2× tri · 2× exp · 4× pattern · random · AND · OR (two squares, 1× and 3×: 2 or 4 steps)</dd></div>
+      <div><dt>Wave II</dt><dd>tri 90° · square 90° · exp saw · log tri · 2× saw · 2× pattern · 4× exp · random glide · AND · OR (1× and 5×)</dd></div>
       <div><dt><span class="cap">OCT−</span> <span class="cap">OCT+</span></dt><dd>Tap: the next shape, round and round · with <span class="cap">SEL</span>: the one before</dd></div>
     </dl>
   </div>
@@ -532,8 +532,9 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">FX</div>
         <div class="pstack">
-        <div class="g-page"><i>Delay</i><span class="k both"><span class="sr">Knob 1: </span>Type<small>tape · wide · ping-pong · clean</small></span><span class="k both"><span class="sr">Knob 2: </span>Time<small>70–450 ms</small></span><span class="k both"><span class="sr">Knob 3: </span>Repeats</span><span class="k both"><span class="sr">Knob 4: </span>Dly mix</span></div>
-        <div class="g-page"><i>Reverb</i><span class="k both"><span class="sr">Knob 1: </span>Type<small>room · hall · cathedral · chorus</small></span><span class="k both"><span class="sr">Knob 2: </span>Length<small>to Inf: a freeze</small></span><span class="k both"><span class="sr">Knob 3: </span>Damp</span><span class="k both"><span class="sr">Knob 4: </span>Rev mix</span></div>
+        <div class="g-page"><i>Delay</i><span class="k both"><span class="sr">Knob 1: </span>Drive<small>after the delay</small></span><span class="k both"><span class="sr">Knob 2: </span>Time<small>70–450 ms</small></span><span class="k both"><span class="sr">Knob 3: </span>Repeats</span><span class="k both"><span class="sr">Knob 4: </span>Dly mix</span></div>
+        <div class="g-page"><i>Reverb</i><span class="k both"><span class="sr">Knob 1: </span>Length<small>to Inf: a freeze</small></span><span class="k both"><span class="sr">Knob 2: </span>Damp</span><span class="k both none"><span class="sr">Knob 3: </span>–</span><span class="k both"><span class="sr">Knob 4: </span>Rev mix</span></div>
+        <div class="g-page"><i>Types</i><span class="k both"><span class="sr">Knob 1: </span>Delay<small>tape · wide · ping-pong · clean · grain · self</small></span><span class="k both"><span class="sr">Knob 2: </span>Reverb<small>room · hall · cathedral · chorus</small></span><span class="k both none"><span class="sr">Knob 3: </span>–</span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
         </div>
       </div>
     </div>
@@ -737,7 +738,7 @@ function hit(c, cls) {
   c.hit = d;
 }
 // what each control does, on hover (the Buttons list below says the same)
-const TIP = { FX: "Delay: type, time, repeats, mix (again: Reverb: type, length to Inf, damp, mix)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
+const TIP = { FX: "Delay: drive, time, repeats, mix (again: Reverb: length to Inf, damp, mix; again: Types: the delay's, the reverb's)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
   ENV: "Tone 1: noise and its colour, white to pink (again: Life: character, feedback, age, drift); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: Mods: rate mod, mod by, X-mod amount, delay LFO)",
   EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure)",
   HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in bank A, B or C)", ARP: "Swell: tap on / off, hold to peek at its page, tap twice to stay on it", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",

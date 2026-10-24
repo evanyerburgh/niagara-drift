@@ -94,6 +94,7 @@ static void drone(int partners, int voices, int heavy)   /* voices: how many dro
         dr_set(P_REV_MIX, 80);
         dr_set(P_WANDER, 100);
         dr_set(P_AGE, 100);
+        dr_set(P_DLY_DRIVE, 60);                 /* the drive after the delay (v0.3) */
         for (g = 0; g < DR_NGEST; g++)            /* every gesture in but Clean (which takes things away) */
             if (g != DR_G_CLEAN)
                 dr_gesture(g, 1000);
@@ -144,7 +145,7 @@ int main(void)
 
     drone(1, 2, 2);
     ipc = cost(dr_render, &ns);
-    report("worst case: + feedback, character, drift, macros", ipc, ns, 0);
+    report("worst case: + feedback, character, drift, macros, drive", ipc, ns, 0);
 
     printf(bad ? "drone cost: OVER LIMIT\n" : "drone cost: ok\n");
     return bad ? 1 : 0;

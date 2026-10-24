@@ -5,7 +5,7 @@
  *
  * Always live:
  *   KNOB 1-2       drone I's two values on the page shown, KNOB 3-4 drone II's; the Play page (HOME):
- *                  Pitch and Cutoff. A pitch is continuous, 27 Hz .. 1.6 kHz, a slow full turn an octave;
+ *                  Pitch and Cutoff. A pitch is continuous, 2 Hz .. 1.6 kHz, a slow full turn an octave;
  *                  hold SEL for a cent a detent. With PITCH LINK on, KNOB 3 moves drone II's offset.
  *   SELECT         LFO rate      ALGORITHM   MOVEMENT: every LFO depth together, 0 .. 200 %
  *   PRESETS        GESTURE TIME: every gesture's speed, x0.1 .. x10 (v0.2)
@@ -36,7 +36,8 @@
  * REC            the MOTION LOOP: tap to record what the knobs do, tap again to loop it from the start,
  *                tap again to stop (everything stays where it is); up to 5 minutes (lit: blinking recording,
  *                steady looping)
- *   FX             Delay: type, time, repeats, mix; again: Reverb: type, length (to Inf), damp, mix
+ *   FX             Delay: drive (after the delay, v0.3), time, repeats, mix; again: Reverb: length (to Inf),
+ *                  damp, mix; again: Types: the delay's, the reverb's
  *                  (the delay LFO's tap: the LFO page's key in drone II's filter group)
  *   ENV            Tone 1: each drone's noise and colour; again: Tone 2: character, feedback
  * Saving: SAVE, and by itself a few seconds after a change while stopped (a flash write stops the audio
@@ -45,9 +46,10 @@
 /* ------------------------------------------------------------- pages --- */
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
 enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_MOVES, V_SETUP, V_SETUP2,
-       V_PULSE, V_FX, V_FX2, NVIEWS };
+       V_PULSE, V_FX, V_FX2, V_FX3, NVIEWS };
 static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone 1", "Life", "Osc", "Sub · Drive", "LFO depths",
-                                              "Mods", "Partner", "Pitch moves", "Setup 1", "Setup 2", "Swell", "Delay", "Reverb"};
+                                              "Mods", "Partner", "Pitch moves", "Setup 1", "Setup 2", "Swell", "Delay", "Reverb",
+                                              "Types"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
  * nothing (g NONE) */
 #define G 2
@@ -70,14 +72,16 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{G, P_FADE}, {G, P_MORPH}, {G, P_SCENE_T}, {NONE, 0}},
     {{G, P_TUNE}, {G, P_WIDTH}, {G, P_PRESS_SENS}, {NONE, 0}},   /* the Speaker cut is automatic (2026-10-20) */
     {{G, P_PULSE_RATE}, {G, P_PULSE_DEPTH}, {G, P_PULSE_SHAPE}, {G, P_PULSE_SWING}},
-    {{G, P_DLY_TYPE}, {G, P_DLY_TIME}, {G, P_DLY_REPEATS}, {G, P_DLY_MIX}},
-    {{G, P_REV_TYPE}, {G, P_REV_LEN}, {G, P_REV_DAMP}, {G, P_REV_MIX}},
+    /* FX (v0.3): the delay with the drive after it; the reverb; their types on a page of their own (FX, third tap) */
+    {{G, P_DLY_DRIVE}, {G, P_DLY_TIME}, {G, P_DLY_REPEATS}, {G, P_DLY_MIX}},
+    {{G, P_REV_LEN}, {G, P_REV_DAMP}, {NONE, 0}, {G, P_REV_MIX}},
+    {{G, P_DLY_TYPE}, {G, P_REV_TYPE}, {NONE, 0}, {NONE, 0}},
 };
 /* the page buttons: each shows its first page, pressed again the next */
 static const struct {
     uint8_t btn, first, n;
 } PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_TONE, 2}, {B_EDIT, V_OSC, 2}, {B_LFO, V_LFO, 2},
-                {B_SEQ, V_PARTNER, 2}, {B_GLO, V_SETUP, 2}, {B_FX, V_FX, 2},
+                {B_SEQ, V_PARTNER, 2}, {B_GLO, V_SETUP, 2}, {B_FX, V_FX, 3},
                 {B_ARP, V_PULSE, 1}};                                    /* ARP: a tap toggles */
 #define NPAGE_BTN (sizeof PAGE_BTN / sizeof PAGE_BTN[0])
 #define HOLD_MS 400u                   /* a page button held this long (or a knob turned) is a peek */
@@ -547,7 +551,8 @@ static void page_up(int b)
 
 static float morph_ms(void) { return 20.0f * fm_exp2f((float)proj.par[P_MORPH] * 0.105507f); }
 
-/* OCT- / OCT+: the LFO's two waves (v0.2): a tap is the next shape, round and round (Off, the seven, random);
+/* OCT- / OCT+: the LFO's two waves (v0.2): a tap is the next shape, round and round (Off, the seven, random,
+ * AND, OR);
  * SEL + OCT the one before. The engine glides a new shape in over the Switch time. Shown in the top bar */
 static void hands_on(int p) { ui.hands[p / 64] |= (uint64_t)1 << (p % 64); }
 static int hands_has(int p) { return (int)(ui.hands[p / 64] >> (p % 64) & 1u); }
@@ -1424,6 +1429,8 @@ static const char *card_name(int p)
     case P_MORPH: return "Switch";             /* Switch time */
     case P_GLIDE: return "Glide";              /* Pitch glide */
     case P_PRESS_SENS: return "Press.";
+    case P_DLY_TYPE: return "Delay";           /* the Types page: each "Type" */
+    case P_REV_TYPE: return "Reverb";
     default: break;
     }
     if (p < P_XMOD && p % GP_N == GP_OLFO_DEPTH)
@@ -1449,7 +1456,7 @@ static uint16_t page_col(void)
 {
     switch (ui.view) {
     case V_LFO: case V_LFO2: return K_LFO;
-    case V_FX: case V_FX2: case V_TONE2: return K_FX;
+    case V_FX: case V_FX2: case V_FX3: case V_TONE2: return K_FX;
     case V_PULSE: return K_PULSE;
     case V_SETUP: case V_SETUP2: return K_SETUP;
     default: return K_DIM;
@@ -2041,6 +2048,14 @@ static void draw_tail(int type, int len, int32_t x0, int32_t yb, int32_t w, int3
     plot(x0, 2, y, n, c);
 }
 
+/* where an echo is drawn, off its time: Grain's jitter (its own sound shakes the time), Self's drift later (its
+ * loudness stretches it) */
+static int32_t echo_shift(int ty, int k)
+{
+    static const int8_t JIT[8] = {0, 2, -2, 3, -1, -3, 1, 2};
+    return ty == 4 ? JIT[k & 7] : ty == 5 ? (int32_t)(k * k) / 3 : 0;
+}
+
 /* Delay: the echoes over 2 s, the left side above the line and the right below it (Wide: the right comes
  * sooner; Ping-pong: they take turns), each as loud as Repeats leaves it, darker each time */
 static void pic_fx(int32_t y0)
@@ -2056,7 +2071,7 @@ static void pic_fx(int32_t y0)
     for (side = 0; side < 2; side++) {
         float a = 1.0f, step = ms * (side && ty == 1 ? 0.75f : 1.0f);
         for (k = 1; k < 40; k++) {
-            int32_t x = 12 + (int32_t)(step * (float)k * 0.104f), bh;   /* 208 px = 2 s */
+            int32_t x = 12 + (int32_t)(step * (float)k * 0.104f) + echo_shift(ty, k), bh;   /* 208 px = 2 s */
             int heard = ty != 2 || (k & 1) != side;   /* ping-pong: odd repeats on the left, even on the right */
             a *= fb;
             if (x > 218)
@@ -2079,6 +2094,40 @@ static void pic_fx(int32_t y0)
         text_r(222, y0 + 3, "runaway", K_GOLD);
     else if (ty == 3)
         text_r(222, y0 + 3, "no wow", K_DIM);
+    if (proj.par[P_DLY_DRIVE]) {               /* the drive after it (KNOB 1) */
+        dr_param_text(P_DLY_DRIVE, proj.par[P_DLY_DRIVE], scopy(t, "drive "));
+        text_r(222, y0 + 112, t, proj.par[P_DLY_DRIVE] > 50 ? K_GOLD : K_FX);
+    }
+}
+
+/* Types (FX, third tap): the delay's type above (its first echoes, left above the line and right below, as on the
+ * Delay page) and the reverb's below (its tail's start, the pre-delay a gap), each named */
+static void pic_types(int32_t y0)
+{
+    const int dt = (unsigned)proj.par[P_DLY_TYPE] < DR_NDLY ? proj.par[P_DLY_TYPE] : 0;
+    const int rt = (unsigned)proj.par[P_REV_TYPE] < DR_NREV ? proj.par[P_REV_TYPE] : 2;
+    static const char *const DLY_SAYS[DR_NDLY] = {"warm, mono", "stereo, brighter", "side to side", "bright, still",
+                                                  "shaken by itself", "sways when loud"};
+    static const char *const REV_SAYS[DR_NREV] = {"small, close", "a hall", "the largest", "a hall, swinging"};
+    int32_t mid = y0 + 42, k, side;
+    cv_text(12, y0 + 3, &FONT_S, "DELAY", K_DIM);
+    cv_text(12, y0 + 25, &FONT_B, DR_DLY_NAME[dt], K_FX);
+    text_r(222, y0 + 3, DLY_SAYS[dt], K_TEXT2);
+    cv_rect(108, mid, 114, 1, K_GRID);
+    for (side = 0; side < 2; side++)
+        for (k = 1; k <= 5; k++) {
+            int32_t x = 108 + (int32_t)((float)k * 21.0f * (side && dt == 1 ? 0.75f : 1.0f)) + echo_shift(dt, k),
+                    bh = 18 - 3 * k;
+            if (dt == 2 && (k & 1) == side)    /* ping-pong: they take turns */
+                continue;
+            cv_rect(x, side ? mid + 2 : mid - bh, 3, bh, blend(K_FX, K_PANEL, k, 9));
+        }
+    cv_rect(12, y0 + 66, 210, 1, K_GRID);
+    cv_text(12, y0 + 72, &FONT_S, "REVERB", K_DIM);
+    cv_text(12, y0 + 94, &FONT_B, DR_REV_NAME[rt], K_FX);
+    text_r(222, y0 + 72, REV_SAYS[rt], K_TEXT2);
+    cv_rect(108, y0 + 120, 114, 1, K_GRID);
+    draw_tail(rt, 75, 108, y0 + 120, 114, 26, K_FX);
 }
 
 /* Reverb: the tail over 5 s (its length; flat at Inf, "freeze"), as high as its mix, darker as Damp rises */
@@ -2341,6 +2390,7 @@ static void draw_pic(void)
     if (keymap_on()) {
         keymap_pic();
     } else if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 ||
+        ui.view == V_FX3 ||
         ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_TONE2 ||
         ui.view == V_MOVES) {
         cv_round(6, 4, WIDE_W, PAN_H, 4, K_PANEL);
@@ -2350,6 +2400,7 @@ static void draw_pic(void)
         case V_LFO2: pic_lfo2(4); break;
         case V_FX: pic_fx(4); break;
         case V_FX2: pic_fx2(4); break;
+        case V_FX3: pic_types(4); break;
         case V_TONE2: pic_tone2(4); break;
         case V_SETUP2: pic_setup2(4); break;
         case V_MOVES: pic_moves(4); break;

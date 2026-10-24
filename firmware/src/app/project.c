@@ -250,10 +250,11 @@ static int in_range(const int16_t *v)
 
 /* the older layouts: 19 and 20 had 16 scenes in the project (scenes 13-16 become B1-B4), 21 had bank A there and
  * B, C in their own objects, each with 78 values a sound (DR_NPARAMS before the macros); 22 as 21 with 94 (before
- * the effects' four). A value added since takes its default. */
+ * the effects' four); 23-31 as now with 98 (before the delay's drive). A value added since takes its default. */
 #define NP21 78
 #define NP22 94
-_Static_assert(DR_NPARAMS >= NP22, "the values only grow");
+#define NP31 98
+_Static_assert(DR_NPARAMS >= NP31, "the values only grow");
 typedef struct {
     uint32_t magic, format;
     int16_t par[NP21];
@@ -288,8 +289,24 @@ typedef struct {
     uint16_t used, rsv;
     int16_t scene[NSCENES][NP22];
 } bank_v22_t;
+typedef struct {
+    uint32_t magic, format;
+    int16_t par[NP31];
+    uint8_t leds, bank, mtime;
+    uint8_t gkey_old[4];
+    uint8_t rsv[9];
+    uint16_t scene_used;
+    int16_t scene[NSCENES][NP31];
+} proj_v31_t;
+typedef struct {
+    uint32_t magic, format;
+    uint16_t used, rsv;
+    int16_t scene[NSCENES][NP31];
+} bank_v31_t;
 static union {
     project_t p;
+    proj_v31_t o31;
+    bank_v31_t b31;
     proj_v20_t o20;
     proj_v21_t o21;
     bank_t b;
@@ -302,7 +319,7 @@ static union {
 static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old sound: the new values' defaults */
 {
     int k;
-    const int np = from >= 22u ? NP22 : NP21;
+    const int np = from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
     for (k = 0; k < DR_NPARAMS; k++)
         dst[k] = k < np ? src[k] : dr_param_info(k)->def;
     if (dst[P_LFO_RATE] < 0)                   /* slower than 50 s, as it went before 2026-10-14: the slowest */
@@ -318,14 +335,16 @@ static void bank_load(int b)                   /* B (1), C (2) or the Presets (3
     memset(ld.raw, 0, sizeof ld.raw);
     if (plat_store_load(BANK_OBJ[b - 1], ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
         return;
-    if (ld.b.format == PROJ_FORMAT || (ld.b.format >= 23u && ld.b.format <= 30u)) {
-        uint32_t f = ld.b.format;
+    if (ld.b.format == PROJ_FORMAT) {
         *k = ld.b;
-        if (f != PROJ_FORMAT) {                /* 23-30: the same layout */
-            for (i = 0; i < NSCENES; i++)
-                convert(k->scene[i], f);
-            bank_dirty |= (uint8_t)(1u << b);
-        }
+    } else if (ld.b.format >= 23u && ld.b.format < PROJ_FORMAT) {   /* 23-31: 98 values a sound */
+        static bank_v31_t o;
+        uint32_t f = ld.b.format;
+        o = ld.b31;
+        k->used = o.used;
+        for (i = 0; i < NSCENES; i++)
+            widen(k->scene[i], o.scene[i], f);
+        bank_dirty |= (uint8_t)(1u << b);
     } else if (ld.b.format == 22u) {
         k->used = ld.b22.used;
         for (i = 0; i < NSCENES; i++)
@@ -393,13 +412,19 @@ int project_load(void)
         project_defaults();
         return -1;
     }
-    if (from == PROJ_FORMAT || (from >= 23u && from <= 30u)) {   /* 23-30: the same layout */
+    if (from == PROJ_FORMAT) {
         proj = ld.p;
-        if (from != PROJ_FORMAT) {
-            convert(proj.par, from);
-            for (i = 0; i < NSCENES; i++)
-                convert(proj.scene[i], from);
-        }
+    } else if (from >= 23u) {                  /* 23-31: 98 values a sound */
+        static proj_v31_t o;
+        o = ld.o31;
+        memset(&proj, 0, sizeof proj);
+        widen(proj.par, o.par, from);
+        proj.leds = o.leds;
+        proj.bank = o.bank;
+        proj.mtime = o.mtime;
+        proj.scene_used = o.scene_used & ((1u << NSCENES) - 1u);
+        for (i = 0; i < NSCENES; i++)
+            widen(proj.scene[i], o.scene[i], from);
     } else if (from == 22u) {
         static proj_v22_t o;
         o = ld.o22;

@@ -27,6 +27,25 @@ int plat_store_save(uint32_t obj, const void *src, uint32_t len)
 
 #include "../../firmware/src/app/project.c"
 
+/* a project as 23-31 saved it: 98 values a sound (before the delay's drive) */
+static void store_v31(const project_t *p)
+{
+    static proj_v31_t o;
+    int i;
+    memset(&o, 0, sizeof o);
+    o.magic = p->magic;
+    o.format = p->format;
+    memcpy(o.par, p->par, sizeof o.par);
+    o.leds = p->leds;
+    o.bank = p->bank;
+    o.mtime = p->mtime;
+    o.scene_used = p->scene_used;
+    for (i = 0; i < NSCENES; i++)
+        memcpy(o.scene[i], p->scene[i], sizeof o.scene[i]);
+    memcpy(store[OBJ_PROJ], &o, sizeof o);
+    store_n[OBJ_PROJ] = (int)sizeof o;
+}
+
 static int fails;
 static void check(const char *what, int ok)
 {
@@ -64,7 +83,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 31, on bank A", proj.format == 31u && PROJ_FORMAT == 31u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 32, on bank A", proj.format == 32u && PROJ_FORMAT == 32u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -119,8 +138,7 @@ int main(void)
         p23.par[P_FEEDBACK] = 40;
         p23.par[P_GD_1] = 70;              /* Heat's depth then; out of Shift's range now */
         p23.par[P_GL_0] = 100;            /* Beat latched then */
-        memcpy(store[OBJ_PROJ], &p23, sizeof p23);
-        store_n[OBJ_PROJ] = (int)sizeof p23;
+        store_v31(&p23);
         check("PR #14's project (23) loads: its sound kept, the gestures at their defaults, the set macros gone",
               project_load() == 0 && proj.par[P_FEEDBACK] == 40 && proj.par[P_WANDER] == 0 && proj.par[P_GD_1] == dr_param_info(P_GD_1)->def &&
                   proj.par[P_SHIFT_MOVE] == 1400 &&
@@ -130,8 +148,7 @@ int main(void)
         p23.par[P_GR_1] = 70;
         p23.par[P_GD_1] = 2;                   /* Shift's move then (a 4th down) */
         p23.par[P_GL_3] = 100;
-        memcpy(store[OBJ_PROJ], &p23, sizeof p23);
-        store_n[OBJ_PROJ] = (int)sizeof p23;
+        store_v31(&p23);
         check("PR #18's project (24) loads: the swells to the new defaults, Shift's move moved, the latches let go",
               project_load() == 0 && proj.par[P_GR_1] == dr_param_info(P_GR_1)->def &&
                   proj.par[P_SHIFT_MOVE] == 200 && proj.par[P_GD_1] == dr_param_info(P_GD_1)->def &&
@@ -144,8 +161,7 @@ int main(void)
         p29.par[DR_GP(0, GP_INTERVAL)] = 7;    /* +5th then */
         p29.par[DR_GP(1, GP_INTERVAL)] = 3;    /* unison then */
         p29.par[P_II_OUT] = 1;
-        memcpy(store[OBJ_PROJ], &p29, sizeof p29);
-        store_n[OBJ_PROJ] = (int)sizeof p29;
+        store_v31(&p29);
         check("PR #24's project (29) loads: a just +5th stays just, unison stays unison, Tuning folded in",
               project_load() == 0 && proj.par[DR_GP(0, GP_INTERVAL)] == 13 &&
                   proj.par[DR_GP(1, GP_INTERVAL)] == DR_IV_UNISON && proj.par[P_II_OUT] == 0);
@@ -159,11 +175,38 @@ int main(void)
         p30.scene_used |= 1u;
         p30.scene[0][DR_GP(0, GP_LEVEL)] = 100;
         p30.scene[0][DR_GP(1, GP_LEVEL)] = 1;
-        memcpy(store[OBJ_PROJ], &p30, sizeof p30);
-        store_n[OBJ_PROJ] = (int)sizeof p30;
+        store_v31(&p30);
         check("0.2-beta's project (30) loads: Level 57 / 37 is 75 / 61 on the new taper, a scene's 100 / 1 is 100 / 10",
               project_load() == 0 && proj.par[DR_GP(0, GP_LEVEL)] == 75 && proj.par[DR_GP(1, GP_LEVEL)] == 61 &&
                   proj.scene[0][DR_GP(0, GP_LEVEL)] == 100 && proj.scene[0][DR_GP(1, GP_LEVEL)] == 10);
+    }
+    {   /* 0.2's (31): 98 values a sound; the delay's drive comes in at 0 (off), everything else kept, bank B's too */
+        static project_t p31;
+        static bank_v31_t b31;
+        p31 = proj;
+        p31.format = 31u;
+        p31.par[P_PRESS_SENS] = 63;
+        p31.par[DR_GP(1, GP_CUTOFF)] = 432;
+        p31.scene_used |= 1u << 4;
+        p31.scene[4][P_DLY_TIME] = 77;
+        p31.scene[4][P_PRESS_SENS] = 21;
+        store_v31(&p31);
+        memset(&b31, 0, sizeof b31);
+        b31.magic = BANK_MAGIC;
+        b31.format = 31u;
+        b31.used = 1u << 2;
+        memcpy(b31.scene[2], p31.par, sizeof b31.scene[2]);
+        b31.scene[2][P_REV_LEN] = 91;
+        memcpy(store[OBJ_BANKB], &b31, sizeof b31);
+        store_n[OBJ_BANKB] = (int)sizeof b31;
+        check("0.2's project (31) loads: its sound and A5 kept, the delay's drive off",
+              project_load() == 0 && proj.par[P_PRESS_SENS] == 63 && proj.par[DR_GP(1, GP_CUTOFF)] == 432 &&
+                  proj.par[P_DLY_DRIVE] == 0 && scene_get(0, 4) && scene_get(0, 4)[P_DLY_TIME] == 77 &&
+                  scene_get(0, 4)[P_PRESS_SENS] == 21 && scene_get(0, 4)[P_DLY_DRIVE] == 0);
+        check("... B3 as it was, its drive off", scene_get(1, 2) && scene_get(1, 2)[P_REV_LEN] == 91 &&
+                                                   scene_get(1, 2)[P_DLY_DRIVE] == 0 &&
+                                                   scene_get(1, 2)[P_PRESS_SENS] == 63);
+        store_n[OBJ_BANKB] = 0;
     }
     {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */
         static proj_v21_t p21;

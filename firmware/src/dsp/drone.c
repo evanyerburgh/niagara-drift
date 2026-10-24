@@ -55,17 +55,18 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"D5 time", 0, 100, 30}, {"E5 time", 0, 100, 40}, {"F5 time", 0, 100, 35}, {"G5 time", 0, 100, 35},
     {"D5 latch", 0, 100, 0}, {"E5 latch", 0, 100, 0}, {"F5 latch", 0, 100, 0}, {"G5 latch", 0, 100, 0},
     {"Type", 0, DR_NDLY - 1, 0}, {"Length", 0, 100, 60}, {"Damp", 0, 100, 40}, {"Pressure", 0, 100, 50},
+    {"Drive", 0, 100, 0},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
-const char *const DR_DLY_NAME[DR_NDLY] = {"Tape", "Wide", "Ping-pong", "Clean"};
+const char *const DR_DLY_NAME[DR_NDLY] = {"Tape", "Wide", "Ping-pong", "Clean", "Grain", "Self"};
 const char *const DR_WSCALE_NAME[DR_NWSCALE] = {"Minor pent", "Major pent", "5ths + 8ves", "Whole tone", "Dorian",
                                                 "Just 1-8"};
 
 /* the Ultra LFO's shapes, after the DS-2's names; how each moves is ours (the DS-2 doesn't say) */
 const char *const DR_LFO_W1_NAME[DR_LFO_NSHAPES] = {"Off", "Triangle", "Square", "Saw", "Roundtooth",
-                                                    "2x Tri", "2x Exp", "4x Pattern", "Random"};
+                                                    "2x Tri", "2x Exp", "4x Pattern", "Random", "AND 3", "OR 3"};
 const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES] = {"Off", "Tri 90", "Square 90", "Exp saw", "Log tri",
-                                                    "2x Saw", "2x Pattern", "4x Exp", "Rnd glide"};
+                                                    "2x Saw", "2x Pattern", "4x Exp", "Rnd glide", "AND 5", "OR 5"};
 
 const dr_param_t *dr_param_info(int i) { return (i >= 0 && i < DR_NPARAMS) ? &PARAMS[i] : &PARAMS[0]; }
 
@@ -152,7 +153,12 @@ static void pitch_text(int c, char *b)
 {
     static const char *const NN[12] = {"C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"};
     int n = (c + 50) / 100, d = c - 100 * n, o = n / 12 - 1;
-    const char *s = NN[n % 12];
+    const char *s;
+    if (c < DR_PITCH_NOTE) {                     /* under the DS-2's range (and the note names' table): in Hz */
+        hz_text(8.1757989f * fm_exp2f((float)c * (1.0f / 1200.0f)), b);
+        return;
+    }
+    s = NN[n % 12];
     while (*s)
         *b++ = *s++;
     *b++ = (char)('0' + o);
@@ -1099,13 +1105,28 @@ static float rnd_shape(int tap, int c, float f)  /* c 1: this cycle, 0: the last
     return lfo_rnd[c] + (lfo_rnd[1 + c] - lfo_rnd[c]) * (0.5f - 0.5f * fm_cosf(FM_PI * f));
 }
 
-/* tap 0 (Wave I) or 1 (Wave II), shape 1..8, at phase ph (cycles). Every shape averages 0 over a cycle (the
+/* tap 0 (Wave I) or 1 (Wave II), shape 1..10, at phase ph (cycles). Every shape averages 0 over a cycle (the
  * lopsided ones shifted and scaled into -1..1), so picking one doesn't retune the drone: Roundtooth sat at
  * +0.61 of the depth (~1.4 semitones sharp at osc depth 30) */
+/* AND / OR (the Lyra-8's Hyper LFO, v0.3): a square at the LFO's rate and a faster one inside it (3x on Wave I, 5x on
+ * Wave II), multiplied (AND: up only while both are, a step between 2 levels) or added (OR, the slow one twice the
+ * fast: 4 levels). Lyra-8 acid, on pitch. AND is up for 1/3 of a cycle (3x) or 3/10 (5x): the rest sits lower by as
+ * much, so it averages 0 as the others do */
+static float lfo_logic(int tap, int shape, float ph)
+{
+    const float k = tap ? 5.0f : 3.0f, lo = tap ? -0.3f / 0.7f : -0.5f;
+    float a = l_sq(ph), b = l_sq(k * ph);
+    if (shape == DR_LFO_AND)
+        return a > 0.0f && b > 0.0f ? 1.0f : lo;
+    return (2.0f * a + b) * (1.0f / 3.0f);
+}
+
 static float lfo_shape(int tap, int shape, float ph)
 {
     if (shape == DR_LFO_RANDOM)
         return rnd_shape(tap, 1, fr(ph));
+    if (shape >= DR_LFO_AND)
+        return lfo_logic(tap, shape, ph);
     static const float PAT4[8] = {1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f};
     static const float PAT2[4] = {1.0f, -1.0f, 0.5f, -0.5f};
     float f = fr(ph);

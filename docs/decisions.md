@@ -341,3 +341,14 @@ at the end. The current state is in the [README](../README.md) and the code.
   (no pills; Drone I / II as brackets over KNOB1-2 / 3-4), on the keys 12.5 u ink, at most two lines (violet: the LFO
   pages' name). Buttons name the page they open (FX Delay, LFO Depths, EDIT Osc, SAVE Store, PLAY On/off). Captions in a
   strip between the key rows; the gesture keys show their bank at the top. The README picture is drawn the same way.
+- 2026-10-24 (0.3, step 1; Evan): two new LFO shapes on each wave, after Random: **AND** and **OR** (the Lyra-8's): a
+  square at the LFO's rate with one 3x (Wave I) or 5x (Wave II) faster, multiplied (2 levels) or added, the slow one
+  twice the fast (4 levels); centred, as every shape. A **drive after the delay**, before the reverb: the Delay page's
+  KNOB 1 (Drive, Time, Repeats, Mix); the first fifth blends it in, then up to 26 dB into a soft clip with a little bias;
+  its loudness matched to what goes in over ~0.3 s (P1, P9, P11 within 1.1 dB, 0..100). The delay and reverb types
+  move to a **Types** page (FX, third tap: KNOB 1 delay, KNOB 2 reverb); Reverb is Length, Damp, -, Mix. PROJ_FORMAT 32
+  (99 values a sound; 23-31 load with the drive off).
+- 2026-10-24 (0.3, step 1, Evan after the "hear it first" recordings): two more delay types, **Grain** (Tape whose time
+  its own sound moves, ~280 Hz and under, 60 samples a unit) and **Self** (Tape whose time its own loudness stretches,
+  followed at ~10 Hz against its slow mean, 25 % of the time a unit): six in all. The pitch knobs go down to **2 Hz**
+  (DR_PITCH_LO -2400 cents; was 27 Hz); under 27 Hz the screen shows Hz.
