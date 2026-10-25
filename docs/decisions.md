@@ -378,3 +378,9 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-25 (Evan): the **delay types in a new order**, plain to most alive: Clean, Wide, Ping-pong, Tape, Grain, Self
   (were Tape, Wide, Ping-pong, Clean, ...). Tape stays the default. PROJ_FORMAT 33: saved sounds and scenes from 23-32
   have Clean and Tape swapped once, so every sound keeps its delay.
+- 2026-10-25 (Evan, after recordings; the ideas from players): **Into reverb** (Types, KNOB 3; P_DLY_ROUTE, the 100th
+  value, PROJ_FORMAT 33): Both (as before), Echoes (the delay's echoes alone into the reverb, the dry kept whole and the
+  wash added: +0.6 dB at a reverb mix of 45, +1.7 at 90), Drones (the drones alone into it, the echoes dry); a change
+  crossfades over 50 ms. **Swell Shape** -100..100: over 0 as before (saved values unchanged), under 0 a ramp, the rise
+  taking up to 97 % of each breath, the fall at least 20 ms. **Every knob of named choices goes round** (the types, Into
+  reverb, Wander's scale; not a list ordered by size, such as Partner's interval).

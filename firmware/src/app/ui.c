@@ -75,7 +75,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
     /* FX (v0.3): the delay with the drive after it; the reverb; their types on a page of their own (FX, third tap) */
     {{G, P_DLY_DRIVE}, {G, P_DLY_TIME}, {G, P_DLY_REPEATS}, {G, P_DLY_MIX}},
     {{G, P_REV_LEN}, {G, P_REV_DAMP}, {NONE, 0}, {G, P_REV_MIX}},
-    {{G, P_DLY_TYPE}, {G, P_REV_TYPE}, {NONE, 0}, {NONE, 0}},
+    {{G, P_DLY_TYPE}, {G, P_REV_TYPE}, {G, P_DLY_ROUTE}, {NONE, 0}},
 };
 /* the page buttons: each shows its first page, pressed again the next */
 static const struct {
@@ -364,6 +364,14 @@ static void depth_hint(int p)
         say_c(tap == DR_LFO_II ? "WAVE II OFF" : "WAVE I OFF", tap == DR_LFO_II ? "tap OCT+" : "tap OCT-", K_LFO);
 }
 
+/* A KNOB OVER A LIST OF NAMED CHOICES GOES ROUND (Evan, 2026-10-25: the rule for every such knob): past the last
+ * comes the first, before the first the last, one choice a detent. Not a list ordered by size (Partner's interval,
+ * like a pitch, has ends). A new knob of choices goes here */
+static int knob_list(int p)
+{
+    return p == P_DLY_TYPE || p == P_REV_TYPE || p == P_DLY_ROUTE || p == P_WSCALE;
+}
+
 static void knob_turn(int i, int32_t e)
 {
     int p = knob_param(i);
@@ -376,8 +384,8 @@ static void knob_turn(int i, int32_t e)
         pitch_turn(k.g, p, EN_K1 + i, e);
     else if (dr_param_info(p)->hi - dr_param_info(p)->lo > 24)
         cont_turn(p, EN_K1 + i, e);
-    else if (p == P_DLY_TYPE || p == P_REV_TYPE) {     /* a type goes round both ways, as the LFO waves do (Evan,
-                                                        * 2026-10-25) */
+    else if (knob_list(p)) {                           /* a list of choices goes round both ways, as the LFO waves
+                                                        * do (Evan, 2026-10-25) */
         const dr_param_t *in = dr_param_info(p);
         int n = in->hi - in->lo + 1, v = (proj.par[p] - in->lo + (e > 0 ? 1 : -1)) % n;
         param_set(p, in->lo + (v < 0 ? v + n : v));
@@ -1432,6 +1440,7 @@ static const char *card_name(int p)
     case P_PRESS_SENS: return "Press.";
     case P_DLY_TYPE: return "Delay";           /* the Types page: each "Type" */
     case P_REV_TYPE: return "Reverb";
+    case P_DLY_ROUTE: return "Into rev";       /* what goes into the reverb */
     default: break;
     }
     if (p < P_XMOD && p % GP_N == GP_OLFO_DEPTH)
@@ -2100,8 +2109,10 @@ static void pic_types(int32_t y0)
 {
     const int dt = (unsigned)proj.par[P_DLY_TYPE] < DR_NDLY ? proj.par[P_DLY_TYPE] : DR_DLY_TAPE;
     const int rt = (unsigned)proj.par[P_REV_TYPE] < DR_NREV ? proj.par[P_REV_TYPE] : 2;
-    static const char *const DLY_SAYS[DR_NDLY] = {"warm, mono", "stereo, brighter", "side to side", "bright, still",
-                                                  "shaken by itself", "sways when loud"};
+    static const char *const DLY_SAYS[DR_NDLY] = {"bright, still", "stereo, brighter", "side to side", "warm, mono",
+                                                  "shaken by itself", "sways when loud"};   /* DR_DLY_NAME's order */
+    static const char *const ROUTE_SAYS[DR_NROUTE] = {"in: both", "in: echoes", "in: drones"};
+    const int ro = (unsigned)proj.par[P_DLY_ROUTE] < DR_NROUTE ? proj.par[P_DLY_ROUTE] : 0;
     static const char *const REV_SAYS[DR_NREV] = {"small, close", "a hall", "the largest", "a hall, swinging"};
     int32_t mid = y0 + 42, k, side;
     cv_text(12, y0 + 3, &FONT_S, "DELAY", K_DIM);
@@ -2122,6 +2133,7 @@ static void pic_types(int32_t y0)
     text_r(222, y0 + 72, REV_SAYS[rt], K_TEXT2);
     cv_rect(108, y0 + 120, 114, 1, K_GRID);
     draw_tail(rt, 75, 108, y0 + 120, 114, 26, K_FX);
+    cv_text(12, y0 + 116, &FONT_S, ROUTE_SAYS[ro], ro ? K_TEXT2 : K_DIM);   /* what goes into it (KNOB 3) */
 }
 
 /* Reverb: the tail over 5 s (its length; flat at Inf, "freeze"), as high as its mix, darker as Damp rises */

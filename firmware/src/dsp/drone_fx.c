@@ -123,6 +123,16 @@ static dly_type_t dly_c = {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.0f};
 #define DLY_XSTEP (1.0f / (0.05f * DR_SR))
 static uint8_t dly_pt = DT_TAPE, dly_qt = DT_TAPE;   /* the type read now, and the one it's coming from */
 static float dly_xf = 1.0f;                          /* that crossfade, 0..1 (1: done) */
+/* what goes into the reverb (P_DLY_ROUTE): both the drones and their echoes, the echoes alone (the drones dry, the
+ * wash added to them), or the drones alone (the reverb beside the delay, the echoes dry). Each route's send and
+ * its share of the dry: a new route crossfades to them over 50 ms */
+static float rt_w[DR_NROUTE] = {1.0f, 0.0f, 0.0f};
+static void rt_snap(void)                /* at the route at once (a load, at rest) */
+{
+    int q;
+    for (q = 0; q < DR_NROUTE; q++)
+        rt_w[q] = q == ((unsigned)par[P_DLY_ROUTE] < DR_NROUTE ? par[P_DLY_ROUTE] : 0) ? 1.0f : 0.0f;
+}
 static float self_s, self_e, self_es;    /* Grain's sound (~280 Hz); Self's loudness (~10 Hz) and its mean (~0.2 Hz) */
 
 static float dly_ms(int v) { return 70.0f * fm_exp2f((float)v * 0.026845f); }   /* 70 * (450/70)^(v/100) */
@@ -452,6 +462,7 @@ static void fx_clear(void)
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
     dly_xf = 1.0f;
+    rt_snap();
     rv_clear();
     fx_gains();
     fx_quiet = 0;
@@ -464,6 +475,7 @@ static void fx_rest(void)
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
     dly_xf = 1.0f;
+    rt_snap();
     fx_gains();
 }
 
@@ -489,6 +501,9 @@ static void fx_run(float *l, float *r, uint32_t n)
     const dly_type_t *dt = &DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     const float ease = fm_minf((float)n * (1.0f / (0.25f * DR_SR)), 1.0f);   /* a type's glide: ~0.25 s */
     static float sl[BLK], sr[BLK];       /* the reverb's send (mono, in sl) and its wet, a block */
+    static float in_m[BLK], wet_m[BLK];  /* the drones into the delay, and its echoes, mono (the routes' sends) */
+    const int route = (unsigned)par[P_DLY_ROUTE] < DR_NROUTE ? par[P_DLY_ROUTE] : 0;
+    float rw0[DR_NROUTE], drw[DR_NROUTE];
     float pgain;
     int mono = 0;
     uint32_t j;
@@ -526,6 +541,7 @@ static void fx_run(float *l, float *r, uint32_t n)
         dry1 += dd1;
         wet1 += dw1;
         x = (l[j] + r[j]) * 0.5f;
+        in_m[j] = x;
         {
             float lfo = lfo_at(dly_rt, j / CR);
             if (dly_rw < 1.0f) {
@@ -586,12 +602,29 @@ static void fx_run(float *l, float *r, uint32_t n)
             dly_buf[1][dly_w] = (int16_t)(fm_clampf(wr, -1.99f, 1.99f) * 16384.0f);
             dly_w = (dly_w + 1u) & DLY_MASK;
         }
+        wet_m[j] = (dly_olp[0] + dly_olp[1]) * 0.5f * wet1 * pgain;
         l[j] = l[j] * dry1 + dly_olp[0] * wet1 * pgain;
         r[j] = r[j] * dry1 + dly_olp[1] * wet1 * pgain;
     }
     drive_run(l, r, n);                  /* DRIVE: the drones and their repeats together */
-    for (j = 0; j < n; j++)
-        sl[j] = (l[j] + r[j]) * 0.5f;    /* the reverb's send */
+    {
+        int q;
+        for (q = 0; q < DR_NROUTE; q++) {          /* toward the route, 50 ms the whole way, sample by sample */
+            float to = q == route ? 1.0f : 0.0f;
+            rw0[q] = rt_w[q];
+            rt_w[q] = to > rt_w[q] ? fm_minf(rt_w[q] + (float)n * DLY_XSTEP, to) : fm_maxf(rt_w[q] - (float)n * DLY_XSTEP, to);
+            drw[q] = (rt_w[q] - rw0[q]) * dn;
+        }
+    }
+    {
+        float w0 = rw0[0], w1 = rw0[1], w2 = rw0[2];
+        for (j = 0; j < n; j++) {             /* the reverb's send */
+            w0 += drw[0];
+            w1 += drw[1];
+            w2 += drw[2];
+            sl[j] = (l[j] + r[j]) * 0.5f * w0 + wet_m[j] * w1 + in_m[j] * w2;
+        }
+    }
     /* REVERB at the half rate: the send down, the network, the wet up */
     rv_block(n / 2u, (float)n / DR_SR);
     for (j = 0; j + 1u < n; j += 2u) {
@@ -611,11 +644,17 @@ static void fx_run(float *l, float *r, uint32_t n)
         rv.hold[0] = sl[n - 1u];
         rv.hold[1] = sr[n - 1u];
     }
-    for (j = 0; j < n; j++) {
-        dry2 += dd2;
-        wet2 += dw2;
-        l[j] = l[j] * dry2 + sl[j] * RV_WET * rv.gain * wet2;
-        r[j] = r[j] * dry2 + sr[j] * RV_WET * rv.gain * wet2;
+    {
+        float w1 = rw0[1];
+        for (j = 0; j < n; j++) {             /* the echoes alone in: the dry kept whole, the wash added */
+            float d;
+            dry2 += dd2;
+            wet2 += dw2;
+            w1 += drw[1];
+            d = dry2 + (1.0f - dry2) * w1;
+            l[j] = l[j] * d + sl[j] * RV_WET * rv.gain * wet2;
+            r[j] = r[j] * d + sr[j] * RV_WET * rv.gain * wet2;
+        }
     }
     fx_g[0] = fbg1;
     fx_g[1] = dry1e;

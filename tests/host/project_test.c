@@ -279,10 +279,10 @@ int main(void)
     check("v0.2's first (20) loads, Colours as they were",
           project_load() == 0 && proj.par[DR_GP(0, GP_NCOLOR)] == 100 && scene_get(1, 0) &&
               scene_get(1, 0)[DR_GP(1, GP_NCOLOR)] == 100);
-    {   /* 32 (#38-#40): the same layout, the delay types then Tape, Wide, Ping-pong, Clean, Grain, Self; now Clean,
+    {   /* 32 (#38, #39): 99 values a sound, the delay types then Tape, Wide, Ping-pong, Clean, Grain, Self; now Clean,
          * Wide, Ping-pong, Tape, Grain, Self */
-        static project_t p32;
-        static bank_t b32;
+        static proj_v32_t p32;
+        static bank_v32_t b32;
         int i;
         memset(&p32, 0, sizeof p32);
         memset(&b32, 0, sizeof b32);
@@ -290,7 +290,7 @@ int main(void)
         p32.format = 32u;
         b32.magic = BANK_MAGIC;
         b32.format = 32u;
-        for (i = 0; i < DR_NPARAMS; i++)
+        for (i = 0; i < NP32; i++)
             p32.par[i] = p32.scene[0][i] = p32.scene[1][i] = b32.scene[0][i] = dr_param_info(i)->def;
         p32.par[P_DLY_TYPE] = 3;                   /* Clean then */
         p32.scene[0][P_DLY_TYPE] = 0;              /* Tape */
@@ -306,6 +306,8 @@ int main(void)
         check("32's delay types, in the new order: Clean and Tape trade places, the others stay",
               project_load() == 0 && proj.par[P_DLY_TYPE] == 0 && scene_get(0, 0)[P_DLY_TYPE] == 3 &&
                   scene_get(0, 1)[P_DLY_TYPE] == 4 && scene_get(1, 0)[P_DLY_TYPE] == 1);
+        check("... the reverb's route (new in 33) as it was: both the drones and their echoes into it",
+              proj.par[P_DLY_ROUTE] == 0 && scene_get(0, 0)[P_DLY_ROUTE] == 0 && scene_get(1, 0)[P_DLY_ROUTE] == 0);
         check("... and written again in 33 on the next save", project_save() == 0 && store_n[OBJ_BANKB] == (int)sizeof(bank_t));
     }
     old_project(18u);

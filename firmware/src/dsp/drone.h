@@ -86,7 +86,8 @@ enum {
     P_PULSE,                        /* the PULSE on (1) / off (0): both drones chopped in time (a switch) */
     P_PULSE_RATE,                   /* 0..100 = 0.03 .. 16 pulses a second, exponential (a 33 s breath .. a buzz) */
     P_PULSE_DEPTH,                  /* 0..100: how far the level drops between pulses */
-    P_PULSE_SHAPE,                  /* 0..100: a smooth swell .. a hard gate */
+    P_PULSE_SHAPE,                  /* -100..100: 0 a smooth swell; up to 100 firmer, a hard gate at the top; down to
+                                     * -100 a ramp, rising slowly and falling quickly (a user's ask, 2026-10-25) */
     P_PULSE_SWING,                  /* 0..50: every other pulse longer (50: 3 to 1) */
     P_DLY_TIME,                     /* the DELAY: 0..100 = 70 .. 450 ms (exponential) */
     P_DLY_REPEATS,                  /* 0..100: its feedback; past ~85 it runs away (held by a soft clip) */
@@ -132,6 +133,9 @@ enum {
     P_PRESS_SENS,                   /* the keys' pressure sensitivity, 0..100 (50: as tuned; a room setting) */
     P_DLY_DRIVE,                    /* DRIVE after the delay (v0.3, the Lyra-8's): 0..100, the drones and their repeats
                                      * distorted together, before the reverb; the loudness held */
+    P_DLY_ROUTE,                    /* what goes into the reverb (v0.3, DR_ROUTE_NAME): 0 both, the drones and their
+                                     * echoes; 1 the echoes alone (the drones dry, the wash added); 2 the drones alone (the
+                                     * reverb beside the delay, the echoes dry) */
     DR_NPARAMS
 };
 
@@ -163,6 +167,8 @@ extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
 #define DR_PITCH_HI 9135                       /* 1.6 kHz */
 #define DR_NREV 4
 extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
+#define DR_NROUTE 3
+extern const char *const DR_ROUTE_NAME[DR_NROUTE];      /* "Both", "Echoes", "Drones" */
 #define DR_NDLY 6
 #define DR_DLY_TAPE 3                                     /* the starting type */
 extern const char *const DR_DLY_NAME[DR_NDLY];          /* "Clean", "Wide", "Ping-pong", "Tape", "Grain", "Self" */

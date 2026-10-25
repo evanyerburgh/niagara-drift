@@ -713,6 +713,40 @@ int main(void)
         }
     }
 
+    {   /* the Swell's RAMP (Shape under 0, 2026-10-25): it rises slowly and falls quickly; at a fast rate the fall is
+         * never under 20 ms */
+        static int32_t small[2 * 32];
+        const int rates[2] = {30, 100};
+        float up[2];
+        int t, k;
+        for (t = 0; t < 2; t++) {
+            int nu = 0, nd = 0;
+            float last = 1.0f;
+            dry_init();
+            dr_set(P_FADE, 0);
+            dr_set(P_PULSE, 1);
+            dr_set(P_PULSE_RATE, rates[t]);              /* 0.2 breaths a second; 16 */
+            dr_set(P_PULSE_DEPTH, 100);
+            dr_set(P_PULSE_SHAPE, -100);
+            dr_play(1);
+            for (k = 0; k < (int)(15.0f * DR_SR / 32.0f); k++) {   /* 15 s in 32-frame steps */
+                dr_render(small, 32, 3277);
+                if (k > (int)(2.0f * DR_SR / 32.0f)) {
+                    if (dr_pulse > last + 1e-5f)
+                        nu++;
+                    else if (dr_pulse < last - 1e-5f)
+                        nd++;
+                }
+                last = dr_pulse;
+            }
+            up[t] = (float)nu / (float)(nu + nd + 1);
+        }
+        printf("    swell ramp: rising %.0f %% of the time at 0.2 a second, %.0f %% at 16\n", (double)(100.0f * up[0]),
+               (double)(100.0f * up[1]));
+        check("swell ramp: a slow rise (over 90 % of a breath), the fall never under 20 ms (at 16 a second, a rise of "
+              "68 % at most)", up[0] > 0.9f && up[1] < 0.72f);
+    }
+
     {   /* the PULSE: its rate (gate openings a second), its depth, its swing (beats 3:1), and off again */
         int opens = 0, k, last_open = -1, lens[16], nl = 0, was = 1;
         float mn = 9.0f;

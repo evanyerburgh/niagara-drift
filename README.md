@@ -287,8 +287,10 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 - Tap ARP for this page; tap it again here to start or stop the Swell. The picture shows a bar of it, and a dot where it is.
 - **The Swell** runs from a 33-second breath to a buzz (the starting sound has it on: a slow breath, 40 deep).
-- **Depth** is how far it dips, in dB (down to −30; all the way, silence). **Shape** firms the breath up into
-  a pulse, and only at the top into a hard gate.
+- **Depth** is how far it dips, in dB (down to −30; all the way, silence). **Shape** runs both ways from the
+  middle, **even** (a smooth breath): to the right it firms up into a pulse, and only at the top into a hard gate; to
+  the left it becomes a **ramp**, swelling slowly and falling away quickly, more like a sawtooth the further you go
+  ("ramp 100": the rise takes 97 % of each breath; at fast rates the fall stays at least 20 ms, so it doesn't click).
 
 #### Delay, Reverb and Types · FX
 
@@ -298,7 +300,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 |---|---|---|---|---|
 | Delay | drive | time | repeats | delay mix |
 | Reverb | length | damp | | reverb mix |
-| Types | delay type | reverb type | | |
+| Types | delay type | reverb type | into reverb | |
 
 - **Drive** distorts the drones and their echoes together, after the delay and before the reverb, as the Lyra-8's
   distortion does: ghost notes, beating and crackle on the repeats. The first fifth of its turn blends a little in;
@@ -314,6 +316,10 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
   away into self-oscillation ("runaway" on the screen), held by a soft clip.
 - **Reverb types**: **Room**, **Hall**, **Cathedral** (the largest), **Chorus hall** (a hall that shimmers).
   They differ in size, distance and movement; changing type crossfades, and the knob goes round both ways.
+- **Into reverb** (Types, KNOB 3) is what the reverb hears: **Both** (the drones and their echoes, as the effects
+  are chained), **Echoes** (only the echoes wash out; the drones stay dry and up front), or **Drones** (the reverb
+  beside the delay: the drones wash, the echoes stay dry and distinct on top). Like every knob of choices, it goes
+  round.
 - **Length** is how long the tail takes to die away, 0.3 to 40 seconds. At the top, **Inf**, it never does: a
   freeze. Press PLAY to stop and the freeze lets go, over about twice the Fade time.
 - **Damp** darkens the tail (out at Inf, so a freeze holds what's in it).

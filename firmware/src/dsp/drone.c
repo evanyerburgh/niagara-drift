@@ -44,7 +44,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
     {"Stereo", 0, 100, 60}, {"Tune", -50, 50, 0},
-    {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", 0, 100, 25}, {"Swing", 0, 50, 0},
+    {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", -100, 100, 25}, {"Swing", 0, 50, 0},
     {"Time", 0, 100, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
     {"Type", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Dly LFO", -100, 100, 20},
     {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
@@ -55,9 +55,10 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"D5 time", 0, 100, 30}, {"E5 time", 0, 100, 40}, {"F5 time", 0, 100, 35}, {"G5 time", 0, 100, 35},
     {"D5 latch", 0, 100, 0}, {"E5 latch", 0, 100, 0}, {"F5 latch", 0, 100, 0}, {"G5 latch", 0, 100, 0},
     {"Type", 0, DR_NDLY - 1, DR_DLY_TAPE}, {"Length", 0, 100, 60}, {"Damp", 0, 100, 40}, {"Pressure", 0, 100, 50},
-    {"Drive", 0, 100, 0},
+    {"Drive", 0, 100, 0}, {"Into rev", 0, DR_NROUTE - 1, 0},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
+const char *const DR_ROUTE_NAME[DR_NROUTE] = {"Both", "Echoes", "Drones"};
 const char *const DR_DLY_NAME[DR_NDLY] = {"Clean", "Wide", "Ping-pong", "Tape", "Grain", "Self"};
 const char *const DR_WSCALE_NAME[DR_NWSCALE] = {"Minor pent", "Major pent", "5ths + 8ves", "Whole tone", "Dorian",
                                                 "Just 1-8"};
@@ -262,6 +263,16 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_REV_NAME[(unsigned)v < DR_NREV ? v : 0]);
     else if (i == P_DLY_TYPE)
         copy_s(b, DR_DLY_NAME[(unsigned)v < DR_NDLY ? v : DR_DLY_TAPE]);
+    else if (i == P_DLY_ROUTE)
+        copy_s(b, DR_ROUTE_NAME[(unsigned)v < DR_NROUTE ? v : 0]);
+    else if (i == P_PULSE_SHAPE && v <= 0) {     /* "even"; "ramp 40" (the left half) */
+        if (v == 0) {
+            copy_s(b, "even");
+        } else {
+            copy_s(b, "ramp ");
+            itoa_s(-v, b + 5);
+        }
+    }
     else if (i == P_WSCALE)
         copy_s(b, DR_WSCALE_NAME[(unsigned)v < DR_NWSCALE ? v : 0]);
     else if (i == P_WANDER) {                    /* "off", "25-30s", "4.1-7.6s", "0.5-2.0s" */
@@ -1772,22 +1783,33 @@ static float pulse_depth(int v)
 {
     return v >= 100 ? 1.0f : 1.0f - fm_exp2f((float)v * (-30.0f / 99.0f * 0.166096405f));
 }
-static float pulse_gain(float ph, float depth, float shape, float b1)
+/* a breath's gain at ph (0..2 a bar, two breaths; swing b1 the first's length). SHAPE over 0 firms it up, toward a
+ * gate; under 0 a ramp: the rise (trough to peak) takes up to 97 % of the breath, the fall the rest, but never under
+ * 20 ms (hz: breaths a second): quicker, it clicked */
+static float pulse_gain(float ph, float depth, float shape, float b1, float hz)
 {
-    float f = ph < b1 ? ph / b1 : (ph - b1) / (2.0f - b1);
-    float o = fm_clampf(0.5f * fm_sinf(FM_TWO_PI * f) / (1.0f - 0.98f * shape) + 0.5f, 0.0f, 1.0f);
+    float f = ph < b1 ? ph / b1 : (ph - b1) / (2.0f - b1), o;
+    if (shape < 0.0f) {
+        float r = fm_minf(0.5f - 0.47f * shape, 1.0f - 0.02f * hz), u = f + 0.25f;
+        u -= fm_floorf(u);
+        if (r > 0.5f)
+            u = u < r ? 0.5f * u / r : 0.5f + 0.5f * (u - r) / (1.0f - r);
+        f = u - 0.25f;
+        shape = 0.0f;
+    }
+    o = fm_clampf(0.5f * fm_sinf(FM_TWO_PI * f) / (1.0f - 0.98f * shape) + 0.5f, 0.0f, 1.0f);
     return 1.0f - depth * (1.0f - o);
 }
 float dr_pulse_wave(float ph)
 {
     ph -= 2.0f * fm_floorf(ph * 0.5f);
     return pulse_gain(ph, pulse_depth(par[P_PULSE_DEPTH]), (float)par[P_PULSE_SHAPE] * 0.01f,
-                      1.0f + (float)par[P_PULSE_SWING] * 0.01f);
+                      1.0f + (float)par[P_PULSE_SWING] * 0.01f, pulse_hz(par[P_PULSE_RATE]));
 }
 static void pulse_run(uint32_t n)
 {
     const int on = par[P_PULSE];
-    const float step = pulse_hz(par[P_PULSE_RATE]) * (1.0f / DR_SR), depth = pulse_depth(par[P_PULSE_DEPTH]);
+    const float hz = pulse_hz(par[P_PULSE_RATE]), step = hz * (1.0f / DR_SR), depth = pulse_depth(par[P_PULSE_DEPTH]);
     const float ak = 4.0f / (morph_s() * DR_SR);      /* switched on or off: in or out over the Morph */
     /* ... in dB: its dips' depth in dB follows pa (the depth reached through the floor's power), not their
      * gain (which left the first half nearly silent and all the change at the end) */
@@ -1804,7 +1826,7 @@ static void pulse_run(uint32_t n)
         if (on ? pa > 0.997f : pa < 0.003f)
             pa = on ? 1.0f : 0.0f;
         if (pa > 0.0f) {
-            t = pulse_gain(ph, pa >= 1.0f ? depth : dn * (1.0f - fm_exp2f(lf * pa)), shape, b1);
+            t = pulse_gain(ph, pa >= 1.0f ? depth : dn * (1.0f - fm_exp2f(lf * pa)), shape, b1, hz);
             ph += step;
             if (ph >= 2.0f) {
                 ph -= 2.0f;

@@ -671,4 +671,20 @@ expect par64 3
 spin K2 1
 spin K2 1
 expect par64 1
+# ... and what goes into the reverb (KNOB 3): both, then back round to the drones alone, then both again
+expect par99 0
+spin K3 -1
+expect par99 2
+spin K3 1
+expect par99 0
+tap HOME
+# Wander's scale (Pitch moves, KNOB 4) goes round too: before the first (minor pentatonic) comes just intonation
+tap SEQ
+tap SEQ
+expect view 9
+expect par81 0
+spin K4 -1
+expect par81 5
+spin K4 1
+expect par81 0
 tap HOME

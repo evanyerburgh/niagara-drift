@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 33u                  /* 33: the delay types reordered (32's converted);
+#define PROJ_FORMAT 33u                  /* 33: the delay types reordered, the reverb's route (100 values; 32's
+                                          * read, widened and converted);
                                           * 32: the delay's drive (99 values a sound; 23-31's read and widened);
                                           * 31: Level an audio taper (30's levels to 10 sqrt(v));
                                           * 30: Tuning in each Interval (the interval and Tuning to one index);
