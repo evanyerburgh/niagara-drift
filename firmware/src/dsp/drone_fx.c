@@ -117,6 +117,12 @@ static const dly_type_t DLY_TYPE[DT_NTYPES] = {
     {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.25f},   /* SELF: Tape, stretched by its own loudness */
 };
 static dly_type_t dly_c = {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.0f};   /* the type as it glides */
+/* where a type reads (its spread, wow, Grain's and Self's moves) changes at once on a new type, each side read at
+ * the old type's place and the new one's for 50 ms and crossfaded (Evan, 2026-10-24: a glide of the places bent the
+ * repeats' pitch, as the reverb's did); the rest of the type (tone, out, ping-pong, gain) glides */
+#define DLY_XSTEP (1.0f / (0.05f * DR_SR))
+static uint8_t dly_pt = DT_TAPE, dly_qt = DT_TAPE;   /* the type read now, and the one it's coming from */
+static float dly_xf = 1.0f;                          /* that crossfade, 0..1 (1: done) */
 static float self_s, self_e, self_es;    /* Grain's sound (~280 Hz); Self's loudness (~10 Hz) and its mean (~0.2 Hz) */
 
 static float dly_ms(int v) { return 70.0f * fm_exp2f((float)v * 0.026845f); }   /* 70 * (450/70)^(v/100) */
@@ -444,6 +450,8 @@ static void fx_clear(void)
     drv_k = drv_g = 1.0f;
     dly_t = dly_ms(par[P_DLY_TIME]) * 0.001f * DR_SR;    /* at its time, no glide from an old one */
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
+    dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
+    dly_xf = 1.0f;
     rv_clear();
     fx_gains();
     fx_quiet = 0;
@@ -454,6 +462,8 @@ static void fx_rest(void)
 {
     dly_t = dly_ms(par[P_DLY_TIME]) * 0.001f * DR_SR;
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
+    dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
+    dly_xf = 1.0f;
     fx_gains();
 }
 
@@ -489,29 +499,29 @@ static void fx_run(float *l, float *r, uint32_t n)
         dly_rt = (uint8_t)par[P_DLY_LFO];
         dly_rw = 0.0f;
     }
-    float sp = dly_c.spread, dsp;        /* the right side's spread across the block, sample by sample (QA
-                                          * 2026-10-20: stepped each block, Wide crackled as it came and went) */
-    dly_c.spread += (dt->spread - dly_c.spread) * ease;
+    const dly_type_t *pa, *qa;           /* where it reads: the new type, the old (crossfading) */
+    if (dt != &DLY_TYPE[dly_pt]) {
+        if (dly_xf >= 0.5f)              /* mid-crossfade, the louder one is the one it comes from */
+            dly_qt = dly_pt;
+        dly_pt = (uint8_t)(dt - DLY_TYPE);
+        dly_xf = 0.0f;
+    }
+    pa = &DLY_TYPE[dly_pt];
+    qa = &DLY_TYPE[dly_qt];
     dly_c.tone += (dt->tone - dly_c.tone) * ease;
     dly_c.out += (dt->out - dly_c.out) * ease;
-    dly_c.wow += (dt->wow - dly_c.wow) * ease;
     dly_c.ping += (dt->ping - dly_c.ping) * ease;
     dly_c.gain += (dt->gain - dly_c.gain) * ease;
-    dly_c.grain += (dt->grain - dly_c.grain) * ease;
-    dly_c.self += (dt->self - dly_c.self) * ease;
     pgain = dly_c.gain;
-    if (dt->spread >= 1.0f && dt->ping <= 0.0f && dly_c.spread > 0.9995f && dly_c.ping < 0.0005f) {
-        dly_c.spread = 1.0f;             /* settled on a mono type */
-        dly_c.ping = 0.0f;
+    if (pa->spread >= 1.0f && pa->ping <= 0.0f && dly_xf >= 1.0f && dly_c.ping < 0.0005f) {
+        dly_c.ping = 0.0f;               /* settled on a mono type */
         mono = 1;
     }
-    dsp = (dly_c.spread - sp) * dn;
     rv_coefs(ease);
     dr_dly_ms = dly_t * (1000.0f / DR_SR);
     /* DELAY */
     for (j = 0; j < n; j++) {
-        float x, yl, yr, fl, fr, t, wow, pp = dly_c.ping;
-        sp += dsp;
+        float x, yl, yr, fl, fr, t, wa, wq, pp = dly_c.ping;
         fbg += dfb;
         dry1 += dd1;
         wet1 += dw1;
@@ -529,14 +539,25 @@ static void fx_run(float *l, float *r, uint32_t n)
             dly_ph1 = advance(dly_ph1, 0.55f * (float)CR / DR_SR);
             dly_ph2 = advance(dly_ph2, 3.3f * (float)CR / DR_SR);
         }
-        wow = dly_c.wow * (0.75f * fm_sin_turns(dly_ph1) + 0.25f * fm_sin_turns(dly_ph2));
-        if (dly_c.grain > 0.01f || dly_c.self > 0.0001f) {   /* GRAIN, SELF: its own echoes move its time */
-            self_s += (dly_olp[0] - self_s) * 0.04f;
-            self_e += (fm_fabsf(dly_olp[0]) - self_e) * 0.0015f;
-            self_es += (self_e - self_es) * 0.00003f;
-            wow += dly_c.grain * self_s + dly_t * dly_c.self * (self_e - self_es);
+        {
+            float w = 0.75f * fm_sin_turns(dly_ph1) + 0.25f * fm_sin_turns(dly_ph2), m = 0.0f, e = 0.0f;
+            if (pa->grain > 0.0f || pa->self > 0.0f || (dly_xf < 1.0f && (qa->grain > 0.0f || qa->self > 0.0f))) {
+                self_s += (dly_olp[0] - self_s) * 0.04f;     /* GRAIN, SELF: its own echoes move its time */
+                self_e += (fm_fabsf(dly_olp[0]) - self_e) * 0.0015f;
+                self_es += (self_e - self_es) * 0.00003f;
+                m = self_s;
+                e = dly_t * (self_e - self_es);
+            }
+            wa = pa->wow * (w + 1.0f) + pa->grain * m + pa->self * e;   /* (the wow's own offset in it) */
+            wq = qa->wow * (w + 1.0f) + qa->grain * m + qa->self * e;
         }
-        yl = dly_read(dly_buf[0], fm_clampf(dly_t + wow + dly_c.wow, 4.0f, (float)(DLY_N - 4u)));
+        if (dly_xf < 1.0f)
+            dly_xf = fm_minf(dly_xf + DLY_XSTEP, 1.0f);
+        yl = dly_read(dly_buf[0], fm_clampf(dly_t + wa, 4.0f, (float)(DLY_N - 4u)));
+        if (dly_xf < 1.0f) {
+            float yq = dly_read(dly_buf[0], fm_clampf(dly_t + wq, 4.0f, (float)(DLY_N - 4u)));
+            yl = yq + (yl - yq) * dly_xf;
+        }
         dly_olp[0] += (yl - dly_olp[0]) * dly_c.out;               /* the wet out */
         /* the loops: soft clip, the tone, no rumble (~80 Hz taken away) */
         dly_lp[0] += (sat(yl * fbg) - dly_lp[0]) * dly_c.tone;
@@ -549,7 +570,11 @@ static void fx_run(float *l, float *r, uint32_t n)
             dly_hp[1] = dly_hp[0];
             fr = fl;
         } else {
-            yr = dly_read(dly_buf[1], fm_clampf(dly_t * sp + wow + dly_c.wow, 4.0f, (float)(DLY_N - 4u)));
+            yr = dly_read(dly_buf[1], fm_clampf(dly_t * pa->spread + wa, 4.0f, (float)(DLY_N - 4u)));
+            if (dly_xf < 1.0f) {
+                float yq = dly_read(dly_buf[1], fm_clampf(dly_t * qa->spread + wq, 4.0f, (float)(DLY_N - 4u)));
+                yr = yq + (yr - yq) * dly_xf;
+            }
             dly_olp[1] += (yr - dly_olp[1]) * dly_c.out;
             dly_lp[1] += (sat(yr * fbg) - dly_lp[1]) * dly_c.tone;
             dly_hp[1] += (dly_lp[1] - dly_hp[1]) * 0.0114f;
