@@ -821,11 +821,11 @@ int main(void)
     }
 
     {   /* the EFFECTS. Drone I alone (a saw, filter open), into the effects only (wet), in short bursts */
-        static float cap[44100];
+        static float cap[88200];
         int k, t, first;
-        float ms_want[3] = {70.0f, 177.48f, 450.0f};     /* 70 x (450 / 70)^(v / 100) */
-        int ms_v[3] = {0, 50, 100};
-        for (t = 0; t < 3; t++) {                       /* the delay's time: the first echo, on time */
+        float ms_want[4] = {70.0f, 177.48f, 450.0f, 1455.3f};   /* 70 x (450 / 70)^(v / 100), on to 163 (2026-10-25) */
+        int ms_v[4] = {0, 50, 100, DR_DLY_TMAX};
+        for (t = 0; t < 4; t++) {                       /* the delay's time: the first echo, on time */
             dry_init();
             dr_set(P_FADE, 0);
             dr_set(DR_GP(0, GP_LEVEL), 89);             /* (the level it was measured at, 80 before the taper) */
@@ -836,12 +836,13 @@ int main(void)
             dr_set(P_DLY_TIME, ms_v[t]);
             run(secs(0.5f));                            /* stopped: the time settles */
             dr_play(1);
-            capture(cap, 30000, 0);
-            for (first = 0; first < 30000 && fabsf(cap[first]) < 1e-4f; first++)
+            capture(cap, 80000, 0);
+            for (first = 0; first < 80000 && fabsf(cap[first]) < 1e-4f; first++)
                 ;
             printf("    delay %d: first echo after %.1f ms (want %.0f)\n", ms_v[t], (double)((float)first * 1000.0f / DR_SR),
                    (double)ms_want[t]);
-            check(t == 0 ? "delay: its time (70 ms at 0)" : t == 1 ? "delay: its time (177 ms at 50)" : "delay: its time (450 ms at 100)",
+            check(t == 0 ? "delay: its time (70 ms at 0)" : t == 1 ? "delay: its time (177 ms at 50)" :
+                  t == 2 ? "delay: its time (450 ms at 100)" : "delay: its time (1.46 s at the top, the line at half rate)",
                   fabsf((float)first * 1000.0f / DR_SR - ms_want[t] - 30.0f * 1000.0f / DR_SR) < 2.0f);   /* Tape reads
                                                     * 30 samples (0.7 ms) later, its wow's centre (it sat on the edge) */
         }

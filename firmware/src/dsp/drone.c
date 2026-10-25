@@ -45,7 +45,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
     {"Stereo", 0, 100, 60}, {"Tune", -50, 50, 0},
     {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", -100, 100, 25}, {"Swing", 0, 50, 0},
-    {"Time", 0, 100, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
+    {"Time", 0, DR_DLY_TMAX, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
     {"Type", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Dly LFO", -100, 100, 20},
     {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
     {"Switch time", 0, 100, 47}, {"Scene time", 0, 100, 63}, {"II out", 0, 1, 0}, {"Speaker", 0, 100, 0},
@@ -338,11 +338,23 @@ void dr_param_text(int i, int v, char *b)
             copy_s(b, "Off");
         else
             secs_text(10.0f * (float)v * (float)v * 0.0001f, b);
-    } else if (i == P_DLY_TIME) {                  /* "177ms" */
-        itoa_s((int)(70.0f * fm_exp2f((float)v * 0.026845f) + 0.5f), b);
-        while (*b)
-            b++;
-        copy_s(b, "ms");
+    } else if (i == P_DLY_TIME) {                  /* "177ms"; "1.46s" from a second */
+        float ms = 70.0f * fm_exp2f((float)v * 0.026845f);
+        if (ms >= 999.5f) {
+            int c = (int)(ms * 0.1f + 0.5f);       /* hundredths of a second */
+            itoa_s(c / 100, b);
+            while (*b)
+                b++;
+            *b++ = '.';
+            *b++ = (char)('0' + c / 10 % 10);
+            *b++ = (char)('0' + c % 10);
+            copy_s(b, "s");
+        } else {
+            itoa_s((int)(ms + 0.5f), b);
+            while (*b)
+                b++;
+            copy_s(b, "ms");
+        }
     }
     else if (gp == GP_NCOLOR) {                  /* "White", "Pink 40", "Pink" */
         if (v <= 0 || v >= 100)

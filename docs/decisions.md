@@ -388,3 +388,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   ~10 Hz stages (one let the level's ripple, at twice the pitch, shake its time at audio rate: FM, its echoes 2-9 dB over
   Tape's; now within +0.4..+2.8 dB), and **Grain's and Self's moves of the time ease in and out over a second** on a type
   change (their followers run whatever the type). The Types page drops the reverb types' descriptions.
+- 2026-10-25 (Evan, from a player's ask; picked ~1.5 s over 590 ms free or 2 s+ later): the **delay line at half rate**:
+  the loop at the full rate, its writes down through the reverb's half-band (flat to 9.5 kHz), read back with an
+  8-tap windowed sinc (Kaiser, 128 phases); the line 40960 half-rate samples a side (1.86 s, +32 KB of the pool).
+  **Time** runs on the same curve past 100 to 163 (1455 ms), so saved times are unchanged. Presets within 1 dB; the
+  echoes lose what's over ~9 kHz. Cost +143 host instructions a sample (worst case 2,555 with Self's fix, was 2,384).

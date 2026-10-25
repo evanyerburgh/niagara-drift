@@ -91,10 +91,15 @@ static void drive_run(float *l, float *r, uint32_t n)
 }
 
 /* ------------------------------------------------------------- delay --- */
-#define DLY_N 32768u                     /* 743 ms: 450 ms + the LFO's 25 % + the wow + room */
-#define DLY_MASK (DLY_N - 1u)
+/* the line is kept at half the rate (Evan, 2026-10-25: up to ~1.5 s in the memory 0.74 s took): the loop runs at the
+ * full rate, what it writes goes down through a half-band (flat to 9.5 kHz) and is read back up with a 4-point cubic.
+ * DLY_N half-rate samples: 1.86 s, the longest Time (1.46 s) with the LFO's 25 % and the wow */
+#define DLY_N 40960u
 static int16_t dly_buf[2][DLY_N] DR_POOL;
-static uint32_t dly_w;
+static uint32_t dly_w;                   /* the next half-rate sample to write */
+static uint8_t dly_odd;                  /* a full-rate sample in hand (the first of a pair) */
+static float dly_in[2];                  /* ... it, left and right */
+
 static float dly_t = 0.177f * DR_SR;    /* the left's time, in samples, smoothed */
 volatile float dr_dly_ms;               /* ... in ms, each block (the host's probe) */
 static float dly_lp[2], dly_hp[2], dly_olp[2];
@@ -141,17 +146,59 @@ static float self_s, self_e, self_e2, self_es;    /* Grain's sound (~280 Hz); Se
 
 static float dly_ms(int v) { return 70.0f * fm_exp2f((float)v * 0.026845f); }   /* 70 * (450/70)^(v/100) */
 
-static inline float dly_read(const int16_t *b, float d)   /* d samples back, linearly interpolated */
+/* the read: 8 taps of a windowed sinc (Kaiser, beta 6, cut at 0.46 of the half rate: flat to ~8 kHz, as far as the
+ * half-band lets through), the nearest of 128 phases (its timing within 0.18 us: its error > 60 dB under at 1 kHz).
+ * A cubic rolled off above ~5 kHz, again with each repeat */
+#define DLY_TAPS 8
+#define DLY_PH 128
+static float dly_k[DLY_PH + 1][DLY_TAPS];
+static void dly_kinit(void)
 {
-    float p = (float)dly_w - d, f;
-    int32_t i;
+    int ph, t;
+    for (ph = 0; ph <= DLY_PH; ph++) {
+        float f = (float)ph / (float)DLY_PH, sum = 0.0f;
+        for (t = 0; t < DLY_TAPS; t++) {
+            float x = (float)(t - DLY_TAPS / 2 + 1) - f, w = x / (0.5f * (float)DLY_TAPS), sx, k, i0a = 1.0f, i0b = 1.0f, ta = 1.0f, tb = 1.0f;
+            int m;
+            sx = fm_fabsf(x) < 1e-6f ? 0.92f : fm_sinf(3.14159265f * 0.92f * x) / (3.14159265f * x);
+            for (m = 1; m < 20; m++) {                /* I0, the window's: of 6 sqrt(1 - w^2), and of 6 */
+                float a = 6.0f * fm_sqrtf(fm_maxf(1.0f - w * w, 0.0f)) * 0.5f / (float)m, b = 6.0f * 0.5f / (float)m;
+                ta *= a * a;
+                tb *= b * b;
+                i0a += ta;
+                i0b += tb;
+            }
+            k = sx * (fm_fabsf(w) <= 1.0f ? i0a / i0b : 0.0f);
+            dly_k[ph][t] = k;
+            sum += k;
+        }
+        for (t = 0; t < DLY_TAPS; t++)             /* unity at DC */
+            dly_k[ph][t] /= sum;
+    }
+}
+static inline int32_t dly_wrap(int32_t i) { return i < 0 ? i + (int32_t)DLY_N : i >= (int32_t)DLY_N ? i - (int32_t)DLY_N : i; }
+static inline float dly_read(const int16_t *b, float d)   /* d full-rate samples back */
+{
+    float p = (float)dly_w - 5.0f + 0.5f * ((float)dly_odd - d), f, y = 0.0f;
+    int32_t i, t, ph;
     if (p < 0.0f)
         p += (float)DLY_N;
     i = (int32_t)p;
-    f = p - (float)i;
-    return ((float)b[(uint32_t)i & DLY_MASK] * (1.0f - f) + (float)b[(uint32_t)(i + 1) & DLY_MASK] * f) *
-           (1.0f / 16384.0f);
+    f = (p - (float)i) * (float)DLY_PH + 0.5f;
+    ph = (int32_t)f;                     /* the nearest phase (DLY_PH: the next sample's first, as made) */
+    i -= DLY_TAPS / 2 - 1;
+    if (i >= 0 && i + DLY_TAPS <= (int32_t)DLY_N) {
+        const int16_t *q = b + i;
+        const float *k = dly_k[ph];
+        for (t = 0; t < DLY_TAPS; t++)
+            y += (float)q[t] * k[t];
+    } else {
+        for (t = 0; t < DLY_TAPS; t++)
+            y += (float)b[dly_wrap(i + t)] * dly_k[ph][t];
+    }
+    return y * (1.0f / 16384.0f);
 }
+#define DLY_DMAX (2.0f * (float)DLY_N - 16.0f)   /* the farthest back it reads, full-rate samples */
 
 /* ------------------------------------------------------------ reverb --- */
 enum { RV_ROOM, RV_HALL, RV_CATHEDRAL, RV_CHORUS_HALL, RV_NTYPES };
@@ -225,6 +272,7 @@ static inline float hb_ap(hb_t *h, int k, float a, float x)
     h->y[k] = y;
     return y;
 }
+static hb_t dly_dn[2];                   /* the delay's line down to half rate, left and right */
 
 static float rv_rt60(int v)              /* LENGTH -> seconds; 100: Inf (0) */
 {
@@ -455,8 +503,12 @@ static inline void rv_tick(float x, float *ol, float *or_)
 static void fx_clear(void)
 {
     uint32_t k;
+    if (dly_k[0][DLY_TAPS / 2 - 1] == 0.0f)
+        dly_kinit();
     for (k = 0; k < DLY_N; k++)
         dly_buf[0][k] = dly_buf[1][k] = 0;
+    dly_dn[0] = dly_dn[1] = (hb_t){{0.0f}, {0.0f}};
+    dly_odd = 0;
     dly_lp[0] = dly_lp[1] = dly_hp[0] = dly_hp[1] = dly_olp[0] = dly_olp[1] = 0.0f;
     dly_ph1 = dly_ph2 = 0.0f;            /* the wow from its start: a cleared delay sounds the same each time */
     self_s = self_e = self_e2 = self_es = 0.0f;
@@ -586,9 +638,9 @@ static void fx_run(float *l, float *r, uint32_t n)
         }
         if (dly_xf < 1.0f)
             dly_xf = fm_minf(dly_xf + DLY_XSTEP, 1.0f);
-        yl = dly_read(dly_buf[0], fm_clampf(dly_t + wa + pa->wow, 4.0f, (float)(DLY_N - 4u)));
+        yl = dly_read(dly_buf[0], fm_clampf(dly_t + wa + pa->wow, 8.0f, DLY_DMAX));
         if (dly_xf < 1.0f) {
-            float yq = dly_read(dly_buf[0], fm_clampf(dly_t + wq + qa->wow, 4.0f, (float)(DLY_N - 4u)));
+            float yq = dly_read(dly_buf[0], fm_clampf(dly_t + wq + qa->wow, 8.0f, DLY_DMAX));
             yl = yq + (yl - yq) * dly_xf;
         }
         dly_olp[0] += (yl - dly_olp[0]) * dly_c.out;               /* the wet out */
@@ -603,9 +655,9 @@ static void fx_run(float *l, float *r, uint32_t n)
             dly_hp[1] = dly_hp[0];
             fr = fl;
         } else {
-            yr = dly_read(dly_buf[1], fm_clampf(dly_t * pa->spread + wa + pa->wow, 4.0f, (float)(DLY_N - 4u)));
+            yr = dly_read(dly_buf[1], fm_clampf(dly_t * pa->spread + wa + pa->wow, 8.0f, DLY_DMAX));
             if (dly_xf < 1.0f) {
-                float yq = dly_read(dly_buf[1], fm_clampf(dly_t * qa->spread + wq + qa->wow, 4.0f, (float)(DLY_N - 4u)));
+                float yq = dly_read(dly_buf[1], fm_clampf(dly_t * qa->spread + wq + qa->wow, 8.0f, DLY_DMAX));
                 yr = yq + (yr - yq) * dly_xf;
             }
             dly_olp[1] += (yr - dly_olp[1]) * dly_c.out;
@@ -615,9 +667,20 @@ static void fx_run(float *l, float *r, uint32_t n)
         }
         {   /* stereo: each side feeds itself; ping-pong: the input into L, L into R, R into L */
             float wl = x + fl * (1.0f - pp) + fr * pp, wr = x * (1.0f - pp) + fr * (1.0f - pp) + fl * pp;
-            dly_buf[0][dly_w] = (int16_t)(fm_clampf(wl, -1.99f, 1.99f) * 16384.0f);
-            dly_buf[1][dly_w] = (int16_t)(fm_clampf(wr, -1.99f, 1.99f) * 16384.0f);
-            dly_w = (dly_w + 1u) & DLY_MASK;
+            if (!dly_odd) {              /* the first of a pair: in hand */
+                dly_in[0] = wl;
+                dly_in[1] = wr;
+                dly_odd = 1;
+            } else {                     /* the second: the pair down to one sample a side, written */
+                float a = (hb_ap(&dly_dn[0], 1, HB_A1, hb_ap(&dly_dn[0], 0, HB_A0, wl)) +
+                           hb_ap(&dly_dn[0], 3, HB_A3, hb_ap(&dly_dn[0], 2, HB_A2, dly_in[0]))) * 0.5f;
+                float b = (hb_ap(&dly_dn[1], 1, HB_A1, hb_ap(&dly_dn[1], 0, HB_A0, wr)) +
+                           hb_ap(&dly_dn[1], 3, HB_A3, hb_ap(&dly_dn[1], 2, HB_A2, dly_in[1]))) * 0.5f;
+                dly_buf[0][dly_w] = (int16_t)(fm_clampf(a, -1.99f, 1.99f) * 16384.0f);
+                dly_buf[1][dly_w] = (int16_t)(fm_clampf(b, -1.99f, 1.99f) * 16384.0f);
+                dly_w = dly_w + 1u >= DLY_N ? 0u : dly_w + 1u;
+                dly_odd = 0;
+            }
         }
         wet_m[j] = (dly_olp[0] + dly_olp[1]) * 0.5f * wet1 * pgain;
         l[j] = l[j] * dry1 + dly_olp[0] * wet1 * pgain;
