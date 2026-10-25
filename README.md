@@ -146,9 +146,9 @@ parts come in one after another, and go in their own order when you let go. Scen
   hold; **let go** and it goes, over as long as you held it (hold 2 s, it leaves in 2 s; hold 10 s, it drifts out
   over 10 s). **Tap** it (a press under half a second) and it goes all the way and stays; tap again and it goes. **SEL held as you let go** keeps
   it where it is. Its key glows dimly, and lights as it comes in.
-- **PRESETS is Gesture time**: it speeds up or slows down every gesture, coming in and going out, from 10 times faster
-  to 10 times slower (the middle: each gesture's own time: Weight 2.8 s, Shift 3.9 s, the others 3.3 s). Turn it
-  while a gesture moves to change it on the way.
+- **PRESETS is Gesture time**: it speeds up or slows down every gesture, coming in and going out: right is faster, up
+  to 10 times (x10), left slower, down to a tenth (x0.1). The middle is each gesture's own time: Weight 2.8 s, Shift
+  3.9 s, the others 3.3 s. Turn it while a gesture moves to change it on the way.
 - **The LFOs step aside**: while a gesture is in, the LFO that moves the same thing eases off (the filter LFO for
   Weight's cutoff, the oscillator LFO for Shift's pitch), so
   a high **Movement** doesn't wobble what the gesture is doing. **Wash** also eases the filter LFOs to a third, so
@@ -168,7 +168,7 @@ knob you're turning.
 | **OCT− / OCT+** | the LFO's **Wave I** / **Wave II**: tap for the next shape, round and round; **SEL + OCT** for the one before. Each light pulses with its wave |
 | **SAVE** | save the sound, at once. While the drone plays, the sound dips out and back over about 50 ms around the write; SAVE glows dimly while something isn't written yet |
 | **SEL** (hold) | fine: a pitch knob moves in single cents, cutoff and resonance in tenths |
-| **ARP** (tap) | the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at its page; tap twice quickly to stay on it (the Swell isn't touched then: a single tap switches it a moment later, once no second tap comes) |
+| **ARP** (tap) | the Swell page, as the other page buttons open theirs (landing on it switches nothing). On the page, a tap switches the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at the page from anywhere, to set the Swell before you start it |
 | **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 
 ### Pages
@@ -279,13 +279,13 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 #### Swell · ARP
 
-<img src="docs/img/page-swell.png" width="244" alt="The Swell page: the swell's shape over two bars">
+<img src="docs/img/page-swell.png" width="244" alt="The Swell page: the swell's shape over a bar">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Swell | rate | depth | shape | swing |
 
-- Tap ARP to start or stop the Swell; tap it twice to see this page.
+- Tap ARP for this page; tap it again here to start or stop the Swell. The picture shows a bar of it, and a dot where it is.
 - **The Swell** runs from a 33-second breath to a buzz (the starting sound has it on: a slow breath, 40 deep).
 - **Depth** is how far it dips, in dB (down to −30; all the way, silence). **Shape** firms the breath up into
   a pulse, and only at the top into a hard gate.
@@ -308,11 +308,12 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
   echoes come at three-quarters of the left's time), **Ping-pong** (the echoes bounce left and right),
   **Clean** (bright, with no wow, so a just-tuned drone stays still), **Grain** (Tape whose time its own echoes
   shake: grainy, metallic, wilder as they ring), **Self** (Tape whose time stretches as its echoes get louder: loud
-  echoes sag and wobble, and a runaway lurches). Changing type glides.
+  echoes sag and wobble, and a runaway lurches). Changing type crossfades the echoes, without bending their pitch.
+  The type knobs go round both ways: past Self comes Tape again.
 - **Time** is 70–450 ms, and turning it bends the echoes' pitch, as tape does. **Repeats** past about 85 runs
   away into self-oscillation ("runaway" on the screen), held by a soft clip.
 - **Reverb types**: **Room**, **Hall**, **Cathedral** (the largest), **Chorus hall** (a hall that shimmers).
-  They differ in size, distance and movement; changing type glides.
+  They differ in size, distance and movement; changing type crossfades, and the knob goes round both ways.
 - **Length** is how long the tail takes to die away, 0.3 to 40 seconds. At the top, **Inf**, it never does: a
   freeze. Press PLAY to stop and the freeze lets go, over about twice the Fade time.
 - **Damp** darkens the tail (out at Inf, so a freeze holds what's in it).
@@ -331,7 +332,7 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
 
 - **Fade** is how long PLAY takes (up to 60 s); **Switch time** is how long a black key or a new LFO wave (OCT) takes
   to move the sound to its new setting (0.02–30 s); **Scene time** is how long every scene move takes: a tap, a
-  crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about 4 s to start).
+  crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about 15 s to start).
 - **Tune** moves everything up or down by up to 50 cents. **Stereo** spreads the drones from mono to drone I
   left, drone II right.
 - **The speaker** gets a low cut (about 120 Hz) for the deep bass it can't play, so it doesn't waste its loudness

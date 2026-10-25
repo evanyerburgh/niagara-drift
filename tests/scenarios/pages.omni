@@ -109,7 +109,7 @@ shot setup2.png
 spin K1 -6
 spin K2 -30
 spin K3 -20
-# Pulse (hold ARP for its page; a tap starts it): some swing
+# Swell (hold ARP to peek at its page): some swing
 expect par55 1
 press ARP
 expect view 12

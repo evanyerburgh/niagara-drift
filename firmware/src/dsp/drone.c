@@ -48,7 +48,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Time", 0, 100, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
     {"Type", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Dly LFO", -100, 100, 20},
     {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
-    {"Switch time", 0, 100, 47}, {"Scene time", 0, 100, 46}, {"II out", 0, 1, 0}, {"Speaker", 0, 100, 0},
+    {"Switch time", 0, 100, 47}, {"Scene time", 0, 100, 63}, {"II out", 0, 1, 0}, {"Speaker", 0, 100, 0},
     {"Pitch lock", 0, 1, 1}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
     {"Wander", 0, 100, 0}, {"Age", 0, 100, 0}, {"Shift move", 0, 2 * DR_SHIFT_MID, 2 * DR_SHIFT_MID}, {"Scale", 0, DR_NWSCALE - 1, 0},
     {"D5 depth", 0, 100, 70}, {"E5 depth", 0, 100, 100}, {"F5 depth", 0, 100, 100}, {"G5 depth", 0, 100, 70},

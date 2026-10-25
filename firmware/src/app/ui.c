@@ -82,7 +82,7 @@ static const struct {
     uint8_t btn, first, n;
 } PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_TONE, 2}, {B_EDIT, V_OSC, 2}, {B_LFO, V_LFO, 2},
                 {B_SEQ, V_PARTNER, 2}, {B_GLO, V_SETUP, 2}, {B_FX, V_FX, 3},
-                {B_ARP, V_PULSE, 1}};                                    /* ARP: a tap toggles */
+                {B_ARP, V_PULSE, 1}};                                    /* ARP: on its page, a tap toggles */
 #define NPAGE_BTN (sizeof PAGE_BTN / sizeof PAGE_BTN[0])
 #define HOLD_MS 400u                   /* a page button held this long (or a knob turned) is a peek */
 
@@ -143,8 +143,6 @@ static struct {
     uint32_t saved_t;                  /* the last autosave tried */
     int8_t save_q;                     /* a save waiting for the dip (playing): -2 none, -1 the sound, N scene N */
     uint32_t save_t;                   /* ... asked then */
-    uint32_t arp_t;                    /* the last ARP tap (two quick taps: stay on the Swell page) */
-    uint8_t arp_pend;                  /* ... its on / off still to come (if no second tap) */
     uint8_t page_last[8];              /* each page button's page last shown (0: its first): opened again there */
     uint32_t sel_t;                    /* when SEL went down (held 0.4 s: the black keys' map) */
     int8_t km_key;                     /* the black key touched while SEL is held (named, not switched), or -1 */
@@ -378,7 +376,13 @@ static void knob_turn(int i, int32_t e)
         pitch_turn(k.g, p, EN_K1 + i, e);
     else if (dr_param_info(p)->hi - dr_param_info(p)->lo > 24)
         cont_turn(p, EN_K1 + i, e);
-    else {
+    else if (p == P_DLY_TYPE || p == P_REV_TYPE) {     /* a type goes round both ways, as the LFO waves do (Evan,
+                                                        * 2026-10-25) */
+        const dr_param_t *in = dr_param_info(p);
+        int n = in->hi - in->lo + 1, v = (proj.par[p] - in->lo + (e > 0 ? 1 : -1)) % n;
+        param_set(p, in->lo + (v < 0 ? v + n : v));
+        loop_note(p, proj.par[p], 0);
+    } else {
         param_set(p, proj.par[p] + accel(EN_K1 + i, e, dr_param_info(p)->hi - dr_param_info(p)->lo));
         loop_note(p, proj.par[p], 0);
     }
@@ -426,7 +430,7 @@ static void link_set(int on)
     param_set(P_PLINK, on);
 }
 
-static void sw_toggle(sw_t w)
+static void sw_flip(sw_t w)
 {
     static const char *const DR[2] = {"I ", "II "};
     static const char *const WAVES[4] = {"OFF", "WAVE I", "WAVE II", "WAVES I+II"};
@@ -472,6 +476,21 @@ static void sw_toggle(sw_t w)
     say_c(a, st, w.s == S_LFORESET || w.s == S_DTAP ? RGB(183, 145, 255) : w.g ? RGB(69, 227, 211) : RGB(255, 176, 74));
 }
 
+static void hands_on(int p);
+
+/* a black key: what it changes is a hand's, as a turned knob's is, so a scene on its way leaves it alone (Evan,
+ * 2026-10-25: during a switch the Sub key showed its next step but held until the scene landed) */
+static void sw_toggle(sw_t w)
+{
+    static int16_t was[DR_NPARAMS];
+    int k;
+    memcpy(was, proj.par, sizeof was);
+    sw_flip(w);
+    for (k = 0; k < DR_NPARAMS; k++)
+        if (proj.par[k] != was[k])
+            hands_on(k);
+}
+
 /* ------------------------------------------------------------ buttons --- */
 static int on_pages(int i) { return ui.view >= PAGE_BTN[i].first && ui.view < PAGE_BTN[i].first + PAGE_BTN[i].n; }
 static void set_view(int v)
@@ -507,15 +526,6 @@ static void page_down(int b)
     if (!ui.hold_cycle)
         set_view(PAGE_BTN[i].first + (b == B_HOME ? 0 : ui.page_last[i]));
 }
-#define ARP_TAPS_MS 350u               /* two ARP taps this close: the Swell's page */
-static void arp_run(void)                              /* each frame: a lone ARP tap, once it's alone */
-{
-    if (ui.arp_pend && plat_ms() - ui.arp_t >= ARP_TAPS_MS) {
-        ui.arp_pend = 0;
-        param_set(P_PULSE, !proj.par[P_PULSE]);
-        say("SWELL", proj.par[P_PULSE] ? "ON" : "OFF");
-    }
-}
 /* let go: after a hold (or a knob turned while held), back where it was; after a tap, stay (or step on) */
 static void page_up(int b)
 {
@@ -523,23 +533,11 @@ static void page_up(int b)
     if (ui.hold_btn != b)
         return;
     peek = ui.hold_turned || plat_ms() - ui.hold_t >= HOLD_MS;
-    if (b == B_ARP) {                                  /* ARP: a tap is the pulse on / off; its page only */
-        if (!peek) {                                   /* a tap: the swell on / off, once no second tap */
-            uint32_t now = plat_ms();                  /* follows; two quick taps: its page, to stay, the */
-            if (ui.arp_pend && now - ui.arp_t < ARP_TAPS_MS) {   /* Swell untouched (the review: it dipped) */
-                ui.arp_pend = 0;
-                set_view(V_PULSE);
-                ui.hold_btn = -1;
-                say("SWELL", "PAGE");
-                return;
-            }
-            ui.arp_t = now;
-            ui.arp_pend = 1;                           /* arp_run switches it */
-        }
-        if (!ui.hold_cycle)
-            set_view(ui.hold_from);
-        ui.hold_btn = -1;
-        return;
+    if (b == B_ARP && !peek && ui.hold_cycle) {        /* ARP, as the other page buttons (Evan, 2026-10-24): a tap
+                                                        * opens the Swell page (landing never switches it), a tap
+                                                        * on it is the Swell on / off, a hold peeks */
+        param_set(P_PULSE, !proj.par[P_PULSE]);
+        say("SWELL", proj.par[P_PULSE] ? "ON" : "OFF");
     }
     if (peek) {
         if (!ui.hold_cycle)
@@ -1089,14 +1087,15 @@ static float mtime_k(void)                             /* GESTURE TIME: the gest
 {
     return fm_exp2f(((float)proj.mtime - 50.0f) * 0.0664386f);
 }
-static void mtime_turn(int32_t e)                      /* PRESETS: Gesture time */
+static void mtime_turn(int32_t e)                      /* PRESETS: Gesture time, shown as a speed (x0.1 .. x10):
+                                                        * right is faster (Evan, 2026-10-24) */
 {
-    int v = (int)proj.mtime + (int)e;
+    int v = (int)proj.mtime - (int)e;
     float k;
     char *q;
     proj.mtime = (uint8_t)(v < 0 ? 0 : v > 100 ? 100 : v);
     mark_dirty();
-    k = mtime_k();
+    k = 1.0f / mtime_k();
     scopy(ui.glab[0], "GESTURE TIME");
     q = ui.glab[1];
     *q++ = 'x';
@@ -1247,6 +1246,7 @@ static void input(void)
         } else if (w.s == S_LFORESET && (keys >> BLACK_K[i] & 1u) && !ui.rst_done &&
                    plat_ms() - ui.rst_t >= HOLD_MS + 100u) {
             int on = !proj.par[P_LFO_LOCK];            /* held: the LFO locked to the pulse's bars, or free */
+            hands_on(P_LFO_LOCK);
             param_set(P_LFO_LOCK, on);
             ui.scene_at = -1;
             if (on && !proj.par[P_PULSE])              /* (shorter: "LOCKED (SWELL OFF)" ran off the screen) */
@@ -1806,29 +1806,22 @@ static void pic_pulse(int32_t y0)
     uint16_t c = on ? K_PULSE : K_FAINT;
     char t[16];
     for (i = 0; i < n; i++)
-        y[i] = (int16_t)(top + h - (int32_t)(dr_pulse_wave(4.0f * (float)i / (float)(n - 1)) * (float)h));
+        y[i] = (int16_t)(top + h - (int32_t)(dr_pulse_wave(2.0f * (float)i / (float)(n - 1)) * (float)h));
     cv_rect(12, top + h, 208, 1, K_GRID);
-    for (i = 1; i < 4; i++)                    /* the beats */
-        cv_rect(12 + 52 * i, top, 1, h, K_GRID);
+    cv_rect(12 + 104, top, 1, h, K_GRID);      /* one bar, its two beats (Evan, 2026-10-24: two bars showed the
+                                                * same twice) */
     plot(12, 2, y, n, c);
-    if (on) {                                  /* now: a dot on the line, across both bars (it went over */
-        static float last;                     /* the first only, then jumped back) */
-        static uint8_t odd;
+    if (on) {                                  /* now: a dot on the line */
         float ph = dr_pulse_ph;
-        int32_t px, py;
-        if (ph < last - 1.0f)                  /* a new bar: the other half of the picture */
-            odd ^= 1u;
-        last = ph;
-        px = 12 + (int32_t)((ph + 2.0f * (float)odd) * 52.0f);
-        py = top + h - (int32_t)(dr_pulse_wave(ph) * (float)h);
+        int32_t px = 12 + (int32_t)(ph * 104.0f), py = top + h - (int32_t)(dr_pulse_wave(ph) * (float)h);
         cv_round(px - 3, py - 3, 7, 7, 3, K_TEXT);
     }
     dr_param_text(P_PULSE_RATE, proj.par[P_PULSE_RATE], t);
     cv_text(12, y0 + 3, &FONT_S, t, c);
     text_r(222, y0 + 3, on ? "ON" : "OFF", on ? K_PULSE : K_DIM);
-    text_c(120, y0 + PAN_H - 18, &FONT_S,
-           !on ? "tap ARP to start the swell" : proj.par[P_LFO_LOCK] ? "the LFO restarts each bar" : "the swell, over two bars",
-           proj.par[P_LFO_LOCK] && on ? K_LFO : K_DIM);
+    if (!on || proj.par[P_LFO_LOCK])
+        text_c(120, y0 + PAN_H - 18, &FONT_S, !on ? "tap ARP to start the swell" : "the LFO restarts each bar",
+               on ? K_LFO : K_DIM);
 }
 
 /* LFO: the routing as a picture. Each wave on the left (I above, II below: one cycle of its shape, a dot
@@ -2771,7 +2764,6 @@ void ui_frame(void)
     input();
     press_run();
     gesture_run();
-    arp_run();
     scene_morph();
     autosave();
     if (!ui.splash_done) {

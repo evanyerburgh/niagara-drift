@@ -300,12 +300,15 @@ expect pitch1 5640
 tapkey b8
 expect par45 0
 expect par21 5640
-# ARP: a tap is the pulse on / off (once no second tap follows: 350 ms), and the page stays; held, its page,
-# without toggling
+# ARP, as the other page buttons (2026-10-25): a tap opens the Swell page and leaves the Swell alone; a tap on the
+# page is the Swell on / off; held, a peek (its knobs turn, nothing switches)
 tap ARP
+expect view 12
 expect par55 0
-wait 400
+tap ARP
 expect par55 1
+expect view 12
+tap HOME
 expect view 0
 press ARP
 expect view 12
@@ -317,18 +320,10 @@ expect par55 1
 wait 400
 shot pulse.png
 tap ARP
-wait 400
-expect par55 0
-# two quick taps: the Swell page, to stay, the swell never touched (no dip); another page button leaves it
+expect view 12
+expect par55 1
 tap ARP
 expect par55 0
-tap ARP
-expect view 12
-expect par55 0
-wait 400
-expect par55 0
-wait 600
-expect view 12
 tap HOME
 expect view 0
 # REC: the motion loop. Record two turns of KNOB 2 (drone I's cutoff, 50 now), 0.3 s apart, then loop:
@@ -637,3 +632,42 @@ press SEL
 tapkey w13
 release SEL
 expect bscenes 4
+# a black key during a scene change is the hand's: the scene leaves it alone (2026-10-25: the Sub key showed its next
+# step but held until the scene landed)
+set 71 60
+press SAVE
+tapkey w5
+release SAVE
+wait 300
+spin K2 -20
+tapkey w5
+wait 1000
+expect par6 3
+tapkey b1
+expect par6 4
+wait 12000
+expect par6 4
+set 71 30
+# the types go round both ways (Types: FX, third tap): the delay from Wide (1) to Tape, Self, Tape, Wide; the
+# reverb from the hall (1) to the room, the chorus hall, the room, the hall
+tap FX
+tap FX
+tap FX
+expect view 15
+expect par94 1
+spin K1 -1
+expect par94 0
+spin K1 -1
+expect par94 5
+spin K1 1
+expect par94 0
+spin K1 1
+expect par94 1
+expect par64 1
+spin K2 -1
+spin K2 -1
+expect par64 3
+spin K2 1
+spin K2 1
+expect par64 1
+tap HOME
