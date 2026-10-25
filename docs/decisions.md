@@ -366,3 +366,21 @@ at the end. The current state is in the [README](../README.md) and the code.
   headroom). Each oscillator has its own make-up under A1 (the largest after the filter, the others in at their share
   before it, so the filter's drive is hit no harder). Lower partner intervals were tried and left out: the sub clicks
   on any wave and stays in time.
+- 2026-10-25 (Evan, after testing 0.3 step 1 on the FM-1): a new **delay type** moves where it reads (the right side's
+  spread, the wow, Grain's and Self's moves) at once, each side read at both places for 50 ms and crossfaded; its tone,
+  output, ping-pong and gain still glide over 0.25 s (Tape to Wide had bent the right side's echoes 4-5 semitones over
+  0.25 s). The **Delay and Reverb type knobs go round** both ways, as the LFO waves do. **Gesture time** (PRESETS)
+  turns as a speed, right faster (shown x0.1-x10; saved values unchanged). **Scene time** starts at 63 (~15 s; was 46,
+  ~4 s; a room setting: only a new FM-1 or a reset gets it). **ARP** works as the other page buttons: a tap opens the
+  Swell page (switching nothing), a tap on the page is the Swell on / off, a hold peeks; the two-quick-taps rule is
+  gone. The Swell page draws one bar, without "the swell, over two bars". A **black key** pressed while a scene is on
+  its way is the hand's, as a turned knob's value is: the scene leaves it alone.
+- 2026-10-25 (Evan): the **delay types in a new order**, plain to most alive: Clean, Wide, Ping-pong, Tape, Grain, Self
+  (were Tape, Wide, Ping-pong, Clean, ...). Tape stays the default. PROJ_FORMAT 33: saved sounds and scenes from 23-32
+  have Clean and Tape swapped once, so every sound keeps its delay.
+- 2026-10-25 (Evan, after recordings; the ideas from players): **Into reverb** (Types, KNOB 3; P_DLY_ROUTE, the 100th
+  value, PROJ_FORMAT 33): Both (as before), Echoes (the delay's echoes alone into the reverb, the dry kept whole and the
+  wash added: +0.6 dB at a reverb mix of 45, +1.7 at 90), Drones (the drones alone into it, the echoes dry); a change
+  crossfades over 50 ms. **Swell Shape** -100..100: over 0 as before (saved values unchanged), under 0 a ramp, the rise
+  taking up to 97 % of each breath, the fall at least 20 ms. **Every knob of named choices goes round** (the types, Into
+  reverb, Wander's scale; not a list ordered by size, such as Partner's interval).

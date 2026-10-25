@@ -10,13 +10,15 @@ press SEL
 tapkey w12
 release SEL
 expect bank 0
+# scenes switch in ~4 s here (the Scene time at 46; ~15 s on a new FM-1 since 2026-10-25)
+set 71 46
 tap PLAY
 wait 1000
 expect heard7 700
-# PRESETS: Gesture time (50: each gesture's own time)
-spin PRESET 10
-expect mtime 60
+# PRESETS: Gesture time, a speed (50: each gesture's own time; right is faster, left slower)
 spin PRESET -10
+expect mtime 60
+spin PRESET 10
 expect mtime 50
 # WEIGHT held swells in (2.8 s), a warm bass: half way, the cutoff most of the way down (by 10 at most), the sub
 # half way up (by 15 at most, 2026-10-20: the main oscillator stays, for the speaker)
@@ -52,8 +54,8 @@ wait 2500
 expect heard5 >31
 wait 3000
 expect heard5 30
-# Gesture time x0.1 (PRESETS all the way down): in by about 0.3 s (held 0.6 s: under 0.5 s would be a tap)
-spin PRESET -50
+# Gesture time x10, the fastest (PRESETS all the way right): in by about 0.3 s (held 0.6 s: under 0.5 s would be a tap)
+spin PRESET 50
 expect mtime 0
 key w12 down
 wait 600
@@ -61,7 +63,7 @@ expect heard5 >42
 key w12 up
 wait 600
 expect heard5 30
-spin PRESET 50
+spin PRESET -50
 expect mtime 50
 # a tap: to its depth, and it stays; a tap again: it goes
 tapkey w12

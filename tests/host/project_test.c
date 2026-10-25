@@ -83,7 +83,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 32, on bank A", proj.format == 32u && PROJ_FORMAT == 32u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 33, on bank A", proj.format == 33u && PROJ_FORMAT == 33u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -270,7 +270,7 @@ int main(void)
                   proj.mtime == MTIME_DEF && proj.par[P_REV_LEN] == dr_param_info(P_REV_LEN)->def);
         check("... A2 and C1 as they were, the new values and the gestures at their defaults",
               scene_get(0, 1) && scene_get(0, 1)[P_GL_3] == 0 && scene_get(2, 0) &&
-                  scene_get(2, 0)[P_CHAR] == 77 && scene_get(2, 0)[P_DLY_TYPE] == 0 &&
+                  scene_get(2, 0)[P_CHAR] == 77 && scene_get(2, 0)[P_DLY_TYPE] == 3 &&
                   scene_get(2, 0)[P_PRESS_SENS] == 50);
         check("... and C written again in the new layout on the next save",
               project_save() == 0 && store_n[OBJ_BANKC] == (int)sizeof(bank_t));
@@ -279,6 +279,37 @@ int main(void)
     check("v0.2's first (20) loads, Colours as they were",
           project_load() == 0 && proj.par[DR_GP(0, GP_NCOLOR)] == 100 && scene_get(1, 0) &&
               scene_get(1, 0)[DR_GP(1, GP_NCOLOR)] == 100);
+    {   /* 32 (#38, #39): 99 values a sound, the delay types then Tape, Wide, Ping-pong, Clean, Grain, Self; now Clean,
+         * Wide, Ping-pong, Tape, Grain, Self */
+        static proj_v32_t p32;
+        static bank_v32_t b32;
+        int i;
+        memset(&p32, 0, sizeof p32);
+        memset(&b32, 0, sizeof b32);
+        p32.magic = PROJ_MAGIC;
+        p32.format = 32u;
+        b32.magic = BANK_MAGIC;
+        b32.format = 32u;
+        for (i = 0; i < NP32; i++)
+            p32.par[i] = p32.scene[0][i] = p32.scene[1][i] = b32.scene[0][i] = dr_param_info(i)->def;
+        p32.par[P_DLY_TYPE] = 3;                   /* Clean then */
+        p32.scene[0][P_DLY_TYPE] = 0;              /* Tape */
+        p32.scene[1][P_DLY_TYPE] = 4;              /* Grain: the same */
+        p32.scene_used = 3u;
+        b32.scene[0][P_DLY_TYPE] = 1;              /* Wide: the same */
+        b32.used = 1u;
+        memset(store_n, 0, sizeof store_n);
+        memcpy(store[OBJ_PROJ], &p32, sizeof p32);
+        store_n[OBJ_PROJ] = (int)sizeof p32;
+        memcpy(store[OBJ_BANKB], &b32, sizeof b32);
+        store_n[OBJ_BANKB] = (int)sizeof b32;
+        check("32's delay types, in the new order: Clean and Tape trade places, the others stay",
+              project_load() == 0 && proj.par[P_DLY_TYPE] == 0 && scene_get(0, 0)[P_DLY_TYPE] == 3 &&
+                  scene_get(0, 1)[P_DLY_TYPE] == 4 && scene_get(1, 0)[P_DLY_TYPE] == 1);
+        check("... the reverb's route (new in 33) as it was: both the drones and their echoes into it",
+              proj.par[P_DLY_ROUTE] == 0 && scene_get(0, 0)[P_DLY_ROUTE] == 0 && scene_get(1, 0)[P_DLY_ROUTE] == 0);
+        check("... and written again in 33 on the next save", project_save() == 0 && store_n[OBJ_BANKB] == (int)sizeof(bank_t));
+    }
     old_project(18u);
     check("format 18 gives the defaults", project_load() == -1 && !scene_get(0, 0) && !scene_get(1, 0));
     printf("project: %s\n", fails ? "FAILED" : "all ok");

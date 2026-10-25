@@ -99,7 +99,7 @@ static float dly_t = 0.177f * DR_SR;    /* the left's time, in samples, smoothed
 volatile float dr_dly_ms;               /* ... in ms, each block (the host's probe) */
 static float dly_lp[2], dly_hp[2], dly_olp[2];
 static float dly_ph1, dly_ph2;           /* the wow's two sines */
-enum { DT_TAPE, DT_WIDE, DT_PING, DT_CLEAN, DT_GRAIN, DT_SELF, DT_NTYPES };
+enum { DT_CLEAN, DT_WIDE, DT_PING, DT_TAPE, DT_GRAIN, DT_SELF, DT_NTYPES };   /* plain to most alive (Evan, 2026-10-25) */
 _Static_assert(DT_NTYPES == DR_NDLY, "a name for each type");
 typedef struct {
     float spread, tone, out, wow, ping;  /* R's time / L's; the loop's low-pass k; the wet's low-pass k; the wow,
@@ -109,14 +109,30 @@ typedef struct {
                                           * the time's share a unit (Self) */
 } dly_type_t;
 static const dly_type_t DLY_TYPE[DT_NTYPES] = {
-    {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.0f},    /* TAPE: ~3.5 kHz in the loop, ~5 kHz out, 0.7 ms of wow */
+    {1.00f, 0.86f, 1.00f, 0.0f, 0.0f, 1.08f, 0.0f, 0.0f},     /* CLEAN: ~14 kHz, nothing out */
     {0.75f, 0.57f, 0.70f, 14.0f, 0.0f, 1.15f, 0.0f, 0.0f},    /* WIDE: ~6 kHz, ~8.5 kHz */
     {1.00f, 0.50f, 0.66f, 14.0f, 1.0f, 1.66f, 0.0f, 0.0f},    /* PING-PONG: each repeat on one side (3 dB of it) */
-    {1.00f, 0.86f, 1.00f, 0.0f, 0.0f, 1.08f, 0.0f, 0.0f},     /* CLEAN: ~14 kHz, nothing out */
+    {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.0f},    /* TAPE: ~3.5 kHz in the loop, ~5 kHz out, 0.7 ms of wow */
     {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 60.0f, 0.0f},   /* GRAIN: Tape, shaken by its own sound */
     {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.25f},   /* SELF: Tape, stretched by its own loudness */
 };
 static dly_type_t dly_c = {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.0f};   /* the type as it glides */
+/* where a type reads (its spread, wow, Grain's and Self's moves) changes at once on a new type, each side read at
+ * the old type's place and the new one's for 50 ms and crossfaded (Evan, 2026-10-24: a glide of the places bent the
+ * repeats' pitch, as the reverb's did); the rest of the type (tone, out, ping-pong, gain) glides */
+#define DLY_XSTEP (1.0f / (0.05f * DR_SR))
+static uint8_t dly_pt = DT_TAPE, dly_qt = DT_TAPE;   /* the type read now, and the one it's coming from */
+static float dly_xf = 1.0f;                          /* that crossfade, 0..1 (1: done) */
+/* what goes into the reverb (P_DLY_ROUTE): both the drones and their echoes, the echoes alone (the drones dry, the
+ * wash added to them), or the drones alone (the reverb beside the delay, the echoes dry). Each route's send and
+ * its share of the dry: a new route crossfades to them over 50 ms */
+static float rt_w[DR_NROUTE] = {1.0f, 0.0f, 0.0f};
+static void rt_snap(void)                /* at the route at once (a load, at rest) */
+{
+    int q;
+    for (q = 0; q < DR_NROUTE; q++)
+        rt_w[q] = q == ((unsigned)par[P_DLY_ROUTE] < DR_NROUTE ? par[P_DLY_ROUTE] : 0) ? 1.0f : 0.0f;
+}
 static float self_s, self_e, self_es;    /* Grain's sound (~280 Hz); Self's loudness (~10 Hz) and its mean (~0.2 Hz) */
 
 static float dly_ms(int v) { return 70.0f * fm_exp2f((float)v * 0.026845f); }   /* 70 * (450/70)^(v/100) */
@@ -444,6 +460,9 @@ static void fx_clear(void)
     drv_k = drv_g = 1.0f;
     dly_t = dly_ms(par[P_DLY_TIME]) * 0.001f * DR_SR;    /* at its time, no glide from an old one */
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
+    dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
+    dly_xf = 1.0f;
+    rt_snap();
     rv_clear();
     fx_gains();
     fx_quiet = 0;
@@ -454,6 +473,9 @@ static void fx_rest(void)
 {
     dly_t = dly_ms(par[P_DLY_TIME]) * 0.001f * DR_SR;
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
+    dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
+    dly_xf = 1.0f;
+    rt_snap();
     fx_gains();
 }
 
@@ -479,6 +501,9 @@ static void fx_run(float *l, float *r, uint32_t n)
     const dly_type_t *dt = &DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     const float ease = fm_minf((float)n * (1.0f / (0.25f * DR_SR)), 1.0f);   /* a type's glide: ~0.25 s */
     static float sl[BLK], sr[BLK];       /* the reverb's send (mono, in sl) and its wet, a block */
+    static float in_m[BLK], wet_m[BLK];  /* the drones into the delay, and its echoes, mono (the routes' sends) */
+    const int route = (unsigned)par[P_DLY_ROUTE] < DR_NROUTE ? par[P_DLY_ROUTE] : 0;
+    float rw0[DR_NROUTE], drw[DR_NROUTE];
     float pgain;
     int mono = 0;
     uint32_t j;
@@ -489,33 +514,34 @@ static void fx_run(float *l, float *r, uint32_t n)
         dly_rt = (uint8_t)par[P_DLY_LFO];
         dly_rw = 0.0f;
     }
-    float sp = dly_c.spread, dsp;        /* the right side's spread across the block, sample by sample (QA
-                                          * 2026-10-20: stepped each block, Wide crackled as it came and went) */
-    dly_c.spread += (dt->spread - dly_c.spread) * ease;
+    const dly_type_t *pa, *qa;           /* where it reads: the new type, the old (crossfading) */
+    if (dt != &DLY_TYPE[dly_pt]) {
+        if (dly_xf >= 0.5f)              /* mid-crossfade, the louder one is the one it comes from */
+            dly_qt = dly_pt;
+        dly_pt = (uint8_t)(dt - DLY_TYPE);
+        dly_xf = 0.0f;
+    }
+    pa = &DLY_TYPE[dly_pt];
+    qa = &DLY_TYPE[dly_qt];
     dly_c.tone += (dt->tone - dly_c.tone) * ease;
     dly_c.out += (dt->out - dly_c.out) * ease;
-    dly_c.wow += (dt->wow - dly_c.wow) * ease;
     dly_c.ping += (dt->ping - dly_c.ping) * ease;
     dly_c.gain += (dt->gain - dly_c.gain) * ease;
-    dly_c.grain += (dt->grain - dly_c.grain) * ease;
-    dly_c.self += (dt->self - dly_c.self) * ease;
     pgain = dly_c.gain;
-    if (dt->spread >= 1.0f && dt->ping <= 0.0f && dly_c.spread > 0.9995f && dly_c.ping < 0.0005f) {
-        dly_c.spread = 1.0f;             /* settled on a mono type */
-        dly_c.ping = 0.0f;
+    if (pa->spread >= 1.0f && pa->ping <= 0.0f && dly_xf >= 1.0f && dly_c.ping < 0.0005f) {
+        dly_c.ping = 0.0f;               /* settled on a mono type */
         mono = 1;
     }
-    dsp = (dly_c.spread - sp) * dn;
     rv_coefs(ease);
     dr_dly_ms = dly_t * (1000.0f / DR_SR);
     /* DELAY */
     for (j = 0; j < n; j++) {
-        float x, yl, yr, fl, fr, t, wow, pp = dly_c.ping;
-        sp += dsp;
+        float x, yl, yr, fl, fr, t, wa, wq, pp = dly_c.ping;
         fbg += dfb;
         dry1 += dd1;
         wet1 += dw1;
         x = (l[j] + r[j]) * 0.5f;
+        in_m[j] = x;
         {
             float lfo = lfo_at(dly_rt, j / CR);
             if (dly_rw < 1.0f) {
@@ -529,14 +555,25 @@ static void fx_run(float *l, float *r, uint32_t n)
             dly_ph1 = advance(dly_ph1, 0.55f * (float)CR / DR_SR);
             dly_ph2 = advance(dly_ph2, 3.3f * (float)CR / DR_SR);
         }
-        wow = dly_c.wow * (0.75f * fm_sin_turns(dly_ph1) + 0.25f * fm_sin_turns(dly_ph2));
-        if (dly_c.grain > 0.01f || dly_c.self > 0.0001f) {   /* GRAIN, SELF: its own echoes move its time */
-            self_s += (dly_olp[0] - self_s) * 0.04f;
-            self_e += (fm_fabsf(dly_olp[0]) - self_e) * 0.0015f;
-            self_es += (self_e - self_es) * 0.00003f;
-            wow += dly_c.grain * self_s + dly_t * dly_c.self * (self_e - self_es);
+        {
+            float w = 0.75f * fm_sin_turns(dly_ph1) + 0.25f * fm_sin_turns(dly_ph2), m = 0.0f, e = 0.0f;
+            if (pa->grain > 0.0f || pa->self > 0.0f || (dly_xf < 1.0f && (qa->grain > 0.0f || qa->self > 0.0f))) {
+                self_s += (dly_olp[0] - self_s) * 0.04f;     /* GRAIN, SELF: its own echoes move its time */
+                self_e += (fm_fabsf(dly_olp[0]) - self_e) * 0.0015f;
+                self_es += (self_e - self_es) * 0.00003f;
+                m = self_s;
+                e = self_e - self_es;
+            }
+            wa = pa->wow * w + (pa->grain * m + dly_t * pa->self * e);   /* (summed as before the crossfade: */
+            wq = qa->wow * w + (qa->grain * m + dly_t * qa->self * e);   /* a steady type reads exactly as it did) */
         }
-        yl = dly_read(dly_buf[0], fm_clampf(dly_t + wow + dly_c.wow, 4.0f, (float)(DLY_N - 4u)));
+        if (dly_xf < 1.0f)
+            dly_xf = fm_minf(dly_xf + DLY_XSTEP, 1.0f);
+        yl = dly_read(dly_buf[0], fm_clampf(dly_t + wa + pa->wow, 4.0f, (float)(DLY_N - 4u)));
+        if (dly_xf < 1.0f) {
+            float yq = dly_read(dly_buf[0], fm_clampf(dly_t + wq + qa->wow, 4.0f, (float)(DLY_N - 4u)));
+            yl = yq + (yl - yq) * dly_xf;
+        }
         dly_olp[0] += (yl - dly_olp[0]) * dly_c.out;               /* the wet out */
         /* the loops: soft clip, the tone, no rumble (~80 Hz taken away) */
         dly_lp[0] += (sat(yl * fbg) - dly_lp[0]) * dly_c.tone;
@@ -549,7 +586,11 @@ static void fx_run(float *l, float *r, uint32_t n)
             dly_hp[1] = dly_hp[0];
             fr = fl;
         } else {
-            yr = dly_read(dly_buf[1], fm_clampf(dly_t * sp + wow + dly_c.wow, 4.0f, (float)(DLY_N - 4u)));
+            yr = dly_read(dly_buf[1], fm_clampf(dly_t * pa->spread + wa + pa->wow, 4.0f, (float)(DLY_N - 4u)));
+            if (dly_xf < 1.0f) {
+                float yq = dly_read(dly_buf[1], fm_clampf(dly_t * qa->spread + wq + qa->wow, 4.0f, (float)(DLY_N - 4u)));
+                yr = yq + (yr - yq) * dly_xf;
+            }
             dly_olp[1] += (yr - dly_olp[1]) * dly_c.out;
             dly_lp[1] += (sat(yr * fbg) - dly_lp[1]) * dly_c.tone;
             dly_hp[1] += (dly_lp[1] - dly_hp[1]) * 0.0114f;
@@ -561,12 +602,29 @@ static void fx_run(float *l, float *r, uint32_t n)
             dly_buf[1][dly_w] = (int16_t)(fm_clampf(wr, -1.99f, 1.99f) * 16384.0f);
             dly_w = (dly_w + 1u) & DLY_MASK;
         }
+        wet_m[j] = (dly_olp[0] + dly_olp[1]) * 0.5f * wet1 * pgain;
         l[j] = l[j] * dry1 + dly_olp[0] * wet1 * pgain;
         r[j] = r[j] * dry1 + dly_olp[1] * wet1 * pgain;
     }
     drive_run(l, r, n);                  /* DRIVE: the drones and their repeats together */
-    for (j = 0; j < n; j++)
-        sl[j] = (l[j] + r[j]) * 0.5f;    /* the reverb's send */
+    {
+        int q;
+        for (q = 0; q < DR_NROUTE; q++) {          /* toward the route, 50 ms the whole way, sample by sample */
+            float to = q == route ? 1.0f : 0.0f;
+            rw0[q] = rt_w[q];
+            rt_w[q] = to > rt_w[q] ? fm_minf(rt_w[q] + (float)n * DLY_XSTEP, to) : fm_maxf(rt_w[q] - (float)n * DLY_XSTEP, to);
+            drw[q] = (rt_w[q] - rw0[q]) * dn;
+        }
+    }
+    {
+        float w0 = rw0[0], w1 = rw0[1], w2 = rw0[2];
+        for (j = 0; j < n; j++) {             /* the reverb's send */
+            w0 += drw[0];
+            w1 += drw[1];
+            w2 += drw[2];
+            sl[j] = (l[j] + r[j]) * 0.5f * w0 + wet_m[j] * w1 + in_m[j] * w2;
+        }
+    }
     /* REVERB at the half rate: the send down, the network, the wet up */
     rv_block(n / 2u, (float)n / DR_SR);
     for (j = 0; j + 1u < n; j += 2u) {
@@ -586,11 +644,17 @@ static void fx_run(float *l, float *r, uint32_t n)
         rv.hold[0] = sl[n - 1u];
         rv.hold[1] = sr[n - 1u];
     }
-    for (j = 0; j < n; j++) {
-        dry2 += dd2;
-        wet2 += dw2;
-        l[j] = l[j] * dry2 + sl[j] * RV_WET * rv.gain * wet2;
-        r[j] = r[j] * dry2 + sr[j] * RV_WET * rv.gain * wet2;
+    {
+        float w1 = rw0[1];
+        for (j = 0; j < n; j++) {             /* the echoes alone in: the dry kept whole, the wash added */
+            float d;
+            dry2 += dd2;
+            wet2 += dw2;
+            w1 += drw[1];
+            d = dry2 + (1.0f - dry2) * w1;
+            l[j] = l[j] * d + sl[j] * RV_WET * rv.gain * wet2;
+            r[j] = r[j] * d + sr[j] * RV_WET * rv.gain * wet2;
+        }
     }
     fx_g[0] = fbg1;
     fx_g[1] = dry1e;

@@ -86,7 +86,8 @@ enum {
     P_PULSE,                        /* the PULSE on (1) / off (0): both drones chopped in time (a switch) */
     P_PULSE_RATE,                   /* 0..100 = 0.03 .. 16 pulses a second, exponential (a 33 s breath .. a buzz) */
     P_PULSE_DEPTH,                  /* 0..100: how far the level drops between pulses */
-    P_PULSE_SHAPE,                  /* 0..100: a smooth swell .. a hard gate */
+    P_PULSE_SHAPE,                  /* -100..100: 0 a smooth swell; up to 100 firmer, a hard gate at the top; down to
+                                     * -100 a ramp, rising slowly and falling quickly (a user's ask, 2026-10-25) */
     P_PULSE_SWING,                  /* 0..50: every other pulse longer (50: 3 to 1) */
     P_DLY_TIME,                     /* the DELAY: 0..100 = 70 .. 450 ms (exponential) */
     P_DLY_REPEATS,                  /* 0..100: its feedback; past ~85 it runs away (held by a soft clip) */
@@ -126,12 +127,15 @@ enum {
     P_GR_0, P_GR_1, P_GR_2, P_GR_3,      /* unused since 2026-10-18 (each key's time: now DR_GEST_TIME) */
     P_GL_0, P_GL_1, P_GL_2, P_GL_3,      /* ... latched at, 0..100 (0: not latched) */
     /* THE EFFECTS (v0.2, ChoralRoot's design) */
-    P_DLY_TYPE,                     /* the delay's type: Tape, Wide, Ping-pong, Clean, Grain, Self (DR_DLY_NAME) */
+    P_DLY_TYPE,                     /* the delay's type: Clean, Wide, Ping-pong, Tape, Grain, Self (DR_DLY_NAME) */
     P_REV_LEN,                      /* the reverb's LENGTH: 0..99 = 0.3 .. 40 s (its decay time), 100 Inf (a freeze) */
     P_REV_DAMP,                     /* 0..100: how dark its tail gets, open .. ~600 Hz (out at Inf) */
     P_PRESS_SENS,                   /* the keys' pressure sensitivity, 0..100 (50: as tuned; a room setting) */
     P_DLY_DRIVE,                    /* DRIVE after the delay (v0.3, the Lyra-8's): 0..100, the drones and their repeats
                                      * distorted together, before the reverb; the loudness held */
+    P_DLY_ROUTE,                    /* what goes into the reverb (v0.3, DR_ROUTE_NAME): 0 both, the drones and their
+                                     * echoes; 1 the echoes alone (the drones dry, the wash added); 2 the drones alone (the
+                                     * reverb beside the delay, the echoes dry) */
     DR_NPARAMS
 };
 
@@ -163,8 +167,11 @@ extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
 #define DR_PITCH_HI 9135                       /* 1.6 kHz */
 #define DR_NREV 4
 extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
+#define DR_NROUTE 3
+extern const char *const DR_ROUTE_NAME[DR_NROUTE];      /* "Both", "Echoes", "Drones" */
 #define DR_NDLY 6
-extern const char *const DR_DLY_NAME[DR_NDLY];          /* "Tape", "Wide", "Ping-pong", "Clean", "Grain", "Self" */
+#define DR_DLY_TAPE 3                                     /* the starting type */
+extern const char *const DR_DLY_NAME[DR_NDLY];          /* "Clean", "Wide", "Ping-pong", "Tape", "Grain", "Self" */
 #define DR_NINTERVALS 17
 extern const float DR_IV_SEMI[DR_NINTERVALS];           /* semitones: -Oct, -5th, -5th just .. +Oct+5 just */
 #define DR_IV_UNISON 5

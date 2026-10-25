@@ -41,7 +41,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     {I_(GP_PITCH), 5000, II_(GP_PITCH), 5600, I_(GP_LEVEL), 95, II_(GP_LEVEL), 76, I_(GP_WAVE), 20, II_(GP_WAVE), 33, I_(GP_INTERVAL), 1,
      II_(GP_INTERVAL), 7, I_(GP_DETUNE), 35, II_(GP_DETUNE), 8, II_(GP_MODE), DR_BP, II_(GP_CUTOFF), 640,
      II_(GP_RESO), 720, I_(GP_CUTOFF), 600, II_(GP_NOISE), 12, II_(GP_NCOLOR), 0, P_WANDER, 25, P_WSCALE, 3,
-     P_GLIDE, 45, P_LFO_W1, 6, P_MOVE, 70, P_PULSE, 0, P_REV_TYPE, 3, P_REV_MIX, 55, P_DLY_TYPE, 3, P_DLY_TIME, 100,
+     P_GLIDE, 45, P_LFO_W1, 6, P_MOVE, 70, P_PULSE, 0, P_REV_TYPE, 3, P_REV_MIX, 55, P_DLY_TYPE, 0, P_DLY_TIME, 100,
      P_DLY_REPEATS, 70, P_DLY_MIX, 30, II_(GP_OLFO), DR_LFO_II, II_(GP_OLFO_DEPTH), 12, P_LFO_RMOD, 40,
      P_LFO_RMOD_SRC, DR_LFO_I, -1},
     /* P4 GLASS: high sines a fifth apart (D5, A5), drone I's partner an octave up, beating a little, a long bright cathedral */
@@ -70,7 +70,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      * hiss, darker, the sub an octave down.
      * Tape wow: the oscillator LFO on both pitches, slow and small (about 2 s, +-12 cents) */
     {I_(GP_PITCH), 5000, II_(GP_PITCH), 5300, I_(GP_WAVE), 100, I_(GP_WIDTH), 35, II_(GP_WAVE), 67, I_(GP_MIX), 30,
-     P_AGE, 80, P_CHAR, 98, P_DLY_TYPE, 0, P_DLY_MIX, 35, P_DLY_REPEATS, 55, I_(GP_CUTOFF), 720,
+     P_AGE, 80, P_CHAR, 98, P_DLY_TYPE, 3, P_DLY_MIX, 35, P_DLY_REPEATS, 55, I_(GP_CUTOFF), 720,
      II_(GP_CUTOFF), 700, I_(GP_NOISE), 18, II_(GP_NOISE), 12, I_(GP_LEVEL), 70, II_(GP_LEVEL), 70, P_REV_TYPE, 0,
      P_REV_LEN, 35, P_REV_MIX, 25, I_(GP_OLFO_DEPTH), 7, II_(GP_OLFO), DR_LFO_I, II_(GP_OLFO_DEPTH), 6, P_LFO_RATE, 40,
      I_(GP_FLFO_DEPTH), 40, II_(GP_FLFO_DEPTH), -40, -1},
@@ -79,7 +79,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      * long clean echoes in a cathedral; no Swell */
     {I_(GP_PITCH), 3800, II_(GP_PITCH), 4500, I_(GP_WAVE), 20, II_(GP_WAVE), 20, I_(GP_CUTOFF), 497,
      II_(GP_CUTOFF), 556, I_(GP_RESO), 960, II_(GP_RESO), 960, I_(GP_DRIVE), 10, II_(GP_DRIVE), 10, I_(GP_MIX), 0,
-     II_(GP_MIX), 0, I_(GP_FLFO_DEPTH), 12, II_(GP_FLFO_DEPTH), -12, P_PULSE, 0, P_MOVE, 40, P_DLY_TYPE, 3,
+     II_(GP_MIX), 0, I_(GP_FLFO_DEPTH), 12, II_(GP_FLFO_DEPTH), -12, P_PULSE, 0, P_MOVE, 40, P_DLY_TYPE, 0,
      P_DLY_TIME, 90, P_DLY_REPEATS, 55, P_DLY_MIX, 25, P_REV_TYPE, 2, P_REV_LEN, 80, P_REV_MIX, 50, I_(GP_LEVEL), 54, II_(GP_LEVEL), 51, -1},
     /* P9 HOWL: low, a semitone apart (they grind), the feedback high, resonant, drone II band-passed, driven, dark;
      * a short tape slap in a small room.
@@ -101,7 +101,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     {I_(GP_PITCH), 3800, II_(GP_PITCH), 5730, P_XMOD, 1, P_XMOD_AMT, 60, P_SYNC, 1, I_(GP_WAVE), 100,
      II_(GP_WAVE), 100, I_(GP_WIDTH), 50, I_(GP_MODE), DR_HP, I_(GP_CUTOFF), 520, II_(GP_CUTOFF), 750,
      I_(GP_RESO), 650, II_(GP_RESO), 400, I_(GP_DRIVE), 55, II_(GP_DRIVE), 55, P_REV_TYPE, 0, P_REV_MIX, 25,
-     I_(GP_LEVEL), 73, II_(GP_LEVEL), 73, P_DLY_TYPE, 3, P_DLY_TIME, 10, P_DLY_REPEATS, 30, P_DLY_MIX, 25,
+     I_(GP_LEVEL), 73, II_(GP_LEVEL), 73, P_DLY_TYPE, 0, P_DLY_TIME, 10, P_DLY_REPEATS, 30, P_DLY_MIX, 25,
      I_(GP_OLFO_DEST), DR_TO_XWAVE, I_(GP_OLFO_DEPTH), 45, II_(GP_OLFO), DR_LFO_II, II_(GP_OLFO_DEST), DR_TO_XWAVE,
      II_(GP_OLFO_DEPTH), 45, P_LFO_RATE, 45, I_(GP_FLFO_DEPTH), 50, II_(GP_FLFO_DEPTH), -50, -1},
     /* P12 CLEAN (locked): one oscillator, drone I's saw alone through an open filter, everything else off; drone II
@@ -232,6 +232,12 @@ static void convert(int16_t *v, uint32_t from)
                 x++;
             v[DR_GP(g, GP_LEVEL)] = (int16_t)x;
         }
+    if (from >= 23u && from <= 32u) {           /* the delay types reordered, plain to most alive (Evan, 2026-10-25):
+                                                 * Tape, Wide, Ping-pong, Clean, ... then; Clean, Wide, Ping-pong, Tape now
+                                                 * (22 and before had no type: the default, Tape, already) */
+        int t = v[P_DLY_TYPE];
+        v[P_DLY_TYPE] = (int16_t)(t == 0 ? 3 : t == 3 ? 0 : t);
+    }
     if (from == 24u)                            /* the swells shorter (2-4 s, Evan 2026-10-18): to the new defaults */
         for (g = P_GR_0; g <= P_GR_3; g++)
             v[g] = dr_param_info(g)->def;
@@ -250,11 +256,13 @@ static int in_range(const int16_t *v)
 
 /* the older layouts: 19 and 20 had 16 scenes in the project (scenes 13-16 become B1-B4), 21 had bank A there and
  * B, C in their own objects, each with 78 values a sound (DR_NPARAMS before the macros); 22 as 21 with 94 (before
- * the effects' four); 23-31 as now with 98 (before the delay's drive). A value added since takes its default. */
+ * the effects' four); 23-31 as now with 98 (before the delay's drive), 32 with 99 (before the reverb's route). A value
+ * added since takes its default. */
 #define NP21 78
 #define NP22 94
 #define NP31 98
-_Static_assert(DR_NPARAMS >= NP31, "the values only grow");
+#define NP32 99
+_Static_assert(DR_NPARAMS >= NP32, "the values only grow");
 typedef struct {
     uint32_t magic, format;
     int16_t par[NP21];
@@ -303,10 +311,26 @@ typedef struct {
     uint16_t used, rsv;
     int16_t scene[NSCENES][NP31];
 } bank_v31_t;
+typedef struct {
+    uint32_t magic, format;
+    int16_t par[NP32];
+    uint8_t leds, bank, mtime;
+    uint8_t gkey_old[4];
+    uint8_t rsv[9];
+    uint16_t scene_used;
+    int16_t scene[NSCENES][NP32];
+} proj_v32_t;
+typedef struct {
+    uint32_t magic, format;
+    uint16_t used, rsv;
+    int16_t scene[NSCENES][NP32];
+} bank_v32_t;
 static union {
     project_t p;
     proj_v31_t o31;
     bank_v31_t b31;
+    proj_v32_t o32;
+    bank_v32_t b32;
     proj_v20_t o20;
     proj_v21_t o21;
     bank_t b;
@@ -319,7 +343,7 @@ static union {
 static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old sound: the new values' defaults */
 {
     int k;
-    const int np = from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
+    const int np = from >= 32u ? NP32 : from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
     for (k = 0; k < DR_NPARAMS; k++)
         dst[k] = k < np ? src[k] : dr_param_info(k)->def;
     if (dst[P_LFO_RATE] < 0)                   /* slower than 50 s, as it went before 2026-10-14: the slowest */
@@ -337,7 +361,13 @@ static void bank_load(int b)                   /* B (1), C (2) or the Presets (3
         return;
     if (ld.b.format == PROJ_FORMAT) {
         *k = ld.b;
-    } else if (ld.b.format >= 23u && ld.b.format < PROJ_FORMAT) {   /* 23-31: 98 values a sound */
+    } else if (ld.b.format == 32u) {           /* 32: 99 values a sound */
+        const bank_v32_t *o = &ld.b32;         /* read in place (a copy was 2.4 KB of RAM) */
+        k->used = o->used;
+        for (i = 0; i < NSCENES; i++)
+            widen(k->scene[i], o->scene[i], 32u);
+        bank_dirty |= (uint8_t)(1u << b);
+    } else if (ld.b.format >= 23u && ld.b.format < 32u) {   /* 23-31: 98 values a sound */
         static bank_v31_t o;
         uint32_t f = ld.b.format;
         o = ld.b31;
@@ -414,6 +444,16 @@ int project_load(void)
     }
     if (from == PROJ_FORMAT) {
         proj = ld.p;
+    } else if (from == 32u) {                  /* 32: 99 values a sound */
+        const proj_v32_t *o = &ld.o32;         /* read in place (a copy was 2.4 KB of RAM) */
+        memset(&proj, 0, sizeof proj);
+        widen(proj.par, o->par, from);
+        proj.leds = o->leds;
+        proj.bank = o->bank;
+        proj.mtime = o->mtime;
+        proj.scene_used = o->scene_used & ((1u << NSCENES) - 1u);
+        for (i = 0; i < NSCENES; i++)
+            widen(proj.scene[i], o->scene[i], from);
     } else if (from >= 23u) {                  /* 23-31: 98 values a sound */
         static proj_v31_t o;
         o = ld.o31;
