@@ -123,6 +123,10 @@ static dly_type_t dly_c = {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.0f};
 #define DLY_XSTEP (1.0f / (0.05f * DR_SR))
 static uint8_t dly_pt = DT_TAPE, dly_qt = DT_TAPE;   /* the type read now, and the one it's coming from */
 static float dly_xf = 1.0f;                          /* that crossfade, 0..1 (1: done) */
+/* ... but Grain's and Self's moves of the time ease in and out over a second (Evan, 2026-10-25: a loud Self moves it
+ * by milliseconds, and switched in or out within 50 ms that sang as a swoop) */
+#define DLY_MSTEP (1.0f / (1.0f * DR_SR))
+static float dly_ga, dly_sa;                         /* Grain's amount now, Self's */
 /* what goes into the reverb (P_DLY_ROUTE): both the drones and their echoes, the echoes alone (the drones dry, the
  * wash added to them), or the drones alone (the reverb beside the delay, the echoes dry). Each route's send and
  * its share of the dry: a new route crossfades to them over 50 ms */
@@ -133,7 +137,7 @@ static void rt_snap(void)                /* at the route at once (a load, at res
     for (q = 0; q < DR_NROUTE; q++)
         rt_w[q] = q == ((unsigned)par[P_DLY_ROUTE] < DR_NROUTE ? par[P_DLY_ROUTE] : 0) ? 1.0f : 0.0f;
 }
-static float self_s, self_e, self_es;    /* Grain's sound (~280 Hz); Self's loudness (~10 Hz) and its mean (~0.2 Hz) */
+static float self_s, self_e, self_e2, self_es;    /* Grain's sound (~280 Hz); Self's loudness (~10 Hz) and its mean (~0.2 Hz) */
 
 static float dly_ms(int v) { return 70.0f * fm_exp2f((float)v * 0.026845f); }   /* 70 * (450/70)^(v/100) */
 
@@ -455,13 +459,15 @@ static void fx_clear(void)
         dly_buf[0][k] = dly_buf[1][k] = 0;
     dly_lp[0] = dly_lp[1] = dly_hp[0] = dly_hp[1] = dly_olp[0] = dly_olp[1] = 0.0f;
     dly_ph1 = dly_ph2 = 0.0f;            /* the wow from its start: a cleared delay sounds the same each time */
-    self_s = self_e = self_es = 0.0f;
+    self_s = self_e = self_e2 = self_es = 0.0f;
     drv_m = drv_pi = drv_pw = drv_dc[0] = drv_dc[1] = 0.0f;
     drv_k = drv_g = 1.0f;
     dly_t = dly_ms(par[P_DLY_TIME]) * 0.001f * DR_SR;    /* at its time, no glide from an old one */
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
     dly_xf = 1.0f;
+    dly_ga = DLY_TYPE[dly_pt].grain;
+    dly_sa = DLY_TYPE[dly_pt].self;
     rt_snap();
     rv_clear();
     fx_gains();
@@ -475,6 +481,8 @@ static void fx_rest(void)
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
     dly_xf = 1.0f;
+    dly_ga = DLY_TYPE[dly_pt].grain;
+    dly_sa = DLY_TYPE[dly_pt].self;
     rt_snap();
     fx_gains();
 }
@@ -557,15 +565,24 @@ static void fx_run(float *l, float *r, uint32_t n)
         }
         {
             float w = 0.75f * fm_sin_turns(dly_ph1) + 0.25f * fm_sin_turns(dly_ph2), m = 0.0f, e = 0.0f;
-            if (pa->grain > 0.0f || pa->self > 0.0f || (dly_xf < 1.0f && (qa->grain > 0.0f || qa->self > 0.0f))) {
-                self_s += (dly_olp[0] - self_s) * 0.04f;     /* GRAIN, SELF: its own echoes move its time */
-                self_e += (fm_fabsf(dly_olp[0]) - self_e) * 0.0015f;
-                self_es += (self_e - self_es) * 0.00003f;
+            /* GRAIN, SELF: its own echoes move its time. What they follow runs whatever the type (Evan, 2026-10-25:
+             * switched to Self, it lurched for a second, its loudness's mean starting from where it was left) */
+            self_s += (dly_olp[0] - self_s) * 0.04f;
+            self_e += (fm_fabsf(dly_olp[0]) - self_e) * 0.0015f;   /* two stages, ~10 Hz: one let the level's */
+            self_e2 += (self_e - self_e2) * 0.0015f;               /* ripple (twice the pitch) through, and Self */
+            self_es += (self_e2 - self_es) * 0.00003f;              /* shook its time at audio rate: FM, +2-9 dB */
+            if (dly_ga != pa->grain)
+                dly_ga = dly_ga < pa->grain ? fm_minf(dly_ga + pa->grain * DLY_MSTEP, pa->grain)
+                                            : fm_maxf(dly_ga - DLY_TYPE[DT_GRAIN].grain * DLY_MSTEP, pa->grain);
+            if (dly_sa != pa->self)
+                dly_sa = dly_sa < pa->self ? fm_minf(dly_sa + pa->self * DLY_MSTEP, pa->self)
+                                           : fm_maxf(dly_sa - DLY_TYPE[DT_SELF].self * DLY_MSTEP, pa->self);
+            if (dly_ga > 0.0f || dly_sa > 0.0f) {
                 m = self_s;
-                e = self_e - self_es;
+                e = self_e2 - self_es;
             }
-            wa = pa->wow * w + (pa->grain * m + dly_t * pa->self * e);   /* (summed as before the crossfade: */
-            wq = qa->wow * w + (qa->grain * m + dly_t * qa->self * e);   /* a steady type reads exactly as it did) */
+            wa = pa->wow * w + (dly_ga * m + dly_t * dly_sa * e);   /* (summed as before the crossfade: */
+            wq = qa->wow * w + (dly_ga * m + dly_t * dly_sa * e);   /* a steady type reads exactly as it did) */
         }
         if (dly_xf < 1.0f)
             dly_xf = fm_minf(dly_xf + DLY_XSTEP, 1.0f);

@@ -2113,7 +2113,6 @@ static void pic_types(int32_t y0)
                                                   "shaken by itself", "sways when loud"};   /* DR_DLY_NAME's order */
     static const char *const ROUTE_SAYS[DR_NROUTE] = {"in: both", "in: echoes", "in: drones"};
     const int ro = (unsigned)proj.par[P_DLY_ROUTE] < DR_NROUTE ? proj.par[P_DLY_ROUTE] : 0;
-    static const char *const REV_SAYS[DR_NREV] = {"small, close", "a hall", "the largest", "a hall, swinging"};
     int32_t mid = y0 + 42, k, side;
     cv_text(12, y0 + 3, &FONT_S, "DELAY", K_DIM);
     cv_text(12, y0 + 25, &FONT_B, DR_DLY_NAME[dt], K_FX);
@@ -2130,7 +2129,6 @@ static void pic_types(int32_t y0)
     cv_rect(12, y0 + 66, 210, 1, K_GRID);
     cv_text(12, y0 + 72, &FONT_S, "REVERB", K_DIM);
     cv_text(12, y0 + 94, &FONT_B, DR_REV_NAME[rt], K_FX);
-    text_r(222, y0 + 72, REV_SAYS[rt], K_TEXT2);
     cv_rect(108, y0 + 120, 114, 1, K_GRID);
     draw_tail(rt, 75, 108, y0 + 120, 114, 26, K_FX);
     cv_text(12, y0 + 116, &FONT_S, ROUTE_SAYS[ro], ro ? K_TEXT2 : K_DIM);   /* what goes into it (KNOB 3) */
