@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 32u                  /* 32: the delay's drive (99 values a sound; 23-31's read and widened);
+#define PROJ_FORMAT 33u                  /* 33: the delay types reordered (32's converted);
+                                          * 32: the delay's drive (99 values a sound; 23-31's read and widened);
                                           * 31: Level an audio taper (30's levels to 10 sqrt(v));
                                           * 30: Tuning in each Interval (the interval and Tuning to one index);
                                           * 29: the gesture keys fixed (Weight, Shift, Clean, Wash; 28's latches

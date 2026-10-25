@@ -40,7 +40,7 @@ banks you pick with SEL and the top four.*
   move its own rate and lock to the Swell.
 - **Movement** (ALGORITHM): all the LFO's depths down or up together, from still to double.
 - **The Swell**: both drones breathing in time, from a slow soft swell to a hard rhythmic gate, with swing.
-- **Effects**: a stereo delay of six types (Tape, Wide, Ping-pong, Clean, and the Lyra-8-like Grain and Self, whose
+- **Effects**: a stereo delay of six types (Clean, Wide, Ping-pong, Tape, and the Lyra-8-like Grain and Self, whose
   own echoes move their time; the LFO can warble it too), a drive
   after it (the drones and their echoes distorted together, as on the Lyra-8), into a reverb of four (Room, Hall,
   Cathedral, Chorus hall) whose length goes to Inf, a freeze.
@@ -304,12 +304,12 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
   distortion does: ghost notes, beating and crackle on the repeats. The first fifth of its turn blends a little in;
   past that it drives harder, up to a hard clip. It holds the loudness: turning it changes the grit, not the level.
 
-- **Delay types**: **Tape** (the same on both sides, warm, a gentle wow), **Wide** (stereo: the right side's
-  echoes come at three-quarters of the left's time), **Ping-pong** (the echoes bounce left and right),
-  **Clean** (bright, with no wow, so a just-tuned drone stays still), **Grain** (Tape whose time its own echoes
-  shake: grainy, metallic, wilder as they ring), **Self** (Tape whose time stretches as its echoes get louder: loud
-  echoes sag and wobble, and a runaway lurches). Changing type crossfades the echoes, without bending their pitch.
-  The type knobs go round both ways: past Self comes Tape again.
+- **Delay types**, from plain to most alive: **Clean** (bright, with no wow, so a just-tuned drone stays still),
+  **Wide** (stereo: the right side's echoes come at three-quarters of the left's time), **Ping-pong** (the echoes
+  bounce left and right), **Tape** (the same on both sides, warm, a gentle wow; the one a new sound starts with),
+  **Grain** (Tape whose time its own echoes shake: grainy, metallic, wilder as they ring), **Self** (Tape whose
+  time stretches as its echoes get louder: loud echoes sag and wobble, and a runaway lurches). Changing type
+  crossfades the echoes, without bending their pitch. The type knobs go round both ways: past Self comes Clean.
 - **Time** is 70–450 ms, and turning it bends the echoes' pitch, as tape does. **Repeats** past about 85 runs
   away into self-oscillation ("runaway" on the screen), held by a soft clip.
 - **Reverb types**: **Room**, **Hall**, **Cathedral** (the largest), **Chorus hall** (a hall that shimmers).

@@ -99,7 +99,7 @@ static float dly_t = 0.177f * DR_SR;    /* the left's time, in samples, smoothed
 volatile float dr_dly_ms;               /* ... in ms, each block (the host's probe) */
 static float dly_lp[2], dly_hp[2], dly_olp[2];
 static float dly_ph1, dly_ph2;           /* the wow's two sines */
-enum { DT_TAPE, DT_WIDE, DT_PING, DT_CLEAN, DT_GRAIN, DT_SELF, DT_NTYPES };
+enum { DT_CLEAN, DT_WIDE, DT_PING, DT_TAPE, DT_GRAIN, DT_SELF, DT_NTYPES };   /* plain to most alive (Evan, 2026-10-25) */
 _Static_assert(DT_NTYPES == DR_NDLY, "a name for each type");
 typedef struct {
     float spread, tone, out, wow, ping;  /* R's time / L's; the loop's low-pass k; the wet's low-pass k; the wow,
@@ -109,10 +109,10 @@ typedef struct {
                                           * the time's share a unit (Self) */
 } dly_type_t;
 static const dly_type_t DLY_TYPE[DT_NTYPES] = {
-    {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.0f},    /* TAPE: ~3.5 kHz in the loop, ~5 kHz out, 0.7 ms of wow */
+    {1.00f, 0.86f, 1.00f, 0.0f, 0.0f, 1.08f, 0.0f, 0.0f},     /* CLEAN: ~14 kHz, nothing out */
     {0.75f, 0.57f, 0.70f, 14.0f, 0.0f, 1.15f, 0.0f, 0.0f},    /* WIDE: ~6 kHz, ~8.5 kHz */
     {1.00f, 0.50f, 0.66f, 14.0f, 1.0f, 1.66f, 0.0f, 0.0f},    /* PING-PONG: each repeat on one side (3 dB of it) */
-    {1.00f, 0.86f, 1.00f, 0.0f, 0.0f, 1.08f, 0.0f, 0.0f},     /* CLEAN: ~14 kHz, nothing out */
+    {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.0f},    /* TAPE: ~3.5 kHz in the loop, ~5 kHz out, 0.7 ms of wow */
     {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 60.0f, 0.0f},   /* GRAIN: Tape, shaken by its own sound */
     {1.00f, 0.39f, 0.51f, 30.0f, 0.0f, 1.00f, 0.0f, 0.25f},   /* SELF: Tape, stretched by its own loudness */
 };
@@ -546,16 +546,16 @@ static void fx_run(float *l, float *r, uint32_t n)
                 self_e += (fm_fabsf(dly_olp[0]) - self_e) * 0.0015f;
                 self_es += (self_e - self_es) * 0.00003f;
                 m = self_s;
-                e = dly_t * (self_e - self_es);
+                e = self_e - self_es;
             }
-            wa = pa->wow * (w + 1.0f) + pa->grain * m + pa->self * e;   /* (the wow's own offset in it) */
-            wq = qa->wow * (w + 1.0f) + qa->grain * m + qa->self * e;
+            wa = pa->wow * w + (pa->grain * m + dly_t * pa->self * e);   /* (summed as before the crossfade: */
+            wq = qa->wow * w + (qa->grain * m + dly_t * qa->self * e);   /* a steady type reads exactly as it did) */
         }
         if (dly_xf < 1.0f)
             dly_xf = fm_minf(dly_xf + DLY_XSTEP, 1.0f);
-        yl = dly_read(dly_buf[0], fm_clampf(dly_t + wa, 4.0f, (float)(DLY_N - 4u)));
+        yl = dly_read(dly_buf[0], fm_clampf(dly_t + wa + pa->wow, 4.0f, (float)(DLY_N - 4u)));
         if (dly_xf < 1.0f) {
-            float yq = dly_read(dly_buf[0], fm_clampf(dly_t + wq, 4.0f, (float)(DLY_N - 4u)));
+            float yq = dly_read(dly_buf[0], fm_clampf(dly_t + wq + qa->wow, 4.0f, (float)(DLY_N - 4u)));
             yl = yq + (yl - yq) * dly_xf;
         }
         dly_olp[0] += (yl - dly_olp[0]) * dly_c.out;               /* the wet out */
@@ -570,9 +570,9 @@ static void fx_run(float *l, float *r, uint32_t n)
             dly_hp[1] = dly_hp[0];
             fr = fl;
         } else {
-            yr = dly_read(dly_buf[1], fm_clampf(dly_t * pa->spread + wa, 4.0f, (float)(DLY_N - 4u)));
+            yr = dly_read(dly_buf[1], fm_clampf(dly_t * pa->spread + wa + pa->wow, 4.0f, (float)(DLY_N - 4u)));
             if (dly_xf < 1.0f) {
-                float yq = dly_read(dly_buf[1], fm_clampf(dly_t * qa->spread + wq, 4.0f, (float)(DLY_N - 4u)));
+                float yq = dly_read(dly_buf[1], fm_clampf(dly_t * qa->spread + wq + qa->wow, 4.0f, (float)(DLY_N - 4u)));
                 yr = yq + (yr - yq) * dly_xf;
             }
             dly_olp[1] += (yr - dly_olp[1]) * dly_c.out;

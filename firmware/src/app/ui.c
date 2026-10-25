@@ -2054,7 +2054,7 @@ static int32_t echo_shift(int ty, int k)
  * sooner; Ping-pong: they take turns), each as loud as Repeats leaves it, darker each time */
 static void pic_fx(int32_t y0)
 {
-    const int ty = (unsigned)proj.par[P_DLY_TYPE] < DR_NDLY ? proj.par[P_DLY_TYPE] : 0;
+    const int ty = (unsigned)proj.par[P_DLY_TYPE] < DR_NDLY ? proj.par[P_DLY_TYPE] : DR_DLY_TAPE;
     float ms = 70.0f * fm_exp2f((float)proj.par[P_DLY_TIME] * 0.026845f);
     float fb = fm_minf((float)proj.par[P_DLY_REPEATS] * 0.0115f, 1.0f);
     float mix = (float)proj.par[P_DLY_MIX] * 0.01f, wet = mix > 0.0f ? 0.25f + 0.75f * mix : 0.0f;
@@ -2086,7 +2086,7 @@ static void pic_fx(int32_t y0)
     cv_text(28, y0 + 3, &FONT_S, t, mix > 0.0f ? K_FX : K_DIM);
     if (proj.par[P_DLY_REPEATS] > 85)
         text_r(222, y0 + 3, "runaway", K_GOLD);
-    else if (ty == 3)
+    else if (ty == 0)                          /* Clean */
         text_r(222, y0 + 3, "no wow", K_DIM);
     if (proj.par[P_DLY_DRIVE]) {               /* the drive after it (KNOB 1) */
         dr_param_text(P_DLY_DRIVE, proj.par[P_DLY_DRIVE], scopy(t, "drive "));
@@ -2098,7 +2098,7 @@ static void pic_fx(int32_t y0)
  * Delay page) and the reverb's below (its tail's start, the pre-delay a gap), each named */
 static void pic_types(int32_t y0)
 {
-    const int dt = (unsigned)proj.par[P_DLY_TYPE] < DR_NDLY ? proj.par[P_DLY_TYPE] : 0;
+    const int dt = (unsigned)proj.par[P_DLY_TYPE] < DR_NDLY ? proj.par[P_DLY_TYPE] : DR_DLY_TAPE;
     const int rt = (unsigned)proj.par[P_REV_TYPE] < DR_NREV ? proj.par[P_REV_TYPE] : 2;
     static const char *const DLY_SAYS[DR_NDLY] = {"warm, mono", "stereo, brighter", "side to side", "bright, still",
                                                   "shaken by itself", "sways when loud"};

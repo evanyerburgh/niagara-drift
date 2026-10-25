@@ -124,7 +124,9 @@ tap FX
 expect view 14
 tap FX
 expect view 15
-spin K1 1
+spin K1 -1
+spin K1 -1
+expect par94 1
 wait 300
 shot types.png
 # Delay: Wide, its echoes left and right, a little drive after it

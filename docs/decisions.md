@@ -375,3 +375,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   Swell page (switching nothing), a tap on the page is the Swell on / off, a hold peeks; the two-quick-taps rule is
   gone. The Swell page draws one bar, without "the swell, over two bars". A **black key** pressed while a scene is on
   its way is the hand's, as a turned knob's value is: the scene leaves it alone.
+- 2026-10-25 (Evan): the **delay types in a new order**, plain to most alive: Clean, Wide, Ping-pong, Tape, Grain, Self
+  (were Tape, Wide, Ping-pong, Clean, ...). Tape stays the default. PROJ_FORMAT 33: saved sounds and scenes from 23-32
+  have Clean and Tape swapped once, so every sound keeps its delay.

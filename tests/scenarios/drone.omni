@@ -387,7 +387,8 @@ wait 100
 shot fx2.png
 tap FX
 expect view 15
-spin K1 1
+spin K1 -1
+spin K1 -1
 expect par94 1
 spin K2 -1
 expect par64 1
@@ -648,7 +649,7 @@ expect par6 4
 wait 12000
 expect par6 4
 set 71 30
-# the types go round both ways (Types: FX, third tap): the delay from Wide (1) to Tape, Self, Tape, Wide; the
+# the types go round both ways (Types: FX, third tap): the delay from Wide (1) to Clean, Self, Clean, Wide; the
 # reverb from the hall (1) to the room, the chorus hall, the room, the hall
 tap FX
 tap FX

@@ -1711,7 +1711,7 @@ int main(void)
             run(secs(2.0f));
             capture(cap, 44100, 0);
             r[t] = rms_of(cap, 44100);
-            if (t >= 4 && fabsf(20.0f * log10f(r[t] / r[0])) > 1.5f)   /* Grain, Self: Tape's, moved */
+            if (t >= 4 && fabsf(20.0f * log10f(r[t] / r[DR_DLY_TAPE])) > 1.5f)   /* Grain, Self: Tape's, moved */
                 bad++;
             dr_set(P_DLY_REPEATS, 95);
             run(secs(3.0f));
@@ -1722,10 +1722,10 @@ int main(void)
                 pk = fmaxf(pk, fabsf(cap[k]));
             }
         }
-        printf("    delay types against Tape: %+.1f %+.1f %+.1f %+.1f %+.1f dB; runaway peak %.2f\n",
-               (double)(20.0f * log10f(r[1] / r[0])), (double)(20.0f * log10f(r[2] / r[0])),
-               (double)(20.0f * log10f(r[3] / r[0])), (double)(20.0f * log10f(r[4] / r[0])),
-               (double)(20.0f * log10f(r[5] / r[0])), (double)pk);
+        printf("    delay types against Tape (Clean, Wide, Ping-pong, Grain, Self): %+.1f %+.1f %+.1f %+.1f %+.1f dB; runaway peak %.2f\n",
+               (double)(20.0f * log10f(r[0] / r[3])), (double)(20.0f * log10f(r[1] / r[3])),
+               (double)(20.0f * log10f(r[2] / r[3])), (double)(20.0f * log10f(r[4] / r[3])),
+               (double)(20.0f * log10f(r[5] / r[3])), (double)pk);
         check("Grain and Self as loud as Tape (within 1.5 dB); every type at runaway finite, inside full scale", bad == 0 && pk <= 1.0f);
     }
     {   /* a pitch under 27 Hz (v0.3: down to 2 Hz) is written in Hz, every one (the note names' table stops at

@@ -126,7 +126,7 @@ enum {
     P_GR_0, P_GR_1, P_GR_2, P_GR_3,      /* unused since 2026-10-18 (each key's time: now DR_GEST_TIME) */
     P_GL_0, P_GL_1, P_GL_2, P_GL_3,      /* ... latched at, 0..100 (0: not latched) */
     /* THE EFFECTS (v0.2, ChoralRoot's design) */
-    P_DLY_TYPE,                     /* the delay's type: Tape, Wide, Ping-pong, Clean, Grain, Self (DR_DLY_NAME) */
+    P_DLY_TYPE,                     /* the delay's type: Clean, Wide, Ping-pong, Tape, Grain, Self (DR_DLY_NAME) */
     P_REV_LEN,                      /* the reverb's LENGTH: 0..99 = 0.3 .. 40 s (its decay time), 100 Inf (a freeze) */
     P_REV_DAMP,                     /* 0..100: how dark its tail gets, open .. ~600 Hz (out at Inf) */
     P_PRESS_SENS,                   /* the keys' pressure sensitivity, 0..100 (50: as tuned; a room setting) */
@@ -164,7 +164,8 @@ extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
 #define DR_NREV 4
 extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
 #define DR_NDLY 6
-extern const char *const DR_DLY_NAME[DR_NDLY];          /* "Tape", "Wide", "Ping-pong", "Clean", "Grain", "Self" */
+#define DR_DLY_TAPE 3                                     /* the starting type */
+extern const char *const DR_DLY_NAME[DR_NDLY];          /* "Clean", "Wide", "Ping-pong", "Tape", "Grain", "Self" */
 #define DR_NINTERVALS 17
 extern const float DR_IV_SEMI[DR_NINTERVALS];           /* semitones: -Oct, -5th, -5th just .. +Oct+5 just */
 #define DR_IV_UNISON 5

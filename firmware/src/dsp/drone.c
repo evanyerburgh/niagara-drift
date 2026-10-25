@@ -54,11 +54,11 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"D5 depth", 0, 100, 70}, {"E5 depth", 0, 100, 100}, {"F5 depth", 0, 100, 100}, {"G5 depth", 0, 100, 70},
     {"D5 time", 0, 100, 30}, {"E5 time", 0, 100, 40}, {"F5 time", 0, 100, 35}, {"G5 time", 0, 100, 35},
     {"D5 latch", 0, 100, 0}, {"E5 latch", 0, 100, 0}, {"F5 latch", 0, 100, 0}, {"G5 latch", 0, 100, 0},
-    {"Type", 0, DR_NDLY - 1, 0}, {"Length", 0, 100, 60}, {"Damp", 0, 100, 40}, {"Pressure", 0, 100, 50},
+    {"Type", 0, DR_NDLY - 1, DR_DLY_TAPE}, {"Length", 0, 100, 60}, {"Damp", 0, 100, 40}, {"Pressure", 0, 100, 50},
     {"Drive", 0, 100, 0},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
-const char *const DR_DLY_NAME[DR_NDLY] = {"Tape", "Wide", "Ping-pong", "Clean", "Grain", "Self"};
+const char *const DR_DLY_NAME[DR_NDLY] = {"Clean", "Wide", "Ping-pong", "Tape", "Grain", "Self"};
 const char *const DR_WSCALE_NAME[DR_NWSCALE] = {"Minor pent", "Major pent", "5ths + 8ves", "Whole tone", "Dorian",
                                                 "Just 1-8"};
 
@@ -261,7 +261,7 @@ void dr_param_text(int i, int v, char *b)
     else if (i == P_REV_TYPE)
         copy_s(b, DR_REV_NAME[(unsigned)v < DR_NREV ? v : 0]);
     else if (i == P_DLY_TYPE)
-        copy_s(b, DR_DLY_NAME[(unsigned)v < DR_NDLY ? v : 0]);
+        copy_s(b, DR_DLY_NAME[(unsigned)v < DR_NDLY ? v : DR_DLY_TAPE]);
     else if (i == P_WSCALE)
         copy_s(b, DR_WSCALE_NAME[(unsigned)v < DR_NWSCALE ? v : 0]);
     else if (i == P_WANDER) {                    /* "off", "25-30s", "4.1-7.6s", "0.5-2.0s" */
