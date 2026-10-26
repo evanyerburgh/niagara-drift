@@ -101,13 +101,15 @@ void plat_leds(const uint8_t *b, const uint8_t *k)
 }
 
 #define MQ 256
-static uint32_t min_q[MQ], mi_w, mi_r;
+static uint32_t min_q[MQ], min_t[MQ], mi_w, mi_r;
+static double clk_bpm, clk_jit, clk_next_us;      /* the "clock" command: pulses at this tempo, jittered (ms) */
 static FILE *midi_log;
 static uint32_t midi_out_count, clock_out_count;
-int plat_midi_in(uint32_t *pkt)
+int plat_midi_in(uint32_t *pkt, uint32_t *us)
 {
     if (mi_r == mi_w)
         return 0;
+    *us = min_t[mi_r % MQ];
     *pkt = min_q[mi_r++ % MQ];
     return 1;
 }
@@ -303,6 +305,12 @@ static void run_ms(uint32_t ms)
     uint32_t i, k;
     for (i = 0; i < ms; i++) {
         now_ms++;
+        while (clk_bpm > 0.0 && clk_next_us <= (double)now_ms * 1000.0) {   /* the "clock" command's pulses */
+            double j = clk_jit > 0.0 ? clk_jit * 1000.0 * ((double)rand() / RAND_MAX - 0.5) * 2.0 : 0.0;
+            min_t[mi_w % MQ] = (uint32_t)(clk_next_us + j);
+            min_q[mi_w++ % MQ] = 0x0F | 0xF8u << 8;
+            clk_next_us += 60.0e6 / (clk_bpm * 24.0);
+        }
         while (audio_due_ms <= (double)now_ms) {      /* 256-frame blocks, as the device renders them */
             double t0 = now_ns(), dt;
             dr_render(blk, 256, master);
@@ -396,6 +404,14 @@ static int expect(const char *what, const char *val)
         got = (int)store_writes;
     else if (!strncmp(what, "heard", 5))          /* heardN: parameter N as heard (with the macros) */
         got = dr_heard(atoi(what + 5));
+    else if (!strcmp(what, "clkbpm"))             /* the MIDI clock in: its tempo x 10 */
+        got = (int)(clk.bpm * 10.0f + 0.5f);
+    else if (!strcmp(what, "clkjit"))             /* ... its jitter (RMS), us */
+        got = (int)(clk.jit * 1000.0f + 0.5f);
+    else if (!strcmp(what, "clkmax"))             /* ... its largest, us */
+        got = (int)(clk.jmax * 1000.0f + 0.5f);
+    else if (!strcmp(what, "clkstarts"))          /* ... Starts, Continues, Stops received */
+        got = (int)(clk.starts * 100u + clk.conts * 10u + clk.stops);
     else if (!strcmp(what, "wander"))             /* Wander's move of drone II now, |cents| */
         got = (int)(fm_fabsf(dr_wander()) * 100.0f + 0.5f);
     else if (!strncmp(what, "mtime", 5))          /* Macro time (PRESETS), 0..100 */
@@ -548,7 +564,12 @@ int main(int argc, char **argv)
         else if (!strcmp(cmd, "midi")) {
             uint32_t s = (uint32_t)strtoul(a, 0, 16), d1 = (uint32_t)strtoul(b, 0, 16), d2 = (uint32_t)strtoul(c, 0, 16);
             uint32_t cin = s >= 0xF0 ? 0x0F : s >> 4;
+            min_t[mi_w % MQ] = now_ms * 1000u;
             min_q[mi_w++ % MQ] = cin | s << 8 | d1 << 16 | d2 << 24;
+        } else if (!strcmp(cmd, "clock")) {          /* clock BPM [JITTER_MS]: MIDI clock in from now (0: stop) */
+            clk_bpm = atof(a);
+            clk_jit = b[0] ? atof(b) : 0.0;
+            clk_next_us = (double)now_ms * 1000.0;
         } else if (!strcmp(cmd, "wav")) {
             snprintf(out, sizeof out, "%s/%s", dir, a);
             wav_open(out);

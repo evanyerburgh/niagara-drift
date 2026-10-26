@@ -33,7 +33,7 @@ int plat_pressure(uint32_t k);         /* key k's pressure 0..127 while held (0 
 void plat_leds(const uint8_t *buttons, const uint8_t *keys);   /* brightness 0..255 (as the eye sees it): [B_*], [key] */
 
 /* USB MIDI, 4-byte USB-MIDI event packets (cable 0) */
-int plat_midi_in(uint32_t *pkt);       /* 1 = got one (called from the audio ISR) */
+int plat_midi_in(uint32_t *pkt, uint32_t *us);   /* 1 = got one, and when it came in, us (called from the audio ISR) */
 void plat_midi_out(uint32_t pkt);      /* queue one (audio ISR or main loop) */
 
 /* persistent storage (Felucca storage.c objects: A/B sectors, CRC, torn-write safe) */

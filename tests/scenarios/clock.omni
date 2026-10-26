@@ -1,0 +1,33 @@
+# MIDI CLOCK IN (v0.3, step 3): the tempo and the jitter of a clock from a DAW, as the test build shows them.
+# clkbpm is the tempo x 10, clkjit / clkmax the jitter (RMS / largest) in us
+tap PLAY
+wait 500
+# a steady 120 BPM: two beats to settle, then on the tempo, no jitter
+clock 120
+wait 1500
+expect clkbpm 1200
+expect clkjit <20
+# 90 BPM: there in two beats
+clock 90
+wait 1500
+expect clkbpm 900
+# a DAW's clock, each pulse up to 2 ms off: the tempo still 90, the jitter seen (+-2 ms even: about 1.2 RMS)
+clock 90 2
+wait 3000
+expect clkbpm >895
+expect clkbpm <905
+expect clkjit >700
+expect clkjit <1700
+expect clkmax <2100
+# Start, Continue, Stop counted
+midi FA 0 0
+midi FB 0 0
+midi FC 0 0
+wait 50
+expect clkstarts 111
+# the clock gone, then back at 140: lost, and a fresh tempo
+clock 0
+wait 1000
+clock 140
+wait 1500
+expect clkbpm 1400

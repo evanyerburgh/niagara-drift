@@ -1033,11 +1033,100 @@ static void button(int b)                              /* the other buttons, on 
 }
 
 /* MIDI in (USB and the TRS jack): a note on channel 1 tunes drone I to it, on channel 2 drone II */
+/* MIDI CLOCK IN (v0.3, step 3; a test build first, OM_CLOCK_TEST: the tempo and jitter on screen). 24 pulses a beat,
+ * each stamped as it came in (us; the inputs are read between renders, so a pulse can wait one out). Over the last
+ * two beats (48 pulses) a straight line through their times: its slope the tempo, how far each pulse sits off it the
+ * jitter (its RMS and its largest). No pulse for 500 ms: lost, and it starts over */
+#define CLK_N 48
+#define CLK_LOST_MS 500u
+static struct {
+    uint32_t t[CLK_N];                 /* the last pulses' times, us */
+    uint32_t n;                        /* pulses since it (re)started */
+    uint32_t last_ms, shown_ms, hold_ms;   /* the last pulse; the readout last shown; a message held till */
+    uint32_t starts, conts, stops;
+    float bpm, jit, jmax;              /* the tempo; the jitter, RMS and largest, ms */
+} clk;
+static void clk_fit(void)
+{
+    uint32_t k, t0 = clk.t[(clk.n - CLK_N) % CLK_N];
+    float sy = 0.0f, sxy = 0.0f, slope, b, e2 = 0.0f, em = 0.0f;
+    const float mx = 0.5f * (float)(CLK_N - 1), sxx = (float)CLK_N * ((float)CLK_N * (float)CLK_N - 1.0f) / 12.0f;
+    for (k = 0; k < CLK_N; k++) {      /* x: the pulse's number, y: its time after the first (us) */
+        float y = (float)(clk.t[(clk.n - CLK_N + k) % CLK_N] - t0);
+        sy += y;
+        sxy += ((float)k - mx) * y;
+    }
+    slope = sxy / sxx;
+    b = sy / (float)CLK_N - slope * mx;
+    for (k = 0; k < CLK_N; k++) {
+        float e = (float)(clk.t[(clk.n - CLK_N + k) % CLK_N] - t0) - (b + slope * (float)k);
+        e2 += e * e;
+        em = fm_maxf(em, fm_fabsf(e));
+    }
+    clk.bpm = slope > 0.0f ? 60.0e6f / (24.0f * slope) : 0.0f;
+    clk.jit = fm_sqrtf(e2 / (float)CLK_N) * 0.001f;
+    clk.jmax = em * 0.001f;
+}
+static void clk_pulse(uint32_t us)
+{
+    if (clk.n && plat_ms() - clk.last_ms > CLK_LOST_MS)
+        clk.n = 0;
+    clk.t[clk.n % CLK_N] = us;
+    clk.n++;
+    clk.last_ms = plat_ms();
+    if (clk.n >= CLK_N)
+        clk_fit();
+}
+#ifdef OM_CLOCK_TEST
+static char *dec1(float v, char *b);
+static void clk_show(void)                             /* the test build: the clock's tempo and jitter, twice a second */
+{
+    uint32_t now = plat_ms();
+    char a[24], b[24], *q;
+    if (!clk.n || now - clk.shown_ms < 500u || (int32_t)(clk.hold_ms - now) > 0)
+        return;
+    clk.shown_ms = now;
+    if (now - clk.last_ms > CLK_LOST_MS) {
+        clk.n = 0;
+        say("CLOCK LOST", 0);
+        return;
+    }
+    if (clk.n < CLK_N) {
+        say("CLOCK", "LISTENING");
+        return;
+    }
+    q = dec1(clk.bpm, a);              /* "120.1 BPM" "JIT 0.8/1.7": the jitter's RMS / largest, ms (the box fits 23) */
+    scopy(q, " BPM");
+    q = scopy(b, "JIT ");
+    q = dec1(clk.jit, q);
+    *q++ = '/';
+    dec1(clk.jmax, q);
+    say(a, b);
+}
+#endif
+
 static void midi_in(void)
 {
-    uint32_t pkt;
-    while (plat_midi_in(&pkt)) {
+    uint32_t pkt, us;
+    while (plat_midi_in(&pkt, &us)) {
         uint32_t st = (pkt >> 8) & 0xFFu, n = (pkt >> 16) & 0x7Fu, v = pkt >> 24;
+        if (st == 0xF8u) {
+            clk_pulse(us);
+            continue;
+        }
+        if (st == 0xFAu || st == 0xFBu || st == 0xFCu) {   /* Start, Continue, Stop: counted (and named, testing) */
+            if (st == 0xFAu)
+                clk.starts++;
+            else if (st == 0xFBu)
+                clk.conts++;
+            else
+                clk.stops++;
+#ifdef OM_CLOCK_TEST
+            say("CLOCK", st == 0xFAu ? "START" : st == 0xFBu ? "CONTINUE" : "STOP");
+            clk.hold_ms = plat_ms() + 1000u;
+#endif
+            continue;
+        }
         if ((st == 0x90u || st == 0x91u) && v) {
             int g = (int)(st & 1u), c = (int)n * 100;
             if (g == 1 && proj.par[P_PLINK])
@@ -1334,6 +1423,9 @@ static void input(void)
         ui.act_t = plat_ms();
     loop_run();
     midi_in();
+#ifdef OM_CLOCK_TEST
+    clk_show();
+#endif
     if ((e = plat_enc(EN_SELECT)) != 0)              /* SELECT: the LFO rate */
         global_turn(EN_SELECT, P_LFO_RATE, "LFO RATE", e);
     if ((e = plat_enc(EN_ALGO)) != 0)                /* ALGORITHM: the Movement, every LFO depth 0 .. 200 % */

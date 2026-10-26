@@ -46,6 +46,7 @@ static inline int32_t clamp(int32_t v, int32_t lo, int32_t hi) { return v < lo ?
 #ifndef FELUCCA_ID
 #define FELUCCA_ID "FM-1_800"     /* package identity (tools/build.py) */
 #endif
+#define MQ_NOW_US() (fm1_ticks() / FM1_TICKS_PER_US)   /* a MIDI packet's time, us (the clock's) */
 #include "usb.c"
 #ifndef OM_TRS
 #define OM_TRS 1                  /* MIDI IN on the TRS jack */
