@@ -19,7 +19,7 @@
  *   Clean      bright, no wow (just tuning stays still)
  *   Grain      Tape whose time its own sound shakes (~280 Hz and under, 60 samples a unit): grainy, metallic
  *              echoes, wilder as they ring (v0.3, the Lyra-8's SELF)
- *   Self       Tape whose time its own loudness stretches (followed at ~10 Hz, against its slow mean): loud
+ *   Self       Tape whose time its own loudness stretches (followed at ~3 Hz, against its slow mean): loud
  *              echoes sag and wobble, a runaway lurches (v0.3)
  *
  * DRIVE (v0.3, after the Lyra-8, whose distortion comes after its delay): the drones and their repeats into one soft
@@ -142,7 +142,7 @@ static void rt_snap(void)                /* at the route at once (a load, at res
     for (q = 0; q < DR_NROUTE; q++)
         rt_w[q] = q == ((unsigned)par[P_DLY_ROUTE] < DR_NROUTE ? par[P_DLY_ROUTE] : 0) ? 1.0f : 0.0f;
 }
-static float self_s, self_e, self_e2, self_es;    /* Grain's sound (~280 Hz); Self's loudness (~10 Hz) and its mean (~0.2 Hz) */
+static float self_s, self_e, self_e2, self_es;    /* Grain's sound (~280 Hz); Self's loudness (~3 Hz) and its mean (~0.2 Hz) */
 
 static float dly_ms(int v) { return 70.0f * fm_exp2f((float)v * 0.026845f); }   /* 70 * (450/70)^(v/100) */
 
@@ -592,9 +592,13 @@ static void fx_run(float *l, float *r, uint32_t n)
             /* GRAIN, SELF: its own echoes move its time. What they follow runs whatever the type (Evan, 2026-10-25:
              * switched to Self, it lurched for a second, its loudness's mean starting from where it was left) */
             self_s += (dly_olp[0] - self_s) * 0.04f;
-            self_e += (fm_fabsf(dly_olp[0]) - self_e) * 0.0015f;   /* two stages, ~10 Hz: one let the level's */
-            self_e2 += (self_e - self_e2) * 0.0015f;               /* ripple (twice the pitch) through, and Self */
-            self_es += (self_e2 - self_es) * 0.00003f;              /* shook its time at audio rate: FM, +2-9 dB */
+            self_e += (fm_fabsf(dly_olp[0]) - self_e) * 0.000427f;  /* two stages, ~3 Hz (Evan, 2026-10-26, by ear):
+                                                                     * one at 10 Hz let the level's ripple (twice the
+                                                                     * pitch) through, FM, +2-9 dB; two at 10 Hz still
+                                                                     * warbled +-380 c with high repeats, the echoes'
+                                                                     * beating in their level; at 3 Hz +-77 c */
+            self_e2 += (self_e - self_e2) * 0.000427f;
+            self_es += (self_e2 - self_es) * 0.00003f;
             if (dly_ga != pa->grain)
                 dly_ga = dly_ga < pa->grain ? fm_minf(dly_ga + pa->grain * DLY_MSTEP, pa->grain)
                                             : fm_maxf(dly_ga - DLY_TYPE[DT_GRAIN].grain * DLY_MSTEP, pa->grain);
