@@ -29,6 +29,8 @@ static int plat_analog_led_ok(uint32_t col, uint32_t rowbit);
 #include "gfx.c"
 
 static volatile uint32_t fm1_ms;  /* milliseconds since boot (TIMER4-based, TIMER5 ISR) */
+static volatile uint32_t fm1_us, fm1_us_t;   /* microseconds since boot, kept the same way, and the tick they were at
+                                              * (the timer wraps every 179 s: its ticks / 24 can't be used across it) */
 #define RING_PUBLISH() __asm__ volatile("" ::: "memory")
 static inline int32_t clamp(int32_t v, int32_t lo, int32_t hi) { return v < lo ? lo : v > hi ? hi : v; }
 
@@ -46,7 +48,7 @@ static inline int32_t clamp(int32_t v, int32_t lo, int32_t hi) { return v < lo ?
 #ifndef FELUCCA_ID
 #define FELUCCA_ID "FM-1_800"     /* package identity (tools/build.py) */
 #endif
-#define MQ_NOW_US() (fm1_ticks() / FM1_TICKS_PER_US)   /* a MIDI packet's time, us (the clock's) */
+#define MQ_NOW_US() (fm1_us + (fm1_ticks() - fm1_us_t) / FM1_TICKS_PER_US)   /* a MIDI packet's time, us (the clock's) */
 #include "usb.c"
 #ifndef OM_TRS
 #define OM_TRS 1                  /* MIDI IN on the TRS jack */

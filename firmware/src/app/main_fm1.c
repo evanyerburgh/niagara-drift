@@ -115,10 +115,14 @@ void fm1_timer5_irq(void)
     if (++sub == 10u)
         sub = 0;
     {
-        static uint32_t last, acc;
+        static uint32_t last, acc, uacc;
         uint32_t now = fm1_ticks();
         acc += now - last;
+        uacc += now - last;
         last = now;
+        fm1_us += uacc / FM1_TICKS_PER_US;      /* the microseconds, from the same ticks (MQ_NOW_US) */
+        uacc %= FM1_TICKS_PER_US;
+        fm1_us_t = now - uacc;
         while (acc >= 1000u * FM1_TICKS_PER_US) {
             acc -= 1000u * FM1_TICKS_PER_US;
             fm1_ms++;
