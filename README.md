@@ -312,7 +312,8 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
   **Grain** (Tape whose time its own echoes shake: grainy, metallic, wilder as they ring), **Self** (Tape whose
   time stretches as its echoes get louder: loud echoes sag and wobble, and a runaway lurches). Changing type
   crossfades the echoes, without bending their pitch. The type knobs go round both ways: past Self comes Clean.
-- **Time** is 70–450 ms, and turning it bends the echoes' pitch, as tape does. **Repeats** past about 85 runs
+- **Time** is 70 ms to 1.46 s, and turning it bends the echoes' pitch, as tape does. The echoes keep what's under
+  about 9 kHz. **Repeats** past about 85 runs
   away into self-oscillation ("runaway" on the screen), held by a soft clip.
 - **Reverb types**: **Room**, **Hall**, **Cathedral** (the largest), **Chorus hall** (a hall that shimmers).
   They differ in size, distance and movement; changing type crossfades, and the knob goes round both ways.

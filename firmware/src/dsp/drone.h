@@ -89,7 +89,8 @@ enum {
     P_PULSE_SHAPE,                  /* -100..100: 0 a smooth swell; up to 100 firmer, a hard gate at the top; down to
                                      * -100 a ramp, rising slowly and falling quickly (a user's ask, 2026-10-25) */
     P_PULSE_SWING,                  /* 0..50: every other pulse longer (50: 3 to 1) */
-    P_DLY_TIME,                     /* the DELAY: 0..100 = 70 .. 450 ms (exponential) */
+    P_DLY_TIME,                     /* the DELAY: 70 ms * (450/70)^(v/100): 0..100 70 .. 450 ms as since 0.1, on to
+                                     * DR_DLY_TMAX, 1.46 s (2026-10-25: the line at half rate) */
     P_DLY_REPEATS,                  /* 0..100: its feedback; past ~85 it runs away (held by a soft clip) */
     P_DLY_MIX,                      /* 0..100: dry .. wet */
     P_REV_MIX,                      /* the REVERB: 0..100, dry .. wet */
@@ -167,6 +168,7 @@ extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
 #define DR_PITCH_HI 9135                       /* 1.6 kHz */
 #define DR_NREV 4
 extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
+#define DR_DLY_TMAX 163                                   /* the delay's longest Time: 1455 ms */
 #define DR_NROUTE 3
 extern const char *const DR_ROUTE_NAME[DR_NROUTE];      /* "Both", "Echoes", "Drones" */
 #define DR_NDLY 6

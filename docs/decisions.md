@@ -384,3 +384,12 @@ at the end. The current state is in the [README](../README.md) and the code.
   crossfades over 50 ms. **Swell Shape** -100..100: over 0 as before (saved values unchanged), under 0 a ramp, the rise
   taking up to 97 % of each breath, the fall at least 20 ms. **Every knob of named choices goes round** (the types, Into
   reverb, Wander's scale; not a list ordered by size, such as Partner's interval).
+- 2026-10-25 (Evan, on the FM-1: "Self is much stronger than the others"; 3 Hz picked by ear 2026-10-26): **Self**
+  follows its loudness through two ~3 Hz stages (one let the level's ripple, at twice the pitch, shake its time at audio rate: FM, its echoes 2-9 dB over
+  Tape's; at 10 Hz, two stages still warbled +-380 c with high repeats; at 3 Hz +-77 c, +0.6..+2.9 dB of Tape), and **Grain's and Self's moves of the time ease in and out over a second** on a type
+  change (their followers run whatever the type). The Types page drops the reverb types' descriptions.
+- 2026-10-25 (Evan, from a player's ask; picked ~1.5 s over 590 ms free or 2 s+ later): the **delay line at half rate**:
+  the loop at the full rate, its writes down through the reverb's half-band (flat to 9.5 kHz), read back with an
+  8-tap windowed sinc (Kaiser, 128 phases); the line 40960 half-rate samples a side (1.86 s, +32 KB of the pool).
+  **Time** runs on the same curve past 100 to 163 (1455 ms), so saved times are unchanged. Presets within 1 dB; the
+  echoes lose what's over ~9 kHz. Cost +143 host instructions a sample (worst case 2,555 with Self's fix, was 2,384).
