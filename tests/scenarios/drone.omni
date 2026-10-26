@@ -688,3 +688,13 @@ expect par81 5
 spin K4 1
 expect par81 0
 tap HOME
+# CROSS-MOD (black key 11) goes round: off, cutoff, pitch (cross-FM, v0.3), off
+expect par42 0
+tapkey b10
+expect par42 1
+tapkey b10
+expect par42 2
+wait 300
+shot xfm-mods.png
+tapkey b10
+expect par42 0

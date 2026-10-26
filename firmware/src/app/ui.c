@@ -26,13 +26,12 @@
  * Black keys, lit when on (or on the second choice), following the page:
  *   F#3 G#3 A#3   C#4 D#4   F#4 G#4 A#4   C#5 D#5   F#5. Normally, by meaning: drone I (Partner, Sub
  *   (round: -1, -2 oct, 1/3, 1/5, -3, -4 oct), Filter (round: LP, BP, HP)) | global (Pitch lock, LFO reset) | drone II
- *   (the same) | links (Pitch link, Hard sync) | Cross-mod. On the LFO page: Osc wave, Osc LFO -> X-Wave, Filter LFO -> Reso | Filter wave,
+ * *   (the same) | links (Pitch link, Hard sync) | Cross-mod (round: off, cutoff, pitch). On the LFO page: Osc wave, Osc LFO -> X-Wave, Filter LFO -> Reso | Filter wave,
  *   LFO reset | Osc wave, Osc LFO -> X-Wave, Filter LFO -> Reso | Filter wave, Delay wave | Cross-mod. A
  *   wave key goes round I, II, I+II (lit for II, winking for both). LFO reset (either layer): a tap restarts
  *   the LFO; held half a second, it locks the LFO to the Pulse's bars (restarting each bar; lit while
  *   locked), held again, free.
- * ARP            tap: the SWELL on / off (lit, in time); hold: its page (Rate, Depth, Shape, Swing); two
- *                quick taps: its page, to stay
+ * ARP            tap: the SWELL page; tapped on it, the Swell on / off (lit, in time); hold: a peek
  * REC            the MOTION LOOP: tap to record what the knobs do, tap again to loop it from the start,
  *                tap again to stop (everything stays where it is); up to 5 minutes (lit: blinking recording,
  *                steady looping)
@@ -419,7 +418,7 @@ static int sw_get(sw_t w)                              /* 1: lit (on, or the sec
     case S_FTAP: return tap_lit(p[GP_FLFO]);
     case S_PLINK: return proj.par[P_PLINK] != 0;
     case S_SYNC: return proj.par[P_SYNC] != 0;
-    case S_XMOD: return proj.par[P_XMOD] != 0;
+    case S_XMOD: return proj.par[P_XMOD] == DR_XMOD_FM ? 2 : proj.par[P_XMOD] != 0;   /* cutoff lit, pitch winking */
     case S_DTAP: return tap_lit(proj.par[P_DLY_LFO]);
     default: return 0;
     }
@@ -475,7 +474,14 @@ static void sw_flip(sw_t w)
     case S_FTAP: param_set(tp, nx); what = "FILTER LFO"; st = WAVES[nx]; break;
     case S_PLINK: link_set(on); q = a; what = "PITCH LINK"; st = on ? "ON" : "OFF"; break;
     case S_SYNC: param_set(P_SYNC, on); q = a; what = "HARD SYNC"; st = on ? "ON" : "OFF"; break;
-    case S_XMOD: param_set(P_XMOD, on); q = a; what = "I > II CUTOFF"; st = on ? "ON" : "OFF"; break;
+    case S_XMOD: {                             /* round: off, cutoff, pitch (v0.3: cross-FM) */
+        int m = (proj.par[P_XMOD] + 1) % (DR_XMOD_FM + 1);
+        param_set(P_XMOD, m);
+        q = a;
+        what = "CROSS-MOD";
+        st = m == DR_XMOD_FM ? "PITCH I <> II" : m ? "I > II CUTOFF" : "OFF";
+        break;
+    }
     case S_LFORESET: dr_lfo_reset(); q = a; what = "LFO"; st = "RESET"; break;
     case S_DTAP: param_set(tp, nx); q = a; what = "DELAY LFO"; st = WAVES[nx]; break;
     default: return;
@@ -1951,7 +1957,7 @@ static void pic_lfo2(int32_t y0)
     cv_rect(118, y0 + 68, 1, PAN_H - 72, K_GRID);
     /* --- cross-mod (bottom left): drone II's filter moving with drone I's sound --- */
     {
-        int on = proj.par[P_XMOD] != 0;
+        int on = proj.par[P_XMOD] == DR_XMOD_CUT;
         float a = (float)proj.par[P_XMOD_AMT] * 0.01f, cut = dr_cut[1], k = 12.0f * a * a / 0.0981378f;
         float sft = on ? dr_scope[0][(ui.frame * 7u) % DR_SCOPE_N] * k : 0.0f;
         if (on && a > 0.0f) {                  /* the range drone I's sound pushes it through (a band that widens
@@ -1965,8 +1971,19 @@ static void pic_lfo2(int32_t y0)
             draw_filter(1, cut + mn * k, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
             draw_filter(1, cut + mx * k, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
         }
-        draw_filter(1, cut + sft, 14, y0 + 86, 96, 36, on ? K_DRONE[1] : K_FAINT);
-        cv_text(12, y0 + 66, &FONT_S, on ? "I > II cut" : "x-mod off", on ? K_DRONE[1] : K_DIM);
+        if (proj.par[P_XMOD] == DR_XMOD_FM) {  /* CROSS-FM: the two drones' waves, each bent by the other */
+            int g, n;
+            for (g = 0; g < 2; g++) {
+                int16_t y[48];
+                for (n = 0; n < 48; n++)
+                    y[n] = (int16_t)(y0 + 96 + g * 22 - (int32_t)(fm_clampf(dr_scope[g][n * DR_SCOPE_N / 48], -1.0f, 1.0f) * 18.0f));
+                plot(14, 2, y, 48, a > 0.0f ? K_DRONE[g] : K_FAINT);
+            }
+            cv_text(12, y0 + 66, &FONT_S, "I <> II pitch", K_TEXT2);
+        } else {
+            draw_filter(1, cut + sft, 14, y0 + 86, 96, 36, on ? K_DRONE[1] : K_FAINT);
+            cv_text(12, y0 + 66, &FONT_S, on ? "I > II cut" : "x-mod off", on ? K_DRONE[1] : K_DIM);
+        }
     }
     /* --- the delay's time on its LFO (bottom right) --- */
     {
@@ -2226,7 +2243,7 @@ static void sw_text(sw_t w, const char **name, const char **st)
     case S_LFORESET: *name = "LFO reset"; *st = proj.par[P_LFO_LOCK] ? "locked" : "tap"; break;
     case S_PLINK: *name = "Pitch link"; break;
     case S_SYNC: *name = "Hard sync"; break;
-    case S_XMOD: *name = "X-mod"; break;
+    case S_XMOD: *name = "X-mod"; *st = proj.par[P_XMOD] == DR_XMOD_FM ? "pitch" : on ? "cutoff" : "off"; break;
     case S_OTAP: *name = "Osc LFO"; *st = TAP[(unsigned)p[GP_OLFO] & 3u]; break;
     case S_ODEST: *name = "Osc to"; *st = on ? "X-Wave" : "Pitch"; break;
     case S_FDEST: *name = "Filt to"; *st = on ? "Reso" : "Cutoff"; break;

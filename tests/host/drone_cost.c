@@ -147,6 +147,11 @@ int main(void)
     ipc = cost(dr_render, &ns);
     report("worst case: + feedback, character, drift, macros, drive", ipc, ns, 0);
 
+    drone(1, 2, 2);
+    dr_set(P_XMOD, DR_XMOD_FM);                   /* the same, Cross-mod on pitch: cross-FM (v0.3) */
+    ipc = cost(dr_render, &ns);
+    report("the same, Cross-mod on pitch (cross-FM)", ipc, ns, 0);
+
     printf(bad ? "drone cost: OVER LIMIT\n" : "drone cost: ok\n");
     return bad ? 1 : 0;
 }

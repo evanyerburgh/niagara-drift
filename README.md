@@ -14,7 +14,7 @@ note. It's inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the S
 
 *Your FM-1 with Niagara Drift installed: what each knob, button and key now does. Amber is drone I,
 teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO pages they set the
-LFO's routing, and X-mod lets drone I move drone II's filter); the lower 12 white keys hold scenes, in
+LFO's routing, and X-mod lets drone I move drone II's filter, or each drone bend the other's pitch); the lower 12 white keys hold scenes, in
 banks you pick with SEL and the top four.*
 
 **Status: 0.2.** It runs on the FM-1 (tested on one unit so far) and in the browser:
@@ -34,7 +34,8 @@ banks you pick with SEL and the top four.*
   partner oscillator at an interval (tempered or just) with detune, a sub one to four octaves down
   (the lowest two click under a low drone) or a subharmonic (⅓, ⅕ of the pitch), and a white or pink noise, into its own self-oscillating
   filter (low-, band- or high-pass) with drive. Pitch is free between notes, from 2 Hz to 1.6 kHz.
-- **Links** between them: pitch link, hard sync, and drone I's sound moving drone II's cutoff.
+- **Links** between them: pitch link, hard sync, and cross-mod: drone I's sound moving drone II's cutoff, or each
+  drone's sound bending the other's pitch (cross-FM, as on the Lyra-8).
 - **The Ultra LFO**, after the DS-2's: one rate, two waves of ten shapes each (one of them truly
   random, two the Lyra-8's stepped AND and OR), routed to each drone's pitch or X-WAVE and cutoff or resonance, alone or summed. It can
   move its own rate and lock to the Swell.
@@ -270,7 +271,9 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **Mods**, the LFO moving other things, and cross-mod's amount:
   - **Rate mod**: the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
   - **Mod by**: which wave does that (I, II or both).
-  - **X-mod amt**: how much drone I's sound moves drone II's filter, while the cross-mod switch (black key 11) is on.
+  - **X-mod amt**: how deep cross-mod goes (black key 11): how much drone I's sound moves drone II's filter, or how
+    far each drone's sound bends the other's pitch. A little roughens and thickens the two; a lot turns them into one
+    tangled, metallic, restless sound. Their pitches stay where you set them: the bending is around them.
   - **Dly LFO**: how far the LFO wobbles the delay's time (up to ±25%; negative the other way), on the wave black
     key 10 picks on the LFO pages. You hear it only with some delay mix (FX, the Delay page).
   - Movement (ALGORITHM) scales the delay's wobble too, as it does the LFO depths; not Rate mod or X-mod (see
@@ -369,7 +372,7 @@ and slowly, so Movement is heard at once; set an osc depth to hear it move the p
 | Movement scales | Movement leaves alone |
 |---|---|
 | **LFO depths**: all four knobs (each drone's osc depth and filter depth) | **Mods: Rate mod** (how much the LFO speeds itself up) |
-| **Mods: Dly LFO** (the delay's wobble) | **Mods: X-mod amt** (drone I moving drone II's filter: that's sound, not the LFO) |
+| **Mods: Dly LFO** (the delay's wobble) | **Mods: X-mod amt** (the drones moving each other: that's sound, not the LFO) |
 | | the LFO's rate, its shapes, and where the waves go (the black keys on the LFO pages) |
  Turning a
 depth that can't be heard says why on the screen (Movement at 0%, or its wave off).
@@ -399,7 +402,7 @@ key.
 | 8 | II filter: LP, BP, HP | II filter LFO → resonance |
 | 9 | pitch link (II follows I) | II filter wave (I, II, both) |
 | 10 | hard sync (II to I) | delay wave (I, II, both) |
-| 11 | I → II cutoff | I → II cutoff |
+| 11 | cross-mod: off, I → II cutoff (lit), pitch I ↔ II (winking) | the same |
 
 - A **wave key** goes round with each tap: Wave I (dark), Wave II (lit), both (winking).
 - **LFO reset:** tap to restart the LFO. Hold it half a second to lock the LFO to the Swell (it then

@@ -68,7 +68,8 @@ enum {
 
 /* global parameters, after the drones' */
 enum {
-    P_XMOD = DR_NGROUPS * GP_N,     /* drone I -> drone II's cutoff on (1) / off (0): a switch */
+    P_XMOD = DR_NGROUPS * GP_N,     /* CROSS-MOD: 0 off, 1 drone I moves drone II's cutoff, 2 (v0.3) cross-FM: each drone's
+                                     * sound moves the other's pitch (DR_XMOD_*); X-mod amt the depth of either */
     P_XMOD_AMT,                     /* 0..100: how far drone I's sound moves drone II's cutoff */
     P_SYNC,                         /* drone II's oscillator hard-synced to drone I's (1) / free (0): a switch */
     P_PLINK,                        /* drone II's pitch linked to drone I's (1) / its own (0): a switch */
@@ -169,6 +170,8 @@ extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
 #define DR_NREV 4
 extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
 #define DR_DLY_TMAX 163                                   /* the delay's longest Time: 1455 ms */
+#define DR_XMOD_CUT 1
+#define DR_XMOD_FM 2
 #define DR_NROUTE 3
 extern const char *const DR_ROUTE_NAME[DR_NROUTE];      /* "Both", "Echoes", "Drones" */
 #define DR_NDLY 6

@@ -448,7 +448,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="g-grp both"><span><span class="sr">Key 4: </span>Pitch lock<small>on at start</small></span><span><span class="sr">Key 5: </span>LFO reset<small>hold: lock</small></span></div>
       <div class="g-grp d2" data-label="Drone II"><span><span class="sr">Key 6: </span>Partner<small>on · off</small></span><span><span class="sr">Key 7: </span>Sub<small>−1 −2 ⅓ ⅕ −3 −4</small></span><span><span class="sr">Key 8: </span>Filter<small>LP BP HP</small></span></div>
       <div class="g-grp both"><span><span class="sr">Key 9: </span>Pitch link<small>II follows I</small></span><span><span class="sr">Key 10: </span>Hard sync</span></div>
-      <div class="g-grp both"><span><span class="sr">Key 11: </span>I → II<small>cutoff</small></span></div>
+      <div class="g-grp both"><span><span class="sr">Key 11: </span>Cross-mod<small>off · cutoff · pitch</small></span></div>
       </div>
       <h4 class="lfo">On LFO pages <span class="h4note">· in lilac, I and II are the LFO’s two waves</span></h4>
       <div class="krow">
@@ -456,7 +456,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="g-grp both"><span class="d1"><span class="sr">Key 4: </span>Filter wave<small class="w">I · II · both</small></span><span><span class="sr">Key 5: </span>LFO reset</span></div>
       <div class="g-grp d2" data-label="Drone II"><span><span class="sr">Key 6: </span>Osc wave<small class="w">I · II · both</small></span><span><span class="sr">Key 7: </span>Osc to<small>pitch · X‑Wave</small></span><span><span class="sr">Key 8: </span>Filter to<small>cutoff · reso</small></span></div>
       <div class="g-grp both"><span class="d2"><span class="sr">Key 9: </span>Filter wave<small class="w">I · II · both</small></span><span><span class="sr">Key 10: </span>Delay wave<small class="w">I · II · both</small></span></div>
-      <div class="g-grp both"><span><span class="sr">Key 11: </span>I → II<small>cutoff</small></span></div>
+      <div class="g-grp both"><span><span class="sr">Key 11: </span>Cross-mod<small>off · cutoff · pitch</small></span></div>
       </div>
     </div>
   </div>
@@ -471,7 +471,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
         <div class="g-btn">LFO</div>
         <div class="pstack">
         <div class="g-page drones"><i>LFO depths</i><b class="dl d1">Drone I</b><span class="k d1"><span class="sr">Knob 1, drone I: </span>Osc depth</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Filt depth</span><b class="dl d2">Drone II</b><span class="k d2"><span class="sr">Knob 3, drone II: </span>Osc depth</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Filt depth</span></div>
-        <div class="g-page"><i>Mods</i><span class="k both"><span class="sr">Knob 1: </span>Rate mod<small>LFO speed</small></span><span class="k both"><span class="sr">Knob 2: </span>Mod by<small>which wave</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>X-mod amt<small>I → II</small></span><span class="k both"><span class="sr">Knob 4: </span>Dly LFO<small>LFO on delay time</small></span></div>
+        <div class="g-page"><i>Mods</i><span class="k both"><span class="sr">Knob 1: </span>Rate mod<small>LFO speed</small></span><span class="k both"><span class="sr">Knob 2: </span>Mod by<small>which wave</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>X-mod amt<small>how deep</small></span><span class="k both"><span class="sr">Knob 4: </span>Dly LFO<small>LFO on delay time</small></span></div>
         <p class="pnote">Depths: the middle is none; either side moves the opposite way</p>
         </div>
       </div>
@@ -757,7 +757,7 @@ const BLACK_TIP = [["drone I's partner on / off", "drone I's osc wave: I, II, bo
   ["drone II's filter: LP, BP, HP", "drone II's filter LFO to resonance (instead of cutoff)"],
   ["pitch link: drone II follows drone I (KNOB 3 sets the gap)", "drone II's filter wave: I, II, both"],
   ["hard sync: drone II to drone I", "the delay's LFO wave: I, II, both"],
-  ["I → II cutoff: drone I's sound moves drone II's filter", "I → II cutoff: drone I's sound moves drone II's filter"]];
+  ["Cross-mod, round: off, drone I's sound moves drone II's filter (lit), each drone bends the other's pitch (winking)", "Cross-mod, round: off, drone I's sound moves drone II's filter (lit), each drone bends the other's pitch (winking)"]];
 BLACK_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", `Key ${k + 1} (${"1234567890-"[k]}): ${BLACK_TIP[k][0]}` +
   (BLACK_TIP[k][1] !== BLACK_TIP[k][0] ? `; on the LFO pages: ${BLACK_TIP[k][1]}` : "")));
 WHITE_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", k < 12
