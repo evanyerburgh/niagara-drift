@@ -3,6 +3,7 @@
  * Part of the unity build (main.c), after the HAL, usb.c, storage.c and panel.c. */
 
 uint32_t plat_ms(void) { return fm1_ms; }
+uint32_t plat_us(void) { return MQ_NOW_US(); }
 
 uint32_t plat_buttons(void)
 {

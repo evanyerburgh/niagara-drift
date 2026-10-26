@@ -406,3 +406,11 @@ at the end. The current state is in the [README](../README.md) and the code.
   **Snarl** is Cross-mod's fourth choice (P_XMOD 3, winking): the finished sound, fb_d samples ago, bends both drones'
   speed as cross-FM does (lows out, soft-limited, mean out after), its level made up to P1's (0.22, x8 at most); X-mod
   amt the depth (9.8 at the top). Worst case 2,660 host instructions a sample (cross-FM), Snarl 2,654.
+- 2026-10-26 (0.3 step 3; Evan's answers after a clock test from Logic: 0.2-0.4 ms jitter with the drone stopped, ~1.5
+  ms at 78 % load): **MIDI clock in** (USB, TRS) moves the Swell. Each packet stamped as it comes in (us, kept by the
+  10 kHz tick); the tempo a straight line through the last 48 pulses, shown in whole BPM moving past 0.6. With a clock,
+  the Swell's KNOB 1 is **Division** (P_PULSE_DIV, PROJ_FORMAT 34: 32 bars .. 1/4 a breath, 8 bars to start); its
+  speed the clock's tempo, its place steered 2 % a block toward the beat counted from the pulses (no drift: within 1.3 %
+  of a quarter-note breath over 10 minutes of +-4 ms jitter); scenes keep it in time; Start back to the top; stopped,
+  it carries on at the last tempo. The locked LFO follows the Swell's bars. A test build (OM_CLOCK_TEST) shows the
+  tempo and jitter; tools/fm1_clock.py reads them over USB (SysEx 0x7C).

@@ -25,6 +25,7 @@ enum { EN_SELECT, EN_ALGO, EN_PRESET, EN_K1, EN_K2, EN_K3, EN_K4, NE };
 #define NKEYS 27                       /* F3 .. G5 */
 
 uint32_t plat_ms(void);
+uint32_t plat_us(void);                 /* microseconds, as MIDI packets are stamped (v0.3: the clock) */
 uint32_t plat_buttons(void);           /* held: bit B_* */
 uint32_t plat_keys(void);              /* held: bit k = key k (0 = F3) */
 int32_t plat_enc(int role);            /* detents since the last call, + = clockwise; EN_* */

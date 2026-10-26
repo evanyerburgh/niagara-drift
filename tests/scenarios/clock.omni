@@ -19,15 +19,34 @@ expect clkbpm <905
 expect clkjit >700
 expect clkjit <1700
 expect clkmax <2100
-# Start, Continue, Stop counted
+# Start, Continue, Stop counted (each clock command above sent a Start first: 3, and this one)
 midi FA 0 0
 midi FB 0 0
 midi FC 0 0
 wait 50
-expect clkstarts 111
+expect clkstarts 411
 # the clock gone, then back at 140: lost, and a fresh tempo
 clock 0
 wait 1000
 clock 140
 wait 1500
 expect clkbpm 1400
+# THE SWELL ON THE CLOCK: a breath a quarter note (the Division, 100 = 7; the hardest), a clock 2 minutes long, each
+# pulse up to 4 ms off: the Swell stays on the beat (swerr: its error in thousandths of a breath), it doesn't drift
+set 55 1
+set 100 7
+clock 120 4
+wait 5000
+expect swerr <30
+wait 55000
+expect swerr <30
+wait 60000
+expect swerr <30
+# the clock stops: the Swell carries on at the last tempo, and a Start (a new clock) puts it at the top
+clock 0
+wait 3000
+expect clkbpm >1195
+expect clkbpm <1205
+clock 100
+wait 3000
+expect swerr <30

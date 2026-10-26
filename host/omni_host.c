@@ -62,6 +62,7 @@ static int32_t enc_acc[NE];
 static uint32_t lit_btn, lit_keys;
 
 uint32_t plat_ms(void) { return now_ms; }
+uint32_t plat_us(void) { return now_ms * 1000u; }
 uint32_t plat_buttons(void) { return held_btn; }
 #ifdef OM_WEB
 static int phones = 1;                     /* the browser: a computer's output, no speaker cut */
@@ -103,6 +104,7 @@ void plat_leds(const uint8_t *b, const uint8_t *k)
 #define MQ 256
 static uint32_t min_q[MQ], min_t[MQ], mi_w, mi_r;
 static double clk_bpm, clk_jit, clk_next_us;      /* the "clock" command: pulses at this tempo, jittered (ms) */
+static double clk_true_beat;                      /* ... the true beat (no jitter), from the first pulse after a start */
 static FILE *midi_log;
 static uint32_t midi_out_count, clock_out_count;
 int plat_midi_in(uint32_t *pkt, uint32_t *us)
@@ -310,6 +312,7 @@ static void run_ms(uint32_t ms)
             min_t[mi_w % MQ] = (uint32_t)(clk_next_us + j);
             min_q[mi_w++ % MQ] = 0x0F | 0xF8u << 8;
             clk_next_us += 60.0e6 / (clk_bpm * 24.0);
+            clk_true_beat += 1.0 / 24.0;
         }
         while (audio_due_ms <= (double)now_ms) {      /* 256-frame blocks, as the device renders them */
             double t0 = now_ns(), dt;
@@ -404,6 +407,16 @@ static int expect(const char *what, const char *val)
         got = (int)store_writes;
     else if (!strncmp(what, "heard", 5))          /* heardN: parameter N as heard (with the macros) */
         got = dr_heard(atoi(what + 5));
+    else if (!strcmp(what, "swerr")) {            /* the Swell against the true beat (clock command): |error| in
+                                                    * thousandths of a breath */
+        static const double DIVB[DR_NDIV] = {128, 64, 32, 16, 8, 4, 2, 1};   /* drone.c's DIV_BEATS */
+        double beats = DIVB[(unsigned)proj.par[P_PULSE_DIV] < DR_NDIV ? proj.par[P_PULSE_DIV] : 2];
+        double tb = clk_true_beat + ((double)now_ms * 1000.0 - (clk_next_us - 60.0e6 / (clk_bpm * 24.0))) /
+                                        (60.0e6 / clk_bpm);
+        double x = fmod(tb / beats, 2.0), e = (double)dr_pulse_ph - x;
+        e -= e >= 1.0 ? 2.0 : e < -1.0 ? -2.0 : 0.0;
+        got = (int)(fabs(e) * 1000.0 + 0.5);
+    }
     else if (!strcmp(what, "clkbpm"))             /* the MIDI clock in: its tempo x 10 */
         got = (int)(clk.bpm * 10.0f + 0.5f);
     else if (!strcmp(what, "clkjit"))             /* ... its jitter (RMS), us */
@@ -570,6 +583,9 @@ int main(int argc, char **argv)
             clk_bpm = atof(a);
             clk_jit = b[0] ? atof(b) : 0.0;
             clk_next_us = (double)now_ms * 1000.0;
+            clk_true_beat = -1.0 / 24.0;          /* the first pulse: beat 0 */
+            min_t[mi_w % MQ] = now_ms * 1000u;    /* a Start first: the count from the top */
+            min_q[mi_w++ % MQ] = 0x0F | 0xFAu << 8;
         } else if (!strcmp(cmd, "wav")) {
             snprintf(out, sizeof out, "%s/%s", dir, a);
             wav_open(out);

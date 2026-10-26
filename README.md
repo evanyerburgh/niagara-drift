@@ -289,7 +289,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Swell | rate | depth | shape | swing |
+| Swell | rate (on a MIDI clock: division) | depth | shape | swing |
 
 - Tap ARP for this page; tap it again here to start or stop the Swell. The picture shows a bar of it, and a dot where it is.
 - **The Swell** runs from a 33-second breath to a buzz (the starting sound has it on: a slow breath, 40 deep).
@@ -297,6 +297,9 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
   middle, **even** (a smooth breath): to the right it firms up into a pulse, and only at the top into a hard gate; to
   the left it becomes a **ramp**, swelling slowly and falling away quickly, more like a sawtooth the further you go
   ("ramp 100": the rise takes 97 % of each breath; at fast rates the fall stays at least 20 ms, so it doesn't click).
+- **On a MIDI clock** (see MIDI below) the Swell breathes in time: KNOB 1 becomes **Division**, how long a breath
+  lasts, from 32 bars down to a quarter note, and the picture shows it with the tempo ("8 bars · 120"). A locked LFO
+  (black key 5, held) restarts on the Swell's bars, so it follows the clock too.
 
 #### Delay, Reverb and Types · FX
 
@@ -420,6 +423,12 @@ key.
 Over USB or the TRS jack, a note on **channel 1** tunes drone I to it, a note on **channel 2** drone II
 (with Pitch link on, a channel 2 note sets the interval instead). It tunes, even with Pitch lock on; it doesn't start
 or stop the drones.
+
+**MIDI clock** (from a DAW or a drum machine, over USB or the TRS jack) puts the Swell in time: after about two beats
+it locks ("120 BPM · SWELL ON CLOCK"), and its breath follows the clock's beat however long it runs; a wobbly
+clock's tempo is smoothed, and the Swell can't drift from it. **Start** (playing from the top) brings the breath back
+to its top; a scene change keeps it in time. When the clock stops, the Swell carries on at the last tempo ("CLOCK
+STOPPED · KEEPS 120"). In Logic: File → Project Settings → Synchronization → MIDI, tick Clock for the FM-1.
 
 ### Trying it in the browser
 
