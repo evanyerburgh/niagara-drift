@@ -255,8 +255,11 @@ static int knob_param(int i)
     knob_t k = VIEW_KNOB[ui.view][i];
     if (k.g == NONE)
         return -1;
-    if (k.g == G)                      /* the Swell's Rate: its division of the beat while a clock is in (v0.3) */
-        return k.p == P_PULSE_RATE && dr_ext_spb > 0.0f ? P_PULSE_DIV : k.p;
+    if (k.g == G && dr_ext_spb > 0.0f)  /* on a MIDI clock (v0.3): the Swell's Rate its division, the delay's Time a note
+                                         * value, the Scene time bars */
+        return k.p == P_PULSE_RATE ? P_PULSE_DIV : k.p == P_DLY_TIME ? P_DLY_NOTE : k.p == P_SCENE_T ? P_SCENE_BARS : k.p;
+    if (k.g == G)
+        return k.p;
     if (k.g == 1 && k.p == GP_PITCH && proj.par[P_PLINK])
         return P_PLINK_OFF;
     return DR_GP(k.g, k.p);
@@ -720,7 +723,7 @@ static int scene_step(int p)                           /* a value that steps (a 
 static int scene_room(int p)
 {
     return p == P_FADE || p == P_TUNE || p == P_SPEAKER || p == P_WIDTH || p == P_PLOCK || p == P_MORPH ||
-           p == P_SCENE_T || p == P_PRESS_SENS;
+           p == P_SCENE_T || p == P_PRESS_SENS || p == P_SCENE_BARS;
 }
 
 /* a scene's name: its bank's letter and its number ("B5"; the Presets "P2") */
@@ -782,7 +785,20 @@ static void scene_store(int n)                         /* SAVE held + a white ke
 }
 
 static float fade_s(void) { return 0.05f * fm_exp2f((float)proj.par[P_FADE] * 0.102288f); }
-static float scene_s(void) { return 0.1f * fm_exp2f((float)proj.par[P_SCENE_T] * 0.115507f); }
+static float clk_bar_frac(void);
+/* the Scene time, s. On a MIDI clock (v0.3): its bars (P_SCENE_BARS), ending on a bar line: the rest of this bar and
+ * the bars after it (less than half a bar left of this one: a bar more) */
+static float scene_s(void)
+{
+    if (dr_ext_spb > 0.0f) {
+        float bars = (float)DR_BARS_N[(unsigned)proj.par[P_SCENE_BARS] < DR_NBARS ? proj.par[P_SCENE_BARS] : 2] -
+                     clk_bar_frac();
+        if (bars < 0.5f)
+            bars += 1.0f;
+        return bars * 4.0f * dr_ext_spb * (1.0f / DR_SR);
+    }
+    return 0.1f * fm_exp2f((float)proj.par[P_SCENE_T] * 0.115507f);
+}
 
 static void scene_recall(int n)                        /* a white key: morph there over the Scene time */
 {
@@ -831,6 +847,9 @@ static void sound_blend(const int16_t *from, const int16_t *to, float x)
         if (scene_room(k) || hands_has(k))             /* the room's settings aren't a scene's; nor what a
                                                         * hand has moved since the switch began */
             continue;
+        if (dr_ext_spb > 0.0f && (k == P_PULSE || k == P_PULSE_DIV))
+            continue;                                  /* on a MIDI clock the Swell's on / off and its division stay as
+                                                        * they are (Evan, 2026-10-26: a scene switched it off mid-song) */
         if (proj.par[P_PLOCK] && (k == DR_GP(0, GP_PITCH) || k == DR_GP(1, GP_PITCH) || k == P_PLINK_OFF ||
                                   k == P_WANDER || k == P_GL_0 + DR_G_SHIFT))
             continue;                                  /* pitch lock: the drones keep their pitch (2026-10-17) */
@@ -1122,6 +1141,16 @@ static void clk_feed(void)
     dr_ext_seq++;
 }
 int ui_clock_bpm(void) { return clk.shown; }
+static float clk_bar_frac(void)        /* how far into its bar (4 beats) the clock is, 0..1 */
+{
+    float iv, f, b;
+    if (clk.n < CLK_N || clk.bpm < 20.0f)
+        return 0.0f;
+    iv = 60.0e6f / (clk.bpm * 24.0f);
+    f = fm_clampf((float)(plat_us() - clk.t[(clk.n - 1u) % CLK_N]) / iv, 0.0f, 0.999f);
+    b = ((float)((clk.count + 24u * 256u - 1u) % 96u) + f) * (1.0f / 96.0f);
+    return b;
+}
 
 void ui_clock_stats(uint32_t w[8])
 {
@@ -1490,7 +1519,7 @@ static void input(void)
     clk_show();
 #endif
     if ((e = plat_enc(EN_SELECT)) != 0)              /* SELECT: the LFO rate */
-        global_turn(EN_SELECT, P_LFO_RATE, "LFO RATE", e);
+        global_turn(EN_SELECT, dr_ext_spb > 0.0f ? P_LFO_DIV : P_LFO_RATE, dr_ext_spb > 0.0f ? "LFO CYCLE" : "LFO RATE", e);
     if ((e = plat_enc(EN_ALGO)) != 0)                /* ALGORITHM: the Movement, every LFO depth 0 .. 200 % */
         global_turn(EN_ALGO, P_MOVE, "MOVEMENT", e);
     if ((e = plat_enc(EN_PRESET)) != 0)              /* PRESETS: Gesture time, every gesture's speed */
@@ -1602,6 +1631,7 @@ static const char *card_name(int p)
     case P_DLY_TYPE: return "Delay";           /* the Types page: each "Type" */
     case P_REV_TYPE: return "Reverb";
     case P_DLY_ROUTE: return "Into rev";       /* what goes into the reverb */
+    case P_SCENE_BARS: return "Scenes";        /* the Scene time in bars (on a clock) */
     default: break;
     }
     if (p < P_XMOD && p % GP_N == GP_OLFO_DEPTH)
@@ -2071,7 +2101,8 @@ static void pic_lfo(int32_t y0)
     {   /* the rate; locked to the swell, the lock beside it */
         int lk = proj.par[P_LFO_LOCK] != 0;
         int32_t x;
-        dr_param_text(P_LFO_RATE, proj.par[P_LFO_RATE], scopy(t, lk ? (proj.par[P_PULSE] ? "locked " : "lock (no swell) ") : "rate "));
+        dr_param_text(dr_ext_spb > 0.0f ? P_LFO_DIV : P_LFO_RATE, proj.par[dr_ext_spb > 0.0f ? P_LFO_DIV : P_LFO_RATE],
+                      scopy(t, lk ? (proj.par[P_PULSE] ? "locked " : "lock (no swell) ") : dr_ext_spb > 0.0f ? "cycle " : "rate "));
         x = cv_text(LFO_WX0, y0 + PAN_H - 18, &FONT_S, t, lk ? K_PULSE : K_LFO);
         if (proj.par[P_MOVE] != 50) {          /* the Movement (OCT- / OCT+) when it isn't as set */
             dr_param_text(P_MOVE, proj.par[P_MOVE], scopy(t, "move "));
@@ -2245,7 +2276,7 @@ static int32_t echo_shift(int ty, int k)
 static void pic_fx(int32_t y0)
 {
     const int ty = (unsigned)proj.par[P_DLY_TYPE] < DR_NDLY ? proj.par[P_DLY_TYPE] : DR_DLY_TAPE;
-    float ms = 70.0f * fm_exp2f((float)proj.par[P_DLY_TIME] * 0.026845f);
+    float ms = dr_ext_spb > 0.0f && dr_dly_ms > 0.0f ? dr_dly_ms : 70.0f * fm_exp2f((float)proj.par[P_DLY_TIME] * 0.026845f);
     float fb = fm_minf((float)proj.par[P_DLY_REPEATS] * 0.0115f, 1.0f);
     float mix = (float)proj.par[P_DLY_MIX] * 0.01f, wet = mix > 0.0f ? 0.25f + 0.75f * mix : 0.0f;
     int32_t mid = y0 + 72, h = 34, k, side;
@@ -2272,7 +2303,10 @@ static void pic_fx(int32_t y0)
     cv_text(12, y0 + 112, &FONT_S, "R", K_DIM);
     q = scopy(t, DR_DLY_NAME[ty]);
     q = scopy(q, "  ");
-    dr_param_text(P_DLY_TIME, proj.par[P_DLY_TIME], q);
+    if (dr_ext_spb > 0.0f)                     /* on a MIDI clock: its note value ("Tape  1/4") */
+        dr_param_text(P_DLY_NOTE, proj.par[P_DLY_NOTE], q);
+    else
+        dr_param_text(P_DLY_TIME, proj.par[P_DLY_TIME], q);
     cv_text(28, y0 + 3, &FONT_S, t, mix > 0.0f ? K_FX : K_DIM);
     if (proj.par[P_DLY_REPEATS] > 85)
         text_r(222, y0 + 3, "runaway", K_GOLD);
@@ -2509,11 +2543,13 @@ static void pic_setup(int32_t y0)
                              *const W[3] = {"PLAY in, out", "black keys, LFO waves", "between scenes"};
     int r;
     for (r = 0; r < 3; r++) {
-        int32_t y = y0 + 4 + r * 38, w = 76 * proj.par[P[r]] / 100;   /* the bars right of the hints */
+        int bars = r == 2 && dr_ext_spb > 0.0f;   /* on a MIDI clock the Scene time is bars (v0.3) */
+        int p = bars ? P_SCENE_BARS : P[r];
+        int32_t y = y0 + 4 + r * 38, w = bars ? 76 * (proj.par[p] + 1) / DR_NBARS : 76 * proj.par[p] / 100;
         char t[16];
         cv_text(12, y, &FONT_S, N[r], K_SETUP);
         cv_text(12, y + 18, &FONT_XS, W[r], K_DIM);
-        dr_param_text(P[r], proj.par[P[r]], t);
+        dr_param_text(p, proj.par[p], t);
         text_r(222, y, t, K_TEXT2);
         cv_round(146, y + 24, 76, 6, 3, K_GRID);
         if (w > 3)

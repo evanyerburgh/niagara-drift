@@ -141,6 +141,10 @@ enum {
                                      * reverb beside the delay, the echoes dry) */
     P_PULSE_DIV,                    /* the Swell's breath with a MIDI clock in (v0.3, step 3; DR_DIV_NAME): 0 32 bars .. 7 a
                                      * quarter note; without a clock P_PULSE_RATE as before */
+    P_LFO_DIV,                      /* ... the LFO's cycle (DR_LDIV_NAME): 0 32 bars .. 9 a sixteenth (v0.3) */
+    P_DLY_NOTE,                     /* ... the delay's time (DR_NOTE_NAME): 1/16 .. 1 bar (v0.3) */
+    P_SCENE_BARS,                   /* ... the Scene time (DR_BARS_NAME): 1 .. 16 bars, landing on a bar line (a room
+                                     * setting, v0.3) */
     DR_NPARAMS
 };
 
@@ -175,6 +179,14 @@ extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cath
 #define DR_DLY_TMAX 163                                   /* the delay's longest Time: 1455 ms */
 #define DR_NDIV 8
 extern const char *const DR_DIV_NAME[DR_NDIV];          /* "32 bars" .. "1/4" */
+#define DR_NLDIV 10
+extern const char *const DR_LDIV_NAME[DR_NLDIV];        /* "32 bars" .. "1/16" */
+#define DR_NNOTE 11
+extern const char *const DR_NOTE_NAME[DR_NNOTE];        /* "1/16" .. "1 bar" */
+extern const float DR_NOTE_BEATS[DR_NNOTE];
+#define DR_NBARS 5
+extern const char *const DR_BARS_NAME[DR_NBARS];        /* "1 bar" .. "16 bars" */
+extern const uint8_t DR_BARS_N[DR_NBARS];
 /* the MIDI clock in (v0.3), set by the UI: samples a beat (0: none heard yet; kept when it stops), the beat it's at
  * (counted from the clock's pulses), a count bumped with each update, and a Start (the Swell back to its top) */
 extern volatile float dr_ext_spb, dr_ext_beat;

@@ -56,12 +56,38 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"D5 latch", 0, 100, 0}, {"E5 latch", 0, 100, 0}, {"F5 latch", 0, 100, 0}, {"G5 latch", 0, 100, 0},
     {"Type", 0, DR_NDLY - 1, DR_DLY_TAPE}, {"Length", 0, 100, 60}, {"Damp", 0, 100, 40}, {"Pressure", 0, 100, 50},
     {"Drive", 0, 100, 0}, {"Into rev", 0, DR_NROUTE - 1, 0}, {"Division", 0, DR_NDIV - 1, 2},
+    {"LFO div", 0, DR_NLDIV - 1, 3}, {"Dly note", 0, DR_NNOTE - 1, 5}, {"Scene bars", 0, DR_NBARS - 1, 2},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
 const char *const DR_DIV_NAME[DR_NDIV] = {"32 bars", "16 bars", "8 bars", "4 bars", "2 bars", "1 bar", "1/2", "1/4"};
 static const float DIV_BEATS[DR_NDIV] = {128.0f, 64.0f, 32.0f, 16.0f, 8.0f, 4.0f, 2.0f, 1.0f};   /* a breath, beats */
+const char *const DR_LDIV_NAME[DR_NLDIV] = {"32 bars", "16 bars", "8 bars", "4 bars", "2 bars", "1 bar", "1/2", "1/4",
+                                            "1/8", "1/16"};
+static const float LDIV_BEATS[DR_NLDIV] = {128.0f, 64.0f, 32.0f, 16.0f, 8.0f, 4.0f, 2.0f, 1.0f, 0.5f, 0.25f};   /* a cycle */
+const char *const DR_NOTE_NAME[DR_NNOTE] = {"1/16", "1/8T", "1/8", "1/4T", "1/8D", "1/4", "1/2T", "1/4D", "1/2", "1/2D",
+                                            "1 bar"};
+const float DR_NOTE_BEATS[DR_NNOTE] = {0.25f, 1.0f / 3.0f, 0.5f, 2.0f / 3.0f, 0.75f, 1.0f, 4.0f / 3.0f, 1.5f, 2.0f, 3.0f, 4.0f};
+const char *const DR_BARS_NAME[DR_NBARS] = {"1 bar", "2 bars", "4 bars", "8 bars", "16 bars"};
+const uint8_t DR_BARS_N[DR_NBARS] = {1, 2, 4, 8, 16};
 volatile float dr_ext_spb, dr_ext_beat;
 volatile uint32_t dr_ext_seq, dr_ext_start;
+/* the beat now, on a MIDI clock: the UI's last count, carried on by the samples since (ext_n, advanced once a block in
+ * pulse_run; on at the last tempo when the clock stops). 256 beats round (the UI's count's) */
+static uint32_t ext_seq, ext_n;
+static float ext_beat;
+static float ext_beats(void)
+{
+    if (dr_ext_seq != ext_seq) {                         /* a fresh count from the UI */
+        ext_seq = dr_ext_seq;
+        ext_beat = dr_ext_beat;
+        ext_n = 0;
+    } else if (ext_n > (uint32_t)DR_SR) {               /* a second on its own: folded in (the float stays fine) */
+        ext_beat += (float)ext_n / dr_ext_spb;
+        ext_beat -= ext_beat >= 256.0f ? 256.0f : 0.0f;
+        ext_n = 0;
+    }
+    return ext_beat + (float)ext_n / dr_ext_spb;
+}
 const char *const DR_ROUTE_NAME[DR_NROUTE] = {"Both", "Echoes", "Drones"};
 const char *const DR_DLY_NAME[DR_NDLY] = {"Clean", "Wide", "Ping-pong", "Tape", "Grain", "Self"};
 const char *const DR_WSCALE_NAME[DR_NWSCALE] = {"Minor pent", "Major pent", "5ths + 8ves", "Whole tone", "Dorian",
@@ -273,6 +299,12 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_ROUTE_NAME[(unsigned)v < DR_NROUTE ? v : 0]);
     else if (i == P_PULSE_DIV)
         copy_s(b, DR_DIV_NAME[(unsigned)v < DR_NDIV ? v : 2]);
+    else if (i == P_LFO_DIV)
+        copy_s(b, DR_LDIV_NAME[(unsigned)v < DR_NLDIV ? v : 3]);
+    else if (i == P_DLY_NOTE)
+        copy_s(b, DR_NOTE_NAME[(unsigned)v < DR_NNOTE ? v : 5]);
+    else if (i == P_SCENE_BARS)
+        copy_s(b, DR_BARS_NAME[(unsigned)v < DR_NBARS ? v : 2]);
     else if (i == P_PULSE_SHAPE && v <= 0) {     /* "even"; "ramp 40" (the left half) */
         if (v == 0) {
             copy_s(b, "even");
@@ -785,6 +817,21 @@ static void wander_run(uint32_t n)
             wand_n = (uint32_t)((lo + (hi - lo) * mac_rand()) * DR_SR);
     }
     wand_v = base[P_WANDER];
+    {   /* on a MIDI clock (v0.3): a note due waits for the next beat (the next bar, when they're slower than ~6 beats
+         * apart), so the melody lands on the grid, its times still random */
+        static float lb;
+        float bn = dr_ext_spb > 0.0f ? ext_beats() : 0.0f, lo, hi, g;
+        if (dr_ext_spb > 0.0f && a > 0.0f && wand_n <= n) {
+            wander_gap(base[P_WANDER], &lo, &hi);
+            g = 0.5f * (lo + hi) * DR_SR / dr_ext_spb >= 6.0f ? 4.0f : 1.0f;
+            if (fm_floorf(bn / g) == fm_floorf(lb / g)) {
+                lb = bn;
+                wand_n = 0;                      /* due: held till the line */
+                goto glide;
+            }
+        }
+        lb = bn;
+    }
     if (a <= 0.0f) {
         wand_to = 0.0f;
         wand_n = 0;
@@ -809,6 +856,7 @@ static void wander_run(uint32_t n)
     } else {
         wand_n -= n;
     }
+glide:
     gs = (float)par[P_GLIDE] * 0.01f;            /* GLO's Glide: 0..10 s, quadratic (0: a jump) */
     gs = 10.0f * gs * gs;
     if (gs <= 0.0f)
@@ -1235,7 +1283,11 @@ float dr_lfo_rmod_k(float rm, int src, int w1, int w2)
  * don't click */
 static void lfo_run(uint32_t n)
 {
-    const float step = lfo_hz_f(pfs[P_LFO_RATE]) * (float)CR * (1.0f / DR_SR);
+    /* on a MIDI clock (v0.3): a cycle a division of the beat (P_LFO_DIV), steered toward the beat as the Swell is, more
+     * gently (a two-hundredth a block): the rate mod's warp within a cycle is kept */
+    const int ext = dr_ext_spb > 0.0f;
+    const float lbeats = LDIV_BEATS[(unsigned)par[P_LFO_DIV] < DR_NLDIV ? par[P_LFO_DIV] : 3];
+    const float step = ext ? (float)CR / (lbeats * dr_ext_spb) : lfo_hz_f(pfs[P_LFO_RATE]) * (float)CR * (1.0f / DR_SR);
     const int w[2] = {par[P_LFO_W1], par[P_LFO_W2]};
     const float mstep = (float)CR / (morph_s() * DR_SR);
     /* RATE MOD: the LFO's own wave (I, II or both) speeds it up and slows it down within its cycle, as the
@@ -1281,6 +1333,14 @@ static void lfo_run(uint32_t n)
             lfo_rnd[1] = lfo_rnd[2];
             lfo_rnd[2] = rnd_next();
         }
+        lfo_ph = (float)(lfo_q >> 8) * (1.0f / 16777216.0f);
+    }
+    if (ext) {
+        float x = ext_beats() / lbeats, e;
+        x -= fm_floorf(x);
+        e = x - lfo_ph;
+        e -= e >= 0.5f ? 1.0f : e < -0.5f ? -1.0f : 0.0f;
+        lfo_q += (uint32_t)(int32_t)(0.005f * e * 4294967296.0f);
         lfo_ph = (float)(lfo_q >> 8) * (1.0f / 16777216.0f);
     }
     dr_lfo[0] = lfo_s[0];
@@ -1908,21 +1968,9 @@ float dr_pulse_wave(float ph)
  * clock's tempo, its place steered toward the clock's beat (a gentle phase lock, ~0.3 s): it can't drift from the
  * master however its pulses wobble. The beat the UI last counted, carried on by the samples since (and on at the last
  * tempo when the clock stops). A Start: back to the top, at once */
-static uint32_t ext_seq, ext_n;
-static float ext_beat;
 static float ext_target(float beats_a_breath)          /* where the clock says the Swell is, 0..2 (two breaths) */
 {
-    float b, x;
-    if (dr_ext_seq != ext_seq) {                         /* a fresh count from the UI */
-        ext_seq = dr_ext_seq;
-        ext_beat = dr_ext_beat;
-        ext_n = 0;
-    } else if (ext_n > (uint32_t)DR_SR) {               /* a second on its own: folded in (the float stays fine) */
-        ext_beat += (float)ext_n / dr_ext_spb;
-        ext_n = 0;
-    }
-    b = ext_beat + (float)ext_n / dr_ext_spb;
-    x = b / beats_a_breath;
+    float x = ext_beats() / beats_a_breath;
     x -= 2.0f * fm_floorf(x * 0.5f);
     return x;
 }

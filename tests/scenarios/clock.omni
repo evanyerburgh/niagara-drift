@@ -50,3 +50,45 @@ expect clkbpm <1205
 clock 100
 wait 3000
 expect swerr <30
+# on a clock, scenes leave the Swell's on / off and its division alone (Evan, 2026-10-26): P12 (Clean) has the Swell off
+# and 8 bars; tapped, the Swell stays on at a quarter note
+set 71 0
+expect par55 1
+expect par100 7
+tapkey w11
+wait 1000
+expect par55 1
+expect par100 7
+expect swerr <30
+# THE LFO on the clock: SELECT turns its cycle (LFO div, 101; 7 = a quarter note), steered to the beat
+expect par101 3
+spin SELECT 4
+expect par101 7
+wait 4000
+expect lfoerr <30
+# THE DELAY: its time a note value (Dly note, 102): a quarter note at 100 BPM is 600 ms (dlyt: tenths of a ms)
+tap FX
+expect view 13
+expect par102 5
+wait 2000
+expect dlyt >5950
+expect dlyt <6050
+# ... a half note: 1.2 s; a bar (2.4 s) is longer than the line: halved, 1.2 s
+spin K2 3
+expect par102 8
+wait 2000
+expect dlyt >11900
+expect dlyt <12100
+spin K2 2
+expect par102 10
+wait 2000
+expect dlyt >11900
+expect dlyt <12100
+tap HOME
+# SCENE TIME in bars (Scene bars, 103: 2 = 4 bars), landing on a bar line: a scene change lasts the rest of this bar
+# and three more, 3 .. 4 bars at 100 BPM (7.2 .. 9.6 s)
+expect par103 2
+tapkey w0
+wait 100
+expect morphms >7100
+expect morphms <9700

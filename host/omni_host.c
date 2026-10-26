@@ -417,6 +417,18 @@ static int expect(const char *what, const char *val)
         e -= e >= 1.0 ? 2.0 : e < -1.0 ? -2.0 : 0.0;
         got = (int)(fabs(e) * 1000.0 + 0.5);
     }
+    else if (!strcmp(what, "lfoerr")) {           /* the LFO against the true beat (clock command): |error| in
+                                                    * thousandths of a cycle */
+        static const double LD[DR_NLDIV] = {128, 64, 32, 16, 8, 4, 2, 1, 0.5, 0.25};   /* drone.c's LDIV_BEATS */
+        double beats = LD[(unsigned)proj.par[P_LFO_DIV] < DR_NLDIV ? proj.par[P_LFO_DIV] : 3];
+        double tb = clk_true_beat + ((double)now_ms * 1000.0 - (clk_next_us - 60.0e6 / (clk_bpm * 24.0))) /
+                                        (60.0e6 / clk_bpm);
+        double x = fmod(tb / beats, 1.0), e = (double)dr_lfo_ph - x;
+        e -= e >= 0.5 ? 1.0 : e < -0.5 ? -1.0 : 0.0;
+        got = (int)(fabs(e) * 1000.0 + 0.5);
+    }
+    else if (!strcmp(what, "morphms"))            /* the scene change going on: its length, ms */
+        got = (int)ui.morph_ms;
     else if (!strcmp(what, "clkbpm"))             /* the MIDI clock in: its tempo x 10 */
         got = (int)(clk.bpm * 10.0f + 0.5f);
     else if (!strcmp(what, "clkjit"))             /* ... its jitter (RMS), us */

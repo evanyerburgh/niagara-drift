@@ -257,13 +257,15 @@ static int in_range(const int16_t *v)
 /* the older layouts: 19 and 20 had 16 scenes in the project (scenes 13-16 become B1-B4), 21 had bank A there and
  * B, C in their own objects, each with 78 values a sound (DR_NPARAMS before the macros); 22 as 21 with 94 (before
  * the effects' four); 23-31 as now with 98 (before the delay's drive), 32 with 99 (before the reverb's route), 33 with 100
- * (before the Swell's division). A value added since takes its default. */
+ * (before the Swell's division), 34 with 101 (before the LFO's, the delay's and the scenes' clock values). A value added
+ * since takes its default. */
 #define NP21 78
 #define NP22 94
 #define NP31 98
 #define NP32 99
 #define NP33 100
-_Static_assert(DR_NPARAMS >= NP33, "the values only grow");
+#define NP34 101
+_Static_assert(DR_NPARAMS >= NP34, "the values only grow");
 typedef struct {
     uint32_t magic, format;
     int16_t par[NP21];
@@ -340,6 +342,20 @@ typedef struct {
     uint16_t used, rsv;
     int16_t scene[NSCENES][NP33];
 } bank_v33_t;
+typedef struct {
+    uint32_t magic, format;
+    int16_t par[NP34];
+    uint8_t leds, bank, mtime;
+    uint8_t gkey_old[4];
+    uint8_t rsv[9];
+    uint16_t scene_used;
+    int16_t scene[NSCENES][NP34];
+} proj_v34_t;
+typedef struct {
+    uint32_t magic, format;
+    uint16_t used, rsv;
+    int16_t scene[NSCENES][NP34];
+} bank_v34_t;
 static union {
     project_t p;
     proj_v31_t o31;
@@ -348,6 +364,8 @@ static union {
     bank_v32_t b32;
     proj_v33_t o33;
     bank_v33_t b33;
+    proj_v34_t o34;
+    bank_v34_t b34;
     proj_v20_t o20;
     proj_v21_t o21;
     bank_t b;
@@ -360,7 +378,7 @@ static union {
 static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old sound: the new values' defaults */
 {
     int k;
-    const int np = from >= 33u ? NP33 : from >= 32u ? NP32 : from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
+    const int np = from >= 34u ? NP34 : from >= 33u ? NP33 : from >= 32u ? NP32 : from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
     for (k = 0; k < DR_NPARAMS; k++)
         dst[k] = k < np ? src[k] : dr_param_info(k)->def;
     if (dst[P_LFO_RATE] < 0)                   /* slower than 50 s, as it went before 2026-10-14: the slowest */
@@ -378,6 +396,12 @@ static void bank_load(int b)                   /* B (1), C (2) or the Presets (3
         return;
     if (ld.b.format == PROJ_FORMAT) {
         *k = ld.b;
+    } else if (ld.b.format == 34u) {           /* 34: 101 values a sound */
+        const bank_v34_t *o = &ld.b34;
+        k->used = o->used;
+        for (i = 0; i < NSCENES; i++)
+            widen(k->scene[i], o->scene[i], 34u);
+        bank_dirty |= (uint8_t)(1u << b);
     } else if (ld.b.format == 33u) {           /* 33: 100 values a sound */
         const bank_v33_t *o = &ld.b33;
         k->used = o->used;
@@ -467,6 +491,16 @@ int project_load(void)
     }
     if (from == PROJ_FORMAT) {
         proj = ld.p;
+    } else if (from == 34u) {                  /* 34: 101 values a sound */
+        const proj_v34_t *o = &ld.o34;
+        memset(&proj, 0, sizeof proj);
+        widen(proj.par, o->par, from);
+        proj.leds = o->leds;
+        proj.bank = o->bank;
+        proj.mtime = o->mtime;
+        proj.scene_used = o->scene_used & ((1u << NSCENES) - 1u);
+        for (i = 0; i < NSCENES; i++)
+            widen(proj.scene[i], o->scene[i], from);
     } else if (from == 33u) {                  /* 33: 100 values a sound */
         const proj_v33_t *o = &ld.o33;
         memset(&proj, 0, sizeof proj);
