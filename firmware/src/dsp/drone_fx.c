@@ -149,33 +149,7 @@ static float dly_ms(int v) { return 70.0f * fm_exp2f((float)v * 0.026845f); }   
 /* the read: 8 taps of a windowed sinc (Kaiser, beta 6, cut at 0.46 of the half rate: flat to ~8 kHz, as far as the
  * half-band lets through), the nearest of 128 phases (its timing within 0.18 us: its error > 60 dB under at 1 kHz).
  * A cubic rolled off above ~5 kHz, again with each repeat */
-#define DLY_TAPS 8
-#define DLY_PH 128
-static float dly_k[DLY_PH + 1][DLY_TAPS];
-static void dly_kinit(void)
-{
-    int ph, t;
-    for (ph = 0; ph <= DLY_PH; ph++) {
-        float f = (float)ph / (float)DLY_PH, sum = 0.0f;
-        for (t = 0; t < DLY_TAPS; t++) {
-            float x = (float)(t - DLY_TAPS / 2 + 1) - f, w = x / (0.5f * (float)DLY_TAPS), sx, k, i0a = 1.0f, i0b = 1.0f, ta = 1.0f, tb = 1.0f;
-            int m;
-            sx = fm_fabsf(x) < 1e-6f ? 0.92f : fm_sinf(3.14159265f * 0.92f * x) / (3.14159265f * x);
-            for (m = 1; m < 20; m++) {                /* I0, the window's: of 6 sqrt(1 - w^2), and of 6 */
-                float a = 6.0f * fm_sqrtf(fm_maxf(1.0f - w * w, 0.0f)) * 0.5f / (float)m, b = 6.0f * 0.5f / (float)m;
-                ta *= a * a;
-                tb *= b * b;
-                i0a += ta;
-                i0b += tb;
-            }
-            k = sx * (fm_fabsf(w) <= 1.0f ? i0a / i0b : 0.0f);
-            dly_k[ph][t] = k;
-            sum += k;
-        }
-        for (t = 0; t < DLY_TAPS; t++)             /* unity at DC */
-            dly_k[ph][t] /= sum;
-    }
-}
+#include "dly_kernel.h"                 /* dly_k: fixed numbers, in the firmware (2026-10-26: 4 KB of RAM back) */
 static inline int32_t dly_wrap(int32_t i) { return i < 0 ? i + (int32_t)DLY_N : i >= (int32_t)DLY_N ? i - (int32_t)DLY_N : i; }
 static inline float dly_read(const int16_t *b, float d)   /* d full-rate samples back */
 {
@@ -503,8 +477,6 @@ static inline void rv_tick(float x, float *ol, float *or_)
 static void fx_clear(void)
 {
     uint32_t k;
-    if (dly_k[0][DLY_TAPS / 2 - 1] == 0.0f)
-        dly_kinit();
     for (k = 0; k < DLY_N; k++)
         dly_buf[0][k] = dly_buf[1][k] = 0;
     dly_dn[0] = dly_dn[1] = (hb_t){{0.0f}, {0.0f}};
