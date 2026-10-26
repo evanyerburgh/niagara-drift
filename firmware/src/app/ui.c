@@ -255,8 +255,8 @@ static int knob_param(int i)
     knob_t k = VIEW_KNOB[ui.view][i];
     if (k.g == NONE)
         return -1;
-    if (k.g == G)
-        return k.p;
+    if (k.g == G)                      /* the Swell's Rate: its division of the beat while a clock is in (v0.3) */
+        return k.p == P_PULSE_RATE && dr_ext_spb > 0.0f ? P_PULSE_DIV : k.p;
     if (k.g == 1 && k.p == GP_PITCH && proj.par[P_PLINK])
         return P_PLINK_OFF;
     return DR_GP(k.g, k.p);
@@ -1033,11 +1033,162 @@ static void button(int b)                              /* the other buttons, on 
 }
 
 /* MIDI in (USB and the TRS jack): a note on channel 1 tunes drone I to it, on channel 2 drone II */
+/* MIDI CLOCK IN (v0.3, step 3; a test build first, OM_CLOCK_TEST: the tempo and jitter on screen). 24 pulses a beat,
+ * each stamped as it came in (us; the inputs are read between renders, so a pulse can wait one out). Over the last
+ * two beats (48 pulses) a straight line through their times: its slope the tempo, how far each pulse sits off it the
+ * jitter (its RMS and its largest). No pulse for 500 ms: lost, and it starts over */
+#define CLK_N 48
+#define CLK_LOST_MS 500u
+static struct {
+    uint32_t t[CLK_N];                 /* the last pulses' times, us */
+    uint32_t n;                        /* pulses since it (re)started */
+    uint32_t count;                    /* pulses since a Start (or since it came), for the beat; 256 beats round */
+    uint32_t last_ms, shown_ms, hold_ms;   /* the last pulse; the readout last shown; a message held till */
+    uint32_t starts, conts, stops;
+    float bpm, jit, jmax;              /* the tempo; the jitter, RMS and largest, ms */
+    int shown;                         /* the tempo as shown, whole BPM: moves only past 0.6 of a BPM (a wobbly master's
+                                        * readout flickered: a user's report, 2026-10-20) */
+    uint8_t following;                 /* the Swell follows it (said once when it starts, and when it's lost) */
+} clk;
+static void clk_fit(void)
+{
+    uint32_t k, t0 = clk.t[(clk.n - CLK_N) % CLK_N];
+    float sy = 0.0f, sxy = 0.0f, slope, b, e2 = 0.0f, em = 0.0f;
+    const float mx = 0.5f * (float)(CLK_N - 1), sxx = (float)CLK_N * ((float)CLK_N * (float)CLK_N - 1.0f) / 12.0f;
+    for (k = 0; k < CLK_N; k++) {      /* x: the pulse's number, y: its time after the first (us) */
+        float y = (float)(clk.t[(clk.n - CLK_N + k) % CLK_N] - t0);
+        sy += y;
+        sxy += ((float)k - mx) * y;
+    }
+    slope = sxy / sxx;
+    b = sy / (float)CLK_N - slope * mx;
+    for (k = 0; k < CLK_N; k++) {
+        float e = (float)(clk.t[(clk.n - CLK_N + k) % CLK_N] - t0) - (b + slope * (float)k);
+        e2 += e * e;
+        em = fm_maxf(em, fm_fabsf(e));
+    }
+    clk.bpm = slope > 0.0f ? 60.0e6f / (24.0f * slope) : 0.0f;
+    clk.jit = fm_sqrtf(e2 / (float)CLK_N) * 0.001f;
+    clk.jmax = em * 0.001f;
+}
+static void clk_pulse(uint32_t us)
+{
+    if (clk.n && plat_ms() - clk.last_ms > CLK_LOST_MS)
+        clk.n = 0;
+    clk.t[clk.n % CLK_N] = us;
+    clk.n++;
+    clk.count = (clk.count + 1u) % (24u * 256u);
+    clk.last_ms = plat_ms();
+    if (clk.n >= CLK_N) {
+        clk_fit();
+        if (!clk.shown || clk.bpm > (float)clk.shown + 0.6f || clk.bpm < (float)clk.shown - 0.6f)
+            clk.shown = (int)(clk.bpm + 0.5f);
+    }
+}
+/* each frame: the engine told the tempo and the beat, counted in pulses (the first after a Start beat 0), and how far
+ * into the next one by now. Only while the clock runs: stopped or lost, the engine carries on at the last tempo
+ * (Evan, 2026-10-26), until a clock comes again */
+static void clk_feed(void)
+{
+    uint32_t now = plat_ms();
+    float iv, f;
+    char a[24];
+    if (clk.following && now - clk.last_ms > CLK_LOST_MS) {    /* lost: said once, the Swell carries on */
+        clk.following = 0;
+#ifndef OM_CLOCK_TEST
+        itoa_u((uint32_t)clk.shown, scopy(a, "KEEPS "));   /* (the box fits 23) */
+        say("CLOCK STOPPED", a);
+#endif
+    }
+    if (clk.n < CLK_N || clk.bpm < 20.0f || now - clk.last_ms > CLK_LOST_MS)
+        return;
+    if (!clk.following) {                                       /* found: said once */
+        clk.following = 1;
+#ifndef OM_CLOCK_TEST
+        {
+            char *q = a;
+            itoa_u((uint32_t)clk.shown, q);
+            while (*q)
+                q++;
+            scopy(q, " BPM");
+        }
+        say_c(a, "SWELL ON CLOCK", K_PULSE);
+#endif
+    }
+    iv = 60.0e6f / (clk.bpm * 24.0f);                  /* a pulse, us */
+    f = fm_clampf((float)(plat_us() - clk.t[(clk.n - 1u) % CLK_N]) / iv, 0.0f, 0.999f);
+    dr_ext_spb = DR_SR * 60.0f / clk.bpm;
+    dr_ext_beat = ((float)((clk.count + 24u * 256u - 1u) % (24u * 256u)) + f) * (1.0f / 24.0f);
+    dr_ext_seq++;
+}
+int ui_clock_bpm(void) { return clk.shown; }
+
+void ui_clock_stats(uint32_t w[8])
+{
+    w[0] = (uint32_t)(clk.bpm * 100.0f + 0.5f);
+    w[1] = (uint32_t)(clk.jit * 1000.0f + 0.5f);
+    w[2] = (uint32_t)(clk.jmax * 1000.0f + 0.5f);
+    w[3] = clk.n;
+    w[4] = clk.starts;
+    w[5] = clk.conts;
+    w[6] = clk.stops;
+    w[7] = clk.n ? plat_ms() - clk.last_ms : 0xFFFFFFFFu;
+}
+#ifdef OM_CLOCK_TEST
+static char *dec1(float v, char *b);
+static void clk_show(void)                             /* the test build: the clock's tempo and jitter, twice a second */
+{
+    uint32_t now = plat_ms();
+    char a[24], b[24], *q;
+    if (!clk.n || now - clk.shown_ms < 500u || (int32_t)(clk.hold_ms - now) > 0)
+        return;
+    clk.shown_ms = now;
+    if (now - clk.last_ms > CLK_LOST_MS) {
+        clk.n = 0;
+        say("CLOCK LOST", 0);
+        return;
+    }
+    if (clk.n < CLK_N) {
+        say("CLOCK", "LISTENING");
+        return;
+    }
+    q = dec1(clk.bpm, a);              /* "120.1 BPM" "JIT 0.8/1.7": the jitter's RMS / largest, ms (the box fits 23) */
+    scopy(q, " BPM");
+    q = scopy(b, "JIT ");
+    q = dec1(clk.jit, q);
+    *q++ = '/';
+    dec1(clk.jmax, q);
+    say(a, b);
+}
+#endif
+
 static void midi_in(void)
 {
-    uint32_t pkt;
-    while (plat_midi_in(&pkt)) {
+    uint32_t pkt, us;
+    while (plat_midi_in(&pkt, &us)) {
         uint32_t st = (pkt >> 8) & 0xFFu, n = (pkt >> 16) & 0x7Fu, v = pkt >> 24;
+        if (st == 0xF8u) {
+            clk_pulse(us);
+            continue;
+        }
+        if (st == 0xFAu || st == 0xFBu || st == 0xFCu) {   /* Start, Continue, Stop: counted (and named, testing) */
+            if (st == 0xFAu) {                 /* Start: the song's top, the Swell's too (Evan, 2026-10-26) */
+                clk.starts++;
+                clk.count = 0;
+                dr_ext_beat = 0.0f;
+                dr_ext_seq++;
+                dr_ext_start = 1;
+            } else if (st == 0xFBu) {
+                clk.conts++;
+            } else {
+                clk.stops++;
+            }
+#ifdef OM_CLOCK_TEST
+            say("CLOCK", st == 0xFAu ? "START" : st == 0xFBu ? "CONTINUE" : "STOP");
+            clk.hold_ms = plat_ms() + 1000u;
+#endif
+            continue;
+        }
         if ((st == 0x90u || st == 0x91u) && v) {
             int g = (int)(st & 1u), c = (int)n * 100;
             if (g == 1 && proj.par[P_PLINK])
@@ -1334,6 +1485,10 @@ static void input(void)
         ui.act_t = plat_ms();
     loop_run();
     midi_in();
+    clk_feed();
+#ifdef OM_CLOCK_TEST
+    clk_show();
+#endif
     if ((e = plat_enc(EN_SELECT)) != 0)              /* SELECT: the LFO rate */
         global_turn(EN_SELECT, P_LFO_RATE, "LFO RATE", e);
     if ((e = plat_enc(EN_ALGO)) != 0)                /* ALGORITHM: the Movement, every LFO depth 0 .. 200 % */
@@ -1831,7 +1986,16 @@ static void pic_pulse(int32_t y0)
         int32_t px = 12 + (int32_t)(ph * 104.0f), py = top + h - (int32_t)(dr_pulse_wave(ph) * (float)h);
         cv_round(px - 3, py - 3, 7, 7, 3, K_TEXT);
     }
-    dr_param_text(P_PULSE_RATE, proj.par[P_PULSE_RATE], t);
+    if (dr_ext_spb > 0.0f) {                   /* on a MIDI clock: its division and the tempo ("8 bars · 120") */
+        char *q;
+        dr_param_text(P_PULSE_DIV, proj.par[P_PULSE_DIV], t);
+        q = t;
+        while (*q)
+            q++;
+        itoa_u((uint32_t)ui_clock_bpm(), scopy(q, " \xc2\xb7 "));
+    } else {
+        dr_param_text(P_PULSE_RATE, proj.par[P_PULSE_RATE], t);
+    }
     cv_text(12, y0 + 3, &FONT_S, t, c);
     text_r(222, y0 + 3, on ? "ON" : "OFF", on ? K_PULSE : K_DIM);
     if (!on || proj.par[P_LFO_LOCK])

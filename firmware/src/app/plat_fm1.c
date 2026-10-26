@@ -3,6 +3,7 @@
  * Part of the unity build (main.c), after the HAL, usb.c, storage.c and panel.c. */
 
 uint32_t plat_ms(void) { return fm1_ms; }
+uint32_t plat_us(void) { return MQ_NOW_US(); }
 
 uint32_t plat_buttons(void)
 {
@@ -191,11 +192,12 @@ static void plat_pressure_poll(void)
 int plat_pressure(uint32_t k) { return k < NKEYS && sense_is_analog(k) ? p_val[k] : -1; }
 
 /* MIDI: Felucca's rings carry 4-byte USB-MIDI event packets, byte 0 = cable / CIN */
-int plat_midi_in(uint32_t *pkt)
+int plat_midi_in(uint32_t *pkt, uint32_t *us)
 {
     if (mi_r == mi_w)
         return 0;
     *pkt = midi_in_q[mi_r % MQ];
+    *us = midi_in_t[mi_r % MQ];
     mi_r++;
     return 1;
 }

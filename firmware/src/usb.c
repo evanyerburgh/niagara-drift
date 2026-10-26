@@ -127,7 +127,11 @@ static volatile uint32_t so_w, so_r;
 
 /* MIDI rings: 4-byte USB-MIDI event packets */
 #define MQ 64u
+#ifndef MQ_NOW_US
+#define MQ_NOW_US() 0u                                /* the device's main.c gives the time (the host tests none) */
+#endif
 static uint32_t midi_in_q[MQ], midi_out_q[MQ];
+static uint32_t midi_in_t[MQ];                        /* when each came in, us (v0.3: the MIDI clock's pulses) */
 static volatile uint32_t mi_w, mi_r, mo_w, mo_r;
 
 static void midi_out_event(uint32_t pkt)            /* from the audio ISR */
@@ -640,6 +644,7 @@ static void ep1_rx(void)
         } else if (((cin >= 8u && cin <= 0xEu) || (cin == 0xFu && ep1rx[i + 1] >= 0xF8u)) && mi_w - mi_r < MQ) {
             /* CIN 0xF: a single byte; the real-time ones (clock, start, continue, stop) matter */
             midi_in_q[mi_w % MQ] = pkt;
+            midi_in_t[mi_w % MQ] = MQ_NOW_US();
             RING_PUBLISH();
             mi_w++;
         }

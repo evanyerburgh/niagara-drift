@@ -20,6 +20,7 @@ static int um_put(uint32_t pkt)                    /* into midi_in_q (usb.c): 0 
     if (mi_w - mi_r >= MQ)
         return 0;
     midi_in_q[mi_w % MQ] = pkt;
+    midi_in_t[mi_w % MQ] = MQ_NOW_US();
     RING_PUBLISH();
     mi_w++;
     return 1;

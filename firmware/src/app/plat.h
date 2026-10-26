@@ -25,6 +25,7 @@ enum { EN_SELECT, EN_ALGO, EN_PRESET, EN_K1, EN_K2, EN_K3, EN_K4, NE };
 #define NKEYS 27                       /* F3 .. G5 */
 
 uint32_t plat_ms(void);
+uint32_t plat_us(void);                 /* microseconds, as MIDI packets are stamped (v0.3: the clock) */
 uint32_t plat_buttons(void);           /* held: bit B_* */
 uint32_t plat_keys(void);              /* held: bit k = key k (0 = F3) */
 int32_t plat_enc(int role);            /* detents since the last call, + = clockwise; EN_* */
@@ -33,7 +34,7 @@ int plat_pressure(uint32_t k);         /* key k's pressure 0..127 while held (0 
 void plat_leds(const uint8_t *buttons, const uint8_t *keys);   /* brightness 0..255 (as the eye sees it): [B_*], [key] */
 
 /* USB MIDI, 4-byte USB-MIDI event packets (cable 0) */
-int plat_midi_in(uint32_t *pkt);       /* 1 = got one (called from the audio ISR) */
+int plat_midi_in(uint32_t *pkt, uint32_t *us);   /* 1 = got one, and when it came in, us (called from the audio ISR) */
 void plat_midi_out(uint32_t pkt);      /* queue one (audio ISR or main loop) */
 
 /* persistent storage (Felucca storage.c objects: A/B sectors, CRC, torn-write safe) */

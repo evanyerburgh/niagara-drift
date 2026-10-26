@@ -115,10 +115,14 @@ void fm1_timer5_irq(void)
     if (++sub == 10u)
         sub = 0;
     {
-        static uint32_t last, acc;
+        static uint32_t last, acc, uacc;
         uint32_t now = fm1_ticks();
         acc += now - last;
+        uacc += now - last;
         last = now;
+        fm1_us += uacc / FM1_TICKS_PER_US;      /* the microseconds, from the same ticks (MQ_NOW_US) */
+        uacc %= FM1_TICKS_PER_US;
+        fm1_us_t = now - uacc;
         while (acc >= 1000u * FM1_TICKS_PER_US) {
             acc -= 1000u * FM1_TICKS_PER_US;
             fm1_ms++;
@@ -278,6 +282,14 @@ static void dbg_service(void)
         backup_cmd(ota_dec[2], ota_dec + 6, d - 7u);
     } else if (d == 7u && ota_dec[2] == 0x11) {
         ota_reply_identity();
+    } else if (d == 7u && ota_dec[2] == 0x7C) {     /* the MIDI clock in (v0.3, step 3): ui_clock_stats */
+        uint32_t w[8];
+        uint8_t b[32];
+        uint32_t i;
+        ui_clock_stats(w);
+        for (i = 0; i < 32u; i++)
+            b[i] = (uint8_t)(w[i / 4u] >> (8u * (i % 4u)));
+        ota_send_msg(0x7C, b, sizeof b);
     } else if (d == 7u && ota_dec[2] == 0x7E) {
         const uint32_t w[8] = {om_dbg.cpu_q8, om_dbg.max_us, HALF_FRAMES * 1000000u / FS, om_dbg.late,
                                om_dbg.halves, om_dbg.nested, om_dbg.boots, om_dbg.last_us};

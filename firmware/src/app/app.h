@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 33u                  /* 33: the delay types reordered, the reverb's route (100 values; 32's
+#define PROJ_FORMAT 34u                  /* 34: the Swell's division (101 values; 33's read and widened);
+                                          * 33: the delay types reordered, the reverb's route (100 values; 32's
                                           * read, widened and converted);
                                           * 32: the delay's drive (99 values a sound; 23-31's read and widened);
                                           * 31: Level an audio taper (30's levels to 10 sqrt(v));
@@ -75,4 +76,6 @@ void ui_init(void);
 void ui_frame(void);
 void ui_input_only(void);
 int ui_dirty(void);
+void ui_clock_stats(uint32_t w[8]);   /* the MIDI clock in: tempo x 100, jitter RMS / largest (us), pulses, Starts,
+                                       * Continues, Stops, ms since the last pulse (tools/fm1_clock.py) */
 void ui_say(const char *a, const char *b);

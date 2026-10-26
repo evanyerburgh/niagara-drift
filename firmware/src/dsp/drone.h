@@ -139,6 +139,8 @@ enum {
     P_DLY_ROUTE,                    /* what goes into the reverb (v0.3, DR_ROUTE_NAME): 0 both, the drones and their
                                      * echoes; 1 the echoes alone (the drones dry, the wash added); 2 the drones alone (the
                                      * reverb beside the delay, the echoes dry) */
+    P_PULSE_DIV,                    /* the Swell's breath with a MIDI clock in (v0.3, step 3; DR_DIV_NAME): 0 32 bars .. 7 a
+                                     * quarter note; without a clock P_PULSE_RATE as before */
     DR_NPARAMS
 };
 
@@ -171,6 +173,12 @@ extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
 #define DR_NREV 4
 extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
 #define DR_DLY_TMAX 163                                   /* the delay's longest Time: 1455 ms */
+#define DR_NDIV 8
+extern const char *const DR_DIV_NAME[DR_NDIV];          /* "32 bars" .. "1/4" */
+/* the MIDI clock in (v0.3), set by the UI: samples a beat (0: none heard yet; kept when it stops), the beat it's at
+ * (counted from the clock's pulses), a count bumped with each update, and a Start (the Swell back to its top) */
+extern volatile float dr_ext_spb, dr_ext_beat;
+extern volatile uint32_t dr_ext_seq, dr_ext_start;
 #define DR_XMOD_CUT 1
 #define DR_XMOD_FM 2
 #define DR_XMOD_OUT 3                                     /* SNARL: the finished sound bends both drones */

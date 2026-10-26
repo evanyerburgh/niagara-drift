@@ -55,9 +55,13 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"D5 time", 0, 100, 30}, {"E5 time", 0, 100, 40}, {"F5 time", 0, 100, 35}, {"G5 time", 0, 100, 35},
     {"D5 latch", 0, 100, 0}, {"E5 latch", 0, 100, 0}, {"F5 latch", 0, 100, 0}, {"G5 latch", 0, 100, 0},
     {"Type", 0, DR_NDLY - 1, DR_DLY_TAPE}, {"Length", 0, 100, 60}, {"Damp", 0, 100, 40}, {"Pressure", 0, 100, 50},
-    {"Drive", 0, 100, 0}, {"Into rev", 0, DR_NROUTE - 1, 0},
+    {"Drive", 0, 100, 0}, {"Into rev", 0, DR_NROUTE - 1, 0}, {"Division", 0, DR_NDIV - 1, 2},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
+const char *const DR_DIV_NAME[DR_NDIV] = {"32 bars", "16 bars", "8 bars", "4 bars", "2 bars", "1 bar", "1/2", "1/4"};
+static const float DIV_BEATS[DR_NDIV] = {128.0f, 64.0f, 32.0f, 16.0f, 8.0f, 4.0f, 2.0f, 1.0f};   /* a breath, beats */
+volatile float dr_ext_spb, dr_ext_beat;
+volatile uint32_t dr_ext_seq, dr_ext_start;
 const char *const DR_ROUTE_NAME[DR_NROUTE] = {"Both", "Echoes", "Drones"};
 const char *const DR_DLY_NAME[DR_NDLY] = {"Clean", "Wide", "Ping-pong", "Tape", "Grain", "Self"};
 const char *const DR_WSCALE_NAME[DR_NWSCALE] = {"Minor pent", "Major pent", "5ths + 8ves", "Whole tone", "Dorian",
@@ -267,6 +271,8 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_DLY_NAME[(unsigned)v < DR_NDLY ? v : DR_DLY_TAPE]);
     else if (i == P_DLY_ROUTE)
         copy_s(b, DR_ROUTE_NAME[(unsigned)v < DR_NROUTE ? v : 0]);
+    else if (i == P_PULSE_DIV)
+        copy_s(b, DR_DIV_NAME[(unsigned)v < DR_NDIV ? v : 2]);
     else if (i == P_PULSE_SHAPE && v <= 0) {     /* "even"; "ramp 40" (the left half) */
         if (v == 0) {
             copy_s(b, "even");
@@ -1520,7 +1526,7 @@ static void render_group(int g, uint32_t n)
     }
     for (j0 = 0; j0 < n; j0 += CR) {
         float inc, pinc, sinc, lk, ilk, mlk, plk, slk, gc, a1, a2, a3, gstep, gend, lend, lstep, lv = v->lv, ph = v->ph, pph = v->pph,
-              sph = v->sph, om, fmod, fl, pmod, xw, wf, og, sg, xd, xpd, xh = v->xh, xc = v->xc, wl, wb, wh, sy, r;
+              sph = v->sph, om, fmod, fl, pmod, xw, wf, og, sg, xd, xpd, xh = v->xh, xc = v->xc, wl, wb, wh, sy, r, fbn, fsn;
         int wi, sync;
         float ic1 = v->ic1, ic2 = v->ic2, bc = v->bc, gf = v->gf, peak = v->peak, bk;
         float z0 = v->nz[0], z1 = v->nz[1], z2 = v->nz[2], z3 = v->nz[3], z4 = v->nz[4], z5 = v->nz[5], nh = v->nh;
@@ -1589,6 +1595,9 @@ static void render_group(int g, uint32_t n)
         sg = sub * v->sg;
         xd = xamt * v->xm;
         xpd = v->xp * famt_x;                    /* CROSS-FM's depth, this tick */
+        fbn = fbk * (1.0f / fbc) * 0.25f / fm_maxf(v->fbe, 0.03125f);   /* FEEDBACK's make-up and gain, this tick (a
+                                                                          * division a sample was 4 % of the FM-1) */
+        fsn = fnk * 0.22f / fm_maxf(g ? grp[0].fse : v->fse, 0.0275f);  /* SNARL's, this tick */
         wl = v->wm[DR_LP];
         sy = v->sy;
         sync = v->sync;
@@ -1675,8 +1684,8 @@ static void render_group(int g, uint32_t n)
                 fv -= v->fsh;
                 v->fse += (fm_fabsf(fv) - v->fse) * 0.000427f;   /* its level made up to P1's (0.22; x8 at most): as
                                                                   * strong on a quiet sound as on P1 (Evan, 2026-10-26:
-                                                                  * subtle on P12, strong on P1) */
-                q = fnk * fv * (0.22f / fm_maxf(v->fse, 0.0275f));
+                                                                  * subtle on P12, strong on P1): fsn, a tick's */
+                q = fv * fsn;
                 q = q / (1.0f + fm_fabsf(q));
                 v->fsc += (q - v->fsc) * 0.001424f;   /* its mean out after the limit, as cross-FM's (Evan, 2026-10-26:
                                                        * at 100 the pitch sank) */
@@ -1761,10 +1770,9 @@ static void render_group(int g, uint32_t n)
                 fv = fb_ring[ri & (FB_N - 1u)] + (fb_ring[(ri + 1u) & (FB_N - 1u)] - fb_ring[ri & (FB_N - 1u)]) * fr;
                 v->fbh += (fv - v->fbh) * 0.011f;        /* ~80 Hz */
                 fv -= v->fbh;
-                v->fbe += (fm_fabsf(fv) - v->fbe) * 0.000427f;   /* its level, ~3 Hz: made up to 0.25 (x8 at most) */
-                fv *= 0.25f / fm_maxf(v->fbe, 0.03125f);
-                in = fbc * fm_tanhf(fbk * fv * (1.0f / fbc));   /* capped (it can't take over below 70); over the top the
-                                                                 * cap rises, so a dry sound sings too */
+                v->fbe += (fm_fabsf(fv) - v->fbe) * 0.000427f;   /* its level, ~3 Hz: made up to 0.25 (x8 at most), in fbn */
+                in = fbc * fm_tanhf(fv * fbn);  /* capped (it can't take over below 70); over the top the cap rises, so a
+                                                 * dry sound sings too */
                 in *= ilk;
                 fb_eosc += x * x;
                 fb_ein += in * in;
@@ -1896,18 +1904,54 @@ float dr_pulse_wave(float ph)
     return pulse_gain(ph, pulse_depth(par[P_PULSE_DEPTH]), (float)par[P_PULSE_SHAPE] * 0.01f,
                       1.0f + (float)par[P_PULSE_SWING] * 0.01f, pulse_hz(par[P_PULSE_RATE]));
 }
+/* THE SWELL ON A MIDI CLOCK (v0.3, step 3; Evan, 2026-10-26): a breath a division of the beat (P_PULSE_DIV), its speed the
+ * clock's tempo, its place steered toward the clock's beat (a gentle phase lock, ~0.3 s): it can't drift from the
+ * master however its pulses wobble. The beat the UI last counted, carried on by the samples since (and on at the last
+ * tempo when the clock stops). A Start: back to the top, at once */
+static uint32_t ext_seq, ext_n;
+static float ext_beat;
+static float ext_target(float beats_a_breath)          /* where the clock says the Swell is, 0..2 (two breaths) */
+{
+    float b, x;
+    if (dr_ext_seq != ext_seq) {                         /* a fresh count from the UI */
+        ext_seq = dr_ext_seq;
+        ext_beat = dr_ext_beat;
+        ext_n = 0;
+    } else if (ext_n > (uint32_t)DR_SR) {               /* a second on its own: folded in (the float stays fine) */
+        ext_beat += (float)ext_n / dr_ext_spb;
+        ext_n = 0;
+    }
+    b = ext_beat + (float)ext_n / dr_ext_spb;
+    x = b / beats_a_breath;
+    x -= 2.0f * fm_floorf(x * 0.5f);
+    return x;
+}
 static void pulse_run(uint32_t n)
 {
-    const int on = par[P_PULSE];
-    const float hz = pulse_hz(par[P_PULSE_RATE]), step = hz * (1.0f / DR_SR), depth = pulse_depth(par[P_PULSE_DEPTH]);
+    const int on = par[P_PULSE], ext = dr_ext_spb > 0.0f;
+    const float dbeats = DIV_BEATS[(unsigned)par[P_PULSE_DIV] < DR_NDIV ? par[P_PULSE_DIV] : 2];
+    const float hz = ext ? DR_SR / (dbeats * dr_ext_spb) : pulse_hz(par[P_PULSE_RATE]), step = hz * (1.0f / DR_SR),
+                depth = pulse_depth(par[P_PULSE_DEPTH]);
     const float ak = 4.0f / (morph_s() * DR_SR);      /* switched on or off: in or out over the Morph */
     /* ... in dB: its dips' depth in dB follows pa (the depth reached through the floor's power), not their
      * gain (which left the first half nearly silent and all the change at the end) */
     const float floorg = fm_maxf(1.0f - depth, 0.0316f), lf = fm_log2f(floorg), dn = depth / (1.0f - floorg + 1e-9f);
     float pa = pulse_a;
     const float shape = (float)par[P_PULSE_SHAPE] * 0.01f, b1 = 1.0f + (float)par[P_PULSE_SWING] * 0.01f;
-    float ph = pulse_ph, g = pulse_g;
+    float ph = pulse_ph, g = pulse_g, pt = 1.0f;
     uint32_t j;
+    if (ext) {                                   /* steered by the clock: at its place when it starts (or a Start), else
+                                                  * a fiftieth of the way a block */
+        float tg = ext_target(dbeats), e = tg - ph;
+        e -= e >= 1.0f ? 2.0f : e < -1.0f ? -2.0f : 0.0f;
+        if (dr_ext_start || pa <= 0.0f)
+            ph = tg;
+        else
+            ph += 0.02f * e;
+        ph -= ph >= 2.0f ? 2.0f : ph < 0.0f ? -2.0f : 0.0f;
+        dr_ext_start = 0;
+        ext_n += n;
+    }
     for (j = 0; j < n; j++) {
         float t = 1.0f;
         /* in or out like a breath: most of the change first, easing into place (an exponential approach:
@@ -1916,7 +1960,10 @@ static void pulse_run(uint32_t n)
         if (on ? pa > 0.997f : pa < 0.003f)
             pa = on ? 1.0f : 0.0f;
         if (pa > 0.0f) {
-            t = pulse_gain(ph, pa >= 1.0f ? depth : dn * (1.0f - fm_exp2f(lf * pa)), shape, b1, hz);
+            if (!(j & 3u))                       /* its curve every 4th sample, held (the 3 ms glide below rounds it):
+                                                  * a sine and a division a sample were 2 % of the FM-1 */
+                pt = pulse_gain(ph, pa >= 1.0f ? depth : dn * (1.0f - fm_exp2f(lf * pa)), shape, b1, hz);
+            t = pt;
             ph += step;
             if (ph >= 2.0f) {
                 ph -= 2.0f;
@@ -1927,7 +1974,7 @@ static void pulse_run(uint32_t n)
         g += (t - g) * 0.00753f;                 /* 1 - exp(-1 / (3 ms * SR)) */
         pgain[j] = g;
     }
-    pulse_ph = pa > 0.0f ? ph : 0.0f;            /* off (and out): the next one starts on a beat */
+    pulse_ph = pa > 0.0f || ext ? ph : 0.0f;     /* off (and out): the next one starts on a beat (on a clock, where it is) */
     pulse_a = pa;
     dr_pulse_ph = pulse_ph;
     pulse_g = g;
