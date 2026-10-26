@@ -32,6 +32,9 @@ run sense sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Wno-unused-fu
     -o $OUT/sense_test tests/host/sense_test.c -lm && $OUT/sense_test"
 run drone sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Wdouble-promotion -Werror -DOM_HOST -Ifirmware/src/dsp \
     -o $OUT/drone_test tests/host/drone_test.c firmware/src/dsp/drone.c && $OUT/drone_test"
+# cross-FM keeps both drones' pitch (built with the engine: it counts the oscillators' phases)
+run xfm sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Werror -Wno-unused-function -DOM_HOST -Ifirmware/src/dsp \
+    -o $OUT/xfm_test tests/host/xfm_test.c -lm && $OUT/xfm_test"
 # what the drone engine costs (host instructions a sample, macOS; a device estimate): fails over its budget
 run drone-cost sh -c "$CC -O2 -ffp-contract=off -std=c99 -D_DARWIN_C_SOURCE -Wall -Wextra -Werror -DOM_HOST -Ifirmware/src/dsp \
     -o $OUT/drone_cost tests/host/drone_cost.c firmware/src/dsp/drone.c && $OUT/drone_cost"

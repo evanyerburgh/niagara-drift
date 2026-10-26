@@ -393,3 +393,16 @@ at the end. The current state is in the [README](../README.md) and the code.
   8-tap windowed sinc (Kaiser, 128 phases); the line 40960 half-rate samples a side (1.86 s, +32 KB of the pool).
   **Time** runs on the same curve past 100 to 163 (1455 ms), so saved times are unchanged. Presets within 1 dB; the
   echoes lose what's over ~9 kHz. Cost +143 host instructions a sample (worst case 2,555 with Self's fix, was 2,384).
+- 2026-10-26 (0.3 step 2): **Cross-FM** is Cross-mod's third choice (black key 11 goes round off, cutoff (lit), pitch
+  (winking); P_XMOD 0..2, saved values unchanged): each drone's sound speeds the other's oscillators (main, partner,
+  sub) up and down, linear FM, drone I hearing drone II one block late. The modulator's lows under ~10 Hz out, soft-
+  limited (x0.05..x1.95), its mean out after the limit: both drones within 0.2 cents of their pitch at every depth
+  (a test). X-mod amt the depth (10x the sound at the top). Loudness within 1.3 dB; worst case 2,570 host
+  instructions a sample (filter mode stays the dearest, 2,593).
+- 2026-10-26 (Evan, after recordings: today's Feedback faint, "output as FM" liked, the two too unlike for one dial):
+  **Feedback** at a steady strength (the loop's level followed at ~3 Hz and made up to 0.25, x8 at most), its gain
+  0.9 a unit up to 70 then rising to 4.0 at 100, its cap 0.45 rising to 1.6 over the top, the loudness held by a
+  quarter power of what it adds and a trim of 1 dB at 70 to 5 dB at 100: P1 within +3.8 dB; the meter its share.
+  **Snarl** is Cross-mod's fourth choice (P_XMOD 3, winking): the finished sound, fb_d samples ago, bends both drones'
+  speed as cross-FM does (lows out, soft-limited, mean out after), its level made up to P1's (0.22, x8 at most); X-mod
+  amt the depth (9.8 at the top). Worst case 2,660 host instructions a sample (cross-FM), Snarl 2,654.
