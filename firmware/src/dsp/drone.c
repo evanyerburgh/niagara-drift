@@ -1520,7 +1520,7 @@ static void render_group(int g, uint32_t n)
     }
     for (j0 = 0; j0 < n; j0 += CR) {
         float inc, pinc, sinc, lk, ilk, mlk, plk, slk, gc, a1, a2, a3, gstep, gend, lend, lstep, lv = v->lv, ph = v->ph, pph = v->pph,
-              sph = v->sph, om, fmod, fl, pmod, xw, wf, og, sg, xd, xpd, xh = v->xh, xc = v->xc, wl, wb, wh, sy, r;
+              sph = v->sph, om, fmod, fl, pmod, xw, wf, og, sg, xd, xpd, xh = v->xh, xc = v->xc, wl, wb, wh, sy, r, fbn, fsn;
         int wi, sync;
         float ic1 = v->ic1, ic2 = v->ic2, bc = v->bc, gf = v->gf, peak = v->peak, bk;
         float z0 = v->nz[0], z1 = v->nz[1], z2 = v->nz[2], z3 = v->nz[3], z4 = v->nz[4], z5 = v->nz[5], nh = v->nh;
@@ -1589,6 +1589,9 @@ static void render_group(int g, uint32_t n)
         sg = sub * v->sg;
         xd = xamt * v->xm;
         xpd = v->xp * famt_x;                    /* CROSS-FM's depth, this tick */
+        fbn = fbk * (1.0f / fbc) * 0.25f / fm_maxf(v->fbe, 0.03125f);   /* FEEDBACK's make-up and gain, this tick (a
+                                                                          * division a sample was 4 % of the FM-1) */
+        fsn = fnk * 0.22f / fm_maxf(g ? grp[0].fse : v->fse, 0.0275f);  /* SNARL's, this tick */
         wl = v->wm[DR_LP];
         sy = v->sy;
         sync = v->sync;
@@ -1675,8 +1678,8 @@ static void render_group(int g, uint32_t n)
                 fv -= v->fsh;
                 v->fse += (fm_fabsf(fv) - v->fse) * 0.000427f;   /* its level made up to P1's (0.22; x8 at most): as
                                                                   * strong on a quiet sound as on P1 (Evan, 2026-10-26:
-                                                                  * subtle on P12, strong on P1) */
-                q = fnk * fv * (0.22f / fm_maxf(v->fse, 0.0275f));
+                                                                  * subtle on P12, strong on P1): fsn, a tick's */
+                q = fv * fsn;
                 q = q / (1.0f + fm_fabsf(q));
                 v->fsc += (q - v->fsc) * 0.001424f;   /* its mean out after the limit, as cross-FM's (Evan, 2026-10-26:
                                                        * at 100 the pitch sank) */
@@ -1761,10 +1764,9 @@ static void render_group(int g, uint32_t n)
                 fv = fb_ring[ri & (FB_N - 1u)] + (fb_ring[(ri + 1u) & (FB_N - 1u)] - fb_ring[ri & (FB_N - 1u)]) * fr;
                 v->fbh += (fv - v->fbh) * 0.011f;        /* ~80 Hz */
                 fv -= v->fbh;
-                v->fbe += (fm_fabsf(fv) - v->fbe) * 0.000427f;   /* its level, ~3 Hz: made up to 0.25 (x8 at most) */
-                fv *= 0.25f / fm_maxf(v->fbe, 0.03125f);
-                in = fbc * fm_tanhf(fbk * fv * (1.0f / fbc));   /* capped (it can't take over below 70); over the top the
-                                                                 * cap rises, so a dry sound sings too */
+                v->fbe += (fm_fabsf(fv) - v->fbe) * 0.000427f;   /* its level, ~3 Hz: made up to 0.25 (x8 at most), in fbn */
+                in = fbc * fm_tanhf(fv * fbn);  /* capped (it can't take over below 70); over the top the cap rises, so a
+                                                 * dry sound sings too */
                 in *= ilk;
                 fb_eosc += x * x;
                 fb_ein += in * in;
@@ -1906,7 +1908,7 @@ static void pulse_run(uint32_t n)
     const float floorg = fm_maxf(1.0f - depth, 0.0316f), lf = fm_log2f(floorg), dn = depth / (1.0f - floorg + 1e-9f);
     float pa = pulse_a;
     const float shape = (float)par[P_PULSE_SHAPE] * 0.01f, b1 = 1.0f + (float)par[P_PULSE_SWING] * 0.01f;
-    float ph = pulse_ph, g = pulse_g;
+    float ph = pulse_ph, g = pulse_g, pt = 1.0f;
     uint32_t j;
     for (j = 0; j < n; j++) {
         float t = 1.0f;
@@ -1916,7 +1918,10 @@ static void pulse_run(uint32_t n)
         if (on ? pa > 0.997f : pa < 0.003f)
             pa = on ? 1.0f : 0.0f;
         if (pa > 0.0f) {
-            t = pulse_gain(ph, pa >= 1.0f ? depth : dn * (1.0f - fm_exp2f(lf * pa)), shape, b1, hz);
+            if (!(j & 3u))                       /* its curve every 4th sample, held (the 3 ms glide below rounds it):
+                                                  * a sine and a division a sample were 2 % of the FM-1 */
+                pt = pulse_gain(ph, pa >= 1.0f ? depth : dn * (1.0f - fm_exp2f(lf * pa)), shape, b1, hz);
+            t = pt;
             ph += step;
             if (ph >= 2.0f) {
                 ph -= 2.0f;
