@@ -152,6 +152,11 @@ int main(void)
     ipc = cost(dr_render, &ns);
     report("the same, Cross-mod on pitch (cross-FM)", ipc, ns, 0);
 
+    drone(1, 2, 2);
+    dr_set(P_XMOD, DR_XMOD_OUT);                  /* ... and on the output: Snarl (v0.3) */
+    ipc = cost(dr_render, &ns);
+    report("the same, Cross-mod on the output (Snarl)", ipc, ns, 0);
+
     printf(bad ? "drone cost: OVER LIMIT\n" : "drone cost: ok\n");
     return bad ? 1 : 0;
 }

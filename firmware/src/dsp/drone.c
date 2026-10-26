@@ -40,7 +40,7 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
 static const dr_param_t PARAMS[DR_NPARAMS] = {
     VOICE_PARAMS(5000, 67, DR_IV_UNISON, 30, 700, 75, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
     VOICE_PARAMS(5700, 33, DR_IV_UNISON + 9, 15, 680, 61, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
-    {"Cross-mod", 0, DR_XMOD_FM, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
+    {"Cross-mod", 0, DR_XMOD_OUT, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
     {"Stereo", 0, 100, 60}, {"Tune", -50, 50, 0},
@@ -213,7 +213,7 @@ void dr_param_text(int i, int v, char *b)
     static const char *const TAP[4] = {"Off", "I", "II", "I+II"};
     int gp = i < P_XMOD ? i % GP_N : -1;
     if (i == P_XMOD)
-        copy_s(b, v == DR_XMOD_FM ? "Pitch" : v ? "Cutoff" : "Off");
+        copy_s(b, v == DR_XMOD_OUT ? "Snarl" : v == DR_XMOD_FM ? "Pitch" : v ? "Cutoff" : "Off");
     else if (gp == GP_PARTNER || i == P_SYNC || i == P_PLINK || i == P_PULSE || i == P_LFO_LOCK ||
         i == P_PLOCK)
         copy_s(b, v ? "On" : "Off");
@@ -487,9 +487,12 @@ typedef struct {
     float nz[NZ_N], nh;                           /* ... its colour's shelves, its low cut */
     float nc;                                     /* ... its colour, 0 white .. 1 pink (the switch, crossfading) */
     float fbh;                                    /* FEEDBACK: its low cut's state */
+    float fbe, fsh, fsc, fse;                     /* SING: the loop's level (~3 Hz); SNARL: its lows' state (~10 Hz), the
+                                                   * limited bend's mean, its level (~3 Hz) */
     float wn[4], wt[4];                           /* DRIFT's wanders (cutoff, X-WAVE, level, detune): now, aim */
     uint32_t wc[4];                               /* ... ticks until each picks a new aim */
     float xm;                                     /* cross-mod (drone II), 0..1 */
+    float xs;                                     /* SNARL (v0.3, Cross-mod's fourth): how far in, 0..1 */
     float xp, xh, xc;                             /* CROSS-FM (v0.3): how far in, 0..1; the other's sound's low part;
                                                    * the limited sound's mean */
     uint8_t rt[2], rp[2];                         /* the LFO routes (osc, filter): the tap now, the one before */
@@ -518,7 +521,7 @@ static uint32_t fb_w;
  * over): a whole number of drone I's periods, or a period over a whole number, within 256 .. 510 samples (a block
  * is read back, never the one being made), gliding as drone I's pitch moves; and the loudness it adds, measured
  * (the energy fed in against the oscillators'), taken off the output: never louder than without it */
-static float fb_d = 300.0f, fb_c = 1.0f, fb_ein, fb_eosc;
+static float fb_d = 300.0f, fb_c = 1.0f, fb_ein, fb_eosc, fb_esn;   /* (fb_esn: Snarl's bend, its power) */
 static float spk[2][2];                          /* the speaker low cut's states, left and right */
 volatile uint8_t dr_phones;
 #define SPK_CUT 61.0f                            /* the speaker's low cut, fixed (2026-10-20: ~120 Hz; P_SPEAKER unused) */
@@ -534,7 +537,7 @@ volatile float dr_lfo[2];
 volatile float dr_pulse = 1.0f;
 volatile float dr_lfo_ph, dr_pulse_ph;
 volatile float dr_cut[DR_NGROUPS];
-volatile float dr_fb;
+volatile float dr_fb, dr_snarl;
 volatile float dr_scope[DR_NGROUPS][DR_SCOPE_N];
 static float sc_buf[DR_NGROUPS][DR_SCOPE_N];
 static float pulse_ph, pulse_g = 1.0f;           /* the pulse: phase over two beats (0..2), its gain */
@@ -1094,6 +1097,7 @@ static float lfo_tick[2][BLK / CR + 1];          /* each tap's value at each con
 /* what drone I leaves for drone II each block: its sound, its oscillator's restarts, its pitch a tick */
 static float xbuf[BLK], ptick[BLK / CR + 1];
 static float ybuf[BLK];                           /* drone II's sound, for drone I's cross-FM in the next block */
+static float snq[BLK];                            /* SNARL's bend each sample, worked out for drone I, shared with II */
 static uint8_t sbuf[BLK];
 static float sfr[BLK];                           /* ... and where in its sample it restarted (0..1) */
 /* a route's LFO at control tick t: Wave I, Wave II, or both summed (as two DS-2 waves switched to one
@@ -1340,6 +1344,7 @@ static void morph_snap(int g)                    /* all of a drone's switches wh
     v->sync = (uint8_t)(g == 1 && par[P_SYNC]);
     v->xm = g == 1 && par[P_XMOD] == DR_XMOD_CUT ? 1.0f : 0.0f;
     v->xp = par[P_XMOD] == DR_XMOD_FM ? 1.0f : 0.0f;
+    v->xs = par[P_XMOD] == DR_XMOD_OUT ? 1.0f : 0.0f;
     v->rt[0] = v->rp[0] = (uint8_t)p[GP_OLFO];
     v->rt[1] = v->rp[1] = (uint8_t)p[GP_FLFO];
     v->rw[0] = v->rw[1] = 1.0f;
@@ -1377,6 +1382,7 @@ static void morph_tick(int g, float step)        /* one control tick of the swit
     }
     v->xm = toward(v->xm, g == 1 && par[P_XMOD] == DR_XMOD_CUT ? 1.0f : 0.0f, step);
     v->xp = toward(v->xp, par[P_XMOD] == DR_XMOD_FM ? 1.0f : 0.0f, step);
+    v->xs = toward(v->xs, par[P_XMOD] == DR_XMOD_OUT ? 1.0f : 0.0f, step);
     for (i = 0; i < 2; i++) {                    /* a route to a new wave: from the old one */
         uint8_t t = (uint8_t)p[i ? GP_FLFO : GP_OLFO];
         if (t != v->rt[i]) {
@@ -1428,7 +1434,20 @@ static void render_group(int g, uint32_t n)
     /* FEEDBACK: its gain into the filter, in a straight line, bounded by its ceiling (it ran away from ~50 at
      * 1.6 with none). Evan, on the FM-1: 0.85 / 0.35 too mild, 1.05 / 0.6 (singing) too strong: 0.9 / 0.45, a
      * strong texture no louder at 100 than without; the sound you hear turned down as it rises (in dr_render) */
-    const float fbk = pfs[P_FEEDBACK] * FB_MAX * 0.01f;
+    /* v0.3 (Evan, 2026-10-26: at 100 still faint): FEEDBACK at a steady strength whatever the sound's level (its own
+     * level followed and made up), about as before up to ~70, then over the top it crosses into singing in key (the
+     * loop's gain past 1, its cap rising), the loudness only partly held. SNARL (Cross-mod's fourth choice): the
+     * finished sound bends both drones' pitch instead (FM, like cross-FM, from the output); X-mod amt its depth */
+#ifndef SING_TOP
+#define SING_TOP 4.0f
+#endif
+    const float fsa = pfs[P_FEEDBACK] * 0.01f;
+    const float fbk = fsa <= 0.7f ? fsa * 0.9f : 0.63f + (fsa - 0.7f) * (1.0f / 0.3f) * (SING_TOP - 0.63f);
+    const float fnk = v->xs * depth_amtf(pfs[P_XMOD_AMT]) * 9.8f;   /* SNARL's depth (x the way in) */
+#ifndef SING_CEIL
+#define SING_CEIL 1.6f
+#endif
+    const float fbc = fsa <= 0.7f ? FB_CEIL : FB_CEIL + (fsa - 0.7f) * (1.0f / 0.3f) * (SING_CEIL - FB_CEIL);
     const float xw0 = pv[GP_WAVE] * 0.01f;
     /* DRIVE: the soft clip's input gain, 0.5 (clean: a sine comes through with its 3rd harmonic near -40 dB)
      * to 16 (as before at 100); the make-up keeps a signal of DRV_REF's size as loud as it went in, so the
@@ -1642,6 +1661,32 @@ static void render_group(int g, uint32_t n)
         lstep = (lend - lv) * (1.0f / (float)CR);
         for (j = j0; j < je; j++) {
             float ci = inc, cp = pinc, cs = sinc, x, y, v1, v2, v3, a;
+            if (fnk > 0.0f && g == 1) {         /* SNARL on drone II: drone I's bend, the same sound's */
+                ci *= snq[j];
+                cp *= snq[j];
+                cs *= snq[j];
+            } else if (fnk > 0.0f) {            /* SNARL: the finished sound, fb_d samples ago, bends both drones (FM), its
+                                                 * lows under ~10 Hz out, soft-limited as cross-FM */
+                float rp = (float)(fb_w + j + FB_N) - fb_d, fr, fv, q;
+                uint32_t ri = (uint32_t)rp;
+                fr = rp - (float)ri;
+                fv = fb_ring[ri & (FB_N - 1u)] + (fb_ring[(ri + 1u) & (FB_N - 1u)] - fb_ring[ri & (FB_N - 1u)]) * fr;
+                v->fsh += (fv - v->fsh) * 0.001424f;
+                fv -= v->fsh;
+                v->fse += (fm_fabsf(fv) - v->fse) * 0.000427f;   /* its level made up to P1's (0.22; x8 at most): as
+                                                                  * strong on a quiet sound as on P1 (Evan, 2026-10-26:
+                                                                  * subtle on P12, strong on P1) */
+                q = fnk * fv * (0.22f / fm_maxf(v->fse, 0.0275f));
+                q = q / (1.0f + fm_fabsf(q));
+                v->fsc += (q - v->fsc) * 0.001424f;   /* its mean out after the limit, as cross-FM's (Evan, 2026-10-26:
+                                                       * at 100 the pitch sank) */
+                q = fm_clampf(1.0f + 0.9f * (q - v->fsc), 0.05f, 1.95f);
+                ci *= q;
+                cp *= q;
+                cs *= q;
+                snq[j] = q;
+                fb_esn += 2.0f * (q - 1.0f) * (q - 1.0f);
+            }
             if (xpd > 0.0f) {                   /* CROSS-FM (v0.3, the Lyra-8's): the other drone's sound speeds this one's
                                                  * oscillators up and down (linear FM), soft-limited so none stops (x0.05 ..
                                                  * x1.95). The pitch stays centred: the lows (under ~10 Hz) out before the
@@ -1715,7 +1760,11 @@ static void render_group(int g, uint32_t n)
                 fr = rp - (float)ri;
                 fv = fb_ring[ri & (FB_N - 1u)] + (fb_ring[(ri + 1u) & (FB_N - 1u)] - fb_ring[ri & (FB_N - 1u)]) * fr;
                 v->fbh += (fv - v->fbh) * 0.011f;        /* ~80 Hz */
-                in = FB_CEIL * fm_tanhf(fbk * (fv - v->fbh) * (1.0f / FB_CEIL));   /* capped: it can't take over */
+                fv -= v->fbh;
+                v->fbe += (fm_fabsf(fv) - v->fbe) * 0.000427f;   /* its level, ~3 Hz: made up to 0.25 (x8 at most) */
+                fv *= 0.25f / fm_maxf(v->fbe, 0.03125f);
+                in = fbc * fm_tanhf(fbk * fv * (1.0f / fbc));   /* capped (it can't take over below 70); over the top the
+                                                                 * cap rises, so a dry sound sings too */
                 in *= ilk;
                 fb_eosc += x * x;
                 fb_ein += in * in;
@@ -2010,9 +2059,22 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
                 pk = fm_maxf(pk, fm_fabsf(m));
             }
             fb_w = (fb_w + k) & (FB_N - 1u);
-            dr_fb = fm_maxf(dr_fb * 0.95f, pk * pfs[P_FEEDBACK] * FB_MAX * 0.01f);
-            {   /* what you hear, turned down by as much as the feedback adds (smoothed, ~60 ms) */
-                float to = pfs[P_FEEDBACK] > 0.0f && fb_eosc > 1e-9f ? fm_sqrtf(fb_eosc / (fb_eosc + fb_ein)) : 1.0f;
+#ifndef SING_COMP
+#define SING_COMP 0.25f
+#endif
+            {   /* the meter: Feedback's share of the sound; Snarl's bend (how far it moves the drones' speed, x3) */
+                float m = pfs[P_FEEDBACK] > 0.0f && fb_eosc > 1e-9f ? fm_sqrtf(fb_ein / (fb_eosc + fb_ein)) : 0.0f;
+                dr_snarl = fm_maxf(dr_snarl * 0.95f, fm_minf(3.0f * fm_sqrtf(fb_esn / (float)(2u * k)), 1.0f));
+                dr_fb = fm_maxf(dr_fb * 0.95f, m);
+                (void)pk;
+                fb_esn = 0.0f;
+            }
+            {   /* what you hear, turned down by part of what Sing adds (smoothed, ~60 ms): its power's ratio^0.25, half
+                 * the loudness it adds held back (it held all of it: at 100 it was only a change of tone) */
+                float sa = fm_maxf(pfs[P_FEEDBACK], 0.0f) * 0.01f;
+                float to = sa > 0.0f && fb_eosc > 1e-9f ? fm_exp2f(SING_COMP * fm_log2f(fb_eosc / (fb_eosc + fb_ein))) : 1.0f;
+                /* ... and a trim with the knob (the resonance it rings up isn't in what it adds): 1 dB by 70, 5 at the top */
+                to *= fm_exp2f(-0.166096f * (sa <= 0.7f ? sa * (1.0f / 0.7f) : 1.0f + (sa - 0.7f) * (4.0f / 0.3f)));
                 float c0 = fb_c, dc;
                 fb_c += (to - fb_c) * fm_minf((float)k / (0.06f * DR_SR), 1.0f);
                 dc = (fb_c - c0) / (float)k;

@@ -418,7 +418,7 @@ static int sw_get(sw_t w)                              /* 1: lit (on, or the sec
     case S_FTAP: return tap_lit(p[GP_FLFO]);
     case S_PLINK: return proj.par[P_PLINK] != 0;
     case S_SYNC: return proj.par[P_SYNC] != 0;
-    case S_XMOD: return proj.par[P_XMOD] == DR_XMOD_FM ? 2 : proj.par[P_XMOD] != 0;   /* cutoff lit, pitch winking */
+    case S_XMOD: return proj.par[P_XMOD] >= DR_XMOD_FM ? 2 : proj.par[P_XMOD] != 0;   /* cutoff lit; pitch, Snarl winking */
     case S_DTAP: return tap_lit(proj.par[P_DLY_LFO]);
     default: return 0;
     }
@@ -474,12 +474,12 @@ static void sw_flip(sw_t w)
     case S_FTAP: param_set(tp, nx); what = "FILTER LFO"; st = WAVES[nx]; break;
     case S_PLINK: link_set(on); q = a; what = "PITCH LINK"; st = on ? "ON" : "OFF"; break;
     case S_SYNC: param_set(P_SYNC, on); q = a; what = "HARD SYNC"; st = on ? "ON" : "OFF"; break;
-    case S_XMOD: {                             /* round: off, cutoff, pitch (v0.3: cross-FM) */
-        int m = (proj.par[P_XMOD] + 1) % (DR_XMOD_FM + 1);
+    case S_XMOD: {                             /* round: off, cutoff, pitch (v0.3: cross-FM), Snarl (v0.3) */
+        int m = (proj.par[P_XMOD] + 1) % (DR_XMOD_OUT + 1);
         param_set(P_XMOD, m);
         q = a;
         what = "CROSS-MOD";
-        st = m == DR_XMOD_FM ? "PITCH I <> II" : m ? "I > II CUTOFF" : "OFF";
+        st = m == DR_XMOD_OUT ? "SNARL: OUT > I II" : m == DR_XMOD_FM ? "PITCH I <> II" : m ? "I > II CUTOFF" : "OFF";
         break;
     }
     case S_LFORESET: dr_lfo_reset(); q = a; what = "LFO"; st = "RESET"; break;
@@ -1971,7 +1971,7 @@ static void pic_lfo2(int32_t y0)
             draw_filter(1, cut + mn * k, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
             draw_filter(1, cut + mx * k, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
         }
-        if (proj.par[P_XMOD] == DR_XMOD_FM) {  /* CROSS-FM: the two drones' waves, each bent by the other */
+        if (proj.par[P_XMOD] >= DR_XMOD_FM) {  /* CROSS-FM, SNARL: the two drones' waves, bent */
             int g, n;
             for (g = 0; g < 2; g++) {
                 int16_t y[48];
@@ -1979,7 +1979,7 @@ static void pic_lfo2(int32_t y0)
                     y[n] = (int16_t)(y0 + 96 + g * 22 - (int32_t)(fm_clampf(dr_scope[g][n * DR_SCOPE_N / 48], -1.0f, 1.0f) * 18.0f));
                 plot(14, 2, y, 48, a > 0.0f ? K_DRONE[g] : K_FAINT);
             }
-            cv_text(12, y0 + 66, &FONT_S, "I <> II pitch", K_TEXT2);
+            cv_text(12, y0 + 66, &FONT_S, proj.par[P_XMOD] == DR_XMOD_OUT ? "snarl: out > I II" : "I <> II pitch", K_TEXT2);
         } else {
             draw_filter(1, cut + sft, 14, y0 + 86, 96, 36, on ? K_DRONE[1] : K_FAINT);
             cv_text(12, y0 + 66, &FONT_S, on ? "I > II cut" : "x-mod off", on ? K_DRONE[1] : K_DIM);
@@ -2243,7 +2243,7 @@ static void sw_text(sw_t w, const char **name, const char **st)
     case S_LFORESET: *name = "LFO reset"; *st = proj.par[P_LFO_LOCK] ? "locked" : "tap"; break;
     case S_PLINK: *name = "Pitch link"; break;
     case S_SYNC: *name = "Hard sync"; break;
-    case S_XMOD: *name = "X-mod"; *st = proj.par[P_XMOD] == DR_XMOD_FM ? "pitch" : on ? "cutoff" : "off"; break;
+    case S_XMOD: *name = "X-mod"; *st = proj.par[P_XMOD] == DR_XMOD_OUT ? "snarl" : proj.par[P_XMOD] == DR_XMOD_FM ? "pitch" : on ? "cutoff" : "off"; break;
     case S_OTAP: *name = "Osc LFO"; *st = TAP[(unsigned)p[GP_OLFO] & 3u]; break;
     case S_ODEST: *name = "Osc to"; *st = on ? "X-Wave" : "Pitch"; break;
     case S_FDEST: *name = "Filt to"; *st = on ? "Reso" : "Cutoff"; break;

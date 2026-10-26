@@ -14,7 +14,7 @@ note. It's inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the S
 
 *Your FM-1 with Niagara Drift installed: what each knob, button and key now does. Amber is drone I,
 teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO pages they set the
-LFO's routing, and X-mod lets drone I move drone II's filter, or each drone bend the other's pitch); the lower 12 white keys hold scenes, in
+LFO's routing, and X-mod lets drone I move drone II's filter, or the drones and their sound bend each other's pitch); the lower 12 white keys hold scenes, in
 banks you pick with SEL and the top four.*
 
 **Status: 0.2.** It runs on the FM-1 (tested on one unit so far) and in the browser:
@@ -212,8 +212,9 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **Character** takes the oscillators from clean to vintage: softer edges, a bent saw, a little pitch
   jitter, the two drones slightly apart, a whisper of noise.
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
-  thickening colour that grows with the knob (more with the delay up), rough at the top but about as loud as the
-  sound without it. It rings in key, on drone I's harmonics, and fades with the drones when you stop.
+  thickening colour that grows with the knob, as strong on a quiet, dry sound as on a loud one. Over the top of
+  its turn (past about 70) it starts to sing on its own and takes the sound over, held close to the same loudness.
+  It rings in key, on drone I's harmonics, and fades with the drones when you stop. The meter shows its share.
 - **Age** wears the sound like an old tape: darker, a little hiss, a slow wow and a little flutter in the pitch.
   It wears in slowly (about 20 s from none to full) and wears out as slowly when you turn it back. Character is
   the oscillators' own wear; Age is the tape's.
@@ -271,9 +272,11 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **Mods**, the LFO moving other things, and cross-mod's amount:
   - **Rate mod**: the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
   - **Mod by**: which wave does that (I, II or both).
-  - **X-mod amt**: how deep cross-mod goes (black key 11): how much drone I's sound moves drone II's filter, or how
-    far each drone's sound bends the other's pitch. A little roughens and thickens the two; a lot turns them into one
-    tangled, metallic, restless sound. Their pitches stay where you set them: the bending is around them.
+  - **X-mod amt**: how deep cross-mod goes (black key 11): how much drone I's sound moves drone II's filter; how
+    far each drone's sound bends the other's pitch (**cross-FM**: a little roughens and thickens the two, a lot
+    tangles them into one restless, metallic sound); or, with **Snarl**, how far the finished sound, echoes and all,
+    bends both drones' pitch (growly with two different pitches; on a single plain drone it only reshapes the tone).
+    Their pitches stay where you set them: the bending is around them.
   - **Dly LFO**: how far the LFO wobbles the delay's time (up to ±25%; negative the other way), on the wave black
     key 10 picks on the LFO pages. You hear it only with some delay mix (FX, the Delay page).
   - Movement (ALGORITHM) scales the delay's wobble too, as it does the LFO depths; not Rate mod or X-mod (see
@@ -402,7 +405,7 @@ key.
 | 8 | II filter: LP, BP, HP | II filter LFO → resonance |
 | 9 | pitch link (II follows I) | II filter wave (I, II, both) |
 | 10 | hard sync (II to I) | delay wave (I, II, both) |
-| 11 | cross-mod: off, I → II cutoff (lit), pitch I ↔ II (winking) | the same |
+| 11 | cross-mod: off, I → II cutoff (lit), pitch I ↔ II (winking), Snarl: the finished sound bends both (winking) | the same |
 
 - A **wave key** goes round with each tap: Wave I (dark), Wave II (lit), both (winking).
 - **LFO reset:** tap to restart the LFO. Hold it half a second to lock the LFO to the Swell (it then

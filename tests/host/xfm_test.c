@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
-/* Cross-FM (Cross-mod on pitch, v0.3): each drone's sound bends the other's pitch, and their pitches stay where
- * they're set: each oscillator's average frequency, counted over 20 s from its phase, within 2 cents of its
+/* Cross-FM and Snarl (Cross-mod on pitch, on the output: v0.3): each drone's sound bends the other's pitch, or the
+ * finished sound bends both, and their pitches stay where they're set: each oscillator's average frequency, counted over 20 s from its phase, within 2 cents of its
  * frequency with Cross-mod off, at every depth. Built with the engine itself (its oscillators' phases) */
 #include "drone.c"
 #include <math.h>
@@ -52,6 +52,15 @@ int main(void)
         if (fabs(c[0]) > 2.0 || fabs(c[1]) > 2.0)
             bad = 1;
     }
-    printf("%s cross-FM: both drones keep their pitch (within 2 cents) at every depth\n", bad ? "FAIL" : "ok  ");
+    for (i = 0; i < 3; i++) {
+        double c[2];
+        count(DR_XMOD_OUT, amts[i], hz);
+        for (g = 0; g < 2; g++)
+            c[g] = 1200.0 * log2(hz[g] / ref[g]);
+        printf("    Snarl at %3d: drone I %+.2f cents, drone II %+.2f cents\n", amts[i], c[0], c[1]);
+        if (fabs(c[0]) > 2.0 || fabs(c[1]) > 2.0)
+            bad = 1;
+    }
+    printf("%s cross-FM, Snarl: both drones keep their pitch (within 2 cents) at every depth\n", bad ? "FAIL" : "ok  ");
     return bad;
 }
