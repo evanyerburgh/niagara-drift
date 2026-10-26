@@ -75,4 +75,6 @@ void ui_init(void);
 void ui_frame(void);
 void ui_input_only(void);
 int ui_dirty(void);
+void ui_clock_stats(uint32_t w[8]);   /* the MIDI clock in: tempo x 100, jitter RMS / largest (us), pulses, Starts,
+                                       * Continues, Stops, ms since the last pulse (tools/fm1_clock.py) */
 void ui_say(const char *a, const char *b);

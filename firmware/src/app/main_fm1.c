@@ -278,6 +278,14 @@ static void dbg_service(void)
         backup_cmd(ota_dec[2], ota_dec + 6, d - 7u);
     } else if (d == 7u && ota_dec[2] == 0x11) {
         ota_reply_identity();
+    } else if (d == 7u && ota_dec[2] == 0x7C) {     /* the MIDI clock in (v0.3, step 3): ui_clock_stats */
+        uint32_t w[8];
+        uint8_t b[32];
+        uint32_t i;
+        ui_clock_stats(w);
+        for (i = 0; i < 32u; i++)
+            b[i] = (uint8_t)(w[i / 4u] >> (8u * (i % 4u)));
+        ota_send_msg(0x7C, b, sizeof b);
     } else if (d == 7u && ota_dec[2] == 0x7E) {
         const uint32_t w[8] = {om_dbg.cpu_q8, om_dbg.max_us, HALF_FRAMES * 1000000u / FS, om_dbg.late,
                                om_dbg.halves, om_dbg.nested, om_dbg.boots, om_dbg.last_us};

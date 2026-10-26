@@ -1077,6 +1077,17 @@ static void clk_pulse(uint32_t us)
     if (clk.n >= CLK_N)
         clk_fit();
 }
+void ui_clock_stats(uint32_t w[8])
+{
+    w[0] = (uint32_t)(clk.bpm * 100.0f + 0.5f);
+    w[1] = (uint32_t)(clk.jit * 1000.0f + 0.5f);
+    w[2] = (uint32_t)(clk.jmax * 1000.0f + 0.5f);
+    w[3] = clk.n;
+    w[4] = clk.starts;
+    w[5] = clk.conts;
+    w[6] = clk.stops;
+    w[7] = clk.n ? plat_ms() - clk.last_ms : 0xFFFFFFFFu;
+}
 #ifdef OM_CLOCK_TEST
 static char *dec1(float v, char *b);
 static void clk_show(void)                             /* the test build: the clock's tempo and jitter, twice a second */
