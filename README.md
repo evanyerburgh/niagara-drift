@@ -85,13 +85,14 @@ still works. If an FM-1 won't start at all, a Mac can still put the stock firmwa
 1. **PLAY**: the drones fade in.
 2. **Tap the white keys 1–12**: a new FM-1 starts on the Presets, a sound on each key ([The Presets](#the-presets)).
 3. **Hold a top white key** (Weight, Shift, Clean, Wash) and let go: a gesture ([The gestures](#the-gestures)).
-4. **Tune each drone**: black key 4 turns Pitch lock off, then KNOB 1 and KNOB 3 on the Play page.
+4. **Tune each drone**: black key 4 turns Pitch lock off, then KNOB 1 and KNOB 3 on the Drones page.
 5. **Change the sound**: the page buttons (ENV, EDIT, LFO, …) and KNOB 1–4 ([Pages](#pages)).
 6. **Save your sound**: SEL + D5 picks bank A, then hold SAVE and tap a white key.
 7. **PLAY** again: the drones fade out.
 
 The keys aren't notes: the drones play on their own. The lower 12 white keys hold presets and scenes, the top four
-are gestures, the black keys are switches.
+are gestures, the black keys are switches. The first time you do some things (blend into a scene, flip a black key, play
+a gesture, open the effects…) the screen shows a one-line tip about what's next to it, once.
 
 ### The Presets
 
@@ -122,9 +123,9 @@ made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE
 | | |
 |---|---|
 | **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Pitch lock, Fade, Switch time and Scene time stay as they are |
-| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where it began, at the same speed. Press it again on the way back and you pick up from there |
+| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and the blend **stays** where it was as you lifted your finger: a sound of its own between the two (SEL + SAVE takes you back) |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
-| **Press SEL while holding**, then let go | the blend **holds** where it is from the moment SEL goes down until you let go of the scene key (lifting your finger can't move it, and nor can letting go of SEL first), and **stays**: a sound of its own between the two |
+| **SEL + SAVE** | **undo**: back to the sound before your last scene tap or blend, gliding over the Scene time (a knob turned since goes back too; the room's settings, such as Stereo or the Scene time, stay). Again, and it goes forward to where you were. Keep SEL down until you've let go of SAVE |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A, B or C) |
 | **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
 | **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The gestures](#the-gestures)) |
@@ -176,19 +177,19 @@ knob you're turning.
 
 Tap a page button and the knobs stay on that page. Hold it to peek: turn a knob, let go, and you're
 back. Tap it again for its next page (FX has three); "1/2" by the page's name shows which of its pages you're on. A page
-button opens the page you last used there (HOME always opens Play 1), so after visiting Reverb, holding FX
+button opens the page you last used there (HOME always opens Drones 1), so after visiting Reverb, holding FX
 peeks at Reverb.
 Each page's screen shows a picture of what its knobs do, and the four values below it. Every knob
 glides: a slow turn is a smooth sweep, never steps; turn faster to go further. The levels follow your ear: halfway is about a quarter as loud.
 
-#### Play · HOME
+#### Drones · HOME
 
-<img src="docs/img/page-play.png" width="488" alt="The Play 1 and Play 2 pages: each drone's waveform; each drone's level and filter curve">
+<img src="docs/img/page-play.png" width="488" alt="The Drones 1 and Drones 2 pages: each drone's waveform; each drone's level and filter curve">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Play 1 | I pitch | I cutoff | II pitch | II cutoff |
-| Play 2 | I level | I resonance | II level | II resonance |
+| Drones 1 | I pitch | I cutoff | II pitch | II cutoff |
+| Drones 2 | I level | I resonance | II level | II resonance |
 
 - **Pitch** goes from 1.6 kHz down to 2 Hz. Under 27 Hz (where the screen shows Hz, not a note) a drone stops being a
   tone and becomes a pulse of clicks, a click a cycle: rhythm, and through a drive they ping against the other drone.
@@ -390,7 +391,8 @@ Lit means on. They follow the page: on the LFO pages they set the LFO's routing.
 by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8), the links (9–11).
 
 **Hold SEL** for a moment and the screen draws the black keys as they sit on the keyboard, lit as on the panel,
-with their groups named. **Touch a black key while SEL is held** and the screen names it and its setting ("I: SUB
+with their groups named, and the top four white keys as the banks they pick (A, B, C, P), the one playing lit.
+**Touch a black key while SEL is held** and the screen names it and its setting ("I: SUB
 -1 OCT"), without switching it: let go of SEL to play it. The map steps aside while you turn a knob or hold a white
 key.
 
@@ -416,7 +418,8 @@ key.
 - With **pitch link** on, KNOB 3 sets the gap between the drones, in semitones and cents ("+7 st", "+8 st +20").
 - A **filter key** goes round with each tap: low-pass (dark), band-pass (winking), high-pass (lit).
 - A **sub key** goes round with each tap: −1 octave (dark), −2 octaves (lit), then the subharmonics ⅓
-  and ⅕ of the pitch (winking).
+  and ⅕ of the pitch (winking). With the drone's OSC MIX at 0 (Sub · Drive) the sub isn't heard: the screen says
+  so ("OSC MIX 0 · EDIT x2").
 
 ### MIDI
 

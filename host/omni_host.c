@@ -633,6 +633,8 @@ int main(int argc, char **argv)
             printf("\n");
         } else if (!strcmp(cmd, "expect"))
             fails += expect(a, b);
+        else if (!strcmp(cmd, "notips"))            /* every one-time tip seen (the manual's pictures) */
+            memset(proj.seen, 0xFF, sizeof proj.seen);
         else if (!strcmp(cmd, "classic")) {         /* the starting sound before 2026-10-17, for the scenarios made on
                                                     * it (they test the controls, not the starting sound) */
             static const int16_t OLD[][2] = {{DR_GP(0, GP_FLFO_DEPTH), 25}, {DR_GP(1, GP_FLFO_DEPTH), -25},

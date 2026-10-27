@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # The README's pictures: runs tests/scenarios/pages.omni in the host simulator (each page with values that
 # show something) and puts each button's page, or its two pages side by side, in docs/img/page-<name>.png;
-# and draws the FM-1 itself (the emulator's geometry, the Play page on its screen) with what every knob,
+# and draws the FM-1 itself (the emulator's geometry, the Drones page on its screen) with what every knob,
 # button and key does in Niagara Drift written on it: docs/img/panel.png.
 #   sh host/build_host.sh && python3 tools/make_screens.py
 import os, subprocess, sys, tempfile
@@ -48,7 +48,7 @@ KNOBS = [(105, 100, 24, "MASTER", "Volume", PALE), (215, 100, 24, "SELECT", "LFO
          (105, 210, 24, "PRESETS", "Gesture time", PALE), (215, 210, 24, "ALGORITHM", "Movement", LILAC)] + \
         [(610 + i * 104, 100, 22, "KNOB%d" % (i + 1), None, None) for i in range(4)]
 ROW1 = [("FX", "Delay"), ("SEL", "Fine"), ("ENV", "Tone"), ("LFO", "Depths"), ("EDIT", "Osc"), ("GLO", "Setup")]
-ROW2 = [("HOME", "Play"), ("SAVE", "Store"), ("ARP", "Swell"), ("SEQ", "Partner"), ("PLAY", "On/off"), ("REC", "Loop")]
+ROW2 = [("HOME", "Drones"), ("SAVE", "Store"), ("ARP", "Swell"), ("SEQ", "Partner"), ("PLAY", "On/off"), ("REC", "Loop")]
 BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14]
 BLACK = [(["Partner"], AMBER), (["Sub"], AMBER), (["Filter"], AMBER), (["Pitch", "lock"], None), (["LFO", "reset"], None),
          (["Partner"], TEAL), (["Sub"], TEAL), (["Filter"], TEAL), (["Pitch", "link"], None), (["Hard", "sync"], None),

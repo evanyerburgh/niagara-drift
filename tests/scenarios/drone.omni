@@ -15,7 +15,7 @@ expect par74 0
 # 44 hard sync, 45 pitch link, 46 link offset, 47 LFO rate, 48 Wave I, 49 Wave II, 50 Glide, 51 Fade, 55 Pulse,
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
 # depth.
-# Pages: 0 Play 1 1 Play 2 2 Tone 1 3 Life 4 Osc 5 Sub · Drive 6 LFO depths 7 Mods 8 Partner 9 Pitch moves
+# Pages: 0 Drones 1 1 Drones 2 2 Tone 1 3 Life 4 Osc 5 Sub · Drive 6 LFO depths 7 Mods 8 Partner 9 Pitch moves
 # 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb 15 Types.
 # a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
 expect bank 3
@@ -43,7 +43,7 @@ wait 500
 expect peak_db_max -0.1
 expect peak_db_min -20
 shot playing.png
-# the Play page: KNOB 1 drone I's pitch (60 cents a detent; SEL held, a cent), KNOB 2 its cutoff,
+# the Drones page: KNOB 1 drone I's pitch (60 cents a detent; SEL held, a cent), KNOB 2 its cutoff,
 # KNOB 3-4 drone II's
 spin K1 2
 expect par0 5120
@@ -72,7 +72,7 @@ expect pitch0 5217
 spin K1 -3
 expect par0 5037
 wait 100
-# HOME again: Play 2, each drone's level and resonance (KNOB 1-2 drone I, 3-4 drone II)
+# HOME again: Drones 2, each drone's level and resonance (KNOB 1-2 drone I, 3-4 drone II)
 tap HOME
 expect view 1
 spin K3 -20
@@ -423,7 +423,7 @@ expect par97 50
 tap GLO
 expect view 10
 # a page button opens the page last shown there: Reverb, then home, then FX held (a peek) shows Reverb; HOME is
-# always Play 1
+# always Drones 1
 tap HOME
 expect view 0
 tap FX
@@ -474,8 +474,9 @@ wait 2500
 expect fade 0
 wait 4500
 expect dirty 0
-# the knob came back where it was: the flash has this sound already, so nothing is written
-expect store_writes 1
+# the knob came back where it was: the flash has this sound already; written once, for the tip seen since the save
+# (FX's first time, v0.3: the tips' seen flags go with the next save)
+expect store_writes 2
 wavstop
 # everything comes back after a reboot
 reboot
@@ -493,7 +494,7 @@ press SAVE
 tapkey w0
 release SAVE
 expect scenes 1
-expect store_writes 2
+expect store_writes 3
 expect view 0
 # the sound is scene 1 (its key blinks), until a knob is turned
 expect scene_at 0

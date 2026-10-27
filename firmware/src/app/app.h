@@ -47,7 +47,8 @@ typedef struct {
     uint8_t mtime;                       /* GESTURE TIME, 0..100 (PRESETS): every gesture's speed x0.1 .. x10, 50 as set
                                           * (the player's, not a scene's; was the macro PRESETS played, format <= 25) */
     uint8_t gkey_old[4];                 /* unused since 29 (what each gesture key played, 27-28) */
-    uint8_t rsv[9];                      /* room to grow: an older, shorter project loads (zeros here) */
+    uint8_t seen[2];                     /* the one-time tips shown (bit TIP_*; v0.3): the player's, not a scene's */
+    uint8_t rsv[7];                      /* room to grow: an older, shorter project loads (zeros here) */
     uint16_t scene_used;                 /* bank A: bit n, scene n holds a sound */
     int16_t scene[NSCENES][DR_NPARAMS];  /* bank A: every parameter, recalled but for the room's settings */
 } project_t;

@@ -360,7 +360,8 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     <dl class="acts">
       <div><dt>Presets</dt><dd>Twelve sounds to start from, one on each key: Niagara · Abyss · Eerie · Glass · Heaven · Tanpura · Tape · Whistle · Howl · Cathedral · Metal · Clean. Your first bank</dd></div>
       <div><dt>Go to a scene</dt><dd>Tap a <span class="cap white">white key</span>: the sound glides there</dd></div>
-      <div><dt>Blend into a scene</dt><dd>On the FM‑1: hold a <span class="cap white">white key</span> and press harder to go further in; all the way to take it; <span class="cap">SEL</span> while holding, then let go, keeps the blend. Here: hold to visit, let go to come back</dd></div>
+      <div><dt>Blend into a scene</dt><dd>On the FM‑1: hold a <span class="cap white">white key</span> and press harder to go further in; all the way to take it; let go and the blend stays. Here: hold to visit, let go to come back</dd></div>
+      <div><dt>Undo a scene change</dt><dd>Hold <span class="cap">SEL</span>, tap <span class="cap">SAVE</span>: back to the sound before your last tap or blend; again, forward</dd></div>
       <div><dt>Pick a bank</dt><dd>Hold <span class="cap">SEL</span>, tap one of the top four <span class="cap white">white keys</span>: A · B · C · Presets (alone they’re the gestures)</dd></div>
       <div><dt>Save a sound to a scene</dt><dd>In bank A, B or C (the Presets are fixed): hold <span class="cap">SAVE</span> first, then tap a <span class="cap white">white key</span></dd></div>
       <div><dt>Save everything</dt><dd>Tap <span class="cap">SAVE</span></dd></div>
@@ -393,14 +394,14 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
   </div>
 
   <div class="g-card one-l">
-    <h3>The Play page</h3>
+    <h3>The Drones pages</h3>
     <div class="pmap">
       <div class="khdr" aria-hidden="true"><span></span><div class="kcols"><b class="d1 two">Drone I</b><b class="d2 two">Drone II</b><span class="cap knob d1">KNOB 1</span><span class="cap knob d1">KNOB 2</span><span class="cap knob d2">KNOB 3</span><span class="cap knob d2">KNOB 4</span></div></div>
       <div class="pblock">
         <div class="g-btn">HOME</div>
         <div class="pstack">
-        <div class="g-page"><i>Play 1</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Pitch</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Cutoff</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Pitch</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Cutoff</span></div>
-        <div class="g-page"><i>Play 2</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Level</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Reso</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Level</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Reso</span></div>
+        <div class="g-page"><i>Drones 1</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Pitch</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Cutoff</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Pitch</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Cutoff</span></div>
+        <div class="g-page"><i>Drones 2</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Level</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Reso</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Level</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Reso</span></div>
         <p class="pnote combos"><span>Start or stop drone II alone: <span class="cap">SEL</span> + <span class="cap">PLAY</span></span></p>
         </div>
       </div>
@@ -675,7 +676,7 @@ button(72, 272, 82, 38, "OCT-", "Wave I", LILAC); button(170, 272, 82, 38, "OCT+
 el("rect", { x: 300, y: 44, width: 236, height: 236, rx: 26, fill: "#0a0a0b" });
 el("rect", { x: 568, y: 160, width: 400, height: 140, rx: 18, fill: TRAY });
 const ROW1 = [["FX", "Delay"], ["SEL", "Fine"], ["ENV", "Tone"], ["LFO", "Depths"], ["EDIT", "Osc"], ["GLO", "Setup"]],
-      ROW2 = [["HOME", "Play"], ["SAVE", "Store"], ["ARP", "Swell"], ["SEQ", "Partner"], ["PLAY", "On/off"], ["REC", "Loop"]];
+      ROW2 = [["HOME", "Drones"], ["SAVE", "Store"], ["ARP", "Swell"], ["SEQ", "Partner"], ["PLAY", "On/off"], ["REC", "Loop"]];
 for (let i = 0; i < 6; i++) {
   button(582 + i * 63, 174, 54, 48, ...ROW1[i]);
   button(582 + i * 63, 236, 54, 48, ...ROW2[i]);
@@ -741,7 +742,7 @@ function hit(c, cls) {
 const TIP = { FX: "Delay: drive, time, repeats, mix (again: Reverb: length to Inf, damp, mix; again: Types: the delay's, the reverb's)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
   ENV: "Tone 1: noise and its colour, white to pink (again: Life: character, feedback, age, drift); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: Mods: rate mod, mod by, X-mod amount, delay LFO)",
   EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure)",
-  HOME: "Play 1: pitch, cutoff (again: Play 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in bank A, B or C)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
+  HOME: "Drones 1: pitch, cutoff (again: Drones 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in bank A, B or C)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
   PLAY: "Drones in / out (with SEL: drone II alone)", REC: "Motion loop: tap to record knob moves, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "Gesture time: every gesture faster (right) or slower (left)", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };

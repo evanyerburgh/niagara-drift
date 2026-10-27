@@ -29,11 +29,31 @@ pressure w0 64
 wait 800
 expect par7 >480
 expect par7 <540
-# let go: back to where it began, at the same speed (0.6 s from half way)
+# let go: the blend stays, a sound of its own (v0.3; it went back unless SEL held it)
 key w0 up
 wait 1200
-expect par7 300
+expect par7 >480
+expect par7 <540
 expect scene_at -1
+# SEL + SAVE: undo, back to the sound before the blend, over the Scene time
+press SEL
+tap SAVE
+release SEL
+wait 1300
+expect par7 300
+# ... and again: forward to the blend
+press SEL
+tap SAVE
+release SEL
+wait 1300
+expect par7 >480
+expect par7 <540
+# back to before it, for what follows
+press SEL
+tap SAVE
+release SEL
+wait 1300
+expect par7 300
 # a tap (let go under half a second), however hard: there, over the Scene time (1.1 s), and stay
 key w0 down
 pressure w0 127
@@ -68,65 +88,55 @@ key w0 up
 wait 1200
 expect par7 700
 expect scene_at 0
-# SEL held as you let go: the blend stays (parked); SEL down holds it, so the finger's pressure falling on the
-# way up doesn't take it back
+# the finger lifting (its pressure falling on the way up) before the key lets go doesn't take the blend back: let
+# go, it stays where it was a moment before
 spin K2 -40
 wait 300
 key w0 down
 pressure w0 64
 wait 1000
-press SEL
-wait 100
 pressure w0 30
-wait 300
+wait 60
 pressure w0 0
-wait 300
+wait 40
 key w0 up
-release SEL
-wait 1200
-expect par7 >480
+wait 600
+expect par7 >470
 expect par7 <540
 expect scene_at -1
-# ... and with SEL let go first: still held until the key lets go (Evan, 2026-10-19: it moved again)
-spin K2 -21
-wait 300
-key w0 down
-pressure w0 64
-wait 1000
+# undone: back to the sound before it
 press SEL
-wait 150
+tap SAVE
 release SEL
-wait 150
-pressure w0 30
-wait 300
-pressure w0 0
-wait 300
-expect par7 >480
-key w0 up
-wait 1200
-expect par7 >480
-expect par7 <540
-expect scene_at -1
-# pressed again on the way back: picked up from there, and back to where it first began
-spin K2 -21
-wait 300
-expect par7 295
+wait 1300
+expect par7 300
+# a tap held past the crossfade's start (350 ms): undo goes back to the sound before the press, not to the
+# blend it had begun (the review, 2026-10-27)
 key w0 down
-pressure w0 127
-wait 300
-pressure w0 80
-wait 300
+pressure w0 100
+wait 350
 key w0 up
-wait 150
-key w0 down
-pressure w0 64
-wait 800
-expect par7 >480
-key w0 up
-wait 1200
-expect par7 295
+wait 1600
+expect par7 700
+press SEL
+tap SAVE
+release SEL
+wait 1300
+expect par7 300
+# undo leaves the room's settings (Stereo) where they are
+tapkey w0
+wait 1600
+expect par7 700
+set 53 90
+press SEL
+tap SAVE
+release SEL
+wait 1300
+expect par7 300
+expect par53 90
+set 53 60
 # turning ALGORITHM (Movement, par75) while a scene switch is on its way: the switch lets go of it, and the
-# rest still lands (scene A2 stored with Movement 50 and cutoff 695; the sound at Movement 80, cutoff 295)
+# rest still lands (scene A2 stored with Movement 50 and cutoff 700; the sound at Movement 80, cutoff 300)
 spin K2 40
 wait 300
 press SAVE
@@ -147,4 +157,4 @@ wait 200
 spin ALGO 5
 wait 7500
 expect par75 >90
-expect par7 695
+expect par7 700
