@@ -426,3 +426,12 @@ at the end. The current state is in the [README](../README.md) and the code.
   `.claude/CLAUDE.md` (the FM-1's budget, what the build enforces) and `.claude/rules/dsp.md` (audio code). Every
   firmware PR body carries `tools/budget.py`'s line: RAM, pool headroom, image size and the engine's worst case,
   against main.
+- 2026-10-27 (Evan): **the mapping (0.3, step 4).** HOME's pages are **Drones 1 / 2** (were Play 1 / 2). The SEL map draws
+  the top four white keys as the **banks** they pick (A, B, C, P), the one playing lit. **One-time tips**, once each, when
+  the screen is free: PRESS HARDER: BLEND (a scene tap), HOLD SEL: KEY NAMES (a black key), HOLD: IN · TAP: LATCH (a
+  gesture), TAP FX: REVERB, TYPES (Delay), KNOB 3: INTO REVERB (Types), KEY 11: PITCH, SNARL (cross-mod on), SWELL KNOB
+  1: DIVISION (a clock), SEL + SAVE: UNDO (a scene replacing a sound of your own); seen flags in the project's spare
+  bytes (no format change), saved with the next save. **A crossfade stays when you let go**, where it was 150 ms before
+  (the finger lifting); SEL no longer holds it. **SEL + SAVE undoes** the last scene tap or blend, over the Scene time;
+  again, forward. The Sub key with OSC MIX at 0 says so after its step ("OSC MIX 0 · EDIT x2"). Pitch lock stays as it
+  is (scenes keep your pitch while it's on); the pitch knobs on semitones go with clock out.

@@ -4,7 +4,7 @@
  * unity build (after gfx.c and project.c); the host simulator includes it too.
  *
  * Always live:
- *   KNOB 1-2       drone I's two values on the page shown, KNOB 3-4 drone II's; the Play page (HOME):
+ *   KNOB 1-2       drone I's two values on the page shown, KNOB 3-4 drone II's; the Drones page (HOME):
  *                  Pitch and Cutoff. A pitch is continuous, 2 Hz .. 1.6 kHz, a slow full turn an octave;
  *                  hold SEL for a cent a detent. With PITCH LINK on, KNOB 3 moves drone II's offset.
  *   SELECT         LFO rate      ALGORITHM   MOVEMENT: every LFO depth together, 0 .. 200 %
@@ -12,7 +12,7 @@
  *   PLAY           the drone fades in / out      MASTER   volume      SAVE   saves
  * One button away (tap: the knobs stay on its page, pressed again its second page; hold: they switch
  * only while it's held, and the page you were on comes back when it's let go):
- *   HOME Play, Play 2 (Level, Reso) · ENV Tone (Noise, Colour: white .. pink) · EDIT Osc (X-Wave, PW), Source
+ *   HOME Drones 1, Drones 2 (Level, Reso) · ENV Tone (Noise, Colour: white .. pink) · EDIT Osc (X-Wave, PW), Source
  *   (Osc mix, Drive) · LFO LFO (depths), Mod (Rate mod, Mod by, X-mod amount, Delay LFO depth) · SEQ Partner ·
  *   GLO Setup, Setup 2 (Switch time, Scene time, Tune, Tuning), Setup 3 (Speaker,
  *   Pressure) (global). The top bar shows a dot for each of a
@@ -46,7 +46,7 @@
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
 enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_MOVES, V_SETUP, V_SETUP2,
        V_PULSE, V_FX, V_FX2, V_FX3, NVIEWS };
-static const char *const VIEW_NAME[NVIEWS] = {"Play 1", "Play 2", "Tone 1", "Life", "Osc", "Sub · Drive", "LFO depths",
+static const char *const VIEW_NAME[NVIEWS] = {"Drones 1", "Drones 2", "Tone 1", "Life", "Osc", "Sub · Drive", "LFO depths",
                                               "Mods", "Partner", "Pitch moves", "Setup 1", "Setup 2", "Swell", "Delay", "Reverb",
                                               "Types"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
@@ -171,7 +171,13 @@ static struct {
     int16_t morph_to[DR_NPARAMS];      /* the scene being morphed to, as it was when its key was pressed */
     int8_t press;                      /* the scene key held in a pressure crossfade (v0.2), or -1 */
     uint8_t press_done;                /* ... pressed through: the scene is taken */
-    uint8_t press_held;                /* ... SEL pressed during it: held where it is until the key lets go */
+    int16_t undo[DR_NPARAMS];          /* UNDO (SEL + SAVE, v0.3): the sound before the last scene tap or blend */
+    int8_t undo_ok, undo_at;           /* ... there is one; the scene it was (-1: a sound of its own) */
+    uint16_t tip_q;                    /* the one-time tips waiting for the screen (bit TIP_*) */
+    char msg_next[24];                 /* a message's second part, shown after it (too long for one) */
+    float px_h[16];                    /* a crossfade's last frames (how far in), for the let-go (PR_LIFT_MS) */
+    uint32_t pt_h[16];
+    uint8_t ph_i;
     uint32_t press_t0, press_hi_t;     /* ... since; above the commit level since (0: not) */
     uint32_t press_ft;                 /* ... the last frame's time (its glide toward the pressure) */
     float press_x;                     /* ... how far into the scene, 0..1 */
@@ -212,6 +218,41 @@ static void say_c(const char *a, const char *b, uint16_t col)
 void ui_say(const char *a, const char *b) { say(a, b); }
 
 static void mark_dirty(void) { ui.dirty = 1; ui.chg_t = plat_ms(); }
+
+/* ONE-TIME TIPS (v0.3): the first time a player does a thing, a line on what's next to it, once (the project keeps
+ * what's been seen, the player's, as the Gesture time is). A tip waits for the screen: after any message */
+enum { TIP_BLEND, TIP_NAMES, TIP_GEST, TIP_FX, TIP_INTO, TIP_XMOD, TIP_CLOCK, TIP_UNDO, NTIPS };
+static const char *const TIP_TEXT[NTIPS] = {   /* one line, the banner's width (~23) */
+    "PRESS HARDER: BLEND", "HOLD SEL: KEY NAMES", "HOLD: IN · TAP: LATCH", "TAP FX: REVERB, TYPES",
+    "KNOB 3: INTO REVERB", "KEY 11: PITCH, SNARL", "SWELL KNOB 1: DIVISION", "SEL + SAVE: UNDO"};
+#define TIP_MS 3500u
+static int tip_seen(int t) { return proj.seen[t >> 3] >> (t & 7) & 1u; }
+static void tip(int t)
+{
+    if (!tip_seen(t))
+        ui.tip_q |= (uint16_t)(1u << t);
+}
+static void tips_run(void)                             /* each frame: a tip waiting, the screen free */
+{
+    int t;
+    if (plat_ms() < ui.msg_until + (ui.msg_next[0] ? 0u : 300u))
+        return;
+    if (ui.msg_next[0]) {                              /* a message's second part, just after it */
+        say_c(ui.msg_next, 0, ui.msg_col);
+        ui.msg_next[0] = 0;
+        return;
+    }
+    if (!ui.tip_q)
+        return;
+    for (t = 0; !(ui.tip_q >> t & 1u); t++)
+        ;
+    ui.tip_q &= (uint16_t)~(1u << t);
+    if (tip_seen(t))
+        return;
+    proj.seen[t >> 3] |= (uint8_t)(1u << (t & 7));   /* saved with the next save (no write of its own) */
+    say_c(TIP_TEXT[t], 0, K_GOLD);
+    ui.msg_until = plat_ms() + TIP_MS;
+}
 int ui_dirty(void) { return ui.dirty != 0; }
 
 static void itoa_u(uint32_t v, char *b)
@@ -248,7 +289,7 @@ static void param_set(int p, int v)
 
 static void loop_note(int p, int v, uint32_t slide);  /* the motion loop notes knob moves (below) */
 
-/* the parameter knob i moves on the page shown, or -1 (on the Play page, KNOB 3 is the link offset while
+/* the parameter knob i moves on the page shown, or -1 (on the Drones page, KNOB 3 is the link offset while
  * PITCH LINK is on) */
 static int knob_param(int i)
 {
@@ -460,6 +501,8 @@ static void sw_flip(sw_t w)
         param_set(base + GP_SUBOCT, v);
         what = "SUB";
         st = SUB[v];
+        if (proj.par[base + GP_MIX] <= 2)      /* not heard: OSC MIX (Sub · Drive, EDIT twice) is at the oscillators */
+            scopy(ui.msg_next, "OSC MIX 0 · EDIT x2");
         break;
     }
     case S_PLOCK: param_set(P_PLOCK, on); q = a; what = "PITCH LOCK"; st = on ? "ON" : "OFF"; break;
@@ -483,6 +526,8 @@ static void sw_flip(sw_t w)
         q = a;
         what = "CROSS-MOD";
         st = m == DR_XMOD_OUT ? "SNARL: OUT > I II" : m == DR_XMOD_FM ? "PITCH I <> II" : m ? "I > II CUTOFF" : "OFF";
+        if (m == 1)
+            tip(TIP_XMOD);
         break;
     }
     case S_LFORESET: dr_lfo_reset(); q = a; what = "LFO"; st = "RESET"; break;
@@ -503,6 +548,7 @@ static void sw_toggle(sw_t w)
     int k;
     memcpy(was, proj.par, sizeof was);
     sw_flip(w);
+    tip(TIP_NAMES);
     for (k = 0; k < DR_NPARAMS; k++)
         if (proj.par[k] != was[k])
             hands_on(k);
@@ -516,6 +562,10 @@ static void set_view(int v)
     ui.view = (uint8_t)v;
     for (i = 0; i < 4; i++)
         ui.touch_t[i] = 0;
+    if (v == V_FX)
+        tip(TIP_FX);
+    else if (v == V_FX3)
+        tip(TIP_INTO);
     for (i = 0; i < NPAGE_BTN; i++)                    /* remembered: the button opens it next time */
         if (on_pages((int)i))
             ui.page_last[i] = (uint8_t)(v - PAGE_BTN[i].first);
@@ -531,7 +581,7 @@ static int page_btn(int b)                             /* the index in PAGE_BTN,
 }
 
 /* a page button pressed: the page of its last shown at once (the review: Reverb, Tone 2, Moves couldn't be peeked;
- * HOME always Play 1, home), unless already on its pages (then the next on a tap) */
+ * HOME always Drones 1, home), unless already on its pages (then the next on a tap) */
 static void page_down(int b)
 {
     int i = page_btn(b);
@@ -800,6 +850,44 @@ static float scene_s(void)
     return 0.1f * fm_exp2f((float)proj.par[P_SCENE_T] * 0.115507f);
 }
 
+#define VISIT_BACK NSCENES                     /* the morph's target: ui.visit_back (a visit's way back, an undo) */
+/* UNDO (v0.3, SEL + SAVE): back to the sound before the last scene tap or blend, over the Scene time; again, forward.
+ * Its first time replacing a sound of the player's own (no scene's), a tip says how */
+static void undo_keep(void)
+{
+    memcpy(ui.undo, proj.par, sizeof ui.undo);
+    ui.undo_ok = 1;
+    ui.undo_at = ui.scene_at;
+    if (ui.scene_at < 0)
+        tip(TIP_UNDO);
+}
+static void scene_undo(void)
+{
+    int k;
+    if (!ui.undo_ok) {
+        say_c("NOTHING TO UNDO", 0, K_GOLD);
+        return;
+    }
+    for (k = 0; k < DR_NPARAMS; k++) {
+        int16_t v = ui.undo[k];
+        ui.undo[k] = proj.par[k];                      /* undo again: forward to where it was */
+        ui.morph_from[k] = proj.par[k];
+        ui.visit_back[k] = v;
+    }
+    {
+        int8_t at = ui.undo_at;
+        ui.undo_at = ui.scene_at;
+        ui.scene_at = at;
+    }
+    hands_clear();
+    ui.press = -1;
+    ui.visit = -1;
+    ui.morph = VISIT_BACK;
+    ui.morph_t0 = plat_ms();
+    ui.morph_ms = (uint32_t)(scene_s() * 1000.0f);
+    say_c("UNDO", "AGAIN: REDO", K_GOLD);
+}
+
 static void scene_recall(int n)                        /* a white key: morph there over the Scene time */
 {
     char t[12] = "SCENE ";
@@ -810,6 +898,7 @@ static void scene_recall(int n)                        /* a white key: morph the
         say(t, "EMPTY: SAVE+KEY");
         return;
     }
+    undo_keep();
     for (k = 0; k < DR_NPARAMS; k++) {
         ui.morph_from[k] = proj.par[k];
         ui.morph_to[k] = sc[k];
@@ -823,7 +912,6 @@ static void scene_recall(int n)                        /* a white key: morph the
 }
 
 /* a visit let go: morph back to the sound before it, over the Scene time */
-#define VISIT_BACK NSCENES
 static void scene_back(void)
 {
     int k;
@@ -885,23 +973,25 @@ static void scene_morph(void)
  * moves; PR_FULL is all the way; held at PR_COMMIT for PR_COMMIT_MS the scene is taken (the key flashes);
  * a tap (let go under PR_TAP_MS, however hard) goes there to stay. The pressure is where the sound heads, not
  * where it is: it glides there no faster than the whole way in a Scene time, so a hard press glides in as a tap
- * does and a slow one follows the finger (Evan, 2026-10-19: a quick press to 100 was a jump). Let go: back to
- * where it began at that speed; SEL pressed on the way holds the blend (until the key lets go: lifting the
- * finger, or SEL first, doesn't move it), and it stays. Pressing it again on the way back picks up from there. */
+ * does and a slow one follows the finger (Evan, 2026-10-19: a quick press to 100 was a jump). Let go: the blend
+ * stays, where it was before the finger lifted, a sound of its own (v0.3; it went back unless SEL held it; SEL + SAVE
+ * undoes it now). */
 #define PR_DEAD 0.08f
 #define PR_FULL 0.90f
 #define PR_COMMIT 0.90f
 #define PR_COMMIT_MS 300u
 #define PR_TAP_MS 500u                 /* a scene key let go sooner: a tap, there to stay, as a gesture key (Evan,
                                         * 2026-10-18: 250 was too quick, a relaxed tap became a visit and went BACK) */
+#define PR_LIFT_MS 150u                /* ... let go: as far in as it got in this long before (the finger lifting) */
 #define PR_WAIT_MS 250u                /* ... held this long, the pressure starts to move the sound (a crossfade) */
 static void press_start(int n, const int16_t *sc)
 {
     int k;
     float x0 = 0.0f;
     if (!(ui.morph == VISIT_BACK && ui.visit == -2 - n)) {  /* not already gliding back from this key: */
-        for (k = 0; k < DR_NPARAMS; k++)                   /* where letting go comes back to */
+        for (k = 0; k < DR_NPARAMS; k++)                   /* where the blend starts from */
             ui.visit_back[k] = proj.par[k];
+        undo_keep();
         hands_clear();
     } else if (ui.morph_ms) {                              /* on the way back: from where it is now */
         float p = fm_clampf((float)(plat_ms() - ui.morph_t0) / (float)ui.morph_ms, 0.0f, 1.0f);
@@ -913,7 +1003,7 @@ static void press_start(int n, const int16_t *sc)
     ui.morph = -1;
     ui.press = (int8_t)n;
     ui.press_done = 0;
-    ui.press_held = 0;
+    memset(ui.pt_h, 0, sizeof ui.pt_h);
     ui.press_ft = plat_ms();
     ui.press_t0 = plat_ms();
     ui.press_hi_t = 0;
@@ -937,28 +1027,6 @@ static void press_run(void)                            /* each frame, while a sc
     uint32_t now = plat_ms();
     if (ui.press < 0)
         return;
-    if (!ui.press_done && now - ui.press_t0 >= PR_WAIT_MS && (ui.press_held || (ui.btn >> B_SEL & 1u))) {
-        /* SEL down during a crossfade: the blend holds where it is, so lifting the finger (its pressure falls
-         * on the way up, before the key lets go) can't take it back, SEL let go first or not; let go to keep it */
-        ui.press_held = 1;
-        ui.press_ft = now;
-        ui.btn_used |= 1u << B_SEL;
-        ui.press_hi_t = 0;
-        scene_name(t, proj.bank, ui.press);
-        {
-            char *q = t;
-            while (*q)
-                q++;
-            *q++ = ' ';
-            *q++ = ' ';
-            itoa_u((uint32_t)(ui.press_x * 100.0f + 0.5f), q);
-            while (*q)
-                q++;
-            scopy(q, "%");
-        }
-        say_c(t, "HELD", K_GOLD);
-        return;
-    }
     p = press_scaled(plat_pressure(WHITE_K[ui.press]));
     x = fm_clampf(((float)p / 127.0f - PR_DEAD) / (PR_FULL - PR_DEAD), 0.0f, 1.0f);
     if ((float)p / 127.0f >= PR_COMMIT) {
@@ -983,6 +1051,8 @@ static void press_run(void)                            /* each frame, while a sc
         ui.press_x += fm_clampf(x - ui.press_x, -step, step);
     }
     sound_blend(ui.visit_back, ui.press_to, ui.press_x);
+    ui.px_h[ui.ph_i & 15u] = ui.press_x;               /* (the let-go keeps the most of the last moments) */
+    ui.pt_h[ui.ph_i++ & 15u] = now;
     t[0] = 0;
     scene_name(t, proj.bank, ui.press);
     if (ui.press_done)
@@ -997,7 +1067,7 @@ static void press_run(void)                            /* each frame, while a sc
         while (*q)
             q++;
         scopy(q, "%");
-        say_c(t, "SEL: KEEP", K_GOLD);
+        say_c(t, "LET GO: STAYS", K_GOLD);
     }
 }
 
@@ -1009,9 +1079,10 @@ static void press_end(void)                            /* the key let go */
     ui.press = -1;
     if (n < 0)
         return;
-    if (!ui.press_done && !ui.press_held && now - ui.press_t0 < PR_TAP_MS && !(ui.btn >> B_SEL & 1u)) {
+    if (!ui.press_done && now - ui.press_t0 < PR_TAP_MS) {
         /* a tap (however far a crossfade had begun): there, over the Scene time */
         scene_recall(n);
+        tip(TIP_BLEND);
         return;
     }
     scene_name(t + 6, proj.bank, n);
@@ -1026,15 +1097,20 @@ static void press_end(void)                            /* the key let go */
         ui.morph = (int8_t)n;
         ui.scene_at = (int8_t)n;
         say_c(t, "TAKEN", K_GOLD);
-    } else if (ui.press_held || (ui.btn >> B_SEL & 1u)) {   /* SEL: the blend stays, a sound of its own */
-        ui.btn_used |= 1u << B_SEL;
+    } else {                                           /* let go: the blend stays, a sound of its own (v0.3;
+                                                        * SEL + SAVE undoes it), where it was before the finger
+                                                        * lifted (its pressure falls on the way up) */
+        float xk = ui.press_x;
+        uint32_t i;
+        for (i = 0; i < 16u; i++)
+            if (ui.pt_h[i] && now - ui.pt_h[i] <= PR_LIFT_MS && ui.px_h[i] > xk)
+                xk = ui.px_h[i];
+        if (xk > ui.press_x) {
+            ui.press_x = xk;
+            sound_blend(ui.visit_back, ui.press_to, xk);
+        }
         ui.scene_at = -1;
-        say_c("KEPT", 0, K_GOLD);
-    } else {                                           /* back to where it began */
-        ui.morph = VISIT_BACK;
-        ui.visit = (int8_t)(-2 - n);                   /* (pressed again on the way: picked up from there) */
-        ui.scene_at = ui.visit_from;
-        say("BACK", 0);
+        say_c("KEPT", "SEL + SAVE: UNDO", K_GOLD);
     }
 }
 
@@ -1042,7 +1118,12 @@ static void button(int b)                              /* the other buttons, on 
 {
     switch (b) {
     case B_SAVE:
-        save_ask(-1);
+        if (ui.btn >> B_SEL & 1u) {                    /* SEL + SAVE: undo (v0.3) */
+            ui.btn_used |= 1u << B_SEL;
+            scene_undo();
+        } else {
+            save_ask(-1);
+        }
         break;
     case B_REC:
         loop_button();
@@ -1132,6 +1213,7 @@ static void clk_feed(void)
             scopy(q, " BPM");
         }
         say_c(a, "SWELL ON CLOCK", K_PULSE);
+        tip(TIP_CLOCK);
 #endif
     }
     iv = 60.0e6f / (clk.bpm * 24.0f);                  /* a pulse, us */
@@ -1247,6 +1329,7 @@ static void gesture_down(int g)
     }
     ui.g_held |= (uint8_t)(1u << g);
     ui.g_t0[g] = plat_ms();
+    tip(TIP_GEST);
     ui.g_out_s[g] = 0.0f;
 }
 static void gesture_up(int g)
@@ -1456,7 +1539,8 @@ static void input(void)
             if (!save_dn)
                 save_dn = plat_ms() | 1u;
             if (plat_ms() - save_dn >= HOLD_MS && !(ui.btn_used >> B_SAVE & 1u))
-                say_c(proj.bank == BANK_PRESETS ? "PRESETS ARE FIXED" : "KEY: STORE", "LET GO: SAVE", K_GOLD);
+                say_c(proj.bank == BANK_PRESETS ? "PRESETS ARE FIXED" : "KEY: STORE",
+                      btn >> B_SEL & 1u ? "LET GO: UNDO" : "LET GO: SAVE", K_GOLD);
         } else {
             save_dn = 0;
         }
@@ -1872,7 +1956,7 @@ static void draw_filter(int g, float cut, int32_t x0, int32_t y0, int32_t w, int
     plot(x0, 2, y, n, c);
 }
 
-/* Play 2: each drone's level (a live meter, KNOB 1 / 3) and its resonance (its filter's curve, the peak growing,
+/* Drones 2: each drone's level (a live meter, KNOB 1 / 3) and its resonance (its filter's curve, the peak growing,
  * KNOB 2 / 4) */
 static void pic_play2(int g, int32_t x0, int32_t y0)
 {
@@ -1903,7 +1987,7 @@ static void pic_play2(int g, int32_t x0, int32_t y0)
 
 
 /* Tone 2: each drone's noise as it leaves the filter: its colour's slope (0 dB/oct white, -3 pink, level
- * at 100 Hz) through the filter's curve (dim behind it, moving with the LFO as Play 2's), as low as its level
+ * at 100 Hz) through the filter's curve (dim behind it, moving with the LFO as Drones 2's), as low as its level
  * is; its colour's name, and its level against the oscillators */
 static void pic_tone(int g, int32_t x0, int32_t y0)
 {
@@ -2479,6 +2563,13 @@ static void keymap_pic(void)                   /* the keyboard, in the picture's
         cv_rect(i * 15, y, 15, h, K_PANEL);
         cv_rect(i * 15, y, 1, h, K_BG);
     }
+    for (i = 0; i < NBANKS; i++) {                                /* D5-G5 with SEL: the banks */
+        int32_t x = (NSCENES + i) * 15, on = proj.bank == i;
+        char l[2] = {BANK_L[i], 0};
+        if (on)
+            cv_rect(x + 1, y + bh + 4, 14, h - bh - 4, K_GOLD);
+        text_c(x + 8, y + bh + 14, &FONT_XS, l, on ? K_BG : K_DIM);
+    }
     for (i = 0; i < 11; i++) {
         int32_t x = KM_CX[i] - 4;
         uint16_t c = km_colour(km_group(i));
@@ -2886,7 +2977,7 @@ void ui_init(void)
 /* ------------------------------------------------------------- the start --- */
 /* As the web page: a red field, two thick bands (violet, and one that darkens what it crosses) drifting in from
  * the right and settling across the name, which turns pale pink where they cross it; it holds still for half a
- * second where it lands, then fades to the Play page slowly. About 3.5 s (the last 1.3 s the fade); any button
+ * second where it lands, then fades to the Drones page slowly. About 3.5 s (the last 1.3 s the fade); any button
  * or key ends it at once (and does what it does). The drones stay silent until PLAY. Not in the host
  * simulator's scenarios, which start at once (the browser emulator has it; OM_SPLASH shows it on the host). */
 #if defined(OM_HOST) && !defined(OM_WEB) && !defined(OM_SPLASH)
@@ -2991,6 +3082,7 @@ void ui_frame(void)
     input();
     press_run();
     gesture_run();
+    tips_run();
     scene_morph();
     autosave();
     if (!ui.splash_done) {
