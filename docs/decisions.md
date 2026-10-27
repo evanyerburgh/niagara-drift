@@ -414,3 +414,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   of a quarter-note breath over 10 minutes of +-4 ms jitter); scenes keep it in time; Start back to the top; stopped,
   it carries on at the last tempo. The locked LFO follows the Swell's bars. A test build (OM_CLOCK_TEST) shows the
   tempo and jitter; tools/fm1_clock.py reads them over USB (SysEx 0x7C).
+- 2026-10-26 (Evan, after trying it on the FM-1 with Logic): on a MIDI clock **scenes leave the Swell's on / off and its
+  division alone**, and more follows the clock: the **LFO** (SELECT turns P_LFO_DIV, 32 bars .. 1/16 a cycle, steered
+  0.5 % a block toward the beat), the **delay** (Time turns P_DLY_NOTE, 1/16 .. 1 bar, halved to fit 1.46 s; its tempo
+  steadied: a change over 0.4 % glides it in, till within 0.05 %), **Wander** (a note due waits for the next beat, or
+  bar when they're over ~6 beats apart), the **Scene time** (P_SCENE_BARS, a room setting, 1 .. 16 bars; a change ends
+  on a bar line: the rest of this bar and the bars after, a bar more under half a bar). PROJ_FORMAT 35 (104 values).

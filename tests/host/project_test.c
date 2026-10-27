@@ -83,7 +83,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 34, on bank A", proj.format == 34u && PROJ_FORMAT == 34u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 35, on bank A", proj.format == 35u && PROJ_FORMAT == 35u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -309,6 +309,22 @@ int main(void)
         check("... the reverb's route (new in 33) as it was: both the drones and their echoes into it",
               proj.par[P_DLY_ROUTE] == 0 && scene_get(0, 0)[P_DLY_ROUTE] == 0 && scene_get(1, 0)[P_DLY_ROUTE] == 0);
         check("... and written again in 33 on the next save", project_save() == 0 && store_n[OBJ_BANKB] == (int)sizeof(bank_t));
+    }
+    {   /* 34 (#43): 101 values a sound, before the LFO's, the delay's and the scenes' clock values */
+        static proj_v34_t p34;
+        int i;
+        memset(&p34, 0, sizeof p34);
+        p34.magic = PROJ_MAGIC;
+        p34.format = 34u;
+        for (i = 0; i < NP34; i++)
+            p34.par[i] = dr_param_info(i)->def;
+        p34.par[P_PULSE_DIV] = 6;
+        memset(store_n, 0, sizeof store_n);
+        memcpy(store[OBJ_PROJ], &p34, sizeof p34);
+        store_n[OBJ_PROJ] = (int)sizeof p34;
+        check("34 loads: the Swell's division kept, the new clock values at their defaults (4 bars, 1/4, 4 bars)",
+              project_load() == 0 && proj.par[P_PULSE_DIV] == 6 && proj.par[P_LFO_DIV] == 3 && proj.par[P_DLY_NOTE] == 5 &&
+                  proj.par[P_SCENE_BARS] == 2);
     }
     {   /* 33 (#40-#42): 100 values a sound, before the Swell's division */
         static proj_v33_t p33;

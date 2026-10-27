@@ -145,6 +145,30 @@ static void rt_snap(void)                /* at the route at once (a load, at res
 static float self_s, self_e, self_e2, self_es;    /* Grain's sound (~280 Hz); Self's loudness (~3 Hz) and its mean (~0.2 Hz) */
 
 static float dly_ms(int v) { return 70.0f * fm_exp2f((float)v * 0.026845f); }   /* 70 * (450/70)^(v/100) */
+/* on a MIDI clock (v0.3): the time a note value of the tempo (P_DLY_NOTE), halved till the line holds it; the tempo
+ * steadied for it (a change over 0.4 % sets it gliding, till within 0.05 %): a wobbly clock's tempo would bend the
+ * echoes */
+static float dly_spb;
+static uint8_t dly_sgo;                  /* gliding to a new tempo: till within 0.05 % */
+static float dly_ms_now(void)
+{
+    float ms, d;
+    if (dr_ext_spb <= 0.0f)
+        return dly_ms(par[P_DLY_TIME]);
+    if (dly_spb <= 0.0f)
+        dly_spb = dr_ext_spb;
+    d = fm_fabsf(dr_ext_spb - dly_spb);
+    if (d > 0.004f * dly_spb)
+        dly_sgo = 1;
+    else if (d < 0.0005f * dly_spb)
+        dly_sgo = 0;
+    if (dly_sgo)
+        dly_spb += (dr_ext_spb - dly_spb) * 0.05f;
+    ms = DR_NOTE_BEATS[(unsigned)par[P_DLY_NOTE] < DR_NNOTE ? par[P_DLY_NOTE] : 5] * dly_spb * (1000.0f / DR_SR);
+    while (ms > dly_ms(DR_DLY_TMAX))
+        ms *= 0.5f;
+    return fm_maxf(ms, dly_ms(0));
+}
 
 /* the read: 8 taps of a windowed sinc (Kaiser, beta 6, cut at 0.46 of the half rate: flat to ~8 kHz, as far as the
  * half-band lets through), the nearest of 128 phases (its timing within 0.18 us: its error > 60 dB under at 1 kHz).
@@ -486,7 +510,7 @@ static void fx_clear(void)
     self_s = self_e = self_e2 = self_es = 0.0f;
     drv_m = drv_pi = drv_pw = drv_dc[0] = drv_dc[1] = 0.0f;
     drv_k = drv_g = 1.0f;
-    dly_t = dly_ms(par[P_DLY_TIME]) * 0.001f * DR_SR;    /* at its time, no glide from an old one */
+    dly_t = dly_ms_now() * 0.001f * DR_SR;    /* at its time, no glide from an old one */
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
     dly_xf = 1.0f;
@@ -501,7 +525,7 @@ static void fx_clear(void)
 /* resting (stopped and silent): the delay's time and type go straight to their knobs */
 static void fx_rest(void)
 {
-    dly_t = dly_ms(par[P_DLY_TIME]) * 0.001f * DR_SR;
+    dly_t = dly_ms_now() * 0.001f * DR_SR;
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
     dly_xf = 1.0f;
@@ -520,7 +544,7 @@ static void fx_run(float *l, float *r, uint32_t n)
      * last one ended: read raw (par), each detent was a step, a click on a soft sound */
     /* stopped or stopping, the repeats can't run away: they ring out (QA 2026-10-20: at 90+ the howl went on after
      * PLAY, with "PLAY to start" on the screen) */
-    const float ms = dly_ms(par[P_DLY_TIME]),
+    const float ms = dly_ms_now(),
                 fbg1 = fade_target <= 0.0f ? fm_minf(rep_g(pfs[P_DLY_REPEATS]), 0.85f) : rep_g(pfs[P_DLY_REPEATS]);
     const float dm = pfs[P_DLY_MIX] * 0.01f, dry1e = fm_sqrtf(1.0f - dm), wet1e = fm_sqrtf(dm);
     const float rm = pfs[P_REV_MIX] * 0.01f, dry2e = fm_sqrtf(1.0f - rm), wet2e = fm_sqrtf(rm);
