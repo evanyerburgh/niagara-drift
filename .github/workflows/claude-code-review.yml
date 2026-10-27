@@ -1,23 +1,14 @@
 name: Claude Code Review
 
+# Once a PR opens or is marked ready (not on every push: "@claude review again" in a comment asks for
+# another, through claude.yml).
 on:
   pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    types: [opened, ready_for_review, reopened]
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -36,9 +27,29 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
-          plugins: 'code-review@claude-code-plugins'
-          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
 
+            Review this pull request to Niagara Drift, firmware for a small synthesizer (the M-VAVE FM-1).
+            First read .claude/CLAUDE.md, and .claude/rules/dsp.md if the PR touches firmware/src/dsp,
+            tests/host or host. They hold the FM-1's budget (RAM, CPU) and the rules for audio code.
+
+            Look for, in this order:
+            1. Bugs: wrong behaviour, crashes, state that isn't saved or restored, a parameter added
+               without PROJ_FORMAT or the scenarios updated.
+            2. The sound: clicks or zipper noise from a jump not ramped, new aliasing, a level change not
+               taken back off, precision lost (a float phase or index that grows, a double constant).
+            3. Cost on the FM-1: work done every sample that could be done once a block, a divide or a
+               libm call a sample, a stage computed while it isn't heard, RAM or tables that could stay in
+               flash. Say roughly what it would save.
+            4. Licensing: SPDX headers, LICENSING.md rows for anything borrowed.
+            Leave style alone unless it hides a bug. Don't repeat what the tests already check.
+
+            Write one PR comment with `gh pr comment`. Start with a short summary in plain language
+            for the owner, a product designer, not a C programmer: what the change does, whether it looks
+            safe to install on the FM-1, and anything he should listen for. Then the findings, most
+            serious first, each with the file and line and a suggested fix. Use inline comments only for
+            findings tied to a line. If there's nothing worth changing, say so in one line.
+          claude_args: |
+            --allowed-tools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"

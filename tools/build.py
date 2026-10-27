@@ -13,6 +13,7 @@ macOS (or with JIELI_DOCKER=1) each tool runs in a linux/amd64 container.
 """
 import argparse
 import hashlib
+import json
 import os
 import platform
 import re
@@ -286,6 +287,9 @@ def check(img, syms, dis, rt):
     bss = sym("_bss_end") - 0x01C08000
     pool = sym("_pool_end") - sym("_pool_start")
     notes.append(f"image {len(img)} B; RAM .data+.bss {bss} B of 98304; pool {pool} B of {0x54000}")
+    # the numbers a PR's budget line compares with main's (tools/budget.py)
+    (OUT / "budget.json").write_text(json.dumps({"image": len(img), "ram": bss, "ram_max": 96 * 1024,
+                                                 "pool": pool, "pool_max": 0x54000}) + "\n")
     if bss > 96 * 1024:
         errors.append("RAM region overflow")
     if 0x54000 - pool < 8192:                     # keep >= 8 KiB of the pool spare

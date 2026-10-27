@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# The host tests and the emulator on Linux, and what the engine costs against main.
+# The firmware itself can't build here (the JieLi SDK isn't redistributable): that stays ./build.sh on
+# the Mac, with tools/budget.py for the PR's budget line.
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install Pillow
+      - uses: mymindstorm/setup-emsdk@v14
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Host tests, scenarios and the emulator
+        env:
+          CC: cc -D_DEFAULT_SOURCE -Wl,--no-as-needed -lm
+        run: sh tests/run_tests.sh
+
+  cost:
+    # Linux has no instruction counter: valgrind counts each case of tests/host/drone_cost.c, on this
+    # branch and on main, on the same machine. Linux counts aren't the Mac's, so only the change
+    # means anything here; the budget itself is checked on the Mac (drone-cost in run_tests.sh).
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq valgrind
+      - name: The engine's cost, this PR against main
+        run: |
+          git worktree add -q --detach ../base origin/${{ github.base_ref }}
+          python3 tools/ci_cost.py ../base .
