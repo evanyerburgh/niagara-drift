@@ -5,9 +5,11 @@
  * sample, the ratio of Felucca's PHYS engine measured on the device). Each case renders 0.5 s to settle,
  * then 2 s counted. For scale: FoMni's engine at its busiest (strings, chord and rhythm), which runs on the
  * FM-1, measured ~1,875 the same way (~32 %).
- *   drone_cost            prints the table; fails if a case is over its limit */
+ *   drone_cost            prints the table; fails if a case is over its limit
+ *   drone_cost N          renders case N only (for valgrind, below) */
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <time.h>
 #ifdef __APPLE__
 #include <libproc.h>
@@ -36,6 +38,7 @@ static uint64_t ns_now(void)
 }
 
 typedef void (*render_fn)(int32_t *, uint32_t, uint32_t);
+__attribute__((noinline))                     /* valgrind counts inside it (below) */
 static double cost(render_fn f, double *ns)
 {
     static int32_t buf[2 * 256];
@@ -114,49 +117,58 @@ static void report(const char *name, double ipc, double ns, double limit)
     bad += over;
 }
 
-int main(void)
+/* the cases, in the table's order */
+static const char *const names[] = {
+    "drone stopped (silence)",
+    "1 drone, no partner",
+    "1 drone with its partner",
+    "2 drones with partners (defaults)",
+    "everything: blends, LFOs, links, pulse, delay, reverb",
+    "worst case: + feedback, character, drift, macros, drive",
+    "the same, Cross-mod on pitch (cross-FM)",
+    "the same, Cross-mod on the output (Snarl)",
+};
+#define NCASES ((int)(sizeof names / sizeof names[0]))
+
+static void setup(int c)
+{
+    switch (c) {
+    case 0: drone(1, 2, 0); dr_play(0); dr_panic(); break;
+    case 1: drone(0, 1, 0); break;
+    case 2: drone(1, 1, 0); break;
+    case 3: drone(1, 2, 0); break;
+    case 4: drone(1, 2, 1); break;
+    case 5: drone(1, 2, 2); break;
+    case 6: drone(1, 2, 2); dr_set(P_XMOD, DR_XMOD_FM); break;   /* cross-FM (v0.3) */
+    case 7: drone(1, 2, 2); dr_set(P_XMOD, DR_XMOD_OUT); break;  /* Snarl (v0.3) */
+    }
+}
+
+/* the limit: the engine's worst case under ~40 % of the device, leaving the rest for the delay, the
+ * reverb and the UI */
+static double limit(int c) { return c == 4 ? 2350.0 : 0.0; }
+
+/*   drone_cost N   only case N, for counting under valgrind (Linux has no instruction counter):
+ *   valgrind --tool=callgrind --toggle-collect=cost* drone_cost N   counts the 2.5 s cost() renders */
+int main(int argc, char **argv)
 {
     double ns, ipc;
+    int c;
+    if (argc > 1) {
+        c = atoi(argv[1]);
+        if (c < 0 || c >= NCASES)
+            return 2;
+        setup(c);
+        cost(dr_render, &ns);
+        printf("%s\n", names[c]);
+        return 0;
+    }
     printf("drone cost, host instructions per 44.1 kHz sample (device estimate 1.7 %% per 100):\n");
-
-    drone(1, 2, 0);
-    dr_play(0);
-    dr_panic();
-    ipc = cost(dr_render, &ns);
-    report("drone stopped (silence)", ipc, ns, 0);
-
-    drone(0, 1, 0);
-    ipc = cost(dr_render, &ns);
-    report("1 drone, no partner", ipc, ns, 0);
-
-    drone(1, 1, 0);
-    ipc = cost(dr_render, &ns);
-    report("1 drone with its partner", ipc, ns, 0);
-
-    drone(1, 2, 0);
-    ipc = cost(dr_render, &ns);
-    report("2 drones with partners (defaults)", ipc, ns, 0);
-
-    drone(1, 2, 1);
-    ipc = cost(dr_render, &ns);
-    /* the limit: the engine's worst case under ~40 % of the device, leaving the rest for the delay,
-     * the reverb and the UI */
-    report("everything: blends, LFOs, links, pulse, delay, reverb", ipc, ns, 2350.0);
-
-    drone(1, 2, 2);
-    ipc = cost(dr_render, &ns);
-    report("worst case: + feedback, character, drift, macros, drive", ipc, ns, 0);
-
-    drone(1, 2, 2);
-    dr_set(P_XMOD, DR_XMOD_FM);                   /* the same, Cross-mod on pitch: cross-FM (v0.3) */
-    ipc = cost(dr_render, &ns);
-    report("the same, Cross-mod on pitch (cross-FM)", ipc, ns, 0);
-
-    drone(1, 2, 2);
-    dr_set(P_XMOD, DR_XMOD_OUT);                  /* ... and on the output: Snarl (v0.3) */
-    ipc = cost(dr_render, &ns);
-    report("the same, Cross-mod on the output (Snarl)", ipc, ns, 0);
-
+    for (c = 0; c < NCASES; c++) {
+        setup(c);
+        ipc = cost(dr_render, &ns);
+        report(names[c], ipc, ns, limit(c));
+    }
     printf(bad ? "drone cost: OVER LIMIT\n" : "drone cost: ok\n");
     return bad ? 1 : 0;
 }

@@ -420,3 +420,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   steadied: a change over 0.4 % glides it in, till within 0.05 %), **Wander** (a note due waits for the next beat, or
   bar when they're over ~6 beats apart), the **Scene time** (P_SCENE_BARS, a room setting, 1 .. 16 bars; a change ends
   on a bar line: the rest of this bar and the bars after, a bar more under half a bar). PROJ_FORMAT 35 (104 values).
+- 2026-10-27 (Evan): **CI and the review.** GitHub Actions runs the host tests, the scenarios and the emulator on every
+  PR and on main (`tests.yml`), and counts the engine's cost case by case under valgrind against main (a warning past
+  +2 %). The Claude review runs when a PR opens or is marked ready (again on "@claude review again"), reading
+  `.claude/CLAUDE.md` (the FM-1's budget, what the build enforces) and `.claude/rules/dsp.md` (audio code). Every
+  firmware PR body carries `tools/budget.py`'s line: RAM, pool headroom, image size and the engine's worst case,
+  against main.
