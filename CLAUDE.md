@@ -50,7 +50,8 @@ Every firmware PR body carries `tools/budget.py`'s line, so a change's cost is s
   screenshot. Measure on and off as two renders of the same passage (the host is deterministic).
 - **A change that shouldn't change the sound or the screen passes `tools/same_samples.py`** (CI runs it on every PR:
   every fixed render in `tests/golden`, every scenario, the engine's scenes, sample by sample). One that means to
-  carries the PR label `changes-sound`, with its WAVs. A new feature adds its own render to `tests/golden`.
+  carries the PR label `changes-sound`, with its WAVs. A new feature adds its own render to `tests/golden`; renumbered
+  parameters or pages renumber `tests/golden` too (a script that differs from main's isn't compared, only listed).
 - Audio code: `.claude/rules/dsp.md`.
 
 ## Gotchas

@@ -15,6 +15,8 @@ permissions:
 
 jobs:
   host:
+    # not again when only a label changed (same-samples reads the label)
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +37,7 @@ jobs:
     # Linux has no instruction counter: valgrind counts each case of tests/host/drone_cost.c, on this
     # branch and on main, on the same machine. Linux counts aren't the Mac's, so only the change
     # means anything here; the budget itself is checked on the Mac (drone-cost in run_tests.sh).
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.action != 'labeled' && github.event.action != 'unlabeled'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,7 +62,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install Pillow
+      - run: pip install numpy Pillow
       - name: Same samples as main
         env:
           CC: cc -D_DEFAULT_SOURCE -Wl,--no-as-needed -lm
