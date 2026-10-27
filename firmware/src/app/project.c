@@ -4,8 +4,10 @@
  * the ones saved over before, moved to the banks at load). A project of another format, or none,
  * gives the defaults; 0.1's (19) and v0.2's first (20) are converted. Part of the unity build, after app.h. */
 project_t proj;
-static bank_t bank_bc[3];                  /* banks B, C, and the Presets saved over before 2026-10-19 */
-static uint8_t bank_dirty;                 /* bit 1 B, bit 2 C, bit 3 the Presets: to be written with the next save */
+static bank_t bank_bc[2];                  /* banks B and C */
+static uint8_t bank_dirty;                 /* bit 1 B, bit 2 C, bit 3 the old Presets object: to be written with the next
+                                            * save */
+static uint16_t p_moved;                   /* the old Presets object's scenes moved to the banks, to be cleared there */
 static const uint8_t BANK_OBJ[3] = {OBJ_BANKB, OBJ_BANKC, OBJ_BANKP};
 static uint32_t proj_h;                    /* a hash of the project as on the flash, 0 = unknown: a save that
                                             * would write the same bytes skips it (each write is a late block) */
@@ -119,17 +121,20 @@ const char *preset_name(int n)             /* a Preset's name */
     return n >= 0 && n < NPRESETS ? PRESET_NAME[n] : 0;
 }
 _Static_assert(NPRESETS == NSCENES && PRESET_LOCKED < NPRESETS, "a Preset for every key, the clean one locked");
-static int16_t preset[NPRESETS][DR_NPARAMS];
+static int16_t preset[DR_NPARAMS];         /* one Preset, built when it's asked for (all twelve were 2.4 KB of RAM) */
+static int preset_n = -1;                  /* ... which */
 
-static void presets_init(void)
+static const int16_t *preset_get(int n)
 {
-    int n, k;
-    for (n = 0; n < NPRESETS; n++) {
+    int k;
+    if (n != preset_n) {
         for (k = 0; k < DR_NPARAMS; k++)
-            preset[n][k] = dr_param_info(k)->def;
+            preset[k] = dr_param_info(k)->def;
         for (k = 0; k < PRESET_N && PRESET_CHANGES[n][k] >= 0; k += 2)
-            preset[n][PRESET_CHANGES[n][k]] = PRESET_CHANGES[n][k + 1];
+            preset[PRESET_CHANGES[n][k]] = PRESET_CHANGES[n][k + 1];
+        preset_n = n;
     }
+    return preset;
 }
 
 static void bank_blank(bank_t *b)
@@ -152,11 +157,23 @@ void project_defaults(void)
     proj.mtime = MTIME_DEF;
     bank_blank(&bank_bc[0]);
     bank_blank(&bank_bc[1]);
-    bank_blank(&bank_bc[2]);
+    p_moved = 0;
     proj.bank = BANK_PRESETS;                  /* a new FM-1: the keys play the Presets */
 }
 
-const int16_t *scene_get(int bank, int n)
+int scene_has(int bank, int n)                 /* scene n of a bank holds a sound (builds nothing) */
+{
+    if (n < 0 || n >= NSCENES)
+        return 0;
+    switch (bank) {
+    case 0: return proj.scene_used >> n & 1u;
+    case 1: case 2: return bank_bc[bank - 1].used >> n & 1u;
+    case BANK_PRESETS: return n < NPRESETS;
+    default: return 0;
+    }
+}
+
+const int16_t *scene_get(int bank, int n)      /* a Preset's stays as given until another Preset is asked for */
 {
     if (n < 0 || n >= NSCENES)
         return 0;
@@ -164,7 +181,7 @@ const int16_t *scene_get(int bank, int n)
     case 0: return proj.scene_used >> n & 1u ? proj.scene[n] : 0;
     case 1: case 2: return bank_bc[bank - 1].used >> n & 1u ? bank_bc[bank - 1].scene[n] : 0;
     case BANK_PRESETS:                         /* the firmware's, fixed (2026-10-19) */
-        return n < NPRESETS ? preset[n] : 0;
+        return n < NPRESETS ? preset_get(n) : 0;
     default: return 0;
     }
 }
@@ -386,7 +403,7 @@ static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old s
     convert(dst, from);
 }
 
-static void bank_load(int b)                   /* B (1), C (2) or the Presets (3): from its object, if it's sound */
+static void bank_load(int b)                   /* B (1) or C (2): from its object, if it's sound */
 {
     bank_t *k = &bank_bc[b - 1];
     int i;
@@ -415,12 +432,10 @@ static void bank_load(int b)                   /* B (1), C (2) or the Presets (3
             widen(k->scene[i], o->scene[i], 32u);
         bank_dirty |= (uint8_t)(1u << b);
     } else if (ld.b.format >= 23u && ld.b.format < 32u) {   /* 23-31: 98 values a sound */
-        static bank_v31_t o;
-        uint32_t f = ld.b.format;
-        o = ld.b31;
-        k->used = o.used;
+        const bank_v31_t *o = &ld.b31;         /* read in place, as all of them (copies were 12 KB of RAM) */
+        k->used = o->used;
         for (i = 0; i < NSCENES; i++)
-            widen(k->scene[i], o.scene[i], f);
+            widen(k->scene[i], o->scene[i], ld.b.format);
         bank_dirty |= (uint8_t)(1u << b);
     } else if (ld.b.format == 22u) {
         k->used = ld.b22.used;
@@ -442,31 +457,55 @@ static void bank_load(int b)                   /* B (1), C (2) or the Presets (3
 }
 
 /* The Presets are fixed since 2026-10-19: any saved over before (OBJ_BANKP) move to the first empty slots of C,
- * then B, then A, so nothing is lost; one with no room left stays in OBJ_BANKP (the installer backs it up) */
+ * then B, then A, so nothing is lost; one with no room left stays in OBJ_BANKP (the installer backs it up). Read from
+ * the load buffer, scene by scene, in whatever format it was saved; the object is rewritten without the moved ones by
+ * the next save, after the banks and the project that now hold them */
 static int moved_a;
+static const int16_t *old_scene(int n, uint32_t *from)   /* scene n of the bank in ld, and its format; 0: none */
+{
+    uint32_t f = ld.b.format;
+    *from = f;
+    if (f == PROJ_FORMAT) return ld.b.scene[n];
+    if (f == 34u) return ld.b34.scene[n];
+    if (f == 33u) return ld.b33.scene[n];
+    if (f == 32u) return ld.b32.scene[n];
+    if (f >= 23u && f < 32u) return ld.b31.scene[n];
+    if (f == 22u) return ld.b22.scene[n];
+    if (f == 21u) return ld.b21.scene[n];
+    return 0;
+}
 static void presets_move(void)
 {
-    int n, b, i, k;
-    bank_t *p = &bank_bc[2];
+    int n, b, i;
+    uint16_t used;
+    memset(ld.raw, 0, sizeof ld.raw);
+    if (plat_store_load(OBJ_BANKP, ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
+        return;
+    used = ld.b.used;
     for (n = 0; n < NSCENES; n++) {
-        if (!(p->used >> n & 1u))
+        uint32_t from;
+        const int16_t *src = old_scene(n, &from);
+        if (!(used >> n & 1u) || !src)
             continue;
         for (b = 2; b >= 0; b--) {             /* C, B, A */
-            uint16_t used = b ? bank_bc[b - 1].used : proj.scene_used;
-            for (i = 0; i < NSCENES && (used >> i & 1u); i++)
+            uint16_t u = b ? bank_bc[b - 1].used : proj.scene_used;
+            int16_t *d;
+            for (i = 0; i < NSCENES && (u >> i & 1u); i++)
                 ;
             if (i == NSCENES)
                 continue;
-            for (k = 0; k < DR_NPARAMS; k++)
-                (b ? bank_bc[b - 1].scene[i] : proj.scene[i])[k] = p->scene[n][k];
-            if (b) {
-                bank_bc[b - 1].used |= (uint16_t)(1u << i);
-                bank_dirty |= (uint8_t)(1u << b);
-            } else {
-                proj.scene_used |= (uint16_t)(1u << i);
-                moved_a = 1;                   /* not yet on the flash (proj_h below) */
+            d = b ? bank_bc[b - 1].scene[i] : proj.scene[i];
+            widen(d, src, from);
+            if (in_range(d)) {
+                if (b) {
+                    bank_bc[b - 1].used |= (uint16_t)(1u << i);
+                    bank_dirty |= (uint8_t)(1u << b);
+                } else {
+                    proj.scene_used |= (uint16_t)(1u << i);
+                    moved_a = 1;               /* not yet on the flash (proj_h below) */
+                }
             }
-            p->used &= (uint16_t)~(1u << n);
+            p_moved |= (uint16_t)(1u << n);    /* (one out of range is dropped, as at any load) */
             bank_dirty |= 1u << 3;
             break;
         }
@@ -477,11 +516,11 @@ int project_load(void)
 {
     int n, i;
     uint32_t from;
-    presets_init();
+    preset_n = -1;
     bank_dirty = 0;
+    p_moved = 0;
     bank_blank(&bank_bc[0]);
     bank_blank(&bank_bc[1]);
-    bank_blank(&bank_bc[2]);
     memset(ld.raw, 0, sizeof ld.raw);
     n = plat_store_load(OBJ_PROJ, ld.raw, sizeof ld.raw);
     from = ld.p.format;
@@ -522,49 +561,45 @@ int project_load(void)
         for (i = 0; i < NSCENES; i++)
             widen(proj.scene[i], o->scene[i], from);
     } else if (from >= 23u) {                  /* 23-31: 98 values a sound */
-        static proj_v31_t o;
-        o = ld.o31;
+        const proj_v31_t *o = &ld.o31;   /* read in place */
         memset(&proj, 0, sizeof proj);
-        widen(proj.par, o.par, from);
-        proj.leds = o.leds;
-        proj.bank = o.bank;
-        proj.mtime = o.mtime;
-        proj.scene_used = o.scene_used & ((1u << NSCENES) - 1u);
+        widen(proj.par, o->par, from);
+        proj.leds = o->leds;
+        proj.bank = o->bank;
+        proj.mtime = o->mtime;
+        proj.scene_used = o->scene_used & ((1u << NSCENES) - 1u);
         for (i = 0; i < NSCENES; i++)
-            widen(proj.scene[i], o.scene[i], from);
+            widen(proj.scene[i], o->scene[i], from);
     } else if (from == 22u) {
-        static proj_v22_t o;
-        o = ld.o22;
+        const proj_v22_t *o = &ld.o22;   /* read in place */
         memset(&proj, 0, sizeof proj);
-        widen(proj.par, o.par, from);
-        proj.leds = o.leds;
-        proj.bank = o.bank;
+        widen(proj.par, o->par, from);
+        proj.leds = o->leds;
+        proj.bank = o->bank;
         proj.mtime = MTIME_DEF;
-        proj.scene_used = o.scene_used & ((1u << NSCENES) - 1u);
+        proj.scene_used = o->scene_used & ((1u << NSCENES) - 1u);
         for (i = 0; i < NSCENES; i++)
-            widen(proj.scene[i], o.scene[i], from);
+            widen(proj.scene[i], o->scene[i], from);
     } else if (from == 21u) {
-        static proj_v21_t o;
-        o = ld.o21;
+        const proj_v21_t *o = &ld.o21;   /* read in place */
         memset(&proj, 0, sizeof proj);
-        widen(proj.par, o.par, from);
-        proj.leds = o.leds;
-        proj.bank = o.bank;
-        proj.scene_used = o.scene_used & ((1u << NSCENES) - 1u);
+        widen(proj.par, o->par, from);
+        proj.leds = o->leds;
+        proj.bank = o->bank;
+        proj.scene_used = o->scene_used & ((1u << NSCENES) - 1u);
         for (i = 0; i < NSCENES; i++)
-            widen(proj.scene[i], o.scene[i], from);
+            widen(proj.scene[i], o->scene[i], from);
     } else {                                   /* 19, 20 */
-        static proj_v20_t o;
-        o = ld.o20;
+        const proj_v20_t *o = &ld.o20;   /* read in place */
         memset(&proj, 0, sizeof proj);
-        widen(proj.par, o.par, from);
-        proj.leds = o.leds;
-        proj.scene_used = o.scene_used & ((1u << NSCENES) - 1u);
+        widen(proj.par, o->par, from);
+        proj.leds = o->leds;
+        proj.scene_used = o->scene_used & ((1u << NSCENES) - 1u);
         for (i = 0; i < NSCENES; i++)
-            widen(proj.scene[i], o.scene[i], from);
+            widen(proj.scene[i], o->scene[i], from);
         for (i = 0; i < 4; i++)                /* scenes 13-16 to B1-B4 */
-            if (o.scene_used >> (12 + i) & 1u) {
-                widen(bank_bc[0].scene[i], o.scene[12 + i], from);
+            if (o->scene_used >> (12 + i) & 1u) {
+                widen(bank_bc[0].scene[i], o->scene[12 + i], from);
                 bank_bc[0].used |= (uint16_t)(1u << i);
             }
         bank_dirty |= 1u << 1;
@@ -573,7 +608,6 @@ int project_load(void)
         bank_load(1);
         bank_load(2);
     }
-    bank_load(3);
     moved_a = 0;
     presets_move();
     proj.magic = PROJ_MAGIC;
@@ -594,12 +628,13 @@ int project_load(void)
     return 0;
 }
 
-int project_save(void)                         /* the banks first: a converted 0.1 project's B1-B4 are on
-                                                * the flash before the project that no longer holds them */
+int project_save(void)                         /* the banks first, then the project: a converted 0.1 project's
+                                                * B1-B4 are on the flash before the project that no longer holds them;
+                                                * the old Presets object last, once the scenes moved from it are saved */
 {
-    int rc = 0, b;
+    int rc = 0, b, n;
     uint32_t h;
-    for (b = 1; b <= 3; b++)
+    for (b = 1; b <= 2; b++)
         if (!rc && (bank_dirty >> b & 1u)) {
             rc = plat_store_save(BANK_OBJ[b - 1], &bank_bc[b - 1], sizeof bank_bc[b - 1]);
             if (!rc)
@@ -608,10 +643,24 @@ int project_save(void)                         /* the banks first: a converted 0
     if (rc)
         return rc;
     h = proj_hash();
-    if (h == proj_h)
-        return 0;                              /* the flash has it already */
-    rc = plat_store_save(OBJ_PROJ, &proj, sizeof proj);
-    proj_h = rc ? 0u : h;
+    if (h != proj_h) {                         /* (the flash has it already otherwise) */
+        rc = plat_store_save(OBJ_PROJ, &proj, sizeof proj);
+        proj_h = rc ? 0u : h;
+        if (rc)
+            return rc;
+    }
+    if (bank_dirty >> 3 & 1u) {                /* the old Presets object, without the scenes moved from it */
+        memset(ld.raw, 0, sizeof ld.raw);
+        n = plat_store_load(OBJ_BANKP, ld.raw, sizeof ld.raw);
+        if (n >= 8 && ld.b.magic == BANK_MAGIC) {
+            ld.b.used &= (uint16_t)~p_moved;   /* (the same place in every format) */
+            rc = plat_store_save(OBJ_BANKP, ld.raw, (uint32_t)n);
+        }
+        if (!rc) {
+            bank_dirty &= (uint8_t)~(1u << 3);
+            p_moved = 0;
+        }
+    }
     return rc;
 }
 

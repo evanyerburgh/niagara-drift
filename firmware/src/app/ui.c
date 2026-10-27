@@ -1562,7 +1562,7 @@ static void input(void)
             if (btn >> B_SAVE & 1u) {
                 ui.btn_used |= 1u << B_SAVE;           /* SAVE let go: not a plain save */
                 scene_store((int)i);
-            } else if (plat_pressure(WHITE_K[i]) >= 0 && scene_get(proj.bank, (int)i)) {
+            } else if (plat_pressure(WHITE_K[i]) >= 0 && scene_has(proj.bank, (int)i)) {
                 press_start((int)i, scene_get(proj.bank, (int)i));   /* the pressure crossfade (v0.2) */
             } else {                                   /* no pressure here (the emulator): 0.1's timed visit */
                 int k;
@@ -2939,7 +2939,7 @@ static void leds(void)
             k[BLACK_K[i]] = 255;
     }
     for (i = 0; i < NSCENES; i++)                    /* the scene keys: the bank's slots that hold a scene; the */
-        if (scene_get(proj.bank, (int)i) &&            /* one the sound is, blinking slowly */
+        if (scene_has(proj.bank, (int)i) &&            /* one the sound is, blinking slowly */
             (ui.scene_at != (int8_t)i || plat_ms() % 1000u < 600u))
             k[WHITE_K[i]] = 255;
     if (ui.press >= 0)                                 /* the key pressed into: as bright as how far in */
