@@ -2,7 +2,7 @@
 
 Drone-synth firmware for the M-VAVE FM-1 (GPL-3.0-only). The README is the player's manual; BUILDING.md
 says how to build. This file is for anyone working on the code with Claude, and for the PR review in
-GitHub Actions.
+GitHub Actions. Personal notes go in `CLAUDE.local.md` (ignored).
 
 ## Commands
 
@@ -48,3 +48,11 @@ Every firmware PR body carries `tools/budget.py`'s line, so a change's cost is s
 - A sound change comes with a host render (WAV) and numbers measured on it; a screen change with a
   screenshot. Measure on and off as two renders of the same passage (the host is deterministic).
 - Audio code: `.claude/rules/dsp.md`.
+
+## Gotchas
+
+- `tools/make_screens.py` (after `sh host/build_host.sh`) remakes the README's pictures from
+  `tests/scenarios/pages.omni`, which starts with `notips` so no one-time tip shows; afterwards only the screens a
+  change touches should differ (`git status docs/img`).
+- A host build next to stale copies of `drone.h` picks those up: build from the tree.
+- `.omni` files are the host simulator's scenarios (the name is FoMni's: "OMNI"); `omni_host`, `build/omni.fwsc` too.

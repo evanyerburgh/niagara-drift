@@ -32,7 +32,7 @@ jobs:
             PR NUMBER: ${{ github.event.pull_request.number }}
 
             Review this pull request to Niagara Drift, firmware for a small synthesizer (the M-VAVE FM-1).
-            First read .claude/CLAUDE.md, and .claude/rules/dsp.md if the PR touches firmware/src/dsp,
+            First read CLAUDE.md, and .claude/rules/dsp.md if the PR touches firmware/src/dsp,
             tests/host or host. They hold the FM-1's budget (RAM, CPU) and the rules for audio code.
 
             Look for, in this order:
