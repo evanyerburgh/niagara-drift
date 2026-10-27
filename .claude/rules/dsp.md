@@ -7,7 +7,7 @@ paths:
 
 # Audio code (the engine, firmware/src/dsp)
 
-The aim: the best sound the FM-1 can make, inside its budget (`.claude/CLAUDE.md`). None of these rules
+The aim: the best sound the FM-1 can make, inside its budget (`CLAUDE.md`). None of these rules
 costs sound. They're how this code gets quality and speed at once.
 
 ## Every sample is expensive
