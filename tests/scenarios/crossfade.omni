@@ -110,6 +110,31 @@ tap SAVE
 release SEL
 wait 1300
 expect par7 300
+# a tap held past the crossfade's start (350 ms): undo goes back to the sound before the press, not to the
+# blend it had begun (the review, 2026-10-27)
+key w0 down
+pressure w0 100
+wait 350
+key w0 up
+wait 1600
+expect par7 700
+press SEL
+tap SAVE
+release SEL
+wait 1300
+expect par7 300
+# undo leaves the room's settings (Stereo) where they are
+tapkey w0
+wait 1600
+expect par7 700
+set 53 90
+press SEL
+tap SAVE
+release SEL
+wait 1300
+expect par7 300
+expect par53 90
+set 53 60
 # turning ALGORITHM (Movement, par75) while a scene switch is on its way: the switch lets go of it, and the
 # rest still lands (scene A2 stored with Movement 50 and cutoff 700; the sound at Movement 80, cutoff 300)
 spin K2 40

@@ -214,6 +214,7 @@ static void say_c(const char *a, const char *b, uint16_t col)
         ui.msg[1][i] = b[i];
     ui.msg[1][i] = 0;
     ui.msg_until = plat_ms() + 1300u;
+    ui.msg_next[0] = 0;                                /* a second part waiting belonged to the last one */
 }
 void ui_say(const char *a, const char *b) { say(a, b); }
 
@@ -238,8 +239,9 @@ static void tips_run(void)                             /* each frame: a tip wait
     if (plat_ms() < ui.msg_until + (ui.msg_next[0] ? 0u : 300u))
         return;
     if (ui.msg_next[0]) {                              /* a message's second part, just after it */
-        say_c(ui.msg_next, 0, ui.msg_col);
-        ui.msg_next[0] = 0;
+        char t[sizeof ui.msg_next];
+        memcpy(t, ui.msg_next, sizeof t);
+        say_c(t, 0, ui.msg_col);
         return;
     }
     if (!ui.tip_q)
@@ -486,7 +488,7 @@ static void sw_flip(sw_t w)
     static const char *const DR[2] = {"I ", "II "};
     static const char *const WAVES[4] = {"OFF", "WAVE I", "WAVE II", "WAVES I+II"};
     char a[24];
-    const char *what = 0, *st = 0;
+    const char *what = 0, *st = 0, *next = 0;
     int on = !sw_get(w), base = DR_GP(w.g, 0), tp = -1, nx;
     /* a route's key goes round: Wave I, Wave II, both (I+II), Wave I */
     if (w.s == S_OTAP || w.s == S_FTAP || w.s == S_DTAP)
@@ -502,7 +504,7 @@ static void sw_flip(sw_t w)
         what = "SUB";
         st = SUB[v];
         if (proj.par[base + GP_MIX] <= 2)      /* not heard: OSC MIX (Sub · Drive, EDIT twice) is at the oscillators */
-            scopy(ui.msg_next, "OSC MIX 0 · EDIT x2");
+            next = "OSC MIX 0 · EDIT x2";
         break;
     }
     case S_PLOCK: param_set(P_PLOCK, on); q = a; what = "PITCH LOCK"; st = on ? "ON" : "OFF"; break;
@@ -536,6 +538,8 @@ static void sw_flip(sw_t w)
     }
     scopy(q, what);
     say_c(a, st, w.s == S_LFORESET || w.s == S_DTAP ? RGB(183, 145, 255) : w.g ? RGB(69, 227, 211) : RGB(255, 176, 74));
+    if (next)
+        scopy(ui.msg_next, next);
 }
 
 static void hands_on(int p);
@@ -888,7 +892,8 @@ static void scene_undo(void)
     say_c("UNDO", "AGAIN: REDO", K_GOLD);
 }
 
-static void scene_recall(int n)                        /* a white key: morph there over the Scene time */
+static void scene_recall(int n, int keep)              /* a white key: morph there over the Scene time; keep: the
+                                                        * sound before it for undo (a press kept it already) */
 {
     char t[12] = "SCENE ";
     const int16_t *sc = scene_get(proj.bank, n);
@@ -898,7 +903,8 @@ static void scene_recall(int n)                        /* a white key: morph the
         say(t, "EMPTY: SAVE+KEY");
         return;
     }
-    undo_keep();
+    if (keep)
+        undo_keep();
     for (k = 0; k < DR_NPARAMS; k++) {
         ui.morph_from[k] = proj.par[k];
         ui.morph_to[k] = sc[k];
@@ -982,7 +988,7 @@ static void scene_morph(void)
 #define PR_COMMIT_MS 300u
 #define PR_TAP_MS 500u                 /* a scene key let go sooner: a tap, there to stay, as a gesture key (Evan,
                                         * 2026-10-18: 250 was too quick, a relaxed tap became a visit and went BACK) */
-#define PR_LIFT_MS 150u                /* ... let go: as far in as it got in this long before (the finger lifting) */
+#define PR_LIFT_MS 80u                 /* ... let go: back up the finger's lift, at most this long before it */
 #define PR_WAIT_MS 250u                /* ... held this long, the pressure starts to move the sound (a crossfade) */
 static void press_start(int n, const int16_t *sc)
 {
@@ -1081,7 +1087,7 @@ static void press_end(void)                            /* the key let go */
         return;
     if (!ui.press_done && now - ui.press_t0 < PR_TAP_MS) {
         /* a tap (however far a crossfade had begun): there, over the Scene time */
-        scene_recall(n);
+        scene_recall(n, 0);
         tip(TIP_BLEND);
         return;
     }
@@ -1102,9 +1108,12 @@ static void press_end(void)                            /* the key let go */
                                                         * lifted (its pressure falls on the way up) */
         float xk = ui.press_x;
         uint32_t i;
-        for (i = 0; i < 16u; i++)
-            if (ui.pt_h[i] && now - ui.pt_h[i] <= PR_LIFT_MS && ui.px_h[i] > xk)
-                xk = ui.px_h[i];
+        for (i = 1; i <= 16u; i++) {               /* newest first: back while it was further in (the lift's fall) */
+            uint32_t j = (ui.ph_i - i) & 15u;
+            if (!ui.pt_h[j] || now - ui.pt_h[j] > PR_LIFT_MS || ui.px_h[j] < xk)
+                break;
+            xk = ui.px_h[j];
+        }
         if (xk > ui.press_x) {
             ui.press_x = xk;
             sound_blend(ui.visit_back, ui.press_to, xk);
@@ -1538,9 +1547,12 @@ static void input(void)
         if (btn >> B_SAVE & 1u) {
             if (!save_dn)
                 save_dn = plat_ms() | 1u;
-            if (plat_ms() - save_dn >= HOLD_MS && !(ui.btn_used >> B_SAVE & 1u))
-                say_c(proj.bank == BANK_PRESETS ? "PRESETS ARE FIXED" : "KEY: STORE",
-                      btn >> B_SEL & 1u ? "LET GO: UNDO" : "LET GO: SAVE", K_GOLD);
+            if (plat_ms() - save_dn >= HOLD_MS && !(ui.btn_used >> B_SAVE & 1u)) {
+                if (btn >> B_SEL & 1u)
+                    say_c("LET GO: UNDO", 0, K_GOLD);
+                else
+                    say_c(proj.bank == BANK_PRESETS ? "PRESETS ARE FIXED" : "KEY: STORE", "LET GO: SAVE", K_GOLD);
+            }
         } else {
             save_dn = 0;
         }
@@ -1557,7 +1569,7 @@ static void input(void)
                 for (k = 0; k < DR_NPARAMS; k++)       /* where a visit comes back to */
                     ui.visit_back[k] = proj.par[k];
                 ui.visit_from = ui.scene_at;
-                scene_recall((int)i);
+                scene_recall((int)i, 1);
                 ui.visit = ui.morph == (int8_t)i ? (int8_t)i : -1;
                 ui.visit_t = plat_ms();
             }
