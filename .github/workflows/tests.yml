@@ -6,6 +6,7 @@ name: Tests
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches: [main]
 
@@ -14,6 +15,8 @@ permissions:
 
 jobs:
   host:
+    # not again when only a label changed (same-samples reads the label)
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +37,7 @@ jobs:
     # Linux has no instruction counter: valgrind counts each case of tests/host/drone_cost.c, on this
     # branch and on main, on the same machine. Linux counts aren't the Mac's, so only the change
     # means anything here; the budget itself is checked on the Mac (drone-cost in run_tests.sh).
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.action != 'labeled' && github.event.action != 'unlabeled'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,3 +48,24 @@ jobs:
         run: |
           git worktree add -q --detach ../base origin/${{ github.base_ref }}
           python3 tools/ci_cost.py ../base .
+
+  same-samples:
+    # The sound and the screen against main: every fixed render (tests/golden), every scenario and the engine's own
+    # scenes, played by this branch and by main on the same machine, compared sample by sample and pixel by pixel.
+    # A PR that means to change the sound carries the label "changes-sound": the differences are listed, not failed.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install numpy Pillow
+      - name: Same samples as main
+        env:
+          CC: cc -D_DEFAULT_SOURCE -Wl,--no-as-needed -lm
+        run: |
+          git worktree add -q --detach ../base origin/${{ github.base_ref }}
+          python3 tools/same_samples.py ../base . ${{ contains(github.event.pull_request.labels.*.name, 'changes-sound') && '--allow-change' || '' }}

@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): scenes: a tap, a blend by pressure, let go, undo, redo. Rendered by this branch and by main;
+# a change that keeps the sound gives the same samples. Not a test of its own (no expectations).
+pressure w0 0
+pressure w1 0
+pressure w2 0
+pressure w3 0
+pressure w4 0
+pressure w5 0
+pressure w6 0
+pressure w7 0
+pressure w8 0
+pressure w9 0
+pressure w10 0
+pressure w11 0
+notips
+set 71 30
+set 74 0
+press SEL
+tapkey w12
+release SEL
+tap PLAY
+wait 1500
+press SAVE
+tapkey w0
+release SAVE
+spin K2 -40
+spin K1 5
+spin K3 -3
+press SAVE
+tapkey w1
+release SAVE
+wait 500
+wav scenes.wav
+tapkey w0
+wait 3000
+key w1 down
+pressure w1 70
+wait 2500
+pressure w1 0
+key w1 up
+wait 2000
+press SEL
+tap SAVE
+release SEL
+wait 2500
+press SEL
+tap SAVE
+release SEL
+wait 2500
+wavstop

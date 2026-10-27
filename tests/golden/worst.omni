@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): the worst case: everything on, the gestures held, cross-FM and Snarl. Rendered by this branch and by main;
+# a change that keeps the sound gives the same samples. Not a test of its own (no expectations).
+pressure w0 0
+pressure w1 0
+pressure w2 0
+pressure w3 0
+pressure w4 0
+pressure w5 0
+pressure w6 0
+pressure w7 0
+pressure w8 0
+pressure w9 0
+pressure w10 0
+pressure w11 0
+notips
+tap PLAY
+wait 1500
+set 76 100
+set 77 100
+set 52 100
+set 53 100
+set 68 50
+set 61 90
+set 63 80
+set 78 100
+set 79 100
+set 98 60
+set 62 50
+set 66 50
+set 64 3
+set 94 5
+set 44 1
+set 1 85
+set 22 85
+set 10 100
+set 31 100
+set 19 30
+set 40 30
+set 42 2
+key w12 down
+key w14 down
+key w15 down
+wait 4000
+wav worst-crossfm.wav
+wait 10000
+wavstop
+set 42 3
+wait 1000
+wav worst-snarl.wav
+wait 10000
+wavstop
+key w12 up
+key w14 up
+key w15 up

@@ -435,3 +435,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   (the finger lifting); SEL no longer holds it. **SEL + SAVE undoes** the last scene tap or blend, over the Scene time;
   again, forward. The Sub key with OSC MIX at 0 says so after its step ("OSC MIX 0 · EDIT x2"). Pitch lock stays as it
   is (scenes keep your pitch while it's on); the pitch knobs on semitones go with clock out.
+- 2026-10-27 (Evan): **same samples.** Every PR is checked against main for sound and screen: `tools/same_samples.py`
+  plays the fixed renders in `tests/golden` (each preset, the worst case with cross-FM and with Snarl, each gesture
+  held, latched and kept, scenes with a blend and undo, the MIDI clock), every scenario and the engine's own scenes
+  through both, and compares every WAV sample by sample (same; close: within -90 dBFS; different) and every
+  screenshot pixel by pixel. CI fails a PR on a difference unless it carries the label `changes-sound`. Efficiency
+  work comes next, with this under it: measure first, then fix by payoff.
