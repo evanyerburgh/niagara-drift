@@ -407,7 +407,7 @@ static int expect(const char *what, const char *val)
         int n;
         got = 0;
         for (n = 0; n < NSCENES; n++)
-            got |= (scene_get(proj.bank, n) != 0) << n;
+            got |= (scene_has(proj.bank, n) != 0) << n;
     }
     else if (!strcmp(what, "lfo0"))                /* the LFO's Wave I now, x 100 */
         got = (int)(dr_lfo[0] * 100.0f);

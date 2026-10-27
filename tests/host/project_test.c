@@ -18,8 +18,11 @@ int plat_store_load(uint32_t obj, void *dst, uint32_t max)
     memcpy(dst, store[obj], (size_t)n);
     return n;
 }
+static int fail_obj = -1;                       /* a save of this object fails (a power cut, say) */
 int plat_store_save(uint32_t obj, const void *src, uint32_t len)
 {
+    if ((int)obj == fail_obj)
+        return -1;
     memcpy(store[obj], src, len);
     store_n[obj] = (int)len;
     return 0;
@@ -346,6 +349,43 @@ int main(void)
     }
     old_project(18u);
     check("format 18 gives the defaults", project_load() == -1 && !scene_get(0, 0) && !scene_get(1, 0));
+    {   /* a P2 saved over before 2026-10-19 in an older format (31): moved scene by scene from the load buffer; and the
+         * old Presets object is rewritten only once the scene's new home is on the flash (2026-10-27) */
+        static bank_v31_t bp;
+        int i;
+        project_defaults();
+        proj.bank = 0;
+        project_save();
+        memset(&bp, 0, sizeof bp);
+        bp.magic = BANK_MAGIC;
+        bp.format = 31u;
+        bp.used = 1u << 1;
+        for (i = 0; i < NP31; i++)
+            bp.scene[1][i] = dr_param_info(i)->def;
+        bp.scene[1][DR_GP(0, GP_PITCH)] = 4444;
+        memcpy(store[OBJ_BANKP], &bp, sizeof bp);
+        store_n[OBJ_BANKP] = (int)sizeof bp;
+        check("an old-format P2 saved over loads into C1", project_load() == 0 && scene_get(2, 0) &&
+                                                         scene_get(2, 0)[DR_GP(0, GP_PITCH)] == 4444);
+        fail_obj = OBJ_BANKC;
+        check("... C's save failing: the old Presets object keeps P2", project_save() != 0 &&
+                                                         (((bank_v31_t *)store[OBJ_BANKP])->used & (1u << 1)));
+        fail_obj = -1;
+        check("... saved: C holds it, then the old Presets object lets it go", project_save() == 0 &&
+                                                         (((bank_t *)store[OBJ_BANKC])->used & 1u) &&
+                                                         ((bank_v31_t *)store[OBJ_BANKP])->used == 0);
+        memset(&proj, 0, sizeof proj);
+        check("... and reloaded: in C1 once, not moved again", project_load() == 0 && scene_get(2, 0) &&
+                                                         scene_get(2, 0)[DR_GP(0, GP_PITCH)] == 4444 && !scene_has(2, 1));
+    }
+    {   /* a Preset is built when it's asked for: the same values as the table, each time */
+        const int16_t *a = scene_get(BANK_PRESETS, 4);
+        int16_t p5[DR_NPARAMS];
+        memcpy(p5, a, sizeof p5);
+        scene_get(BANK_PRESETS, 9);
+        check("a Preset built again is the same", memcmp(scene_get(BANK_PRESETS, 4), p5, sizeof p5) == 0 &&
+                                                     scene_has(BANK_PRESETS, 11) && !scene_has(BANK_PRESETS, 12));
+    }
     printf("project: %s\n", fails ? "FAILED" : "all ok");
     return fails != 0;
 }

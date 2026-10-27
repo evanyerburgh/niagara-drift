@@ -441,3 +441,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   through both, and compares every WAV sample by sample (same; close: within -90 dBFS; different) and every
   screenshot pixel by pixel. CI fails a PR on a difference unless it carries the label `changes-sound`. Efficiency
   work comes next, with this under it: measure first, then fix by payoff.
+- 2026-10-27: **RAM: 16.5 KB back** (80.5 -> 64.0 KB of 96; the efficiency report's fixes 1-3). Old saves convert read in
+  place from the load buffer (their copies were 12.1 KB); a Preset is built when it's asked for, one at a time
+  (`scene_has()` for the keys' lights and the pressure check); the Presets saved over before 2026-10-19 are moved
+  straight from the load buffer, and their object is rewritten after the banks and the project that now hold them.
