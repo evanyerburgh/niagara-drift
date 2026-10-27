@@ -301,6 +301,16 @@ static void boot(void)
     ui_init();
 }
 
+/* the clock's jitter: the same numbers on every machine (libc's rand() differs between macOS and Linux) */
+static double jit_rand(void)                      /* -1 .. 1 */
+{
+    static uint32_t x = 2463534242u;              /* xorshift32 */
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    return (double)x / 2147483648.0 - 1.0;
+}
+
 static void run_ms(uint32_t ms)
 {
     static int32_t blk[512];
@@ -308,7 +318,7 @@ static void run_ms(uint32_t ms)
     for (i = 0; i < ms; i++) {
         now_ms++;
         while (clk_bpm > 0.0 && clk_next_us <= (double)now_ms * 1000.0) {   /* the "clock" command's pulses */
-            double j = clk_jit > 0.0 ? clk_jit * 1000.0 * ((double)rand() / RAND_MAX - 0.5) * 2.0 : 0.0;
+            double j = clk_jit > 0.0 ? clk_jit * 1000.0 * jit_rand() : 0.0;
             min_t[mi_w % MQ] = (uint32_t)(clk_next_us + j);
             min_q[mi_w++ % MQ] = 0x0F | 0xF8u << 8;
             clk_next_us += 60.0e6 / (clk_bpm * 24.0);
