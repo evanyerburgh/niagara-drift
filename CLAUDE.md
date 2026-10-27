@@ -12,6 +12,7 @@ sh host/build_host.sh        # the host simulator: build/host/omni_host SCRIPT.o
 ./build.sh                   # the firmware (Docker, the JieLi toolchain and SDK): build/omni.fwsc
 sh web/emu/build.sh          # the browser emulator into build/emu
 tools/budget.py              # after ./build.sh: the PR's budget line against main
+tools/same_samples.py        # this tree's sounds and screens against main's: the same, or listen
 ```
 
 On macOS, export `SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"` first. On Linux the tests need
@@ -47,6 +48,9 @@ Every firmware PR body carries `tools/budget.py`'s line, so a change's cost is s
 - `drone.c` is one compilation unit (it includes `drone_fx.c`): declare statics before first use.
 - A sound change comes with a host render (WAV) and numbers measured on it; a screen change with a
   screenshot. Measure on and off as two renders of the same passage (the host is deterministic).
+- **A change that shouldn't change the sound or the screen passes `tools/same_samples.py`** (CI runs it on every PR:
+  every fixed render in `tests/golden`, every scenario, the engine's scenes, sample by sample). One that means to
+  carries the PR label `changes-sound`, with its WAVs. A new feature adds its own render to `tests/golden`.
 - Audio code: `.claude/rules/dsp.md`.
 
 ## Gotchas

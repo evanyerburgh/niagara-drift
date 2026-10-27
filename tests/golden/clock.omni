@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): on a MIDI clock (120 BPM, jitter), then stopped. Rendered by this branch and by main;
+# a change that keeps the sound gives the same samples. Not a test of its own (no expectations).
+pressure w0 0
+pressure w1 0
+pressure w2 0
+pressure w3 0
+pressure w4 0
+pressure w5 0
+pressure w6 0
+pressure w7 0
+pressure w8 0
+pressure w9 0
+pressure w10 0
+pressure w11 0
+notips
+tap PLAY
+wait 1500
+clock 120 1
+wait 3000
+wav clock.wav
+wait 12000
+clock 0
+wait 4000
+wavstop
