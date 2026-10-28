@@ -86,7 +86,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 36, on bank A", proj.format == 36u && PROJ_FORMAT == 36u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 37, on bank A", proj.format == 37u && PROJ_FORMAT == 37u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -455,6 +455,44 @@ int main(void)
         check("... A10 to A8 (within A), not to B again", scene_has(0, 7) && scene_get(0, 7)[DR_GP(0, GP_PITCH)] == 4100 &&
                                                          proj_note_moved == 1 && proj_note_presets == 0);
         check("... C holds P9-P12 once (C5 empty)", scene_has(2, 3) && !scene_has(2, 4));
+    }
+    {   /* format 36 (108 values): loads, its sounds kept, each drone's sub wave the square it was (2026-10-28) */
+        static proj_v36_t o;
+        static bank_v36_t bb;
+        int i, k;
+        memset(store_n, 0, sizeof store_n);
+        memset(&o, 0, sizeof o);
+        o.magic = PROJ_MAGIC;
+        o.format = 36u;
+        o.mtime = MTIME_DEF;
+        for (k = 0; k < NP36; k++)
+            o.par[k] = dr_param_info(k)->def;
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < NP36; k++)
+                o.scene[i][k] = dr_param_info(k)->def;
+        o.par[DR_GP(1, GP_PITCH)] = 6100;
+        o.par[P_GL_7] = 40;
+        o.scene_used = 0x003u;
+        o.scene[1][DR_GP(0, GP_PITCH)] = 4400;
+        memcpy(store[OBJ_PROJ], &o, sizeof o);
+        store_n[OBJ_PROJ] = (int)sizeof o;
+        memset(&bb, 0, sizeof bb);
+        bb.magic = BANK_MAGIC;
+        bb.format = 36u;
+        bb.used = 1u << 2;
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < NP36; k++)
+                bb.scene[i][k] = dr_param_info(k)->def;
+        bb.scene[2][DR_GP(0, GP_PITCH)] = 4500;
+        memcpy(store[OBJ_BANKB], &bb, sizeof bb);
+        store_n[OBJ_BANKB] = (int)sizeof bb;
+        check("a format-36 project loads", project_load() == 0 && proj.format == PROJ_FORMAT);
+        check("... its sound and scenes kept", proj.par[DR_GP(1, GP_PITCH)] == 6100 && proj.par[P_GL_7] == 40 &&
+                                               scene_get(0, 1)[DR_GP(0, GP_PITCH)] == 4400 &&
+                                               scene_get(1, 2)[DR_GP(0, GP_PITCH)] == 4500 && proj_note_moved == 0);
+        check("... the subs square, as they were", proj.par[P_SUBW_0] == DR_SUBW_SQUARE &&
+                                                  proj.par[P_SUBW_1] == DR_SUBW_SQUARE &&
+                                                  scene_get(1, 2)[P_SUBW_1] == DR_SUBW_SQUARE);
     }
     printf("project: %s\n", fails ? "FAILED" : "all ok");
     return fails != 0;

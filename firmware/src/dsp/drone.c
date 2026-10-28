@@ -58,6 +58,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Drive", 0, 100, 0}, {"Into rev", 0, DR_NROUTE - 1, 0}, {"Division", 0, DR_NDIV - 1, 2},
     {"LFO div", 0, DR_NLDIV - 1, 3}, {"Dly note", 0, DR_NNOTE - 1, 5}, {"Scene bars", 0, DR_NBARS - 1, 2},
     {"G4 latch", 0, 100, 0}, {"A4 latch", 0, 100, 0}, {"B4 latch", 0, 100, 0}, {"C5 latch", 0, 100, 0},
+    {"Sub wave", 0, DR_NSUBW - 1, DR_SUBW_SQUARE}, {"Sub wave", 0, DR_NSUBW - 1, DR_SUBW_SQUARE},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
 const char *const DR_DIV_NAME[DR_NDIV] = {"32 bars", "16 bars", "8 bars", "4 bars", "2 bars", "1 bar", "1/2", "1/4"};
@@ -90,6 +91,7 @@ static float ext_beats(void)
     return ext_beat + (float)ext_n / dr_ext_spb;
 }
 const char *const DR_ROUTE_NAME[DR_NROUTE] = {"Both", "Echoes", "Drones"};
+const char *const DR_SUBW_NAME[DR_NSUBW] = {"Square", "Sine", "Triangle", "Saw"};
 const char *const DR_DLY_NAME[DR_NDLY] = {"Clean", "Wide", "Ping-pong", "Tape", "Grain", "Self"};
 const char *const DR_WSCALE_NAME[DR_NWSCALE] = {"Minor pent", "Major pent", "5ths + 8ves", "Whole tone", "Dorian",
                                                 "Just 1-8"};
@@ -298,6 +300,8 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_DLY_NAME[(unsigned)v < DR_NDLY ? v : DR_DLY_TAPE]);
     else if (i == P_DLY_ROUTE)
         copy_s(b, DR_ROUTE_NAME[(unsigned)v < DR_NROUTE ? v : 0]);
+    else if (i == P_SUBW_0 || i == P_SUBW_1)
+        copy_s(b, DR_SUBW_NAME[(unsigned)v < DR_NSUBW ? v : 0]);
     else if (i == P_PULSE_DIV)
         copy_s(b, DR_DIV_NAME[(unsigned)v < DR_NDIV ? v : 2]);
     else if (i == P_LFO_DIV)
@@ -519,6 +523,7 @@ typedef struct {
     float ov;                                     /* ... or a gesture's own (semitones; CHORD), when ovon */
     int ovon;
     float sg, sdiv;                               /* the sub's swap: its gain (down, swap, up), the octave */
+    uint8_t sw;                                   /* ... and its wave (P_SUBW_*, swapped as the octave is) */
     float sy;                                     /* hard sync's swap (drone II): its gain */
     uint8_t sync;                                 /* hard sync as it sounds now */
     float sync_next;                              /* the sync BLEP's second half, for the next sample */
@@ -1162,6 +1167,19 @@ static inline float blep(float t, float dt)
     return 0.0f;
 }
 
+/* THE SUB's wave at phase ph (turns), dt its phase step (P_SUBW_*): each as loud (RMS) as the square, so a change of
+ * wave changes its colour, not its level. The square and saw band-limited (their edges); the sine and triangle have
+ * none to smooth */
+static inline float sub_wave(int w, float ph, float dt)
+{
+    switch (w) {
+    case DR_SUBW_SINE: return 1.41421356f * fm_sinf(6.28318531f * ph);
+    case DR_SUBW_TRI: return 1.73205081f * (ph < 0.5f ? 4.0f * ph - 1.0f : 3.0f - 4.0f * ph);
+    case DR_SUBW_SAW: return 1.73205081f * (2.0f * ph - 1.0f - blep(ph, dt));
+    default: return (ph < 0.5f ? 1.0f : -1.0f) + blep(ph, dt) - blep(ph < 0.5f ? ph + 0.5f : ph - 0.5f, dt);
+    }
+}
+
 /* one cycle of the wave at phase ph (turns), dt the phase step a sample; pw the square's high fraction.
  * The four are in phase (their fundamentals all rise from 0 at ph = 0: the triangle peaks at 1/4, the
  * saw falls), so an X-WAVE blend of two never cancels. The sine and triangle are lifted (OSC_*_K, below). */
@@ -1476,6 +1494,7 @@ static void morph_snap(int g)                    /* all of a drone's switches wh
     v->nc = (float)p[GP_NCOLOR] * 0.01f;
     v->sg = 1.0f;
     v->sdiv = sub_div(p[GP_SUBOCT]);
+    v->sw = (uint8_t)par[P_SUBW_0 + g];
     v->sy = 1.0f;
     v->sync = (uint8_t)(g == 1 && par[P_SYNC]);
     v->xm = g == 1 && par[P_XMOD] == DR_XMOD_CUT ? 1.0f : 0.0f;
@@ -1508,11 +1527,13 @@ static void morph_tick(int g, float step)        /* one control tick of the swit
     } else {
         v->ig = fm_minf(v->ig + 2.0f * step, 1.0f);   /* (its own interval switches as it always has) */
     }
-    if (v->sdiv != sdiv) {                       /* the sub: down, then swap the octave, then up */
+    if (v->sdiv != sdiv || v->sw != (uint8_t)par[P_SUBW_0 + g]) {   /* the sub: down, then swap the octave or
+                                                                  * the wave, then up */
         v->sg -= 2.0f * step;
         if (v->sg <= 0.0f) {
             v->sg = 0.0f;
             v->sdiv = sdiv;
+            v->sw = (uint8_t)par[P_SUBW_0 + g];
         }
     } else {
         v->sg = fm_minf(v->sg + 2.0f * step, 1.0f);
@@ -1667,7 +1688,7 @@ static void render_group(int g, uint32_t n)
     for (j0 = 0; j0 < n; j0 += CR) {
         float inc, pinc, sinc, lk, ilk, mlk, plk, slk, gc, a1, a2, a3, gstep, gend, lend, lstep, lv = v->lv, ph = v->ph, pph = v->pph,
               sph = v->sph, om, fmod, fl, pmod, xw, wf, og, sg, xd, xpd, xh = v->xh, xc = v->xc, wl, wb, wh, sy, r, fbn, fsn;
-        int wi, sync;
+        int wi, sync, sw = v->sw;
         float ic1 = v->ic1, ic2 = v->ic2, bc = v->bc, gf = v->gf, peak = v->peak, bk;
         float z0 = v->nz[0], z1 = v->nz[1], z2 = v->nz[2], z3 = v->nz[3], z4 = v->nz[4], z5 = v->nz[5], nh = v->nh;
         uint32_t nn = v->nn;                    /* the noise's states, kept in registers through the tick */
@@ -1733,6 +1754,7 @@ static void render_group(int g, uint32_t n)
         morph_tick(g, mstep);
         og = (0.9f - 0.28f * v->pg) * omix;      /* main alone 0.9, with its partner 0.62 each */
         sg = sub * v->sg;
+        sw = v->sw;
         xd = xamt * v->xm;
         xpd = v->xp * famt_x;                    /* CROSS-FM's depth, this tick */
         fbn = fbk * (1.0f / fbc) * 0.25f / fm_maxf(v->fbe, 0.03125f);   /* FEEDBACK's make-up and gain, this tick (a
@@ -1881,7 +1903,7 @@ static void render_group(int g, uint32_t n)
             else
                 x *= og * mlk;
             if (sg > 0.0f)
-                x += sg * slk * ((sph < 0.5f ? 1.0f : -1.0f) + blep(sph, cs) - blep(sph < 0.5f ? sph + 0.5f : sph - 0.5f, cs));
+                x += sg * slk * sub_wave(sw, sph, cs);
             if (nmix > 0.0f) {                  /* NOISE, coloured, beside the oscillators */
                 float w;
                 nn = nn * 1664525u + 1013904223u;

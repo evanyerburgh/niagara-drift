@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 36u                  /* 36: the pressure keys' gestures' latches (108; 35's widened); scenes 9-12 moved
+#define PROJ_FORMAT 37u                  /* 37: each drone's sub wave (110 values; 36's widened);
+                                          * 36: the pressure keys' gestures' latches (108; 35's widened); scenes 9-12 moved
                                           * to keys 1-8, P9-P12 copied into the banks (keys 9-12 are gestures);
                                           * 35: the LFO's, the delay's and the scenes' clock values (104; 34's widened);
                                           * 34: the Swell's division (101 values; 33's read and widened);
