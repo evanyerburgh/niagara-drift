@@ -57,6 +57,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Type", 0, DR_NDLY - 1, DR_DLY_TAPE}, {"Length", 0, 100, 60}, {"Damp", 0, 100, 40}, {"Pressure", 0, 100, 50},
     {"Drive", 0, 100, 0}, {"Into rev", 0, DR_NROUTE - 1, 0}, {"Division", 0, DR_NDIV - 1, 2},
     {"LFO div", 0, DR_NLDIV - 1, 3}, {"Dly note", 0, DR_NNOTE - 1, 5}, {"Scene bars", 0, DR_NBARS - 1, 2},
+    {"G4 latch", 0, 100, 0}, {"A4 latch", 0, 100, 0}, {"B4 latch", 0, 100, 0}, {"C5 latch", 0, 100, 0},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
 const char *const DR_DIV_NAME[DR_NDIV] = {"32 bars", "16 bars", "8 bars", "4 bars", "2 bars", "1 bar", "1/2", "1/4"};
@@ -514,6 +515,9 @@ typedef struct {
     /* MORPH: where each switch's change has got to, moving to its setting over the Morph time */
     float wm[3];                                  /* the filter mode's weights: LP, BP, HP */
     float pg;                                     /* the partner's gain, 0..1 */
+    float ig;                                     /* a gesture's interval for the partner coming or going: its gain */
+    float ov;                                     /* ... or a gesture's own (semitones; CHORD), when ovon */
+    int ovon;
     float sg, sdiv;                               /* the sub's swap: its gain (down, swap, up), the octave */
     float sy;                                     /* hard sync's swap (drone II): its gain */
     uint8_t sync;                                 /* hard sync as it sounds now */
@@ -545,6 +549,20 @@ static float gam[DR_NGEST];                       /* the gestures' amounts now, 
 static uint8_t mac_dirty;                         /* an amount or a depth changed: the offsets again */
 static int16_t moff[DR_NPARAMS];                  /* the macros' offset on each value now (MOFF_ON: a switch on) */
 #define MOFF_ON 0x7FFF
+#define MOFF_SET 0x7FFD                           /* moff[]: a switch set to mset[] (MK_SET) */
+static int16_t mset[DR_NPARAMS];
+/* TICK: the sub's own rate, a drone's (p): TICKD sinks it from its octave under 20 Hz into sparse beats (2^-7 of the
+ * drone), TICKU speeds the beats up (to 2^-3): the press is the beat rate */
+static float tick_d[DR_NGROUPS], tick_u[DR_NGROUPS];
+/* CHORD: a partner's interval from Wander's scale (P_WSCALE), built on drone I, just: d 1 drone I's partner, d 2 drone
+ * II's; spread open, one of CHORD_V's voicings each press (never the same twice): each partner's chord tone (0 the
+ * root, 1 the third, 2 the top note, 3 the fifth) and how many octaves up */
+static float chord_t[DR_NGROUPS];
+static int chord_on[DR_NGROUPS];
+static const uint8_t CHORD_V[5][4] = {{1, 1, 2, 1}, {1, 1, 2, 2}, {0, 1, 1, 2}, {2, 1, 1, 2}, {3, 1, 1, 2}};
+static int chord_vi;
+static const float CHORD_T[DR_NWSCALE][2] = {
+    {3.15641f, 10.17596f}, {3.86314f, 8.84359f}, {7.01955f, 12.0f}, {4.0f, 8.0f}, {3.15641f, 8.84359f}, {3.86314f, 9.68826f}};
 static float mac_p[DR_NGROUPS];                   /* each drone's pitch move, semitones: Shift's, Wander's, Age's */
 /* FEEDBACK: the finished sound (mono, after the effects), kept for a fixed 256 samples (5.8 ms) and fed
  * back into the drones' filters: a loop of the same length whatever the block size */
@@ -679,8 +697,10 @@ void dr_init(void)
  * value toward 0 (by d %, all the way when d is 0); TO the value up toward d (nothing if it's there already: a
  * sound with its own effects up isn't pushed past them); SHIFT a drone's pitch (Shift's move); BUMP an offset that
  * rises over in0 .. in1 and falls again over out0 .. out1, both ways (a dip while something else moves); PULSE an
- * offset breathing slowly (PULSE_HZ) while it's in; WOW a drone's pitch wavering slowly, d cents. */
-enum { MK_ADD, MK_SW, MK_OFF, MK_ZERO, MK_TO, MK_SHIFT, MK_BUMP, MK_PULSE, MK_WOW };
+ * offset breathing slowly (PULSE_HZ) while it's in; WOW a drone's pitch wavering slowly, d cents; SET a switch set to d
+ * while the move is in (a later move on the same value wins); TICKD / TICKU the sub's own rate (p a drone); CHORD a
+ * partner's own interval (p a drone, d 1 or 2), from Wander's scale (v0.3). */
+enum { MK_ADD, MK_SW, MK_OFF, MK_ZERO, MK_TO, MK_SHIFT, MK_BUMP, MK_PULSE, MK_WOW, MK_SET, MK_TICKD, MK_TICKU, MK_CHORD };
 typedef struct {
     uint8_t p, kind;                             /* the value (or, for a pitch move, the drone) and the kind */
     int16_t d;                                   /* the amount at full (MK_ADD; MK_TO: the value aimed at) */
@@ -691,9 +711,10 @@ typedef struct {
 #define MOVE_S 0.15f                             /* a move's level: the whole way in this long, at most (a
                                                   * turn back half way doesn't jump; Gesture time can be quick) */
 #define MOFF_OFF 0x7FFE                          /* moff[]: a switch held off */
-const char *const DR_GEST_NAME[DR_NGTYPE] = {"Weight", "Shift", "Clean", "Wash"};
-const uint8_t DR_GEST_DEPTH[DR_NGTYPE] = {70, 100, 100, 70};   /* a tap, or a hold all the way in */
-const uint8_t DR_GEST_TIME[DR_NGTYPE] = {30, 40, 35, 35};      /* 0..100 = 1 .. 30 s: 2.8 s, 3.9 s, 3.3 s, 3.3 s */
+const char *const DR_GEST_NAME[DR_NGTYPE] = {"Weight", "Shift", "Clean", "Wash", "Tick", "Chord", "Snarl", "Stutter"};
+const uint8_t DR_GEST_DEPTH[DR_NGTYPE] = {70, 100, 100, 70, 100, 100, 100, 100};   /* a tap, or a hold all the way in */
+const uint8_t DR_GEST_TIME[DR_NGTYPE] = {30, 40, 35, 35, 55, 55, 55, 55};   /* 0..100 = 1 .. 30 s: 2.8 s, 3.9 s, 3.3 s, 3.3 s;
+                                                                          * the pressure keys' 6.5 s (as tried on the FM-1) */
 static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
     /* WEIGHT: a full, warm bass (Evan, 2026-10-18): the sub comes up through most of the swell (a little: the main
      * oscillator's fundamental is the low-mids a small speaker plays), the drones come up, the resonance and the
@@ -733,6 +754,32 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
      {DR_GP(1, GP_LEVEL), MK_ADD, -15, 60, 100, 60, 100}, {DR_GP(0, GP_LEVEL), MK_PULSE, -14, 55, 70, 55, 70},
      {DR_GP(1, GP_LEVEL), MK_PULSE, -14, 55, 70, 55, 70},
      {DR_GP(0, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}, {DR_GP(1, GP_FLFO_DEPTH), MK_ZERO, 67, 20, 70, 0, 40}},
+    /* the pressure keys G4..C5 (v0.3), each the partner of the top key four to its right: Tick (the low end, as Weight),
+     * Chord (pitch, as Shift), Snarl (dirt in; Clean takes it out), Stutter (time, as Wash). Pressed harder, further in */
+    /* TICK (G4): the sub comes up and sinks from its hum through 20 Hz into sparse beats; then the press speeds the beats
+     * up, louder, into a flutter with drive. Let go: the beats slow, then climb back up into the hum */
+    {{DR_GP(0, GP_MIX), MK_ADD, 25, 0, 30, 0, 35}, {DR_GP(1, GP_MIX), MK_ADD, 25, 0, 30, 0, 35},
+     {0, MK_TICKD, 1, 0, 40, 0, 40}, {1, MK_TICKD, 1, 0, 40, 0, 40},
+     {0, MK_TICKU, 1, 40, 100, 40, 100}, {1, MK_TICKU, 1, 40, 100, 40, 100},
+     {DR_GP(0, GP_MIX), MK_ADD, 25, 40, 100, 40, 100}, {DR_GP(1, GP_MIX), MK_ADD, 25, 40, 100, 40, 100},
+     {DR_GP(0, GP_DRIVE), MK_ADD, 30, 60, 100, 60, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 30, 60, 100, 60, 100}},
+    /* CHORD (A4): a chord builds a voice at a time: the beating goes (both partners' detune out), drone I's partner moves
+     * to a just major third, then drone II's to a just fifth above it (D, F#, A, E), the filters ease open a little.
+     * Let go: drone II's voice goes home first, then drone I's, the beating returns last */
+    {{DR_GP(0, GP_DETUNE), MK_ZERO, 0, 0, 30, 0, 30}, {DR_GP(1, GP_DETUNE), MK_ZERO, 0, 0, 30, 0, 30},
+     {0, MK_CHORD, 1, 30, 31, 40, 41}, {1, MK_CHORD, 2, 60, 61, 70, 71},
+     {DR_GP(0, GP_CUTOFF), MK_ADD, 40, 30, 100, 30, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, 40, 50, 100, 50, 100}},
+    /* SNARL (B4): a slight unease first (drone II detuned), then Snarl comes in (its mode crossfades in at the sound's
+     * own amount) and grows, the drive bites, Feedback sings at the top. Let go: Feedback and drive first, the
+     * snarl after, the unease last */
+    {{DR_GP(1, GP_DETUNE), MK_ADD, 20, 0, 40, 0, 50}, {P_XMOD, MK_SW, 0, 15, 16, 10, 11},
+     {P_XMOD_AMT, MK_TO, 85, 20, 80, 15, 75}, {DR_GP(0, GP_DRIVE), MK_ADD, 30, 50, 100, 40, 100},
+     {DR_GP(1, GP_DRIVE), MK_ADD, 30, 50, 100, 40, 100}, {P_FEEDBACK, MK_TO, 45, 70, 100, 60, 100}},
+    /* STUTTER (C5): the Swell switches on and chops quickly from the first touch, gently; pressing on, the chop
+     * deepens, then hardens into a gate. Let go: it softens first, then slows, then lets go */
+    {{P_PULSE, MK_SW, 0, 0, 1, 0, 1}, {P_PULSE_RATE, MK_TO, 80, 0, 35, 0, 35}, {P_PULSE_DEPTH, MK_TO, 95, 10, 70, 10, 70},
+     {P_PULSE_SHAPE, MK_TO, 85, 50, 100, 50, 100}, {P_PULSE_RATE, MK_TO, 90, 70, 100, 70, 100}},
+
 };
 /* AGE (Life), a state: as the old tape wears, darker, a little hiss, the pitch wavering slowly (wow) and a little
  * quickly (flutter); it wears in (and out) over AGE_S. Not Character (Evan, 2026-10-20: the two knobs overlapped) */
@@ -744,7 +791,7 @@ static const move_t AGE_MV[MV_N] = {
 #define AGE_S 20.0f                              /* Age wears in from none to full this long */
 static float mv_lvl[DR_NGEST][MV_N];             /* each key's moves' levels now, 0..1 (gliding) */
 static float mac_last[DR_NGEST];                 /* each key's amount last time ... */
-static uint8_t mac_out;                          /* ... and which are on their way out (bit m) */
+static uint8_t mac_out;  /* (8 gestures: one bit each) */                          /* ... and which are on their way out (bit m) */
 static uint8_t mv_moving;                        /* a move's level still gliding: again next block */
 static float mac_ph;                             /* the PULSE moves' phase, cycles */
 static float age_l, age_ph;                      /* Age as heard now (gliding), 0..1; its wow's phase */
@@ -785,8 +832,8 @@ static float mv_ease(float a, int lo, int hi)    /* the amount a through the win
 }
 static int heard(int i)                          /* the sound's own value with the macros' offset, in range */
 {
-    int v = moff[i] == MOFF_ON ? PARAMS[i].hi : moff[i] == MOFF_OFF ? PARAMS[i].lo : base[i] + moff[i];
-    if (i < P_XMOD && i % GP_N == GP_LEVEL && moff[i] && moff[i] != MOFF_ON && moff[i] != MOFF_OFF) {
+    int v = moff[i] == MOFF_SET ? mset[i] : moff[i] == MOFF_ON ? PARAMS[i].hi : moff[i] == MOFF_OFF ? PARAMS[i].lo : base[i] + moff[i];
+    if (i < P_XMOD && i % GP_N == GP_LEVEL && moff[i] && moff[i] != MOFF_ON && moff[i] != MOFF_OFF && moff[i] != MOFF_SET) {
         /* a level's moves are in the knob's units before its taper (v^2 / 100): the same dips and lifts in dB as
          * Evan approved (Weight +40, Wash -15 and its breath -14), at any level */
         float l = fm_clampf((float)(base[i] * base[i]) * 0.01f + (float)moff[i], 0.0f, 100.0f);
@@ -871,6 +918,19 @@ static void mv_add(const move_t *v, float l, float *off, uint8_t *on, float *pm,
     switch (v->kind) {
     case MK_SW: on[v->p] = 1; break;
     case MK_OFF: on[v->p] = 2; break;
+    case MK_SET: on[v->p] = 3; mset[v->p] = v->d; break;
+    case MK_CHORD: {
+        int sc = base[P_WSCALE] < 0 ? 0 : base[P_WSCALE] >= DR_NWSCALE ? DR_NWSCALE - 1 : base[P_WSCALE];
+        const uint8_t *vc = CHORD_V[chord_vi] + (v->d == 1 ? 0 : 2);
+        float t = (vc[0] == 0 ? 0.0f : vc[0] == 3 ? 7.01955f : CHORD_T[sc][vc[0] - 1]) + 12.0f * (float)vc[1];
+        if (v->d != 1)                           /* drone II's: the note over drone I, from drone II */
+            t -= (float)(base[DR_GP(1, GP_PITCH)] - base[DR_GP(0, GP_PITCH)]) * 0.01f;
+        chord_t[v->p] = t;
+        chord_on[v->p] = 1;
+        break;
+    }
+    case MK_TICKD: tick_d[v->p] = fm_maxf(tick_d[v->p], l); break;
+    case MK_TICKU: tick_u[v->p] = fm_maxf(tick_u[v->p], l); break;
     case MK_ZERO: off[v->p] -= (float)base[v->p] * l * (v->d ? (float)v->d * 0.01f : 1.0f); break;
     case MK_TO: off[v->p] += fm_maxf((float)(v->d - base[v->p]), 0.0f) * l; break;
     case MK_SHIFT: pm[v->p] += (float)(base[P_SHIFT_MOVE] - DR_SHIFT_MID) * 0.01f * l; break;
@@ -913,9 +973,13 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
         on[i] = 0;
     }
     mv_moving = 0;
+    tick_d[0] = tick_d[1] = tick_u[0] = tick_u[1] = 0.0f;
+    chord_on[0] = chord_on[1] = 0;
     for (m = 0; m < DR_NGEST; m++) {
         const move_t *row = MACRO_MV[m];
         float a = mac_amt(m);
+        if (m == DR_G_CHORD && a < 0.3f && mac_last[m] >= 0.3f)   /* CHORD: its voices gone, the next press a new voicing */
+            chord_vi = (chord_vi + 1 + (int)(mac_rand() * 3.999f)) % 5;
         if (a > mac_last[m] + 1e-4f)
             mac_out &= (uint8_t)~(1u << m);
         else if (a < mac_last[m] - 1e-4f)
@@ -977,7 +1041,7 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
     }
     for (i = 0; i < DR_NPARAMS; i++) {
         int v;
-        moff[i] = on[i] == 1 ? (int16_t)MOFF_ON : on[i] == 2 ? (int16_t)MOFF_OFF
+        moff[i] = on[i] == 3 ? (int16_t)MOFF_SET : on[i] == 1 ? (int16_t)MOFF_ON : on[i] == 2 ? (int16_t)MOFF_OFF
                                                  : (int16_t)(off[i] + (off[i] >= 0.0f ? 0.5f : -0.5f));
         v = heard(i);
         if (v != par[i]) {
@@ -1403,6 +1467,9 @@ static void morph_snap(int g)                    /* all of a drone's switches wh
     for (i = 0; i < 3; i++)
         v->wm[i] = p[GP_MODE] == i ? 1.0f : 0.0f;
     v->pg = p[GP_PARTNER] ? 1.0f : 0.0f;
+    v->ovon = 0;
+    v->ov = 0.0f;
+    v->ig = 1.0f;
     v->nc = (float)p[GP_NCOLOR] * 0.01f;
     v->sg = 1.0f;
     v->sdiv = sub_div(p[GP_SUBOCT]);
@@ -1428,6 +1495,16 @@ static void morph_tick(int g, float step)        /* one control tick of the swit
         v->wm[i] = toward(v->wm[i], p[GP_MODE] == i ? 1.0f : 0.0f, step);
     v->pg = toward(v->pg, p[GP_PARTNER] ? 1.0f : 0.0f, step);
     v->nc = pfs[DR_GP(g, GP_NCOLOR)] * 0.01f;    /* the colour, a blend white .. pink, gliding as a knob does */
+    if (v->ovon != chord_on[g] || (chord_on[g] && fm_fabsf(v->ov - chord_t[g]) > 1e-3f)) {
+        v->ig -= 2.0f * step;                    /* a gesture's interval for the partner (CHORD, v0.3): down, swap, up */
+        if (v->ig <= 0.0f) {
+            v->ig = 0.0f;
+            v->ovon = chord_on[g];
+            v->ov = chord_t[g];
+        }
+    } else {
+        v->ig = fm_minf(v->ig + 2.0f * step, 1.0f);   /* (its own interval switches as it always has) */
+    }
     if (v->sdiv != sdiv) {                       /* the sub: down, then swap the octave, then up */
         v->sg -= 2.0f * step;
         if (v->sg <= 0.0f) {
@@ -1547,12 +1624,12 @@ static void render_group(int g, uint32_t n)
     const int iv = (unsigned)p[GP_INTERVAL] < DR_NINTERVALS ? p[GP_INTERVAL] : DR_IV_UNISON;
     /* the partner's interval: tempered, or just (pure ratios, so a fifth or a third doesn't beat; Detune
      * still adds beating on purpose) */
-    const float ival = DR_IV_SEMI[iv];
+    const float ival = v->ovon ? v->ov : DR_IV_SEMI[iv];
     const float detune = pv[GP_DETUNE] * 0.003f;            /* semitones: 30 cents at 100 */
     /* Unison with no Detune is one fat oscillator: the partner is pulled into phase with the main (~25 ms),
      * so it can't sit half a cycle out and cancel it (it did: -20 dB, depending on what came before), and
      * Drift's wanders don't beat them. Any Detune lets it go. */
-    const int plock = iv == DR_IV_UNISON && pv[GP_DETUNE] < 0.5f;
+    const int plock = !v->ovon && iv == DR_IV_UNISON && pv[GP_DETUNE] < 0.5f;
     const float tune = (float)par[P_TUNE] * 0.01f, target = (float)p[GP_PITCH] * 0.01f;
     /* the cutoff, 0..1000 = log2 20 .. log2 18000 */
     const float cut_t = 4.32192809f + pv[GP_CUTOFF] * 0.00981378f;
@@ -1689,8 +1766,14 @@ static void render_group(int g, uint32_t n)
         inc = note_inc(v->ps2 + tune + pmod + v->drift[0] * drift_c + chr * (0.4f * v->jit + mm) + mac_p[g]);
         pinc = note_inc(v->ps2 + tune + pmod + mac_p[g] + ival + detune + dw * 0.1f * v->wn[3] + v->drift[1] * drift_c +
                         chr * (0.4f * v->jit + mm));
-        sinc = inc * v->sdiv;
-        while (sinc < 20.0f / DR_SR && v->sdiv > 0.1f)   /* no subsonic sub: under 20 Hz, an octave up (the -2 oct
+        const int tick = tick_d[g] > 0.0f || tick_u[g] > 0.0f;
+        float sd = v->sdiv;
+        if (tick) {                              /* TICK (v0.3), log2: from the sub's octave down to -7, then up by 4 */
+            float l2 = (1.0f - tick_d[g]) * fm_log2f(v->sdiv) - 7.0f * tick_d[g] + 4.0f * tick_u[g];
+            sd = fm_expf(l2 * 0.69314718f);
+        }
+        sinc = inc * sd;
+        while (sinc < 20.0f / DR_SR && sd > 0.1f && !tick)   /* no subsonic sub: under 20 Hz, an octave up (the -2 oct
                                                           * and 1/5 at the bottom of the range); -3 and -4 oct go
                                                           * down there and click (v0.3) */
             sinc *= 2.0f;
@@ -1705,7 +1788,7 @@ static void render_group(int g, uint32_t n)
             float fhz = inc * DR_SR, phz = pinc * DR_SR, shz = sinc * DR_SR;
             float mk_ = fhz < 55.0f ? fm_sqrtf(55.0f / fm_maxf(fhz, 0.5f)) : 1.0f;
             float pk_ = phz < 55.0f ? fm_sqrtf(55.0f / fm_maxf(phz, 0.5f)) : 1.0f;
-            float sk_ = v->sdiv < 0.1f && shz < 55.0f ? fm_sqrtf(55.0f / fm_maxf(shz, 0.5f)) : 1.0f;   /* -3, -4 oct */
+            float sk_ = sd < 0.1f && shz < 55.0f ? fm_sqrtf(55.0f / fm_maxf(shz, 0.5f)) : 1.0f;   /* -3, -4 oct */
             lk = v->pg > 0.0f ? fm_maxf(mk_, pk_) : mk_;
             if (sg > 0.0f)
                 lk = fm_maxf(lk, sk_);
@@ -1787,7 +1870,7 @@ static void render_group(int g, uint32_t n)
                 }
             }
             if (v->pg > 0.0f)                   /* the partner, as loud as it's faded in */
-                x = (x * mlk + v->pg * plk * xosc(wi, wf, pph, cp, pw)) * og;
+                x = (x * mlk + v->pg * v->ig * plk * xosc(wi, wf, pph, cp, pw)) * og;
             else
                 x *= og * mlk;
             if (sg > 0.0f)

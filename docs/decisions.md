@@ -445,3 +445,13 @@ at the end. The current state is in the [README](../README.md) and the code.
   place from the load buffer (their copies were 12.1 KB); a Preset is built when it's asked for, one at a time
   (`scene_has()` for the keys' lights and the pressure check); the Presets saved over before 2026-10-19 are moved
   straight from the load buffer, and their object is rewritten after the banks and the project that now hold them.
+- 2026-10-28 (Evan): **eight gestures; scenes on keys 1-8.** Keys 9-12 (G4-C5) are gestures on every bank, by pressure
+  (toward how hard the key is pressed, over the gesture's time, 6.5 s at Gesture time 50): **Tick** (the sub's own rate
+  sinks under 20 Hz into beats, 2^-7 of the drone, and speeds up to 2^-3), **Chord** (the partners to a just chord from
+  Wander's scale, spread open, one of 5 voicings at random each press), **Snarl** (drone II detuned, Snarl, the drive,
+  Feedback at the top), **Stutter** (the Swell on: its rate, depth, then a hard shape); each the partner of the top key
+  four to its right. A tap latches any gesture at 100; SEL tapped while one is held latches it where it got to. A bank
+  plays 8 scenes; the Presets P1-P8; P9-P12 start in C1-C4 (an updated FM-1: copied into the first empty keys 1-8 of C,
+  B, A). Scenes on keys 9-12 move once to the first empty key 1-8 of their bank, then another's; one with no room stays
+  stored. A partner's interval now crossfades when it changes (down, swap, up). PROJ_FORMAT 36 (108 values: the new
+  gestures' latches `P_GL_4`-`7`). The 9 unused parameters stay (retiring them renumbers everything after them).

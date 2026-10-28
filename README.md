@@ -14,19 +14,20 @@ note. It's inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the S
 
 *Your FM-1 with Niagara Drift installed: what each knob, button and key now does. Amber is drone I,
 teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO pages they set the
-LFO's routing, and X-mod lets drone I move drone II's filter, or the drones and their sound bend each other's pitch); the lower 12 white keys hold scenes, in
-banks you pick with SEL and the top four.*
+LFO's routing, and X-mod lets drone I move drone II's filter, or the drones and their sound bend each other's pitch); white keys 1–8 hold scenes, in
+banks you pick with SEL and the top four; keys 9–12 and the top four are gestures.*
 
 **Status: 0.2.** It runs on the FM-1 (tested on one unit so far) and in the browser:
 [try it](https://evanyerburgh.github.io/niagara-drift/) without an FM-1, the same code with sound.
 
 ## What it does
 
-- **Twelve presets** to start from, one on each white key, each a different side of the instrument: Niagara,
-  Abyss, Eerie, Glass, Heaven, Tanpura, Tape, Whistle, Howl, Cathedral, Metal, Clean.
-- **Four gestures** on the top white keys: **Weight**, **Shift**, **Clean** and **Wash**, each several settings moving
-  together on top of your sound, in while you hold and out as slowly as you held (or tapped in to stay).
-- **Scenes**: 12 on the white keys in each of three banks (36 of yours), plus the Presets, recalled gliding over the
+- **Presets** to start from, each a different side of the instrument: Niagara, Abyss, Eerie, Glass, Heaven,
+  Tanpura, Tape and Whistle on keys 1–8 of the Presets bank, and Howl, Cathedral, Metal and Clean in bank C.
+- **Eight gestures**, each several settings moving together on top of your sound: **Weight**, **Shift**, **Clean** and
+  **Wash** on the top keys, in while you hold and out as slowly as you held; **Tick**, **Chord**, **Snarl** and
+  **Stutter** on keys 9–12, as deep as you press. Tap any of them in to stay.
+- **Scenes**: 8 on the white keys in each of three banks (24 of yours), plus the Presets, recalled gliding over the
   Scene time, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob moves.
 - **It moves on its own**: the LFO, the Swell, **Drift**, **Wander** (drone II's slow random melody on a scale) and
   **Age** (tape wear) keep it breathing without a hand on it.
@@ -83,20 +84,23 @@ still works. If an FM-1 won't start at all, a Mac can still put the stock firmwa
 ### Start here
 
 1. **PLAY**: the drones fade in.
-2. **Tap the white keys 1–12**: a new FM-1 starts on the Presets, a sound on each key ([The Presets](#the-presets)).
-3. **Hold a top white key** (Weight, Shift, Clean, Wash) and let go: a gesture ([The gestures](#the-gestures)).
+2. **Tap the white keys 1–8**: a new FM-1 starts on the Presets, a sound on each key ([The Presets](#the-presets)).
+3. **Hold a gesture key** and let go: a top key (Weight, Shift, Clean, Wash), or keys 9–12 (Tick, Chord, Snarl,
+   Stutter), pressed harder for more ([The gestures](#the-gestures)).
 4. **Tune each drone**: black key 4 turns Pitch lock off, then KNOB 1 and KNOB 3 on the Drones page.
 5. **Change the sound**: the page buttons (ENV, EDIT, LFO, …) and KNOB 1–4 ([Pages](#pages)).
 6. **Save your sound**: SEL + D5 picks bank A, then hold SAVE and tap a white key.
 7. **PLAY** again: the drones fade out.
 
-The keys aren't notes: the drones play on their own. The lower 12 white keys hold presets and scenes, the top four
-are gestures, the black keys are switches. The first time you do some things (blend into a scene, flip a black key, play
+The keys aren't notes: the drones play on their own. White keys 1–8 hold presets and scenes, keys 9–12 and the top
+four are gestures, the black keys are switches. The first time you do some things (blend into a scene, flip a black key, play
 a gesture, open the effects…) the screen shows a one-line tip about what's next to it, once.
 
 ### The Presets
 
-Twelve sounds to start from on the Presets bank (SEL + G5), each showing a part of what Niagara Drift does. Most
+Twelve sounds to start from, each showing a part of what Niagara Drift does: P1–P8 on keys 1–8 of the Presets bank
+(SEL + G5), P9–P12 in bank C (keys 1–4 on a new FM-1; on one updated from 0.2, in the first empty keys of C, B or A),
+where they're yours to change and store over. Most
 have drone I on D, so moving between them keeps the root and changes the interval and the sound. With **Pitch lock**
 on (as a new FM-1 starts) they keep the pitch you're on, so you hear the textures first; turn it off (black key 4)
 and each plays at its own pitches, as described below. They're levelled to sound alike in loudness with the lock on,
@@ -122,17 +126,25 @@ made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE
 
 | | |
 |---|---|
-| **White key** (the lower 12, F3–C5): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Pitch lock, Fade, Switch time and Scene time stay as they are |
+| **White key** 1–8 (F3–F4): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Pitch lock, Fade, Switch time and Scene time stay as they are |
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and the blend **stays** where it was as you lifted your finger: a sound of its own between the two (SEL + SAVE takes you back) |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **SEL + SAVE** | **undo**: back to the sound before your last scene tap or blend, gliding over the Scene time (a knob turned since goes back too; the room's settings, such as Stereo or the Scene time, stay). Again, and it goes forward to where you were. Keep SEL down until you've let go of SAVE |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A, B or C) |
-| **SEL + a top white key** | picks the bank the 12 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
+| **SEL + a top white key** | picks the bank the 8 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
 | **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The gestures](#the-gestures)) |
+| **Keys 9–12** (G4–C5) | **gestures** too, by pressure: Tick, Chord, Snarl, Stutter (see [The gestures](#the-gestures)) |
+
+Updating from 0.2: keys 9–12 used to hold scenes. On the first start of 0.3, each scene you had there moves to the
+first empty key 1–8 of its own bank, then of another; one with no room left stays stored, unplayed (the installer
+backs everything up first). The screen says how many moved.
 
 ### The gestures
 
-The top four white keys are gestures, each a few settings together, by set amounts, on top of your sound.
+Eight keys are gestures, each a few settings together, by set amounts, on top of your sound: the top four, which go
+by how long you hold, and keys 9–12, which go by how hard you press. Each on keys 9–12 is the partner of the top key
+four to its right: Tick the low end (as Weight), Chord pitch (as Shift), Snarl dirt (which Clean takes out), Stutter
+time (as Wash).
 Your own settings stay as they are underneath: when a gesture has gone, it's gone without a trace. A gesture's
 parts come in one after another, and go in their own order when you let go. Scenes remember which are latched.
 
@@ -141,16 +153,22 @@ parts come in one after another, and go in their own order when you let go. Scen
 | **Weight** | a full, warm bass: the drones and a little of the sub come up through the swell, the resonance and noise give way, the cutoffs ease down a little, then drive and the vintage character round it off. It sounds heavier on the speaker too. Let go: the brightness comes back first, the sub lingers | D5 |
 | **Shift** | a new chord, a voice at a time: drone I glides to the move you set (anywhere from a fifth down to a fifth up, in cents), drone II follows. Let go: drone I comes back first | E5 |
 | **Clean** | back to a clean sound, your notes kept: the grit leaves first (drive, character, feedback, noise, cross-mod, hard sync), then the movement (Movement, Drift, the Swell), then the effects (the repeats, both mixes, the reverb's length). Let go: the effects come back first, the grit last. It holds the loudness: with the dips of the Swell gone the sound would jump up, so the level eases down to where it was | F5 |
+| **Tick** | the sub sinks from its hum through 20 Hz until it breaks into slow beats, a click or two a second; pressing harder speeds the beats up, louder, into a flutter with a little drive. Ease off and they slow; let go and they climb back up into the hum | G4 |
+| **Chord** | the beating goes, then the partners move one at a time to a chord from Wander's scale, tuned just and beatless, spread open: a different voicing each time you press (minor pentatonic: Dm7; major: D6; Dorian: Dm6; just: La Monte Young's harmonic seventh…) | A4 |
+| **Snarl** | drone II detunes a little, then Snarl comes in and grows, the drive bites, and Feedback sings at the top. Let go: Feedback and the drive leave first, the snarl after, the detune last | B4 |
+| **Stutter** | the Swell switches on and chops the drone: quick from the first touch, then deeper, then harder, into a gate. Let go: it softens, slows, and lets go | C5 |
 | **Wash** | the delay first, then the reverb opens and grows longer and darker (toward Inf), each only up to where Wash aims (if your own effects are already further up, it leaves them be; the repeats stop short of the delay's howl), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5 |
 
-- **The gestures** are the top four white keys, always the same: D5 Weight, E5 Shift, F5 Clean, G5 Wash (they
-  don't sense pressure). **Hold** one and it comes in while you
-  hold; **let go** and it goes, over as long as you held it (hold 2 s, it leaves in 2 s; hold 10 s, it drifts out
-  over 10 s). **Tap** it (a press under half a second) and it goes all the way and stays; tap again and it goes. **SEL held as you let go** keeps
-  it where it is. Its key glows dimly, and lights as it comes in.
+- **The top four** are always the same: D5 Weight, E5 Shift, F5 Clean, G5 Wash (they don't sense pressure).
+  **Hold** one and it comes in while you hold; **let go** and it goes, over as long as you held it (hold 2 s, it leaves
+  in 2 s; hold 10 s, it drifts out over 10 s).
+- **Keys 9–12** sense pressure: press and the gesture moves toward how hard you press, over its time (press half way,
+  it goes half way in); ease off and it comes back; let go and it goes.
+- On any gesture key, a **tap** (a press under half a second) takes it all the way and keeps it; tap again and it
+  goes. **Tap SEL while holding one** and it stays where it has got to. Its key glows dimly, and lights as it comes in.
 - **PRESETS is Gesture time**: it speeds up or slows down every gesture, coming in and going out: right is faster, up
   to 10 times (x10), left slower, down to a tenth (x0.1). The middle is each gesture's own time: Weight 2.8 s, Shift
-  3.9 s, the others 3.3 s. Turn it while a gesture moves to change it on the way.
+  3.9 s, Clean and Wash 3.3 s, Tick, Chord, Snarl and Stutter 6.5 s. Turn it while a gesture moves to change it on the way.
 - **The LFOs step aside**: while a gesture is in, the LFO that moves the same thing eases off (the filter LFO for
   Weight's cutoff, the oscillator LFO for Shift's pitch), so
   a high **Movement** doesn't wobble what the gesture is doing. **Wash** also eases the filter LFOs to a third, so
@@ -456,7 +474,7 @@ builds the same page from your checkout, serves it at http://localhost:8765 and 
 | PLAY · SAVE (hold) · SEL (hold) | | Space · Enter · C |
 | HOME · EDIT · Wave I · Wave II (OCT− · OCT+) | | Esc · V · Z · X |
 | Black keys 1–11 | click | 1 … 0, − |
-| Scenes 1–12 · gestures | click | Q … I, A … F · G … K |
+| Scenes 1–8 · gestures 9–12 · gestures 13–16 | click | Q … I · A … F · G … K |
 
 ## Problems and ideas
 

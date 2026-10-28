@@ -120,7 +120,7 @@ def panel(play_png):
     for i in range(16):                                        # 12 scenes; 4 gestures, each with SEL a bank
         rect(left(i), wy, kw, wh, kw / 2, KEY_W)
         kx = left(i) + kw / 2
-        text(kx, wy + wh - 14, str(i + 1) if i < 12 else ("Weight", "Shift", "Clean", "Wash")[i - 12], 14 if i < 12 else 12.5, INK)
+        text(kx, wy + wh - 14, str(i + 1) if i < 8 else ("Tick", "Chord", "Snarl", "Stutter", "Weight", "Shift", "Clean", "Wash")[i - 8], 14 if i < 8 else 12.5, INK)
         if i >= 12:
             text(kx, wy + 22, ("A", "B", "C", "Presets")[i - 12], 10.5, MUTED_KEY, "SemiBold")
     for k, a in enumerate(BLACK_AFTER):
@@ -131,7 +131,8 @@ def panel(play_png):
             rect(cx - 9, by + 9, 18, 5, 2.5, col)
         for j, wd in enumerate(words):
             text(cx, by + 52 + (j - (len(words) - 1) / 2) * 14 + 4.5, wd, 12.5, INK)
-    bracket(left(0), left(11) + kw, 451, "Presets & scenes · tap: go · SAVE + tap: store", LEGEND, 11.5, 4)
+    bracket(left(0), left(7) + kw, 451, "Presets & scenes · tap: go · SAVE + tap: store", LEGEND, 11.5, 4)
+    bracket(left(8), left(11) + kw, 451, "Gestures · press", LEGEND, 11.5, 4)
     bracket(left(12), left(15) + kw, 451, "Gestures · with SEL: bank", LEGEND, 11.5, 4)
     return img
 

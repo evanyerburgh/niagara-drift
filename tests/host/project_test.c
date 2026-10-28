@@ -86,23 +86,25 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 35, on bank A", proj.format == 35u && PROJ_FORMAT == 35u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 36, on bank A", proj.format == 36u && PROJ_FORMAT == 36u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
           proj.par[DR_GP(0, GP_NCOLOR)] == 100 && proj.par[DR_GP(1, GP_NCOLOR)] == 0);
     a1 = scene_get(0, 0);
-    a12 = scene_get(0, 11);
+    a12 = scene_get(0, 1);                     /* (v0.3: keys 9-12 are gestures, so A12 moved to A2) */
     b1 = scene_get(1, 0);
     b4 = scene_get(1, 3);
-    check("scenes 1 and 12 are A1 and A12", a1 && a12 && a1[DR_GP(0, GP_PITCH)] == 3000 &&
-                                                 a12[DR_GP(0, GP_PITCH)] == 3011);
+    check("scene 1 is A1; scene 12 moved to A2 (keys 9-12 are gestures)", a1 && a12 && a1[DR_GP(0, GP_PITCH)] == 3000 &&
+                                                 a12[DR_GP(0, GP_PITCH)] == 3011 && !scene_has(0, 11));
     check("scenes 13 and 16 are B1 and B4", b1 && b4 && b1[DR_GP(0, GP_PITCH)] == 3012 &&
                                                 b4[DR_GP(0, GP_PITCH)] == 3015);
-    check("empty ones stay empty (A2, B2, C1)", !scene_get(0, 1) && !scene_get(1, 1) && !scene_get(2, 0));
+    check("empty ones stay empty (A3, B2, C5); P9-P12 in C1-C4", !scene_get(0, 2) && !scene_get(1, 1) && !scene_get(2, 4) &&
+                                                                 scene_has(2, 0) && scene_has(2, 3));
     check("the scenes' Colours converted, B's too", a1[DR_GP(1, GP_NCOLOR)] == 100 && b4[DR_GP(1, GP_NCOLOR)] == 100);
-    check("saved: the project and bank B written", project_save() == 0 && store_n[OBJ_PROJ] == (int)sizeof(project_t) &&
-                                                       store_n[OBJ_BANKB] == (int)sizeof(bank_t) && !store_n[OBJ_BANKC]);
+    check("saved: the project and banks B and C written", project_save() == 0 && store_n[OBJ_PROJ] == (int)sizeof(project_t) &&
+                                                       store_n[OBJ_BANKB] == (int)sizeof(bank_t) &&
+                                                       store_n[OBJ_BANKC] == (int)sizeof(bank_t));
     proj.par[DR_GP(0, GP_PITCH)] = 5000;
     check("a scene into C3", scene_put(2, 2) == 0 && scene_get(2, 2) && project_save() == 0 && store_n[OBJ_BANKC]);
     check("no Preset can be saved over (P3, P12)", scene_put(BANK_PRESETS, 2) != 0 &&
@@ -110,7 +112,8 @@ int main(void)
                                                        scene_get(BANK_PRESETS, PRESET_LOCKED)[P_II_OUT] == 1);
     proj.bank = 2;
     project_save();
-    {   /* a P3 saved over before 2026-10-19 (OBJ_BANKP): moved to C's first empty slot (C1), P3 the firmware's */
+    {   /* a P3 saved over before 2026-10-19 (OBJ_BANKP): moved to C's first empty slot (C5: C1-C4 hold P9-P12, C3
+         * stored over), P3 the firmware's */
         static bank_t bp;
         int i;
         memset(&bp, 0, sizeof bp);
@@ -126,13 +129,13 @@ int main(void)
     memset(&proj, 0, sizeof proj);
     check("reloaded: as saved", project_load() == 0 && proj.bank == 2 && scene_get(1, 3) &&
                                     scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 3015 && scene_get(2, 2) &&
-                                    scene_get(2, 2)[DR_GP(0, GP_PITCH)] == 5000 && scene_get(0, 11));
-    check("... the P3 saved over now in C1, P3 the firmware's", scene_get(2, 0) &&
-                                                     scene_get(2, 0)[DR_GP(0, GP_PITCH)] == 4321 &&
+                                    scene_get(2, 2)[DR_GP(0, GP_PITCH)] == 5000 && scene_get(0, 1));
+    check("... the P3 saved over now in C5, P3 the firmware's", scene_get(2, 4) &&
+                                                     scene_get(2, 4)[DR_GP(0, GP_PITCH)] == 4321 &&
                                                      scene_get(BANK_PRESETS, 2)[DR_GP(0, GP_PITCH)] != 4321);
     check("... and saved: C and the emptied Presets object", project_save() == 0 &&
                                                      ((bank_t *)store[OBJ_BANKP])->used == 0 &&
-                                                     (((bank_t *)store[OBJ_BANKC])->used & 1u));
+                                                     (((bank_t *)store[OBJ_BANKC])->used & (1u << 4)));
     {   /* PR #14's (23): the same layout, the gestures Beat, Heat, Converge, Wash */
         static project_t p23;
         p23 = proj;
@@ -365,18 +368,18 @@ int main(void)
         bp.scene[1][DR_GP(0, GP_PITCH)] = 4444;
         memcpy(store[OBJ_BANKP], &bp, sizeof bp);
         store_n[OBJ_BANKP] = (int)sizeof bp;
-        check("an old-format P2 saved over loads into C1", project_load() == 0 && scene_get(2, 0) &&
-                                                         scene_get(2, 0)[DR_GP(0, GP_PITCH)] == 4444);
+        check("an old-format P2 saved over loads into C5 (C1-C4: P9-P12, v0.3)", project_load() == 0 && scene_get(2, 4) &&
+                                                         scene_get(2, 4)[DR_GP(0, GP_PITCH)] == 4444);
         fail_obj = OBJ_BANKC;
         check("... C's save failing: the old Presets object keeps P2", project_save() != 0 &&
                                                          (((bank_v31_t *)store[OBJ_BANKP])->used & (1u << 1)));
         fail_obj = -1;
         check("... saved: C holds it, then the old Presets object lets it go", project_save() == 0 &&
-                                                         (((bank_t *)store[OBJ_BANKC])->used & 1u) &&
+                                                         (((bank_t *)store[OBJ_BANKC])->used & (1u << 4)) &&
                                                          ((bank_v31_t *)store[OBJ_BANKP])->used == 0);
         memset(&proj, 0, sizeof proj);
-        check("... and reloaded: in C1 once, not moved again", project_load() == 0 && scene_get(2, 0) &&
-                                                         scene_get(2, 0)[DR_GP(0, GP_PITCH)] == 4444 && !scene_has(2, 1));
+        check("... and reloaded: in C5 once, not moved again", project_load() == 0 && scene_get(2, 4) &&
+                                                         scene_get(2, 4)[DR_GP(0, GP_PITCH)] == 4444 && !scene_has(2, 5));
     }
     {   /* a Preset is built when it's asked for: the same values as the table, each time */
         const int16_t *a = scene_get(BANK_PRESETS, 4);
@@ -384,7 +387,52 @@ int main(void)
         memcpy(p5, a, sizeof p5);
         scene_get(BANK_PRESETS, 9);
         check("a Preset built again is the same", memcmp(scene_get(BANK_PRESETS, 4), p5, sizeof p5) == 0 &&
-                                                     scene_has(BANK_PRESETS, 11) && !scene_has(BANK_PRESETS, 12));
+                                                     scene_has(BANK_PRESETS, 7) && !scene_has(BANK_PRESETS, 8));
+    }
+    {   /* 0.3: keys 9-12 are gestures. A format-35 project with scenes on A10, A11 and B12: they move to the first
+         * empty keys 1-8 (A's own first, then B's); P9-P12 are copied into C's empty keys; nothing over a scene */
+        static proj_v35_t o;
+        static bank_v35_t bb;
+        int i, k;
+        memset(store_n, 0, sizeof store_n);
+        memset(&o, 0, sizeof o);
+        o.magic = PROJ_MAGIC;
+        o.format = 35u;
+        o.bank = 0;
+        o.mtime = MTIME_DEF;
+        for (k = 0; k < NP35; k++)
+            o.par[k] = dr_param_info(k)->def;
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < NP35; k++)
+                o.scene[i][k] = dr_param_info(k)->def;
+        o.scene_used = 0x0FFu | 1u << 9 | 1u << 10;    /* A1-A8 full, and A10, A11 */
+        o.scene[9][DR_GP(0, GP_PITCH)] = 4100;
+        o.scene[10][DR_GP(0, GP_PITCH)] = 4200;
+        memcpy(store[OBJ_PROJ], &o, sizeof o);
+        store_n[OBJ_PROJ] = (int)sizeof o;
+        memset(&bb, 0, sizeof bb);
+        bb.magic = BANK_MAGIC;
+        bb.format = 35u;
+        bb.used = 1u << 11 | 1u << 0;                  /* B1 and B12 */
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < NP35; k++)
+                bb.scene[i][k] = dr_param_info(k)->def;
+        bb.scene[11][DR_GP(0, GP_PITCH)] = 4300;
+        memcpy(store[OBJ_BANKB], &bb, sizeof bb);
+        store_n[OBJ_BANKB] = (int)sizeof bb;
+        check("0.3: a format-35 project loads", project_load() == 0 && proj.format == PROJ_FORMAT);
+        check("... A10, A11 to B2, B3 (A full); B12 to B4", scene_get(1, 1) && scene_get(1, 1)[DR_GP(0, GP_PITCH)] == 4100 &&
+                                                       scene_get(1, 2)[DR_GP(0, GP_PITCH)] == 4200 &&
+                                                       scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 4300 &&
+                                                       !scene_has(0, 9) && !scene_has(1, 11) && proj_note_moved == 3);
+        check("... P9-P12 copied into C1-C4", proj_note_presets == 4 &&
+                                               memcmp(scene_get(2, 0), preset_get(8), sizeof(int16_t) * DR_NPARAMS) == 0 &&
+                                               memcmp(scene_get(2, 3), preset_get(11), sizeof(int16_t) * DR_NPARAMS) == 0);
+        check("... the new latches at their defaults", proj.par[P_GL_4] == 0 && proj.par[P_GL_7] == 0);
+        check("... saved and reloaded: as moved, nothing moved again", project_save() == 0 && project_load() == 0 &&
+                                                       proj_note_moved == 0 && proj_note_presets == 0 &&
+                                                       scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 4300 && scene_has(2, 3) &&
+                                                       !scene_has(2, 4));
     }
     printf("project: %s\n", fails ? "FAILED" : "all ok");
     return fails != 0;

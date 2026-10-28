@@ -11,7 +11,9 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 35u                  /* 35: the LFO's, the delay's and the scenes' clock values (104; 34's widened);
+#define PROJ_FORMAT 36u                  /* 36: the pressure keys' gestures' latches (108; 35's widened); scenes 9-12 moved
+                                          * to keys 1-8, P9-P12 copied into the banks (keys 9-12 are gestures);
+                                          * 35: the LFO's, the delay's and the scenes' clock values (104; 34's widened);
                                           * 34: the Swell's division (101 values; 33's read and widened);
                                           * 33: the delay types reordered, the reverb's route (100 values; 32's
                                           * read, widened and converted);
@@ -34,7 +36,8 @@
                                           * speaker, pitch lock, subharmonics, 13: gliding knobs, Scene time, 12: Morph, 11:
                                           * the LFO rate mod, 10: the LFO lock, 9: the filter LFO's destination, 8: the
                                           * effects, 7: the pulse, 6: scenes) */
-#define NSCENES 12                       /* a bank: the 12 lower white keys (F3 .. C5, which sense pressure) */
+#define NSCENES 12                       /* a bank's slots: the 12 lower white keys (F3 .. C5, which sense pressure) */
+#define NPLAY 8                          /* ... the scenes it plays: keys 1-8 (F3 .. F4); 9-12 are gestures (v0.3) */
 #define NBANKS 4                         /* A, B, C (yours), and the Presets (fixed, in the firmware) */
 #define BANK_PRESETS 3
 #define PRESET_LOCKED 11                 /* P12, the clean sound */
@@ -69,6 +72,7 @@ extern project_t proj;
 void project_defaults(void);
 int project_load(void);                  /* 0 = loaded; else defaults are in place */
 int project_save(void);                  /* 0 = saved and verified */
+extern int proj_note_moved, proj_note_stored, proj_note_presets;   /* the load's moves for 0.3's keys 9-12 */
 int scene_has(int bank, int n);                 /* scene n of a bank holds a sound */
 const int16_t *scene_get(int bank, int n);   /* scene n of a bank, or 0 if empty (a Preset's: until another is asked for) */
 const char *preset_name(int n);          /* the Preset's name (P1 "NIAGARA" ..) */
