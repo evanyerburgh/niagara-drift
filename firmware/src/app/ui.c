@@ -32,7 +32,7 @@
  *   the LFO; held half a second, it locks the LFO to the Pulse's bars (restarting each bar; lit while
  *   locked), held again, free.
  * ARP            tap: the SWELL page; tapped on it, the Swell on / off (lit, in time); hold: a peek
- * REC            the MOTION LOOP: tap to record what the knobs do, tap again to loop it from the start,
+ * REC            the MOTION LOOP: tap to record what the knobs, gestures and scenes do, tap again to loop it from the start,
  *                tap again to stop (everything stays where it is); up to 5 minutes (lit: blinking recording,
  *                steady looping)
  *   FX             Delay: drive (after the delay, v0.3), time, repeats, mix, and with SEL held KNOB 4 the delay's

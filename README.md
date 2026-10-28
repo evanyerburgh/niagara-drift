@@ -30,7 +30,7 @@ FX Delay, Reverb · GLO Setup 1, 2.*
   **Wash** on the top keys, in while you hold and out as slowly as you held; **Tick**, **Chord**, **Snarl** and
   **Stutter** on keys 9–12, as deep as you press. Tap any of them in to stay.
 - **Scenes**: 8 on the white keys in each of three banks (24 of yours), plus the Presets, recalled gliding over the
-  Scene time, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob moves.
+  Scene time, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob moves, gestures and scenes.
 - **It moves on its own**: the LFO, the Swell, **Drift**, **Wander** (drone II's slow random melody on a scale) and
   **Age** (tape wear) keep it breathing without a hand on it.
 - **Two drones**, each a main oscillator that blends sine → triangle → saw → square (X-WAVE), a
@@ -191,7 +191,7 @@ knob you're turning.
 | **SAVE** | save the sound, at once. While the drone plays, the sound dips out and back over about 50 ms around the write; SAVE glows dimly while something isn't written yet |
 | **SEL** (hold) | fine: a pitch knob moves in single cents, cutoff and resonance in tenths |
 | **ARP** (tap) | the Swell page, as the other page buttons open theirs (landing on it switches nothing). On the page, a tap switches the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at the page from anywhere, to set the Swell before you start it |
-| **REC** | tap to record your knob moves, tap to loop them, tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
+| **REC** | tap to record your knob moves, gestures and scenes (tapped or blended by pressure), tap to loop them (your own keys still play on top), tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 
 ### Pages
 

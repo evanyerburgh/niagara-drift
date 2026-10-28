@@ -463,3 +463,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   made before playing: the delay's type, and what goes into the reverb. Its card shows both at all times, in two
   halves: the mix above, "+ SEL Type" / "+ SEL Into" below; the half turning lights, and while SEL turns it only the
   mix half dims. The delay picture no longer shows "drive" (it has KNOB 1). Parameters unchanged (no PROJ_FORMAT).
+- 2026-10-28 (Evan, on the FM-1): the **motion loop records gestures and scenes** too: each gesture's level as played
+  (and its latch), a scene tapped, a scene blended by pressure. Played back, a gesture is the loop's or the hand's,
+  whichever is more; a loop with scenes starts each pass from the whole sound it began on. On Delay and Reverb, SEL's
+  key map waits 1.5 s (0.4 elsewhere), and once KNOB 4's SEL job turns, not until SEL is let go.
