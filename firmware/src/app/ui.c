@@ -1489,6 +1489,7 @@ static void input(void)
     if ((ch & btn) >> B_SEL & 1u) {
         int g;
         ui.sel_t = plat_ms();
+        ui.k4_sel = 0;                                 /* a new hold: KNOB 4's SEL job not turned yet */
         for (g = 0; g < DR_NGEST; g++)                 /* SEL tapped while a gesture is held: latched where it is */
             if ((ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u) && plat_ms() - ui.g_t0[g] >= GEST_TAP_MS) {
                 int v = (int)(ui.g_amt[g] * 100.0f + 0.999f);   /* rounded up, as a SEL let-go's */
@@ -2523,12 +2524,16 @@ static void pic_life(int32_t y0)
  * named. A key touched while SEL is held names itself and its setting, large, and doesn't switch (Evan, 2026-10-19:
  * the eleven names and settings at once were too crowded to read). The LFO pages' layer on those pages */
 #define KEYMAP_MS 400u
+#define KEYMAP_JOB_MS 1500u            /* ... on a page where KNOB 4 has a SEL job: a quick SEL + turn never meets the map
+                                        * (Evan, 2026-10-28); once that job is turned, not until SEL is let go */
 static int keymap_on(void)
 {
-    uint32_t white = 0, i;
+    uint32_t white = 0, i, wait = sel_job_of(ui.view) >= 0 ? KEYMAP_JOB_MS : KEYMAP_MS;
     for (i = 0; i < NWHITE; i++)
         white |= 1u << WHITE_K[i];
-    return (ui.btn >> B_SEL & 1u) && (plat_ms() - ui.sel_t >= KEYMAP_MS || ui.km_key >= 0) && !lit(0) && !lit(1) &&
+    if (sel_job_of(ui.view) >= 0 && ui.k4_sel && ui.km_key < 0)
+        return 0;
+    return (ui.btn >> B_SEL & 1u) && (plat_ms() - ui.sel_t >= wait || ui.km_key >= 0) && !lit(0) && !lit(1) &&
            !lit(2) && !lit(3) && !(ui.keys & white) && ui.press < 0;
 }
 static void sw_text(sw_t w, const char **name, const char **st)
