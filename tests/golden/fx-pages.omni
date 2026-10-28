@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): FX's two pages (the Types page folded in, Evan 2026-10-28). Delay
+# at rest, KNOB 4 in two halves (Dly mix, "+ SEL Type"); SEL + KNOB 4 turning the delay's type, its lower half lit
+# and only Mix dim; Reverb with its type on KNOB 3 and "+ SEL Into" under Rev mix, then SEL + KNOB 4 turning what
+# goes into it. Not a test of its own (no expectations).
+notips
+tap PLAY
+wait 2000
+tap FX
+wait 2000
+shot delay-rest.png
+press SEL
+spin K4 1
+wait 300
+shot delay-sel.png
+spin K4 -1
+release SEL
+wait 2000
+spin K4 5
+wait 300
+shot delay-mix.png
+tap FX
+wait 2000
+shot reverb-rest.png
+press SEL
+spin K4 1
+wait 300
+shot reverb-sel.png
+spin K4 -1
+release SEL

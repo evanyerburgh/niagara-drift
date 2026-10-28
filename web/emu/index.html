@@ -535,9 +535,8 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">FX</div>
         <div class="pstack">
-        <div class="g-page"><i>Delay</i><span class="k both"><span class="sr">Knob 1: </span>Drive<small>after the delay</small></span><span class="k both"><span class="sr">Knob 2: </span>Time<small>70 ms – 1.46 s · on a clock: notes</small></span><span class="k both"><span class="sr">Knob 3: </span>Repeats</span><span class="k both"><span class="sr">Knob 4: </span>Dly mix</span></div>
-        <div class="g-page"><i>Reverb</i><span class="k both"><span class="sr">Knob 1: </span>Length<small>to Inf: a freeze</small></span><span class="k both"><span class="sr">Knob 2: </span>Damp</span><span class="k both none"><span class="sr">Knob 3: </span>–</span><span class="k both"><span class="sr">Knob 4: </span>Rev mix</span></div>
-        <div class="g-page"><i>Types</i><span class="k both"><span class="sr">Knob 1: </span>Delay<small>clean · wide · ping-pong · tape · grain · self</small></span><span class="k both"><span class="sr">Knob 2: </span>Reverb<small>room · hall · cathedral · chorus</small></span><span class="k both"><span class="sr">Knob 3: </span>Into reverb<small>both · echoes · drones</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
+        <div class="g-page"><i>Delay</i><span class="k both"><span class="sr">Knob 1: </span>Drive<small>after the delay</small></span><span class="k both"><span class="sr">Knob 2: </span>Time<small>70 ms – 1.46 s · on a clock: notes</small></span><span class="k both"><span class="sr">Knob 3: </span>Repeats</span><span class="k both"><span class="sr">Knob 4: </span>Dly mix<small>+ SEL: type · clean · wide · ping-pong · tape · grain · self</small></span></div>
+        <div class="g-page"><i>Reverb</i><span class="k both"><span class="sr">Knob 1: </span>Length<small>to Inf: a freeze</small></span><span class="k both"><span class="sr">Knob 2: </span>Damp</span><span class="k both"><span class="sr">Knob 3: </span>Type<small>room · hall · cathedral · chorus</small></span><span class="k both"><span class="sr">Knob 4: </span>Rev mix<small>+ SEL: into · both · echoes · drones</small></span></div>
         </div>
       </div>
     </div>
@@ -742,7 +741,7 @@ function hit(c, cls) {
   c.hit = d;
 }
 // what each control does, on hover (the Buttons list below says the same)
-const TIP = { FX: "Delay: drive, time, repeats, mix (again: Reverb: length to Inf, damp, mix; again: Types: the delay's, the reverb's)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
+const TIP = { FX: "Delay: drive, time, repeats, mix; SEL + KNOB 4: the delay type (again: Reverb: length to Inf, damp, type, mix; SEL + KNOB 4: what goes into it)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
   ENV: "Life: character, feedback, age, drift (again: Tone: noise and its colour, white to pink); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: Mods: rate mod, mod by, X-mod amount, delay LFO)",
   EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure)",
   HOME: "Drones 1: pitch, cutoff (again: Drones 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in bank A, B or C)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
