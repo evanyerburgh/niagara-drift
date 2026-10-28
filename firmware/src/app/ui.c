@@ -673,8 +673,8 @@ static loop_ev_t loop_ev[LOOP_MAX] OM_POOL;
 /* Beyond the parameters, the loop records what the hands do that isn't a value (Evan, 2026-10-28: a loop of gestures
  * was "nothing moved"): each gesture's level as it went (LP_GEST + g, 0..1000; its latch is a value, P_GL_*), a scene
  * tapped (LP_SCENE: bank << 4 | key), a scene blended by pressure (LP_BLEND: its key; then LP_BLEND_X, how far in,
- * 0..1000) */
-enum { LP_GEST = DR_NPARAMS, LP_SCENE = LP_GEST + DR_NGEST, LP_BLEND, LP_BLEND_X, LP_N };
+ * 0..1000; LP_BLEND_END let go there, the blend a sound of its own from then on) */
+enum { LP_GEST = DR_NPARAMS, LP_SCENE = LP_GEST + DR_NGEST, LP_BLEND, LP_BLEND_X, LP_BLEND_END, LP_N };
 _Static_assert(LP_N <= 256, "the events' parameter is a byte");
 static uint64_t loop_used[(LP_N + 63) / 64];           /* the parameters the loop moves */
 /* playing: a gesture's level and the blend's depth glide between events, as a knob's slide */
@@ -693,6 +693,8 @@ static int scene_room(int p);
  * turn: a detent every ~15 ms) join it, its slide reaching on to this one, so the 4096 events last (a busy
  * two-handed recording filled them in 1-2 minutes; the loop then held still) */
 #define LOOP_JOIN 20u                  /* 100 ms, in the events' 5 ms units */
+#define LOOP_JOIN_SLOW 40u             /* ... a gesture's level, a blend's depth: 200 ms (they move over seconds; the review:
+                                        * four moving with the knobs filled the events in minutes) */
 static void loop_note(int p, int v, uint32_t slide)
 {
     loop_ev_t *e;
@@ -702,9 +704,9 @@ static void loop_note(int p, int v, uint32_t slide)
         return;
     if (p == LP_SCENE || p == LP_BLEND)
         ui.loop_scenes = 1;
-    for (i = p == LP_SCENE || p == LP_BLEND ? -1 : ui.loop_n - 1; i >= 0 && i >= ui.loop_n - 8; i--) {
+    for (i = p == LP_SCENE || p == LP_BLEND || p == LP_BLEND_END ? -1 : ui.loop_n - 1; i >= 0 && i >= ui.loop_n - 8; i--) {
         e = &loop_ev[i];
-        if (t - e->t >= LOOP_JOIN)
+        if (t - e->t >= (p >= LP_GEST ? LOOP_JOIN_SLOW : LOOP_JOIN))
             break;
         if (e->p == p) {
             uint32_t sl = (uint32_t)(t - e->t) * 5u + slide;
@@ -763,6 +765,13 @@ static void loop_apply(int p, int v, uint32_t slide)
         loop_glide(&loop_gl[DR_NGEST], (float)v * 0.001f, slide);
         return;
     }
+    if (p == LP_BLEND_END) {                            /* let go: there, then the loop lets the sound be (a recorded
+                                                         * knob on the scene's values isn't overwritten after) */
+        if (loop_bl_on)
+            sound_blend(loop_bl_from, loop_bl_to, loop_gl[DR_NGEST].to);
+        loop_bl_on = 0;
+        return;
+    }
     if (p == DR_GP(0, GP_PITCH) || p == DR_GP(1, GP_PITCH))
         dr_slide(p / GP_N, (int)slide);
     else if (p == P_PLINK_OFF)
@@ -803,8 +812,13 @@ static void loop_button(void)                  /* REC: record, loop, stop */
     case L_IDLE:
         for (p = 0; p < DR_NPARAMS; p++)
             ui.loop_from[p] = proj.par[p];
-        for (p = 0; p < DR_NGEST; p++)
+        for (p = 0; p < DR_NGEST; p++) {
             ui.loop_g0[p] = ui.g_amt[p];
+            loop_gl[p].from = loop_gl[p].to = ui.g_amt[p];   /* not the last loop's (the review) */
+            loop_gl[p].ms = 0;
+        }
+        loop_gl[DR_NGEST].from = loop_gl[DR_NGEST].to = 0.0f;
+        loop_bl_on = 0;
         for (p = 0; p < (int)(sizeof loop_used / sizeof loop_used[0]); p++)
             loop_used[p] = 0;
         ui.loop_scenes = 0;
@@ -1236,6 +1250,8 @@ static void press_end(void)                            /* the key let go */
         }
         ui.scene_at = -1;
         say_c("KEPT", "SEL + SAVE: UNDO", K_GOLD);
+        loop_note(LP_BLEND_X, (int)(ui.press_x * 1000.0f + 0.5f), 0);   /* the loop: where it was kept, and let go */
+        loop_note(LP_BLEND_END, 0, 0);
     }
 }
 

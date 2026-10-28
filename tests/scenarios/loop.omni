@@ -96,12 +96,28 @@ expect loop 2
 wait 1900
 expect gsent0 >30
 wait 1000
-expect gsent0 <15
+expect gsent0 <30
 # stopped: the gesture stays where the loop had it, then goes its own way (out)
 wait 1500
 tap REC
 expect loop 0
 expect gam0 >20
+wait 8000
+expect gam0 0
+# a second loop with the same gesture starts from where it is now, not where the last loop left it (the review: Weight
+# swept down from full at the new loop's start)
+tap REC
+wait 500
+key w12 down
+wait 700
+key w12 up
+wait 300
+tap REC
+expect loop 2
+wait 50
+expect gsent0 <30
+tap REC
+expect loop 0
 wait 8000
 expect gam0 0
 # A SCENE TAPPED IN THE LOOP: a scene with the cutoff up (bank A, key 1), the sound back down; recorded, the tap;
@@ -155,5 +171,26 @@ expect par7 700
 wait 1700
 expect par7 >750
 expect par7 <880
+tap REC
+expect loop 0
+# a blend let go (not taken), then a knob recorded on a value the scene moves: looped, the knob's move holds (the review:
+# the let-go blend went on being forced onto the sound, over the knob's move)
+spin K2 -10
+wait 300
+tap REC
+wait 200
+pressure w0 70
+key w0 down
+wait 1500
+key w0 up
+pressure w0 0
+wait 500
+spin K2 -20
+wait 1000
+expect par7 <700
+tap REC
+expect loop 2
+wait 2700
+expect par7 <700
 tap REC
 expect loop 0
