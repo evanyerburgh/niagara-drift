@@ -1,7 +1,8 @@
 name: Claude Code Review
 
 # Once a PR opens or is marked ready (not on every push: "@claude review again" in a comment asks for
-# another, through claude.yml).
+# another, through claude.yml). It waits for the Tests workflow on the same commit first, and reads what it found
+# (tools/ci_results.py): the review can't build or run anything itself.
 on:
   pull_request:
     types: [opened, ready_for_review, reopened]
@@ -10,10 +11,12 @@ jobs:
   claude-review:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 40              # the tests take ~2 minutes; ci_results.py waits up to 25
     permissions:
       contents: read
       pull-requests: read
       issues: read
+      actions: read
       id-token: write
 
     steps:
@@ -21,6 +24,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
+      - name: Wait for the tests, and gather what they found
+        id: ci
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo 'results<<CI_RESULTS_END'
+            python3 tools/ci_results.py ${{ github.repository }} ${{ github.event.pull_request.number }} ${{ github.event.pull_request.head.sha }} || echo "(the tests' results couldn't be read)"
+            echo 'CI_RESULTS_END'
+          } >> "$GITHUB_OUTPUT"
 
       - name: Run Claude Code Review
         id: claude-review
@@ -35,6 +49,25 @@ jobs:
             First read CLAUDE.md, and .claude/rules/dsp.md if the PR touches firmware/src/dsp,
             tests/host or host. They hold the FM-1's budget (RAM, CPU) and the rules for audio code.
 
+            CI ran on this commit (the Tests workflow). What it found:
+
+            ${{ steps.ci.outputs.results }}
+
+            What the jobs are: "host" builds and runs every host test and scenario and builds the browser emulator;
+            "cost" counts the engine's work per sample against main; "same-samples" renders every fixed script in
+            tests/golden, every scenario and the engine's scenes with this PR and with main, and compares them sample
+            by sample and pixel by pixel. The firmware itself can't be built in CI (the JieLi SDK isn't
+            redistributable): the owner's Mac builds it, and a PR that touches firmware/ carries tools/budget.py's
+            line ("**Budget** ...") in its body from that build. Say if it's missing.
+
+            Reading same-samples: without the label `changes-sound`, any "different" file is a real failure (the
+            change was meant to keep the sound and screen): name the files. With the label, differences are
+            expected and the check passes: compare the files listed with what the PR says it changes (a sound
+            change should differ only in renders that exercise it, a screen change only in screenshots), and flag
+            any that differ but shouldn't. "Not compared, the script changed" lists scripts this PR edits: fine when
+            the PR renumbers or extends them. A failed run superseded by a later one on the same commit (as when
+            the label is added just after opening) is already resolved: the table shows each job's latest result.
+
             Look for, in this order:
             1. Bugs: wrong behaviour, crashes, state that isn't saved or restored, a parameter added
                without PROJ_FORMAT or the scenarios updated.
@@ -47,8 +80,10 @@ jobs:
             Leave style alone unless it hides a bug. Don't repeat what the tests already check.
 
             Write one PR comment with `gh pr comment`. Start with a short summary in plain language
-            for the owner, a product designer, not a C programmer: what the change does, whether it looks
-            safe to install on the FM-1, and anything he should listen for. Then the findings, most
+            for the owner, a product designer, not a C programmer: what the change does, what CI found (passed,
+            or what failed, in plain words; a labelled sound or screen change that differs as the PR says is a
+            pass), whether it looks safe to install on the FM-1, and anything he should listen for. Don't say
+            you couldn't run the tests: CI ran them, and its results are above. Then the findings, most
             serious first, each with the file and line and a suggested fix. Use inline comments only for
             findings tied to a line. If there's nothing worth changing, say so in one line.
           claude_args: |
