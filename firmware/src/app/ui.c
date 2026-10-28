@@ -586,7 +586,7 @@ static int page_btn(int b)                             /* the index in PAGE_BTN,
     return -1;
 }
 
-/* a page button pressed: the page of its last shown at once (the review: Reverb, Tone 2, Moves couldn't be peeked;
+/* a page button pressed: the page of its last shown at once (the review: Reverb, Life, Moves couldn't be peeked;
  * HOME always Drones 1, home), unless already on its pages (then the next on a tap) */
 static void page_down(int b)
 {
@@ -2032,7 +2032,7 @@ static void pic_play2(int g, int32_t x0, int32_t y0)
 
 
 
-/* Tone 2: each drone's noise as it leaves the filter: its colour's slope (0 dB/oct white, -3 pink, level
+/* Tone: each drone's noise as it leaves the filter: its colour's slope (0 dB/oct white, -3 pink, level
  * at 100 Hz) through the filter's curve (dim behind it, moving with the LFO as Drones 2's), as low as its level
  * is; its colour's name, and its level against the oscillators */
 static void pic_tone(int g, int32_t x0, int32_t y0)

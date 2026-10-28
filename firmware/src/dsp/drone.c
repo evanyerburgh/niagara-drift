@@ -687,7 +687,7 @@ void dr_init(void)
 /* THE MACROS (v0.2, option D; two performer reviews; staged 2026-10-18 after the macro research). The four gesture
  * keys (D5-G5) play Weight, Shift, Clean, Wash, always the same (Evan, 2026-10-18: you learn where they are), by the
  * UI's swell (gam) times the gesture's full depth (DR_GEST_DEPTH); while one is in, the LFOs ease off what it moves.
- * Two slow states on knobs: AGE (Tone 2) and WANDER (Moves).
+ * Two slow states on knobs: AGE (Life) and WANDER (Moves).
  * The sound's own values (base) stay as they are; what's heard is base + the sum, clamped to each value's range.
  * Each move comes in over its own part of the macro's way in (in0 .. in1 of the amount, eased) and goes over
  * its own part of the way out (out0 .. out1), so a macro's parts arrive in order and leave in their own order
