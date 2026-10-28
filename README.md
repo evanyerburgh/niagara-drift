@@ -168,9 +168,12 @@ parts come in one after another, and go in their own order when you let go. Scen
   it goes half way in); ease off and it comes back; let go and it goes.
 - On any gesture key, a **tap** (a press under half a second) takes it all the way and keeps it; tap again and it
   goes. **Tap SEL while holding one** and it stays where it has got to. Its key glows dimly, and lights as it comes in.
-- **PRESETS is Gesture time**: it speeds up or slows down every gesture, coming in and going out: right is faster, up
-  to 10 times (x10), left slower, down to a tenth (x0.1). The middle is each gesture's own time: Weight 2.8 s, Shift
-  3.9 s, Clean and Wash 3.3 s, Tick, Chord, Snarl and Stutter 6.5 s. Turn it while a gesture moves to change it on the way.
+- **PRESETS is Gesture time**: how long every gesture takes, coming in and going out. The screen shows Weight's time
+  ("GESTURE TIME 2.8 s"); the others scale with it. The middle is each gesture's own time: Weight 2.8 s, Shift 3.9 s,
+  Clean and Wash 3.3 s, Tick, Chord, Snarl and Stutter 6.5 s. Left is slower, each detent a little more time, up to
+  12 times as long (Weight 34 s); right is faster, up to 4 times (Weight 0.7 s). For a long one, tap the key: it
+  latches and comes in on its own, and a tap lets it go over the same time. Turn it while a gesture moves to change
+  it on the way.
 - **The LFOs step aside**: while a gesture is in, the LFO that moves the same thing eases off (the filter LFO for
   Weight's cutoff, the oscillator LFO for Shift's pitch), so
   a high **Movement** doesn't wobble what the gesture is doing. **Wash** also eases the filter LFOs to a third, so
@@ -250,11 +253,15 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Osc | I X-Wave | I PW (pulse width) | II X-Wave | II PW |
-| Sub · Drive | I osc mix | I drive | II osc mix | II drive |
+| Sub · Drive | I osc mix (+ SEL: sub wave) | I drive | II osc mix (+ SEL: sub wave) | II drive |
 
 - **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width. The sine and the triangle are a
   little louder than the saw and the square, so they still carry on a small speaker.
 - **Osc mix** goes from the oscillators to the sub; **drive** pushes each drone into its filter.
+- **The sub's wave**: hold SEL and turn a drone's Osc mix knob: **Square** (as it starts), **Sine** (pure weight, the
+  deepest on headphones, the least for a small speaker), **Triangle**, **Saw** (the brightest). Each is as loud as the
+  square, and a change glides through, as the sub's octave does. The card shows both: the mix above, "+ SEL Wave"
+  below.
 
 #### Partner · SEQ
 

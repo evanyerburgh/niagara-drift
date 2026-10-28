@@ -1529,26 +1529,32 @@ static void gesture_up(int g)
     }
 }
 static char *dec1(float v, char *b);                   /* below */
-static float mtime_k(void)                             /* GESTURE TIME: the gestures' times x 0.1 .. x 10 */
+/* GESTURE TIME: the gestures' times x 0.25 .. x 12, 50 as set. Slower, evenly in seconds (each detent the same time
+ * more, to 12x); faster, by ratio and only to 4x (Evan, 2026-10-28: most of the old x 0.1 .. x 10 was fast, the slow
+ * end a few big jumps; a slow one is for a tap, which latches and comes in by itself) */
+static float mtime_k(void)
 {
-    return fm_exp2f(((float)proj.mtime - 50.0f) * 0.0664386f);
+    float m = (float)proj.mtime;
+    return m > 50.0f ? 1.0f + (m - 50.0f) * 0.22f : fm_exp2f((m - 50.0f) * 0.04f);
 }
-static void mtime_turn(int32_t e)                      /* PRESETS: Gesture time, shown as a speed (x0.1 .. x10):
-                                                        * right is faster (Evan, 2026-10-24) */
+static void mtime_turn(int32_t e)                      /* PRESETS: Gesture time, shown as Weight's time in (the
+                                                        * others scale with it): right is faster (Evan, 2026-10-24) */
 {
     int v = (int)proj.mtime - (int)e;
-    float k;
+    float t;
     char *q;
     proj.mtime = (uint8_t)(v < 0 ? 0 : v > 100 ? 100 : v);
     mark_dirty();
-    k = 1.0f / mtime_k();
+    t = fm_exp2f((float)DR_GEST_TIME[DR_G_WEIGHT] * 0.0490689f) * mtime_k();
     scopy(ui.glab[0], "GESTURE TIME");
     q = ui.glab[1];
-    *q++ = 'x';
-    if (k < 9.95f)
-        dec1(k, q);
+    if (t < 9.95f)
+        q = dec1(t, q);
     else
-        itoa_u((uint32_t)(k + 0.5f), q);
+        itoa_u((uint32_t)(t + 0.5f), q);
+    while (*q)
+        q++;
+    scopy(q, " s");
     ui.glab_until = plat_ms() + 1500u;
     ui.act_t = plat_ms();
 }

@@ -48,7 +48,7 @@ typedef struct {
     int16_t par[DR_NPARAMS];             /* drone.h parameters */
     uint8_t leds;                        /* key lights on */
     uint8_t bank;                        /* the bank the scene keys play (0 A .. 3 Presets) */
-    uint8_t mtime;                       /* GESTURE TIME, 0..100 (PRESETS): every gesture's speed x0.1 .. x10, 50 as set
+    uint8_t mtime;                       /* GESTURE TIME, 0..100 (PRESETS): every gesture's time x0.25 .. x12, 50 as set
                                           * (the player's, not a scene's; was the macro PRESETS played, format <= 25) */
     uint8_t gkey_old[4];                 /* unused since 29 (what each gesture key played, 27-28) */
     uint8_t seen[2];                     /* the one-time tips shown (bit TIP_*; v0.3): the player's, not a scene's */

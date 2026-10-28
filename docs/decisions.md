@@ -467,3 +467,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   (and its latch), a scene tapped, a scene blended by pressure. Played back, a gesture is the loop's or the hand's,
   whichever is more; a loop with scenes starts each pass from the whole sound it began on. On Delay and Reverb, SEL's
   key map waits 1.5 s (0.4 elsewhere), and once KNOB 4's SEL job turns, not until SEL is let go.
+- 2026-10-28 (Evan): **each drone's sub wave** is a choice, SEL + its Osc mix knob (Sub · Drive), the card in two
+  halves: Square (as before, the default), Sine, Triangle, Saw, each as loud (RMS) as the square, a change gliding
+  through as the octave's does. PROJ_FORMAT 37 (110 values: `P_SUBW_0`, `P_SUBW_1`). **Gesture time** respread: 50 as
+  before; slower evenly in seconds to x12 (Weight 34 s), faster only to x4 (0.7 s); shown as Weight's time ("2.8 s").
+  A per-note envelope for Wander was drawn and set aside; a Lyra-like "plate" gesture (pressure opens a drone) is a
+  0.4 idea.

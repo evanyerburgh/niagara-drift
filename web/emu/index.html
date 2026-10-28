@@ -375,7 +375,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div><dt>Weight · Shift · Clean · Wash</dt><dd>The top four <span class="cap white">white keys</span>: hold to bring in, let go and it leaves as slowly as you held it</dd></div>
       <div><dt>Tick · Chord · Snarl · Stutter</dt><dd><span class="cap white">Keys 9–12</span>, each the partner of the top key four to its right: on the FM‑1 they go as deep as you press; here, all the way while held</dd></div>
       <div><dt>Keep one</dt><dd>Tap a gesture key: all the way, to stay (tap again: it goes). Tap <span class="cap">SEL</span> while holding one: it stays where it got to</dd></div>
-      <div><dt>Gesture time</dt><dd><span class="cap">PRESETS</span>: every gesture faster (turn right) or slower (left), even while it moves</dd></div>
+      <div><dt>Gesture time</dt><dd><span class="cap">PRESETS</span>: how long every gesture takes, shown as Weight's time: left slower (up to 34 s), right faster (to 0.7 s), even while it moves</dd></div>
       <div><dt>Shift’s move</dt><dd><span class="cap">SEQ</span> twice (Pitch moves), <span class="cap">KNOB 1</span>: a fifth down to a fifth up</dd></div>
     </dl>
   </div>
@@ -427,7 +427,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
         <div class="g-btn">EDIT</div>
         <div class="pstack">
         <div class="g-page"><i>Osc</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>X‑Wave<small>sine → square</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>PW<small>square width</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>X‑Wave<small>sine → square</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>PW<small>square width</small></span></div>
-        <div class="g-page"><i>Sub · Drive</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Osc mix<small>osc ↔ sub</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Drive</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Osc mix<small>osc ↔ sub</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Drive</span></div>
+        <div class="g-page"><i>Sub · Drive</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Osc mix<small>osc ↔ sub · + SEL: sub wave</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Drive</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Osc mix<small>osc ↔ sub · + SEL: sub wave</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Drive</span></div>
         </div>
       </div>
       <div class="pblock">
@@ -743,10 +743,10 @@ function hit(c, cls) {
 // what each control does, on hover (the Buttons list below says the same)
 const TIP = { FX: "Delay: drive, time, repeats, mix; SEL + KNOB 4: the delay type (again: Reverb: length to Inf, damp, type, mix; SEL + KNOB 4: what goes into it)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
   ENV: "Life: character, feedback, age, drift (again: Tone: noise and its colour, white to pink); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: Mods: rate mod, mod by, X-mod amount, delay LFO)",
-  EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure)",
+  EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, with SEL the sub's wave; drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure)",
   HOME: "Drones 1: pitch, cutoff (again: Drones 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in bank A, B or C)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
   PLAY: "Drones in / out (with SEL: drone II alone)", REC: "Motion loop: tap to record knob moves, gestures and scenes, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
-  SELECT: "LFO rate", PRESETS: "Gesture time: every gesture faster (right) or slower (left)", ALGORITHM: "Movement: every LFO depth together",
+  SELECT: "LFO rate", PRESETS: "Gesture time: how long every gesture takes, left slower, right faster", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
 for (const [n, c] of [...Object.entries(buttons), ...Object.entries(knobs)]) if (TIP[n]) c.g.setAttribute("aria-description", TIP[n]);
 // the keys: the black ones as switches (and what they do on the LFO pages), the white ones as scenes
