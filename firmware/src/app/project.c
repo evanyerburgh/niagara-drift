@@ -425,14 +425,17 @@ static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old s
     convert(dst, from);
 }
 
+static uint32_t bank_fmt[2];                   /* B's and C's format as stored (0: none) */
 static void bank_load(int b)                   /* B (1) or C (2): from its object, if it's sound */
 {
     bank_t *k = &bank_bc[b - 1];
     int i;
     bank_blank(k);
+    bank_fmt[b - 1] = 0;
     memset(ld.raw, 0, sizeof ld.raw);
     if (plat_store_load(BANK_OBJ[b - 1], ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
         return;
+    bank_fmt[b - 1] = ld.b.format;
     if (ld.b.format == PROJ_FORMAT) {
         *k = ld.b;
     } else if (ld.b.format == 35u) {           /* 35: 104 values a sound */
@@ -560,12 +563,15 @@ static void keys_to_gestures(void)
 {
     static const int8_t ORDER[3][3] = {{0, 1, 2}, {1, 0, 2}, {2, 1, 0}};   /* its own bank first */
     static const int8_t P_INTO[3] = {2, 1, 0};                            /* C, B, A */
+    /* a first save cut short: B or C already written in this format (the banks go first), the project not. Those
+     * moves and copies are on the flash already: only A's own scenes move again, within A, so nothing doubles */
+    const int again = bank_fmt[0] >= 36u || bank_fmt[1] >= 36u;
     int b, n, k, i, d;
     for (b = 0; b < 3; b++)
         for (n = NPLAY; n < NSCENES; n++) {
             if (!(*bank_used(b) >> n & 1u))
                 continue;
-            for (k = 0; k < 3; k++) {
+            for (k = 0; k < (again ? 1 : 3); k++) {
                 d = ORDER[b][k];
                 if ((i = free_key(d)) >= 0) {
                     memcpy(bank_scene(d, i), bank_scene(b, n), sizeof(int16_t) * DR_NPARAMS);
@@ -575,10 +581,10 @@ static void keys_to_gestures(void)
                     break;
                 }
             }
-            if (k == 3)
+            if (k == (again ? 1 : 3))
                 proj_note_stored++;
         }
-    for (n = NPLAY; n < NPRESETS; n++)
+    for (n = again ? NPRESETS : NPLAY; n < NPRESETS; n++)
         for (k = 0; k < 3; k++) {
             d = P_INTO[k];
             if ((i = free_key(d)) >= 0) {

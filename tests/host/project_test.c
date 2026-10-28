@@ -434,6 +434,28 @@ int main(void)
                                                        scene_get(1, 3)[DR_GP(0, GP_PITCH)] == 4300 && scene_has(2, 3) &&
                                                        !scene_has(2, 4));
     }
+    {   /* the same, its first save cut short after the banks (the review, 2026-10-28): the project still 35 on the
+         * flash, B and C already 36. Loaded again: A's scenes move within A only, P9-P12 aren't copied twice */
+        static proj_v35_t o;
+        int i, k;
+        memset(&o, 0, sizeof o);
+        o.magic = PROJ_MAGIC;
+        o.format = 35u;
+        o.mtime = MTIME_DEF;
+        for (k = 0; k < NP35; k++)
+            o.par[k] = dr_param_info(k)->def;
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < NP35; k++)
+                o.scene[i][k] = dr_param_info(k)->def;
+        o.scene_used = 0x07Fu | 1u << 9;               /* A1-A7, and A10 (moved to B before the cut) */
+        o.scene[9][DR_GP(0, GP_PITCH)] = 4100;
+        memcpy(store[OBJ_PROJ], &o, sizeof o);
+        store_n[OBJ_PROJ] = (int)sizeof o;             /* B and C as the save before left them (format 36) */
+        check("a cut-short first save: loads", project_load() == 0);
+        check("... A10 to A8 (within A), not to B again", scene_has(0, 7) && scene_get(0, 7)[DR_GP(0, GP_PITCH)] == 4100 &&
+                                                         proj_note_moved == 1 && proj_note_presets == 0);
+        check("... C holds P9-P12 once (C5 empty)", scene_has(2, 3) && !scene_has(2, 4));
+    }
     printf("project: %s\n", fails ? "FAILED" : "all ok");
     return fails != 0;
 }
