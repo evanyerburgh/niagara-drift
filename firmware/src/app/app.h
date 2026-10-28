@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 36u                  /* 36: the pressure keys' gestures' latches (108; 35's widened); scenes 9-12 moved
+#define PROJ_FORMAT 37u                  /* 37: each drone's sub wave (110 values; 36's widened);
+                                          * 36: the pressure keys' gestures' latches (108; 35's widened); scenes 9-12 moved
                                           * to keys 1-8, P9-P12 copied into the banks (keys 9-12 are gestures);
                                           * 35: the LFO's, the delay's and the scenes' clock values (104; 34's widened);
                                           * 34: the Swell's division (101 values; 33's read and widened);
@@ -47,7 +48,7 @@ typedef struct {
     int16_t par[DR_NPARAMS];             /* drone.h parameters */
     uint8_t leds;                        /* key lights on */
     uint8_t bank;                        /* the bank the scene keys play (0 A .. 3 Presets) */
-    uint8_t mtime;                       /* GESTURE TIME, 0..100 (PRESETS): every gesture's speed x0.1 .. x10, 50 as set
+    uint8_t mtime;                       /* GESTURE TIME, 0..100 (PRESETS): every gesture's time x0.25 .. x12, 50 as set
                                           * (the player's, not a scene's; was the macro PRESETS played, format <= 25) */
     uint8_t gkey_old[4];                 /* unused since 29 (what each gesture key played, 27-28) */
     uint8_t seen[2];                     /* the one-time tips shown (bit TIP_*; v0.3): the player's, not a scene's */

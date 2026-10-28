@@ -14,7 +14,7 @@ expect par74 0
 # depth 17, filter LFO to 18, noise 19, colour 20), drone II the same +21; then 42 cross-mod, 43 its amount,
 # 44 hard sync, 45 pitch link, 46 link offset, 47 LFO rate, 48 Wave I, 49 Wave II, 50 Glide, 51 Fade, 55 Pulse,
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
-# depth.
+# depth; 108, 109 each drone's sub wave.
 # Pages: 0 Drones 1 1 Drones 2 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO depths 7 Mods 8 Partner 9 Pitch moves
 # 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
 # a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
@@ -181,6 +181,32 @@ spin K1 10
 expect par5 40
 spin K2 20
 expect par10 40
+# each drone's sub wave on SEL + its Osc mix knob (KNOB 1, KNOB 3), round both ways: Square, Sine, Triangle, Saw;
+# the mix stays, and without SEL the knob is the mix again (2026-10-28)
+expect par108 0
+expect par109 0
+press SEL
+spin K1 1
+expect par108 1
+spin K1 -1
+spin K1 -1
+expect par108 3
+spin K3 1
+spin K3 1
+expect par109 2
+release SEL
+expect par5 40
+spin K1 1
+expect par5 41
+expect par108 3
+spin K1 -1
+press SEL
+spin K1 1
+spin K3 -1
+spin K3 -1
+release SEL
+expect par108 0
+expect par109 0
 tap EDIT
 expect view 4
 # LFO: the depths, and the keys switch to LFO routing

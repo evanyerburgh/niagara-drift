@@ -147,6 +147,8 @@ enum {
                                      * setting, v0.3) */
     P_GL_4, P_GL_5, P_GL_6, P_GL_7,      /* the pressure keys' gestures (G4-C5: Tick, Chord, Snarl, Stutter) latched at,
                                           * 0..100 (0: not latched; v0.3) */
+    P_SUBW_0, P_SUBW_1,                  /* each drone's sub wave (DR_SUBW_NAME): Square (as before), Sine, Triangle, Saw,
+                                          * each as loud (RMS) as the square (v0.3, Evan 2026-10-28) */
     DR_NPARAMS
 };
 
@@ -199,6 +201,9 @@ extern volatile uint32_t dr_ext_seq, dr_ext_start;
 #define DR_XMOD_FM 2
 #define DR_XMOD_OUT 3                                     /* SNARL: the finished sound bends both drones */
 #define DR_NROUTE 3
+#define DR_NSUBW 4                             /* the sub's waves */
+enum { DR_SUBW_SQUARE, DR_SUBW_SINE, DR_SUBW_TRI, DR_SUBW_SAW };
+extern const char *const DR_SUBW_NAME[DR_NSUBW];
 extern const char *const DR_ROUTE_NAME[DR_NROUTE];      /* "Both", "Echoes", "Drones" */
 #define DR_NDLY 6
 #define DR_DLY_TAPE 3                                     /* the starting type */

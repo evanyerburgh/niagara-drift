@@ -217,3 +217,27 @@ expect store_writes 2
 tap SAVE
 wait 500
 expect store_writes 2
+# GESTURE TIME (PRESETS), respread (Evan, 2026-10-28): slower evenly in seconds to x12 (Weight in over ~34 s), faster
+# only to x4 (~0.7 s). A tap latches at the time set and comes in by itself
+expect mtime 50
+spin PRESET -50
+expect mtime 100
+tapkey w12
+wait 8000
+expect gam0 >18
+expect gam0 <30
+tapkey w12
+wait 40000
+expect gam0 0
+spin PRESET 100
+expect mtime 0
+tapkey w12
+wait 500
+expect gam0 >60
+wait 400
+expect gam0 100
+tapkey w12
+wait 1500
+expect gam0 0
+spin PRESET -50
+expect mtime 50

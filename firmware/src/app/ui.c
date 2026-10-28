@@ -77,9 +77,19 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{G, P_DLY_DRIVE}, {G, P_DLY_TIME}, {G, P_DLY_REPEATS}, {G, P_DLY_MIX}},
     {{G, P_REV_LEN}, {G, P_REV_DAMP}, {G, P_REV_TYPE}, {G, P_REV_MIX}},
 };
-/* KNOB 4's second job with SEL held, on the pages that have one (its card shows both, the second "+ SEL"): the
- * choices set before playing, so a player who never finds it loses nothing */
-static int sel_job_of(int v) { return v == V_FX ? P_DLY_TYPE : v == V_FX2 ? P_DLY_ROUTE : -1; }
+/* A KNOB's SECOND JOB with SEL held, on the pages that have one (its card shows both, the second "+ SEL"): the
+ * choices set before playing, so a player who never finds them loses nothing. FX's KNOB 4: the delay's type, what goes
+ * into the reverb; Sub · Drive's Osc mix knobs: each drone's sub wave (Evan, 2026-10-28) */
+static int sel_job(int v, int i)
+{
+    if (i == 3)
+        return v == V_FX ? P_DLY_TYPE : v == V_FX2 ? P_DLY_ROUTE : -1;
+    if (v == V_SOURCE && (i == 0 || i == 2))
+        return i ? P_SUBW_1 : P_SUBW_0;
+    return -1;
+}
+static int page_jobs(int v) { return sel_job(v, 0) >= 0 || sel_job(v, 3) >= 0; }
+static const char *sel_job_name(int p) { return p == P_DLY_ROUTE ? "Into" : p == P_DLY_TYPE ? "Type" : "Wave"; }
 /* the page buttons: each shows its first page, pressed again the next */
 static const struct {
     uint8_t btn, first, n;
@@ -160,7 +170,8 @@ static struct {
     char glab[2][16];                  /* SELECT / ALGORITHM / PRESETS turned: their name and value (top bar) */
     uint32_t glab_until;
     uint32_t touch_t[4];               /* each knob: lit until then (each its own timer: two hands) */
-    uint8_t k4_sel;                    /* KNOB 4 last turned with SEL held, on a page where that's its second job */
+    uint8_t sel_lit;                   /* bit i: knob i last turned with SEL held, on a page where that's a second job */
+    uint8_t sel_turned;                /* a second job turned since SEL went down (the key map stays away) */
     int8_t morph;                      /* the scene being morphed to (VISIT_BACK: back from a visit), or -1 */
     int8_t visit;                      /* the white key held (a visit, if it's held long), or -1 */
     uint32_t visit_t;                  /* ... since */
@@ -301,11 +312,9 @@ static void loop_note(int p, int v, uint32_t slide);  /* the motion loop notes k
 
 /* the parameter knob i moves on the page shown, or -1 (on the Drones page, KNOB 3 is the link offset while
  * PITCH LINK is on) */
-static int knob_param(int i)
+static int knob_own(int i)
 {
     knob_t k = VIEW_KNOB[ui.view][i];
-    if (i == 3 && (ui.btn >> B_SEL & 1u) && sel_job_of(ui.view) >= 0)
-        return sel_job_of(ui.view);                    /* KNOB 4's second job */
     if (k.g == NONE)
         return -1;
     if (k.g == G && dr_ext_spb > 0.0f)  /* on a MIDI clock (v0.3): the Swell's Rate its division, the delay's Time a note
@@ -316,6 +325,10 @@ static int knob_param(int i)
     if (k.g == 1 && k.p == GP_PITCH && proj.par[P_PLINK])
         return P_PLINK_OFF;
     return DR_GP(k.g, k.p);
+}
+static int knob_param(int i)                           /* ... or, SEL held, its second job */
+{
+    return (ui.btn >> B_SEL & 1u) && sel_job(ui.view, i) >= 0 ? sel_job(ui.view, i) : knob_own(i);
 }
 
 /* knob acceleration by speed (FoMni's): a slow turn is one step a detent, a quick one up to 6 */
@@ -424,7 +437,7 @@ static void depth_hint(int p)
  * like a pitch, has ends). A new knob of choices goes here */
 static int knob_list(int p)
 {
-    return p == P_DLY_TYPE || p == P_REV_TYPE || p == P_DLY_ROUTE || p == P_WSCALE;
+    return p == P_DLY_TYPE || p == P_REV_TYPE || p == P_DLY_ROUTE || p == P_WSCALE || p == P_SUBW_0 || p == P_SUBW_1;
 }
 
 static void knob_turn(int i, int32_t e)
@@ -433,10 +446,15 @@ static void knob_turn(int i, int32_t e)
     knob_t k = VIEW_KNOB[ui.view][i];
     if (p < 0)
         return;
-    if (i == 3 && sel_job_of(ui.view) >= 0) {        /* which half of KNOB 4's card lights */
-        ui.k4_sel = p == sel_job_of(ui.view);
-        if (ui.k4_sel)
-            ui.btn_used |= 1u << B_SEL;               /* SEL let go: not a tap */
+    if (sel_job(ui.view, i) >= 0) {                  /* which half of the knob's card lights */
+        if (p == sel_job(ui.view, i))
+            ui.sel_lit |= (uint8_t)(1u << i);
+        else
+            ui.sel_lit &= (uint8_t)~(1u << i);
+        if (p == sel_job(ui.view, i)) {
+            ui.btn_used |= 1u << B_SEL;
+            ui.sel_turned = 1;
+        }               /* SEL let go: not a tap */
     }
     if (proj.par[P_II_OUT] && k.g == 1)        /* drone II out: say how it comes back, on any page (Evan, 2026-10-18) */
         say_c("II OFF", "SEL + PLAY", K_DRONE[1]);
@@ -1511,26 +1529,32 @@ static void gesture_up(int g)
     }
 }
 static char *dec1(float v, char *b);                   /* below */
-static float mtime_k(void)                             /* GESTURE TIME: the gestures' times x 0.1 .. x 10 */
+/* GESTURE TIME: the gestures' times x 0.25 .. x 12, 50 as set. Slower, evenly in seconds (each detent the same time
+ * more, to 12x); faster, by ratio and only to 4x (Evan, 2026-10-28: most of the old x 0.1 .. x 10 was fast, the slow
+ * end a few big jumps; a slow one is for a tap, which latches and comes in by itself) */
+static float mtime_k(void)
 {
-    return fm_exp2f(((float)proj.mtime - 50.0f) * 0.0664386f);
+    float m = (float)proj.mtime;
+    return m > 50.0f ? 1.0f + (m - 50.0f) * 0.22f : fm_exp2f((m - 50.0f) * 0.04f);
 }
-static void mtime_turn(int32_t e)                      /* PRESETS: Gesture time, shown as a speed (x0.1 .. x10):
-                                                        * right is faster (Evan, 2026-10-24) */
+static void mtime_turn(int32_t e)                      /* PRESETS: Gesture time, shown as Weight's time in (the
+                                                        * others scale with it): right is faster (Evan, 2026-10-24) */
 {
     int v = (int)proj.mtime - (int)e;
-    float k;
+    float t;
     char *q;
     proj.mtime = (uint8_t)(v < 0 ? 0 : v > 100 ? 100 : v);
     mark_dirty();
-    k = 1.0f / mtime_k();
+    t = fm_exp2f((float)DR_GEST_TIME[DR_G_WEIGHT] * 0.0490689f) * mtime_k();
     scopy(ui.glab[0], "GESTURE TIME");
     q = ui.glab[1];
-    *q++ = 'x';
-    if (k < 9.95f)
-        dec1(k, q);
+    if (t < 9.95f)
+        q = dec1(t, q);
     else
-        itoa_u((uint32_t)(k + 0.5f), q);
+        itoa_u((uint32_t)(t + 0.5f), q);
+    while (*q)
+        q++;
+    scopy(q, " s");
     ui.glab_until = plat_ms() + 1500u;
     ui.act_t = plat_ms();
 }
@@ -1614,7 +1638,7 @@ static void input(void)
     if ((ch & btn) >> B_SEL & 1u) {
         int g;
         ui.sel_t = plat_ms();
-        ui.k4_sel = 0;                                 /* a new hold: KNOB 4's SEL job not turned yet */
+        ui.sel_turned = 0;
         for (g = 0; g < DR_NGEST; g++)                 /* SEL tapped while a gesture is held: latched where it is */
             if ((ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u) && plat_ms() - ui.g_t0[g] >= GEST_TAP_MS) {
                 int v = (int)(ui.g_amt[g] * 100.0f + 0.999f);   /* rounded up, as a SEL let-go's */
@@ -2650,14 +2674,14 @@ static void pic_life(int32_t y0)
  * named. A key touched while SEL is held names itself and its setting, large, and doesn't switch (Evan, 2026-10-19:
  * the eleven names and settings at once were too crowded to read). The LFO pages' layer on those pages */
 #define KEYMAP_MS 400u
-#define KEYMAP_JOB_MS 1500u            /* ... on a page where KNOB 4 has a SEL job: a quick SEL + turn never meets the map
-                                        * (Evan, 2026-10-28); once that job is turned, not until SEL is let go */
+#define KEYMAP_JOB_MS 1500u            /* ... on a page where a knob has a SEL job: a quick SEL + turn never meets the map
+                                        * (Evan, 2026-10-28); once a job is turned, not until SEL is let go */
 static int keymap_on(void)
 {
-    uint32_t white = 0, i, wait = sel_job_of(ui.view) >= 0 ? KEYMAP_JOB_MS : KEYMAP_MS;
+    uint32_t white = 0, i, wait = page_jobs(ui.view) ? KEYMAP_JOB_MS : KEYMAP_MS;
     for (i = 0; i < NWHITE; i++)
         white |= 1u << WHITE_K[i];
-    if (sel_job_of(ui.view) >= 0 && ui.k4_sel && ui.km_key < 0)
+    if (page_jobs(ui.view) && ui.sel_turned && ui.km_key < 0)
         return 0;
     return (ui.btn >> B_SEL & 1u) && (plat_ms() - ui.sel_t >= wait || ui.km_key >= 0) && !lit(0) && !lit(1) &&
            !lit(2) && !lit(3) && !(ui.keys & white) && ui.press < 0;
@@ -2930,13 +2954,13 @@ static void big_value(int32_t cx, int32_t y, const char *s, uint16_t c)
     }
 }
 
-/* KNOB 4 with a second job (SEL_JOB): its card in two halves, always both shown (Evan, 2026-10-28: "I would never
+/* A knob with a second job (sel_job): its card in two halves, always both shown (Evan, 2026-10-28: "I would never
  * know there was another knob behind number 4"): its own value above, the SEL job's below ("+ SEL Type"). The
  * half turning lights; while the SEL half turns, only the other half dims (the other knobs work as ever) */
-static void k4_halves(int32_t x, int32_t w, uint16_t accent, int on)
+static void knob_halves(int i, int32_t x, int32_t w, uint16_t accent, int on)
 {
-    const int pm = VIEW_KNOB[ui.view][3].p, ps = sel_job_of(ui.view);
-    const int sel_on = on && ui.k4_sel, mix_on = on && !ui.k4_sel;
+    const int pm = knob_own(i), ps = sel_job(ui.view, i);
+    const int sel_on = on && (ui.sel_lit >> i & 1u), mix_on = on && !(ui.sel_lit >> i & 1u);
     int32_t cx = x + w / 2;
     char t[16], n[16];
     if (mix_on) {
@@ -2951,7 +2975,7 @@ static void k4_halves(int32_t x, int32_t w, uint16_t accent, int on)
     text_fit(cx, 19, w + 2, &FONT_B, t, mix_on ? K_TEXT : sel_on ? K_FAINT : K_TEXT2);
     if (!on)
         cv_rect(x + 4, 42, w - 8, 1, K_GRID);
-    scopy(scopy(n, "+ SEL "), ps == P_DLY_ROUTE ? "Into" : "Type");   /* (with " · " too wide for the card) */
+    scopy(scopy(n, "+ SEL "), sel_job_name(ps));   /* (with " · " too wide for the card) */
     text_fit(cx, 45, w + 2, &FONT_XS, n, sel_on ? accent : K_DIM);
     dr_param_text(ps, proj.par[ps], t);
     text_fit(cx, 60, w + 2, fit_face(t, w + 2, 0), t, sel_on ? K_TEXT : K_TEXT2);
@@ -2973,9 +2997,10 @@ static void draw_values(void)
         h = hash(h, (p < 0 ? 0xFFFFu : (uint32_t)(uint16_t)proj.par[p]) | (uint32_t)lit((int)i) << 16 |
                         (uint32_t)(ui.btn >> B_SEL & 1u) << 17 | (uint32_t)(proj.par[P_PLOCK] != 0) << 18);
     }
-    if (sel_job_of(ui.view) >= 0)              /* KNOB 4's two halves: both values, and which is lit */
-        h = hash(h, (uint32_t)(uint16_t)proj.par[sel_job_of(ui.view)] |
-                        (uint32_t)(uint16_t)proj.par[VIEW_KNOB[ui.view][3].p] << 8 | (uint32_t)ui.k4_sel << 16);
+    for (i = 0; i < 4; i++)                    /* a knob's two halves: both values, and which is lit */
+        if (sel_job(ui.view, (int)i) >= 0)
+            h = hash(h, (uint32_t)(uint16_t)proj.par[sel_job(ui.view, (int)i)] |
+                            (uint32_t)(uint16_t)proj.par[knob_own((int)i)] << 8 | (uint32_t)(ui.sel_lit >> i & 1u) << 24);
     if (keymap_on()) {                         /* SEL held: the map's last two rows here */
         h = hash(h, 0x4B4Du | (uint32_t)(uint8_t)ui.km_key << 16);
         for (i = 0; i < 11u; i++)
@@ -3021,8 +3046,8 @@ static void draw_values(void)
         uint16_t accent = k.g < G ? K_DRONE[k.g] : k.p == P_XMOD_AMT ? K_DRONE[1] : page_col() == K_DIM ? K_TEXT : page_col();
         int is_pitch = k.p == GP_PITCH && k.g < G, locked = is_pitch && proj.par[P_PLOCK] && on;
         char t[16];
-        if (i == 3 && sel_job_of(ui.view) >= 0) {
-            k4_halves(x, w, accent, on);
+        if (sel_job(ui.view, (int)i) >= 0) {
+            knob_halves((int)i, x, w, accent, on);
             continue;
         }
         if (p < 0)

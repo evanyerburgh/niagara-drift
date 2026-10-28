@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): each drone's sub wave (SEL + its Osc mix knob on Sub · Drive,
+# 2026-10-28): the sub mixed in on both drones, then drone I's and drone II's subs through Sine, Triangle and Saw (each
+# as loud as the square); the swaps glide (no click). The page at rest, and with SEL turning drone II's. Not a test of
+# its own (no expectations).
+notips
+tap PLAY
+wait 1500
+tap EDIT
+tap EDIT
+set 5 55
+set 26 55
+wait 2000
+shot sub-rest.png
+wav sub-wave.wav
+wait 4000
+press SEL
+spin K1 1
+spin K3 1
+wait 4000
+spin K1 1
+spin K3 1
+wait 300
+shot sub-sel.png
+wait 3700
+spin K1 1
+spin K3 1
+wait 4000
+release SEL
