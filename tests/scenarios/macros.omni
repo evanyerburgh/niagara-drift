@@ -211,8 +211,9 @@ reboot
 wait 5000
 expect par93 100
 expect heard63 >60
-# SAVE again with nothing changed: nothing is written (each write is a late block while playing)
-expect store_writes 1
+# SAVE again with nothing changed: nothing is written (each write is a late block while playing); two so far: the
+# project, and bank C with P9-P12 on a new FM-1 (v0.3)
+expect store_writes 2
 tap SAVE
 wait 500
-expect store_writes 1
+expect store_writes 2

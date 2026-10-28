@@ -93,7 +93,8 @@ static const uint8_t BLACK_K[11] = {1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25};
 #define NWHITE 16
 static const uint8_t WHITE_K[NWHITE] = {0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26};
 static const char BANK_L[NBANKS] = {'A', 'B', 'C', 'P'};
-static const char *const GESTURE[DR_NGTYPE] = {"WEIGHT", "SHIFT", "CLEAN", "WASH"};   /* D5-G5, fixed */
+static const char *const GESTURE[DR_NGTYPE] = {"WEIGHT", "SHIFT", "CLEAN", "WASH", "TICK", "CHORD", "SNARL",
+                                               "STUTTER"};   /* D5-G5, then G4-C5: fixed */
 enum { S_NONE, S_PARTNER, S_SUBOCT, S_HP, S_OTAP, S_ODEST, S_FTAP, S_FDEST, S_PLINK, S_SYNC, S_XMOD, S_LFORESET, S_DTAP,
        S_PLOCK };
 typedef struct {
@@ -1326,13 +1327,19 @@ static void midi_in(void)
  * needn't be quick) latches it on, all the way;
  * tapping a latched one lets it go (over its own time); SEL held as you let go keeps it where it is. No depth or
  * time of its own to set (Evan, 2026-10-18: how you play it sets them); Shift's move is on Moves. Latched
- * levels are values (P_GL_*): scenes keep them. */
+ * levels are values (P_GL_*): scenes keep them. v0.3: four more on keys 9-12 (G4-C5: Tick, Chord, Snarl, Stutter,
+ * each the partner of the top key four to its right), which sense pressure: held, one goes toward how hard the key is
+ * pressed (over its time x Gesture time), easing off or let go it comes back; a tap latches it, as the top keys'.
+ * SEL tapped while a gesture is held latches it at the level it has reached (Evan, 2026-10-27), on every gesture key. */
 #define GEST_TAP_MS PR_TAP_MS          /* a gesture key let go sooner: a tap, as a scene key */
+#define G_PRESS DR_G_TICK              /* gestures from here on are on the pressure keys */
+static int gl_par(int g) { return g < G_PRESS ? P_GL_0 + g : P_GL_4 + (g - G_PRESS); }   /* its latch */
+static uint32_t gkey(int g) { return g < G_PRESS ? WHITE_K[NSCENES + g] : WHITE_K[NPLAY + g - G_PRESS]; }
 static void gesture_down(int g)
 {
-    if (proj.par[P_GL_0 + g]) {                     /* latched: let go of it, whatever the press */
-        param_set(P_GL_0 + g, 0);
-        hands_on(P_GL_0 + g);
+    if (proj.par[gl_par(g)]) {                     /* latched: let go of it, whatever the press */
+        param_set(gl_par(g), 0);
+        hands_on(gl_par(g));
         ui.g_rel |= (uint8_t)(1u << g);
         say_c(GESTURE[g], "OFF", K_LFO);
     }
@@ -1351,20 +1358,21 @@ static void gesture_up(int g)
         ui.g_rel &= (uint8_t)~(1u << g);
         return;
     }
-    if (held >= GEST_TAP_MS && !(ui.btn >> B_SEL & 1u)) {   /* let go after a hold: out over as long as it was held */
+    if (held >= GEST_TAP_MS && !(ui.btn >> B_SEL & 1u) && g < G_PRESS) {   /* let go after a hold: out over as long
+                                                                         * as it was held (a pressure key: its own time) */
         ui.g_out[g] = ui.g_amt[g];
         ui.g_out_s[g] = fm_minf((float)held * 0.001f, 60.0f);
     }
     if (held < GEST_TAP_MS) {                          /* a tap: latched, at full */
-        param_set(P_GL_0 + g, 100);
-        hands_on(P_GL_0 + g);
+        param_set(gl_par(g), 100);
+        hands_on(gl_par(g));
         say_c(GESTURE[g], "LATCHED", K_LFO);
     } else if (ui.btn >> B_SEL & 1u) {                 /* SEL held: latched where it is */
         int v = (int)(ui.g_amt[g] * 100.0f + 0.999f);   /* rounded up: a hair less would read as letting go
                                                           * (QA 2026-10-20: Shift's chord swapped, Weight jumped) */
         ui.btn_used |= 1u << B_SEL;
-        param_set(P_GL_0 + g, v < 1 ? 1 : v);
-        hands_on(P_GL_0 + g);
+        param_set(gl_par(g), v < 1 ? 1 : v);
+        hands_on(gl_par(g));
         say_c(GESTURE[g], "KEPT", K_LFO);
     }
 }
@@ -1400,7 +1408,15 @@ static void gesture_run(void)                          /* each frame: each gestu
     if (dt > 100u)
         dt = 100u;
     for (g = 0; g < DR_NGEST; g++) {
-        float to = (ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u) ? 1.0f : (float)proj.par[P_GL_0 + g] * 0.01f;
+        float to = (float)proj.par[gl_par(g)] * 0.01f;
+        if ((ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u)) {
+            to = 1.0f;
+            if (g >= G_PRESS) {                        /* a pressure key: as far as it's pressed (none: the emulator) */
+                int pr = plat_pressure(gkey(g));
+                if (pr >= 0)
+                    to = fm_clampf(((float)press_scaled(pr) / 127.0f - PR_DEAD) / (PR_FULL - PR_DEAD), 0.0f, 1.0f);
+            }
+        }
         float *a = &ui.g_amt[g], k = mtime_k();
         float step = *a > to && ui.g_out_s[g] > 0.0f
                        ? (float)dt * 0.001f * ui.g_out[g] / (ui.g_out_s[g] * k)   /* let go: as long as it was held */
@@ -1458,8 +1474,19 @@ static void input(void)
     save_run();
     ch = btn ^ ui.btn;
     ui.btn = btn;
-    if ((ch & btn) >> B_SEL & 1u)
+    if ((ch & btn) >> B_SEL & 1u) {
+        int g;
         ui.sel_t = plat_ms();
+        for (g = 0; g < DR_NGEST; g++)                 /* SEL tapped while a gesture is held: latched where it is */
+            if ((ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u) && plat_ms() - ui.g_t0[g] >= GEST_TAP_MS) {
+                int v = (int)(ui.g_amt[g] * 100.0f + 0.999f);   /* rounded up, as a SEL let-go's */
+                param_set(gl_par(g), v < 1 ? 1 : v);
+                hands_on(gl_par(g));
+                ui.g_rel |= (uint8_t)(1u << g);        /* its let-go does nothing more */
+                ui.btn_used |= 1u << B_SEL;
+                say_c(GESTURE[g], "KEPT", K_LFO);
+            }
+    }
     if (!(btn >> B_SEL & 1u))
         ui.km_key = -1;
     {   /* THE HEADPHONE JACK: the Speaker low cut only while the speaker plays (Evan, 2026-10-20); a plug settled
@@ -1557,7 +1584,7 @@ static void input(void)
             save_dn = 0;
         }
     }
-    for (i = 0; i < NSCENES; i++) {                    /* the white keys: scenes (SAVE held: store) */
+    for (i = 0; i < NPLAY; i++) {                      /* the white keys 1-8: scenes (SAVE held: store) */
         if ((ch & keys) >> WHITE_K[i] & 1u) {
             if (btn >> B_SAVE & 1u) {
                 ui.btn_used |= 1u << B_SAVE;           /* SAVE let go: not a plain save */
@@ -1589,7 +1616,7 @@ static void input(void)
             uint32_t j, held = 0;
             static const char *const BANK_N[NBANKS] = {"A", "B", "C", "PRESETS"};
             ui.btn_used |= 1u << B_SEL;
-            for (j = 0; j < NSCENES; j++)
+            for (j = 0; j < NPLAY; j++)
                 held |= keys >> WHITE_K[j] & 1u;
             if (held)
                 continue;
@@ -1606,6 +1633,12 @@ static void input(void)
     for (i = 0; i < 4u; i++)                         /* ... and let go */
         if ((ch & ~keys) >> WHITE_K[NSCENES + i] & 1u)
             gesture_up((int)i);
+    for (i = NPLAY; i < NSCENES; i++) {              /* keys 9-12: the pressure gestures (v0.3) */
+        if ((ch & keys) >> WHITE_K[i] & 1u)
+            gesture_down(G_PRESS + (int)(i - NPLAY));
+        else if ((ch & ~keys) >> WHITE_K[i] & 1u)
+            gesture_up(G_PRESS + (int)(i - NPLAY));
+    }
     if (btn || keys || ch)
         ui.act_t = plat_ms();
     loop_run();
@@ -2938,7 +2971,7 @@ static void leds(void)
         if (v)
             k[BLACK_K[i]] = 255;
     }
-    for (i = 0; i < NSCENES; i++)                    /* the scene keys: the bank's slots that hold a scene; the */
+    for (i = 0; i < NPLAY; i++)                      /* the scene keys: the bank's slots that hold a scene; the */
         if (scene_has(proj.bank, (int)i) &&            /* one the sound is, blinking slowly */
             (ui.scene_at != (int8_t)i || plat_ms() % 1000u < 600u))
             k[WHITE_K[i]] = 255;
@@ -2948,8 +2981,8 @@ static void leds(void)
         k[WHITE_K[ui.scene_at]] = (plat_ms() - ui.flash_t) % 160u < 80u ? 255 : 0;
     else if (ui.flash_t && ui.press >= 0 && plat_ms() - ui.flash_t < 480u)
         k[WHITE_K[ui.press]] = (plat_ms() - ui.flash_t) % 160u < 80u ? 255 : 0;
-    for (i = 0; i < 4u; i++)                         /* the gestures: a dim glow, lit as far as each is in */
-        k[WHITE_K[NSCENES + i]] = (uint8_t)(40.0f + 215.0f * ui.g_amt[i]);
+    for (i = 0; i < DR_NGEST; i++)                   /* the gestures: a dim glow, lit as far as each is in */
+        k[gkey((int)i)] = (uint8_t)(40.0f + 215.0f * ui.g_amt[i]);
     plat_leds(b, k);
 }
 
@@ -3103,6 +3136,21 @@ void ui_frame(void)
             ui.splash_done = 1;
             ui.sig[0] = ui.sig[1] = ui.sig[2] = 0;                   /* every band drawn afresh */
             lcd_fill(0, 0, 240, 240, K_BG);
+            if (proj_note_moved || proj_note_stored) {   /* updated to 0.3: keys 9-12 are gestures now */
+                char t[24], *q = t;
+                itoa_u((uint32_t)proj_note_moved, t);
+                while (*q)
+                    q++;
+                scopy(q, proj_note_moved == 1 ? " SCENE TO KEYS 1-8" : " SCENES TO KEYS 1-8");
+                say_c(t, 0, K_GOLD);
+                if (proj_note_stored) {
+                    itoa_u((uint32_t)proj_note_stored, ui.msg_next);
+                    for (q = ui.msg_next; *q; q++)
+                        ;
+                    scopy(q, " KEPT, UNPLAYED");
+                }
+                ui.msg_until = plat_ms() + 3500u;
+            }
         } else {
             draw_splash(t);
             leds();

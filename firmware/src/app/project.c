@@ -159,6 +159,11 @@ void project_defaults(void)
     bank_blank(&bank_bc[1]);
     p_moved = 0;
     proj.bank = BANK_PRESETS;                  /* a new FM-1: the keys play the Presets */
+    for (i = NPLAY; i < NPRESETS; i++) {       /* ... P1-P8; P9-P12 start in C1-C4 (v0.3: keys 9-12 are gestures) */
+        memcpy(bank_bc[1].scene[i - NPLAY], preset_get(i), sizeof bank_bc[1].scene[0]);
+        bank_bc[1].used |= (uint16_t)(1u << (i - NPLAY));
+    }
+    bank_dirty |= 1u << 2;                     /* ... and onto the flash with the first save */
 }
 
 int scene_has(int bank, int n)                 /* scene n of a bank holds a sound (builds nothing) */
@@ -168,7 +173,7 @@ int scene_has(int bank, int n)                 /* scene n of a bank holds a soun
     switch (bank) {
     case 0: return proj.scene_used >> n & 1u;
     case 1: case 2: return bank_bc[bank - 1].used >> n & 1u;
-    case BANK_PRESETS: return n < NPRESETS;
+    case BANK_PRESETS: return n < NPLAY;   /* P1-P8 on keys (P9-P12 copied into the banks, v0.3) */
     default: return 0;
     }
 }
@@ -274,15 +279,16 @@ static int in_range(const int16_t *v)
 /* the older layouts: 19 and 20 had 16 scenes in the project (scenes 13-16 become B1-B4), 21 had bank A there and
  * B, C in their own objects, each with 78 values a sound (DR_NPARAMS before the macros); 22 as 21 with 94 (before
  * the effects' four); 23-31 as now with 98 (before the delay's drive), 32 with 99 (before the reverb's route), 33 with 100
- * (before the Swell's division), 34 with 101 (before the LFO's, the delay's and the scenes' clock values). A value added
- * since takes its default. */
+ * (before the Swell's division), 34 with 101 (before the LFO's, the delay's and the scenes' clock values), 35 with 104
+ * (before the pressure keys' gestures' latches). A value added since takes its default. */
 #define NP21 78
 #define NP22 94
 #define NP31 98
 #define NP32 99
 #define NP33 100
 #define NP34 101
-_Static_assert(DR_NPARAMS >= NP34, "the values only grow");
+#define NP35 104
+_Static_assert(DR_NPARAMS >= NP35, "the values only grow");
 typedef struct {
     uint32_t magic, format;
     int16_t par[NP21];
@@ -373,6 +379,20 @@ typedef struct {
     uint16_t used, rsv;
     int16_t scene[NSCENES][NP34];
 } bank_v34_t;
+typedef struct {
+    uint32_t magic, format;
+    int16_t par[NP35];
+    uint8_t leds, bank, mtime;
+    uint8_t seen[2];
+    uint8_t rsv[7];
+    uint16_t scene_used;
+    int16_t scene[NSCENES][NP35];
+} proj_v35_t;
+typedef struct {
+    uint32_t magic, format;
+    uint16_t used, rsv;
+    int16_t scene[NSCENES][NP35];
+} bank_v35_t;
 static union {
     project_t p;
     proj_v31_t o31;
@@ -383,6 +403,8 @@ static union {
     bank_v33_t b33;
     proj_v34_t o34;
     bank_v34_t b34;
+    proj_v35_t o35;
+    bank_v35_t b35;
     proj_v20_t o20;
     proj_v21_t o21;
     bank_t b;
@@ -395,7 +417,7 @@ static union {
 static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old sound: the new values' defaults */
 {
     int k;
-    const int np = from >= 34u ? NP34 : from >= 33u ? NP33 : from >= 32u ? NP32 : from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
+    const int np = from >= 35u ? NP35 : from >= 34u ? NP34 : from >= 33u ? NP33 : from >= 32u ? NP32 : from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
     for (k = 0; k < DR_NPARAMS; k++)
         dst[k] = k < np ? src[k] : dr_param_info(k)->def;
     if (dst[P_LFO_RATE] < 0)                   /* slower than 50 s, as it went before 2026-10-14: the slowest */
@@ -403,16 +425,25 @@ static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old s
     convert(dst, from);
 }
 
+static uint32_t bank_fmt[2];                   /* B's and C's format as stored (0: none) */
 static void bank_load(int b)                   /* B (1) or C (2): from its object, if it's sound */
 {
     bank_t *k = &bank_bc[b - 1];
     int i;
     bank_blank(k);
+    bank_fmt[b - 1] = 0;
     memset(ld.raw, 0, sizeof ld.raw);
     if (plat_store_load(BANK_OBJ[b - 1], ld.raw, sizeof ld.raw) < 8 || ld.b.magic != BANK_MAGIC)
         return;
+    bank_fmt[b - 1] = ld.b.format;
     if (ld.b.format == PROJ_FORMAT) {
         *k = ld.b;
+    } else if (ld.b.format == 35u) {           /* 35: 104 values a sound */
+        const bank_v35_t *o = &ld.b35;
+        k->used = o->used;
+        for (i = 0; i < NSCENES; i++)
+            widen(k->scene[i], o->scene[i], 35u);
+        bank_dirty |= (uint8_t)(1u << b);
     } else if (ld.b.format == 34u) {           /* 34: 101 values a sound */
         const bank_v34_t *o = &ld.b34;
         k->used = o->used;
@@ -466,6 +497,7 @@ static const int16_t *old_scene(int n, uint32_t *from)   /* scene n of the bank 
     uint32_t f = ld.b.format;
     *from = f;
     if (f == PROJ_FORMAT) return ld.b.scene[n];
+    if (f == 35u) return ld.b35.scene[n];
     if (f == 34u) return ld.b34.scene[n];
     if (f == 33u) return ld.b33.scene[n];
     if (f == 32u) return ld.b32.scene[n];
@@ -512,6 +544,60 @@ static void presets_move(void)
     }
 }
 
+/* KEYS 9-12 BECOME GESTURES (format 36, Evan 2026-10-28): a bank plays keys 1-8. On the first start, a scene of
+ * the player's on keys 9-12 moves to the first empty key 1-8 of its own bank, then of another (A, B, C); one with no
+ * room stays stored there, unplayed, not lost. Then P9-P12 (the Presets no longer on keys) are copied into the first
+ * empty keys 1-8 of C, then B, then A, never over a scene. proj_note says what happened, for the screen */
+int proj_note_moved, proj_note_stored, proj_note_presets;
+static uint16_t *bank_used(int b) { return b ? &bank_bc[b - 1].used : &proj.scene_used; }
+static int16_t *bank_scene(int b, int n) { return b ? bank_bc[b - 1].scene[n] : proj.scene[n]; }
+static int free_key(int b)                     /* the first empty key 1-8 of bank b, or -1 */
+{
+    int i;
+    for (i = 0; i < NPLAY; i++)
+        if (!(*bank_used(b) >> i & 1u))
+            return i;
+    return -1;
+}
+static void keys_to_gestures(void)
+{
+    static const int8_t ORDER[3][3] = {{0, 1, 2}, {1, 0, 2}, {2, 1, 0}};   /* its own bank first */
+    static const int8_t P_INTO[3] = {2, 1, 0};                            /* C, B, A */
+    /* a first save cut short: B or C already written in this format (the banks go first), the project not. Those
+     * moves and copies are on the flash already: only A's own scenes move again, within A, so nothing doubles */
+    const int again = bank_fmt[0] >= 36u || bank_fmt[1] >= 36u;
+    int b, n, k, i, d;
+    for (b = 0; b < 3; b++)
+        for (n = NPLAY; n < NSCENES; n++) {
+            if (!(*bank_used(b) >> n & 1u))
+                continue;
+            for (k = 0; k < (again ? 1 : 3); k++) {
+                d = ORDER[b][k];
+                if ((i = free_key(d)) >= 0) {
+                    memcpy(bank_scene(d, i), bank_scene(b, n), sizeof(int16_t) * DR_NPARAMS);
+                    *bank_used(d) |= (uint16_t)(1u << i);
+                    *bank_used(b) &= (uint16_t)~(1u << n);
+                    proj_note_moved++;
+                    break;
+                }
+            }
+            if (k == (again ? 1 : 3))
+                proj_note_stored++;
+        }
+    for (n = again ? NPRESETS : NPLAY; n < NPRESETS; n++)
+        for (k = 0; k < 3; k++) {
+            d = P_INTO[k];
+            if ((i = free_key(d)) >= 0) {
+                memcpy(bank_scene(d, i), preset_get(n), sizeof(int16_t) * DR_NPARAMS);
+                *bank_used(d) |= (uint16_t)(1u << i);
+                proj_note_presets++;
+                break;
+            }
+        }
+    for (b = 1; b < 3; b++)
+        bank_dirty |= (uint8_t)(1u << b);
+}
+
 int project_load(void)
 {
     int n, i;
@@ -530,6 +616,17 @@ int project_load(void)
     }
     if (from == PROJ_FORMAT) {
         proj = ld.p;
+    } else if (from == 35u) {                  /* 35: 104 values a sound */
+        const proj_v35_t *o = &ld.o35;
+        memset(&proj, 0, sizeof proj);
+        widen(proj.par, o->par, from);
+        proj.leds = o->leds;
+        proj.bank = o->bank;
+        proj.mtime = o->mtime;
+        memcpy(proj.seen, o->seen, sizeof proj.seen);
+        proj.scene_used = o->scene_used & ((1u << NSCENES) - 1u);
+        for (i = 0; i < NSCENES; i++)
+            widen(proj.scene[i], o->scene[i], from);
     } else if (from == 34u) {                  /* 34: 101 values a sound */
         const proj_v34_t *o = &ld.o34;
         memset(&proj, 0, sizeof proj);
@@ -610,6 +707,9 @@ int project_load(void)
     }
     moved_a = 0;
     presets_move();
+    proj_note_moved = proj_note_stored = proj_note_presets = 0;
+    if (from < 36u)                            /* 0.3: keys 9-12 are gestures now */
+        keys_to_gestures();
     proj.magic = PROJ_MAGIC;
     proj.format = PROJ_FORMAT;
     if (proj.bank >= NBANKS)

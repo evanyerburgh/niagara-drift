@@ -145,6 +145,8 @@ enum {
     P_DLY_NOTE,                     /* ... the delay's time (DR_NOTE_NAME): 1/16 .. 1 bar (v0.3) */
     P_SCENE_BARS,                   /* ... the Scene time (DR_BARS_NAME): 1 .. 16 bars, landing on a bar line (a room
                                      * setting, v0.3) */
+    P_GL_4, P_GL_5, P_GL_6, P_GL_7,      /* the pressure keys' gestures (G4-C5: Tick, Chord, Snarl, Stutter) latched at,
+                                          * 0..100 (0: not latched; v0.3) */
     DR_NPARAMS
 };
 
@@ -153,8 +155,9 @@ enum { DR_SINE, DR_TRI, DR_SAW, DR_SQUARE };          /* the X-WAVE's four waves
 enum { DR_LFO_OFF, DR_LFO_I, DR_LFO_II, DR_LFO_BOTH };   /* a route's wave; BOTH: I + II, summed */
 enum { DR_TO_PITCH, DR_TO_XWAVE };
 enum { DR_TO_CUTOFF, DR_TO_RESO };
-#define DR_NGEST 4                             /* the gesture keys, D5-G5 */
-enum { DR_G_WEIGHT, DR_G_SHIFT, DR_G_CLEAN, DR_G_WASH, DR_NGTYPE };   /* what each key plays, D5-G5 (fixed) */
+#define DR_NGEST 8                             /* the gesture keys: D5-G5 (by time), G4-C5 (by pressure, v0.3) */
+enum { DR_G_WEIGHT, DR_G_SHIFT, DR_G_CLEAN, DR_G_WASH, DR_G_TICK, DR_G_CHORD, DR_G_SNARL, DR_G_STUTTER,
+       DR_NGTYPE };                       /* what each key plays, fixed: D5-G5, then G4-C5 */
 #define DR_SHIFT_MID 700                       /* Shift's move: none (cents + 700) */
 extern const char *const DR_GEST_NAME[DR_NGTYPE];
 extern const uint8_t DR_GEST_DEPTH[DR_NGTYPE], DR_GEST_TIME[DR_NGTYPE];   /* each one's full depth and its time */

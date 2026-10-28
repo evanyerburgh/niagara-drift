@@ -417,6 +417,10 @@ static int expect(const char *what, const char *val)
         got = (int)store_writes;
     else if (!strncmp(what, "heard", 5))          /* heardN: parameter N as heard (with the macros) */
         got = dr_heard(atoi(what + 5));
+    else if (!strncmp(what, "gam", 3)) {         /* gamN: gesture N's amount now, x 100 (0-3 the top keys, 4-7 G4-C5) */
+        int g = atoi(what + 3);
+        got = g >= 0 && g < DR_NGEST ? (int)(ui.g_amt[g] * 100.0f + 0.5f) : -1;
+    }
     else if (!strcmp(what, "swerr")) {            /* the Swell against the true beat (clock command): |error| in
                                                     * thousandths of a breath */
         static const double DIVB[DR_NDIV] = {128, 64, 32, 16, 8, 4, 2, 1};   /* drone.c's DIV_BEATS */

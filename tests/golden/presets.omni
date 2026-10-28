@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# the same-samples check (tools/same_samples.py): each preset, 10 s on its own. Rendered by this branch and by main;
+# the same-samples check (tools/same_samples.py): each preset, 10 s on its own (P1-P8 on the Presets bank, P9-P12 from C1-C4 since v0.3). Rendered by this branch and by main;
 # a change that keeps the sound gives the same samples. Not a test of its own (no expectations).
 pressure w0 0
 pressure w1 0
@@ -57,22 +57,34 @@ wait 1000
 wav preset-08.wav
 wait 10000
 wavstop
-tapkey w8
+press SEL
+tapkey w14
+release SEL
+tapkey w0
 wait 1000
 wav preset-09.wav
 wait 10000
 wavstop
-tapkey w9
+press SEL
+tapkey w14
+release SEL
+tapkey w1
 wait 1000
 wav preset-10.wav
 wait 10000
 wavstop
-tapkey w10
+press SEL
+tapkey w14
+release SEL
+tapkey w2
 wait 1000
 wav preset-11.wav
 wait 10000
 wavstop
-tapkey w11
+press SEL
+tapkey w14
+release SEL
+tapkey w3
 wait 1000
 wav preset-12.wav
 wait 10000

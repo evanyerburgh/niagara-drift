@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# the same-samples check (tools/same_samples.py): the four gestures: held and let go, latched, kept. Rendered by this branch and by main;
+# the same-samples check (tools/same_samples.py): the gestures: held and let go, latched, kept; the pressure ones
+# (v0.3) pressed all the way in and let go. Rendered by this branch and by main;
 # a change that keeps the sound gives the same samples. Not a test of its own (no expectations).
 pressure w0 0
 pressure w1 0
@@ -59,4 +60,40 @@ release SEL
 wait 6000
 tapkey w12
 wait 4000
+wavstop
+wav gesture-tick.wav
+wait 1000
+key w8 down
+pressure w8 127
+wait 8000
+pressure w8 0
+key w8 up
+wait 8000
+wavstop
+wav gesture-chord.wav
+wait 1000
+key w9 down
+pressure w9 127
+wait 8000
+pressure w9 0
+key w9 up
+wait 8000
+wavstop
+wav gesture-snarl.wav
+wait 1000
+key w10 down
+pressure w10 127
+wait 8000
+pressure w10 0
+key w10 up
+wait 8000
+wavstop
+wav gesture-stutter.wav
+wait 1000
+key w11 down
+pressure w11 127
+wait 8000
+pressure w11 0
+key w11 up
+wait 8000
 wavstop

@@ -55,7 +55,10 @@ expect swerr <30
 set 71 0
 expect par55 1
 expect par100 7
-tapkey w11
+press SEL
+tapkey w14
+release SEL
+tapkey w3
 wait 1000
 expect par55 1
 expect par100 7

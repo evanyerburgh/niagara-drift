@@ -23,8 +23,12 @@ counts them with valgrind: `tools/ci_cost.py`).
 
 The chip is small, and the sound comes first. A change can spend these only when it's worth hearing:
 
+**The same sound for less** (Evan, 2026-10-28): when code can give the same sound and behaviour with less RAM, less CPU
+or less flash, take that version, proven by `tools/same_samples.py`.
+
 - **RAM:** .data + .bss under 96 KB, the pool with at least 8 KB spare; the build fails past either.
-  Both are close (80 KB, 11 KB spare in October 2026): a new buffer or table in RAM needs a reason.
+  The pool is close (11 KB spare in October 2026); the main RAM has room since #50 (64 KB of 96): a new buffer or table
+  in RAM still needs a reason.
 - **CPU:** the engine's worst case (`tests/host/drone_cost.c`) under its limit; on the device the
   longest audio block (`tools/fm1_cpu.py`) about 69 % in the worst realistic case at 0.2: keep the
   headroom. A block past 100 % is late, and a late block is a click.

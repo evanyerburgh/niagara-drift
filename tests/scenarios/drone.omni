@@ -455,10 +455,11 @@ expect par49 1
 midi 91 3C 64
 wait 20
 expect par21 6000
-# SAVE while playing: the output dips out (20 ms), the write, back (30 ms)
+# SAVE while playing: the output dips out (20 ms), the write, back (30 ms); two writes: the project and bank C, which
+# a new FM-1 fills with P9-P12 (v0.3)
 tap SAVE
 wait 150
-expect store_writes 1
+expect store_writes 2
 expect dirty 0
 # no autosave while the drone plays (a knob moved and back: unsaved again)
 spin K1 1
@@ -466,7 +467,7 @@ spin K1 -1
 expect dirty 1
 wait 5000
 expect dirty 1
-expect store_writes 1
+expect store_writes 2
 # PLAY again: out over the fade (Fade is 52 now: 2.0 s), then the autosave
 tap PLAY
 expect playing 0
@@ -476,7 +477,7 @@ wait 4500
 expect dirty 0
 # the knob came back where it was: the flash has this sound already; written once, for the tip seen since the save
 # (FX's first time, v0.3: the tips' seen flags go with the next save)
-expect store_writes 2
+expect store_writes 3
 wavstop
 # everything comes back after a reboot
 reboot
@@ -494,7 +495,7 @@ press SAVE
 tapkey w0
 release SAVE
 expect scenes 1
-expect store_writes 3
+expect store_writes 4
 expect view 0
 # the sound is scene 1 (its key blinks), until a knob is turned
 expect scene_at 0
@@ -572,23 +573,28 @@ expect scenes 1
 # a top key alone: a gesture (to come); the bank stays
 tapkey w12
 expect bank 1
-# the Presets: twelve, fixed: none can be saved over (and picking the bank doesn't play G5's gesture)
+# the Presets: eight on keys 1-8 (v0.3: 9-12 are gestures), fixed: none can be saved over (and picking the bank
+# doesn't play G5's gesture)
 press SEL
 tapkey w15
 release SEL
 expect bank 3
 expect par93 0
-expect bscenes 4095
+expect bscenes 255
 press SAVE
-tapkey w11
+tapkey w7
 release SAVE
 wait 300
-expect bscenes 4095
-# P12 (Clean): one oscillator, drone II out on its own; SEL + PLAY brings it in, and out again (playing)
+expect bscenes 255
+# P12 (Clean): one oscillator, drone II out on its own; SEL + PLAY brings it in, and out again (playing). Since v0.3
+# P9-P12 start in bank C (C1-C4)
 tap PLAY
 wait 1600
 expect playing 1
-tapkey w11
+press SEL
+tapkey w14
+release SEL
+tapkey w3
 wait 2500
 expect par72 1
 expect level1 <2
@@ -598,6 +604,10 @@ release SEL
 wait 2500
 expect par72 0
 expect level1 >3
+# back to the Presets (P12 was C4)
+press SEL
+tapkey w15
+release SEL
 press SEL
 tap PLAY
 release SEL
