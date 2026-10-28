@@ -455,3 +455,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   B, A). Scenes on keys 9-12 move once to the first empty key 1-8 of their bank, then another's; one with no room stays
   stored. A partner's interval now crossfades when it changes (down, swap, up). PROJ_FORMAT 36 (108 values: the new
   gestures' latches `P_GL_4`-`7`). The 9 unused parameters stay (retiring them renumbers everything after them).
+- 2026-10-28: ENV opens on **Life** (Character, Feedback, Age, Drift), then **Tone** (noise, colour; was "Tone 1"):
+  the most played of the two first. While Shift moves a drone's pitch, its pitch card lights and shows the pitch as
+  heard, "SHIFT" under it. From review 5 (playability).

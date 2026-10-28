@@ -122,7 +122,7 @@ enum {
                                      * notes of a scale on drone I (P_WSCALE), up to an octave away; how often:
                                      * 25-30 s apart at 1 .. 0.5-2 s at 100 (GLO's Glide glides it); 0 still (Pitch) */
     P_AGE,                          /* AGE, 0..100: the sound worn, like an old tape: darker, a slow wow, hiss,
-                                     * more character; it wears in (and out) slowly (Tone 2) */
+                                     * more character; it wears in (and out) slowly (Life) */
     P_SHIFT_MOVE,                   /* Shift's move in cents, 0..1400 = a fifth down .. none (700) .. a fifth up (a
                                      * detent 10, with SEL held 1) */
     P_WSCALE,                       /* Wander's scale (DR_WSCALE_NAME), 0 minor pentatonic (Moves) */
@@ -167,6 +167,7 @@ void dr_gesture(int g, int amt);               /* gesture key g's amount now, 0.
 float dr_wander(void);                         /* Wander's move of drone II now, semitones (the screen) */
 int dr_heard(int p);                           /* a value as heard: the sound's own plus the macros (tests) */
 float dr_mac_pitch(int g);                     /* drone g's pitch move by the macros now, semitones (tests) */
+float dr_gest_pitch(int g);                    /* ... by the gestures alone (Shift's; the screen) */
 #define DR_LFO_NSHAPES 11                               /* each tap: off and ten shapes */
 #define DR_LFO_RANDOM 8                                 /* the eighth: random (I: steps, II: a glide) */
 #define DR_LFO_AND 9                                    /* the Lyra-8's: two squares, both up (AND) .. */

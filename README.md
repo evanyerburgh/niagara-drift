@@ -15,7 +15,9 @@ note. It's inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the S
 *Your FM-1 with Niagara Drift installed: what each knob, button and key now does. Amber is drone I,
 teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO pages they set the
 LFO's routing, and X-mod lets drone I move drone II's filter, or the drones and their sound bend each other's pitch); white keys 1–8 hold scenes, in
-banks you pick with SEL and the top four; keys 9–12 and the top four are gestures.*
+banks you pick with SEL and the top four; keys 9–12 and the top four are gestures. The page buttons' pages, each tap the next: HOME
+Drones 1, 2 · ENV Life, Tone · EDIT Osc, Sub · Drive · SEQ Partner, Pitch moves · LFO LFO depths, Mods · ARP Swell ·
+FX Delay, Reverb, Types · GLO Setup 1, 2.*
 
 **Status: 0.2.** It runs on the FM-1 (tested on one unit so far) and in the browser:
 [try it](https://evanyerburgh.github.io/niagara-drift/) without an FM-1, the same code with sound.
@@ -177,7 +179,7 @@ parts come in one after another, and go in their own order when you let go. Scen
 
 ### The controls
 
-**On the drone pages, KNOB 1–2 are drone I and KNOB 3–4 drone II** (Play, Tone 1, Osc, Sub · Drive, Partner, LFO
+**On the drone pages, KNOB 1–2 are drone I and KNOB 3–4 drone II** (Play, Tone, Osc, Sub · Drive, Partner, LFO
 depths: their names underlined amber and teal). The other pages hold settings for the whole sound, a knob each.
 The page buttons change what they do; the screen shows each page's settings as a picture, and the value of the
 knob you're turning.
@@ -215,19 +217,15 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **MASTER**: past about four-fifths of its turn it drives into overdrive, at about the same loudness: thicker,
   but the breathing flattens (the swells and dips get much smaller).
 
-#### Tone · ENV
+#### Life and Tone · ENV
 
-<img src="docs/img/page-tone.png" width="488" alt="The Tone 1 and Life pages: each drone's noise through its filter, and its colour; the character, the feedback, Age and Drift">
+<img src="docs/img/page-tone.png" width="488" alt="The Life and Tone pages: the character, the feedback, Age and Drift; each drone's noise through its filter, and its colour">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Tone 1 | I noise | I colour | II noise | II colour |
 | Life | character | feedback | age | drift |
+| Tone | I noise | I colour | II noise | II colour |
 
-- **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
-  It's heard all along the knob, and at the top it's about as loud as them (100 is level with a saw, 50 about −7 dB, 25 −12; a sine is quieter). It
-  goes through the drone's filter with them, so the cutoff, resonance, LFO and Drift shape it.
-- **Colour** blends from white (left) to pink (right).
 - **Character** takes the oscillators from clean to vintage: softer edges, a bent saw, a little pitch
   jitter, the two drones slightly apart, a whisper of noise.
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
@@ -240,6 +238,10 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **Drift** keeps the drones from ever being quite still: besides a little pitch wander, each drone's
   cutoff, timbre (X-Wave), level and partner detune slowly wander on their own, around where you've set
   them, never repeating. Gentle by default; 0 holds everything exactly where you put it.
+- **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
+  It's heard all along the knob, and at the top it's about as loud as them (100 is level with a saw, 50 about −7 dB, 25 −12; a sine is quieter). It
+  goes through the drone's filter with them, so the cutoff, resonance, LFO and Drift shape it.
+- **Colour** blends from white (left) to pink (right).
 
 #### Osc · EDIT
 
@@ -401,7 +403,7 @@ and slowly, so Movement is heard at once; set an osc depth to hear it move the p
 | | the LFO's rate, its shapes, and where the waves go (the black keys on the LFO pages) |
  Turning a
 depth that can't be heard says why on the screen (Movement at 0%, or its wave off).
-**PRESETS** is **Gesture time**: how fast every gesture moves (see below).
+**PRESETS** is **Gesture time**: how fast every gesture moves (see [The gestures](#the-gestures)).
 
 ### Black keys: switches
 

@@ -38,15 +38,16 @@
  *   FX             Delay: drive (after the delay, v0.3), time, repeats, mix; again: Reverb: length (to Inf),
  *                  damp, mix; again: Types: the delay's, the reverb's
  *                  (the delay LFO's tap: the LFO page's key in drone II's filter group)
- *   ENV            Tone 1: each drone's noise and colour; again: Tone 2: character, feedback
+ *   ENV            Life: character, feedback, Age, Drift (first: review 5, 2026-10-28); again: Tone: each
+ *                  drone's noise and colour
  * Saving: SAVE, and by itself a few seconds after a change while stopped (a flash write stops the audio
  * for a moment). MIDI in: notes on channel 1 tune drone I, on channel 2 drone II. */
 
 /* ------------------------------------------------------------- pages --- */
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
-enum { V_PLAY, V_PLAY2, V_TONE, V_TONE2, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_MOVES, V_SETUP, V_SETUP2,
+enum { V_PLAY, V_PLAY2, V_LIFE, V_TONE, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_MOVES, V_SETUP, V_SETUP2,
        V_PULSE, V_FX, V_FX2, V_FX3, NVIEWS };
-static const char *const VIEW_NAME[NVIEWS] = {"Drones 1", "Drones 2", "Tone 1", "Life", "Osc", "Sub · Drive", "LFO depths",
+static const char *const VIEW_NAME[NVIEWS] = {"Drones 1", "Drones 2", "Life", "Tone", "Osc", "Sub · Drive", "LFO depths",
                                               "Mods", "Partner", "Pitch moves", "Setup 1", "Setup 2", "Swell", "Delay", "Reverb",
                                               "Types"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
@@ -59,8 +60,8 @@ typedef struct {
 static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{0, GP_PITCH}, {0, GP_CUTOFF}, {1, GP_PITCH}, {1, GP_CUTOFF}},
     {{0, GP_LEVEL}, {0, GP_RESO}, {1, GP_LEVEL}, {1, GP_RESO}},
-    {{0, GP_NOISE}, {0, GP_NCOLOR}, {1, GP_NOISE}, {1, GP_NCOLOR}},
     {{G, P_CHAR}, {G, P_FEEDBACK}, {G, P_AGE}, {G, P_DRIFT}},
+    {{0, GP_NOISE}, {0, GP_NCOLOR}, {1, GP_NOISE}, {1, GP_NCOLOR}},
     {{0, GP_WAVE}, {0, GP_WIDTH}, {1, GP_WAVE}, {1, GP_WIDTH}},
     {{0, GP_MIX}, {0, GP_DRIVE}, {1, GP_MIX}, {1, GP_DRIVE}},
     {{0, GP_OLFO_DEPTH}, {0, GP_FLFO_DEPTH}, {1, GP_OLFO_DEPTH}, {1, GP_FLFO_DEPTH}},
@@ -79,7 +80,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
 /* the page buttons: each shows its first page, pressed again the next */
 static const struct {
     uint8_t btn, first, n;
-} PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_TONE, 2}, {B_EDIT, V_OSC, 2}, {B_LFO, V_LFO, 2},
+} PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_LIFE, 2}, {B_EDIT, V_OSC, 2}, {B_LFO, V_LFO, 2},
                 {B_SEQ, V_PARTNER, 2}, {B_GLO, V_SETUP, 2}, {B_FX, V_FX, 3},
                 {B_ARP, V_PULSE, 1}};                                    /* ARP: on its page, a tap toggles */
 #define NPAGE_BTN (sizeof PAGE_BTN / sizeof PAGE_BTN[0])
@@ -585,7 +586,7 @@ static int page_btn(int b)                             /* the index in PAGE_BTN,
     return -1;
 }
 
-/* a page button pressed: the page of its last shown at once (the review: Reverb, Tone 2, Moves couldn't be peeked;
+/* a page button pressed: the page of its last shown at once (the review: Reverb, Life, Moves couldn't be peeked;
  * HOME always Drones 1, home), unless already on its pages (then the next on a tap) */
 static void page_down(int b)
 {
@@ -1786,7 +1787,7 @@ static uint16_t page_col(void)
 {
     switch (ui.view) {
     case V_LFO: case V_LFO2: return K_LFO;
-    case V_FX: case V_FX2: case V_FX3: case V_TONE2: return K_FX;
+    case V_FX: case V_FX2: case V_FX3: case V_LIFE: return K_FX;
     case V_PULSE: return K_PULSE;
     case V_SETUP: case V_SETUP2: return K_SETUP;
     default: return K_DIM;
@@ -2031,7 +2032,7 @@ static void pic_play2(int g, int32_t x0, int32_t y0)
 
 
 
-/* Tone 2: each drone's noise as it leaves the filter: its colour's slope (0 dB/oct white, -3 pink, level
+/* Tone: each drone's noise as it leaves the filter: its colour's slope (0 dB/oct white, -3 pink, level
  * at 100 Hz) through the filter's curve (dim behind it, moving with the LFO as Drones 2's), as low as its level
  * is; its colour's name, and its level against the oscillators */
 static void pic_tone(int g, int32_t x0, int32_t y0)
@@ -2496,9 +2497,9 @@ static void pic_fx2(int32_t y0)
     cv_text(12, y0 + 114, &FONT_XS, "5 s", K_DIM);
 }
 
-/* Tone 2: the oscillators' character, a saw from clean to vintage (left, KNOB 1); the feedback loop's level, live
+/* Life: the oscillators' character, a saw from clean to vintage (left, KNOB 1); the feedback loop's level, live
  * (right, KNOB 2); under them AGE (KNOB 3): how worn the sound is, a bar (it wears in slowly), and DRIFT (KNOB 4) */
-static void pic_tone2(int32_t y0)
+static void pic_life(int32_t y0)
 {
     int fb = proj.par[P_FEEDBACK], ch = proj.par[P_CHAR], i;
     {   /* CHARACTER: three cycles of a saw as the oscillators now make it (bent, rounded) */
@@ -2659,15 +2660,15 @@ static void keymap_values(void)                /* the values' place: the key tou
         for (; *name && q < t + sizeof t - 1; name++)
             *q++ = (char)(*name >= 'a' && *name <= 'z' ? *name - 32 : *name);
         *q = 0;
-        cv_round(6, 2, WIDE_W, 66, 6, K_CARD);
-        cv_frame(6, 2, WIDE_W, 66, c);
+        cv_round(6, 2, WIDE_W, 60, 6, K_CARD);
+        cv_frame(6, 2, WIDE_W, 60, c);
         text_c(120, 7, &FONT_XS, t, c);
         for (i = 0; st[i] && i < (int)sizeof v - 1; i++)           /* the setting in capitals: all of it large */
             v[i] = (char)(st[i] >= 'a' && st[i] <= 'z' ? st[i] - 32 : st[i]);
         v[i] = 0;
         big_value(120, 26, v, K_TEXT);
     }
-    cv_text(10, 72, &FONT_XS, "with SEL:  D5-G5 bank   OCT wave back", K_DIM);
+    cv_text(10, 66, &FONT_XS, "with SEL:  D5-G5 bank   OCT wave back", K_DIM);   /* clear of the edge */
 }
 
 /* Setup 1: the three times, a row each: FADE (KNOB 1, PLAY's fade in and out), SWITCH TIME (KNOB 2, a black key's or
@@ -2749,7 +2750,7 @@ static void draw_pic(void)
         keymap_pic();
     } else if (ui.view == V_PULSE || ui.view == V_LFO || ui.view == V_LFO2 || ui.view == V_FX || ui.view == V_FX2 ||
         ui.view == V_FX3 ||
-        ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_TONE2 ||
+        ui.view == V_SETUP || ui.view == V_SETUP2 || ui.view == V_LIFE ||
         ui.view == V_MOVES) {
         cv_round(6, 4, WIDE_W, PAN_H, 4, K_PANEL);
         switch (ui.view) {
@@ -2759,7 +2760,7 @@ static void draw_pic(void)
         case V_FX: pic_fx(4); break;
         case V_FX2: pic_fx2(4); break;
         case V_FX3: pic_types(4); break;
-        case V_TONE2: pic_tone2(4); break;
+        case V_LIFE: pic_life(4); break;
         case V_SETUP2: pic_setup2(4); break;
         case V_MOVES: pic_moves(4); break;
         default: pic_setup(4); break;
@@ -2829,6 +2830,12 @@ static void big_value(int32_t cx, int32_t y, const char *s, uint16_t c)
 static void draw_values(void)
 {
     uint32_t h = hash(2166136261u, ui.view | (uint32_t)proj.par[P_PLINK] << 8), i;
+    int sh[G];                                 /* Shift's move of each drone now, cents: the pitch as heard */
+    for (i = 0; i < G; i++) {
+        float c = dr_gest_pitch((int)i) * 100.0f;
+        sh[i] = (int)(c + (c >= 0.0f ? 0.5f : -0.5f));
+        h = hash(h, (uint32_t)sh[i]);
+    }
     for (i = 0; i < 4; i++) {
         int p = knob_param((int)i);
         h = hash(h, (p < 0 ? 0xFFFFu : (uint32_t)(uint16_t)proj.par[p]) | (uint32_t)lit((int)i) << 16 |
@@ -2886,6 +2893,10 @@ static void draw_values(void)
         lo = dr_param_info(p)->lo;
         hi = dr_param_info(p)->hi;
         v = proj.par[p];
+        if (is_pitch && (p == P_PLINK_OFF ? sh[1] != sh[0] : sh[k.g] != 0)) {
+            v += p == P_PLINK_OFF ? sh[1] - sh[0] : sh[k.g];   /* Shift moving it: the pitch as heard, lit (the */
+            on = 2;                            /* screen shows what moves; review 5, 2026-10-28) */
+        }
         if (on) {
             cv_round(x - 2, 3, w + 4, 79, 6, K_CARD);
             cv_frame(x - 2, 3, w + 4, 79, accent);
@@ -2918,7 +2929,9 @@ static void draw_values(void)
             text_fit(cx, f == &FONT_M ? 27 : f == &FONT_XS ? 34 : 30, w + 2, f, t, on ? K_TEXT : K_TEXT2);
         }
         if (is_pitch) {                        /* a pitch: no bar; while it moves, how to fine-tune */
-            if (on)
+            if (on == 2)
+                text_c(cx, 56, &FONT_XS, "SHIFT", K_LFO);
+            else if (on)
                 text_c(cx, 56, &FONT_XS, ui.btn >> B_SEL & 1u ? "FINE" : "SEL: fine", K_LFO);
             else if (locked)
                 text_c(cx, 56, &FONT_XS, "locked", K_DIM);

@@ -10,8 +10,7 @@ tap LFO
 spin K2 -25
 expect par17 0
 tap ENV
-tap ENV
-expect view 3
+expect view 2
 spin K4 -30
 expect par52 0
 tap HOME

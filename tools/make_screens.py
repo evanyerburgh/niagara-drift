@@ -9,7 +9,7 @@ import os, subprocess, sys, tempfile
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BUTTONS = [("play", ["play", "play2"]), ("tone", ["tone", "tone2"]), ("osc", ["osc", "source"]), ("seq", ["partner", "partner2"]),
+BUTTONS = [("play", ["play", "play2"]), ("tone", ["life", "tone"]), ("osc", ["osc", "source"]), ("seq", ["partner", "partner2"]),
            ("lfo", ["lfo", "lfo2"]), ("swell", ["pulse"]), ("effects", ["fx", "fx2", "types"]), ("setup", ["setup", "setup2"]), ("keys", ["keymap"])]
 SCALE, GAP = 2, 16
 BG = (26, 4, 24)
@@ -47,7 +47,7 @@ LEGEND, MUTED_KEY = (166, 166, 173), (85, 85, 91)
 KNOBS = [(105, 100, 24, "MASTER", "Volume", PALE), (215, 100, 24, "SELECT", "LFO rate", LILAC),
          (105, 210, 24, "PRESETS", "Gesture time", PALE), (215, 210, 24, "ALGORITHM", "Movement", LILAC)] + \
         [(610 + i * 104, 100, 22, "KNOB%d" % (i + 1), None, None) for i in range(4)]
-ROW1 = [("FX", "Delay"), ("SEL", "Fine"), ("ENV", "Tone"), ("LFO", "Depths"), ("EDIT", "Osc"), ("GLO", "Setup")]
+ROW1 = [("FX", "Delay"), ("SEL", "Fine"), ("ENV", "Life"), ("LFO", "Depths"), ("EDIT", "Osc"), ("GLO", "Setup")]
 ROW2 = [("HOME", "Drones"), ("SAVE", "Store"), ("ARP", "Swell"), ("SEQ", "Partner"), ("PLAY", "On/off"), ("REC", "Loop")]
 BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14]
 BLACK = [(["Partner"], AMBER), (["Sub"], AMBER), (["Filter"], AMBER), (["Pitch", "lock"], None), (["LFO", "reset"], None),
