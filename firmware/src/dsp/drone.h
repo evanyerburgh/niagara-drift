@@ -167,6 +167,7 @@ void dr_gesture(int g, int amt);               /* gesture key g's amount now, 0.
 float dr_wander(void);                         /* Wander's move of drone II now, semitones (the screen) */
 int dr_heard(int p);                           /* a value as heard: the sound's own plus the macros (tests) */
 float dr_mac_pitch(int g);                     /* drone g's pitch move by the macros now, semitones (tests) */
+float dr_gest_pitch(int g);                    /* ... by the gestures alone (Shift's; the screen) */
 #define DR_LFO_NSHAPES 11                               /* each tap: off and ten shapes */
 #define DR_LFO_RANDOM 8                                 /* the eighth: random (I: steps, II: a glide) */
 #define DR_LFO_AND 9                                    /* the Lyra-8's: two squares, both up (AND) .. */

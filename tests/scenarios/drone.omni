@@ -15,7 +15,7 @@ expect par74 0
 # 44 hard sync, 45 pitch link, 46 link offset, 47 LFO rate, 48 Wave I, 49 Wave II, 50 Glide, 51 Fade, 55 Pulse,
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
 # depth.
-# Pages: 0 Drones 1 1 Drones 2 2 Tone 1 3 Life 4 Osc 5 Sub · Drive 6 LFO depths 7 Mods 8 Partner 9 Pitch moves
+# Pages: 0 Drones 1 1 Drones 2 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO depths 7 Mods 8 Partner 9 Pitch moves
 # 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb 15 Types.
 # a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
 expect bank 3
@@ -125,11 +125,13 @@ spin ALGO 5
 expect par75 55
 spin ALGO -5
 expect par75 50
-# hold ENV to peek: the knobs are the Tone page's (noise, colour) while it's held, then back to Play
+# hold ENV to peek: the knobs are the Life page's (Character first) while it's held, then back to Play
 press ENV
 expect view 2
 spin K1 20
-expect par19 20
+expect par77 20
+spin K1 -20
+expect par77 0
 release ENV
 expect view 0
 # a long hold without turning is a peek too
@@ -137,12 +139,21 @@ press EDIT
 wait 600
 release EDIT
 expect view 0
-# tap ENV: Tone, one page: KNOB 1-2 drone I's Noise and Colour (0 white .. 100 pink, pink to start), 3-4 drone II's
+# tap ENV: Life (first since review 5, 2026-10-28): Character, Feedback, Age, Drift
 tap ENV
 expect view 2
+spin K1 10
+expect par77 10
+spin K1 -10
+expect par77 0
+spin K4 -10
+expect par97 50
+# ENV again: Tone: KNOB 1-2 drone I's Noise and Colour (0 white .. 100 pink, pink to start), 3-4 drone II's
+tap ENV
+expect view 3
 expect par20 100
 spin K1 5
-expect par19 25
+expect par19 5
 spin K2 -40
 expect par20 60
 spin K2 50
@@ -151,19 +162,10 @@ spin K4 -100
 expect par41 0
 spin K3 100
 expect par40 100
-spin K1 -25
+spin K1 -5
 spin K3 -100
 expect par19 0
 expect par40 0
-# ENV again: Life: Character, Feedback (KNOB 3-4 nothing)
-tap ENV
-expect view 3
-spin K1 10
-expect par77 10
-spin K1 -10
-expect par77 0
-spin K4 -10
-expect par97 50
 tap ENV
 expect view 2
 # EDIT: Osc (X-Wave, PW); again: Sub · Drive (osc mix, drive); again: Osc

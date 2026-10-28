@@ -562,6 +562,7 @@ static int chord_vi;
 static const float CHORD_T[DR_NWSCALE][2] = {
     {3.15641f, 10.17596f}, {3.86314f, 8.84359f}, {7.01955f, 12.0f}, {4.0f, 8.0f}, {3.15641f, 8.84359f}, {3.86314f, 9.68826f}};
 static float mac_p[DR_NGROUPS];                   /* each drone's pitch move, semitones: Shift's, Wander's, Age's */
+static float mac_gp[DR_NGROUPS];                  /* ... the gestures' share (Shift's): the pitch card shows it */
 /* FEEDBACK: the finished sound (mono, after the effects), kept for a fixed 256 samples (5.8 ms) and fed
  * back into the drones' filters: a loop of the same length whatever the block size */
 #define FB_N 512u
@@ -635,7 +636,7 @@ void dr_init(void)
     int i, g;
     for (i = 0; i < DR_NGEST; i++)
         gam[i] = 0.0f;
-    mac_p[0] = mac_p[1] = 0.0f;
+    mac_p[0] = mac_p[1] = mac_gp[0] = mac_gp[1] = 0.0f;
     macro_reset();
     for (i = 0; i < DR_NPARAMS; i++) {
         par[i] = base[i] = PARAMS[i].def;
@@ -1002,6 +1003,8 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
             }
         }
     }
+    mac_gp[0] = pm[0];                           /* the gestures' pitch move (before Age's and Wander's) */
+    mac_gp[1] = pm[1];
     for (i = 0; i < DR_NGROUPS; i++) {           /* the LFO depths toward 0, as far as calmed */
         off[DR_GP(i, GP_OLFO_DEPTH)] -= ((float)base[DR_GP(i, GP_OLFO_DEPTH)] + off[DR_GP(i, GP_OLFO_DEPTH)]) * co[i];
         off[DR_GP(i, GP_FLFO_DEPTH)] -= ((float)base[DR_GP(i, GP_FLFO_DEPTH)] + off[DR_GP(i, GP_FLFO_DEPTH)]) * cf[i];
@@ -1054,6 +1057,7 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
 float dr_wander(void) { return wand_st; }
 int dr_heard(int p) { return p >= 0 && p < DR_NPARAMS ? par[p] : 0; }
 float dr_mac_pitch(int g) { return g >= 0 && g < DR_NGROUPS ? mac_p[g] : 0.0f; }
+float dr_gest_pitch(int g) { return g >= 0 && g < DR_NGROUPS ? mac_gp[g] : 0.0f; }
 
 static void drain(void)
 {
