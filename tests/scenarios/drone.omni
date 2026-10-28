@@ -681,6 +681,21 @@ expect par94 0
 spin K4 1
 expect par94 1
 release SEL
+# on these two pages SEL's key map waits 1.5 s, not 0.4 (a quick SEL + KNOB 4 never meets it), and once KNOB 4's
+# SEL job has turned it stays away until SEL is let go (Evan, 2026-10-28)
+press SEL
+wait 600
+expect keymap 0
+wait 1000
+expect keymap 1
+release SEL
+press SEL
+spin K4 1
+wait 3000
+expect keymap 0
+spin K4 -1
+release SEL
+expect par94 1
 tap FX
 expect view 14
 expect par64 1
