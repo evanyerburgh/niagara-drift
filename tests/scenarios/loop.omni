@@ -80,3 +80,80 @@ tap PLAY
 release SEL
 wait 2500
 expect level1 >3
+# GESTURES IN THE LOOP (Evan, 2026-10-28: a loop of gestures said "nothing moved"): Weight (D5) held 2 s and let go,
+# recorded as it went; looped, it rises and falls again each pass, from where the recording began (none)
+expect gam0 0
+tap REC
+expect loop 1
+wait 200
+key w12 down
+wait 2000
+expect gam0 >30
+key w12 up
+wait 300
+tap REC
+expect loop 2
+wait 1900
+expect gsent0 >30
+wait 1000
+expect gsent0 <15
+# stopped: the gesture stays where the loop had it, then goes its own way (out)
+wait 1500
+tap REC
+expect loop 0
+expect gam0 >20
+wait 8000
+expect gam0 0
+# A SCENE TAPPED IN THE LOOP: a scene with the cutoff up (bank A, key 1), the sound back down; recorded, the tap;
+# looped, each pass starts on the sound the recording began on and goes to the scene again
+press SEL
+tapkey w12
+release SEL
+expect bank 0
+set 71 0
+spin K2 20
+expect par7 900
+press SAVE
+tapkey w0
+release SAVE
+spin K2 -20
+expect par7 700
+wait 200
+tap REC
+wait 200
+tapkey w0
+wait 800
+expect par7 900
+tap REC
+expect loop 2
+wait 100
+expect par7 700
+wait 500
+expect par7 900
+wait 650
+expect par7 700
+tap REC
+expect loop 0
+# A SCENE BLENDED BY PRESSURE IN THE LOOP: key 1 pressed half way for 1.5 s and let go (the blend stays, part way);
+# looped, each pass starts back on the sound the recording began on and blends part way again
+wait 300
+expect par7 700
+tap REC
+wait 200
+pressure w0 70
+key w0 down
+wait 1500
+key w0 up
+pressure w0 0
+wait 300
+expect par7 >750
+expect par7 <880
+tap REC
+expect loop 2
+wait 100
+expect par7 700
+wait 1700
+expect par7 >750
+expect par7 <880
+tap REC
+expect loop 0

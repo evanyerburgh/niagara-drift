@@ -172,6 +172,8 @@ static struct {
     uint32_t loop_t0, loop_len;        /* recording: its start; playing: this pass's start, the length */
     uint16_t loop_n, loop_i;           /* events recorded, the next to play */
     int16_t loop_from[DR_NPARAMS];     /* every value when the recording began */
+    float loop_g0[DR_NGEST];           /* each gesture's level then */
+    uint8_t loop_scenes;               /* the loop moves scenes: each pass starts from the whole sound it began on */
     uint32_t morph_t0, morph_ms;
     int16_t morph_from[DR_NPARAMS];
     int16_t morph_to[DR_NPARAMS];      /* the scene being morphed to, as it was when its key was pressed */
@@ -668,7 +670,24 @@ typedef struct {
     int16_t v;
 } loop_ev_t;
 static loop_ev_t loop_ev[LOOP_MAX] OM_POOL;
-static uint64_t loop_used[(DR_NPARAMS + 63) / 64];     /* the parameters the loop moves */
+/* Beyond the parameters, the loop records what the hands do that isn't a value (Evan, 2026-10-28: a loop of gestures
+ * was "nothing moved"): each gesture's level as it went (LP_GEST + g, 0..1000; its latch is a value, P_GL_*), a scene
+ * tapped (LP_SCENE: bank << 4 | key), a scene blended by pressure (LP_BLEND: its key; then LP_BLEND_X, how far in,
+ * 0..1000) */
+enum { LP_GEST = DR_NPARAMS, LP_SCENE = LP_GEST + DR_NGEST, LP_BLEND, LP_BLEND_X, LP_N };
+_Static_assert(LP_N <= 256, "the events' parameter is a byte");
+static uint64_t loop_used[(LP_N + 63) / 64];           /* the parameters the loop moves */
+/* playing: a gesture's level and the blend's depth glide between events, as a knob's slide */
+typedef struct {
+    float from, to;
+    uint32_t t0, ms;
+} loop_glide_t;
+static loop_glide_t loop_gl[DR_NGEST + 1];             /* the gestures, then the blend */
+static int16_t loop_bl_from[DR_NPARAMS], loop_bl_to[DR_NPARAMS];   /* playing a blend: the sound it began on, the scene */
+static uint8_t loop_bl_on;
+static void scene_play(int bank, int n);               /* (scenes, below) */
+static void sound_blend(const int16_t *from, const int16_t *to, float x);
+static int scene_room(int p);
 
 /* a knob moved a value: noted while recording. Detents of the same knob within LOOP_JOIN of an event (a quick
  * turn: a detent every ~15 ms) join it, its slide reaching on to this one, so the 4096 events last (a busy
@@ -681,7 +700,9 @@ static void loop_note(int p, int v, uint32_t slide)
     int i;
     if (ui.loop != L_REC || ui.loop_n >= LOOP_MAX)
         return;
-    for (i = ui.loop_n - 1; i >= 0 && i >= ui.loop_n - 8; i--) {
+    if (p == LP_SCENE || p == LP_BLEND)
+        ui.loop_scenes = 1;
+    for (i = p == LP_SCENE || p == LP_BLEND ? -1 : ui.loop_n - 1; i >= 0 && i >= ui.loop_n - 8; i--) {
         e = &loop_ev[i];
         if (t - e->t >= LOOP_JOIN)
             break;
@@ -702,8 +723,46 @@ static void loop_note(int p, int v, uint32_t slide)
 
 static int loop_moves(int p) { return (int)(loop_used[p / 64] >> (p % 64) & 1u); }
 
+static float loop_glide_now(const loop_glide_t *g)
+{
+    uint32_t dt = plat_ms() - g->t0;
+    return dt >= g->ms ? g->to : g->from + (g->to - g->from) * (float)dt / (float)g->ms;
+}
+static float loop_gest(int g) { return ui.loop == L_PLAY && loop_moves(LP_GEST + g) ? loop_glide_now(&loop_gl[g]) : 0.0f; }
+static void loop_glide(loop_glide_t *g, float to, uint32_t ms)
+{
+    g->from = loop_glide_now(g);
+    g->to = to;
+    g->t0 = plat_ms();
+    g->ms = ms;
+}
+
 static void loop_apply(int p, int v, uint32_t slide)
 {
+    if (p >= LP_GEST && p < LP_SCENE) {
+        loop_glide(&loop_gl[p - LP_GEST], (float)v * 0.001f, slide);
+        return;
+    }
+    if (p == LP_SCENE) {
+        loop_bl_on = 0;
+        scene_play(v >> 4, v & 15);
+        return;
+    }
+    if (p == LP_BLEND) {                                /* a blend begins: from the sound as it is now */
+        const int16_t *sc = scene_get(v >> 4, v & 15);
+        if (!sc)
+            return;
+        memcpy(loop_bl_from, proj.par, sizeof loop_bl_from);
+        memcpy(loop_bl_to, sc, sizeof loop_bl_to);
+        ui.morph = -1;
+        loop_gl[DR_NGEST].to = loop_gl[DR_NGEST].from = 0.0f;
+        loop_bl_on = 1;
+        return;
+    }
+    if (p == LP_BLEND_X) {
+        loop_glide(&loop_gl[DR_NGEST], (float)v * 0.001f, slide);
+        return;
+    }
     if (p == DR_GP(0, GP_PITCH) || p == DR_GP(1, GP_PITCH))
         dr_slide(p / GP_N, (int)slide);
     else if (p == P_PLINK_OFF)
@@ -717,9 +776,22 @@ static void loop_rewind(void)                  /* the start of a pass: what the 
 {                                              /* began, gliding over the Switch time (no seam) */
     int p;
     uint32_t back = (uint32_t)morph_ms();
-    for (p = 0; p < DR_NPARAMS; p++)
-        if (loop_moves(p))
-            loop_apply(p, ui.loop_from[p], back < 15u ? 15u : back);
+    if (back < 15u)
+        back = 15u;
+    if (ui.loop_scenes) {                              /* scenes in it: the whole sound back, as it began */
+        loop_bl_on = 0;
+        ui.morph = -1;
+        for (p = 0; p < DR_NPARAMS; p++)
+            if (!scene_room(p) && proj.par[p] != ui.loop_from[p])
+                loop_apply(p, ui.loop_from[p], back);
+    } else {
+        for (p = 0; p < DR_NPARAMS; p++)
+            if (loop_moves(p))
+                loop_apply(p, ui.loop_from[p], back);
+    }
+    for (p = 0; p < DR_NGEST; p++)
+        if (loop_moves(LP_GEST + p))
+            loop_glide(&loop_gl[p], ui.loop_g0[p], back);
     ui.loop_i = 0;
 }
 
@@ -731,8 +803,11 @@ static void loop_button(void)                  /* REC: record, loop, stop */
     case L_IDLE:
         for (p = 0; p < DR_NPARAMS; p++)
             ui.loop_from[p] = proj.par[p];
+        for (p = 0; p < DR_NGEST; p++)
+            ui.loop_g0[p] = ui.g_amt[p];
         for (p = 0; p < (int)(sizeof loop_used / sizeof loop_used[0]); p++)
             loop_used[p] = 0;
+        ui.loop_scenes = 0;
         ui.loop_n = 0;
         ui.loop_t0 = now;
         ui.loop = L_REC;
@@ -751,7 +826,10 @@ static void loop_button(void)                  /* REC: record, loop, stop */
         say("MOTION LOOP", "PLAYING");
         break;
     default:
-        ui.loop = L_IDLE;                      /* stopped: everything stays where it is */
+        for (p = 0; p < DR_NGEST; p++)         /* stopped: everything stays where it is, the gestures too (each */
+            ui.g_amt[p] = fm_maxf(ui.g_amt[p], loop_gest(p));   /* then goes its own way, from there) */
+        loop_bl_on = 0;
+        ui.loop = L_IDLE;
         say("MOTION LOOP", "STOPPED");
         break;
     }
@@ -776,6 +854,8 @@ static void loop_run(void)                     /* every millisecond: recording's
         const loop_ev_t *e = &loop_ev[ui.loop_i++];
         loop_apply(e->p, e->v, (uint32_t)e->slide * 2u);
     }
+    if (loop_bl_on && ui.press < 0)                     /* a blend playing (a hand on a scene key takes over) */
+        sound_blend(loop_bl_from, loop_bl_to, loop_glide_now(&loop_gl[DR_NGEST]));
 }
 
 /* ------------------------------------------------------------- scenes --- */
@@ -928,6 +1008,26 @@ static void scene_recall(int n, int keep)              /* a white key: morph the
     ui.morph_t0 = plat_ms();
     ui.morph_ms = (uint32_t)(scene_s() * 1000.0f);
     say(t, proj.bank == BANK_PRESETS ? preset_name(n) : 0);   /* "SCENE P3" / "EERIE" */
+    loop_note(LP_SCENE, proj.bank << 4 | n, 0);
+}
+
+/* the motion loop playing a scene it recorded: there over the Scene time, as the tap did (no banner, no undo; the
+ * bank it was in then) */
+static void scene_play(int bank, int n)
+{
+    const int16_t *sc = scene_get(bank, n);
+    int k;
+    if (!sc)
+        return;
+    for (k = 0; k < DR_NPARAMS; k++) {
+        ui.morph_from[k] = proj.par[k];
+        ui.morph_to[k] = sc[k];
+    }
+    hands_clear();
+    ui.morph = (int8_t)n;
+    ui.scene_at = -1;
+    ui.morph_t0 = plat_ms();
+    ui.morph_ms = (uint32_t)(scene_s() * 1000.0f);
 }
 
 /* a visit let go: morph back to the sound before it, over the Scene time */
@@ -1027,6 +1127,7 @@ static void press_start(int n, const int16_t *sc)
     ui.press_t0 = plat_ms();
     ui.press_hi_t = 0;
     ui.press_x = x0;
+    loop_note(LP_BLEND, proj.bank << 4 | n, 0);
 }
 
 /* a key's pressure at the player's sensitivity (Setup 2, KNOB 3): a curve, light .. firm, 50 as tuned; a full press
@@ -1070,6 +1171,7 @@ static void press_run(void)                            /* each frame, while a sc
         ui.press_x += fm_clampf(x - ui.press_x, -step, step);
     }
     sound_blend(ui.visit_back, ui.press_to, ui.press_x);
+    loop_note(LP_BLEND_X, (int)(ui.press_x * 1000.0f + 0.5f), 20);
     ui.px_h[ui.ph_i & 15u] = ui.press_x;               /* (the let-go keeps the most of the last moments) */
     ui.pt_h[ui.ph_i++ & 15u] = now;
     t[0] = 0;
@@ -1116,6 +1218,7 @@ static void press_end(void)                            /* the key let go */
         ui.morph = (int8_t)n;
         ui.scene_at = (int8_t)n;
         say_c(t, "TAKEN", K_GOLD);
+        loop_note(LP_SCENE, proj.bank << 4 | n, 0);   /* the loop: the rest of the way */
     } else {                                           /* let go: the blend stays, a sound of its own (v0.3;
                                                         * SEL + SAVE undoes it), where it was before the finger
                                                         * lifted (its pressure falls on the way up) */
@@ -1351,6 +1454,7 @@ static void gesture_down(int g)
 {
     if (proj.par[gl_par(g)]) {                     /* latched: let go of it, whatever the press */
         param_set(gl_par(g), 0);
+        loop_note(gl_par(g), 0, 0);
         hands_on(gl_par(g));
         ui.g_rel |= (uint8_t)(1u << g);
         say_c(GESTURE[g], "OFF", K_LFO);
@@ -1377,6 +1481,7 @@ static void gesture_up(int g)
     }
     if (held < GEST_TAP_MS) {                          /* a tap: latched, at full */
         param_set(gl_par(g), 100);
+        loop_note(gl_par(g), 100, 0);
         hands_on(gl_par(g));
         say_c(GESTURE[g], "LATCHED", K_LFO);
     } else if (ui.btn >> B_SEL & 1u) {                 /* SEL held: latched where it is */
@@ -1384,6 +1489,7 @@ static void gesture_up(int g)
                                                           * (QA 2026-10-20: Shift's chord swapped, Weight jumped) */
         ui.btn_used |= 1u << B_SEL;
         param_set(gl_par(g), v < 1 ? 1 : v);
+        loop_note(gl_par(g), v < 1 ? 1 : v, 0);
         hands_on(gl_par(g));
         say_c(GESTURE[g], "KEPT", K_LFO);
     }
@@ -1438,6 +1544,9 @@ static void gesture_run(void)                          /* each frame: each gestu
         if (*a <= to)
             ui.g_out_s[g] = 0.0f;                      /* out (or on its way in again): its own time from here */
         q = (int16_t)(*a * 1000.0f + 0.5f);
+        if (q != ui.g_sent[g] && ui.loop == L_REC)
+            loop_note(LP_GEST + g, q, dt);             /* the loop: the level as played */
+        q = (int16_t)(fm_maxf(*a, loop_gest(g)) * 1000.0f + 0.5f);   /* playing: the loop's, or the hand's if more */
         if (q != ui.g_sent[g]) {
             ui.g_sent[g] = q;
             dr_gesture(g, q);
@@ -1494,6 +1603,7 @@ static void input(void)
             if ((ui.g_held >> g & 1u) && !(ui.g_rel >> g & 1u) && plat_ms() - ui.g_t0[g] >= GEST_TAP_MS) {
                 int v = (int)(ui.g_amt[g] * 100.0f + 0.999f);   /* rounded up, as a SEL let-go's */
                 param_set(gl_par(g), v < 1 ? 1 : v);
+                loop_note(gl_par(g), v < 1 ? 1 : v, 0);
                 hands_on(gl_par(g));
                 ui.g_rel |= (uint8_t)(1u << g);        /* its let-go does nothing more */
                 ui.btn_used |= 1u << B_SEL;
