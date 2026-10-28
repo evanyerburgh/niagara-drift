@@ -17,7 +17,7 @@ teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO 
 LFO's routing, and X-mod lets drone I move drone II's filter, or the drones and their sound bend each other's pitch); white keys 1–8 hold scenes, in
 banks you pick with SEL and the top four; keys 9–12 and the top four are gestures. The page buttons' pages, each tap the next: HOME
 Drones 1, 2 · ENV Life, Tone · EDIT Osc, Sub · Drive · SEQ Partner, Pitch moves · LFO LFO depths, Mods · ARP Swell ·
-FX Delay, Reverb, Types · GLO Setup 1, 2.*
+FX Delay, Reverb · GLO Setup 1, 2.*
 
 **Status: 0.2.** It runs on the FM-1 (tested on one unit so far) and in the browser:
 [try it](https://evanyerburgh.github.io/niagara-drift/) without an FM-1, the same code with sound.
@@ -322,15 +322,18 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
   lasts, from 32 bars down to a quarter note, and the picture shows it with the tempo ("8 bars · 120"). A locked LFO
   (black key 5, held) restarts on the Swell's bars, so it follows the clock too.
 
-#### Delay, Reverb and Types · FX
+#### Delay and Reverb · FX
 
-<img src="docs/img/page-effects.png" width="732" alt="The Delay, Reverb and Types pages: the echoes on the left and right with the drive, the reverb's tail, and the two types">
+<img src="docs/img/page-effects.png" width="732" alt="The Delay page with KNOB 4's card in two halves, the same page with SEL held and the delay type turning, and the Reverb page with its tail">
 
-| Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
-|---|---|---|---|---|
-| Delay | drive | time | repeats | delay mix |
-| Reverb | length | damp | | reverb mix |
-| Types | delay type | reverb type | into reverb | |
+| Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 | SEL + KNOB 4 |
+|---|---|---|---|---|---|
+| Delay | drive | time | repeats | delay mix | delay type |
+| Reverb | length | damp | reverb type | reverb mix | into reverb |
+
+- **KNOB 4 has two jobs** on these pages, and its card shows both: the mix above, and below it the choice you make
+  before playing, marked **+ SEL**. Hold SEL and turn KNOB 4 to change that choice; its half of the card lights and
+  the mix dims. Let go of SEL and KNOB 4 is the mix again.
 
 - **Drive** distorts the drones and their echoes together, after the delay and before the reverb, as the Lyra-8's
   distortion does: ghost notes, beating and crackle on the repeats. The first fifth of its turn blends a little in;
@@ -347,7 +350,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
   away into self-oscillation ("runaway" on the screen), held by a soft clip.
 - **Reverb types**: **Room**, **Hall**, **Cathedral** (the largest), **Chorus hall** (a hall that shimmers).
   They differ in size, distance and movement; changing type crossfades, and the knob goes round both ways.
-- **Into reverb** (Types, KNOB 3) is what the reverb hears: **Both** (the drones and their echoes, as the effects
+- **Into reverb** (Reverb, SEL + KNOB 4) is what the reverb hears: **Both** (the drones and their echoes, as the effects
   are chained), **Echoes** (only the echoes wash out; the drones stay dry and up front), or **Drones** (the reverb
   beside the delay: the drones wash, the echoes stay dry and distinct on top). Like every knob of choices, it goes
   round.

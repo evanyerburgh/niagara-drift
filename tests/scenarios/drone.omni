@@ -16,7 +16,7 @@ expect par74 0
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
 # depth.
 # Pages: 0 Drones 1 1 Drones 2 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO depths 7 Mods 8 Partner 9 Pitch moves
-# 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb 15 Types.
+# 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
 # a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
 expect bank 3
 press SEL
@@ -359,8 +359,8 @@ wait 600
 expect par7 750
 spin K2 -10
 expect par7 650
-# FX: Delay: drive, time, repeats, mix; again: Reverb: length, damp, -, mix; again: Types: the delay's, the
-# reverb's (v0.3; the delay LFO depth is on Mods)
+# FX: Delay: drive, time, repeats, mix (SEL + KNOB 4: the delay's type); again: Reverb: length, damp, type, mix (SEL +
+# KNOB 4: what goes into it) (v0.3; the delay LFO depth is on Mods)
 tap FX
 expect view 13
 spin K1 20
@@ -381,23 +381,27 @@ spin K1 10
 expect par95 70
 spin K2 -10
 expect par96 30
-spin K3 10
+spin K3 1
+expect par64 3
+spin K3 -1
 expect par64 2
 spin K4 10
 expect par63 35
 wait 100
 shot fx2.png
-tap FX
-expect view 15
-spin K1 -1
-spin K1 -1
-expect par94 1
-spin K2 -1
+spin K3 -1
 expect par64 1
-wait 100
-shot types.png
+# SEL + KNOB 4 on Delay: the delay's type (its Mix stays)
 tap FX
 expect view 13
+press SEL
+spin K4 -1
+spin K4 -1
+expect par94 1
+expect par62 30
+release SEL
+wait 100
+shot fx-sel.png
 # the delay LFO's tap: on the LFO page, drone II's filter group, second key
 tap LFO
 tapkey b9
@@ -445,7 +449,7 @@ tap HOME
 expect view 0
 tap FX
 tap FX
-expect view 15
+expect view 13
 tap HOME
 # SELECT: the LFO rate; PRESETS: nothing yet (the macro to come), the waves stay
 spin SELECT 10
@@ -662,34 +666,45 @@ expect par6 4
 wait 12000
 expect par6 4
 set 71 30
-# the types go round both ways (Types: FX, third tap): the delay from Wide (1) to Clean, Self, Clean, Wide; the
-# reverb from the hall (1) to the room, the chorus hall, the room, the hall
+# the types go round both ways: the delay's (SEL + KNOB 4 on Delay) from Wide (1) to Clean, Self, Clean, Wide; the
+# reverb's (KNOB 3 on Reverb) from the hall (1) to the room, the chorus hall, the room, the hall
 tap FX
-tap FX
-tap FX
-expect view 15
+expect view 13
+press SEL
 expect par94 1
-spin K1 -1
+spin K4 -1
 expect par94 0
-spin K1 -1
+spin K4 -1
 expect par94 5
-spin K1 1
+spin K4 1
 expect par94 0
-spin K1 1
+spin K4 1
 expect par94 1
+release SEL
+tap FX
+expect view 14
 expect par64 1
-spin K2 -1
-spin K2 -1
-expect par64 3
-spin K2 1
-spin K2 1
-expect par64 1
-# ... and what goes into the reverb (KNOB 3): both, then back round to the drones alone, then both again
-expect par99 0
 spin K3 -1
-expect par99 2
+spin K3 -1
+expect par64 3
 spin K3 1
+spin K3 1
+expect par64 1
+# ... and what goes into the reverb (SEL + KNOB 4 on Reverb): both, then back round to the drones alone, then both
+# again; its Mix stays, and without SEL KNOB 4 is the Mix again
 expect par99 0
+expect par63 40
+press SEL
+spin K4 -1
+expect par99 2
+spin K4 1
+expect par99 0
+release SEL
+expect par63 40
+spin K4 1
+expect par63 41
+expect par99 0
+spin K4 -1
 tap HOME
 # Wander's scale (Pitch moves, KNOB 4) goes round too: before the first (minor pentatonic) comes just intonation
 tap SEQ

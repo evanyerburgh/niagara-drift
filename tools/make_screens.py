@@ -10,7 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BUTTONS = [("play", ["play", "play2"]), ("tone", ["life", "tone"]), ("osc", ["osc", "source"]), ("seq", ["partner", "partner2"]),
-           ("lfo", ["lfo", "lfo2"]), ("swell", ["pulse"]), ("effects", ["fx", "fx2", "types"]), ("setup", ["setup", "setup2"]), ("keys", ["keymap"])]
+           ("lfo", ["lfo", "lfo2"]), ("swell", ["pulse"]), ("effects", ["fx", "fx-sel", "fx2"]), ("setup", ["setup", "setup2"]), ("keys", ["keymap"])]
 SCALE, GAP = 2, 16
 BG = (26, 4, 24)
 

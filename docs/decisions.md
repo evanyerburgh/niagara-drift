@@ -458,3 +458,8 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-28: ENV opens on **Life** (Character, Feedback, Age, Drift), then **Tone** (noise, colour; was "Tone 1"):
   the most played of the two first. While Shift moves a drone's pitch, its pitch card lights and shows the pitch as
   heard, "SHIFT" under it. From review 5 (playability).
+- 2026-10-28 (Evan, from review 5): **FX is two pages, the Types page folded in.** Delay: Drive, Time, Repeats, Mix;
+  Reverb: Length, Damp, Type (the knob that was empty), Mix. KNOB 4 on each has a second job with SEL held, the choice
+  made before playing: the delay's type, and what goes into the reverb. Its card shows both at all times, in two
+  halves: the mix above, "+ SEL Type" / "+ SEL Into" below; the half turning lights, and while SEL turns it only the
+  mix half dims. The delay picture no longer shows "drive" (it has KNOB 1). Parameters unchanged (no PROJ_FORMAT).

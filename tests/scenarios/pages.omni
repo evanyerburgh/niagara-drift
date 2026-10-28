@@ -119,26 +119,29 @@ spin K4 30
 wait 2500
 shot pulse.png
 release ARP
-# Types (FX, third tap): the delay Wide, the reverb the cathedral
+# Delay: Wide (SEL + KNOB 4, its second job), its echoes left and right, a little drive after it
 tap FX
 expect view 13
-tap FX
-expect view 14
-tap FX
-expect view 15
-spin K1 -1
-spin K1 -1
+press SEL
+spin K4 -1
+spin K4 -1
 expect par94 1
-wait 300
-shot types.png
-# Delay: Wide, its echoes left and right, a little drive after it
-tap FX
-expect view 13
+release SEL
+wait 1500
 spin K1 15
 spin K3 20
 spin K4 20
 wait 300
 shot fx.png
+# ... SEL held, KNOB 4 turned: its lower half lit, the delay's type (Wide to Ping-pong and back)
+wait 1500
+press SEL
+spin K4 1
+spin K4 -1
+expect par94 1
+wait 300
+shot fx-sel.png
+release SEL
 # Reverb: the cathedral's tail, a little longer
 tap FX
 expect view 14
