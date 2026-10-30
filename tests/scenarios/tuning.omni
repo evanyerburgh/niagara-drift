@@ -39,8 +39,8 @@ press SEL
 spin K1 -3
 release SEL
 expect par0 5550
-# just intonation (5), from A: off its grid, the first detent down is the grid's next below (5518, A's 15/8 over
-# A2), then 5384 5314 5202 (5/3, 8/5, 3/2)
+# just intonation (5, Ptolemy's from C, A 440 its 5/3): off its grid, the first detent down is the grid's next below
+# (5518, 9/5 over A2), then 5406 5314 5202 (27/16, 8/5, 3/2)
 tap GLO
 spin K4 1
 spin K4 1

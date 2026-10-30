@@ -396,11 +396,11 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
 - **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
   tuned).
 - **Tuning** is the notes the pitch knobs move through: **12-tone** (semitones), **Quarter** tones, **19-**, **31-** or
-  **53-tone** equal temperament, **Just** intonation (pure intervals, from A), **LMY**: La Monte Young's tuning for
+  **53-tone** equal temperament, **Just** intonation (Ptolemy's 5-limit, from C), **LMY**: La Monte Young's tuning for
   The Well-Tuned Piano (built on 3s and 7s, with its septimal intervals), **Harmonics** (the odd harmonics 1–15 of A,
   in each octave: the drones as notes of one harmonic series), the 22 **Shrutis** of Indian music, ,
   **Harrison**: Lou Harrison's tuning for his National Steel guitar (11-limit), or **Partch**: Harry Partch's 43 notes
-  to the octave (11-limit). LMY, Shruti (Sa on C), Harrison and Partch are placed as in Ableton's tuning files, with
+  to the octave (11-limit). Just, LMY, Shruti (Sa on C), Harrison and Partch are placed as in Ableton's tuning files, with
   A at 440 one of their notes (Partch's own, G at 392 Hz, is Tune +4). The picture shows an octave of it, A to A, a tick a note.
   Every grid is built on A, so Tune moves it: at −32 cents A is 432 Hz. The knob goes round both ways. It only decides
   where a turn goes: a sound or scene plays its pitches as they were saved, until you turn the knob (the first click

@@ -355,8 +355,11 @@ static int32_t accel(int role, int32_t s, int range)
  * La Monte Young, the firmware's main inspiration (Evan): his Well-Tuned Piano's tuning (LMY: his 1/1 on E-flat; here
  * as Ableton's file has it, A 440 one of its notes: Evan, 2026-10-30), and the harmonics, as his Dream House chords are */
 static const uint8_t TUN_EDO[DR_TUN_JUST] = {12, 24, 19, 31, 53};
-static const int16_t TUN_JUST[12] = {0, 112, 204, 316, 386, 498, 590, 702, 814, 884, 1018, 1088};   /* 5-limit, from
-                                                        * 1/1: 16/15 9/8 6/5 5/4 4/3 45/32 3/2 8/5 5/3 9/5 15/8 */
+static const int16_t TUN_JUST[12] = {0, 133, 204, 316, 427, 520, 631, 702, 814, 906, 1018, 1129};   /* 5-limit
+                                                        * (Ptolemy's: 16/15 9/8 6/5 5/4 4/3 45/32 3/2 8/5 5/3 9/5 15/8
+                                                        * from C), placed as Ableton's file (12 Quintal, center C):
+                                                        * C at C+16, A 440 its 5/3; from A, 27/25 9/8 6/5 32/25 27/20
+                                                        * 36/25 3/2 8/5 27/16 9/5 48/25 */
 static const int16_t TUN_LMY[12] = {0, 27, 63, 267, 294, 498, 525, 702, 729, 765, 969, 996};   /* The Well-Tuned
                                                         * Piano's, placed as Ableton's tuning file (12 Tertial-Septimal
                                                         * LMY WTP, after Kyle Gann) places it, A 440 one of its notes
