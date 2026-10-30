@@ -158,7 +158,7 @@ parts come in one after another, and go in their own order when you let go. Scen
 | **Shift** | a new chord, a voice at a time: drone I glides to the move you set (anywhere from a fifth down to a fifth up, in cents), drone II follows. Let go: drone I comes back first | E5 |
 | **Clean** | back to a clean sound, your notes kept: the grit leaves first (drive, character, feedback, noise, cross-mod, hard sync), then the movement (Movement, Drift, the Swell), then the effects (the repeats, both mixes, the reverb's length). Let go: the effects come back first, the grit last. It holds the loudness: with the dips of the Swell gone the sound would jump up, so the level eases down to where it was | F5 |
 | **Tick** | the sub sinks from its hum through 20 Hz until it breaks into slow beats, a click or two a second; pressing harder speeds the beats up, louder, into a flutter with a little drive. Ease off and they slow; let go and they climb back up into the hum | G4 |
-| **Chord** | the beating goes, then the partners move one at a time to a chord from Wander's scale, tuned just and beatless, spread open: a different voicing each time you press (minor pentatonic: Dm7; major: D6; Dorian: Dm6; just: La Monte Young's harmonic seventh…) | A4 |
+| **Chord** | the beating goes, then the partners move one at a time to a chord from Wander's scale, tuned just and beatless (on the Tuning's notes, when it isn't 12-tone or Quarter), spread open: a different voicing each time you press (minor pentatonic: Dm7; major: D6; Dorian: Dm6; just: La Monte Young's harmonic seventh…) | A4 |
 | **Snarl** | drone II detunes a little, then Snarl comes in and grows, the drive bites, and Feedback sings at the top. Let go: Feedback and the drive leave first, the snarl after, the detune last | B4 |
 | **Stutter** | the Swell switches on and chops the drone: quick from the first touch, then deeper, then harder, into a gate. Let go: it softens, slows, and lets go | C5 |
 | **Wash** | the delay first, then the reverb opens and grows longer and darker (toward Inf), each only up to where Wash aims (if your own effects are already further up, it leaves them be; the repeats stop short of the delay's howl), the dry sound dips last and, at the top, breathes slowly in and out of the cloud. Let go: the dry comes back first, the tails ring on and go last | G5 |
@@ -289,7 +289,8 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **Pitch glide** is how long a drone takes to reach a new pitch (up to 10 s; off by default): a pitch knob, a scene,
   Wander's notes.
 - **Wander's scale**: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just (the
-  harmonics 1–8 of drone I, pure: the root, the pure major third, fifth and the seventh harmonic).
+  harmonics 1–8 of drone I, pure: the root, the pure major third, fifth and the seventh harmonic). Its notes take the
+  Tuning's (Setup 2): see Tuning.
 
 - The partner oscillator sits an interval above or below each drone; **detune** makes them beat.
 - Each **interval** comes twice: tempered, then **just** ("+5th just"), a pure ratio (a fifth is exactly 3/2) that
@@ -396,15 +397,22 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
 - **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
   tuned).
 - **Tuning** is the notes the pitch knobs move through: **12-tone** (semitones), **Quarter** tones, **19-**, **31-** or
-  **53-tone** equal temperament, **Just** intonation (Ptolemy's 5-limit, from C), **LMY**: La Monte Young's tuning for
-  The Well-Tuned Piano (built on 3s and 7s, with its septimal intervals), **Harmonics** (the odd harmonics 1–15 of A,
-  in each octave: the drones as notes of one harmonic series), the 22 **Shrutis** of Indian music, ,
-  **Harrison**: Lou Harrison's tuning for his National Steel guitar (11-limit), or **Partch**: Harry Partch's 43 notes
-  to the octave (11-limit). Just, LMY, Shruti (Sa on C), Harrison and Partch are placed as in Ableton's tuning files, with
-  A at 440 one of their notes (Partch's own, G at 392 Hz, is Tune +4). The picture shows an octave of it, A to A, a tick a note.
-  Every grid is built on A, so Tune moves it: at −32 cents A is 432 Hz. The knob goes round both ways. It only decides
-  where a turn goes: a sound or scene plays its pitches as they were saved, until you turn the knob (the first click
-  goes to the Tuning's next note).
+  **53-tone** equal temperament, **Just** intonation (Ptolemy's 5-limit), **LMY**: La Monte Young's tuning for The
+  Well-Tuned Piano (built on 3s and 7s, with its septimal intervals), **Harmonics** (the odd harmonics 1–15 of A, in
+  each octave: the drones as notes of one harmonic series), the 22 **Shrutis** of Indian music, **Harrison**: Lou
+  Harrison's tuning for his National Steel guitar (11-limit), or **Partch**: Harry Partch's 43 notes to the octave
+  (11-limit). The knob goes round both ways. The picture shows an octave of it, a tick a note.
+  - **Just and Shruti move with drone I**, as just intonation does (a movable do; drone I is do, or Sa): drone I's
+    knob picks the tonic in semitones, and drone II's knob, Pitch link, Wander and Chord are pure over it, wherever it
+    is.
+  - **The others are built on A**, so Tune moves them (at −32 cents A is 432 Hz). LMY, Harrison and Partch are placed
+    as in Ableton's tuning files, with A at 440 one of their notes (Partch's own, G at 392 Hz, is Tune +4).
+  - **Wander and Chord follow it too.** On 12-tone and Quarter they're as they've always been (Chord pure). On the
+    other 12-note Tunings (Just, LMY, Harrison) Wander's scale plays the same keys, so a minor pentatonic on LMY takes
+    LMY's own intervals; on the rest, each note is the Tuning's nearest to the pure interval (a 31-tone minor third is
+    310 cents). On Harmonics, Wander moves between all the harmonics, whatever the scale.
+  - It only decides where a turn goes: a sound or scene plays its pitches as they were saved, until you turn the knob
+    (the first click goes to the Tuning's next note).
 
 ### The LFO
 

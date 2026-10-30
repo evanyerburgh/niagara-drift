@@ -509,3 +509,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   1/1 at C+16, A its 5/3; the shrutis' Sa on C at C-6, their MaL+ 64/45). The equal tunings stay: A 440 is a note of each,
   so which note is 1/1 makes no difference. Two more Tunings, at the end: **Harrison** (Lou Harrison's National Steel guitar, 11-limit, 12 notes)
   and **Partch** (Harry Partch's 43, 11-limit; his own G 392 Hz is Tune +4), both with A 440 one of their notes.
+- 2026-10-30 (Evan): **Just and Shruti move with drone I** (a movable do: just is pure from its tonic): drone I's knob
+  picks the tonic in semitones; drone II's knob, Pitch link, Wander and Chord are pure over it. Their tables are from
+  their own 1/1 again (Ptolemy's 5-limit; the shrutis from Sa, MaL+ 64/45). The other Tunings stay fixed on A.
+  **Wander's notes and Chord's follow the Tuning**: 12-tone and Quarter as before (Chord pure); the 12-note Tunings
+  (Just, LMY, Harrison) the same keys; the rest the Tuning's note nearest the pure interval (31-tone's minor third
+  310, 53-tone's 317); on Harmonics Wander moves among all the harmonics. The Tuning tables moved into the engine.

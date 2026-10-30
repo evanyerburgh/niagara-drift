@@ -95,6 +95,75 @@ const char *const DR_ROUTE_NAME[DR_NROUTE] = {"Both", "Echoes", "Drones"};
 const char *const DR_SUBW_NAME[DR_NSUBW] = {"Square", "Sine", "Triangle", "Saw"};
 const char *const DR_TUNING_NAME[DR_NTUNING] = {"12-tone", "Quarter", "19-tone", "31-tone", "53-tone", "Just", "LMY",
                                                 "Harmonics", "Shruti", "Harrison", "Partch"};
+/* THE TUNINGS' notes (the pitch knobs', Wander's and Chord's; Evan, 2026-10-30): equal ones by their size; the rest
+ * as tables of cents over the root, in one octave. The fixed ones are built on A, A 440 one of their notes, as
+ * Ableton's tuning files place them; Just and Shruti move with drone I (DR_TUN_MOVES): pure over it, from their 1/1.
+ * La Monte Young, the firmware's main inspiration (Evan): his Well-Tuned Piano's tuning (LMY), and the harmonics, as
+ * his Dream House chords are */
+static const uint8_t TUN_EDO[DR_TUN_JUST] = {12, 24, 19, 31, 53};
+static const int16_t TUN_JUST[12] = {0, 112, 204, 316, 386, 498, 590, 702, 814, 884, 1018, 1088};   /* 5-limit
+                                                  * (Ptolemy's, Ableton's 12 Quintal): from 1/1, 16/15 9/8 6/5 5/4 4/3
+                                                  * 45/32 3/2 8/5 5/3 9/5 15/8 */
+static const int16_t TUN_LMY[12] = {0, 27, 63, 267, 294, 498, 525, 702, 729, 765, 969, 996};   /* The Well-Tuned
+                                                  * Piano's, placed as Ableton's file (12 Tertial-Septimal LMY WTP,
+                                                  * after Kyle Gann) places it (27/16 over a C at C-6): from A, 64/63
+                                                  * 28/27 7/6 32/27 4/3 256/189 3/2 32/21 14/9 7/4 16/9 (3s and 7s) */
+static const int16_t TUN_HARM[8] = {0, 204, 386, 551, 702, 841, 969, 1088};   /* the odd harmonics 1-15 of A, in
+                                                  * one octave: 1 9 5 11 3 13 7 15 */
+static const int16_t TUN_SHRUTI[22] = {0, 90, 112, 182, 204, 294, 316, 386, 408, 498, 520, 590, 610, 702, 792, 814,
+                                       884, 906, 996, 1018, 1088, 1110};   /* the 22 shrutis from Sa (Sambamurthy /
+                                                  * Danielou's, 5-limit, as Ableton's 22 Sruti: MaL+ 64/45) */
+static const int16_t TUN_HARRISON[12] = {0, 63, 182, 267, 347, 498, 561, 702, 765, 884, 996, 1049};   /* Lou
+                                                  * Harrison's National Steel guitar tuning (11-limit, after Bill
+                                                  * Alves), as Ableton's file places it (his 9/8 over G): from A,
+                                                  * 28/27 10/9 7/6 11/9 4/3 112/81 3/2 14/9 5/3 16/9 11/6 */
+static const int16_t TUN_PARTCH[43] = {0, 27, 63, 90, 112, 143, 182, 214, 231, 267, 294, 316, 347, 379, 414, 445, 477,
+                                       498, 525, 561, 579, 610, 649, 680, 702, 729, 765, 792, 814, 831, 845, 884, 912,
+                                       943, 975, 996, 1018, 1049, 1081, 1108, 1147, 1161, 1178};   /* Harry Partch's 43
+                                                  * (11-limit, otonal and utonal), from A, his 9/8 over G (his own G
+                                                  * 392 is A 441: Tune +4) */
+static const int16_t *const TUN_TAB[DR_NTUNING - DR_TUN_JUST] = {TUN_JUST, TUN_LMY, TUN_HARM, TUN_SHRUTI, TUN_HARRISON,
+                                                                     TUN_PARTCH};
+static const uint8_t TUN_N[DR_NTUNING - DR_TUN_JUST] = {12, 12, 8, 22, 12, 43};
+static int tun_ok(int t) { return (unsigned)t < DR_NTUNING ? t : DR_TUN_12; }
+int dr_tun_n(int t)
+{
+    t = tun_ok(t);
+    return t < DR_TUN_JUST ? TUN_EDO[t] : TUN_N[t - DR_TUN_JUST];
+}
+int dr_tun_c(int t, int i)
+{
+    t = tun_ok(t);
+    return t < DR_TUN_JUST ? i * 1200 / TUN_EDO[t] : TUN_TAB[t - DR_TUN_JUST][i];
+}
+int dr_grid_k(int t, int v, int root)
+{
+    int x = v - root, o, r, i, n, best = 0, d = 99999;
+    t = tun_ok(t);
+    if (t < DR_TUN_JUST)
+        return (int)fm_floorf((float)x * (float)TUN_EDO[t] * (1.0f / 1200.0f) + 0.5f);
+    n = TUN_N[t - DR_TUN_JUST];
+    o = (int)fm_floorf((float)x / 1200.0f);
+    r = x - o * 1200;
+    for (i = 0; i <= n; i++) {                   /* (the octave's root again, at the top) */
+        int c = i < n ? TUN_TAB[t - DR_TUN_JUST][i] : 1200, e = c > r ? c - r : r - c;
+        if (e < d) {
+            d = e;
+            best = i;
+        }
+    }
+    return o * n + best;
+}
+int dr_grid_at(int t, int k, int root)
+{
+    int n, o;
+    t = tun_ok(t);
+    if (t < DR_TUN_JUST)
+        return root + (int)fm_floorf((float)k * (1200.0f / (float)TUN_EDO[t]) + 0.5f);
+    n = TUN_N[t - DR_TUN_JUST];
+    o = (int)fm_floorf((float)k / (float)n);
+    return root + o * 1200 + TUN_TAB[t - DR_TUN_JUST][k - o * n];
+}
 const char *const DR_DLY_NAME[DR_NDLY] = {"Clean", "Wide", "Ping-pong", "Tape", "Grain", "Self"};
 const char *const DR_WSCALE_NAME[DR_NWSCALE] = {"Minor pent", "Major pent", "5ths + 8ves", "Whole tone", "Dorian",
                                                 "Just 1-8"};
@@ -570,6 +639,24 @@ static float chord_t[DR_NGROUPS];
 static int chord_on[DR_NGROUPS];
 static const uint8_t CHORD_V[5][4] = {{1, 1, 2, 1}, {1, 1, 2, 2}, {0, 1, 1, 2}, {2, 1, 1, 2}, {3, 1, 1, 2}};
 static int chord_vi;
+/* A scale's note on the Tuning (Evan, 2026-10-30): its interval over drone I, semitones; cur as on 12-tone, j its pure
+ * size (cents). 12-tone and Quarter: as cur (Wander's semitones, Chord's pure intervals). The 12-note Tunings (Just,
+ * LMY, Harrison): the same keys, the Tuning's note cur keys over drone I's. The others (19-, 31-, 53-tone, Shruti,
+ * Partch, Harmonics): the Tuning's note nearest j over drone I's. From drone I's nearest note on a fixed grid; on a
+ * movable one (Just, Shruti) from drone I itself, so pure over it */
+static int grid_near_a(int t, int v) { return dr_grid_at(t, dr_grid_k(t, v, 900), 900); }   /* on A */
+float dr_tun_iv(float cur, int j)
+{
+    int t = tun_ok(base[P_TUNING]), p1 = base[DR_GP(0, GP_PITCH)], root, k, g1;
+    if (t == DR_TUN_12 || t == DR_TUN_24)
+        return cur;
+    root = DR_TUN_MOVES(t) ? p1 : 900;
+    k = dr_grid_k(t, p1, root);
+    g1 = dr_grid_at(t, k, root);
+    if (dr_tun_n(t) == 12)
+        return (float)(dr_grid_at(t, k + (int)fm_floorf(cur + 0.5f), root) - g1) * 0.01f;
+    return (float)(dr_grid_at(t, dr_grid_k(t, g1 + j, root), root) - g1) * 0.01f;
+}
 static const float CHORD_T[DR_NWSCALE][2] = {
     {3.15641f, 10.17596f}, {3.86314f, 8.84359f}, {7.01955f, 12.0f}, {4.0f, 8.0f}, {3.15641f, 8.84359f}, {3.86314f, 9.68826f}};
 static float mac_p[DR_NGROUPS];                   /* each drone's pitch move, semitones: Shift's, Wander's, Age's */
@@ -865,6 +952,11 @@ static const float WSCALE[DR_NWSCALE][WS_MAX] = {   /* semitones over drone I; -
     {0.0f, 2.0f, 4.0f, 6.0f, 8.0f, 10.0f, -1.0f}, {0.0f, 2.0f, 3.0f, 5.0f, 7.0f, 9.0f, 10.0f},
     {0.0f, 3.8631f, 7.0196f, 9.6883f, -1.0f},   /* harmonics 1-8: 1 (2, 4, 8), 5, 3 (6), 7 */
 };
+static const int16_t WSCALE_J[DR_NWSCALE][WS_MAX] = {   /* ... their pure sizes, cents (dr_tun_iv): 6/5 4/3 3/2 9/5; 9/8
+                                                  * 5/4 3/2 5/3; 3/2; whole tones; 9/8 6/5 4/3 3/2 5/3 9/5; 5/4 3/2 7/4 */
+    {0, 316, 498, 702, 1018}, {0, 204, 386, 702, 884}, {0, 702}, {0, 200, 400, 600, 800, 1000},
+    {0, 204, 316, 498, 702, 884, 1018}, {0, 386, 702, 969},
+};
 static void wander_run(uint32_t n)
 {
     const float *sc = WSCALE[(unsigned)base[P_WSCALE] < DR_NWSCALE ? base[P_WSCALE] : 0];
@@ -901,10 +993,26 @@ static void wander_run(uint32_t n)
         if (wand_to != 0.0f && mac_rand() < 0.12f) {
             wand_to = 0.0f;                      /* home, now and then */
         } else {
-            float rel = grp[0].ps2 - grp[1].ps2;   /* drone I's root, from drone II's own pitch */
-            for (o = -2; o <= 2; o++)
+            float rel = grp[0].ps2 - grp[1].ps2, deg[8];   /* drone I's root, from drone II's own pitch; the
+                                                            * scale's notes over it, on the Tuning */
+            int nd = 0, t = tun_ok(base[P_TUNING]), j;
+            if (t == DR_TUN_HARM) {              /* the harmonics: all of them, whatever the scale */
+                int g1 = grid_near_a(t, base[DR_GP(0, GP_PITCH)]);
+                for (i = 0; i < 8; i++)
+                    deg[nd++] = (float)(((900 + TUN_HARM[i] - g1) % 1200 + 1200) % 1200) * 0.01f;
+            } else {
+                const int16_t *sj = WSCALE_J[(unsigned)base[P_WSCALE] < DR_NWSCALE ? base[P_WSCALE] : 0];
                 for (i = 0; i < WS_MAX && sc[i] >= 0.0f; i++) {
-                    float x = rel + sc[i] + 12.0f * (float)o;
+                    float x = dr_tun_iv(sc[i], sj[i]);
+                    for (j = 0; j < nd && fm_fabsf(deg[j] - x) > 0.05f; j++)
+                        ;
+                    if (j == nd)                 /* (two notes the Tuning puts on one: once) */
+                        deg[nd++] = x;
+                }
+            }
+            for (o = -2; o <= 2; o++)
+                for (i = 0; i < nd; i++) {
+                    float x = rel + deg[i] + 12.0f * (float)o;
                     if (fm_fabsf(x) <= reach && fm_fabsf(x - wand_to) > 0.5f && fm_fabsf(x) > 0.5f && nc < 40)
                         cand[nc++] = x;
                 }
@@ -934,7 +1042,8 @@ static void mv_add(const move_t *v, float l, float *off, uint8_t *on, float *pm,
     case MK_CHORD: {
         int sc = base[P_WSCALE] < 0 ? 0 : base[P_WSCALE] >= DR_NWSCALE ? DR_NWSCALE - 1 : base[P_WSCALE];
         const uint8_t *vc = CHORD_V[chord_vi] + (v->d == 1 ? 0 : 2);
-        float t = (vc[0] == 0 ? 0.0f : vc[0] == 3 ? 7.01955f : CHORD_T[sc][vc[0] - 1]) + 12.0f * (float)vc[1];
+        float ct = vc[0] == 3 ? 7.01955f : vc[0] ? CHORD_T[sc][vc[0] - 1] : 0.0f;   /* on the Tuning (dr_tun_iv) */
+        float t = (vc[0] ? dr_tun_iv(ct, (int)(ct * 100.0f + 0.5f)) : 0.0f) + 12.0f * (float)vc[1];
         if (v->d != 1)                           /* drone II's: the note over drone I, from drone II */
             t -= (float)(base[DR_GP(1, GP_PITCH)] - base[DR_GP(0, GP_PITCH)]) * 0.01f;
         chord_t[v->p] = t;
