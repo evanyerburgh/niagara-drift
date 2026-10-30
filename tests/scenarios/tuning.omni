@@ -1,48 +1,46 @@
-# THE TUNING (v0.3, Setup 2 KNOB 4, par110): a pitch knob glides as it turns and, stopped, lands on the nearest step of
-# the grid over 250 ms (Evan, 2026-10-30). Drone I's pitch (par0, cents over MIDI 0; D3 5000); the host's spin turns a
-# detent 60 cents, at once: a first detent, so it lands 600 ms on
+# THE TUNING (v0.3, Setup 2 KNOB 4, par110): a pitch knob's detent is the grid's next step, up or down (Evan,
+# 2026-10-30, after #61's glide-and-land: every detent moves the pitch, and the card shows the note it goes to).
+# Drone I's pitch (par0, cents over MIDI 0; D3 5000); the host's spin turns its detents at once: a first turn, no
+# speed-up
 set 74 0
 set 51 0
 tap PLAY
 wait 500
 expect par110 0
 expect par0 5000
-# four detents: 5240 while turning, then 5200 (D#3)
+# four detents: four semitones, at once (F#3)
 spin K1 4
-expect par0 5240
+expect par0 5400
 wait 900
-expect par0 5200
-# SEL fine-tunes, 1 cent a detent, and that stays: +3 over every semitone it lands on after
+expect par0 5400
+# SEL fine-tunes, 1 cent a detent, and that stays: +3 over every semitone it steps to after
 press SEL
 spin K1 3
 release SEL
-wait 900
-expect par0 5203
+expect par0 5403
 spin K1 2
-wait 900
-expect par0 5303
+expect par0 5603
 spin K1 -1
-wait 900
-expect par0 5203
+expect par0 5503
 # the grid goes round both ways: quarter tones (1)
 tap GLO
 tap GLO
 spin K4 -1
-expect par110 8
+expect par110 10
 spin K4 1
 spin K4 1
 expect par110 1
-# ... a turn lands on the nearest quarter tone, still +3 (5203 + 60 = 5263 -> 5253)
+# ... a detent is a quarter tone, still +3
 tap HOME
 spin K1 1
-wait 900
-expect par0 5253
+expect par0 5553
 # SEL back on the grid (-3: the offset 0 again)
 press SEL
 spin K1 -3
 release SEL
-expect par0 5250
-# just intonation (5), from A: down to D3, the fourth below A, 4/3 (498): 4998
+expect par0 5550
+# just intonation (5, Ptolemy's from C, A 440 its 5/3): off its grid, the first detent down is the grid's next below
+# (5518, 9/5 over A2), then 5406 5314 5202 (27/16, 8/5, 3/2)
 tap GLO
 spin K4 1
 spin K4 1
@@ -51,56 +49,77 @@ spin K4 1
 expect par110 5
 tap HOME
 spin K1 -4
-wait 900
-expect par0 4998
-# 53-tone (4): 1200/53 = 22.6 cents a step, from A (900); 4998 + 120 = 5118: step 186 from A, 5111
+expect par0 5202
+# 53-tone (4): 1200/53 = 22.6 cents a step, from A (900): 5202 is step 190 (4302 over A); two up, 192: 5247
 tap GLO
 spin K4 -1
 expect par110 4
 tap HOME
 spin K1 2
-wait 900
-expect par0 5111
-# La Monte Young's (6, The Well-Tuned Piano's, on A): one detent up, 5171: from A2 (4500) 671 cents, the nearest
-# 675 (189/128): 5175
+expect par0 5247
+# LMY (6): La Monte Young's Well-Tuned Piano, as Ableton's file places it (A 440 one of its notes): uneven steps,
+# one each detent. E4+2 (6402, 3/2 over A3) up: 6429 (32/21), 6465 (14/9), 6669 (7/4); down again: 6465 6429 6402
 tap GLO
 spin K4 1
 spin K4 1
 expect par110 6
 tap HOME
+set 0 6402
 spin K1 1
+expect par0 6429
+spin K1 1
+expect par0 6465
+spin K1 1
+expect par0 6669
+spin K1 -1
+expect par0 6465
+spin K1 -1
+expect par0 6429
+spin K1 -1
+expect par0 6402
 wait 900
-expect par0 5175
-# the harmonics (7): 5235, 735 cents over A2: the nearest the 3rd harmonic's 702: 5202
+expect par0 6402
+# the harmonics (7): from 6402 (702 over A3, the 3rd harmonic) up: 841 (13th): 6541
 tap GLO
 spin K4 1
 expect par110 7
 tap HOME
 spin K1 1
-wait 900
-expect par0 5202
-# the shrutis (8): 5262, 762 cents: the nearest shruti 792 (128/81): 5292
+expect par0 6541
+# the shrutis (8, Sa on C, A 440 their Dha+): 6541 (841 over A3) up: 884 (5/3 from A): 6584
 tap GLO
 spin K4 1
 expect par110 8
 tap HOME
 spin K1 1
-wait 900
-expect par0 5292
-# a scene or a note moving the pitch before it lands: no landing over it
+expect par0 6584
+# Lou Harrison's (9, his National Steel guitar's, A 440 one of its notes): 6584 (5/3 over A3) up: 996 (16/9): 6696;
+# down twice: 6584, 6465 (14/9)
+tap GLO
+spin K4 1
+expect par110 9
+tap HOME
+spin K1 1
+expect par0 6696
+spin K1 -2
+expect par0 6465
+# Harry Partch's 43 (10), from A: 6465 (765 over A3, 14/9) up: 792, 814 (128/81, 8/5): 6514
+tap GLO
+spin K4 1
+expect par110 10
+tap HOME
+spin K1 2
+expect par0 6514
 tap GLO
 spin K4 1
 expect par110 0
+spin K4 -1
+expect par110 10
+spin K4 1
 tap HOME
-spin K1 1
-set 0 5555
-wait 900
-expect par0 5555
-# Pitch link on (par45): drone II's knob turns the link offset (par46), which lands on the grid's intervals: a fifth
-# (700) + 60 = 760 -> 800
+# Pitch link on (par45): drone II's knob turns the link offset (par46), a step of the grid's intervals: a fifth
+# (700) up one: 800
 set 45 1
 set 46 700
 spin K3 1
-expect par46 760
-wait 900
 expect par46 800

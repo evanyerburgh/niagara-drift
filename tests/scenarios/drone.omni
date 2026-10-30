@@ -43,39 +43,37 @@ wait 500
 expect peak_db_max -0.1
 expect peak_db_min -20
 shot playing.png
-# the Drones page: KNOB 1 drone I's pitch (60 cents a detent; SEL held, a cent), KNOB 2 its cutoff,
-# KNOB 3-4 drone II's
+# the Drones page: KNOB 1 drone I's pitch (a detent is the Tuning's next step: a semitone; SEL held, a cent),
+# KNOB 2 its cutoff, KNOB 3-4 drone II's
 spin K1 2
-expect par0 5120
+expect par0 5200
 press SEL
 spin K1 -83
 release SEL
-expect par0 5037
+expect par0 5117
 expect view 0
 spin K2 -5
 expect par7 650
 spin K3 1
-expect par21 5760
+expect par21 5800
 spin K4 10
 expect par28 780
 wait 600
-expect pitch0 5037
+expect pitch0 5117
 # a slow turn (clicks 500 ms apart) glides on between clicks, not in stairs: each click glides over the
 # time since the one before, so 300 ms after the last it's still on its way (a 250 ms limit had it there)
 turn K1 2 500
 turn K1 1 10
 wait 300
-expect pitch0 >5160
-expect pitch0 <5212
+expect pitch0 >5300
+expect pitch0 <5417
 wait 300
-expect pitch0 5217
-# stopped, it lands on the Tuning's grid (12-tone): D#3, with the +37 cents SEL gave it (5237); the next turn too
-wait 600
-expect par0 5237
+expect pitch0 5417
+# three semitones up, the +17 cents SEL gave it kept (5417); back down, and it stays
 spin K1 -3
-expect par0 5057
+expect par0 5117
 wait 900
-expect par0 5037
+expect par0 5117
 # HOME again: Drones 2, each drone's level and resonance (KNOB 1-2 drone I, 3-4 drone II)
 tap HOME
 expect view 1
@@ -297,7 +295,7 @@ expect par6 2
 tapkey b3
 expect par74 1
 spin K1 5
-expect par0 5037
+expect par0 5117
 tapkey b3
 expect par74 0
 # with SEL held, a black key names itself on the map and doesn't switch (2026-10-19)
@@ -318,20 +316,20 @@ tapkey b10
 expect par42 1
 wait 100
 shot switches.png
-# pitch link: drone II keeps its pitch (offset = 4600 - 3837 = 763), KNOB 3 moves the offset, drone I
+# pitch link: drone II keeps its pitch (offset = 4600 - 3917 = 683), KNOB 3 moves the offset, drone I
 # carries drone II (pitch link: the links pair's first key, key 9)
 tapkey b8
 expect par45 1
-expect par46 763
+expect par46 683
 spin K3 -1
-expect par46 703
+expect par46 600
 spin K1 -1
-expect par0 4977
+expect par0 5017
 wait 400
-expect pitch1 5680
+expect pitch1 5617
 tapkey b8
 expect par45 0
-expect par21 5680
+expect par21 5617
 # ARP, as the other page buttons (2026-10-25): a tap opens the Swell page and leaves the Swell alone; a tap on the
 # page is the Swell on / off; held, a peek (its knobs turn, nothing switches)
 tap ARP
@@ -518,7 +516,7 @@ wavstop
 # everything comes back after a reboot
 reboot
 wait 300
-expect par0 4937
+expect par0 5017
 expect par21 6000
 expect par42 1
 expect par44 1
@@ -537,7 +535,7 @@ expect view 0
 expect scene_at 0
 spin K1 10
 expect scene_at -1
-expect par0 5537
+expect par0 6017
 spin K2 20
 expect par7 850
 # a scene doesn't carry the room's settings: the stereo width set after storing stays when it's recalled
@@ -553,12 +551,12 @@ tapkey w0
 wait 450
 expect par7 >670
 expect par7 <830
-expect par0 >5000
-expect par0 <5550
+expect par0 >5017
+expect par0 <6017
 wait 900
 expect par7 650
 expect par53 90
-expect par0 4937
+expect par0 5017
 expect scene_at 0
 # an empty slot: nothing changes
 tapkey w1

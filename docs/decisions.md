@@ -501,3 +501,11 @@ at the end. The current state is in the [README](../README.md) and the code.
   a room setting. Pitch link's offset lands on the grid's intervals. Free's 60-cent steps dropped. PROJ_FORMAT 39
   (111 values: `P_TUNING`); old sounds keep their pitches until turned. Young's tuning and the harmonics (Evan: La Monte
   Young is the firmware's main inspiration).
+- 2026-10-30 (Evan, on the FM-1, after #61): **a pitch knob's detent is the Tuning's next note**, up or down (2 when
+  turned quickly), gliding over the time since the last detent; the card shows the note it goes to. #61's glide of 60
+  cents a detent, landing once stopped, could land back on the same note on the uneven grids and showed the cents in
+  between. A pitch off the grid steps to the grid's next note beyond it. Young's tuning is named **LMY**; it, Just and the
+  shrutis are placed as Ableton's tuning files place them, A 440 one of their notes (Just: Ptolemy's 5-limit with C on
+  1/1 at C+16, A its 5/3; the shrutis' Sa on C at C-6, their MaL+ 64/45). The equal tunings stay: A 440 is a note of each,
+  so which note is 1/1 makes no difference. Two more Tunings, at the end: **Harrison** (Lou Harrison's National Steel guitar, 11-limit, 12 notes)
+  and **Partch** (Harry Partch's 43, 11-limit; his own G 392 Hz is Tune +4), both with A 440 one of their notes.

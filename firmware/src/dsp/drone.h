@@ -207,10 +207,12 @@ extern volatile uint32_t dr_ext_seq, dr_ext_start;
 #define DR_NSUBW 4                             /* the sub's waves */
 enum { DR_SUBW_SQUARE, DR_SUBW_SINE, DR_SUBW_TRI, DR_SUBW_SAW };
 extern const char *const DR_SUBW_NAME[DR_NSUBW];
-#define DR_NTUNING 9                           /* the pitch knobs' grids: 12-tone, quarter tones, 19-, 31-, 53-tone equal,
+#define DR_NTUNING 11                          /* the pitch knobs' grids: 12-tone, quarter tones, 19-, 31-, 53-tone equal,
                                                 * just intonation, La Monte Young's (The Well-Tuned Piano's), the
-                                                * harmonics, the 22 shrutis */
-enum { DR_TUN_12, DR_TUN_24, DR_TUN_19, DR_TUN_31, DR_TUN_53, DR_TUN_JUST, DR_TUN_YOUNG, DR_TUN_HARM, DR_TUN_SHRUTI };
+                                                * harmonics, the 22 shrutis, Lou Harrison's (his National Steel
+                                                * guitar's), Harry Partch's 43 */
+enum { DR_TUN_12, DR_TUN_24, DR_TUN_19, DR_TUN_31, DR_TUN_53, DR_TUN_JUST, DR_TUN_LMY, DR_TUN_HARM, DR_TUN_SHRUTI,
+       DR_TUN_HARRISON, DR_TUN_PARTCH };
 extern const char *const DR_TUNING_NAME[DR_NTUNING];
 extern const char *const DR_ROUTE_NAME[DR_NROUTE];      /* "Both", "Echoes", "Drones" */
 #define DR_NDLY 6

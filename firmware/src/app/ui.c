@@ -342,42 +342,54 @@ static int32_t accel(int role, int32_t s, int range)
     return s * (int32_t)m;
 }
 
-/* a pitch knob (or the link offset). A detent is 60 cents (a slow full turn of 20 detents: an octave),
- * more when turned quickly, on a smooth curve (up to 2x at 70 detents a second: Evan, on the FM-1, 4x went
- * too far); with SEL held, 1 cent.
- * Each change slides over the time since the last detent (15..600 ms): the next one is due about then,
- * so a turn at any speed, even a slow uneven drag, is one continuous slide, as an analog knob's; a
- * first detent after a pause slides over 300 ms. (At 250 ms, detents a third of a second apart left
- * 60-cent stairs.) */
-#define PITCH_CENTS 60
-/* THE TUNING (v0.3, Setup 2 KNOB 4; Evan, 2026-10-30): a pitch knob glides as it turns, stepless, and once it stops lands
- * on the nearest step of the grid, over LAND_MS (heard: 80 ms a snap, 600 a bend). Stopped: no detent for half again
- * the time between the last two (150 .. 600 ms; after a first, 600), so a slow turn stays one glide (sooner, it landed
- * between its detents: stairs). A pitch SEL has fine-tuned off the grid keeps that offset: +3 cents over a semitone lands +3 over the next.
- * The grids are built on A (Tune moves it: -31.8 cents, A = 432 Hz); Pitch link's offset lands on the grid's intervals.
- * La Monte Young, the firmware's main inspiration (Evan): his Well-Tuned Piano's tuning (on E-flat there; on A here, as
- * the others), and the harmonics, as his Dream House chords are */
-#define LAND_MS 250
+/* a pitch knob (or the link offset): a detent is the next step of the Tuning, up or down (2 when turned quickly, on a
+ * smooth curve: 70 detents a second; Evan, on the FM-1, 4x went too far); with SEL held, 1 cent.
+ * Each step slides over the time since the last detent (15..600 ms): the next one is due about then, so a steady turn
+ * is one slide through the grid's notes, as an analog knob's; a first detent after a pause slides over 300 ms. */
+/* THE TUNING (v0.3, Setup 2 KNOB 4; Evan, 2026-10-30): every detent moves the pitch to the grid's next step, so the
+ * screen shows the note it goes to (#61 glided 60 cents a detent and landed once stopped: on the uneven grids a detent
+ * could land back on the same note, and the card showed the cents in between). A pitch SEL has fine-tuned off the
+ * grid keeps that offset: +3 cents over a semitone steps to +3 over the next. A pitch off the grid (an old sound, a
+ * note) steps to the grid's next step beyond it.
+ * The grids are built on A (Tune moves it: -31.8 cents, A = 432 Hz); Pitch link's offset steps on the grid's intervals.
+ * La Monte Young, the firmware's main inspiration (Evan): his Well-Tuned Piano's tuning (LMY: his 1/1 on E-flat; here
+ * as Ableton's file has it, A 440 one of its notes: Evan, 2026-10-30), and the harmonics, as his Dream House chords are */
 static const uint8_t TUN_EDO[DR_TUN_JUST] = {12, 24, 19, 31, 53};
-static const int16_t TUN_JUST[12] = {0, 112, 204, 316, 386, 498, 590, 702, 814, 884, 1018, 1088};   /* 5-limit, from
-                                                        * 1/1: 16/15 9/8 6/5 5/4 4/3 45/32 3/2 8/5 5/3 9/5 15/8 */
-static const int16_t TUN_YOUNG[12] = {0, 177, 204, 240, 444, 471, 675, 702, 738, 942, 969, 1173};   /* The Well-Tuned
-                                                        * Piano, from 1/1: 567/512 9/8 147/128 1323/1024 21/16 189/128
-                                                        * 3/2 49/32 441/256 7/4 63/32 (3s and 7s) */
+static const int16_t TUN_JUST[12] = {0, 133, 204, 316, 427, 520, 631, 702, 814, 906, 1018, 1129};   /* 5-limit
+                                                        * (Ptolemy's: 16/15 9/8 6/5 5/4 4/3 45/32 3/2 8/5 5/3 9/5 15/8
+                                                        * from C), placed as Ableton's file (12 Quintal, center C):
+                                                        * C at C+16, A 440 its 5/3; from A, 27/25 9/8 6/5 32/25 27/20
+                                                        * 36/25 3/2 8/5 27/16 9/5 48/25 */
+static const int16_t TUN_LMY[12] = {0, 27, 63, 267, 294, 498, 525, 702, 729, 765, 969, 996};   /* The Well-Tuned
+                                                        * Piano's, placed as Ableton's tuning file (12 Tertial-Septimal
+                                                        * LMY WTP, after Kyle Gann) places it, A 440 one of its notes
+                                                        * (27/16 over a C at C-6): from A, 64/63 28/27 7/6 32/27 4/3
+                                                        * 256/189 3/2 32/21 14/9 7/4 16/9 (3s and 7s) */
 static const int16_t TUN_HARM[8] = {0, 204, 386, 551, 702, 841, 969, 1088};   /* the odd harmonics 1-15 of the root,
                                                         * in one octave: 1 9 5 11 3 13 7 15 */
-static const int16_t TUN_SHRUTI[22] = {0, 90, 112, 182, 204, 294, 316, 386, 408, 498, 520, 590, 612, 702, 792, 814,
-                                       884, 906, 996, 1018, 1088, 1110};   /* the 22 shrutis, from Sa */
-static const int16_t *const TUN_TAB[DR_NTUNING - DR_TUN_JUST] = {TUN_JUST, TUN_YOUNG, TUN_HARM, TUN_SHRUTI};
-static const uint8_t TUN_N[DR_NTUNING - DR_TUN_JUST] = {12, 12, 8, 22};
-static int grid_near(int v, int root)                  /* the grid's step nearest v (cents), the grid on root */
+static const int16_t TUN_SHRUTI[22] = {0, 90, 112, 182, 204, 294, 384, 406, 477, 498, 588, 610, 680, 702, 792, 814,
+                                       884, 904, 996, 1086, 1108, 1178};   /* the 22 shrutis (Sambamurthy / Danielou's,
+                                                        * 5-limit), placed as Ableton's file (22 Sruti, center C) places
+                                                        * them: Sa on C at C-6, A 440 its Dha+ (27/16); from A */
+static const int16_t TUN_HARRISON[12] = {0, 63, 182, 267, 347, 498, 561, 702, 765, 884, 996, 1049};   /* Lou Harrison's
+                                                        * National Steel guitar tuning (11-limit, after Bill Alves),
+                                                        * placed as Ableton's file places it, A 440 (his 9/8 over G):
+                                                        * from A, 28/27 10/9 7/6 11/9 4/3 112/81 3/2 14/9 5/3 16/9 11/6 */
+static const int16_t TUN_PARTCH[43] = {0, 27, 63, 90, 112, 143, 182, 214, 231, 267, 294, 316, 347, 379, 414, 445, 477,
+                                       498, 525, 561, 579, 610, 649, 680, 702, 729, 765, 792, 814, 831, 845, 884, 912,
+                                       943, 975, 996, 1018, 1049, 1081, 1108, 1147, 1161, 1178};   /* Harry Partch's 43
+                                                        * (11-limit, otonal and utonal), from A, his 9/8 over G: A 440
+                                                        * one of its notes (his own G 392 is A 441: Tune +4) */
+static const int16_t *const TUN_TAB[DR_NTUNING - DR_TUN_JUST] = {TUN_JUST, TUN_LMY, TUN_HARM, TUN_SHRUTI, TUN_HARRISON,
+                                                                     TUN_PARTCH};
+static const uint8_t TUN_N[DR_NTUNING - DR_TUN_JUST] = {12, 12, 8, 22, 12, 43};
+static int grid_k(int v, int root)                     /* the index of the grid's step nearest v (cents), the grid on
+                                                        * root: 0 the root, n its octave */
 {
     int t = proj.par[P_TUNING], x = v - root, o, r, i, n, best = 0, d = 99999;
     const int16_t *tab;
-    if ((unsigned)t < DR_TUN_JUST) {
-        float st = 1200.0f / (float)TUN_EDO[t];
-        return root + (int)fm_floorf(fm_floorf((float)x / st + 0.5f) * st + 0.5f);
-    }
+    if ((unsigned)t < DR_TUN_JUST)
+        return (int)fm_floorf((float)x * (float)TUN_EDO[t] * (1.0f / 1200.0f) + 0.5f);
     if ((unsigned)t >= DR_NTUNING)
         t = DR_TUN_JUST;
     tab = TUN_TAB[t - DR_TUN_JUST];
@@ -388,45 +400,29 @@ static int grid_near(int v, int root)                  /* the grid's step neares
         int c = i < n ? tab[i] : 1200, e = c > r ? c - r : r - c;
         if (e < d) {
             d = e;
-            best = c;
+            best = i;
         }
     }
-    return root + o * 1200 + best;
+    return o * n + best;
 }
-static struct {
-    int16_t raw, at;                                   /* the knob's own place (a landing doesn't move it), the value it
-                                                        * set (moved since: no landing); the offset: proj.tun_off */
-    uint8_t on;                                        /* turned, not yet landed */
-    uint32_t t, wait;
-} land[3];                                             /* drone I's pitch, drone II's, the link offset */
-static int land_i(int p) { return p == P_PLINK_OFF ? 2 : p == DR_GP(1, GP_PITCH); }
-static int land_root(int p) { return p == P_PLINK_OFF ? 0 : 900; }   /* A; an interval from 0 */
-static void land_run(void)                             /* each frame: a pitch knob stopped lands */
+static int grid_at(int k, int root)                    /* the grid's step k, cents */
 {
-    static const int16_t LP[3] = {DR_GP(0, GP_PITCH), DR_GP(1, GP_PITCH), P_PLINK_OFF};
-    uint32_t now = plat_ms();
-    int i;
-    for (i = 0; i < 3; i++) {
-        int p = LP[i], to;
-        const dr_param_t *in = dr_param_info(p);
-        if (!land[i].on || now - land[i].t < land[i].wait)
-            continue;
-        land[i].on = 0;
-        if (proj.par[p] != land[i].at)                 /* something else moved it since (a scene, a note) */
-            continue;
-        to = grid_near(land[i].raw - proj.tun_off[i], land_root(p)) + proj.tun_off[i];
-        to = to < in->lo ? in->lo : to > in->hi ? in->hi : to;
-        if (to == proj.par[p])
-            continue;
-        dr_slide(i == 2 ? 1 : i, LAND_MS);
-        param_set(p, to);
-        loop_note(p, proj.par[p], LAND_MS);
-    }
+    int t = proj.par[P_TUNING], n, o;
+    if ((unsigned)t < DR_TUN_JUST)
+        return root + (int)fm_floorf((float)k * (1200.0f / (float)TUN_EDO[t]) + 0.5f);
+    if ((unsigned)t >= DR_NTUNING)
+        t = DR_TUN_JUST;
+    n = TUN_N[t - DR_TUN_JUST];
+    o = (int)fm_floorf((float)k / (float)n);
+    return root + o * 1200 + TUN_TAB[t - DR_TUN_JUST][k - o * n];
 }
+static int grid_near(int v, int root) { return grid_at(grid_k(v, root), root); }
+static int tun_i(int p) { return p == P_PLINK_OFF ? 2 : p == DR_GP(1, GP_PITCH); }   /* its proj.tun_off */
+static int tun_root(int p) { return p == P_PLINK_OFF ? 0 : 900; }   /* A; an interval from 0 */
 static void pitch_turn(int g, int p, int role, int32_t s)
 {
     uint32_t now = plat_ms(), dt = now - ui.enc_t[role], a = (uint32_t)(s < 0 ? -s : s), slide;
-    int cents;
+    int cents, ti = tun_i(p), root = tun_root(p);
     if (proj.par[P_PLOCK]) {                           /* locked against a bumped knob */
         say_c("PITCH LOCKED", "KEY 4", K_GOLD);
         return;
@@ -437,35 +433,32 @@ static void pitch_turn(int g, int p, int role, int32_t s)
     /* the glide: the time since the last detent (when the next is due, so a steady turn never stops),
      * 15 .. 600 ms; after a pause (a first detent), 300 ms */
     slide = accel_off ? 15u : dt < 15u ? 15u : dt > 600u ? 300u : dt;
-    {
-        int li = land_i(p);
-        if (ui.btn >> B_SEL & 1u) {                    /* fine: SEL held; where it ends is the offset kept */
-            int v = proj.par[p] + (int)s;
-            ui.btn_used |= 1u << B_SEL;
-            cents = (int)s;
-            land[li].on = 0;
-            v -= grid_near(v, land_root(p));
-            proj.tun_off[li] = (int8_t)(v < -127 ? -127 : v > 127 ? 127 : v);
-        } else {
-            float v = 1000.0f / (float)(dt ? dt : 1u), x = fm_clampf((v - 10.0f) * (1.0f / 60.0f), 0.0f, 1.0f);
-            const dr_param_t *in = dr_param_info(p);
-            int r;
-            cents = (int)s * (int)((float)PITCH_CENTS * (accel_off ? 1.0f : 1.0f + x * x) + 0.5f);
-            if (!land[li].on || proj.par[p] != land[li].at)   /* a turn begins: from where it is */
-                land[li].raw = proj.par[p];
-            r = land[li].raw + cents;
-            land[li].raw = (int16_t)(r < in->lo ? in->lo : r > in->hi ? in->hi : r);
-            cents = land[li].raw - proj.par[p];
-            land[li].on = 1;
-            land[li].t = now;
-            land[li].wait = dt > 600u ? 600u                  /* a first detent: no pace yet, the longest */
-                          : slide * 3u / 2u < 150u ? 150u : slide * 3u / 2u > 600u ? 600u : slide * 3u / 2u;
-        }
-        dr_slide(g, (int)slide);
-        param_set(p, proj.par[p] + cents);
-        land[li].at = proj.par[p];
-        loop_note(p, proj.par[p], slide);
+    if (ui.btn >> B_SEL & 1u) {                        /* fine: SEL held; where it ends is the offset kept */
+        int v = proj.par[p] + (int)s;
+        ui.btn_used |= 1u << B_SEL;
+        cents = (int)s;
+        v -= grid_near(v, root);
+        proj.tun_off[ti] = (int8_t)(v < -127 ? -127 : v > 127 ? 127 : v);
+    } else {
+        float sp = 1000.0f / (float)(dt ? dt : 1u), x = fm_clampf((sp - 10.0f) * (1.0f / 60.0f), 0.0f, 1.0f);
+        const dr_param_t *in = dr_param_info(p);
+        int n = (int)((float)a * (accel_off ? 1.0f : 1.0f + x * x) + 0.5f), off = proj.tun_off[ti],
+            v = proj.par[p] - off, k = grid_k(v, root), to;
+        if (s > 0)                                     /* the first step: the grid's next beyond where it is */
+            k += (grid_at(k, root) <= v) + n - 1;
+        else
+            k -= (grid_at(k, root) >= v) + n - 1;
+        while ((to = grid_at(k, root) + off) > in->hi && s > 0)   /* the range's ends: the last step inside */
+            k--;
+        while (to < in->lo && s < 0)
+            to = grid_at(++k, root) + off;
+        if (s > 0 ? to <= proj.par[p] : to >= proj.par[p])
+            return;                                    /* at the end */
+        cents = to - proj.par[p];
     }
+    dr_slide(g, (int)slide);
+    param_set(p, proj.par[p] + cents);
+    loop_note(p, proj.par[p], slide);
 }
 
 /* a continuous knob (cutoff, resonance, X-Wave, a depth, a level...: a range over 24 steps), as a pitch
@@ -3426,7 +3419,6 @@ void ui_frame(void)
 {
     input();
     press_run();
-    land_run();
     gesture_run();
     tips_run();
     scene_morph();
