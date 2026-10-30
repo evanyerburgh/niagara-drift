@@ -170,6 +170,8 @@ extern const uint8_t DR_GEST_DEPTH[DR_NGTYPE], DR_GEST_TIME[DR_NGTYPE];   /* eac
 extern const char *const DR_WSCALE_NAME[DR_NWSCALE];
 void dr_gesture(int g, int amt);               /* gesture key g's amount now, 0..1000 (the UI swells it) */
 float dr_wander(void);                         /* Wander's move of drone II now, semitones (the screen) */
+float dr_tun_iv(float cur, int j);             /* a scale's note on the Tuning over drone I, semitones:
+                                                * cur on 12-tone, j its pure size, cents (Wander, Chord; tests) */
 int dr_heard(int p);                           /* a value as heard: the sound's own plus the macros (tests) */
 float dr_mac_pitch(int g);                     /* drone g's pitch move by the macros now, semitones (tests) */
 float dr_gest_pitch(int g);                    /* ... by the gestures alone (Shift's; the screen) */
@@ -214,6 +216,12 @@ extern const char *const DR_SUBW_NAME[DR_NSUBW];
 enum { DR_TUN_12, DR_TUN_24, DR_TUN_19, DR_TUN_31, DR_TUN_53, DR_TUN_JUST, DR_TUN_LMY, DR_TUN_HARM, DR_TUN_SHRUTI,
        DR_TUN_HARRISON, DR_TUN_PARTCH };
 extern const char *const DR_TUNING_NAME[DR_NTUNING];
+#define DR_TUN_MOVES(t) ((t) == DR_TUN_JUST || (t) == DR_TUN_SHRUTI)   /* movable: built on drone I (the tonic,
+                                                * do or Sa), not on A: pure from wherever drone I is */
+int dr_tun_n(int t);                           /* the Tuning t's notes an octave */
+int dr_tun_c(int t, int i);                    /* ... its note i, cents over its root */
+int dr_grid_k(int t, int v, int root);         /* the index of the note nearest v (cents), the grid on root */
+int dr_grid_at(int t, int k, int root);        /* ... the note k, cents (0 the root, n its octave) */
 extern const char *const DR_ROUTE_NAME[DR_NROUTE];      /* "Both", "Echoes", "Drones" */
 #define DR_NDLY 6
 #define DR_DLY_TAPE 3                                     /* the starting type */

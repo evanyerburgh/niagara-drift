@@ -39,8 +39,8 @@ press SEL
 spin K1 -3
 release SEL
 expect par0 5550
-# just intonation (5, Ptolemy's from C, A 440 its 5/3): off its grid, the first detent down is the grid's next below
-# (5518, 9/5 over A2), then 5406 5314 5202 (27/16, 8/5, 3/2)
+# just intonation (5, Ptolemy's, movable: built on drone I, Evan 2026-10-30): drone I's knob picks the tonic in
+# semitones, from 5550 (off the semitones) down four: 5500 5400 5300 5200
 tap GLO
 spin K4 1
 spin K4 1
@@ -49,14 +49,22 @@ spin K4 1
 expect par110 5
 tap HOME
 spin K1 -4
-expect par0 5202
-# 53-tone (4): 1200/53 = 22.6 cents a step, from A (900): 5202 is step 190 (4302 over A); two up, 192: 5247
+expect par0 5200
+# ... and drone II's (par21, 5700: 500 over drone I) steps through the just intervals over it: up to 45/32 (5790),
+# down to 4/3, 5/4 (5698, 5586)
+expect par21 5700
+spin K3 1
+expect par21 5790
+spin K3 -2
+expect par21 5586
+# 53-tone (4): 1200/53 = 22.6 cents a step, from A (900): 5200 is 4300 over A, under step 190 (4302); two up, 190
+# and 191: 5225
 tap GLO
 spin K4 -1
 expect par110 4
 tap HOME
 spin K1 2
-expect par0 5247
+expect par0 5225
 # LMY (6): La Monte Young's Well-Tuned Piano, as Ableton's file places it (A 440 one of its notes): uneven steps,
 # one each detent. E4+2 (6402, 3/2 over A3) up: 6429 (32/21), 6465 (14/9), 6669 (7/4); down again: 6465 6429 6402
 tap GLO
@@ -86,14 +94,18 @@ expect par110 7
 tap HOME
 spin K1 1
 expect par0 6541
-# the shrutis (8, Sa on C, A 440 their Dha+): 6541 (841 over A3) up: 884 (5/3 from A): 6584
+# the shrutis (8, movable as Just: Sa on drone I): drone I's knob in semitones, 6541 up: 6600; drone II's (5586,
+# 1014 under drone I: 186 over Sa an octave down, by 10/9's 182) up to 9/8: 5604
 tap GLO
 spin K4 1
 expect par110 8
 tap HOME
 spin K1 1
-expect par0 6584
-# Lou Harrison's (9, his National Steel guitar's, A 440 one of its notes): 6584 (5/3 over A3) up: 996 (16/9): 6696;
+expect par0 6600
+spin K3 1
+expect par21 5604
+# Lou Harrison's (9, his National Steel guitar's, A 440 one of its notes): 6600 (900 over A3, over 5/3's 884) up:
+# 996 (16/9): 6696;
 # down twice: 6584, 6465 (14/9)
 tap GLO
 spin K4 1

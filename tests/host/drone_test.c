@@ -222,6 +222,38 @@ int main(void)
 {
     int i;
 
+    {   /* WANDER's and CHORD's notes on the Tuning (Evan, 2026-10-30): 12-tone as before; the 12-note Tunings the same
+         * keys; the others the nearest note to the pure size; Just and Shruti pure over drone I, wherever it is */
+        struct { int tun, p1; float cur; int j; float want; const char *what; } c[] = {
+            {DR_TUN_12, 5000, 3.0f, 316, 3.0f, "12-tone: as before (3 semitones)"},
+            {DR_TUN_12, 5000, 3.15641f, 316, 3.15641f, "12-tone: Chord still pure (6/5)"},
+            {DR_TUN_24, 5000, 9.68826f, 969, 9.68826f, "Quarter: as 12-tone"},
+            {DR_TUN_JUST, 5037, 4.0f, 386, 3.86f, "Just, drone I anywhere (5037): 5/4 over it"},
+            {DR_TUN_JUST, 5037, 10.0f, 1018, 10.18f, "Just: key 10, 9/5"},
+            {DR_TUN_SHRUTI, 5250, 3.0f, 316, 3.16f, "Shruti over drone I (5250): 6/5"},
+            {DR_TUN_LMY, 5700, 3.0f, 316, 2.67f, "LMY on A: key 3, 7/6"},
+            {DR_TUN_LMY, 5712, 10.0f, 1018, 9.69f, "LMY, drone I 12 over A: from A, key 10, 7/4"},
+            {DR_TUN_HARRISON, 5700, 4.0f, 386, 3.47f, "Harrison on A: key 4, 11/9"},
+            {DR_TUN_31, 5700, 3.0f, 316, 3.10f, "31-tone: the nearest to 6/5, 8 steps"},
+            {DR_TUN_53, 5700, 4.0f, 386, 3.85f, "53-tone: the nearest to 5/4, 17 steps"},
+            {DR_TUN_PARTCH, 5700, 9.68826f, 969, 9.75f, "Partch on A: the nearest to 7/4 (975)"},
+            {DR_TUN_HARM, 5700, 3.0f, 316, 3.86f, "Harmonics on A: 6/5's nearest, the 5th harmonic"},
+        };
+        int k, ok = 1;
+        dr_init();
+        for (k = 0; k < (int)(sizeof c / sizeof c[0]); k++) {
+            float v;
+            dr_set(P_TUNING, c[k].tun);
+            dr_set(DR_GP(0, GP_PITCH), c[k].p1);
+            dr_render(buf, 256, 3277);
+            v = dr_tun_iv(c[k].cur, c[k].j);
+            if (fabsf(v - c[k].want) > 0.006f) {
+                printf("    %s: %.4f, not %.4f\n", c[k].what, (double)v, (double)c[k].want);
+                ok = 0;
+            }
+        }
+        check("Wander's and Chord's notes on each Tuning", ok);
+    }
     dry_init();
     run(secs(1.0f));
     check("silent before PLAY", nonzero == 0);

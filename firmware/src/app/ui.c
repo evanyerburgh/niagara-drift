@@ -351,78 +351,29 @@ static int32_t accel(int role, int32_t s, int range)
  * could land back on the same note, and the card showed the cents in between). A pitch SEL has fine-tuned off the
  * grid keeps that offset: +3 cents over a semitone steps to +3 over the next. A pitch off the grid (an old sound, a
  * note) steps to the grid's next step beyond it.
- * The grids are built on A (Tune moves it: -31.8 cents, A = 432 Hz); Pitch link's offset steps on the grid's intervals.
- * La Monte Young, the firmware's main inspiration (Evan): his Well-Tuned Piano's tuning (LMY: his 1/1 on E-flat; here
- * as Ableton's file has it, A 440 one of its notes: Evan, 2026-10-30), and the harmonics, as his Dream House chords are */
-static const uint8_t TUN_EDO[DR_TUN_JUST] = {12, 24, 19, 31, 53};
-static const int16_t TUN_JUST[12] = {0, 133, 204, 316, 427, 520, 631, 702, 814, 906, 1018, 1129};   /* 5-limit
-                                                        * (Ptolemy's: 16/15 9/8 6/5 5/4 4/3 45/32 3/2 8/5 5/3 9/5 15/8
-                                                        * from C), placed as Ableton's file (12 Quintal, center C):
-                                                        * C at C+16, A 440 its 5/3; from A, 27/25 9/8 6/5 32/25 27/20
-                                                        * 36/25 3/2 8/5 27/16 9/5 48/25 */
-static const int16_t TUN_LMY[12] = {0, 27, 63, 267, 294, 498, 525, 702, 729, 765, 969, 996};   /* The Well-Tuned
-                                                        * Piano's, placed as Ableton's tuning file (12 Tertial-Septimal
-                                                        * LMY WTP, after Kyle Gann) places it, A 440 one of its notes
-                                                        * (27/16 over a C at C-6): from A, 64/63 28/27 7/6 32/27 4/3
-                                                        * 256/189 3/2 32/21 14/9 7/4 16/9 (3s and 7s) */
-static const int16_t TUN_HARM[8] = {0, 204, 386, 551, 702, 841, 969, 1088};   /* the odd harmonics 1-15 of the root,
-                                                        * in one octave: 1 9 5 11 3 13 7 15 */
-static const int16_t TUN_SHRUTI[22] = {0, 90, 112, 182, 204, 294, 384, 406, 477, 498, 588, 610, 680, 702, 792, 814,
-                                       884, 904, 996, 1086, 1108, 1178};   /* the 22 shrutis (Sambamurthy / Danielou's,
-                                                        * 5-limit), placed as Ableton's file (22 Sruti, center C) places
-                                                        * them: Sa on C at C-6, A 440 its Dha+ (27/16); from A */
-static const int16_t TUN_HARRISON[12] = {0, 63, 182, 267, 347, 498, 561, 702, 765, 884, 996, 1049};   /* Lou Harrison's
-                                                        * National Steel guitar tuning (11-limit, after Bill Alves),
-                                                        * placed as Ableton's file places it, A 440 (his 9/8 over G):
-                                                        * from A, 28/27 10/9 7/6 11/9 4/3 112/81 3/2 14/9 5/3 16/9 11/6 */
-static const int16_t TUN_PARTCH[43] = {0, 27, 63, 90, 112, 143, 182, 214, 231, 267, 294, 316, 347, 379, 414, 445, 477,
-                                       498, 525, 561, 579, 610, 649, 680, 702, 729, 765, 792, 814, 831, 845, 884, 912,
-                                       943, 975, 996, 1018, 1049, 1081, 1108, 1147, 1161, 1178};   /* Harry Partch's 43
-                                                        * (11-limit, otonal and utonal), from A, his 9/8 over G: A 440
-                                                        * one of its notes (his own G 392 is A 441: Tune +4) */
-static const int16_t *const TUN_TAB[DR_NTUNING - DR_TUN_JUST] = {TUN_JUST, TUN_LMY, TUN_HARM, TUN_SHRUTI, TUN_HARRISON,
-                                                                     TUN_PARTCH};
-static const uint8_t TUN_N[DR_NTUNING - DR_TUN_JUST] = {12, 12, 8, 22, 12, 43};
-static int grid_k(int v, int root)                     /* the index of the grid's step nearest v (cents), the grid on
-                                                        * root: 0 the root, n its octave */
+ * The fixed grids are built on A (Tune moves it: -31.8 cents, A = 432 Hz); on a movable one (Just, Shruti: a movable
+ * do, Evan 2026-10-30) drone I's knob picks the tonic in semitones and drone II's steps through the Tuning over drone I.
+ * Pitch link's offset steps on the grid's intervals. The tables: drone.c */
+static int tun_t(int p)                                /* the grid a pitch knob steps on: drone I's on a movable
+                                                        * Tuning (Just, Shruti) picks the tonic, in semitones */
 {
-    int t = proj.par[P_TUNING], x = v - root, o, r, i, n, best = 0, d = 99999;
-    const int16_t *tab;
-    if ((unsigned)t < DR_TUN_JUST)
-        return (int)fm_floorf((float)x * (float)TUN_EDO[t] * (1.0f / 1200.0f) + 0.5f);
-    if ((unsigned)t >= DR_NTUNING)
-        t = DR_TUN_JUST;
-    tab = TUN_TAB[t - DR_TUN_JUST];
-    n = TUN_N[t - DR_TUN_JUST];
-    o = (int)fm_floorf((float)x / 1200.0f);
-    r = x - o * 1200;
-    for (i = 0; i <= n; i++) {                         /* (the octave's root again, at the top) */
-        int c = i < n ? tab[i] : 1200, e = c > r ? c - r : r - c;
-        if (e < d) {
-            d = e;
-            best = i;
-        }
-    }
-    return o * n + best;
+    int t = proj.par[P_TUNING];
+    return DR_TUN_MOVES(t) && p == DR_GP(0, GP_PITCH) ? DR_TUN_12 : t;
 }
-static int grid_at(int k, int root)                    /* the grid's step k, cents */
+static int tun_root(int p)                             /* where its grid starts: A; an interval from 0 (the link
+                                                        * offset); drone I's pitch, for drone II on a movable Tuning */
 {
-    int t = proj.par[P_TUNING], n, o;
-    if ((unsigned)t < DR_TUN_JUST)
-        return root + (int)fm_floorf((float)k * (1200.0f / (float)TUN_EDO[t]) + 0.5f);
-    if ((unsigned)t >= DR_NTUNING)
-        t = DR_TUN_JUST;
-    n = TUN_N[t - DR_TUN_JUST];
-    o = (int)fm_floorf((float)k / (float)n);
-    return root + o * 1200 + TUN_TAB[t - DR_TUN_JUST][k - o * n];
+    return p == P_PLINK_OFF ? 0 : p == DR_GP(1, GP_PITCH) && DR_TUN_MOVES(proj.par[P_TUNING]) ?
+           proj.par[DR_GP(0, GP_PITCH)] : 900;
 }
-static int grid_near(int v, int root) { return grid_at(grid_k(v, root), root); }
+static int grid_k(int p, int v) { return dr_grid_k(tun_t(p), v, tun_root(p)); }
+static int grid_at(int p, int k) { return dr_grid_at(tun_t(p), k, tun_root(p)); }
+static int grid_near(int p, int v) { return grid_at(p, grid_k(p, v)); }
 static int tun_i(int p) { return p == P_PLINK_OFF ? 2 : p == DR_GP(1, GP_PITCH); }   /* its proj.tun_off */
-static int tun_root(int p) { return p == P_PLINK_OFF ? 0 : 900; }   /* A; an interval from 0 */
 static void pitch_turn(int g, int p, int role, int32_t s)
 {
     uint32_t now = plat_ms(), dt = now - ui.enc_t[role], a = (uint32_t)(s < 0 ? -s : s), slide;
-    int cents, ti = tun_i(p), root = tun_root(p);
+    int cents, ti = tun_i(p);
     if (proj.par[P_PLOCK]) {                           /* locked against a bumped knob */
         say_c("PITCH LOCKED", "KEY 4", K_GOLD);
         return;
@@ -437,21 +388,21 @@ static void pitch_turn(int g, int p, int role, int32_t s)
         int v = proj.par[p] + (int)s;
         ui.btn_used |= 1u << B_SEL;
         cents = (int)s;
-        v -= grid_near(v, root);
+        v -= grid_near(p, v);
         proj.tun_off[ti] = (int8_t)(v < -127 ? -127 : v > 127 ? 127 : v);
     } else {
         float sp = 1000.0f / (float)(dt ? dt : 1u), x = fm_clampf((sp - 10.0f) * (1.0f / 60.0f), 0.0f, 1.0f);
         const dr_param_t *in = dr_param_info(p);
         int n = (int)((float)a * (accel_off ? 1.0f : 1.0f + x * x) + 0.5f), off = proj.tun_off[ti],
-            v = proj.par[p] - off, k = grid_k(v, root), to;
+            v = proj.par[p] - off, k = grid_k(p, v), to;
         if (s > 0)                                     /* the first step: the grid's next beyond where it is */
-            k += (grid_at(k, root) <= v) + n - 1;
+            k += (grid_at(p, k) <= v) + n - 1;
         else
-            k -= (grid_at(k, root) >= v) + n - 1;
-        while ((to = grid_at(k, root) + off) > in->hi && s > 0)   /* the range's ends: the last step inside */
+            k -= (grid_at(p, k) >= v) + n - 1;
+        while ((to = grid_at(p, k) + off) > in->hi && s > 0)   /* the range's ends: the last step inside */
             k--;
         while (to < in->lo && s < 0)
-            to = grid_at(++k, root) + off;
+            to = grid_at(p, ++k) + off;
         if (s > 0 ? to <= proj.par[p] : to >= proj.par[p])
             return;                                    /* at the end */
         cents = to - proj.par[p];
@@ -2638,11 +2589,11 @@ static void pic_setup2(int32_t y0)
     }
     {   /* TUNING: an octave, A to A, a tick a step; the root's taller */
         int t = (unsigned)proj.par[P_TUNING] < DR_NTUNING ? proj.par[P_TUNING] : 0;
-        int n = t < DR_TUN_JUST ? TUN_EDO[t] : TUN_N[t - DR_TUN_JUST];
+        int n = dr_tun_n(t);
         cv_text(128, y0 + 60, &FONT_S, "TUNING", K_SETUP);
         cv_rect(128, y0 + 104, 93, 1, K_GRID);
         for (i = 0; i <= n; i++) {
-            int c = i == n ? 1200 : t < DR_TUN_JUST ? i * 1200 / n : TUN_TAB[t - DR_TUN_JUST][i];
+            int c = i == n ? 1200 : dr_tun_c(t, i);
             int32_t x = 128 + c * 92 / 1200, h = i == 0 || i == n ? 22 : 12;
             cv_rect(x, y0 + 104 - h, 1, h, i == 0 || i == n ? K_SETUP : K_TEXT2);
         }
