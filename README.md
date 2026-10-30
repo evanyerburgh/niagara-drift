@@ -396,8 +396,10 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
 - **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
   tuned).
 - **Tuning** is where the pitch knobs settle: **12-tone** (semitones), **Quarter** tones, **19-**, **31-** or
-  **53-tone** equal temperament, **Just** intonation (pure intervals, from A) or the 22 **Shrutis** of Indian music
-  (from A as Sa). The picture shows an octave of it, A to A, a tick a note. Every grid is built on A, so Tune moves it:
+  **53-tone** equal temperament, **Just** intonation (pure intervals, from A), **Young**: La Monte Young's tuning
+  for The Well-Tuned Piano (built on 3s and 7s, with its septimal intervals; on A here, E-flat in his), **Harmonics**
+  (the odd harmonics 1–15 of A, in each octave: the drones as notes of one harmonic series) or the 22 **Shrutis** of
+  Indian music (from A as Sa). The picture shows an octave of it, A to A, a tick a note. Every grid is built on A, so Tune moves it:
   at −32 cents A is 432 Hz. The knob goes round both ways. It only decides where a turn settles: a sound or scene
   plays its pitches as they were saved, until you turn the knob.
 

@@ -28,7 +28,7 @@ expect par0 5203
 tap GLO
 tap GLO
 spin K4 -1
-expect par110 6
+expect par110 8
 spin K4 1
 spin K4 1
 expect par110 1
@@ -61,7 +61,8 @@ tap HOME
 spin K1 2
 wait 900
 expect par0 5111
-# the shrutis (6): one detent up, 5171: from A2 (4500) 671 cents, the nearest shruti 702 (3/2): 5202
+# La Monte Young's (6, The Well-Tuned Piano's, on A): one detent up, 5171: from A2 (4500) 671 cents, the nearest
+# 675 (189/128): 5175
 tap GLO
 spin K4 1
 spin K4 1
@@ -69,7 +70,23 @@ expect par110 6
 tap HOME
 spin K1 1
 wait 900
+expect par0 5175
+# the harmonics (7): 5235, 735 cents over A2: the nearest the 3rd harmonic's 702: 5202
+tap GLO
+spin K4 1
+expect par110 7
+tap HOME
+spin K1 1
+wait 900
 expect par0 5202
+# the shrutis (8): 5262, 762 cents: the nearest shruti 792 (128/81): 5292
+tap GLO
+spin K4 1
+expect par110 8
+tap HOME
+spin K1 1
+wait 900
+expect par0 5292
 # a scene or a note moving the pitch before it lands: no landing over it
 tap GLO
 spin K4 1

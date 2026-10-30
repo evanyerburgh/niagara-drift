@@ -93,7 +93,8 @@ static float ext_beats(void)
 }
 const char *const DR_ROUTE_NAME[DR_NROUTE] = {"Both", "Echoes", "Drones"};
 const char *const DR_SUBW_NAME[DR_NSUBW] = {"Square", "Sine", "Triangle", "Saw"};
-const char *const DR_TUNING_NAME[DR_NTUNING] = {"12-tone", "Quarter", "19-tone", "31-tone", "53-tone", "Just", "Shruti"};
+const char *const DR_TUNING_NAME[DR_NTUNING] = {"12-tone", "Quarter", "19-tone", "31-tone", "53-tone", "Just", "Young",
+                                                "Harmonics", "Shruti"};
 const char *const DR_DLY_NAME[DR_NDLY] = {"Clean", "Wide", "Ping-pong", "Tape", "Grain", "Self"};
 const char *const DR_WSCALE_NAME[DR_NWSCALE] = {"Minor pent", "Major pent", "5ths + 8ves", "Whole tone", "Dorian",
                                                 "Just 1-8"};

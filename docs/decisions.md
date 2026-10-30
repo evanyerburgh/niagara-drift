@@ -496,6 +496,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   Stopped is no detent for half again the time between the last two (150-600 ms; 600 after a first one), so a slow
   turn stays one glide. SEL turns a cent a detent and doesn't land; where it leaves the pitch off the grid is kept
   (`proj.tun_off`, the player's) and every later landing keeps it. **Tuning** on Setup 2 KNOB 4, going round: 12-tone,
-  Quarter, 19-, 31-, 53-tone, Just (5-limit, from A), Shruti (22, from A as Sa); all built on A, so Tune moves them;
+  Quarter, 19-, 31-, 53-tone, Just (5-limit, from A), Young (La Monte Young's Well-Tuned Piano, 7-limit; on A, as
+  the others), Harmonics (odd harmonics 1-15, octave-reduced), Shruti (22, from A as Sa); all built on A, so Tune moves them;
   a room setting. Pitch link's offset lands on the grid's intervals. Free's 60-cent steps dropped. PROJ_FORMAT 39
-  (111 values: `P_TUNING`); old sounds keep their pitches until turned.
+  (111 values: `P_TUNING`); old sounds keep their pitches until turned. Young's tuning and the harmonics (Evan: La Monte
+  Young is the firmware's main inspiration).

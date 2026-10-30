@@ -354,13 +354,22 @@ static int32_t accel(int role, int32_t s, int range)
  * on the nearest step of the grid, over LAND_MS (heard: 80 ms a snap, 600 a bend). Stopped: no detent for half again
  * the time between the last two (150 .. 600 ms; after a first, 600), so a slow turn stays one glide (sooner, it landed
  * between its detents: stairs). A pitch SEL has fine-tuned off the grid keeps that offset: +3 cents over a semitone lands +3 over the next.
- * The grids are built on A (Tune moves it: -31.8 cents, A = 432 Hz); Pitch link's offset lands on the grid's intervals */
+ * The grids are built on A (Tune moves it: -31.8 cents, A = 432 Hz); Pitch link's offset lands on the grid's intervals.
+ * La Monte Young, the firmware's main inspiration (Evan): his Well-Tuned Piano's tuning (on E-flat there; on A here, as
+ * the others), and the harmonics, as his Dream House chords are */
 #define LAND_MS 250
 static const uint8_t TUN_EDO[DR_TUN_JUST] = {12, 24, 19, 31, 53};
 static const int16_t TUN_JUST[12] = {0, 112, 204, 316, 386, 498, 590, 702, 814, 884, 1018, 1088};   /* 5-limit, from
                                                         * 1/1: 16/15 9/8 6/5 5/4 4/3 45/32 3/2 8/5 5/3 9/5 15/8 */
+static const int16_t TUN_YOUNG[12] = {0, 177, 204, 240, 444, 471, 675, 702, 738, 942, 969, 1173};   /* The Well-Tuned
+                                                        * Piano, from 1/1: 567/512 9/8 147/128 1323/1024 21/16 189/128
+                                                        * 3/2 49/32 441/256 7/4 63/32 (3s and 7s) */
+static const int16_t TUN_HARM[8] = {0, 204, 386, 551, 702, 841, 969, 1088};   /* the odd harmonics 1-15 of the root,
+                                                        * in one octave: 1 9 5 11 3 13 7 15 */
 static const int16_t TUN_SHRUTI[22] = {0, 90, 112, 182, 204, 294, 316, 386, 408, 498, 520, 590, 612, 702, 792, 814,
                                        884, 906, 996, 1018, 1088, 1110};   /* the 22 shrutis, from Sa */
+static const int16_t *const TUN_TAB[DR_NTUNING - DR_TUN_JUST] = {TUN_JUST, TUN_YOUNG, TUN_HARM, TUN_SHRUTI};
+static const uint8_t TUN_N[DR_NTUNING - DR_TUN_JUST] = {12, 12, 8, 22};
 static int grid_near(int v, int root)                  /* the grid's step nearest v (cents), the grid on root */
 {
     int t = proj.par[P_TUNING], x = v - root, o, r, i, n, best = 0, d = 99999;
@@ -369,8 +378,10 @@ static int grid_near(int v, int root)                  /* the grid's step neares
         float st = 1200.0f / (float)TUN_EDO[t];
         return root + (int)fm_floorf(fm_floorf((float)x / st + 0.5f) * st + 0.5f);
     }
-    tab = t == DR_TUN_JUST ? TUN_JUST : TUN_SHRUTI;
-    n = t == DR_TUN_JUST ? 12 : 22;
+    if ((unsigned)t >= DR_NTUNING)
+        t = DR_TUN_JUST;
+    tab = TUN_TAB[t - DR_TUN_JUST];
+    n = TUN_N[t - DR_TUN_JUST];
     o = (int)fm_floorf((float)x / 1200.0f);
     r = x - o * 1200;
     for (i = 0; i <= n; i++) {                         /* (the octave's root again, at the top) */
@@ -2633,11 +2644,12 @@ static void pic_setup2(int32_t y0)
         plot(12, 2, y, 46, K_SETUP);
     }
     {   /* TUNING: an octave, A to A, a tick a step; the root's taller */
-        int t = proj.par[P_TUNING], n = (unsigned)t < DR_TUN_JUST ? TUN_EDO[t] : t == DR_TUN_JUST ? 12 : 22;
+        int t = (unsigned)proj.par[P_TUNING] < DR_NTUNING ? proj.par[P_TUNING] : 0;
+        int n = t < DR_TUN_JUST ? TUN_EDO[t] : TUN_N[t - DR_TUN_JUST];
         cv_text(128, y0 + 60, &FONT_S, "TUNING", K_SETUP);
         cv_rect(128, y0 + 104, 93, 1, K_GRID);
         for (i = 0; i <= n; i++) {
-            int c = i == n ? 1200 : (unsigned)t < DR_TUN_JUST ? i * 1200 / n : t == DR_TUN_JUST ? TUN_JUST[i] : TUN_SHRUTI[i];
+            int c = i == n ? 1200 : t < DR_TUN_JUST ? i * 1200 / n : TUN_TAB[t - DR_TUN_JUST][i];
             int32_t x = 128 + c * 92 / 1200, h = i == 0 || i == n ? 22 : 12;
             cv_rect(x, y0 + 104 - h, 1, h, i == 0 || i == n ? K_SETUP : K_TEXT2);
         }
