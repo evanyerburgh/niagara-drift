@@ -138,6 +138,8 @@ const TEXT = {
     restorenow: "Put this backup back",
     restoring: "Putting the backup back",
     restored: "Done: the FM-1 restarts with the backup's sound and scenes.",
+    restoreask: "On the FM-1, press SEL to put the backup back (HOME keeps what it has).",
+    restorecancel: "Not put back: the FM-1 kept its sound and scenes.",
     nobackup: "This FM-1 isn't running Niagara Drift (0.2 or later), so there's nothing to save or put back.",
     backupdone: "Saved to ",
     badbackup: "That isn't a Niagara Drift backup file.",
@@ -274,7 +276,8 @@ async function restore(objs) {               /* a backup back onto a Niagara Dri
   buttons();
   try {
     sayK("restoring");
-    sayK((await new Updater(midi, log).restore(objs)) ? "restored" : "nobackup");
+    const r = await new Updater(midi, log).restore(objs, () => sayK("restoreask"));
+    sayK(r === "restored" ? "restored" : r === "cancelled" ? "restorecancel" : "nobackup");
   } catch (e) {
     if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
     else sayK("error", e && e.message);

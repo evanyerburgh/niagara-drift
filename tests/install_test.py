@@ -10,6 +10,7 @@ build/omni.fwsc, skipped otherwise)."""
 import base64
 import io
 import json
+import zlib
 import queue
 import shutil
 import subprocess
@@ -69,11 +70,12 @@ class FakeFM1:
     """a MIDI backend with one FM-1 on it"""
 
     def __init__(self, image, identity="FM-1_015", name="FM-1", unplug_after=None, after_write="FM-1_900",
-                 stall_after=None, bad_addr=None, stored=None, nobj=5):
+                 stall_after=None, bad_addr=None, stored=None, nobj=5, safe=False, answer="sel"):
         self.image, self.unplug_after, self.after_write = image, unplug_after, after_write
         self.stored = stored                  # Niagara Drift's objects {obj: bytes}; None: no backup commands
         self.nobj = nobj                      # objects this firmware knows (older ones: 4, no Presets bank)
         self.buf, self.restarted = bytearray(3840), 0
+        self.safe, self.answer, self.staged, self.asked_with = safe, answer, {}, None   # 0.3's safe restore
         self.stall_after, self.bad_addr = stall_after, bad_addr
         self.served = self.bad = self.upgrades = 0
         self.sent, self.links, self.gen, self.lock = [], [], 0, threading.Lock()
@@ -104,7 +106,7 @@ class FakeFM1:
 
     def nd(self, d):                          # Niagara Drift's backup / restore (main_fm1.c backup_cmd)
         u = I.unpack7(d[1:-1])
-        if self.stored is None or len(u) < 7 or u[:2] != b"\x00\x59" or not 0x70 <= u[2] <= 0x73:
+        if self.stored is None or len(u) < 7 or u[:2] != b"\x00\x59" or not 0x70 <= u[2] <= 0x75:
             return False
         cmd, b = u[2], u[6:-1]
         if cmd == 0x70:
@@ -120,6 +122,24 @@ class FakeFM1:
         elif cmd == 0x72:
             self.stored[b[0]] = bytes(self.buf[:b[1] | b[2] << 8])
             self.tx(I.nd_msg(0x72, bytes([b[0], 0])))
+        elif cmd == 0x74:
+            if self.safe:                     # staged, checked against the CRC-32: nothing changes yet
+                n, c = b[1] | b[2] << 8, int.from_bytes(b[3:7], "little")
+                data = bytes(self.buf[:n])
+                if zlib.crc32(data) == c:
+                    self.staged[b[0]] = data
+                self.tx(I.nd_msg(0x74, bytes([b[0], 0 if zlib.crc32(data) == c else 2])))
+        elif cmd == 0x75:
+            if self.safe:
+                if b[0] != 0b11101 or set(self.staged) != {0, 2, 3, 4}:   # every object of the backup's list
+                    self.tx(I.nd_msg(0x75, b"\x02"))
+                    return True
+                self.tx(I.nd_msg(0x75, b"\xff"))
+                self.asked_with = dict(self.stored)   # as it was when it asked
+                if self.answer == "sel":
+                    self.stored.update(self.staged)
+                    self.restarted += 1
+                self.tx(I.nd_msg(0x75, bytes([0 if self.answer == "sel" else 1])))
         else:
             self.restarted += 1
         return True
@@ -341,6 +361,15 @@ def backups():
     rc, out, err = cli(["--restore", str(damaged), "--yes"], dev4)
     ok(rc != 0 and "damaged" in err and not dev4.stored, "--restore of a damaged backup: refused, nothing written")
     ok(dev2.restarted == 1, "... and restarts the FM-1")
+    dev5 = FakeFM1(image, identity="FM-1_800", stored={0: b"mine"}, safe=True, answer="sel")
+    rc, out, err = cli(["--restore", str(f), "--yes"], dev5)
+    ok(rc == 0 and dev5.asked_with == {0: b"mine"} and "press SEL" in out and
+       dev5.stored == mine and dev5.restarted == 1,
+       "THE SAFE RESTORE: all staged first (nothing changed when it asks), SEL switches to them all (empty as empty)")
+    dev6 = FakeFM1(image, identity="FM-1_800", stored={0: b"mine"}, safe=True, answer="home")
+    rc, out, err = cli(["--restore", str(f), "--yes"], dev6)
+    ok(rc == 1 and dev6.stored == {0: b"mine"} and "kept" in out and not dev6.restarted,
+       "... HOME: nothing changed")
     old = {k: v for k, v in objs.items() if k < 4}
     rc, out, err = cli(["--backup", str(TMP / "old.json")], FakeFM1(image, identity="FM-1_800", stored=dict(old), nobj=4))
     ok(rc == 0 and I.read_backup(str(TMP / "old.json")) == {k: v for k, v in old.items() if k != 1},

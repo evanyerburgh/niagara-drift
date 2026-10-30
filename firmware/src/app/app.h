@@ -92,3 +92,6 @@ int ui_dirty(void);
 void ui_clock_stats(uint32_t w[8]);   /* the MIDI clock in: tempo x 100, jitter RMS / largest (us), pulses, Starts,
                                        * Continues, Stops, ms since the last pulse (tools/fm1_clock.py) */
 void ui_say(const char *a, const char *b);
+void ui_restore_ask(void);              /* the safe restore (main_fm1.c): RESTORE FROM USB? on the screen, SEL / HOME */
+int ui_restore_answer(void);            /* 0 waiting, 1 yes, 2 no (HOME, or a minute without either); asks no more */
+void ui_restore_said(int ok);           /* the banner after: 1 restored, 0 failed, -1 not */

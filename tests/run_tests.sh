@@ -43,6 +43,8 @@ mkdir -p build/drone
 run drone-render sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Wno-missing-field-initializers -Werror -DOM_HOST \
     -Ifirmware/src/dsp -o $OUT/drone_render host/drone_render.c firmware/src/dsp/drone.c && $OUT/drone_render build/drone"
 run storage sh -c "$CC -O2 -o $OUT/storage_test tests/storage_test.c && $OUT/storage_test"
+# the safe restore's flash core (fm1-base's) on that storage, the power cut after every erase and write
+run restore sh -c "$CC -O2 -Wall -Wextra -Wno-unused-function -o $OUT/restore_test tests/restore_test.c && $OUT/restore_test"
 # the web installer's backup and restore against a pretend FM-1; its file read by the terminal installer
 if command -v node >/dev/null 2>&1; then
     run web-backup sh -c "node tests/web/backup_test.mjs $OUT/web-backup.json && python3 -c \"import sys; \

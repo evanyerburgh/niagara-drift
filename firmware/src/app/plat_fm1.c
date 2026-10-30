@@ -204,7 +204,13 @@ int plat_midi_in(uint32_t *pkt, uint32_t *us)
 void plat_midi_out(uint32_t pkt) { midi_out_event(pkt); }
 
 int plat_store_load(uint32_t obj, void *dst, uint32_t max) { return flash_ok ? st_load(obj, dst, max) : -1; }
-int plat_store_save(uint32_t obj, const void *src, uint32_t len) { return flash_ok ? st_save(obj, src, len) : -9; }
+static uint8_t st_hold;                         /* a restore staged (main_fm1.c): no saves till it's done (they'd
+                                                 * write over the staged copies) */
+int plat_store_save(uint32_t obj, const void *src, uint32_t len)
+{
+    return !flash_ok ? -9 : st_hold ? -10 : st_save(obj, src, len);
+}
+int plat_store_held(void) { return st_hold; }
 
 static volatile uint32_t audio_cpu_pct, audio_xruns;
 uint32_t plat_cpu_pct(void) { return audio_cpu_pct; }

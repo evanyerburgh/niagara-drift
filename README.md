@@ -77,6 +77,12 @@ other's files. Back up before trying another firmware, and restore when you come
 knobs' calibration, which belongs to each FM-1, so it can go onto another one; a damaged file is refused before
 anything is written.
 
+**Restoring is safe:** the whole backup goes onto the FM-1 and is checked first, without changing anything. Then
+the FM-1 asks on its screen, **RESTORE FROM USB?**: **SEL** puts it back, **HOME** keeps what it has (as does a
+minute without either). Your sounds and scenes then change all together, or not at all, even if the power goes off
+halfway (the next power-on finishes it), and the FM-1 restarts with them. Afterwards it holds exactly what the backup
+held.
+
 **Going back:** the installer's "Back to M-VAVE's firmware" writes M-VAVE's own FM-1 V15 back over the
 same cable (or use M-VAVE's updater, M-UPGRADE, from [m-vave.com/download](https://www.m-vave.com/download)).
 If it ever fails to start twice in a row it comes up in **safe mode** (no sound, USB on), where the installer
@@ -552,8 +558,10 @@ Niagara Drift is the next link in a chain of FM-1 firmwares:
   [Velo](https://github.com/charlesvestal/fm1-velocity)'s sensing), which plays the scene crossfade.
 - [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) by Quixotic7: the design of the delay and the
   reverb, written anew here; the idea of crossfading between scenes, and of a backup before installing.
+- [fm1-base](https://github.com/charlesvestal/fm1-base) by Charles Vestal: the safe restore's flash core (staging,
+  the journal, the commit and its finish at power-on), as it is there (MPL-2.0).
 
-GPL-3.0-only; see [LICENSING.md](LICENSING.md).
+GPL-3.0-only (one file from fm1-base keeps its MPL-2.0); see [LICENSING.md](LICENSING.md).
 
 Niagara Drift isn't affiliated with or endorsed by M-VAVE, Hügelton Instruments or the makers of any
 instrument that inspired it.
