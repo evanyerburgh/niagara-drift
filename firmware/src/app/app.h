@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 39u                  /* 39: the pitch knobs' Tuning (111 values; 38's widened);
+#define PROJ_FORMAT 40u                  /* 40: the Tunings reordered, simplest to richest (39's read, remapped);
+                                          * 39: the pitch knobs' Tuning (111 values; 38's widened);
                                           * 38: the Swell's Shape the other way round (37's read, negated);
                                           * 37: each drone's sub wave (110 values; 36's widened);
                                           * 36: the pressure keys' gestures' latches (108; 35's widened); scenes 9-12 moved

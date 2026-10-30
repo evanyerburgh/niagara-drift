@@ -65,12 +65,14 @@ expect par110 4
 tap HOME
 spin K1 2
 expect par0 5225
-# LMY (6): La Monte Young's Well-Tuned Piano, as Ableton's file places it (A 440 one of its notes): uneven steps,
+# the Tunings in order (40: simplest to richest): 5 Just, 6 Harmonics, 7 LMY, 8 Harrison, 9 Shruti, 10 Partch
+# LMY (7): La Monte Young's Well-Tuned Piano, as Ableton's file places it (A 440 one of its notes): uneven steps,
 # one each detent. E4+2 (6402, 3/2 over A3) up: 6429 (32/21), 6465 (14/9), 6669 (7/4); down again: 6465 6429 6402
 tap GLO
 spin K4 1
 spin K4 1
-expect par110 6
+spin K4 1
+expect par110 7
 tap HOME
 set 0 6402
 spin K1 1
@@ -87,29 +89,31 @@ spin K1 -1
 expect par0 6402
 wait 900
 expect par0 6402
-# the harmonics (7): from 6402 (702 over A3, the 3rd harmonic) up: 841 (13th): 6541
+# the harmonics (6): from 6402 (702 over A3, the 3rd harmonic) up: 841 (13th): 6541
 tap GLO
-spin K4 1
-expect par110 7
+spin K4 -1
+expect par110 6
 tap HOME
 spin K1 1
 expect par0 6541
-# the shrutis (8, movable as Just: Sa on drone I): drone I's knob in semitones, 6541 up: 6600; drone II's (5586,
+# the shrutis (9, movable as Just: Sa on drone I): drone I's knob in semitones, 6541 up: 6600; drone II's (5586,
 # 1014 under drone I: 186 over Sa an octave down, by 10/9's 182) up to 9/8: 5604
 tap GLO
 spin K4 1
-expect par110 8
+spin K4 1
+spin K4 1
+expect par110 9
 tap HOME
 spin K1 1
 expect par0 6600
 spin K3 1
 expect par21 5604
-# Lou Harrison's (9, his National Steel guitar's, A 440 one of its notes): 6600 (900 over A3, over 5/3's 884) up:
+# Lou Harrison's (8, his National Steel guitar's, A 440 one of its notes): 6600 (900 over A3, over 5/3's 884) up:
 # 996 (16/9): 6696;
 # down twice: 6584, 6465 (14/9)
 tap GLO
-spin K4 1
-expect par110 9
+spin K4 -1
+expect par110 8
 tap HOME
 spin K1 1
 expect par0 6696
@@ -117,6 +121,7 @@ spin K1 -2
 expect par0 6465
 # Harry Partch's 43 (10), from A: 6465 (765 over A3, 14/9) up: 792, 814 (128/81, 8/5): 6514
 tap GLO
+spin K4 1
 spin K4 1
 expect par110 10
 tap HOME

@@ -266,6 +266,13 @@ static void convert(int16_t *v, uint32_t from)
     if (from <= 37u)                            /* the Swell's Shape turned round (Evan, 2026-10-30): the ramp to the
                                                  * right now, the gate to the left; the same sound */
         v[P_PULSE_SHAPE] = (int16_t)-v[P_PULSE_SHAPE];
+    if (from == 39u) {                          /* the Tunings reordered, simplest to richest (Evan, 2026-10-30): 39's
+                                                 * LMY, Harmonics, Shruti, Harrison now Harmonics, LMY, Harrison, Shruti */
+        static const int8_t T39[DR_NTUNING] = {DR_TUN_12, DR_TUN_24, DR_TUN_19, DR_TUN_31, DR_TUN_53, DR_TUN_JUST,
+                                               DR_TUN_LMY, DR_TUN_HARM, DR_TUN_SHRUTI, DR_TUN_HARRISON, DR_TUN_PARTCH};
+        int t = v[P_TUNING];
+        v[P_TUNING] = (int16_t)((unsigned)t < DR_NTUNING ? T39[t] : DR_TUN_12);
+    }
 }
 
 static int in_range(const int16_t *v)
@@ -457,7 +464,7 @@ static union {
 static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old sound: the new values' defaults */
 {
     int k;
-    const int np = from >= 37u ? NP38 : from >= 36u ? NP36 : from >= 35u ? NP35 : from >= 34u ? NP34 : from >= 33u ? NP33 : from >= 32u ? NP32 : from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
+    const int np = from >= 39u ? DR_NPARAMS : from >= 37u ? NP38 : from >= 36u ? NP36 : from >= 35u ? NP35 : from >= 34u ? NP34 : from >= 33u ? NP33 : from >= 32u ? NP32 : from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
     for (k = 0; k < DR_NPARAMS; k++)
         dst[k] = k < np ? src[k] : dr_param_info(k)->def;
     if (dst[P_LFO_RATE] < 0)                   /* slower than 50 s, as it went before 2026-10-14: the slowest */
@@ -478,6 +485,11 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
     bank_fmt[b - 1] = ld.b.format;
     if (ld.b.format == PROJ_FORMAT) {
         *k = ld.b;
+    } else if (ld.b.format == 39u) {           /* 39: as now, the Tunings in their old order */
+        *k = ld.b;
+        for (i = 0; i < NSCENES; i++)
+            convert(k->scene[i], 39u);
+        bank_dirty |= (uint8_t)(1u << b);
     } else if (ld.b.format == 37u || ld.b.format == 38u) {   /* 37, 38: 110 values a sound (37 the Shape the other
                                                                * way round) */
         const bank_v38_t *o = &ld.b38;
@@ -549,7 +561,7 @@ static const int16_t *old_scene(int n, uint32_t *from)   /* scene n of the bank 
 {
     uint32_t f = ld.b.format;
     *from = f;
-    if (f == PROJ_FORMAT) return ld.b.scene[n];
+    if (f == PROJ_FORMAT || f == 39u) return ld.b.scene[n];   /* (39: as now; widen remaps it) */
     if (f == 37u || f == 38u) return ld.b38.scene[n];
     if (f == 36u) return ld.b36.scene[n];
     if (f == 35u) return ld.b35.scene[n];
@@ -671,6 +683,11 @@ int project_load(void)
     }
     if (from == PROJ_FORMAT) {
         proj = ld.p;
+    } else if (from == 39u) {                  /* 39: as now, the Tunings in their old order */
+        proj = ld.p;
+        convert(proj.par, 39u);
+        for (i = 0; i < NSCENES; i++)
+            convert(proj.scene[i], 39u);
     } else if (from == 37u || from == 38u) {   /* 37, 38: 110 values a sound (37 the Shape the other way round) */
         const proj_v38_t *o = &ld.o38;
         memset(&proj, 0, sizeof proj);
