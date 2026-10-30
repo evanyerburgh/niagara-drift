@@ -29,7 +29,21 @@ pressure w0 64
 wait 800
 expect par7 >480
 expect par7 <540
-# let go: the blend stays, a sound of its own (v0.3; it went back unless SEL held it)
+# let go, no SEL: back to where it was, at the same speed (Evan, 2026-10-30: SEL is what keeps it)
+key w0 up
+wait 1200
+expect par7 300
+expect scene_at -1
+# SEL tapped while it's held, half way: the blend kept there, as a gesture's; pressing on moves nothing, and the
+# let-go doesn't take it back
+key w0 down
+pressure w0 64
+wait 800
+tap SEL
+pressure w0 127
+wait 800
+expect par7 >480
+expect par7 <540
 key w0 up
 wait 1200
 expect par7 >480
@@ -49,26 +63,6 @@ wait 1300
 expect par7 >480
 expect par7 <540
 # back to before it, for what follows
-press SEL
-tap SAVE
-release SEL
-wait 1300
-expect par7 300
-# SEL tapped while it's held, half way: the blend kept there, as a gesture's (Evan, 2026-10-30); pressing on moves
-# nothing, and the let-go keeps it too
-key w0 down
-pressure w0 64
-wait 800
-tap SEL
-pressure w0 127
-wait 800
-expect par7 >480
-expect par7 <540
-key w0 up
-wait 1200
-expect par7 >480
-expect par7 <540
-expect scene_at -1
 press SEL
 tap SAVE
 release SEL
@@ -108,8 +102,7 @@ key w0 up
 wait 1200
 expect par7 700
 expect scene_at 0
-# the finger lifting (its pressure falling on the way up) before the key lets go doesn't take the blend back: let
-# go, it stays where it was a moment before
+# the finger lifting slowly, then let go: back all the same, to the sound before the press
 spin K2 -40
 wait 300
 key w0 down
@@ -120,16 +113,9 @@ wait 60
 pressure w0 0
 wait 40
 key w0 up
-wait 600
-expect par7 >470
-expect par7 <540
-expect scene_at -1
-# undone: back to the sound before it
-press SEL
-tap SAVE
-release SEL
-wait 1300
+wait 1200
 expect par7 300
+expect scene_at -1
 # a tap held past the crossfade's start (350 ms): undo goes back to the sound before the press, not to the
 # blend it had begun (the review, 2026-10-27)
 key w0 down
