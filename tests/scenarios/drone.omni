@@ -14,7 +14,7 @@ expect par74 0
 # depth 17, filter LFO to 18, noise 19, colour 20), drone II the same +21; then 42 cross-mod, 43 its amount,
 # 44 hard sync, 45 pitch link, 46 link offset, 47 LFO rate, 48 Wave I, 49 Wave II, 50 Glide, 51 Fade, 55 Pulse,
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
-# depth; 108, 109 each drone's sub wave.
+# depth; 108, 109 each drone's sub wave; 110 the Tuning.
 # Pages: 0 Drones 1 1 Drones 2 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO depths 7 Mods 8 Partner 9 Pitch moves
 # 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
 # a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
@@ -69,9 +69,13 @@ expect pitch0 >5160
 expect pitch0 <5212
 wait 300
 expect pitch0 5217
+# stopped, it lands on the Tuning's grid (12-tone): D#3, with the +37 cents SEL gave it (5237); the next turn too
+wait 600
+expect par0 5237
 spin K1 -3
+expect par0 5057
+wait 900
 expect par0 5037
-wait 100
 # HOME again: Drones 2, each drone's level and resonance (KNOB 1-2 drone I, 3-4 drone II)
 tap HOME
 expect view 1
@@ -314,20 +318,20 @@ tapkey b10
 expect par42 1
 wait 100
 shot switches.png
-# pitch link: drone II keeps its pitch (offset = 4560 - 3837 = 723), KNOB 3 moves the offset, drone I
+# pitch link: drone II keeps its pitch (offset = 4600 - 3837 = 763), KNOB 3 moves the offset, drone I
 # carries drone II (pitch link: the links pair's first key, key 9)
 tapkey b8
 expect par45 1
-expect par46 723
+expect par46 763
 spin K3 -1
-expect par46 663
+expect par46 703
 spin K1 -1
 expect par0 4977
 wait 400
-expect pitch1 5640
+expect pitch1 5680
 tapkey b8
 expect par45 0
-expect par21 5640
+expect par21 5680
 # ARP, as the other page buttons (2026-10-25): a tap opens the Swell page and leaves the Swell alone; a tap on the
 # page is the Swell on / off; held, a peek (its knobs turn, nothing switches)
 tap ARP
@@ -514,7 +518,7 @@ wavstop
 # everything comes back after a reboot
 reboot
 wait 300
-expect par0 4977
+expect par0 4937
 expect par21 6000
 expect par42 1
 expect par44 1
@@ -533,7 +537,7 @@ expect view 0
 expect scene_at 0
 spin K1 10
 expect scene_at -1
-expect par0 5577
+expect par0 5537
 spin K2 20
 expect par7 850
 # a scene doesn't carry the room's settings: the stereo width set after storing stays when it's recalled
@@ -554,7 +558,7 @@ expect par0 <5550
 wait 900
 expect par7 650
 expect par53 90
-expect par0 4977
+expect par0 4937
 expect scene_at 0
 # an empty slot: nothing changes
 tapkey w1

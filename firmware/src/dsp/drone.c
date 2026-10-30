@@ -59,6 +59,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"LFO div", 0, DR_NLDIV - 1, 3}, {"Dly note", 0, DR_NNOTE - 1, 5}, {"Scene bars", 0, DR_NBARS - 1, 2},
     {"G4 latch", 0, 100, 0}, {"A4 latch", 0, 100, 0}, {"B4 latch", 0, 100, 0}, {"C5 latch", 0, 100, 0},
     {"Sub wave", 0, DR_NSUBW - 1, DR_SUBW_SQUARE}, {"Sub wave", 0, DR_NSUBW - 1, DR_SUBW_SQUARE},
+    {"Tuning", 0, DR_NTUNING - 1, DR_TUN_12},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
 const char *const DR_DIV_NAME[DR_NDIV] = {"32 bars", "16 bars", "8 bars", "4 bars", "2 bars", "1 bar", "1/2", "1/4"};
@@ -92,6 +93,7 @@ static float ext_beats(void)
 }
 const char *const DR_ROUTE_NAME[DR_NROUTE] = {"Both", "Echoes", "Drones"};
 const char *const DR_SUBW_NAME[DR_NSUBW] = {"Square", "Sine", "Triangle", "Saw"};
+const char *const DR_TUNING_NAME[DR_NTUNING] = {"12-tone", "Quarter", "19-tone", "31-tone", "53-tone", "Just", "Shruti"};
 const char *const DR_DLY_NAME[DR_NDLY] = {"Clean", "Wide", "Ping-pong", "Tape", "Grain", "Self"};
 const char *const DR_WSCALE_NAME[DR_NWSCALE] = {"Minor pent", "Major pent", "5ths + 8ves", "Whole tone", "Dorian",
                                                 "Just 1-8"};
@@ -302,6 +304,8 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_ROUTE_NAME[(unsigned)v < DR_NROUTE ? v : 0]);
     else if (i == P_SUBW_0 || i == P_SUBW_1)
         copy_s(b, DR_SUBW_NAME[(unsigned)v < DR_NSUBW ? v : 0]);
+    else if (i == P_TUNING)
+        copy_s(b, DR_TUNING_NAME[(unsigned)v < DR_NTUNING ? v : 0]);
     else if (i == P_PULSE_DIV)
         copy_s(b, DR_DIV_NAME[(unsigned)v < DR_NDIV ? v : 2]);
     else if (i == P_LFO_DIV)

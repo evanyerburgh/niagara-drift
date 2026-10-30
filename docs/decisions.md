@@ -491,3 +491,11 @@ at the end. The current state is in the [README](../README.md) and the code.
   pressing shows "A1 40%", a SEL tap keeps it right there ("A1 40% KEPT", the key then let go any time), and letting
   go without it glides back to where it was, at the speed it came ("A1 BACK"), as in 0.2. SEL + SAVE undoes a kept,
   taken or tapped scene (how is a one-time tip); one let go back leaves nothing to undo.
+- 2026-10-30 (Evan, by ear on headphones): **the pitch knobs land on a Tuning**: a turn glides without steps (60 cents a
+  detent, as before) and, stopped, slides to the nearest step of the grid over 250 ms (80 ms was a snap, 600 a bend).
+  Stopped is no detent for half again the time between the last two (150-600 ms; 600 after a first one), so a slow
+  turn stays one glide. SEL turns a cent a detent and doesn't land; where it leaves the pitch off the grid is kept
+  (`proj.tun_off`, the player's) and every later landing keeps it. **Tuning** on Setup 2 KNOB 4, going round: 12-tone,
+  Quarter, 19-, 31-, 53-tone, Just (5-limit, from A), Shruti (22, from A as Sa); all built on A, so Tune moves them;
+  a room setting. Pitch link's offset lands on the grid's intervals. Free's 60-cent steps dropped. PROJ_FORMAT 39
+  (111 values: `P_TUNING`); old sounds keep their pitches until turned.

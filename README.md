@@ -219,6 +219,11 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **Pitch** goes from 1.6 kHz down to 2 Hz. Under 27 Hz (where the screen shows Hz, not a note) a drone stops being a
   tone and becomes a pulse of clicks, a click a cycle: rhythm, and through a drive they ping against the other drone.
   The speaker can't play the low part: listen on headphones.
+- **Turning a pitch knob** glides, without steps; when you stop, the pitch settles on the nearest note of the
+  **Tuning** (Setup 2, KNOB 4; semitones to start), in a quarter of a second. A slow turn stays one glide: it waits
+  until you've really stopped. **SEL** held, the knob moves a cent at a time and doesn't settle: that's how to tune a
+  drone a little sharp or flat, and the knob keeps it there, so +3 cents over one note settles +3 over the next. With
+  Pitch link on, drone II's knob turns the gap between the drones, and it settles on the Tuning's intervals.
 - **MASTER**: past about four-fifths of its turn it drives into overdrive, at about the same loudness: thicker,
   but the breathing flattens (the swells and dips get much smaller).
 
@@ -377,7 +382,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Setup 1 | fade | switch time | scene time | |
-| Setup 2 | tune | stereo | pressure | |
+| Setup 2 | tune | stereo | pressure | tuning |
 
 Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't change it.
 
@@ -390,6 +395,11 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
   there. It's automatic: plug in headphones and the cut goes out, unplug and it comes back.
 - **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
   tuned).
+- **Tuning** is where the pitch knobs settle: **12-tone** (semitones), **Quarter** tones, **19-**, **31-** or
+  **53-tone** equal temperament, **Just** intonation (pure intervals, from A) or the 22 **Shrutis** of Indian music
+  (from A as Sa). The picture shows an octave of it, A to A, a tick a note. Every grid is built on A, so Tune moves it:
+  at −32 cents A is 432 Hz. The knob goes round both ways. It only decides where a turn settles: a sound or scene
+  plays its pitches as they were saved, until you turn the knob.
 
 ### The LFO
 

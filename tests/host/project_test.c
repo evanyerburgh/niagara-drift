@@ -86,7 +86,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 38, on bank A", proj.format == 38u && PROJ_FORMAT == 38u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 39, on bank A", proj.format == 39u && PROJ_FORMAT == 39u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -494,19 +494,19 @@ int main(void)
                                                   proj.par[P_SUBW_1] == DR_SUBW_SQUARE &&
                                                   scene_get(1, 2)[P_SUBW_1] == DR_SUBW_SQUARE);
     }
-    {   /* format 37 (as now): loads, the Swell's Shape turned round, so it sounds the same (2026-10-30) */
-        static project_t o;
-        static bank_t bb;
+    {   /* format 37 (110 values): loads, the Swell's Shape turned round, so it sounds the same (2026-10-30) */
+        static proj_v38_t o;
+        static bank_v38_t bb;
         int i, k;
         memset(store_n, 0, sizeof store_n);
         memset(&o, 0, sizeof o);
         o.magic = PROJ_MAGIC;
         o.format = 37u;
         o.mtime = MTIME_DEF;
-        for (k = 0; k < DR_NPARAMS; k++)
+        for (k = 0; k < NP38; k++)
             o.par[k] = dr_param_info(k)->def;
         for (i = 0; i < NSCENES; i++)
-            for (k = 0; k < DR_NPARAMS; k++)
+            for (k = 0; k < NP38; k++)
                 o.scene[i][k] = dr_param_info(k)->def;
         o.par[P_PULSE_SHAPE] = 25;                     /* 37's default: a little firmer */
         o.par[P_SUBW_1] = DR_SUBW_SAW;
@@ -519,7 +519,7 @@ int main(void)
         bb.format = 37u;
         bb.used = 1u << 2;
         for (i = 0; i < NSCENES; i++)
-            for (k = 0; k < DR_NPARAMS; k++)
+            for (k = 0; k < NP38; k++)
                 bb.scene[i][k] = dr_param_info(k)->def;
         bb.scene[2][P_PULSE_SHAPE] = 100;              /* the hard gate */
         bb.scene[2][P_SUBW_0] = DR_SUBW_SAW;
@@ -531,8 +531,10 @@ int main(void)
               scene_get(1, 2)[P_PULSE_SHAPE] == -100 && dr_param_info(P_PULSE_SHAPE)->def == -25);
         check("... the rest kept, the subs too", proj.par[P_SUBW_1] == DR_SUBW_SAW && scene_get(1, 2)[P_SUBW_0] == DR_SUBW_SAW &&
                                                  scene_has(0, 1) && scene_has(1, 2));
-        check("... and saved as 38", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 38u &&
-                                     ((const bank_t *)store[OBJ_BANKB])->format == 38u);
+        check("... the Tuning 12-tone, no offsets (39, 2026-10-30)", proj.par[P_TUNING] == DR_TUN_12 &&
+              scene_get(1, 2)[P_TUNING] == DR_TUN_12 && !proj.tun_off[0] && !proj.tun_off[1] && !proj.tun_off[2]);
+        check("... and saved as 39", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 39u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 39u);
     }
     printf("project: %s\n", fails ? "FAILED" : "all ok");
     return fails != 0;

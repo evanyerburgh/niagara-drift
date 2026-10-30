@@ -18,7 +18,7 @@ expect par0 6200
 turn K1 -20 50
 wait 600
 expect par0 >4800
-expect par0 <5000
+expect par0 <5001
 turn K1 15 15
 wait 600
 press SEL

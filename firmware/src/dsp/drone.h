@@ -150,6 +150,8 @@ enum {
                                           * 0..100 (0: not latched; v0.3) */
     P_SUBW_0, P_SUBW_1,                  /* each drone's sub wave (DR_SUBW_NAME): Square (as before), Sine, Triangle, Saw,
                                           * each as loud (RMS) as the square (v0.3, Evan 2026-10-28) */
+    P_TUNING,                       /* where a pitch knob lands when it stops (DR_TUNING_NAME, the UI's; a room setting,
+                                     * v0.3, Evan 2026-10-30): 0 12-tone .. 6 the 22 shrutis */
     DR_NPARAMS
 };
 
@@ -205,6 +207,10 @@ extern volatile uint32_t dr_ext_seq, dr_ext_start;
 #define DR_NSUBW 4                             /* the sub's waves */
 enum { DR_SUBW_SQUARE, DR_SUBW_SINE, DR_SUBW_TRI, DR_SUBW_SAW };
 extern const char *const DR_SUBW_NAME[DR_NSUBW];
+#define DR_NTUNING 7                           /* the pitch knobs' grids: 12-tone, quarter tones, 19-, 31-, 53-tone equal,
+                                                * just intonation, the 22 shrutis */
+enum { DR_TUN_12, DR_TUN_24, DR_TUN_19, DR_TUN_31, DR_TUN_53, DR_TUN_JUST, DR_TUN_SHRUTI };
+extern const char *const DR_TUNING_NAME[DR_NTUNING];
 extern const char *const DR_ROUTE_NAME[DR_NROUTE];      /* "Both", "Echoes", "Drones" */
 #define DR_NDLY 6
 #define DR_DLY_TAPE 3                                     /* the starting type */

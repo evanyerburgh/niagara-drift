@@ -1,0 +1,89 @@
+# THE TUNING (v0.3, Setup 2 KNOB 4, par110): a pitch knob glides as it turns and, stopped, lands on the nearest step of
+# the grid over 250 ms (Evan, 2026-10-30). Drone I's pitch (par0, cents over MIDI 0; D3 5000); the host's spin turns a
+# detent 60 cents, at once: a first detent, so it lands 600 ms on
+set 74 0
+set 51 0
+tap PLAY
+wait 500
+expect par110 0
+expect par0 5000
+# four detents: 5240 while turning, then 5200 (D#3)
+spin K1 4
+expect par0 5240
+wait 900
+expect par0 5200
+# SEL fine-tunes, 1 cent a detent, and that stays: +3 over every semitone it lands on after
+press SEL
+spin K1 3
+release SEL
+wait 900
+expect par0 5203
+spin K1 2
+wait 900
+expect par0 5303
+spin K1 -1
+wait 900
+expect par0 5203
+# the grid goes round both ways: quarter tones (1)
+tap GLO
+tap GLO
+spin K4 -1
+expect par110 6
+spin K4 1
+spin K4 1
+expect par110 1
+# ... a turn lands on the nearest quarter tone, still +3 (5203 + 60 = 5263 -> 5253)
+tap HOME
+spin K1 1
+wait 900
+expect par0 5253
+# SEL back on the grid (-3: the offset 0 again)
+press SEL
+spin K1 -3
+release SEL
+expect par0 5250
+# just intonation (5), from A: down to D3, the fourth below A, 4/3 (498): 4998
+tap GLO
+spin K4 1
+spin K4 1
+spin K4 1
+spin K4 1
+expect par110 5
+tap HOME
+spin K1 -4
+wait 900
+expect par0 4998
+# 53-tone (4): 1200/53 = 22.6 cents a step, from A (900); 4998 + 120 = 5118: step 186 from A, 5111
+tap GLO
+spin K4 -1
+expect par110 4
+tap HOME
+spin K1 2
+wait 900
+expect par0 5111
+# the shrutis (6): one detent up, 5171: from A2 (4500) 671 cents, the nearest shruti 702 (3/2): 5202
+tap GLO
+spin K4 1
+spin K4 1
+expect par110 6
+tap HOME
+spin K1 1
+wait 900
+expect par0 5202
+# a scene or a note moving the pitch before it lands: no landing over it
+tap GLO
+spin K4 1
+expect par110 0
+tap HOME
+spin K1 1
+set 0 5555
+wait 900
+expect par0 5555
+# Pitch link on (par45): drone II's knob turns the link offset (par46), which lands on the grid's intervals: a fifth
+# (700) + 60 = 760 -> 800
+set 45 1
+set 46 700
+spin K3 1
+expect par46 760
+wait 900
+expect par46 800
