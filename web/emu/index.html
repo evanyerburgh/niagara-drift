@@ -402,7 +402,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">HOME</div>
         <div class="pstack">
-        <div class="g-page"><i>Drones 1</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Pitch</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Cutoff</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Pitch</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Cutoff</span></div>
+        <div class="g-page"><i>Drones 1</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Pitch<small>settles on the Tuning</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Cutoff</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Pitch<small>settles on the Tuning</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Cutoff</span></div>
         <div class="g-page"><i>Drones 2</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Level</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Reso</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Level</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Reso</span></div>
         <p class="pnote combos"><span>Start or stop drone II alone: <span class="cap">SEL</span> + <span class="cap">PLAY</span></span></p>
         </div>
@@ -552,7 +552,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
         <div class="g-btn">GLO</div>
         <div class="pstack">
         <div class="g-page"><i>Setup 1</i><span class="k both"><span class="sr">Knob 1: </span>Fade<small>PLAY’s fade</small></span><span class="k both"><span class="sr">Knob 2: </span>Switch time<small>black keys, LFO waves</small></span><span class="k both"><span class="sr">Knob 3: </span>Scene time<small>between scenes</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
-        <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 2: </span>Stereo<small>width</small></span><span class="k both"><span class="sr">Knob 3: </span>Pressure<small>light ↔ firm</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
+        <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 2: </span>Stereo<small>width</small></span><span class="k both"><span class="sr">Knob 3: </span>Pressure<small>light ↔ firm</small></span><span class="k both"><span class="sr">Knob 4: </span>Tuning<small>where pitches settle</small></span></div>
         </div>
       </div>
     </div>
@@ -743,7 +743,7 @@ function hit(c, cls) {
 // what each control does, on hover (the Buttons list below says the same)
 const TIP = { FX: "Delay: drive, time, repeats, mix; SEL + KNOB 4: the delay type (again: Reverb: length to Inf, damp, type, mix; SEL + KNOB 4: what goes into it)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
   ENV: "Life: character, feedback, age, drift (again: Tone: noise and its colour, white to pink); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: Mods: rate mod, mod by, X-mod amount, delay LFO)",
-  EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, with SEL the sub's wave; drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure)",
+  EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, with SEL the sub's wave; drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure, tuning)",
   HOME: "Drones 1: pitch, cutoff (again: Drones 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in bank A, B or C)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
   PLAY: "Drones in / out (with SEL: drone II alone)", REC: "Motion loop: tap to record knob moves, gestures and scenes, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "Gesture time: how long every gesture takes, left slower, right faster", ALGORITHM: "Movement: every LFO depth together",

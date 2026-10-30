@@ -11,7 +11,8 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 38u                  /* 38: the Swell's Shape the other way round (37's read, negated);
+#define PROJ_FORMAT 39u                  /* 39: the pitch knobs' Tuning (111 values; 38's widened);
+                                          * 38: the Swell's Shape the other way round (37's read, negated);
                                           * 37: each drone's sub wave (110 values; 36's widened);
                                           * 36: the pressure keys' gestures' latches (108; 35's widened); scenes 9-12 moved
                                           * to keys 1-8, P9-P12 copied into the banks (keys 9-12 are gestures);
@@ -53,7 +54,9 @@ typedef struct {
                                           * (the player's, not a scene's; was the macro PRESETS played, format <= 25) */
     uint8_t gkey_old[4];                 /* unused since 29 (what each gesture key played, 27-28) */
     uint8_t seen[2];                     /* the one-time tips shown (bit TIP_*; v0.3): the player's, not a scene's */
-    uint8_t rsv[7];                      /* room to grow: an older, shorter project loads (zeros here) */
+    int8_t tun_off[3];                   /* each pitch knob's offset off the Tuning's grid, cents (SEL's fine tuning; drone
+                                          * I, drone II, the link offset; v0.3): the player's, not a scene's */
+    uint8_t rsv[4];                      /* room to grow: an older, shorter project loads (zeros here) */
     uint16_t scene_used;                 /* bank A: bit n, scene n holds a sound */
     int16_t scene[NSCENES][DR_NPARAMS];  /* bank A: every parameter, recalled but for the room's settings */
 } project_t;
