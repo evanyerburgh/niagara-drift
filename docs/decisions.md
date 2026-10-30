@@ -485,3 +485,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   between the harmonics -25 -> -38 dB (A-weighted), +65 instr/sample in the worst case. The delay's drive stays as it
   is (not heard). **The square is 3 dB down** (`OSC_SQ_K`): it was 2.6-4.1 dB over the saw on the speaker, now
   +0.2 / +1.4 dB (D3 / A3); X-Wave's saw-square blends follow. The delay's 16-bit floor (~-90 dBFS) stays: not heard.
+- 2026-10-30 (Evan): **the Swell's Shape turned round**: even in the middle, the ramp to the right (toward a saw),
+  firmer to the left (the hard gate at the end); saved sounds and scenes are converted so they sound the same
+  (PROJ_FORMAT 38, the value negated; the default −25, Stutter toward −85). **A scene blend kept as a gesture is**:
+  pressing shows "A1 40%", a SEL tap keeps it right there ("A1 40% KEPT", the key then let go any time), and letting
+  go keeps it with the same banner; how to undo it is a one-time tip.

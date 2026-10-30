@@ -44,7 +44,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
     {"Stereo", 0, 100, 60}, {"Tune", -50, 50, 0},
-    {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", -100, 100, 25}, {"Swing", 0, 50, 0},
+    {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", -100, 100, -25}, {"Swing", 0, 50, 0},
     {"Time", 0, DR_DLY_TMAX, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
     {"Type", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Dly LFO", -100, 100, 20},
     {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
@@ -310,12 +310,12 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_NOTE_NAME[(unsigned)v < DR_NNOTE ? v : 5]);
     else if (i == P_SCENE_BARS)
         copy_s(b, DR_BARS_NAME[(unsigned)v < DR_NBARS ? v : 2]);
-    else if (i == P_PULSE_SHAPE && v <= 0) {     /* "even"; "ramp 40" (the left half) */
+    else if (i == P_PULSE_SHAPE && v >= 0) {     /* "even"; "ramp 40" (the right half) */
         if (v == 0) {
             copy_s(b, "even");
         } else {
             copy_s(b, "ramp ");
-            itoa_s(-v, b + 5);
+            itoa_s(v, b + 5);
         }
     }
     else if (i == P_WSCALE)
@@ -704,8 +704,9 @@ void dr_init(void)
  * rises over in0 .. in1 and falls again over out0 .. out1, both ways (a dip while something else moves); PULSE an
  * offset breathing slowly (PULSE_HZ) while it's in; WOW a drone's pitch wavering slowly, d cents; TICKD / TICKU the
  * sub's own rate (p a drone); CHORD a
- * partner's own interval (p a drone, d 1 or 2), from Wander's scale (v0.3). */
-enum { MK_ADD, MK_SW, MK_OFF, MK_ZERO, MK_TO, MK_SHIFT, MK_BUMP, MK_PULSE, MK_WOW, MK_TICKD, MK_TICKU, MK_CHORD };
+ * partner's own interval (p a drone, d 1 or 2), from Wander's scale (v0.3); DOWN as TO, down toward d (the Swell's
+ * Shape toward its gate). */
+enum { MK_ADD, MK_SW, MK_OFF, MK_ZERO, MK_TO, MK_SHIFT, MK_BUMP, MK_PULSE, MK_WOW, MK_TICKD, MK_TICKU, MK_CHORD, MK_DOWN };
 typedef struct {
     uint8_t p, kind;                             /* the value (or, for a pitch move, the drone) and the kind */
     int16_t d;                                   /* the amount at full (MK_ADD; MK_TO: the value aimed at) */
@@ -786,7 +787,7 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
      * deepens, then hardens into a gate, and at the top the rate's two moves add up to its fastest (16 a second, as
      * heard and kept on the FM-1, 2026-10-28). Let go: it softens first, then slows, then lets go */
     {{P_PULSE, MK_SW, 0, 0, 1, 0, 1}, {P_PULSE_RATE, MK_TO, 80, 0, 35, 0, 35}, {P_PULSE_DEPTH, MK_TO, 95, 10, 70, 10, 70},
-     {P_PULSE_SHAPE, MK_TO, 85, 50, 100, 50, 100}, {P_PULSE_RATE, MK_TO, 90, 70, 100, 70, 100}},
+     {P_PULSE_SHAPE, MK_DOWN, -85, 50, 100, 50, 100}, {P_PULSE_RATE, MK_TO, 90, 70, 100, 70, 100}},
 };
 /* AGE (Life), a state: as the old tape wears, darker, a little hiss, the pitch wavering slowly (wow) and a little
  * quickly (flutter); it wears in (and out) over AGE_S. Not Character (Evan, 2026-10-20: the two knobs overlapped) */
@@ -939,6 +940,7 @@ static void mv_add(const move_t *v, float l, float *off, uint8_t *on, float *pm,
     case MK_TICKU: tick_u[v->p] = fm_maxf(tick_u[v->p], l); break;
     case MK_ZERO: off[v->p] -= (float)base[v->p] * l * (v->d ? (float)v->d * 0.01f : 1.0f); break;
     case MK_TO: off[v->p] += fm_maxf((float)(v->d - base[v->p]), 0.0f) * l; break;
+    case MK_DOWN: off[v->p] += fm_minf((float)(v->d - base[v->p]), 0.0f) * l; break;
     case MK_SHIFT: pm[v->p] += (float)(base[P_SHIFT_MOVE] - DR_SHIFT_MID) * 0.01f * l; break;
     case MK_PULSE: off[v->p] += (float)v->d * l * (0.5f - 0.5f * fm_cosf(6.2831853f * mac_ph)); *flags |= 2; break;
     case MK_WOW: {                               /* two slow sines a drone, apart (wow: +-14 cents at full), and two
@@ -2091,21 +2093,21 @@ static float pulse_depth(int v)
 {
     return v >= 100 ? 1.0f : 1.0f - fm_exp2f((float)v * (-30.0f / 99.0f * 0.166096405f));
 }
-/* a breath's gain at ph (0..2 a bar, two breaths; swing b1 the first's length). SHAPE over 0 firms it up, toward a
- * gate; under 0 a ramp: the rise (trough to peak) takes up to 97 % of the breath, the fall the rest, but never under
+/* a breath's gain at ph (0..2 a bar, two breaths; swing b1 the first's length). SHAPE under 0 firms it up, toward a
+ * gate; over 0 a ramp (Evan, 2026-10-30: turning right lengthens it, as it was turning left): the rise (trough to peak) takes up to 97 % of the breath, the fall the rest, but never under
  * 20 ms (hz: breaths a second): quicker, it clicked */
 static float pulse_gain(float ph, float depth, float shape, float b1, float hz)
 {
     float f = ph < b1 ? ph / b1 : (ph - b1) / (2.0f - b1), o;
-    if (shape < 0.0f) {
-        float r = fm_minf(0.5f - 0.47f * shape, 1.0f - 0.02f * hz), u = f + 0.25f;
+    if (shape > 0.0f) {
+        float r = fm_minf(0.5f + 0.47f * shape, 1.0f - 0.02f * hz), u = f + 0.25f;
         u -= fm_floorf(u);
         if (r > 0.5f)
             u = u < r ? 0.5f * u / r : 0.5f + 0.5f * (u - r) / (1.0f - r);
         f = u - 0.25f;
         shape = 0.0f;
     }
-    o = fm_clampf(0.5f * fm_sinf(FM_TWO_PI * f) / (1.0f - 0.98f * shape) + 0.5f, 0.0f, 1.0f);
+    o = fm_clampf(0.5f * fm_sinf(FM_TWO_PI * f) / (1.0f + 0.98f * shape) + 0.5f, 0.0f, 1.0f);
     return 1.0f - depth * (1.0f - o);
 }
 float dr_pulse_wave(float ph)

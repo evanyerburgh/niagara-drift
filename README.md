@@ -131,7 +131,7 @@ made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE
 | | |
 |---|---|
 | **White key** 1–8 (F3–F4): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Pitch lock, Fade, Switch time and Scene time stay as they are |
-| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and the blend **stays** where it was as you lifted your finger: a sound of its own between the two (SEL + SAVE takes you back) |
+| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Tap SEL** and the blend stays right there ("A5 40% KEPT"), however you press after; let go when you like. Or just **let go**: it stays where it was as you lifted your finger. Either way it's a sound of its own between the two (SEL + SAVE takes you back) |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **SEL + SAVE** | **undo**: back to the sound before your last scene tap or blend, gliding over the Scene time (a knob turned since goes back too; the room's settings, such as Stereo or the Scene time, stay). Again, and it goes forward to where you were. Keep SEL down until you've let go of SAVE |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A, B or C) |
@@ -325,9 +325,10 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - Tap ARP for this page; tap it again here to start or stop the Swell. The picture shows a bar of it, and a dot where it is.
 - **The Swell** runs from a 33-second breath to a buzz (the starting sound has it on: a slow breath, 40 deep).
 - **Depth** is how far it dips, in dB (down to −30; all the way, silence). **Shape** runs both ways from the
-  middle, **even** (a smooth breath): to the right it firms up into a pulse, and only at the top into a hard gate; to
-  the left it becomes a **ramp**, swelling slowly and falling away quickly, more like a sawtooth the further you go
-  ("ramp 100": the rise takes 97 % of each breath; at fast rates the fall stays at least 20 ms, so it doesn't click).
+  middle, **even** (a smooth breath): to the right it becomes a **ramp**, swelling slowly and falling away quickly,
+  more like a sawtooth the further you go ("ramp 100": the rise takes 97 % of each breath; at fast rates the fall
+  stays at least 20 ms, so it doesn't click); to the left it firms up into a pulse, and only at the end into a hard
+  gate.
 - **On a MIDI clock** (see MIDI below) the Swell breathes in time: KNOB 1 becomes **Division**, how long a breath
   lasts, from 32 bars down to a quarter note, and the picture shows it with the tempo ("8 bars · 120"). A locked LFO
   (black key 5, held) restarts on the Swell's bars, so it follows the clock too.
