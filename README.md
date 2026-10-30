@@ -258,7 +258,8 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 | Sub · Drive | I osc mix (+ SEL: sub wave) | I drive | II osc mix (+ SEL: sub wave) | II drive |
 
 - **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width. The sine and the triangle are a
-  little louder than the saw and the square, so they still carry on a small speaker.
+  little louder than the saw, so they still carry on a small speaker, and the square a little quieter, level with the
+  saw there.
 - **Osc mix** goes from the oscillators to the sub; **drive** pushes each drone into its filter.
 - **The sub's wave**: hold SEL and turn a drone's Osc mix knob: **Square** (as it starts), **Sine** (pure weight, the
   deepest on headphones, the least for a small speaker), **Triangle**, **Saw** (the brightest). Each is as loud as the
