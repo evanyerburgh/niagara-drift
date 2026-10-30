@@ -512,6 +512,7 @@ typedef struct {
     float cut;                                    /* smoothed cutoff, octaves over 1 Hz */
     float ic1, ic2;                               /* filter states */
     float bc;                                     /* the bass makeup's low-pass state */
+    float du, dF;                                 /* the DRIVE's antialiasing: its last input, sat_F of it */
     float gf, gtarget;                            /* the voice's fade, 0..1 */
     float lv;                                     /* the level (with the Crossfade), smoothed */
     float peak;
@@ -1187,6 +1188,8 @@ static inline float sub_wave(int w, float ph, float dt)
  * above 200 Hz, where it starts to work); met half way, ~4 dB (Evan, 2026-10-19), a little louder on headphones */
 #define OSC_SINE_K 1.6f
 #define OSC_TRI_K 1.7f
+/* the square brought down 3 dB: it was the loudest wave on the speaker, 2.7-4.1 dB over the saw (Evan, 2026-10-30) */
+#define OSC_SQ_K 0.70794578f
 static inline float osc(int wave, float ph, float dt, float pw)
 {
     switch (wave) {
@@ -1202,7 +1205,7 @@ static inline float osc(int wave, float ph, float dt, float pw)
         float t2 = ph + 1.0f - pw;
         if (t2 >= 1.0f)
             t2 -= 1.0f;
-        return (ph < pw ? 1.0f : -1.0f) + blep(ph, dt) - blep(t2, dt) + (1.0f - 2.0f * pw);   /* DC-free */
+        return OSC_SQ_K * ((ph < pw ? 1.0f : -1.0f) + blep(ph, dt) - blep(t2, dt) + (1.0f - 2.0f * pw));   /* DC-free */
     }
     }
 }
@@ -1214,6 +1217,28 @@ static inline float sat(float x)
     x = fm_clampf(x, -3.0f, 3.0f);
     x2 = x * x;
     return x * (27.0f + x2) / (27.0f + 9.0f * x2);
+}
+
+/* sat()'s antiderivative, for the DRIVE's antialiasing (sat_aa): x^2/18 + 4/3 ln(9x^2 + 27) on [-3, 3]
+ * (sat = x/9 + 24x/(9x^2 + 27)), and straight on past it (sat is +-1 there) */
+#define SAT_F3 6.7428416f                         /* F(3) = 0.5 + 4/3 ln 108 */
+static inline float sat_F(float x)
+{
+    float a = fm_fabsf(x);
+    if (a >= 3.0f)
+        return SAT_F3 + (a - 3.0f);
+    return x * x * (1.0f / 18.0f) + 0.92419624f * fm_log2f(9.0f * x * x + 27.0f);   /* 4/3 ln2 */
+}
+/* the soft clip without most of its aliasing (first-order antiderivative antialiasing): the clip's mean over the step
+ * from the last input to this one, (F(u) - F(u0)) / (u - u0), instead of its value at one point (Evan, 2026-10-30:
+ * the drone drive at 100 folded tones back in at high notes); half a sample late, a touch softer at the very top */
+static inline float sat_aa(float u, float *u0, float *f0)
+{
+    float f = sat_F(u), d = u - *u0, y;
+    y = *f0 > 0.0f && fm_fabsf(d) > 1e-4f ? (f - *f0) / d : sat(0.5f * (u + *u0));   /* (F >= 4.39: 0 is unset) */
+    *u0 = u;
+    *f0 = f;
+    return y;
 }
 
 static inline float advance(float ph, float dt)
@@ -1620,6 +1645,13 @@ static void render_group(int g, uint32_t n)
      * to 16 (as before at 100); the make-up keeps a signal of DRV_REF's size as loud as it went in, so the
      * knob adds grit, not level (1/sqrt(gain) took 6 dB off from 20 to 100) */
     const float drv = 0.5f * fm_exp2f(pv[GP_DRIVE] * 0.05f), mk = DRV_REF / sat(DRV_REF * drv);
+    /* the drive's antialiasing (sat_aa), blended in from 40 to 60: below 40 the clip barely folds anything back, and
+     * the sound and its cost stay as they were (the starting sound's drive is 20) */
+    const float aaw = fm_clampf((pv[GP_DRIVE] - 40.0f) * 0.05f, 0.0f, 1.0f);
+    if (aaw > 0.0f && v->dF <= 0.0f)
+        v->dF = sat_F(v->du);                     /* (coming in: from the last input, as it was) */
+    else if (aaw <= 0.0f)
+        v->dF = 0.0f;
     /* resonance: damping k from 2 (none) to just under 0 (self-oscillation, held by the soft clip on the
      * band-pass state); the input drops as it rises, so the resonance has room to sing. In low-pass, what
      * that takes from the bass is added back (the DS-2's "no bass loss"): the input through a one-pole an
@@ -1893,7 +1925,7 @@ static void render_group(int g, uint32_t n)
                     /* the oscillator's own BLEP will smooth a saw's or square's natural edge at 0 next
                      * sample: only the rest of the jump is ours there */
                     float nat = 2.0f * ((wi == DR_SAW ? 1.0f - wf : wi + 1 == DR_SAW ? wf : 0.0f) +
-                                        (wi == DR_SQUARE ? 1.0f - wf : wi + 1 == DR_SQUARE ? wf : 0.0f));
+                                        OSC_SQ_K * (wi == DR_SQUARE ? 1.0f - wf : wi + 1 == DR_SQUARE ? wf : 0.0f));
                     x += d * (1.0f - f) * (1.0f - f) * 0.5f;
                     v->sync_next = -(d - nat) * f * f * 0.5f;
                 }
@@ -1950,7 +1982,13 @@ static void render_group(int g, uint32_t n)
                 fb_ein += in * in;
                 x += in;
             }
-            x = sat(x * drv) * mk;
+            if (aaw > 0.0f) {
+                float u = x * drv, a = sat_aa(u, &v->du, &v->dF);
+                x = (aaw < 1.0f ? sat(u) + (a - sat(u)) * aaw : a) * mk;
+            } else {
+                v->du = x * drv;
+                x = sat(v->du) * mk;
+            }
             {                                   /* the bass makeup (low-pass, as weighted) */
                 float bv = (x - bc) * bk;
                 float lo = bv + bc;

@@ -480,3 +480,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   the unit; an older backup's is skipped on restore). After fm1-base's and Melodee's. Still the 0.2 backup commands,
   so a 0.2 FM-1 is backed up before it's updated; a restore that changes the set whole or not at all, with a yes on
   the FM-1's screen (fm1-base's), is for a later PR.
+- 2026-10-30 (Evan, step 6, after listening): the **drone drive is antialiased** (first-order antiderivative
+  antialiasing of its soft clip, blended in from Drive 40 to 60; below 40 as before): at 100 on a saw at A5 the energy
+  between the harmonics -25 -> -38 dB (A-weighted), +65 instr/sample in the worst case. The delay's drive stays as it
+  is (not heard). **The square is 3 dB down** (`OSC_SQ_K`): it was 2.6-4.1 dB over the saw on the speaker, now
+  +0.2 / +1.4 dB (D3 / A3); X-Wave's saw-square blends follow. The delay's 16-bit floor (~-90 dBFS) stays: not heard.
