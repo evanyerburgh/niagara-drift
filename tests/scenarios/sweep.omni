@@ -1,7 +1,8 @@
 # a hand on a pitch knob, to listen to (sweep.wav): drone I alone (drone II's level at 0 on the Shape page),
-# its filter fairly open. A slow full turn of KNOB 1 (20 detents, 150 ms apart: an octave in 3 s), back
+# its filter fairly open. A slow turn of KNOB 1 (12 detents, 150 ms apart: an octave of
+# semitones in 1.8 s), back
 # down at a medium speed, a quick spin up, then fine tuning with SEL held. Every part should sound like
-# a continuous slide, never steps.
+# a continuous slide through the notes, never stairs.
 # Pitch lock off (on at start since 2026-10-19): these move the pitch
 set 74 0
 tap EDIT
@@ -12,10 +13,10 @@ spin K2 20
 wav sweep.wav
 tap PLAY
 wait 1500
-turn K1 20 150
+turn K1 12 150
 wait 600
 expect par0 6200
-turn K1 -20 50
+turn K1 -12 50
 wait 600
 expect par0 >4800
 expect par0 <5001
