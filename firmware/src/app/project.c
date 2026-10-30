@@ -66,7 +66,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     {II_(GP_PITCH), 4500, I_(GP_WAVE), 67, II_(GP_WAVE), 67, I_(GP_INTERVAL), 14, II_(GP_INTERVAL), 14,
      I_(GP_DETUNE), 6, II_(GP_DETUNE), 6, I_(GP_MIX), 0, II_(GP_MIX), 0, I_(GP_CUTOFF), 820, II_(GP_CUTOFF), 780,
      I_(GP_RESO), 320, II_(GP_RESO), 320, I_(GP_DRIVE), 40, II_(GP_DRIVE), 40, P_CHAR, 40, P_PULSE_RATE, 50,
-     P_PULSE_DEPTH, 45, P_PULSE_SHAPE, 40, P_PULSE_SWING, 15, P_MOVE, 30, P_REV_TYPE, 1, P_REV_LEN, 55,
+     P_PULSE_DEPTH, 45, P_PULSE_SHAPE, -40, P_PULSE_SWING, 15, P_MOVE, 30, P_REV_TYPE, 1, P_REV_LEN, 55,
      P_REV_MIX, 30, P_DLY_MIX, 10, I_(GP_LEVEL), 73, II_(GP_LEVEL), 68, -1},
     /* P7 TAPE: worn: a minor third apart (D3, F3), a wide square and a saw, Age and a lot of Character, a tape delay,
      * hiss, darker, the sub an octave down.
@@ -263,6 +263,9 @@ static void convert(int16_t *v, uint32_t from)
     if (from == 24u)                            /* the swells shorter (2-4 s, Evan 2026-10-18): to the new defaults */
         for (g = P_GR_0; g <= P_GR_3; g++)
             v[g] = dr_param_info(g)->def;
+    if (from <= 37u)                            /* the Swell's Shape turned round (Evan, 2026-10-30): the ramp to the
+                                                 * right now, the gate to the left; the same sound */
+        v[P_PULSE_SHAPE] = (int16_t)-v[P_PULSE_SHAPE];
 }
 
 static int in_range(const int16_t *v)
@@ -289,6 +292,7 @@ static int in_range(const int16_t *v)
 #define NP34 101
 #define NP35 104
 #define NP36 108
+#define NP37 110
 _Static_assert(DR_NPARAMS >= NP36, "the values only grow");
 typedef struct {
     uint32_t magic, format;
@@ -435,7 +439,7 @@ static union {
 static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old sound: the new values' defaults */
 {
     int k;
-    const int np = from >= 36u ? NP36 : from >= 35u ? NP35 : from >= 34u ? NP34 : from >= 33u ? NP33 : from >= 32u ? NP32 : from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
+    const int np = from >= 37u ? NP37 : from >= 36u ? NP36 : from >= 35u ? NP35 : from >= 34u ? NP34 : from >= 33u ? NP33 : from >= 32u ? NP32 : from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
     for (k = 0; k < DR_NPARAMS; k++)
         dst[k] = k < np ? src[k] : dr_param_info(k)->def;
     if (dst[P_LFO_RATE] < 0)                   /* slower than 50 s, as it went before 2026-10-14: the slowest */
@@ -456,6 +460,11 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
     bank_fmt[b - 1] = ld.b.format;
     if (ld.b.format == PROJ_FORMAT) {
         *k = ld.b;
+    } else if (ld.b.format == 37u) {           /* 37: as now, the Shape the other way round */
+        k->used = ld.b.used;
+        for (i = 0; i < NSCENES; i++)
+            widen(k->scene[i], ld.b.scene[i], 37u);
+        bank_dirty |= (uint8_t)(1u << b);
     } else if (ld.b.format == 36u) {           /* 36: 108 values a sound */
         const bank_v36_t *o = &ld.b36;
         k->used = o->used;
@@ -520,7 +529,7 @@ static const int16_t *old_scene(int n, uint32_t *from)   /* scene n of the bank 
 {
     uint32_t f = ld.b.format;
     *from = f;
-    if (f == PROJ_FORMAT) return ld.b.scene[n];
+    if (f == PROJ_FORMAT || f == 37u) return ld.b.scene[n];
     if (f == 36u) return ld.b36.scene[n];
     if (f == 35u) return ld.b35.scene[n];
     if (f == 34u) return ld.b34.scene[n];
@@ -641,6 +650,11 @@ int project_load(void)
     }
     if (from == PROJ_FORMAT) {
         proj = ld.p;
+    } else if (from == 37u) {                  /* 37: as now, the Shape the other way round */
+        proj = ld.p;
+        convert(proj.par, from);
+        for (i = 0; i < NSCENES; i++)
+            convert(proj.scene[i], from);
     } else if (from == 36u) {                  /* 36: 108 values a sound */
         const proj_v36_t *o = &ld.o36;
         memset(&proj, 0, sizeof proj);

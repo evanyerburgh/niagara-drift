@@ -1171,6 +1171,21 @@ static int press_scaled(int p)
     return p < 0 ? p : (int)fm_clampf(127.0f * press_curve((float)p * (1.0f / 127.0f)) + 0.5f, 0.0f, 127.0f);
 }
 
+static char *press_label(char *t, int n)               /* "B5  40%": the scene, how far into it */
+{
+    char *q = t;
+    t[0] = 0;
+    scene_name(t, proj.bank, n);
+    while (*q)
+        q++;
+    *q++ = ' ';
+    *q++ = ' ';
+    itoa_u((uint32_t)(ui.press_x * 100.0f + 0.5f), q);
+    while (*q)
+        q++;
+    scopy(q, "%");
+    return t;
+}
 static void press_run(void)                            /* each frame, while a scene key is held */
 {
     char t[16];
@@ -1210,18 +1225,21 @@ static void press_run(void)                            /* each frame, while a sc
     scene_name(t, proj.bank, ui.press);
     if (ui.press_done)
         say_c(t, "TAKEN", K_GOLD);
-    else {                                             /* "B5  40%" */
-        char *q = t;
-        while (*q)
-            q++;
-        *q++ = ' ';
-        *q++ = ' ';
-        itoa_u((uint32_t)(ui.press_x * 100.0f + 0.5f), q);
-        while (*q)
-            q++;
-        scopy(q, "%");
-        say_c(t, "LET GO: STAYS", K_GOLD);
-    }
+    else
+        say_c(press_label(t, ui.press), 0, K_GOLD);   /* "B5  40%", as a gesture's (Evan, 2026-10-30) */
+}
+
+/* the blend stays where it is, a sound of its own (v0.3): the key let go, or SEL tapped while it's held (as a
+ * gesture's, Evan 2026-10-30); "B5  40%  KEPT", and the first time, how to undo it */
+static void press_keep(int n)
+{
+    char t[16];
+    ui.press = -1;
+    ui.scene_at = -1;
+    say_c(press_label(t, n), "KEPT", K_GOLD);
+    tip(TIP_UNDO);
+    loop_note(LP_BLEND_X, (int)(ui.press_x * 1000.0f + 0.5f), 0);   /* the loop: where it was kept, and let go */
+    loop_note(LP_BLEND_END, 0, 0);
 }
 
 static void press_end(void)                            /* the key let go */
@@ -1266,10 +1284,7 @@ static void press_end(void)                            /* the key let go */
             ui.press_x = xk;
             sound_blend(ui.visit_back, ui.press_to, xk);
         }
-        ui.scene_at = -1;
-        say_c("KEPT", "SEL + SAVE: UNDO", K_GOLD);
-        loop_note(LP_BLEND_X, (int)(ui.press_x * 1000.0f + 0.5f), 0);   /* the loop: where it was kept, and let go */
-        loop_note(LP_BLEND_END, 0, 0);
+        press_keep(n);
     }
 }
 
@@ -1649,6 +1664,11 @@ static void input(void)
                 ui.btn_used |= 1u << B_SEL;
                 say_c(GESTURE[g], "KEPT", K_LFO);
             }
+        if (ui.press >= 0 && !ui.press_done && plat_ms() - ui.press_t0 >= PR_WAIT_MS) {   /* ... a scene key: the
+                                                        * blend kept there; its let-go does nothing more */
+            ui.btn_used |= 1u << B_SEL;
+            press_keep(ui.press);
+        }
     }
     if (!(btn >> B_SEL & 1u))
         ui.km_key = -1;

@@ -727,7 +727,7 @@ int main(void)
             dr_set(P_PULSE, 1);
             dr_set(P_PULSE_RATE, rates[t]);              /* 0.2 breaths a second; 16 */
             dr_set(P_PULSE_DEPTH, 100);
-            dr_set(P_PULSE_SHAPE, -100);
+            dr_set(P_PULSE_SHAPE, 100);
             dr_play(1);
             for (k = 0; k < (int)(15.0f * DR_SR / 32.0f); k++) {   /* 15 s in 32-frame steps */
                 dr_render(small, 32, 3277);
@@ -756,7 +756,7 @@ int main(void)
         dr_set(P_PULSE, 1);
         dr_set(P_PULSE_RATE, 67);                       /* 0.03 * 533^0.67 = 2 a second */
         dr_set(P_PULSE_DEPTH, 100);
-        dr_set(P_PULSE_SHAPE, 100);                     /* a hard gate */
+        dr_set(P_PULSE_SHAPE, -100);                     /* a hard gate */
         dr_play(1);
         for (k = 0; k < (int)(4.0f * DR_SR / 32.0f); k++) {   /* 4 s in 32-frame steps */
             int open;
@@ -1174,7 +1174,7 @@ int main(void)
         dr_set(P_MORPH, 64);
         dr_set(P_PULSE_RATE, 67);                       /* 2 a second (the default is slower now) */
         dr_set(P_PULSE_DEPTH, 100);
-        dr_set(P_PULSE_SHAPE, 100);
+        dr_set(P_PULSE_SHAPE, -100);
         dr_set(P_PULSE, 1);
         for (b = 0; b < secs(0.5f); b++) {
             run(1);

@@ -86,7 +86,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 37, on bank A", proj.format == 37u && PROJ_FORMAT == 37u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 38, on bank A", proj.format == 38u && PROJ_FORMAT == 38u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -493,6 +493,46 @@ int main(void)
         check("... the subs square, as they were", proj.par[P_SUBW_0] == DR_SUBW_SQUARE &&
                                                   proj.par[P_SUBW_1] == DR_SUBW_SQUARE &&
                                                   scene_get(1, 2)[P_SUBW_1] == DR_SUBW_SQUARE);
+    }
+    {   /* format 37 (as now): loads, the Swell's Shape turned round, so it sounds the same (2026-10-30) */
+        static project_t o;
+        static bank_t bb;
+        int i, k;
+        memset(store_n, 0, sizeof store_n);
+        memset(&o, 0, sizeof o);
+        o.magic = PROJ_MAGIC;
+        o.format = 37u;
+        o.mtime = MTIME_DEF;
+        for (k = 0; k < DR_NPARAMS; k++)
+            o.par[k] = dr_param_info(k)->def;
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < DR_NPARAMS; k++)
+                o.scene[i][k] = dr_param_info(k)->def;
+        o.par[P_PULSE_SHAPE] = 25;                     /* 37's default: a little firmer */
+        o.par[P_SUBW_1] = DR_SUBW_SAW;
+        o.scene_used = 0x003u;
+        o.scene[1][P_PULSE_SHAPE] = -60;               /* a ramp */
+        memcpy(store[OBJ_PROJ], &o, sizeof o);
+        store_n[OBJ_PROJ] = (int)sizeof o;
+        memset(&bb, 0, sizeof bb);
+        bb.magic = BANK_MAGIC;
+        bb.format = 37u;
+        bb.used = 1u << 2;
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < DR_NPARAMS; k++)
+                bb.scene[i][k] = dr_param_info(k)->def;
+        bb.scene[2][P_PULSE_SHAPE] = 100;              /* the hard gate */
+        bb.scene[2][P_SUBW_0] = DR_SUBW_SAW;
+        memcpy(store[OBJ_BANKB], &bb, sizeof bb);
+        store_n[OBJ_BANKB] = (int)sizeof bb;
+        check("a format-37 project loads", project_load() == 0 && proj.format == PROJ_FORMAT);
+        check("... the Shape turned round: firmer to the left, the ramp to the right",
+              proj.par[P_PULSE_SHAPE] == -25 && scene_get(0, 1)[P_PULSE_SHAPE] == 60 &&
+              scene_get(1, 2)[P_PULSE_SHAPE] == -100 && dr_param_info(P_PULSE_SHAPE)->def == -25);
+        check("... the rest kept, the subs too", proj.par[P_SUBW_1] == DR_SUBW_SAW && scene_get(1, 2)[P_SUBW_0] == DR_SUBW_SAW &&
+                                                 scene_has(0, 1) && scene_has(1, 2));
+        check("... and saved as 38", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 38u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 38u);
     }
     printf("project: %s\n", fails ? "FAILED" : "all ok");
     return fails != 0;

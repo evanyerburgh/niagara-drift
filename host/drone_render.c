@@ -85,7 +85,7 @@ static const scene_t SCENES[] = {
       {35, E_PLAY, 0}, {36, E_END}}},
     {"14-pulse", "the pulse on both drones at 2 a second: a smooth swell, then a hard gate, then swing",
      {{0, E_SET, P_FADE, 30}, {0, E_SET, P_PULSE, 1}, {0, E_SET, P_PULSE_RATE, 50}, {0, E_SET, P_PULSE_SHAPE, 0},
-      {0, E_PLAY, 1}, {6, E_RAMP, P_PULSE_SHAPE, 0, 100, 4}, {12, E_RAMP, P_PULSE_SWING, 0, 40, 3},
+      {0, E_PLAY, 1}, {6, E_RAMP, P_PULSE_SHAPE, 0, -100, 4}, {12, E_RAMP, P_PULSE_SWING, 0, 40, 3},
       {18, E_PLAY, 0}, {19, E_END}}},
     {"15-delay", "the delay: dark repeats under the pulse, then the LFO warbling its time, then Repeats up to runaway",
      {{0, E_SET, P_FADE, 30}, {0, E_SET, P_REV_MIX, 15}, {0, E_SET, P_DLY_MIX, 45}, {0, E_SET, P_DLY_TIME, 55},
@@ -95,7 +95,7 @@ static const scene_t SCENES[] = {
       {28, E_SET, P_DLY_REPEATS, 40}, {32, E_END}}},
     {"16-reverb-types", "the reverb's four types on the pulsing drones, 6 s each: room, plate, hall, chorus hall",
      {{0, E_SET, P_FADE, 20}, {0, E_SET, P_REV_MIX, 55}, {0, E_SET, P_REV_TYPE, 0}, {0, E_SET, P_PULSE, 1},
-      {0, E_SET, P_PULSE_RATE, 20}, {0, E_SET, P_PULSE_SHAPE, 100}, {0, E_PLAY, 1}, {6, E_SET, P_REV_TYPE, 1},
+      {0, E_SET, P_PULSE_RATE, 20}, {0, E_SET, P_PULSE_SHAPE, -100}, {0, E_PLAY, 1}, {6, E_SET, P_REV_TYPE, 1},
       {12, E_SET, P_REV_TYPE, 2}, {18, E_SET, P_REV_TYPE, 3}, {24, E_PLAY, 0}, {28, E_END}}},
     {"17-noise-colours", "the drones as they start, drone I's noise at the top (-6 dB) beside its tones: white, then "
      "pink, white, pink (the switch crossfading over the Morph)",

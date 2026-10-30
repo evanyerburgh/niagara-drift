@@ -88,8 +88,9 @@ enum {
     P_PULSE,                        /* the PULSE on (1) / off (0): both drones chopped in time (a switch) */
     P_PULSE_RATE,                   /* 0..100 = 0.03 .. 16 pulses a second, exponential (a 33 s breath .. a buzz) */
     P_PULSE_DEPTH,                  /* 0..100: how far the level drops between pulses */
-    P_PULSE_SHAPE,                  /* -100..100: 0 a smooth swell; up to 100 firmer, a hard gate at the top; down to
-                                     * -100 a ramp, rising slowly and falling quickly (a user's ask, 2026-10-25) */
+    P_PULSE_SHAPE,                  /* -100..100: 0 a smooth swell; up to 100 a ramp, rising slowly and falling
+                                     * quickly (a user's ask, 2026-10-25); down to -100 firmer, a hard gate at the
+                                     * bottom (the other way round before PROJ_FORMAT 38) */
     P_PULSE_SWING,                  /* 0..50: every other pulse longer (50: 3 to 1) */
     P_DLY_TIME,                     /* the DELAY: 70 ms * (450/70)^(v/100): 0..100 70 .. 450 ms as since 0.1, on to
                                      * DR_DLY_TMAX, 1.46 s (2026-10-25: the line at half rate) */

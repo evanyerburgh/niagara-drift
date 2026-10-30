@@ -54,6 +54,26 @@ tap SAVE
 release SEL
 wait 1300
 expect par7 300
+# SEL tapped while it's held, half way: the blend kept there, as a gesture's (Evan, 2026-10-30); pressing on moves
+# nothing, and the let-go keeps it too
+key w0 down
+pressure w0 64
+wait 800
+tap SEL
+pressure w0 127
+wait 800
+expect par7 >480
+expect par7 <540
+key w0 up
+wait 1200
+expect par7 >480
+expect par7 <540
+expect scene_at -1
+press SEL
+tap SAVE
+release SEL
+wait 1300
+expect par7 300
 # a tap (let go under half a second), however hard: there, over the Scene time (1.1 s), and stay
 key w0 down
 pressure w0 127
