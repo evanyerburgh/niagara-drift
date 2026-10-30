@@ -194,9 +194,6 @@ static struct {
     int8_t undo_ok, undo_at;           /* ... there is one; the scene it was (-1: a sound of its own) */
     uint16_t tip_q;                    /* the one-time tips waiting for the screen (bit TIP_*) */
     char msg_next[24];                 /* a message's second part, shown after it (too long for one) */
-    float px_h[16];                    /* a crossfade's last frames (how far in), for the let-go (PR_LIFT_MS) */
-    uint32_t pt_h[16];
-    uint8_t ph_i;
     uint32_t press_t0, press_hi_t;     /* ... since; above the commit level since (0: not) */
     uint32_t press_ft;                 /* ... the last frame's time (its glide toward the pressure) */
     float press_x;                     /* ... how far into the scene, 0..1 */
@@ -1133,7 +1130,6 @@ static void scene_morph(void)
 #define PR_COMMIT_MS 300u
 #define PR_TAP_MS 500u                 /* a scene key let go sooner: a tap, there to stay, as a gesture key (Evan,
                                         * 2026-10-18: 250 was too quick, a relaxed tap became a visit and went BACK) */
-#define PR_LIFT_MS 80u                 /* ... let go: back up the finger's lift, at most this long before it */
 #define PR_WAIT_MS 250u                /* ... held this long, the pressure starts to move the sound (a crossfade) */
 static void press_start(int n, const int16_t *sc)
 {
@@ -1142,7 +1138,6 @@ static void press_start(int n, const int16_t *sc)
     if (!(ui.morph == VISIT_BACK && ui.visit == -2 - n)) {  /* not already gliding back from this key: */
         for (k = 0; k < DR_NPARAMS; k++)                   /* where the blend starts from */
             ui.visit_back[k] = proj.par[k];
-        undo_keep();
         hands_clear();
     } else if (ui.morph_ms) {                              /* on the way back: from where it is now */
         float p = fm_clampf((float)(plat_ms() - ui.morph_t0) / (float)ui.morph_ms, 0.0f, 1.0f);
@@ -1154,7 +1149,6 @@ static void press_start(int n, const int16_t *sc)
     ui.morph = -1;
     ui.press = (int8_t)n;
     ui.press_done = 0;
-    memset(ui.pt_h, 0, sizeof ui.pt_h);
     ui.press_ft = plat_ms();
     ui.press_t0 = plat_ms();
     ui.press_hi_t = 0;
@@ -1219,8 +1213,6 @@ static void press_run(void)                            /* each frame, while a sc
     }
     sound_blend(ui.visit_back, ui.press_to, ui.press_x);
     loop_note(LP_BLEND_X, (int)(ui.press_x * 1000.0f + 0.5f), 20);
-    ui.px_h[ui.ph_i & 15u] = ui.press_x;               /* (the let-go keeps the most of the last moments) */
-    ui.pt_h[ui.ph_i++ & 15u] = now;
     t[0] = 0;
     scene_name(t, proj.bank, ui.press);
     if (ui.press_done)
@@ -1229,15 +1221,25 @@ static void press_run(void)                            /* each frame, while a sc
         say_c(press_label(t, ui.press), 0, K_GOLD);   /* "B5  40%", as a gesture's (Evan, 2026-10-30) */
 }
 
-/* the blend stays where it is, a sound of its own (v0.3): the key let go, or SEL tapped while it's held (as a
- * gesture's, Evan 2026-10-30); "B5  40%  KEPT", and the first time, how to undo it */
+/* a scene key's press changed the sound (tapped, taken or kept): SEL + SAVE goes back to the sound before it. Not
+ * one let go back: nothing changed */
+static void press_undo(void)
+{
+    memcpy(ui.undo, ui.visit_back, sizeof ui.undo);
+    ui.undo_ok = 1;
+    ui.undo_at = ui.visit_from;
+    if (ui.visit_from < 0)                             /* the first time over a sound of the player's own: how */
+        tip(TIP_UNDO);
+}
+/* SEL tapped while a scene key is held (as a gesture's, Evan 2026-10-30): the blend stays where it is, a sound of
+ * its own; "B5  40%  KEPT", and the first time, how to undo it */
 static void press_keep(int n)
 {
     char t[16];
     ui.press = -1;
     ui.scene_at = -1;
+    press_undo();
     say_c(press_label(t, n), "KEPT", K_GOLD);
-    tip(TIP_UNDO);
     loop_note(LP_BLEND_X, (int)(ui.press_x * 1000.0f + 0.5f), 0);   /* the loop: where it was kept, and let go */
     loop_note(LP_BLEND_END, 0, 0);
 }
@@ -1252,6 +1254,7 @@ static void press_end(void)                            /* the key let go */
         return;
     if (!ui.press_done && now - ui.press_t0 < PR_TAP_MS) {
         /* a tap (however far a crossfade had begun): there, over the Scene time */
+        press_undo();
         scene_recall(n, 0);
         tip(TIP_BLEND);
         return;
@@ -1267,24 +1270,19 @@ static void press_end(void)                            /* the key let go */
             ui.morph_to[k] = ui.press_to[k];
         ui.morph = (int8_t)n;
         ui.scene_at = (int8_t)n;
+        press_undo();
         say_c(t, "TAKEN", K_GOLD);
         loop_note(LP_SCENE, proj.bank << 4 | n, 0);   /* the loop: the rest of the way */
-    } else {                                           /* let go: the blend stays, a sound of its own (v0.3;
-                                                        * SEL + SAVE undoes it), where it was before the finger
-                                                        * lifted (its pressure falls on the way up) */
-        float xk = ui.press_x;
-        uint32_t i;
-        for (i = 1; i <= 16u; i++) {               /* newest first: back while it was further in (the lift's fall) */
-            uint32_t j = (ui.ph_i - i) & 15u;
-            if (!ui.pt_h[j] || now - ui.pt_h[j] > PR_LIFT_MS || ui.px_h[j] < xk)
-                break;
-            xk = ui.px_h[j];
-        }
-        if (xk > ui.press_x) {
-            ui.press_x = xk;
-            sound_blend(ui.visit_back, ui.press_to, xk);
-        }
-        press_keep(n);
+    } else {                                           /* let go, no SEL: back to where it began, at the same speed
+                                                        * (Evan, 2026-10-30: SEL is what keeps it) */
+        ui.morph = VISIT_BACK;
+        ui.visit = (int8_t)(-2 - n);                   /* (pressed again on the way: picked up from there) */
+        ui.scene_at = ui.visit_from;
+        t[0] = 0;
+        scene_name(t, proj.bank, n);
+        say_c(t, "BACK", K_GOLD);
+        loop_note(LP_BLEND_X, 0, ui.morph_ms);         /* the loop: back (its slide 0.5 s at most), and let go */
+        loop_note(LP_BLEND_END, 0, 0);
     }
 }
 
