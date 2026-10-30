@@ -2802,7 +2802,7 @@ static void keymap_values(void)                /* the values' place: the key tou
     cv_text(10, 66, &FONT_XS, "with SEL:  D5-G5 bank   OCT wave back", K_DIM);   /* clear of the edge */
 }
 
-/* Setup 1: the three times, a row each: FADE (KNOB 1, PLAY's fade in and out), SWITCH TIME (KNOB 2, a black key's or
+/* Setup 1: the three times, a row each, under where a message's banner shows (it covered FADE): FADE (KNOB 1, PLAY's fade in and out), SWITCH TIME (KNOB 2, a black key's or
  * a wave's move to its new setting), SCENE TIME (KNOB 3, every scene move); each a bar as far as its knob and its time. None is in scenes */
 static void pic_setup(int32_t y0)
 {
@@ -2813,7 +2813,7 @@ static void pic_setup(int32_t y0)
     for (r = 0; r < 3; r++) {
         int bars = r == 2 && dr_ext_spb > 0.0f;   /* on a MIDI clock the Scene time is bars (v0.3) */
         int p = bars ? P_SCENE_BARS : P[r];
-        int32_t y = y0 + 4 + r * 38, w = bars ? 76 * (proj.par[p] + 1) / DR_NBARS : 76 * proj.par[p] / 100;
+        int32_t y = y0 + 30 + r * 33, w = bars ? 76 * (proj.par[p] + 1) / DR_NBARS : 76 * proj.par[p] / 100;
         char t[16];
         cv_text(12, y, &FONT_S, N[r], K_SETUP);
         cv_text(12, y + 18, &FONT_XS, W[r], K_DIM);

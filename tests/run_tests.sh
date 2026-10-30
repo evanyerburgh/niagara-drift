@@ -43,6 +43,11 @@ mkdir -p build/drone
 run drone-render sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Wno-missing-field-initializers -Werror -DOM_HOST \
     -Ifirmware/src/dsp -o $OUT/drone_render host/drone_render.c firmware/src/dsp/drone.c && $OUT/drone_render build/drone"
 run storage sh -c "$CC -O2 -o $OUT/storage_test tests/storage_test.c && $OUT/storage_test"
+# the web installer's backup and restore against a pretend FM-1; its file read by the terminal installer
+if command -v node >/dev/null 2>&1; then
+    run web-backup sh -c "node tests/web/backup_test.mjs $OUT/web-backup.json && python3 -c \"import sys; \
+sys.path.insert(0, 'tools'); import fm1_install as f; o = f.read_backup('$OUT/web-backup.json'); assert sorted(o) == [0, 2, 3]\""
+fi
 # the update path, against the firmware package (Felucca's tests; needs ./build.sh)
 if [ -f build/omni.fwsc ]; then
     run ota-entry sh -c "$CC -o $OUT/ota_test tests/ota_test.c && $OUT/ota_test build/omni.fwsc"

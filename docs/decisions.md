@@ -473,3 +473,10 @@ at the end. The current state is in the [README](../README.md) and the code.
   before; slower evenly in seconds to x12 (Weight 34 s), faster only to x4 (0.7 s); shown as Weight's time ("2.8 s").
   A per-note envelope for Wander was drawn and set aside; a Lyra-like "plate" gesture (pressure opens a drone) is a
   0.4 idea.
+- 2026-10-30 (Evan): **the web installer backs up first**, as the terminal one does, into the downloads, and offers the
+  backup back after the install; a card saves or restores one at any time. Both write the same file, now with a CRC-32
+  for each object (a damaged file is refused before anything is written; older files without them still restore),
+  each object read twice (one changed meanwhile is refused), and **without the panel's calibration** (it belongs to
+  the unit; an older backup's is skipped on restore). After fm1-base's and Melodee's. Still the 0.2 backup commands,
+  so a 0.2 FM-1 is backed up before it's updated; a restore that changes the set whole or not at all, with a yes on
+  the FM-1's screen (fm1-base's), is for a later PR.

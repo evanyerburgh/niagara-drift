@@ -107,6 +107,130 @@ async function handshake(link, tries = 3) {
   return null;
 }
 
+// BACKUP / RESTORE (Niagara Drift v0.2 on; firmware/src/app/main_fm1.c backup_cmd, tools/fm1_install.py nd_backup): the
+// stored objects as they lie on the flash, read 24 bytes at a time (0x70), written back 128 at a time (0x71), each
+// committed (0x72), then a restart (0x73). The file is tools/fm1_install.py's: either tool restores the other's.
+export const ND_OBJECTS = { 0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C", 4: "presets saved over" };
+const ND_OPTIONAL = new Set([4]);              // firmware older than the Presets bank (v0.2) has no such object
+const ND_UNIT = new Set([1]);                  // the panel's calibration belongs to the unit: never in a backup, never
+                                               // restored from one (as fm1-base's: a backup goes onto any FM-1)
+// zlib's CRC-32 (Python's zlib.crc32): each object's, in the file, checked before anything is written back
+const CRC_T = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+export function ndCrc32(a) { let c = 0xFFFFFFFF; for (const b of a) c = CRC_T[(c ^ b) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+
+function ndMsg(cmd, body = []) {
+  let s = 0;
+  for (const b of body) s += b;
+  const u = [0x00, 0x59, cmd, body.length & 0xFF, (body.length >> 8) & 0xFF, 0, ...body, ~s & 0xFF];
+  return [0xF0, ...pack7(u), 0xF7];
+}
+
+function ndReply(pkt, cmd) {
+  if (!pkt || pkt.length < 2 || pkt[0] !== 0xF0 || pkt[pkt.length - 1] !== 0xF7) return null;
+  const u = unpack7(pkt.slice(1, -1));
+  if (u.length < 7 || u[0] !== 0 || u[1] !== 0x59 || u[2] !== cmd || (u[3] | (u[4] << 8) | (u[5] << 16)) + 7 !== u.length) return null;
+  let s = 0;
+  for (let i = 6; i < u.length - 1; i++) s += u[i];
+  return (~s & 0xFF) === u[u.length - 1] ? u.slice(6, -1) : null;
+}
+
+// send, and the reply to it (want(reply) says which one it is), or null
+async function ndTransact(link, cmd, body, want, tries = 3) {
+  for (let t = 0; t < tries; t++) {
+    if (!link.send(ndMsg(cmd, body))) throw fail("lost", "FM-1 disconnected");
+    const end = Date.now() + 1000;
+    while (Date.now() < end) {
+      const r = ndReply(await link.read(end - Date.now()), cmd);
+      if (r && want(r)) return r;
+    }
+  }
+  return null;
+}
+
+// {obj: Uint8Array} (empty when none is stored), or null: this firmware can't make a backup (not Niagara Drift). Each
+// object is read twice: one that changed meanwhile (a save while it was read) is refused, as Melodee's are
+export async function ndBackup(link) {
+  const first = await ndReadAll(link);
+  if (!first) return null;
+  const again = await ndReadAll(link);
+  const same = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
+  if (Object.keys(first).join() !== Object.keys(again).join() || Object.keys(first).some((k) => !same(first[k], again[k])))
+    throw fail("changed", "backup: the FM-1 changed while it was read");
+  return first;
+}
+
+async function ndReadAll(link) {
+  const objs = {};
+  for (const k of Object.keys(ND_OBJECTS)) {
+    const obj = +k;
+    if (ND_UNIT.has(obj)) continue;
+    let data = [], off = 0, total = null;
+    while (total === null || off < total) {
+      const o = off;
+      const r = await ndTransact(link, 0x70, [obj, o & 0xFF, o >> 8], (r) => r.length >= 5 && r[0] === obj && (r[1] | (r[2] << 8)) === o);
+      if (!r) {
+        if (obj === 0 && off === 0) return null;
+        if (ND_OPTIONAL.has(obj) && off === 0) { data = null; break; }
+        throw fail("lost", `backup: no answer reading the ${ND_OBJECTS[obj]}`);
+      }
+      total = r[3] | (r[4] << 8);
+      const chunk = r.slice(5);
+      if (total && !chunk.length) throw fail("lost", `backup: the ${ND_OBJECTS[obj]} came back short`);
+      data = data.concat(chunk);
+      off += chunk.length;
+      if (!total) break;
+    }
+    if (data) objs[obj] = Uint8Array.from(data);
+  }
+  return objs;
+}
+
+// writes every stored object back; the FM-1 restarts with them
+export async function ndRestore(link, objs, log = () => {}) {
+  for (const k of Object.keys(objs).map(Number).sort((a, b) => a - b)) {
+    const data = objs[k];
+    if (!data || !data.length || ND_UNIT.has(k)) continue;   // (an older backup's calibration: the FM-1 keeps its own)
+    for (let off = 0; off < data.length; off += 128) {
+      const part = Array.from(data.subarray(off, off + 128)), o = off;
+      const r = await ndTransact(link, 0x71, [k, o & 0xFF, o >> 8, ...part], (r) => r.length >= 4 && r[0] === k && (r[1] | (r[2] << 8)) === o);
+      if (!r || r[3]) throw fail("lost", `restore: the ${ND_OBJECTS[k]} wasn't accepted`);
+    }
+    const r = await ndTransact(link, 0x72, [k, data.length & 0xFF, data.length >> 8], (r) => r.length >= 2 && r[0] === k);
+    if (!r || r[1]) throw fail("lost", `restore: the ${ND_OBJECTS[k]} couldn't be written`);
+    log(`restored: ${ND_OBJECTS[k]} (${data.length} bytes)`);
+  }
+  link.send(ndMsg(0x73));
+}
+
+const b64 = (a) => { let s = ""; for (const b of a) s += String.fromCharCode(b); return btoa(s); };
+const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+const two = (n) => String(n).padStart(2, "0");
+
+// the backup file, as tools/fm1_install.py writes it; and its name, as it names it
+export function ndBackupFile(objs, identity, when = new Date()) {
+  const saved = `${when.getFullYear()}-${two(when.getMonth() + 1)}-${two(when.getDate())} ${two(when.getHours())}:${two(when.getMinutes())}:${two(when.getSeconds())}`;
+  const o = {}, crc32 = {};
+  for (const k of Object.keys(objs)) { o[k] = b64(objs[k]); crc32[k] = ndCrc32(objs[k]); }
+  return JSON.stringify({ niagara_drift_backup: 1, identity, saved, objects: o, crc32 }, null, 1);
+}
+export function ndBackupName(when = new Date()) {
+  return `backup-${when.getFullYear()}${two(when.getMonth() + 1)}${two(when.getDate())}-${two(when.getHours())}${two(when.getMinutes())}${two(when.getSeconds())}.json`;
+}
+export function ndReadBackup(text) {
+  let j;
+  try { j = JSON.parse(text); } catch (_) { throw fail("badbackup", "not a Niagara Drift backup"); }
+  if (!j || j.niagara_drift_backup !== 1 || typeof j.objects !== "object") throw fail("badbackup", "not a Niagara Drift backup");
+  const objs = {}, crcs = j.crc32 || {};      // (none before 2026-10-30)
+  for (const [k, v] of Object.entries(j.objects)) {
+    if (!(k in ND_OBJECTS)) throw fail("badbackup", "unknown objects in the backup");
+    try { objs[+k] = unb64(v); } catch (_) { throw fail("badbackup", "not a Niagara Drift backup"); }
+  }
+  if (j.crc32 && (Object.keys(crcs).sort().join() !== Object.keys(objs).sort().join() ||
+                  Object.keys(objs).some((k) => ndCrc32(objs[k]) !== crcs[k])))
+    throw fail("damaged", "the backup is damaged (a checksum doesn't match)");
+  return objs;
+}
+
 export class Updater {
   constructor(access, log) {
     this.access = access;
@@ -196,6 +320,27 @@ export class Updater {
     if (back.id.text !== product) throw fail("mismatch", `installed, but the device reports ${back.id.text}`, back.id.text);
     step("done", back.id.text);
     return back.id.text;
+  }
+
+  // Niagara Drift running: its saved objects and its identity, or null (another firmware, or update mode)
+  async backup() {
+    const dev = await this.find((id) => !IS_OTA(id));
+    if (!dev) throw fail("notfound", "FM-1 not found (USB cable, and no other app using it?)");
+    try {
+      const objs = await ndBackup(dev.link);
+      return objs ? { objs, identity: dev.id.text } : null;
+    } finally { dev.link.close(); }
+  }
+
+  // Niagara Drift running: write a backup back (it restarts with it); false when the firmware can't take one
+  async restore(objs) {
+    const dev = await this.find((id) => !IS_OTA(id));
+    if (!dev) throw fail("notfound", "FM-1 not found (USB cable, and no other app using it?)");
+    try {
+      if (!(await ndTransact(dev.link, 0x70, [0, 0, 0], (r) => r.length >= 5 && r[0] === 0))) return false;
+      await ndRestore(dev.link, objs, this.log);
+      return true;
+    } finally { dev.link.close(); }
   }
 
   // step 2 with the loader found by find()/waitFor()
