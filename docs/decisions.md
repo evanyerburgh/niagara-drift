@@ -515,3 +515,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   **Wander's notes and Chord's follow the Tuning**: 12-tone and Quarter as before (Chord pure); the 12-note Tunings
   (Just, LMY, Harrison) the same keys; the rest the Tuning's note nearest the pure interval (31-tone's minor third
   310, 53-tone's 317); on Harmonics Wander moves among all the harmonics. The Tuning tables moved into the engine.
+- 2026-10-30 (Evan): **the Tunings in order**: 12-tone first (the most common), the equal ones by size (Quarter, 19-,
+  31-, 53-tone), then the rest simplest to richest: Just, Harmonics, LMY, Harrison, Shruti, Partch. PROJ_FORMAT 40
+  (39's read, its Tuning remapped: a saved sound keeps its Tuning).

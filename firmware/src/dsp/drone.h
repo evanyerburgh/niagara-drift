@@ -213,8 +213,9 @@ extern const char *const DR_SUBW_NAME[DR_NSUBW];
                                                 * just intonation, La Monte Young's (The Well-Tuned Piano's), the
                                                 * harmonics, the 22 shrutis, Lou Harrison's (his National Steel
                                                 * guitar's), Harry Partch's 43 */
-enum { DR_TUN_12, DR_TUN_24, DR_TUN_19, DR_TUN_31, DR_TUN_53, DR_TUN_JUST, DR_TUN_LMY, DR_TUN_HARM, DR_TUN_SHRUTI,
-       DR_TUN_HARRISON, DR_TUN_PARTCH };
+enum { DR_TUN_12, DR_TUN_24, DR_TUN_19, DR_TUN_31, DR_TUN_53, DR_TUN_JUST, DR_TUN_HARM, DR_TUN_LMY, DR_TUN_HARRISON,
+       DR_TUN_SHRUTI, DR_TUN_PARTCH };                 /* the equal ones by size, then the rest simplest to richest
+                                                        * (Evan, 2026-10-30; PROJ_FORMAT 40) */
 extern const char *const DR_TUNING_NAME[DR_NTUNING];
 #define DR_TUN_MOVES(t) ((t) == DR_TUN_JUST || (t) == DR_TUN_SHRUTI)   /* movable: built on drone I (the tonic,
                                                 * do or Sa), not on A: pure from wherever drone I is */

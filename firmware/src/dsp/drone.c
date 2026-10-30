@@ -93,8 +93,8 @@ static float ext_beats(void)
 }
 const char *const DR_ROUTE_NAME[DR_NROUTE] = {"Both", "Echoes", "Drones"};
 const char *const DR_SUBW_NAME[DR_NSUBW] = {"Square", "Sine", "Triangle", "Saw"};
-const char *const DR_TUNING_NAME[DR_NTUNING] = {"12-tone", "Quarter", "19-tone", "31-tone", "53-tone", "Just", "LMY",
-                                                "Harmonics", "Shruti", "Harrison", "Partch"};
+const char *const DR_TUNING_NAME[DR_NTUNING] = {"12-tone", "Quarter", "19-tone", "31-tone", "53-tone", "Just", "Harmonics",
+                                                "LMY", "Harrison", "Shruti", "Partch"};
 /* THE TUNINGS' notes (the pitch knobs', Wander's and Chord's; Evan, 2026-10-30): equal ones by their size; the rest
  * as tables of cents over the root, in one octave. The fixed ones are built on A, A 440 one of their notes, as
  * Ableton's tuning files place them; Just and Shruti move with drone I (DR_TUN_MOVES): pure over it, from their 1/1.
@@ -122,9 +122,9 @@ static const int16_t TUN_PARTCH[43] = {0, 27, 63, 90, 112, 143, 182, 214, 231, 2
                                        943, 975, 996, 1018, 1049, 1081, 1108, 1147, 1161, 1178};   /* Harry Partch's 43
                                                   * (11-limit, otonal and utonal), from A, his 9/8 over G (his own G
                                                   * 392 is A 441: Tune +4) */
-static const int16_t *const TUN_TAB[DR_NTUNING - DR_TUN_JUST] = {TUN_JUST, TUN_LMY, TUN_HARM, TUN_SHRUTI, TUN_HARRISON,
+static const int16_t *const TUN_TAB[DR_NTUNING - DR_TUN_JUST] = {TUN_JUST, TUN_HARM, TUN_LMY, TUN_HARRISON, TUN_SHRUTI,
                                                                      TUN_PARTCH};
-static const uint8_t TUN_N[DR_NTUNING - DR_TUN_JUST] = {12, 12, 8, 22, 12, 43};
+static const uint8_t TUN_N[DR_NTUNING - DR_TUN_JUST] = {12, 8, 12, 12, 22, 43};
 static int tun_ok(int t) { return (unsigned)t < DR_NTUNING ? t : DR_TUN_12; }
 int dr_tun_n(int t)
 {

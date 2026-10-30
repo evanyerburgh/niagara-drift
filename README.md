@@ -397,11 +397,11 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
 - **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
   tuned).
 - **Tuning** is the notes the pitch knobs move through: **12-tone** (semitones), **Quarter** tones, **19-**, **31-** or
-  **53-tone** equal temperament, **Just** intonation (Ptolemy's 5-limit), **LMY**: La Monte Young's tuning for The
-  Well-Tuned Piano (built on 3s and 7s, with its septimal intervals), **Harmonics** (the odd harmonics 1–15 of A, in
-  each octave: the drones as notes of one harmonic series), the 22 **Shrutis** of Indian music, **Harrison**: Lou
-  Harrison's tuning for his National Steel guitar (11-limit), or **Partch**: Harry Partch's 43 notes to the octave
-  (11-limit). The knob goes round both ways. The picture shows an octave of it, a tick a note.
+  **53-tone** equal temperament, **Just** intonation (Ptolemy's 5-limit), **Harmonics** (the odd harmonics 1–15 of A,
+  in each octave: the drones as notes of one harmonic series), **LMY**: La Monte Young's tuning for The Well-Tuned
+  Piano (built on 3s and 7s, with its septimal intervals), **Harrison**: Lou Harrison's tuning for his National Steel
+  guitar (11-limit), the 22 **Shrutis** of Indian music, or **Partch**: Harry Partch's 43 notes to the octave
+  (11-limit): the equal ones by size, then the rest simplest to richest. The knob goes round both ways. The picture shows an octave of it, a tick a note.
   - **Just and Shruti move with drone I**, as just intonation does (a movable do; drone I is do, or Sa): drone I's
     knob picks the tonic in semitones, and drone II's knob, Pitch link, Wander and Chord are pure over it, wherever it
     is.
