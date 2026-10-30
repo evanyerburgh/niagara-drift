@@ -111,6 +111,13 @@ static int ota_prog(uint32_t off, const void *p, uint32_t n)
     return fl_write(off, p, n);
 }
 static int ota_fread(uint32_t off, void *p, uint32_t n) { return st_read(off, p, n); }
+/* THE SAFE RESTORE's flash core (fm1-base's, MPL-2.0: restore_core.c): the objects a backup holds, in the order of
+ * its journal record (the panel's calibration never: it belongs to the unit); the record's sector, the update's */
+#define APP_BACKUP_OBJS {OBJ_PROJ, OBJ_BANKB, OBJ_BANKC, OBJ_BANKP}
+#include "restore_core.c"
+static int rs_rec_erase(void) { return ota_erase(RS_REC); }
+static int rs_rec_prog(uint32_t off, const void *src, uint32_t n) { return ota_prog(RS_REC + off, src, n); }
+static int rs_rec_read(uint32_t off, void *dst, uint32_t n) { return ota_fread(RS_REC + off, dst, n); }
 static void ota_show(uint32_t step, int32_t code)
 {
     static const char *const STEP[] = {"", "PACKAGE", "CHECK HEAD", "LOADER", "CONFIRM", "RESTART"};

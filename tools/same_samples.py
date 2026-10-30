@@ -50,15 +50,16 @@ def build(tree):
     return tree / "build" / "host" / "omni_host", out
 
 
-def run_all(tree, scripts, out, problems):
+def run_all(tree, scripts, out, problems, new=frozenset()):
     """Each script through this tree's host. A golden script must run clean; a scenario may fail its expectations
-    (the base doesn't know a PR's new behaviour), but must not crash or stop early."""
+    (the base doesn't know a PR's new behaviour), but must not crash or stop early; a script new in this branch
+    (new: their names) may use a host command the base hasn't got yet: there, it stops, and only its files differ."""
     host, render = build(tree)
     for s in scripts:
         d = out / s.parent.name / s.stem
         d.mkdir(parents=True, exist_ok=True)
         r = subprocess.run([str(host), str(s), str(d)], cwd=tree, capture_output=True, text=True)
-        crashed = r.returncode < 0 or "unknown command" in r.stdout + r.stderr
+        crashed = r.returncode < 0 or ("unknown command" in r.stdout + r.stderr and s.name not in new)
         if crashed or (r.returncode and s.parent.name == "golden"):
             tail = (r.stdout + r.stderr).strip().splitlines()[-5:]
             problems.append(f"{tree.name}: {s.parent.name}/{s.name} exited {r.returncode}: " + " / ".join(tail))
@@ -145,7 +146,7 @@ def main():
     scripts = [head / r for r in rel if r not in changed]   # the same script (or a new one) played by both
     tmp = Path(tempfile.mkdtemp(prefix="same-"))
     problems = []
-    run_all(base, scripts, tmp / "base", problems)
+    run_all(base, scripts, tmp / "base", problems, {r.name for r in rel if not (base / r).exists()})
     run_all(head, scripts, tmp / "head", problems)
     rows, counts = [], {"same": 0, "close": 0, "different": 0}
     files = lambda side: {p.relative_to(tmp / side) for p in (tmp / side).rglob("*") if p.suffix in (".wav", ".png")}

@@ -15,9 +15,13 @@ function reply(cmd, body) {
   return [0xF0, ...pack7([0x00, 0x59, cmd, body.length & 0xFF, (body.length >> 8) & 0xFF, 0, ...body, ~s & 0xFF]), 0xF7];
 }
 
-// the firmware's side: objects 0-3 stored (4 left out: an older FM-1 that has none), a write buffer, the commits
+// the firmware's side: objects 0-3 stored (4 left out: an older FM-1 that has none), a write buffer, the commits; from
+// 0.3 (safe) the staging (0x74) and the question (0x75), answered "sel" or "home"; spoil: a byte lost on the way
 class FakeFM1 {
-  constructor(objs, answers = true) { this.store = objs; this.buf = []; this.q = []; this.answers = answers; this.restarted = false; this.reads = 0; this.onRead = null; }
+  constructor(objs, answers = true, safe = false, answer = "sel") {
+    this.store = objs; this.buf = []; this.q = []; this.answers = answers; this.restarted = false; this.reads = 0; this.onRead = null;
+    this.safe = safe; this.answer = answer; this.staged = {}; this.spoil = false;
+  }
   send(pkt) {
     const u = unpack7(pkt.slice(1, -1)), cmd = u[2], b = u.slice(6, -1);
     if (!this.answers) return true;
@@ -33,12 +37,27 @@ class FakeFM1 {
       this.store[obj] = Uint8Array.from(this.buf.slice(0, off));
       this.buf = [];
       this.q.push(reply(0x72, [obj, 0]));
+    } else if (cmd === 0x74 && this.safe) {
+      const d = Uint8Array.from(this.buf.slice(0, off)), c = (b[3] | (b[4] << 8) | (b[5] << 16) | (b[6] << 24)) >>> 0;
+      if (this.spoil) d[5] ^= 1;
+      const ok = ndCrc32(d) === c;
+      if (ok) this.staged[obj] = d;
+      this.buf = [];
+      this.q.push(reply(0x74, [obj, ok ? 0 : 2]));
+    } else if (cmd === 0x75 && this.safe) {
+      const want = Object.keys(this.staged).join() === "0,2,3,4" ? 0b11101 : -1;   // every object of the list
+      this.q.push(reply(0x75, [b[0] === want ? 0xFF : 2]));
+      if (b[0] === want)                       // (the answer later: when the player presses)
+        this.q.push(() => {
+          if (this.answer === "sel") { Object.assign(this.store, this.staged); this.restarted = true; }
+          return reply(0x75, [this.answer === "sel" ? 0 : 1]);
+        });
     } else if (cmd === 0x73) {
       this.restarted = true;
     }
     return true;
   }
-  async read() { return this.q.shift() || null; }
+  async read() { const r = this.q.shift(); return typeof r === "function" ? r() : r || null; }
 }
 
 const fill = (n, k) => Uint8Array.from({ length: n }, (_, i) => (i * 7 + k) & 0xFF);
@@ -77,9 +96,24 @@ let refused = false;
 try { ndReadBackup('{"something": 1}'); } catch (e) { refused = e.code === "badbackup"; }
 check("another file is refused", refused);
 
-const blank = new FakeFM1({ 0: new Uint8Array(0), 1: new Uint8Array(0), 2: new Uint8Array(0), 3: new Uint8Array(0) });
-await ndRestore(blank, back);
-check("a restore writes every object back, then restarts it", same(blank.store[0], objs[0]) && same(blank.store[3], objs[3]) &&
+const empty = () => ({ 0: new Uint8Array(0), 1: new Uint8Array(0), 2: new Uint8Array(0), 3: new Uint8Array(0) });
+const safe = new FakeFM1(empty(), true, true, "sel");
+let asked = false, untouched = false;
+const res = await ndRestore(safe, back, () => {}, () => { asked = true; untouched = safe.store[0].length === 0 && safe.store[3].length === 0; });
+check("THE SAFE RESTORE: all staged, nothing changed when the FM-1 asks", asked && untouched);
+check("... SEL: every object switched to (one the backup hasn't, emptied), the FM-1 restarting itself", res === "restored" &&
+      same(safe.store[0], objs[0]) && same(safe.store[3], objs[3]) && safe.store[4].length === 0 && safe.restarted);
+const home = new FakeFM1(empty(), true, true, "home");
+check("... HOME: cancelled, nothing changed", (await ndRestore(home, back)) === "cancelled" && home.store[0].length === 0 &&
+      !home.restarted);
+const spoilt = new FakeFM1(empty(), true, true, "sel");
+spoilt.spoil = true;
+let lost = false;
+try { await ndRestore(spoilt, back); } catch (e) { lost = e.code === "lost"; }
+check("... a byte lost on the way: refused before anything changed", lost && spoilt.store[0].length === 0);
+const blank = new FakeFM1(empty());
+const oldRes = await ndRestore(blank, back);
+check("firmware before 0.3: each object written back, then restarted", oldRes === "restored" && same(blank.store[0], objs[0]) && same(blank.store[3], objs[3]) &&
       blank.restarted);
 const keeps = new FakeFM1({ 0: new Uint8Array(0), 1: Uint8Array.from([7, 7]), 2: new Uint8Array(0), 3: new Uint8Array(0) });
 await ndRestore(keeps, fromOld);

@@ -140,6 +140,7 @@ int plat_store_load(uint32_t obj, void *dst, uint32_t max)
     memcpy(dst, store[obj], (size_t)n);
     return n;
 }
+int plat_store_held(void) { return 0; }
 int plat_store_save(uint32_t obj, const void *src, uint32_t len)
 {
     if (obj >= OBJ_NOBJ || len > PLAT_STORE_MAX)
@@ -385,7 +386,9 @@ static int key_of(const char *s)
 static int expect(const char *what, const char *val)
 {
     int got;
-    if (!strcmp(what, "playing"))
+    if (!strcmp(what, "restore"))                  /* the restore's answer: 0 waiting, 1 yes, 2 no (then asks no more) */
+        got = ui_restore_answer();
+    else if (!strcmp(what, "playing"))
         got = ui.playing;
     else if (!strcmp(what, "fade"))                /* the PLAY fade x 100 */
         got = (int)(dr_fade * 100.0f + 0.5f);
@@ -623,6 +626,8 @@ int main(int argc, char **argv)
             wav_open(out);
         } else if (!strcmp(cmd, "wavstop"))
             wav_close();
+        else if (!strcmp(cmd, "restoreask"))       /* the safe restore's question, as a backup staged over USB asks it */
+            ui_restore_ask();
         else if (!strcmp(cmd, "peakreset"))
             peak_out = 0.0f;
         else if (!strcmp(cmd, "shot")) {

@@ -39,7 +39,8 @@ void plat_midi_out(uint32_t pkt);      /* queue one (audio ISR or main loop) */
 
 /* persistent storage (Felucca storage.c objects: A/B sectors, CRC, torn-write safe) */
 int plat_store_load(uint32_t obj, void *dst, uint32_t max);   /* bytes loaded, < 0 = none / bad */
-int plat_store_save(uint32_t obj, const void *src, uint32_t len);   /* 0 = ok */
+int plat_store_save(uint32_t obj, const void *src, uint32_t len);   /* 0 = ok; -10 held (a restore coming) */
+int plat_store_held(void);             /* 1: a restore from USB is staged, saves wait (it restarts after) */
 #define PLAT_STORE_MAX 3840u           /* bytes per object */
 enum { OBJ_PROJ, OBJ_PANEL, OBJ_BANKB, OBJ_BANKC, OBJ_BANKP, OBJ_NOBJ };
 /* flash: OBJ_PROJ 0xFC000, OBJ_PANEL 0xDC000, OBJ_BANKB 0x97000, OBJ_BANKC 0x99000, OBJ_BANKP 0x9B000 (the Presets

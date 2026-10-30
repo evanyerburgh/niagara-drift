@@ -298,9 +298,15 @@ def nd_read_all(link):
     return objs
 
 
-def nd_restore(link, objs, out):
-    for obj, data in sorted(objs.items()):
-        if not data or obj in UNIT:          # (an older backup's calibration: this FM-1 keeps its own)
+def nd_restore(link, objs, out, on_ask=lambda: None):
+    """THE SAFE RESTORE (v0.3; main_fm1.c 0x74 / 0x75): each object into the FM-1's buffer, then staged there, checked
+    against its CRC-32 (nothing changes yet); then the FM-1 asks on its screen, SEL yes, HOME no. "restored" (it
+    restarts itself) or "cancelled". Firmware before it (no answer to the first stage): each written at once, then a
+    restart, as before"""
+    mask, old = 0, False
+    for obj in sorted(OBJECTS):              # every object (fm1-base's journal holds them all): one the backup hasn't,
+        data = objs.get(obj) or b""          # empty (the FM-1 then matches the backup); never the calibration
+        if obj in UNIT or (old and not data):
             continue
         for off in range(0, len(data), 128):
             part = data[off:off + 128]
@@ -308,11 +314,46 @@ def nd_restore(link, objs, out):
                             lambda r: len(r) >= 4 and r[0] == obj and r[1] | r[2] << 8 == off)
             if r is None or r[3]:
                 raise InstallError("lost", f"restore: the {OBJECTS[obj]} wasn't accepted")
-        r = nd_transact(link, 0x72, [obj, len(data) & 0xFF, len(data) >> 8], lambda r: len(r) >= 2 and r[0] == obj)
-        if r is None or r[1]:
-            raise InstallError("lost", f"restore: the {OBJECTS[obj]} couldn't be written")
-        print(f"restored: {OBJECTS[obj]} ({len(data)} bytes)", file=out)
-    link.send(nd_msg(0x73))
+        n, c = len(data), zlib.crc32(data)
+        if old and not n:
+            continue
+        if not old:
+            r = nd_transact(link, 0x74, bytes([obj, n & 0xFF, n >> 8]) + c.to_bytes(4, "little"),
+                            lambda r: len(r) >= 2 and r[0] == obj)
+            if r is None and not mask:
+                old = True
+                print("(this firmware writes them one at a time)", file=out)
+                if not n:
+                    continue
+            elif r is None or r[1]:
+                why = "no answer" if r is None else {1: "refused", 2: "damaged on the way", 3: "flash"}.get(r[1], "?")
+                raise InstallError("lost", f"restore: the {OBJECTS[obj]} couldn't be staged ({why}): nothing changed")
+            else:
+                mask |= 1 << obj
+                print(f"staged: {OBJECTS[obj]} ({n} bytes)", file=out)
+        if old:
+            r = nd_transact(link, 0x72, [obj, n & 0xFF, n >> 8], lambda r: len(r) >= 2 and r[0] == obj)
+            if r is None or r[1]:
+                raise InstallError("lost", f"restore: the {OBJECTS[obj]} couldn't be written")
+            print(f"restored: {OBJECTS[obj]} ({n} bytes)", file=out)
+    if old:
+        link.send(nd_msg(0x73))
+        return "restored"
+    r = nd_transact(link, 0x75, [mask], lambda r: len(r) >= 1)
+    if r is None or r[0] != 0xFF:
+        raise InstallError("lost", "restore: the FM-1 didn't ask: nothing changed")
+    on_ask()
+    end = time.monotonic() + 70.0            # (it asks for a minute)
+    while (left := end - time.monotonic()) > 0:
+        r = nd_reply(link.read(left), 0x75)
+        if not r or r[0] == 0xFF:
+            continue
+        if r[0] == 0:
+            return "restored"
+        if r[0] == 1:
+            return "cancelled"
+        raise InstallError("lost", "restore: the FM-1 couldn't switch to the backup: nothing changed")
+    raise InstallError("lost", "restore: no answer from the FM-1")
 
 
 def backup_file(objs, ident, path):
@@ -562,7 +603,12 @@ def run(a, backend, out, ask):
                                          "sound and scenes, and it restarts. [y/N] "):
                     print("cancelled", file=out)
                     return 1
-                nd_restore(dev.link, objs, out)
+                r = nd_restore(dev.link, objs, out,
+                               lambda: print("On the FM-1: press SEL to put the backup back (HOME keeps what it has)",
+                                             file=out, flush=True))
+                if r == "cancelled":
+                    print("not put back: the FM-1 kept its sound and scenes", file=out)
+                    return 1
                 print("done: the FM-1 restarts with the restored sound and scenes", file=out)
                 return 0
             objs = nd_backup(dev.link)

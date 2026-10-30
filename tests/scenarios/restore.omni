@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# THE SAFE RESTORE's question (v0.3, Evan 2026-10-30): a backup staged over USB (main_fm1.c; the host asks it here),
+# the FM-1 asks RESTORE FROM USB? on the banner: SEL yes, HOME no, a minute without either no; while it asks, the
+# panel does nothing else (a knob turned is dropped, HOME doesn't change the page). The flash's side, cut anywhere:
+# tests/storage_test.c
+notips
+tap PLAY
+wait 1500
+expect view 0
+expect par7 700
+restoreask
+wait 300
+shot restore-ask.png
+wait 1500
+shot restore-keys.png
+expect restore 0
+spin K2 5
+expect par7 700
+tap HOME
+expect restore 2
+expect view 0
+# asked again: SEL is yes
+restoreask
+wait 200
+tap SEL
+expect restore 1
+# ... a minute without an answer: no
+restoreask
+wait 59000
+expect restore 0
+wait 1500
+expect restore 2
+# and the panel's its own again
+spin K2 5
+expect par7 750

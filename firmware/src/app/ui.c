@@ -950,7 +950,12 @@ static void scene_name(char *t, int bank, int n)
 static void save_now(int n)
 {
     char t[12] = "SCENE ";
-    int ok = project_save() == 0;
+    int ok;
+    if (plat_store_held()) {                           /* a restore from USB is coming: it restarts after */
+        say_c("NOT SAVED", "RESTORING FROM USB", K_GOLD);
+        return;
+    }
+    ok = project_save() == 0;
     if (ok)
         ui.dirty = 0;
     if (n < 0) {
@@ -1678,10 +1683,58 @@ static void global_turn(int role, int p, const char *name, int32_t e)
     ui.act_t = plat_ms();
 }
 
+/* THE SAFE RESTORE's question (v0.3, Evan 2026-10-30; main_fm1.c): a backup from USB staged, the FM-1 asks, the
+ * banner held, the question and its keys in turn: SEL yes, HOME no, a minute without either no. While it asks, the panel does nothing else (the sound
+ * plays on); a yes restarts it with the restored sound */
+#define RQ_MS 60000u
+static uint8_t rq, rq_ans;                             /* asking; the answer: 1 yes, 2 no */
+static uint32_t rq_t;
+void ui_restore_ask(void)
+{
+    rq = 1;
+    rq_ans = 0;
+    rq_t = plat_ms();
+}
+int ui_restore_answer(void)
+{
+    int a = rq_ans;
+    if (rq && !a && plat_ms() - rq_t >= RQ_MS)
+        a = 2;
+    if (a)
+        rq = rq_ans = 0;
+    return a;
+}
+void ui_restore_said(int ok)                            /* 1 restored (it restarts), 0 failed, -1 no */
+{
+    say_c(ok > 0 ? "RESTORED" : ok ? "NOT RESTORED" : "RESTORE FAILED", ok > 0 ? "RESTARTING" : ok ? 0 : "NOTHING CHANGED",
+          K_GOLD);
+    ui.msg_until = plat_ms() + 2500u;
+}
+static int rq_input(uint32_t btn)                      /* asking: SEL or HOME answers, the rest waits; 1 = asking */
+{
+    uint32_t ch = btn ^ ui.btn, i;
+    if (!rq)
+        return 0;
+    if (ch & btn & (1u << B_SEL))
+        rq_ans = 1;
+    else if (ch & btn & (1u << B_HOME))
+        rq_ans = 2;
+    ui.btn = btn;
+    ui.btn_used = btn;                                 /* (their let-go does nothing after) */
+    ui.keys = plat_keys();
+    for (i = 0; i < NE; i++)
+        plat_enc((int)i);                              /* turns while asking: dropped */
+    say_c((plat_ms() - rq_t) / 1500u & 1u ? "SEL YES - HOME NO" : "RESTORE FROM USB?", 0, K_GOLD);   /* (one line:
+                                                        * the question and its keys in turn) */
+    return 1;
+}
+
 static void input(void)
 {
     uint32_t btn = plat_buttons(), keys = plat_keys(), ch, i;
     int32_t e;
+    if (rq_input(btn))
+        return;
     save_run();
     ch = btn ^ ui.btn;
     ui.btn = btn;
@@ -3241,7 +3294,7 @@ static void autosave(void)
     uint32_t now = plat_ms();
     if (!ui.dirty || ui.playing || dr_fade > 0.0f || ui.btn || ui.keys || now - ui.act_t < AUTOSAVE_QUIET ||
         now - ui.chg_t < AUTOSAVE_QUIET || ui.morph >= 0 || ui.press >= 0 ||
-        (ui.saved_t && now - ui.saved_t < AUTOSAVE_EVERY))
+        (ui.saved_t && now - ui.saved_t < AUTOSAVE_EVERY) || plat_store_held())
         return;
     ui.saved_t = now;
     if (project_save() == 0)

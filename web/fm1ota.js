@@ -108,8 +108,8 @@ async function handshake(link, tries = 3) {
 }
 
 // BACKUP / RESTORE (Niagara Drift v0.2 on; firmware/src/app/main_fm1.c backup_cmd, tools/fm1_install.py nd_backup): the
-// stored objects as they lie on the flash, read 24 bytes at a time (0x70), written back 128 at a time (0x71), each
-// committed (0x72), then a restart (0x73). The file is tools/fm1_install.py's: either tool restores the other's.
+// stored objects as they lie on the flash, read 24 bytes at a time (0x70), written back 128 at a time (0x71), staged
+// (0x74) and switched to together on a yes on the FM-1 (0x75; before 0.3, each committed, 0x72, then a restart). The file is tools/fm1_install.py's: either tool restores the other's.
 export const ND_OBJECTS = { 0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C", 4: "presets saved over" };
 const ND_OPTIONAL = new Set([4]);              // firmware older than the Presets bank (v0.2) has no such object
 const ND_UNIT = new Set([1]);                  // the panel's calibration belongs to the unit: never in a backup, never
@@ -185,21 +185,49 @@ async function ndReadAll(link) {
   return objs;
 }
 
-// writes every stored object back; the FM-1 restarts with them
-export async function ndRestore(link, objs, log = () => {}) {
-  for (const k of Object.keys(objs).map(Number).sort((a, b) => a - b)) {
-    const data = objs[k];
-    if (!data || !data.length || ND_UNIT.has(k)) continue;   // (an older backup's calibration: the FM-1 keeps its own)
+// THE SAFE RESTORE (v0.3; main_fm1.c 0x74 / 0x75): each object into the FM-1's buffer, then staged there, checked
+// against its CRC-32 (nothing changes yet); then the FM-1 asks on its screen (onAsk: tell the player), SEL yes, HOME
+// no. "restored" (it restarts itself), "cancelled" (HOME, or a minute without an answer). Firmware before it (no
+// answer to the first stage) gets the old way: each object written at once, then a restart
+export async function ndRestore(link, objs, log = () => {}, onAsk = () => {}) {
+  // every object (fm1-base's journal holds them all): one the backup hasn't, empty, so the FM-1 matches the backup;
+  // never the calibration (an older backup's: the FM-1 keeps its own)
+  const ks = Object.keys(ND_OBJECTS).map(Number).sort((a, b) => a - b).filter((k) => !ND_UNIT.has(k));
+  let mask = 0, old = false;
+  for (const k of ks) {
+    const data = objs[k] || new Uint8Array(0);
+    if (old && !data.length) continue;
     for (let off = 0; off < data.length; off += 128) {
       const part = Array.from(data.subarray(off, off + 128)), o = off;
       const r = await ndTransact(link, 0x71, [k, o & 0xFF, o >> 8, ...part], (r) => r.length >= 4 && r[0] === k && (r[1] | (r[2] << 8)) === o);
       if (!r || r[3]) throw fail("lost", `restore: the ${ND_OBJECTS[k]} wasn't accepted`);
     }
-    const r = await ndTransact(link, 0x72, [k, data.length & 0xFF, data.length >> 8], (r) => r.length >= 2 && r[0] === k);
-    if (!r || r[1]) throw fail("lost", `restore: the ${ND_OBJECTS[k]} couldn't be written`);
-    log(`restored: ${ND_OBJECTS[k]} (${data.length} bytes)`);
+    const c = ndCrc32(data), n = data.length;
+    if (!old) {
+      const r = await ndTransact(link, 0x74, [k, n & 0xFF, n >> 8, c & 0xFF, (c >>> 8) & 0xFF, (c >>> 16) & 0xFF, c >>> 24], (r) => r.length >= 2 && r[0] === k);
+      if (!r && !mask) { old = true; log("(this firmware writes them one at a time)"); if (!n) continue; }
+      else if (!r || r[1]) throw fail("lost", `restore: the ${ND_OBJECTS[k]} couldn't be staged (${r ? ["", "refused", "damaged on the way", "flash"][r[1]] : "no answer"}): nothing changed`);
+      else { mask |= 1 << k; log(`staged: ${ND_OBJECTS[k]} (${n} bytes)`); }
+    }
+    if (old) {
+      const r = await ndTransact(link, 0x72, [k, n & 0xFF, n >> 8], (r) => r.length >= 2 && r[0] === k);
+      if (!r || r[1]) throw fail("lost", `restore: the ${ND_OBJECTS[k]} couldn't be written`);
+      log(`restored: ${ND_OBJECTS[k]} (${n} bytes)`);
+    }
   }
-  link.send(ndMsg(0x73));
+  if (old) { link.send(ndMsg(0x73)); return "restored"; }
+  const a = await ndTransact(link, 0x75, [mask], (r) => r.length >= 1);
+  if (!a || a[0] !== 0xFF) throw fail("lost", "restore: the FM-1 didn't ask: nothing changed");
+  onAsk();
+  const end = Date.now() + 70000;              // (it asks for a minute)
+  while (Date.now() < end) {
+    const r = ndReply(await link.read(end - Date.now()), 0x75);
+    if (!r || !r.length || r[0] === 0xFF) continue;
+    if (r[0] === 0) return "restored";
+    if (r[0] === 1) return "cancelled";
+    throw fail("lost", "restore: the FM-1 couldn't switch to the backup: nothing changed");
+  }
+  throw fail("lost", "restore: no answer from the FM-1");
 }
 
 const b64 = (a) => { let s = ""; for (const b of a) s += String.fromCharCode(b); return btoa(s); };
@@ -332,14 +360,14 @@ export class Updater {
     } finally { dev.link.close(); }
   }
 
-  // Niagara Drift running: write a backup back (it restarts with it); false when the firmware can't take one
-  async restore(objs) {
+  // Niagara Drift running: write a backup back (it restarts with it): "restored", "cancelled" (on the FM-1), or false
+  // when the firmware can't take one; onAsk: the FM-1 is asking
+  async restore(objs, onAsk) {
     const dev = await this.find((id) => !IS_OTA(id));
     if (!dev) throw fail("notfound", "FM-1 not found (USB cable, and no other app using it?)");
     try {
       if (!(await ndTransact(dev.link, 0x70, [0, 0, 0], (r) => r.length >= 5 && r[0] === 0))) return false;
-      await ndRestore(dev.link, objs, this.log);
-      return true;
+      return await ndRestore(dev.link, objs, this.log, onAsk);
     } finally { dev.link.close(); }
   }
 

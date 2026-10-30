@@ -518,3 +518,10 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-30 (Evan): **the Tunings in order**: 12-tone first (the most common), the equal ones by size (Quarter, 19-,
   31-, 53-tone), then the rest simplest to richest: Just, Harmonics, LMY, Harrison, Shruti, Partch. PROJ_FORMAT 40
   (39's read, its Tuning remapped: a saved sound keeps its Tuning).
+- 2026-10-30 (Evan): **the safe restore, on fm1-base's flash core** (`restore_core.c`, MPL-2.0, as it is there: proven
+  on FM-1s, and storage.c unchanged). Each object of a backup is checked against its CRC-32 and staged in its spare
+  copy without its header (nothing changes); then the FM-1 asks, RESTORE FROM USB? (SEL yes, HOME no, a minute: no;
+  one banner line, the question and its keys in turn); yes, the journal record (the update area's second sector),
+  the headers, the record erased: the set changes whole or not at all, a power cut finished at the next power-on;
+  then it restarts. Every object of the list is restored (one the backup hasn't, emptied). Saves wait while a restore
+  is staged. USB 0x74 (stage) and 0x75 (ask); the installers fall back to 0.2's way on firmware without them.

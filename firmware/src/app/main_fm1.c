@@ -241,9 +241,67 @@ static void safe_main(void)
  *                                           (off 0 reads the object afresh; len 0: none stored)
  *   0x71 [obj, off lo, off hi, bytes...] -> 0x71 [obj, off lo, off hi, 0 ok / 1 refused]   (into a buffer)
  *   0x72 [obj, len lo, len hi]           -> 0x72 [obj, 0 written / 1 refused]   (the buffer to the flash)
- *   0x73 []                              -> restart (the restored objects load as at power-on) */
-static uint8_t bk_buf[PLAT_STORE_MAX];
+ *   0x73 []                              -> restart (the restored objects load as at power-on)
+ * THE SAFE RESTORE (v0.3, Evan 2026-10-30; storage.c): 0x72 writes an object at once, so a cut between two left a
+ * mix. Now each object goes through 0x71 into the buffer, then is staged (nothing changes yet), then the FM-1 asks:
+ *   0x74 [obj, len lo, len hi, crc32 LE x4] -> 0x74 [obj, 0 staged / 1 refused / 2 CRC wrong / 3 flash]
+ *                                           (the buffer's first len bytes, checked against the file's CRC-32, into
+ *                                           the object's spare copy without its header, read back: fm1-base's
+ *                                           rs_stage, restore_core.c; len 0: the backup hasn't it, it's emptied;
+ *                                           from the first, saves wait)
+ *   0x75 [mask]                          -> 0x75 [0xFF asking], then, answered: 0x75 [0 restored / 1 no / 2 failed]
+ *                                           (mask: every object of the backup, all staged; RESTORE FROM USB? on the
+ *                                           screen, SEL yes, HOME no, a minute without either no; yes, fm1-base's
+ *                                           rs_commit: the set changes whole or not at all; then it restarts)
+ * A restore staged and not asked for in a minute is dropped (the saves go on). */
+#define bk_buf bu_buf                                /* one object's buffer: the restore core's (restore_core.c) */
 static int bk_n;
+static uint32_t rx_staged, rx_t, rx_restart;       /* the restore: the objects staged (bu_objs' order), when (ms); the
+                                                    * restart due */
+static uint8_t rx_asking;
+static void rx_drop(void)                           /* nothing restored: the staged copies stay headerless (unseen) */
+{
+    rx_staged = 0;
+    rx_asking = 0;
+    st_hold = 0;
+}
+static int rx_index(uint32_t obj)                   /* obj's place in the journal record, -1 none */
+{
+    uint32_t i;
+    for (i = 0; i < BU_NOBJ; i++)
+        if (bu_obj(i) == obj)
+            return (int)i;
+    return -1;
+}
+static void rx_run(void)                            /* the main loop: the answer, the minute, the restart */
+{
+    if (rx_restart && fm1_ms >= rx_restart) {
+        fm1_reboot();
+    } else if (rx_asking) {
+        int a = ui_restore_answer();
+        if (a) {
+            uint8_t r = 1;
+            if (a == 1) {
+                int rc = rs_commit();               /* fm1-base's: the record, the headers, the record erased */
+                r = rc ? 2 : 0;
+                ui_restore_said(!rc);
+            } else {
+                ui_restore_said(-1);
+            }
+            ota_send_msg(0x75, &r, 1u);
+            if (!r || r == 2) {
+                rx_asking = 0;
+                rx_restart = fm1_ms + 2500u;        /* restored (or the headers half there: the record finishes them
+                                                     * at power-on: RS_E_COMMIT), then the flash's sound loads; saves
+                                                     * wait */
+            } else {
+                rx_drop();
+            }
+        }
+    } else if (rx_staged && fm1_ms - rx_t > 60000u) {
+        rx_drop();
+    }
+}
 static void backup_cmd(uint32_t cmd, const uint8_t *b, uint32_t n)
 {
     uint8_t r[29];
@@ -269,6 +327,41 @@ static void backup_cmd(uint32_t cmd, const uint8_t *b, uint32_t n)
         int ok = obj < OBJ_NOBJ && off >= 8u && off <= sizeof bk_buf && plat_store_save(obj, bk_buf, off) == 0;
         r[1] = (uint8_t)!ok;
         ota_send_msg(0x72, r, 2u);
+    } else if (cmd == 0x74u && n >= 7u) {         /* stage the buffer as obj (fm1-base's rs_stage) */
+        uint32_t len = off, crc = b[3] | (uint32_t)b[4] << 8 | (uint32_t)b[5] << 16 | (uint32_t)b[6] << 24;
+        int i = rx_index(obj);
+        uint8_t code = 0;
+        if (i < 0 || len > sizeof bk_buf || rx_asking || rx_restart)
+            code = 1;
+        else if (bu_crc(0, bk_buf, len) != crc)
+            code = 2;
+        if (!code) {
+            rs_ent_t *e = &rs_rec.e[i];
+            if (!rx_staged)
+                st_hold = 1;                        /* a restore begins: no saves (they'd take the staged copies) */
+            e->obj = (uint16_t)obj;
+            e->len = len;
+            e->crc = crc;
+            if (rs_stage(e))
+                code = 3;
+            else
+                rx_staged |= 1u << i;
+            rx_t = fm1_ms;
+        }
+        r[1] = code;
+        ota_send_msg(0x74, r, 2u);
+    } else if (cmd == 0x75u && n >= 1u) {          /* ask: every object staged (a backup's missing one as empty) */
+        uint8_t code = 0xFFu;
+        uint32_t i, mask = 0;
+        for (i = 0; i < BU_NOBJ; i++)
+            mask |= 1u << bu_obj(i);
+        if (rx_staged != (1u << BU_NOBJ) - 1u || b[0] != mask || rx_asking || rx_restart)
+            code = 2;
+        ota_send_msg(0x75, &code, 1u);
+        if (code == 0xFFu) {
+            rx_asking = 1;
+            ui_restore_ask();
+        }
     } else if (cmd == 0x73u) {
         fm1_delay_ms(50);                           /* the reply to the last commit out first */
         fm1_reboot();
@@ -278,7 +371,7 @@ static void backup_cmd(uint32_t cmd, const uint8_t *b, uint32_t n)
 static void dbg_service(void)
 {
     uint32_t d = ota_take();
-    if (d >= 7u && ota_dec[2] >= 0x70 && ota_dec[2] <= 0x73) {
+    if (d >= 7u && ota_dec[2] >= 0x70 && ota_dec[2] <= 0x75) {
         backup_cmd(ota_dec[2], ota_dec + 6, d - 7u);
     } else if (d == 7u && ota_dec[2] == 0x11) {
         ota_reply_identity();
@@ -316,9 +409,13 @@ static void fm1_main(void)
         uint32_t f = irq_save();
         flash_ok = FL_FAR(fl_jedec_ram)() == 0x856014u;   /* the expected 1 MiB part, else RAM only */
         irq_restore(f);
-        if (flash_ok)
+        if (flash_ok) {
+            rs_boot();                              /* a restore's commit cut short by a power loss: finished (before
+                                                     * the cleanup, as fm1-base's) */
             ota_boot_cleanup();
+        }
     }
+
     lcd_init();
     palette_set(1);
     splash();
@@ -407,6 +504,7 @@ static void fm1_main(void)
             }
         }
         dbg_service();                              /* M-UPGRADE handshake, the load (other SysEx is dropped) */
+        rx_run();
         if (usb.ota_req) {
             usb.ota_req = 0;
             dr_play(0);

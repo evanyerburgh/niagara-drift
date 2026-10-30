@@ -1,7 +1,7 @@
 # Niagara Drift licensing
 
 Niagara Drift is free software under the GNU General Public License, version 3 only
-(`GPL-3.0-only`, full text in `LICENSE`). It starts from [FoMni](https://github.com/charlesvestal/fm1-fomni), which is built on Felucca's
+(`GPL-3.0-only`, full text in `LICENSE`); one file taken from fm1-base keeps its Mozilla Public License 2.0 (below). It starts from [FoMni](https://github.com/charlesvestal/fm1-fomni), which is built on Felucca's
 platform layer (through X0X), and keeps their licence. If you distribute Niagara Drift, or firmware derived from it, you must give
 your recipients its complete corresponding source under the same licence.
 
@@ -13,6 +13,7 @@ your recipients its complete corresponding source under the same licence.
 | `firmware/src/app/{panel,plat_fm1,main_fm1}.c`, `host/omni_host.c`, `web/emu/` | adapted from X0X (itself from Felucca's `panel.c`, `main.c`, `audio.c`) | GPL-3.0-only |
 | Key pressure: `firmware/src/app/sense.c`, `tests/host/sense_test.c`, the analog row sampling and LED glow in `firmware/hal/fm1_input.h` and `fm1_adc.h`, the pressure tracking in `firmware/src/app/plat_fm1.c` | [MONK-1](https://github.com/charlesvestal/fm1-monk) by Charles Vestal (commit 7937106), from [Velo](https://github.com/charlesvestal/fm1-velocity)'s sensing | GPL-3.0-only |
 | The delay's and reverb's design: `firmware/src/dsp/drone_fx.c` (the stereo delay's types and its wow, after the Moog Matriarch's; the eight-line feedback delay network with its Hadamard mix, diffusers, half-rate half-band filters and their coefficients, line lengths and Inf), written anew in float | [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) by Quixotic7 (`firmware/src/cr_fx.c`, `docs/FX.md`; commit 9fc83fa) | GPL-3.0-only |
+| The safe restore's flash core: `firmware/src/restore_core.c` (staging each object without its header, the journal record, the commit and its finish at power-on), unchanged; the restore around it (`main_fm1.c`, the question in `ui.c`, the installers) is Niagara Drift's | [fm1-base](https://github.com/charlesvestal/fm1-base) by Charles Vestal (`device/backup.c`, commit d8ff8f4) | MPL-2.0 (`LICENSES/MPL-2.0.txt`; the file keeps its header; MPL-2.0 joins a GPL work, §3.3, the file not marked otherwise) |
 | The idea of a browser emulator for FM-1 firmware (`web/emu/`) | [Groove OS](https://www.groove-os.com/) by Peter Gombos, whose site runs its firmware in the browser; no code from it | credit only |
 | Everything else in `firmware/src/{app,dsp}`, `tests/`, unless its header says otherwise | [FoMni](https://github.com/charlesvestal/fm1-fomni) by Charles Vestal | GPL-3.0-only |
 | New files added by Niagara Drift (marked in their headers) | Niagara Drift | GPL-3.0-only |
