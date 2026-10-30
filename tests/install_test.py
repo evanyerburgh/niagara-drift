@@ -7,7 +7,9 @@ then "device asks, host answers" reads of the logical image. Run from the repo r
   python3 tests/install_test.py
 Also checks logical_image/product_of against web/fm1pkg.js (needs node and
 build/omni.fwsc, skipped otherwise)."""
+import base64
 import io
+import json
 import queue
 import shutil
 import subprocess
@@ -318,15 +320,30 @@ def backups():
     rc, out, err = cli(["--backup", str(f)], dev)
     ok(rc == 0 and f.exists(), "--backup writes a file")
     got = I.read_backup(str(f))
-    ok(got == objs, "... with every object as stored (an empty one empty)")
+    mine = {k: v for k, v in objs.items() if k != 1}
+    ok(got == mine, "... with every object as stored (an empty one empty), the panel's calibration left out")
     dev2 = FakeFM1(image, identity="FM-1_800", stored={})
     rc, out, err = cli(["--restore", str(f), "--yes"], dev2)
-    ok(rc == 0 and {k: v for k, v in dev2.stored.items()} == {k: v for k, v in objs.items() if v},
+    ok(rc == 0 and {k: v for k, v in dev2.stored.items()} == {k: v for k, v in mine.items() if v},
        "--restore writes them back (empty ones skipped)")
+    oldfile = TMP / "with-panel.json"           # a backup from before 2026-10-30: the calibration in it, no checksums
+    oldfile.write_text(json.dumps({"niagara_drift_backup": 1, "identity": "FM-1_800", "saved": "",
+                                   "objects": {str(k): base64.b64encode(v).decode() for k, v in objs.items()}}))
+    dev3 = FakeFM1(image, identity="FM-1_800", stored={1: b"this unit's"})
+    rc, out, err = cli(["--restore", str(oldfile), "--yes"], dev3)
+    ok(rc == 0 and dev3.stored[1] == b"this unit's" and dev3.stored[0] == objs[0],
+       "... an older backup restores, the FM-1 keeping its own calibration")
+    j = json.loads(f.read_text())
+    j["objects"]["3"] = base64.b64encode(b"bank C changed").decode()
+    damaged = TMP / "damaged.json"
+    damaged.write_text(json.dumps(j))
+    dev4 = FakeFM1(image, identity="FM-1_800", stored={})
+    rc, out, err = cli(["--restore", str(damaged), "--yes"], dev4)
+    ok(rc != 0 and "damaged" in err and not dev4.stored, "--restore of a damaged backup: refused, nothing written")
     ok(dev2.restarted == 1, "... and restarts the FM-1")
     old = {k: v for k, v in objs.items() if k < 4}
     rc, out, err = cli(["--backup", str(TMP / "old.json")], FakeFM1(image, identity="FM-1_800", stored=dict(old), nobj=4))
-    ok(rc == 0 and I.read_backup(str(TMP / "old.json")) == old,
+    ok(rc == 0 and I.read_backup(str(TMP / "old.json")) == {k: v for k, v in old.items() if k != 1},
        "--backup of a firmware before the Presets bank: the four it has, no error")
     rc, out, err = cli(["--backup", str(TMP / "x.json")], FakeFM1(image))
     ok(rc != 0 and "can't make a backup" in err, "--backup on another firmware: refused, no file")
@@ -337,7 +354,7 @@ def backups():
         dev = FakeFM1(image, identity="FM-1_800", stored=dict(objs))
         rc, out, err = cli([p, "--yes"], dev)
         saved = list((TMP / "auto").glob("backup-*.json"))
-        ok(rc == 0 and len(saved) == 1 and I.read_backup(str(saved[0])) == objs,
+        ok(rc == 0 and len(saved) == 1 and I.read_backup(str(saved[0])) == mine,
            "an install over Niagara Drift saves a backup first")
         rc, out, err = cli([p, "--yes", "--no-backup"], FakeFM1(image, identity="FM-1_800", stored=dict(objs)))
         ok(rc == 0 and len(list((TMP / "auto").glob("backup-*.json"))) == 1, "... not with --no-backup")

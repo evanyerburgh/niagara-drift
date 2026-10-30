@@ -32,6 +32,7 @@ import queue
 import re
 import sys
 import time
+import zlib
 
 HS_QUERY = bytes([0xF0, 0x00, 0x32, 0x45, 0x00, 0x00, 0x00, 0x40, 0x7F, 0xF7])
 UPGRADE = bytes([0xF0, 0x22, 0x24, 0x35, 0x7F, 0xF7])
@@ -223,6 +224,8 @@ def pair_output(name, outs):
 # calibration, banks B and C, read and written as they lie on the flash.
 OBJECTS = {0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C", 4: "presets saved over"}
 OPTIONAL = {4}                     # firmware older than the Presets bank (v0.2) has no such object: none to keep
+UNIT = {1}                         # the panel's calibration belongs to the unit: never in a backup, never restored
+                                   # from one (Evan, 2026-10-30: as fm1-base's; a backup goes onto any FM-1)
 BACKUP_DIR = os.path.join(os.path.expanduser("~"), "niagara-drift-backups")
 
 
@@ -257,9 +260,21 @@ def nd_transact(link, cmd, body, want, tries=3):
 
 
 def nd_backup(link):
-    """{obj: bytes} (b"" when none is stored), or None: this firmware can't make a backup"""
+    """{obj: bytes} (b"" when none is stored), or None: this firmware can't make a backup. Each object is read twice:
+    one that changed meanwhile (a save while it was read) is refused, as Melodee's are"""
+    first = nd_read_all(link)
+    if first is None:
+        return None
+    if nd_read_all(link) != first:
+        raise InstallError("lost", "backup: the FM-1 changed while it was read: stop it (PLAY) and try again")
+    return first
+
+
+def nd_read_all(link):
     objs = {}
     for obj in OBJECTS:
+        if obj in UNIT:
+            continue
         data, off, total = b"", 0, None
         while total is None or off < total:
             r = nd_transact(link, 0x70, [obj, off & 0xFF, off >> 8],
@@ -285,7 +300,7 @@ def nd_backup(link):
 
 def nd_restore(link, objs, out):
     for obj, data in sorted(objs.items()):
-        if not data:
+        if not data or obj in UNIT:          # (an older backup's calibration: this FM-1 keeps its own)
             continue
         for off in range(0, len(data), 128):
             part = data[off:off + 128]
@@ -304,7 +319,8 @@ def backup_file(objs, ident, path):
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, "w") as f:
         json.dump({"niagara_drift_backup": 1, "identity": ident.text, "saved": time.strftime("%Y-%m-%d %H:%M:%S"),
-                   "objects": {str(k): base64.b64encode(v).decode() for k, v in objs.items()}}, f, indent=1)
+                   "objects": {str(k): base64.b64encode(v).decode() for k, v in objs.items()},
+                   "crc32": {str(k): zlib.crc32(v) for k, v in objs.items()}}, f, indent=1)
 
 
 def read_backup(path):
@@ -312,10 +328,13 @@ def read_backup(path):
         with open(path) as f:
             j = json.load(f)
         objs = {int(k): base64.b64decode(v) for k, v in j["objects"].items()}
-    except (OSError, ValueError, KeyError) as e:
+        crcs = {int(k): int(v) for k, v in j.get("crc32", {}).items()}   # (none before 2026-10-30)
+    except (OSError, ValueError, KeyError, TypeError) as e:
         raise InstallError("usage", f"{path}: not a Niagara Drift backup ({e})")
     if any(k not in OBJECTS for k in objs):
         raise InstallError("usage", f"{path}: unknown objects in the backup")
+    if crcs and (set(crcs) != set(objs) or any(zlib.crc32(v) != crcs[k] for k, v in objs.items())):
+        raise InstallError("usage", f"{path}: the backup is damaged (a checksum doesn't match): nothing was written")
     return objs
 
 

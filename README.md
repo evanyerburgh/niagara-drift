@@ -69,11 +69,13 @@ sequencer are gone until you go back (below).
 **Updating:** when there's a new version, run the installer again the same way. Your sound and scenes are
 kept, unless that version's notes in the [changelog](CHANGELOG.md) say otherwise.
 
-**Backing up:** `python3 tools/fm1_install.py --backup` saves your sound, scenes and settings to a
-file (in `~/niagara-drift-backups/`), and `--restore FILE` puts them back (the FM-1 restarts). The terminal
-installer saves one by itself before it installs over Niagara Drift (the web installer doesn't yet).
-Back up before trying another firmware, and restore
-when you come back. A backup is for the same FM-1: it carries that unit's knob calibration too.
+**Backing up:** both installers save your sound, scenes and settings to a file before they install over
+Niagara Drift: the web installer into your downloads (and it offers to put them back afterwards), the terminal
+one into `~/niagara-drift-backups/`. The web installer's "Your sounds and scenes" card saves or restores one at any
+time, as `python3 tools/fm1_install.py --backup` and `--restore FILE` do (the FM-1 restarts); each reads the
+other's files. Back up before trying another firmware, and restore when you come back. A backup leaves out the
+knobs' calibration, which belongs to each FM-1, so it can go onto another one; a damaged file is refused before
+anything is written.
 
 **Going back:** the installer's "Back to M-VAVE's firmware" writes M-VAVE's own FM-1 V15 back over the
 same cable (or use M-VAVE's updater, M-UPGRADE, from [m-vave.com/download](https://www.m-vave.com/download)).

@@ -54,7 +54,16 @@ input[type=file] { font: inherit; font-size: .9rem; color: var(--muted); max-wid
     <p><button id="go" disabled data-t="install"></button></p>
     <progress id="bar" max="100" value="0"></progress>
     <p id="status" role="status"></p>
+    <p class="small" id="saved" hidden></p>
+    <p id="putback" hidden><button id="putbackgo" data-t="putback"></button></p>
     <pre id="log"></pre>
+  </div>
+  <div class="card">
+    <h2 data-t="soundsh"></h2>
+    <p class="small" data-t="soundswhy"></p>
+    <p><button id="backupgo" disabled data-t="backupnow"></button></p>
+    <p class="small"><span data-t="restore1"></span><br><input type="file" id="restorefile" accept=".json,application/json"></p>
+    <p><button id="restorego" disabled data-t="restorenow"></button></p>
   </div>
   <div class="card">
     <h2 data-t="riskh"></h2>
@@ -118,6 +127,22 @@ const TEXT = {
     mismatch: "Written, but the FM-1 reports another version: ",
     badpkg: "The firmware file is damaged. Reload the page.",
     leave: "Writing. Don't close the page.",
+    backingup: "Saving your sounds and scenes first",
+    savedto: "Your sounds and scenes were saved first, to ",
+    savedhint: " (in your downloads). If any are missing afterwards, put them back:",
+    putback: "Put the backup back",
+    soundsh: "Your sounds and scenes",
+    soundswhy: "Every install saves them to a file first, when the FM-1 runs Niagara Drift (not the knobs' calibration, which belongs to each FM-1). You can also save them, or put a saved file back, here: the FM-1 restarts with it. The terminal installer makes and reads the same files.",
+    backupnow: "Save them to a file",
+    restore1: "Or choose a backup file to put back:",
+    restorenow: "Put this backup back",
+    restoring: "Putting the backup back",
+    restored: "Done: the FM-1 restarts with the backup's sound and scenes.",
+    nobackup: "This FM-1 isn't running Niagara Drift (0.2 or later), so there's nothing to save or put back.",
+    backupdone: "Saved to ",
+    badbackup: "That isn't a Niagara Drift backup file.",
+    damaged: "That backup file is damaged (its checksums don't match), so nothing was written. Choose another.",
+    changed: "The FM-1 changed while it was being saved. Stop it (PLAY) and try again.",
   },
 };
 const lang = "en";
@@ -136,6 +161,35 @@ let image = null;
 const meta = /*META*/;
 
 let writing = false;
+let lastBackup = null, chosen = null;
+function download(name, text) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+async function saveBackup(up) {               /* Niagara Drift running: its objects to a file, kept for putting back */
+  const b = await up.backup();
+  if (!b) return null;
+  const name = ndBackupName();
+  download(name, ndBackupFile(b.objs, b.identity));
+  lastBackup = { objs: b.objs, name };
+  log(`backup: ${name}`);
+  return lastBackup;
+}
+function buttons() {
+  $("go").disabled = writing || !image;
+  $("stockgo").disabled = writing || !stock;
+  $("backupgo").disabled = writing || !navigator.requestMIDIAccess;
+  $("restorego").disabled = writing || !chosen;
+  $("putbackgo").disabled = writing;
+}
+async function midiAccess() {
+  try { return await navigator.requestMIDIAccess({ sysex: true }); }
+  catch (e) { sayK("denied"); return null; }
+}
 window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault(); e.returnValue = t("leave"); } });
 
 (async () => {
@@ -171,11 +225,11 @@ $("stockfile").addEventListener("change", async (e) => {
 });
 
 async function run(img, product, isStock) {
-  let midi;
-  try { midi = await navigator.requestMIDIAccess({ sysex: true }); }
-  catch (e) { sayK("denied"); return; }
+  const midi = await midiAccess();
+  if (!midi) return;
   writing = true;
-  $("go").disabled = $("stockgo").disabled = true;
+  buttons();
+  $("saved").hidden = $("putback").hidden = true;
   try {
     const up = new Updater(midi, log);
     const total = 74 + 1167;
@@ -193,7 +247,15 @@ async function run(img, product, isStock) {
       ota.link.close();
       sayK((await up.resume(img, step)) ? (isStock ? "stockdone" : "done") : "stopped");
     } else {
+      sayK("backingup");
+      const b = await saveBackup(up);      /* first: the sound and scenes, to a file (Niagara Drift running) */
+      if (b) {
+        $("saved").textContent = t("savedto") + b.name + (isStock ? "." : t("savedhint"));
+        $("saved").hidden = false;
+      }
       await up.install(img, product, step);
+      if (b && !isStock)
+        $("putback").hidden = false;
     }
   } catch (e) {
     if (isStock && e && e.code === "mismatch") { $("bar").value = 100; sayK("stockdone"); }   /* stock names itself its own way */
@@ -202,9 +264,52 @@ async function run(img, product, isStock) {
     log(String(e && e.stack || e));
   }
   writing = false;
-  $("go").disabled = !image;
-  $("stockgo").disabled = !stock;
+  buttons();
 }
+
+async function restore(objs) {               /* a backup back onto a Niagara Drift FM-1: it restarts */
+  const midi = await midiAccess();
+  if (!midi) return;
+  writing = true;
+  buttons();
+  try {
+    sayK("restoring");
+    sayK((await new Updater(midi, log).restore(objs)) ? "restored" : "nobackup");
+  } catch (e) {
+    if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
+    else sayK("error", e && e.message);
+    log(String(e && e.stack || e));
+  }
+  writing = false;
+  buttons();
+}
+$("backupgo").addEventListener("click", async () => {
+  const midi = await midiAccess();
+  if (!midi) return;
+  writing = true;
+  buttons();
+  try {
+    const b = await saveBackup(new Updater(midi, log));
+    if (b) sayK("backupdone", b.name);
+    else sayK("nobackup");
+  } catch (e) {
+    if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
+    else sayK("error", e && e.message);
+  }
+  writing = false;
+  buttons();
+});
+$("restorefile").addEventListener("change", async (e) => {
+  chosen = null;
+  const f = e.target.files && e.target.files[0];
+  if (f) {
+    try { chosen = ndReadBackup(await f.text()); } catch (err) { sayK(err && err.code === "damaged" ? "damaged" : "badbackup"); }
+  }
+  buttons();
+});
+$("restorego").addEventListener("click", () => { if (chosen) restore(chosen); });
+$("putbackgo").addEventListener("click", () => { if (lastBackup) restore(lastBackup.objs); });
+buttons();
 
 $("go").addEventListener("click", () => run(image, meta.product, false));
 $("stockgo").addEventListener("click", () => { if (stock) run(stock.image, stock.product, true); });
