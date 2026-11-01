@@ -14,9 +14,9 @@ note. It's inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the S
 
 *Your FM-1 with Niagara Drift installed: what each knob, button and key now does. Amber is drone I,
 teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO pages they set the
-LFO's routing, and X-mod lets drone I move drone II's filter, or the drones and their sound bend each other's pitch); white keys 1–8 hold scenes, in
+LFO's routing, and cross-mod lets drone I move drone II's filter, or the drones and their sound bend each other's pitch); white keys 1–8 hold scenes, in
 banks you pick with SEL and the top four; keys 9–12 and the top four are gestures. The page buttons' pages, each tap the next: HOME
-Drones 1, 2 · ENV Life, Tone · EDIT Osc, Sub · Drive · SEQ Partner, Pitch moves · LFO LFO depths, Mods · ARP Swell ·
+Drones 1, 2 · ENV Life, Tone · EDIT Osc, Sub · Drive · SEQ Partner, Pitch moves · LFO LFO sends, Mods · ARP Swell ·
 FX Delay, Reverb · GLO Setup 1, 2.*
 
 **Status: 0.2.** It runs on the FM-1 (tested on one unit so far) and in the browser:
@@ -50,7 +50,7 @@ FX Delay, Reverb · GLO Setup 1, 2.*
   Cathedral, Chorus hall) whose length goes to Inf, a freeze.
 - **Feedback** (the finished sound fed back into the drones) and **Character** (clean to vintage).
 - **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
-- **Switch time**: buttons and keys never jump: the sound moves to a new setting over a time you set.
+- **Morph**: buttons and keys never jump: the sound moves to a new setting over a time you set.
 
 ## Installing
 
@@ -198,7 +198,7 @@ knob you're turning.
 | | |
 |---|---|
 | **PLAY** | fade the drones in or out; **SEL + PLAY** fades drone II alone out or back in |
-| **OCT− / OCT+** | the LFO's **Wave I** / **Wave II**: tap for the next shape, round and round; **SEL + OCT** for the one before. Each light pulses with its wave |
+| **OCT− / OCT+** | **LFO I** / **LFO II**: tap for the next shape, round and round; **SEL + OCT** for the one before. Each light pulses with its wave |
 | **SAVE** | save the sound, at once. While the drone plays, the sound dips out and back over about 50 ms around the write; SAVE glows dimly while something isn't written yet |
 | **SEL** (hold) | fine: a pitch knob moves in single cents, cutoff and resonance in tenths |
 | **ARP** (tap) | the Swell page, as the other page buttons open theirs (landing on it switches nothing). On the page, a tap switches the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at the page from anywhere, to set the Swell before you start it |
@@ -225,7 +225,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **Pitch** goes from 1.6 kHz down to 2 Hz. Under 27 Hz (where the screen shows Hz, not a note) a drone stops being a
   tone and becomes a pulse of clicks, a click a cycle: rhythm, and through a drive they ping against the other drone.
   The speaker can't play the low part: listen on headphones.
-- **Turning a pitch knob** moves it a note of the **Tuning** a click (Setup 2, KNOB 4; semitones to start), however
+- **Turning a pitch knob** moves it a note of the **Tuning** a click (Setup 2, KNOB 1; semitones to start), however
   far apart the Tuning's notes are, and the screen shows the note it's going to. It glides from note to note, so a
   steady turn is one slide. **SEL** held, the knob moves a cent at a time: that's how to tune a drone a little sharp
   or flat, and the knob keeps it there, so +3 cents over one note moves to +3 over the next. With Pitch link on,
@@ -235,25 +235,25 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 #### Life and Tone · ENV
 
-<img src="docs/img/page-tone.png" width="488" alt="The Life and Tone pages: the character, the feedback, Age and Drift; each drone's noise through its filter, and its colour">
+<img src="docs/img/page-tone.png" width="488" alt="The Life and Tone pages: the feedback, Drift, the character and Age; each drone's noise through its filter, and its colour">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Life | character | feedback | age | drift |
+| Life | feedback | drift | character | age |
 | Tone | I noise | I colour | II noise | II colour |
 
-- **Character** takes the oscillators from clean to vintage: softer edges, a bent saw, a little pitch
-  jitter, the two drones slightly apart, a whisper of noise.
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
   thickening colour that grows with the knob, as strong on a quiet, dry sound as on a loud one. Over the top of
   its turn (past about 70) it starts to sing on its own and takes the sound over, held close to the same loudness.
   It rings in key, on drone I's harmonics, and fades with the drones when you stop. The meter shows its share.
-- **Age** wears the sound like an old tape: darker, a little hiss, a slow wow and a little flutter in the pitch.
-  It wears in slowly (about 20 s from none to full) and wears out as slowly when you turn it back. Character is
-  the oscillators' own wear; Age is the tape's.
 - **Drift** keeps the drones from ever being quite still: besides a little pitch wander, each drone's
   cutoff, timbre (X-Wave), level and partner detune slowly wander on their own, around where you've set
   them, never repeating. Gentle by default; 0 holds everything exactly where you put it.
+- **Character** takes the oscillators from clean to vintage: softer edges, a bent saw, a little pitch
+  jitter, the two drones slightly apart, a whisper of noise.
+- **Age** wears the sound like an old tape: darker, a little hiss, a slow wow and a little flutter in the pitch.
+  It wears in slowly (about 20 s from none to full) and wears out as slowly when you turn it back. Character is
+  the oscillators' own wear; Age is the tape's.
 - **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
   It's heard all along the knob, and at the top it's about as loud as them (100 is level with a saw, 50 about −7 dB, 25 −12; a sine is quieter). It
   goes through the drone's filter with them, so the cutoff, resonance, LFO and Drift shape it.
@@ -266,13 +266,13 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Osc | I X-Wave | I PW (pulse width) | II X-Wave | II PW |
-| Sub · Drive | I osc mix (+ SEL: sub wave) | I drive | II osc mix (+ SEL: sub wave) | II drive |
+| Sub · Drive | I osc/sub (+ SEL: sub wave) | I drive | II osc/sub (+ SEL: sub wave) | II drive |
 
 - **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width. The sine and the triangle are a
   little louder than the saw, so they still carry on a small speaker, and the square a little quieter, level with the
   saw there.
-- **Osc mix** goes from the oscillators to the sub; **drive** pushes each drone into its filter.
-- **The sub's wave**: hold SEL and turn a drone's Osc mix knob: **Square** (as it starts), **Sine** (pure weight, the
+- **Osc/Sub** crossfades the oscillators with the sub (the knob reads "Osc/Sb"); **drive** pushes each drone into its filter.
+- **The sub's wave**: hold SEL and turn a drone's Osc/Sub knob: **Square** (as it starts), **Sine** (pure weight, the
   deepest on headphones, the least for a small speaker), **Triangle**, **Saw** (the brightest). Each is as loud as the
   square, and a change glides through, as the sub's octave does. The card shows both: the mix above, "+ SEL Wave"
   below.
@@ -304,25 +304,26 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 #### LFO · LFO
 
-<img src="docs/img/page-lfo.png" width="488" alt="The LFO depths and Mods pages: the two waves and where they go; the rate modulation, cross-mod and delay LFO">
+<img src="docs/img/page-lfo.png" width="488" alt="The LFO sends and Mods pages: the two LFOs and where they go; the speed modulation, the delay modulation and cross-mod">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| LFO depths | I osc depth | I filter depth | II osc depth | II filter depth |
-| Mods | rate mod | mod by (wave) | I → II cutoff amount | delay LFO depth |
+| LFO sends | I pitch (or X-Wave) | I cutoff (or resonance) | II pitch (or X-Wave) | II cutoff (or resonance) |
+| Mods | speed mod | source (LFO) | delay mod | cross-mod |
 
-- **Depths** and **rate mod** are centred: the middle is none.
+- **The sends** and **speed mod** are centred: the middle is none. Each send is named for what it moves: Pitch, or
+  X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 3 / 8.
 - **Mods**, the LFO moving other things, and cross-mod's amount:
-  - **Rate mod**: the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
-  - **Mod by**: which wave does that (I, II or both).
-  - **X-mod amt**: how deep cross-mod goes (black key 11): how much drone I's sound moves drone II's filter; how
+  - **Speed mod** ("Speed" on the knob): the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
+  - **Source**: which LFO does that (I, II or both).
+  - **Delay mod** ("Delay" on the knob): how far the LFO wobbles the delay's time (up to ±25%; negative the other way), on the wave black
+    key 10 picks on the LFO pages. You hear it only with some delay mix (FX, the Delay page).
+  - **Cross-mod** ("X-mod" on the knob): how deep cross-mod goes (black key 11): how much drone I's sound moves drone II's filter; how
     far each drone's sound bends the other's pitch (**cross-FM**: a little roughens and thickens the two, a lot
     tangles them into one restless, metallic sound); or, with **Snarl**, how far the finished sound, echoes and all,
     bends both drones' pitch (growly with two different pitches; on a single plain drone it only reshapes the tone).
     Their pitches stay where you set them: the bending is around them.
-  - **Dly LFO**: how far the LFO wobbles the delay's time (up to ±25%; negative the other way), on the wave black
-    key 10 picks on the LFO pages. You hear it only with some delay mix (FX, the Delay page).
-  - Movement (ALGORITHM) scales the delay's wobble too, as it does the LFO depths; not Rate mod or X-mod (see
+  - Movement (ALGORITHM) scales the delay's wobble too, as it does the LFO sends; not Speed mod or Cross-mod (see
     [The LFO](#the-lfo)).
 - The LFO's rate and waves are on the top-left knobs; see [The LFO](#the-lfo) below.
 
@@ -339,8 +340,8 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **Depth** is how far it dips, in dB (down to −30; all the way, silence). **Shape** runs both ways from the
   middle, **even** (a smooth breath): to the right it becomes a **ramp**, swelling slowly and falling away quickly,
   more like a sawtooth the further you go ("ramp 100": the rise takes 97 % of each breath; at fast rates the fall
-  stays at least 20 ms, so it doesn't click); to the left it firms up into a pulse, and only at the end into a hard
-  gate.
+  stays at least 20 ms, so it doesn't click); to the left it firms up into a pulse ("pulse 50"), and only at the end into a hard
+  gate ("gate").
 - **On a MIDI clock** (see MIDI below) the Swell breathes in time: KNOB 1 becomes **Division**, how long a breath
   lasts, from 32 bars down to a quarter note, and the picture shows it with the tempo ("8 bars · 120"). A locked LFO
   (black key 5, held) restarts on the Swell's bars, so it follows the clock too.
@@ -384,16 +385,16 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 #### Setup · GLO
 
-<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, switch and scene times; the tune, stereo width and the keys' pressure">
+<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, morph and scene times; the Tuning, tune, stereo width and the keys' pressure">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Setup 1 | fade | switch time | scene time | |
-| Setup 2 | tune | stereo | pressure | tuning |
+| Setup 1 | fade | morph | scene time | |
+| Setup 2 | tuning | tune | stereo | pressure |
 
 Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't change it.
 
-- **Fade** is how long PLAY takes (up to 60 s); **Switch time** is how long a black key or a new LFO wave (OCT) takes
+- **Fade** is how long PLAY takes (up to 60 s); **Morph** is how long a black key or a new LFO wave (OCT) takes
   to move the sound to its new setting (0.02–30 s); **Scene time** is how long every scene move takes: a tap, a
   crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about 15 s to start).
 - **Tune** moves everything up or down by up to 50 cents. **Stereo** spreads the drones from mono to drone I
@@ -426,11 +427,11 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
 |---|---|
 | SELECT | the rate, from one cycle in 50 seconds to 70 Hz (below 0.1 Hz the screen shows a cycle's length, "21s"). While SELECT, ALGORITHM or PRESETS turns, its value fills the bottom of the screen, large |
 | ALGORITHM | the **Movement**: every LFO depth together, from still (0%) to double (200%) |
-| OCT− · OCT+ | Wave I's · Wave II's shape: tap for the next (or off), round and round; SEL + OCT for the one before |
+| OCT− · OCT+ | LFO I's · LFO II's shape: tap for the next (or off), round and round; SEL + OCT for the one before |
 
 One clock, two waves; the OCT− and OCT+ lights pulse with them. After the DS-2's shapes comes a random one,
 then the Lyra-8's two: **AND** and **OR**, two square waves together, one at the LFO's rate and one inside it
-(3 times as fast on Wave I, 5 times on Wave II). AND is up only while both are, so it steps between 2 levels; OR
+(3 times as fast on LFO I, 5 times on LFO II). AND is up only while both are, so it steps between 2 levels; OR
 adds them, 4 levels. On a drone's pitch that's the Lyra-8's "acid": the drone jumps between 2 or 4 notes in a
 pattern, as far apart as the osc depth says.
 
@@ -441,8 +442,8 @@ and slowly, so Movement is heard at once; set an osc depth to hear it move the p
 
 | Movement scales | Movement leaves alone |
 |---|---|
-| **LFO depths**: all four knobs (each drone's osc depth and filter depth) | **Mods: Rate mod** (how much the LFO speeds itself up) |
-| **Mods: Dly LFO** (the delay's wobble) | **Mods: X-mod amt** (the drones moving each other: that's sound, not the LFO) |
+| **LFO sends**: all four knobs (each drone's two sends) | **Mods: Speed mod** (how much the LFO speeds itself up) |
+| **Mods: Delay mod** (the delay's wobble) | **Mods: Cross-mod** (the drones moving each other: that's sound, not the LFO) |
 | | the LFO's rate, its shapes, and where the waves go (the black keys on the LFO pages) |
  Turning a
 depth that can't be heard says why on the screen (Movement at 0%, or its wave off).
@@ -475,7 +476,7 @@ key.
 | 10 | hard sync (II to I) | delay wave (I, II, both) |
 | 11 | cross-mod: off, I → II cutoff (lit), pitch I ↔ II (winking), Snarl: the finished sound bends both (winking) | the same |
 
-- A **wave key** goes round with each tap: Wave I (dark), Wave II (lit), both (winking).
+- A **wave key** goes round with each tap: LFO I (dark), LFO II (lit), both (winking).
 - **LFO reset:** tap to restart the LFO. Hold it half a second to lock the LFO to the Swell (it then
   restarts every bar; the key stays lit). Hold again to free it.
 - With **pitch link** on, KNOB 3 sets the gap between the drones, in semitones and cents ("+7 st", "+8 st +20").
@@ -517,7 +518,7 @@ builds the same page from your checkout, serves it at http://localhost:8765 and 
 | Turn a knob | drag up or down, or scroll | ↑ ↓ LFO rate, ← → Movement |
 | Hold a button | Shift-click or right-click (click again to let go) | |
 | PLAY · SAVE (hold) · SEL (hold) | | Space · Enter · C |
-| HOME · EDIT · Wave I · Wave II (OCT− · OCT+) | | Esc · V · Z · X |
+| HOME · EDIT · LFO I · LFO II (OCT− · OCT+) | | Esc · V · Z · X |
 | Black keys 1–11 | click | 1 … 0, − |
 | Scenes 1–8 · gestures 9–12 · gestures 13–16 | click | Q … I · A … F · G … K |
 

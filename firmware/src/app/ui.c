@@ -12,13 +12,13 @@
  *   PLAY           the drone fades in / out      MASTER   volume      SAVE   saves
  * One button away (tap: the knobs stay on its page, pressed again its second page; hold: they switch
  * only while it's held, and the page you were on comes back when it's let go):
- *   HOME Drones 1, Drones 2 (Level, Reso) · ENV Tone (Noise, Colour: white .. pink) · EDIT Osc (X-Wave, PW), Source
- *   (Osc mix, Drive) · LFO LFO (depths), Mod (Rate mod, Mod by, X-mod amount, Delay LFO depth) · SEQ Partner ·
- *   GLO Setup, Setup 2 (Switch time, Scene time, Tune, Tuning), Setup 3 (Speaker,
- *   Pressure) (global). The top bar shows a dot for each of a
+ *   HOME Drones 1, Drones 2 (Level, Reso) · ENV Life (Feedback, Drift, Character, Age), Tone (Noise, Colour: white
+ *   .. pink) · EDIT Osc (X-Wave, PW), Sub · Drive (Osc/Sub, Drive) · LFO LFO sends (each drone's two sends), Mods
+ *   (Speed mod, Source, Delay mod, Cross-mod) · SEQ Partner, Pitch moves · GLO Setup 1 (Fade, Morph, Scene time),
+ *   Setup 2 (Tuning, Tune, Stereo, Pressure) (global). The top bar shows a dot for each of a
  *   button's pages.
- *   OCT- / OCT+    the LFO's Wave I / Wave II: a tap is the next shape, round and round; SEL + OCT the one
- *                  before; lit while its wave is up
+ *   OCT- / OCT+    the LFO's Wave I / Wave II (LFO I and II on screen): a tap is the next shape, round and
+ *                  round; SEL + OCT the one before; lit while its wave is up
  * White keys: 16 scenes. Tap: recall (every value morphs there over the Scene time; a knob turned stops
  *   it); hold (a visit): there while held, back to where it was when let go (a knob turned: it stays);
  *   hold SAVE and tap: store. Lit: the slot holds a scene; blinking slowly: the sound is that scene (stored or
@@ -39,7 +39,7 @@
  *                  type; again: Reverb: length (to Inf), damp, type, mix, and with SEL held KNOB 4 what goes into
  *                  it (the Types page folded in: review 5, Evan 2026-10-28)
  *                  (the delay LFO's tap: the LFO page's key in drone II's filter group)
- *   ENV            Life: character, feedback, Age, Drift (first: review 5, 2026-10-28); again: Tone: each
+ *   ENV            Life: Feedback, Drift, Character, Age (first: review 5, 2026-10-28; reordered 2026-10-31); again: Tone: each
  *                  drone's noise and colour
  * Saving: SAVE, and by itself a few seconds after a change while stopped (a flash write stops the audio
  * for a moment). MIDI in: notes on channel 1 tune drone I, on channel 2 drone II. */
@@ -48,7 +48,7 @@
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
 enum { V_PLAY, V_PLAY2, V_LIFE, V_TONE, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_MOVES, V_SETUP, V_SETUP2,
        V_PULSE, V_FX, V_FX2, NVIEWS };
-static const char *const VIEW_NAME[NVIEWS] = {"Drones 1", "Drones 2", "Life", "Tone", "Osc", "Sub · Drive", "LFO depths",
+static const char *const VIEW_NAME[NVIEWS] = {"Drones 1", "Drones 2", "Life", "Tone", "Osc", "Sub · Drive", "LFO sends",
                                               "Mods", "Partner", "Pitch moves", "Setup 1", "Setup 2", "Swell", "Delay", "Reverb"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
  * nothing (g NONE) */
@@ -60,17 +60,17 @@ typedef struct {
 static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{0, GP_PITCH}, {0, GP_CUTOFF}, {1, GP_PITCH}, {1, GP_CUTOFF}},
     {{0, GP_LEVEL}, {0, GP_RESO}, {1, GP_LEVEL}, {1, GP_RESO}},
-    {{G, P_CHAR}, {G, P_FEEDBACK}, {G, P_AGE}, {G, P_DRIFT}},
+    {{G, P_FEEDBACK}, {G, P_DRIFT}, {G, P_CHAR}, {G, P_AGE}},   /* the one turned most first (Evan, 2026-10-31) */
     {{0, GP_NOISE}, {0, GP_NCOLOR}, {1, GP_NOISE}, {1, GP_NCOLOR}},
     {{0, GP_WAVE}, {0, GP_WIDTH}, {1, GP_WAVE}, {1, GP_WIDTH}},
     {{0, GP_MIX}, {0, GP_DRIVE}, {1, GP_MIX}, {1, GP_DRIVE}},
     {{0, GP_OLFO_DEPTH}, {0, GP_FLFO_DEPTH}, {1, GP_OLFO_DEPTH}, {1, GP_FLFO_DEPTH}},
-    {{G, P_LFO_RMOD}, {G, P_LFO_RMOD_SRC}, {G, P_XMOD_AMT}, {G, P_DLY_LFO_DEPTH}},
+    {{G, P_LFO_RMOD}, {G, P_LFO_RMOD_SRC}, {G, P_DLY_LFO_DEPTH}, {G, P_XMOD_AMT}},   /* the LFO's three, then cross-mod */
     {{0, GP_INTERVAL}, {0, GP_DETUNE}, {1, GP_INTERVAL}, {1, GP_DETUNE}},
     {{G, P_SHIFT_MOVE}, {G, P_GLIDE}, {G, P_WANDER}, {G, P_WSCALE}},   /* Shift's move, Glide; Wander, its scale */
     /* GLO: the room's settings only, none in a sound (Evan, 2026-10-18): the times, then the unit and the room */
     {{G, P_FADE}, {G, P_MORPH}, {G, P_SCENE_T}, {NONE, 0}},
-    {{G, P_TUNE}, {G, P_WIDTH}, {G, P_PRESS_SENS}, {G, P_TUNING}},   /* the Speaker cut is automatic (2026-10-20) */
+    {{G, P_TUNING}, {G, P_TUNE}, {G, P_WIDTH}, {G, P_PRESS_SENS}},   /* Tuning and Tune side by side (2026-11-01) */
     {{G, P_PULSE_RATE}, {G, P_PULSE_DEPTH}, {G, P_PULSE_SHAPE}, {G, P_PULSE_SWING}},
     /* FX (v0.3): the delay with the drive after it; the reverb, its type on KNOB 3. Each page's KNOB 4 has a second
      * job with SEL held (SEL_JOB): the delay's type, what goes into the reverb (Evan, 2026-10-28) */
@@ -462,7 +462,7 @@ static void depth_hint(int p)
     if (proj.par[P_MOVE] == 0)
         say_c("MOVEMENT 0%", "ALGORITHM", K_LFO);
     else if ((tap == DR_LFO_I && !w1) || (tap == DR_LFO_II && !w2) || (tap == DR_LFO_BOTH && !w1 && !w2))
-        say_c(tap == DR_LFO_II ? "WAVE II OFF" : "WAVE I OFF", tap == DR_LFO_II ? "tap OCT+" : "tap OCT-", K_LFO);
+        say_c(tap == DR_LFO_II ? "LFO II OFF" : "LFO I OFF", tap == DR_LFO_II ? "tap OCT+" : "tap OCT-", K_LFO);
 }
 
 /* A KNOB OVER A LIST OF NAMED CHOICES GOES ROUND (Evan, 2026-10-25: the rule for every such knob): past the last
@@ -553,7 +553,7 @@ static void link_set(int on)
 static void sw_flip(sw_t w)
 {
     static const char *const DR[2] = {"I ", "II "};
-    static const char *const WAVES[4] = {"OFF", "WAVE I", "WAVE II", "WAVES I+II"};
+    static const char *const WAVES[4] = {"OFF", "LFO I", "LFO II", "LFO I+II"};
     char a[24];
     const char *what = 0, *st = 0, *next = 0;
     int on = !sw_get(w), base = DR_GP(w.g, 0), tp = -1, nx;
@@ -704,10 +704,10 @@ static void wave_step(int w, int dir)
     param_set(p, v);
     ui.scene_at = -1;
     loop_note(p, v, 0);
-    if (ui.view == V_LFO)                      /* LFO depths draws both waves, named: no need to say it (Evan) */
+    if (ui.view == V_LFO)                      /* LFO sends draws both waves, named: no need to say it (Evan) */
         return;
     dr_param_text(p, v, t);
-    scopy(ui.glab[0], w ? "WAVE II" : "WAVE I");
+    scopy(ui.glab[0], w ? "LFO II" : "LFO I");
     scopy(ui.glab[1], t);
     ui.glab_until = plat_ms() + 1500u;
 }
@@ -2011,33 +2011,38 @@ static const felucca_font_t *fit_face(const char *s, int32_t w, int large)
     return F[2];
 }
 
-/* a knob's name on its card; the few too long for one, shorter there (the manual has the full ones) */
+/* a knob's name on its card; the few too long for one, shorter there (the manual has the full ones; the short forms
+ * Evan's, 2026-11-01) */
 static const char *card_name(int p)
 {
     const char *n = p == P_PLINK_OFF ? "Link ofs" : dr_param_info(p)->name;
     if (p == P_SHIFT_MOVE)
         return "Shift";
     if (p == P_SCENE_T)
-        return "Scenes";                       /* Scene time */
+        return "Scene";                        /* Scene time */
     if (n[0] == 'X' && n[1] == '-' && n[2] == 'm')
         return "X-mod";                        /* X-mod amt */
     switch (p) {                               /* too long at the cards' size (FONT_S, 2026-10-20) */
     case P_CHAR: return "Char.";
     case P_FEEDBACK: return "Feedbk";
-    case P_LFO_RMOD: return "R. mod";
-    case P_MORPH: return "Switch";             /* Switch time */
+    case P_LFO_RMOD: return "Speed";           /* Speed mod */
+    case P_DLY_LFO_DEPTH: return "Delay";      /* Delay mod */
+    case P_MORPH: return "Morph";
+    case P_DLY_REPEATS: return "Repeat";
     case P_GLIDE: return "Glide";              /* Pitch glide */
     case P_PRESS_SENS: return "Press.";
     case P_DLY_TYPE: return "Type";            /* the delay's (KNOB 4 with SEL), the reverb's (KNOB 3) */
     case P_REV_TYPE: return "Type";
     case P_DLY_ROUTE: return "Into rev";       /* what goes into the reverb */
-    case P_SCENE_BARS: return "Scenes";        /* the Scene time in bars (on a clock) */
+    case P_SCENE_BARS: return "Scene";         /* the Scene time in bars (on a clock) */
     default: break;
     }
-    if (p < P_XMOD && p % GP_N == GP_OLFO_DEPTH)
-        return "Osc";                          /* LFO depths: the oscillator's, the filter's */
+    if (p < P_XMOD && p % GP_N == GP_OLFO_DEPTH)  /* LFO sends: named for what they move */
+        return proj.par[p - GP_OLFO_DEPTH + GP_OLFO_DEST] == DR_TO_XWAVE ? "X-Wave" : "Pitch";
     if (p < P_XMOD && p % GP_N == GP_FLFO_DEPTH)
-        return "Filter";
+        return proj.par[p - GP_FLFO_DEPTH + GP_FLFO_DEST] == DR_TO_RESO ? "Reso" : "Cutoff";
+    if (p < P_XMOD && p % GP_N == GP_MIX)
+        return "Osc/Sb";                       /* Osc/Sub */
     return n;
 }
 
@@ -2550,7 +2555,32 @@ static void pic_lfo2(int32_t y0)
     text_r(222, y0 + 2, t, d ? K_TEXT2 : K_DIM);
     cv_rect(12, y0 + 62, 210, 1, K_GRID);
     cv_rect(118, y0 + 68, 1, PAN_H - 72, K_GRID);
-    /* --- cross-mod (bottom left): drone II's filter moving with drone I's sound --- */
+    /* --- the delay's time on its LFO (bottom left, KNOB 3) --- */
+    {
+        int tap = proj.par[P_DLY_LFO], dd = proj.par[P_DLY_LFO_DEPTH];
+        int w1 = tap != DR_LFO_II ? w[0] : 0, w2 = tap >= DR_LFO_II ? w[1] : 0;
+        float dep = (float)dd * 0.01f * fm_fabsf((float)dd * 0.01f) * 0.25f * mv;   /* as the engine */
+        int16_t yd[49];
+        int32_t yc = y0 + 102;
+        for (i = 0; i < 49; i++) {             /* the time, +-25 % full height, two cycles */
+            float p2 = 2.0f * (float)i / 48.0f, v = dr_lfo_wave(0, w1, p2) + dr_lfo_wave(1, w2, p2);
+            yd[i] = (int16_t)(yc - (int32_t)fm_clampf(v * dep / 0.25f * 16.0f, -18.0f, 18.0f));
+        }
+        cv_rect(12, yc, 96, 1, K_GRID);
+        plot(12, 2, yd, 49, dd && (w1 || w2) ? K_FX : K_FAINT);
+        q = scopy(t, "delay ");
+        if (dd && (w1 || w2)) {                /* "+-25%"; a negative depth wobbles the other way: "-+25%" */
+            q = scopy(q, dd < 0 ? "-+" : "+-");
+            itoa_u((uint32_t)(fm_fabsf(dep) * 100.0f + 0.5f), q);
+            while (*q)
+                q++;
+            scopy(q, "%");
+        } else {
+            scopy(q, "still");
+        }
+        cv_text(12, y0 + 66, &FONT_S, t, dd ? K_FX : K_DIM);
+    }
+    /* --- cross-mod (bottom right, KNOB 4): drone II's filter moving with drone I's sound --- */
     {
         int on = proj.par[P_XMOD] == DR_XMOD_CUT;
         float a = (float)proj.par[P_XMOD_AMT] * 0.01f, cut = dr_cut[1], k = 12.0f * a * a / 0.0981378f;
@@ -2563,8 +2593,8 @@ static void pic_lfo2(int32_t y0)
                 mn = fm_minf(mn, dr_scope[0][j]);
                 mx = fm_maxf(mx, dr_scope[0][j]);
             }
-            draw_filter(1, cut + mn * k, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
-            draw_filter(1, cut + mx * k, 14, y0 + 86, 96, 36, K_DRONE_DIM[1]);
+            draw_filter(1, cut + mn * k, 128, y0 + 86, 96, 36, K_DRONE_DIM[1]);
+            draw_filter(1, cut + mx * k, 128, y0 + 86, 96, 36, K_DRONE_DIM[1]);
         }
         if (proj.par[P_XMOD] >= DR_XMOD_FM) {  /* CROSS-FM, SNARL: the two drones' waves, bent */
             int g, n;
@@ -2572,45 +2602,20 @@ static void pic_lfo2(int32_t y0)
                 int16_t y[48];
                 for (n = 0; n < 48; n++)
                     y[n] = (int16_t)(y0 + 96 + g * 22 - (int32_t)(fm_clampf(dr_scope[g][n * DR_SCOPE_N / 48], -1.0f, 1.0f) * 18.0f));
-                plot(14, 2, y, 48, a > 0.0f ? K_DRONE[g] : K_FAINT);
+                plot(128, 2, y, 48, a > 0.0f ? K_DRONE[g] : K_FAINT);
             }
-            cv_text(12, y0 + 66, &FONT_S, proj.par[P_XMOD] == DR_XMOD_OUT ? "snarl: out > I II" : "I <> II pitch", K_TEXT2);
+            cv_text(126, y0 + 66, &FONT_S, proj.par[P_XMOD] == DR_XMOD_OUT ? "snarl: out > I II" : "I <> II pitch", K_TEXT2);
         } else {
-            draw_filter(1, cut + sft, 14, y0 + 86, 96, 36, on ? K_DRONE[1] : K_FAINT);
-            cv_text(12, y0 + 66, &FONT_S, on ? "I > II cut" : "x-mod off", on ? K_DRONE[1] : K_DIM);
+            draw_filter(1, cut + sft, 128, y0 + 86, 96, 36, on ? K_DRONE[1] : K_FAINT);
+            cv_text(126, y0 + 66, &FONT_S, on ? "I > II cut" : "x-mod off", on ? K_DRONE[1] : K_DIM);
         }
-    }
-    /* --- the delay's time on its LFO (bottom right) --- */
-    {
-        int tap = proj.par[P_DLY_LFO], dd = proj.par[P_DLY_LFO_DEPTH];
-        int w1 = tap != DR_LFO_II ? w[0] : 0, w2 = tap >= DR_LFO_II ? w[1] : 0;
-        float dep = (float)dd * 0.01f * fm_fabsf((float)dd * 0.01f) * 0.25f * mv;   /* as the engine */
-        int16_t yd[49];
-        int32_t yc = y0 + 102;
-        for (i = 0; i < 49; i++) {             /* the time, +-25 % full height, two cycles */
-            float p2 = 2.0f * (float)i / 48.0f, v = dr_lfo_wave(0, w1, p2) + dr_lfo_wave(1, w2, p2);
-            yd[i] = (int16_t)(yc - (int32_t)fm_clampf(v * dep / 0.25f * 16.0f, -18.0f, 18.0f));
-        }
-        cv_rect(126, yc, 96, 1, K_GRID);
-        plot(126, 2, yd, 49, dd && (w1 || w2) ? K_FX : K_FAINT);
-        q = scopy(t, "delay ");
-        if (dd && (w1 || w2)) {                /* "+-25%"; a negative depth wobbles the other way: "-+25%" */
-            q = scopy(q, dd < 0 ? "-+" : "+-");
-            itoa_u((uint32_t)(fm_fabsf(dep) * 100.0f + 0.5f), q);
-            while (*q)
-                q++;
-            scopy(q, "%");
-        } else {
-            scopy(q, "still");
-        }
-        cv_text(126, y0 + 66, &FONT_S, t, dd ? K_FX : K_DIM);
     }
 }
 
-/* Setup 2: the unit and the room, a corner each: TUNE (KNOB 1) a needle, -50 .. +50 cents; STEREO (KNOB 2) the
- * drones as far apart as it puts them; PRESSURE (KNOB 3) what a key's press gives, light .. firm; TUNING (KNOB 4) an
- * octave from A with a tick at each of its grid's steps (the speaker's low cut follows the headphone jack). None is in
- * scenes */
+/* Setup 2: the unit and the room, a corner each, the left half KNOB 1-2 and the right KNOB 3-4: TUNING (KNOB 1) an
+ * octave from A with a tick at each of its grid's steps; TUNE (KNOB 2) a needle, -50 .. +50 cents; STEREO (KNOB 3)
+ * the drones as far apart as it puts them; PRESSURE (KNOB 4) what a key's press gives, light .. firm (the speaker's
+ * low cut follows the headphone jack). None is in scenes */
 static void pic_setup2(int32_t y0)
 {
     int tn = proj.par[P_TUNE], i;
@@ -2618,12 +2623,12 @@ static void pic_setup2(int32_t y0)
     char t[16];
     {   /* TUNE */
         int32_t cx = 60, nx = cx + tn * 40 / 50;
-        cv_text(12, y0 + 3, &FONT_S, "TUNE", K_SETUP);
+        cv_text(12, y0 + 60, &FONT_S, "TUNE", K_SETUP);
         dr_param_text(P_TUNE, tn, t);
-        text_r(110, y0 + 3, t, K_TEXT2);
-        cv_rect(cx - 40, y0 + 34, 81, 1, K_GRID);
-        cv_rect(cx, y0 + 26, 1, 17, K_FAINT);
-        cv_round(nx - 3, y0 + 31, 7, 7, 3, K_SETUP);
+        text_r(110, y0 + 60, t, K_TEXT2);
+        cv_rect(cx - 40, y0 + 91, 81, 1, K_GRID);
+        cv_rect(cx, y0 + 83, 1, 17, K_FAINT);
+        cv_round(nx - 3, y0 + 88, 7, 7, 3, K_SETUP);
     }
     {   /* STEREO: drone I and II, two short upright bars on a line */
         int32_t cx = 176;
@@ -2637,18 +2642,18 @@ static void pic_setup2(int32_t y0)
         int16_t y[46];
         for (i = 0; i < 46; i++)
             y[i] = (int16_t)(y0 + 112 - (int32_t)(press_curve((float)i / 45.0f) * 30.0f));
-        cv_text(12, y0 + 60, &FONT_S, "PRESSURE", K_SETUP);
-        plot(12, 2, y, 46, K_SETUP);
+        cv_text(128, y0 + 60, &FONT_S, "PRESSURE", K_SETUP);
+        plot(128, 2, y, 46, K_SETUP);
     }
     {   /* TUNING: an octave, A to A, a tick a step; the root's taller */
         int t = (unsigned)proj.par[P_TUNING] < DR_NTUNING ? proj.par[P_TUNING] : 0;
         int n = dr_tun_n(t);
-        cv_text(128, y0 + 60, &FONT_S, "TUNING", K_SETUP);
-        cv_rect(128, y0 + 104, 93, 1, K_GRID);
+        cv_text(12, y0 + 3, &FONT_S, "TUNING", K_SETUP);
+        cv_rect(12, y0 + 47, 93, 1, K_GRID);
         for (i = 0; i <= n; i++) {
             int c = i == n ? 1200 : dr_tun_c(t, i);
-            int32_t x = 128 + c * 92 / 1200, h = i == 0 || i == n ? 22 : 12;
-            cv_rect(x, y0 + 104 - h, 1, h, i == 0 || i == n ? K_SETUP : K_TEXT2);
+            int32_t x = 12 + c * 92 / 1200, h = i == 0 || i == n ? 22 : 12;
+            cv_rect(x, y0 + 47 - h, 1, h, i == 0 || i == n ? K_SETUP : K_TEXT2);
         }
     }
 }
@@ -2759,33 +2764,33 @@ static void pic_life(int32_t y0)
             if (i >= 8)
                 y[i - 8] = (int16_t)(y0 + 62 - (int32_t)(r * 24.0f));
         }
-        cv_text(12, y0 + 3, &FONT_S, ch ? "CHARACTER" : "clean", ch ? K_TEXT2 : K_DIM);
-        plot(12, 2, y, 51, ch ? K_TEXT2 : K_FAINT);
+        cv_text(128, y0 + 3, &FONT_S, ch ? "CHARACTER" : "clean", ch ? K_TEXT2 : K_DIM);
+        plot(128, 2, y, 51, ch ? K_TEXT2 : K_FAINT);
     }
     {   /* FEEDBACK: a bar, the loop's level now */
         int32_t bh = (int32_t)(fm_clampf(dr_fb, 0.0f, 1.0f) * 72.0f);
-        cv_text(128, y0 + 3, &FONT_S, "FEEDBACK", fb ? K_FX : K_DIM);
-        cv_round(164, y0 + 28, 14, 56, 4, K_GRID);
+        cv_text(12, y0 + 3, &FONT_S, "FEEDBACK", fb ? K_FX : K_DIM);
+        cv_round(48, y0 + 28, 14, 56, 4, K_GRID);
         if (fb && bh > 3)
-            cv_round(164, y0 + 84 - (bh * 56 / 72), 14, bh * 56 / 72, 4, dr_fb > 0.6f ? K_GOLD : K_FX);
+            cv_round(48, y0 + 84 - (bh * 56 / 72), 14, bh * 56 / 72, 4, dr_fb > 0.6f ? K_GOLD : K_FX);
     }
-    {   /* AGE (KNOB 3): how worn, a bar */
+    {   /* AGE (KNOB 4): how worn, a bar */
         int ag = proj.par[P_AGE];
         int32_t w = 56 * ag / 100;
-        cv_text(12, y0 + 98, &FONT_S, "AGE", ag ? K_TEXT2 : K_DIM);
-        cv_round(52, y0 + 106, 56, 6, 3, K_GRID);
+        cv_text(128, y0 + 98, &FONT_S, "AGE", ag ? K_TEXT2 : K_DIM);
+        cv_round(168, y0 + 106, 56, 6, 3, K_GRID);
         if (w > 3)
-            cv_round(52, y0 + 106, w, 6, 3, K_TEXT2);
+            cv_round(168, y0 + 106, w, 6, 3, K_TEXT2);
     }
-    {   /* DRIFT (KNOB 4): a slow wander, as wide as it is set, moving */
+    {   /* DRIFT (KNOB 2): a slow wander, as wide as it is set, moving */
         float drift = (float)proj.par[P_DRIFT] * 0.08f;
         int16_t y[21];
         for (i = 0; i < 21; i++) {
             float s = (float)i * 0.35f + (float)(plat_ms() % 60000u) * 0.0008f;
             y[i] = (int16_t)(y0 + 108 - (int32_t)(fm_sinf(s) * fm_sinf(s * 0.37f + 1.0f) * drift * 1.2f));
         }
-        cv_text(128, y0 + 98, &FONT_S, "DRIFT", drift > 0.0f ? K_TEXT2 : K_DIM);
-        plot(180, 2, y, 21, drift > 0.0f ? K_TEXT2 : K_FAINT);
+        cv_text(12, y0 + 98, &FONT_S, "DRIFT", drift > 0.0f ? K_TEXT2 : K_DIM);
+        plot(64, 2, y, 21, drift > 0.0f ? K_TEXT2 : K_FAINT);
     }
 }
 
@@ -2922,12 +2927,12 @@ static void keymap_values(void)                /* the values' place: the key tou
     cv_text(10, 66, &FONT_XS, "with SEL:  D5-G5 bank   OCT wave back", K_DIM);   /* clear of the edge */
 }
 
-/* Setup 1: the three times, a row each, under where a message's banner shows (it covered FADE): FADE (KNOB 1, PLAY's fade in and out), SWITCH TIME (KNOB 2, a black key's or
+/* Setup 1: the three times, a row each, under where a message's banner shows (it covered FADE): FADE (KNOB 1, PLAY's fade in and out), MORPH (KNOB 2, a black key's or
  * a wave's move to its new setting), SCENE TIME (KNOB 3, every scene move); each a bar as far as its knob and its time. None is in scenes */
 static void pic_setup(int32_t y0)
 {
     static const uint8_t P[3] = {P_FADE, P_MORPH, P_SCENE_T};
-    static const char *const N[3] = {"FADE", "SWITCH TIME", "SCENE TIME"},
+    static const char *const N[3] = {"FADE", "MORPH", "SCENE TIME"},
                              *const W[3] = {"PLAY in, out", "black keys, LFO waves", "between scenes"};
     int r;
     for (r = 0; r < 3; r++) {

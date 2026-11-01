@@ -11,7 +11,7 @@ spin K2 -25
 expect par17 0
 tap ENV
 expect view 2
-spin K4 -30
+spin K2 -30
 expect par52 0
 tap HOME
 expect view 0

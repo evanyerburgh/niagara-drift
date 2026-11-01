@@ -16,8 +16,8 @@ wait 1500
 tap GLO
 tap GLO
 set 110 7
-spin K4 1
-spin K4 -1
+spin K1 1
+spin K1 -1
 wait 300
 shot tunings-setup.png
 tap HOME

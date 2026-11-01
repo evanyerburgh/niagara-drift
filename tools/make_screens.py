@@ -47,7 +47,7 @@ LEGEND, MUTED_KEY = (166, 166, 173), (85, 85, 91)
 KNOBS = [(105, 100, 24, "MASTER", "Volume", PALE), (215, 100, 24, "SELECT", "LFO rate", LILAC),
          (105, 210, 24, "PRESETS", "Gesture time", PALE), (215, 210, 24, "ALGORITHM", "Movement", LILAC)] + \
         [(610 + i * 104, 100, 22, "KNOB%d" % (i + 1), None, None) for i in range(4)]
-ROW1 = [("FX", "Delay"), ("SEL", "Fine"), ("ENV", "Life"), ("LFO", "Depths"), ("EDIT", "Osc"), ("GLO", "Setup")]
+ROW1 = [("FX", "Delay"), ("SEL", "Fine"), ("ENV", "Life"), ("LFO", "Sends"), ("EDIT", "Osc"), ("GLO", "Setup")]
 ROW2 = [("HOME", "Drones"), ("SAVE", "Store"), ("ARP", "Swell"), ("SEQ", "Partner"), ("PLAY", "On/off"), ("REC", "Loop")]
 BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14]
 BLACK = [(["Partner"], AMBER), (["Sub"], AMBER), (["Filter"], AMBER), (["Pitch", "lock"], None), (["LFO", "reset"], None),
@@ -97,7 +97,7 @@ def panel(play_png):
     bracket(580, 744, 143, "Drone I", AMBER, 14, -4)
     bracket(788, 952, 143, "Drone II", TEAL, 14, -4)
     rect(58, 262, 210, 58, 14, TRAY)                           # OCT- / OCT+: the LFO waves
-    for x, n, w in ((72, "OCT−", "Wave I"), (170, "OCT+", "Wave II")):
+    for x, n, w in ((72, "OCT−", "LFO I"), (170, "OCT+", "LFO II")):
         rect(x, 272, 82, 38, 9, BTN, (70, 70, 76), 1.5)
         legend(x + 41, 287, n)
         job(x + 41, 303, w, LILAC)

@@ -525,3 +525,11 @@ at the end. The current state is in the [README](../README.md) and the code.
   the headers, the record erased: the set changes whole or not at all, a power cut finished at the next power-on;
   then it restarts. Every object of the list is restored (one the backup hasn't, emptied). Saves wait while a restore
   is staged. USB 0x74 (stage) and 0x75 (ask); the installers fall back to 0.2's way on firmware without them.
+- 2026-11-01 (Evan): **0.3's knob moves and names**, before the new look: Life is Feedback, Drift, Character, Age (the
+  one turned most first); Mods' knob 3 is Delay mod and 4 Cross-mod (the LFO's three together); Setup 2 is Tuning,
+  Tune, Stereo, Pressure. Renamed: Osc mix → Osc/Sub, Switch time → Morph, LFO depths → LFO sends (its knobs named for
+  what they move: Pitch or X-Wave, Cutoff or Reso), Rate mod → Speed mod, Mod by → Source, Dly LFO → Delay mod, the
+  OCT waves LFO I and LFO II on screen; the Swell's Shape reads gate, pulse 50, even, ramp 40. On the knobs the short
+  forms Feedbk, Char., Press., X-mod, Speed, Delay, Osc/Sb, Repeat, Morph, Scene. The old pictures follow the knobs,
+  the left half KNOB 1-2. Parameters keep their numbers: no PROJ_FORMAT change, saved sounds load as they were; the
+  sound is the same sample for sample (30 renders, main's scripts on main against the remapped ones here).
