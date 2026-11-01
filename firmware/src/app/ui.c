@@ -167,6 +167,7 @@ static struct {
     char msg[2][24];
     uint32_t msg_until;
     uint16_t msg_col;                  /* the banner's colour */
+    uint8_t msg_tip;                   /* the message is a one-time tip (drawn apart from a message in the new look) */
     char glab[2][16];                  /* SELECT / ALGORITHM / PRESETS turned: their name and value (top bar) */
     uint32_t glab_until;
     uint32_t touch_t[4];               /* each knob: lit until then (each its own timer: two hands) */
@@ -222,6 +223,7 @@ static void say(const char *a, const char *b) { say_c(a, b, 0); }
 static void say_c(const char *a, const char *b, uint16_t col)
 {
     ui.msg_col = col;
+    ui.msg_tip = 0;
     uint32_t i;
     for (i = 0; i < 23u && a && a[i]; i++)
         ui.msg[0][i] = a[i];
@@ -269,6 +271,7 @@ static void tips_run(void)                             /* each frame: a tip wait
         return;
     proj.seen[t >> 3] |= (uint8_t)(1u << (t & 7));   /* saved with the next save (no write of its own) */
     say_c(TIP_TEXT[t], 0, K_GOLD);
+    ui.msg_tip = 1;
     ui.msg_until = plat_ms() + TIP_MS;
 }
 int ui_dirty(void) { return ui.dirty != 0; }
@@ -1078,7 +1081,7 @@ static void scene_recall(int n, int keep)              /* a white key: morph the
     ui.scene_at = (int8_t)n;
     ui.morph_t0 = plat_ms();
     ui.morph_ms = (uint32_t)(scene_s() * 1000.0f);
-    say(t, proj.bank == BANK_PRESETS ? preset_name(n) : 0);   /* "SCENE P3" / "EERIE" */
+    say_c(t, proj.bank == BANK_PRESETS ? preset_name(n) : 0, K_GOLD);   /* "SCENE P3" / "EERIE" */
     loop_note(LP_SCENE, proj.bank << 4 | n, 0);
 }
 
@@ -3424,6 +3427,8 @@ static void draw_splash(uint32_t t0)
     }
 }
 
+#include "look.c"                             /* 0.3's new look: the pages moved to it so far */
+
 void ui_frame(void)
 {
     input();
@@ -3460,9 +3465,11 @@ void ui_frame(void)
             return;
         }
     }
-    draw_bar();
-    draw_pic();
-    draw_values();
+    if (!lk_frame()) {
+        draw_bar();
+        draw_pic();
+        draw_values();
+    }
     leds();
     ui.frame++;
 }
