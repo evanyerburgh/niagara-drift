@@ -25,10 +25,10 @@ expect par0 5503
 # the grid goes round both ways: quarter tones (1)
 tap GLO
 tap GLO
-spin K4 -1
+spin K1 -1
 expect par110 10
-spin K4 1
-spin K4 1
+spin K1 1
+spin K1 1
 expect par110 1
 # ... a detent is a quarter tone, still +3
 tap HOME
@@ -42,10 +42,10 @@ expect par0 5550
 # just intonation (5, Ptolemy's, movable: built on drone I, Evan 2026-10-30): drone I's knob picks the tonic in
 # semitones, from 5550 (off the semitones) down four: 5500 5400 5300 5200
 tap GLO
-spin K4 1
-spin K4 1
-spin K4 1
-spin K4 1
+spin K1 1
+spin K1 1
+spin K1 1
+spin K1 1
 expect par110 5
 tap HOME
 spin K1 -4
@@ -60,7 +60,7 @@ expect par21 5586
 # 53-tone (4): 1200/53 = 22.6 cents a step, from A (900): 5200 is 4300 over A, under step 190 (4302); two up, 190
 # and 191: 5225
 tap GLO
-spin K4 -1
+spin K1 -1
 expect par110 4
 tap HOME
 spin K1 2
@@ -69,9 +69,9 @@ expect par0 5225
 # LMY (7): La Monte Young's Well-Tuned Piano, as Ableton's file places it (A 440 one of its notes): uneven steps,
 # one each detent. E4+2 (6402, 3/2 over A3) up: 6429 (32/21), 6465 (14/9), 6669 (7/4); down again: 6465 6429 6402
 tap GLO
-spin K4 1
-spin K4 1
-spin K4 1
+spin K1 1
+spin K1 1
+spin K1 1
 expect par110 7
 tap HOME
 set 0 6402
@@ -91,7 +91,7 @@ wait 900
 expect par0 6402
 # the harmonics (6): from 6402 (702 over A3, the 3rd harmonic) up: 841 (13th): 6541
 tap GLO
-spin K4 -1
+spin K1 -1
 expect par110 6
 tap HOME
 spin K1 1
@@ -99,9 +99,9 @@ expect par0 6541
 # the shrutis (9, movable as Just: Sa on drone I): drone I's knob in semitones, 6541 up: 6600; drone II's (5586,
 # 1014 under drone I: 186 over Sa an octave down, by 10/9's 182) up to 9/8: 5604
 tap GLO
-spin K4 1
-spin K4 1
-spin K4 1
+spin K1 1
+spin K1 1
+spin K1 1
 expect par110 9
 tap HOME
 spin K1 1
@@ -112,7 +112,7 @@ expect par21 5604
 # 996 (16/9): 6696;
 # down twice: 6584, 6465 (14/9)
 tap GLO
-spin K4 -1
+spin K1 -1
 expect par110 8
 tap HOME
 spin K1 1
@@ -121,18 +121,18 @@ spin K1 -2
 expect par0 6465
 # Harry Partch's 43 (10), from A: 6465 (765 over A3, 14/9) up: 792, 814 (128/81, 8/5): 6514
 tap GLO
-spin K4 1
-spin K4 1
+spin K1 1
+spin K1 1
 expect par110 10
 tap HOME
 spin K1 2
 expect par0 6514
 tap GLO
-spin K4 1
+spin K1 1
 expect par110 0
-spin K4 -1
+spin K1 -1
 expect par110 10
-spin K4 1
+spin K1 1
 tap HOME
 # Pitch link on (par45): drone II's knob turns the link offset (par46), a step of the grid's intervals: a fifth
 # (700) up one: 800

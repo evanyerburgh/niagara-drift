@@ -15,7 +15,7 @@ expect par74 0
 # 44 hard sync, 45 pitch link, 46 link offset, 47 LFO rate, 48 Wave I, 49 Wave II, 50 Glide, 51 Fade, 55 Pulse,
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
 # depth; 108, 109 each drone's sub wave; 110 the Tuning.
-# Pages: 0 Drones 1 1 Drones 2 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO depths 7 Mods 8 Partner 9 Pitch moves
+# Pages: 0 Drones 1 1 Drones 2 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO sends 7 Mods 8 Partner 9 Pitch moves
 # 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
 # a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
 expect bank 3
@@ -130,9 +130,9 @@ expect par75 50
 # hold ENV to peek: the knobs are the Life page's (Character first) while it's held, then back to Play
 press ENV
 expect view 2
-spin K1 20
+spin K3 20
 expect par77 20
-spin K1 -20
+spin K3 -20
 expect par77 0
 release ENV
 expect view 0
@@ -144,11 +144,11 @@ expect view 0
 # tap ENV: Life (first since review 5, 2026-10-28): Character, Feedback, Age, Drift
 tap ENV
 expect view 2
-spin K1 10
+spin K3 10
 expect par77 10
-spin K1 -10
+spin K3 -10
 expect par77 0
-spin K4 -10
+spin K2 -10
 expect par97 50
 # ENV again: Tone: KNOB 1-2 drone I's Noise and Colour (0 white .. 100 pink, pink to start), 3-4 drone II's
 tap ENV
@@ -264,11 +264,11 @@ spin K1 -50
 expect par68 0
 # ... and cross-mod's amount (KNOB 3) and the delay LFO's depth (KNOB 4), moved here from Filter 2 and
 # Effects 2
-spin K3 10
+spin K4 10
 expect par43 50
-spin K4 20
+spin K3 20
 expect par66 20
-spin K4 -20
+spin K3 -20
 tap LFO
 expect view 6
 # the normal keys (back on Play): partner, sub -2, HP, hard sync, cross-mod
@@ -450,9 +450,9 @@ shot setup.png
 # GLO again: Setup 2, the room's: Tune, Stereo, Pressure (KNOB 4 nothing: the speaker's cut is automatic); again: Setup 1
 tap GLO
 expect view 11
-spin K3 -10
+spin K4 -10
 expect par97 40
-spin K3 10
+spin K4 10
 expect par97 50
 tap GLO
 expect view 10
@@ -542,7 +542,7 @@ expect par7 850
 tap GLO
 tap GLO
 expect view 11
-spin K2 30
+spin K3 30
 expect par53 90
 tap HOME
 expect view 0

@@ -245,7 +245,7 @@ html { scroll-behavior: smooth; } @media (prefers-reduced-motion: reduce) { html
              display: grid; place-items: center; border-left: 3px solid currentColor; background: var(--ground); border-radius: 10px; }
 .k.d1 { color: var(--d1); } .k.d2 { color: var(--d2); }
 .g-page .k.none { color: var(--muted); box-shadow: none; background: transparent; border-color: transparent; }
-/* LFO depths: per drone, so its row says whose (the waves are I and II too: these are the drones) */
+/* LFO sends: per drone, so its row says whose (the waves are I and II too: these are the drones) */
 .g-page.drones .dl { grid-row: 2; grid-column: 1 / 3; text-align: center; font: 600 .85rem "Inter Tight", sans-serif; margin-bottom: -.15rem; }
 .g-page.drones .dl.d2 { grid-column: 3 / 5; } .g-page.drones .k { grid-row: 3; }
 .dl.d1 { color: var(--d1); } .dl.d2 { color: var(--d2); } .k.lfo { color: var(--lfo); } .k.fx { color: var(--fx); }
@@ -419,7 +419,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">ENV</div>
         <div class="pstack">
-        <div class="g-page"><i>Life</i><span class="k both"><span class="sr">Knob 1: </span>Character<small>clean → vintage</small></span><span class="k both"><span class="sr">Knob 2: </span>Feedback</span><span class="k both"><span class="sr">Knob 3: </span>Age<small>tape wear, slowly</small></span><span class="k both"><span class="sr">Knob 4: </span>Drift<small>slow wander</small></span></div>
+        <div class="g-page"><i>Life</i><span class="k both"><span class="sr">Knob 1: </span>Feedback</span><span class="k both"><span class="sr">Knob 2: </span>Drift<small>slow wander</small></span><span class="k both"><span class="sr">Knob 3: </span>Character<small>clean → vintage</small></span><span class="k both"><span class="sr">Knob 4: </span>Age<small>tape wear, slowly</small></span></div>
         <div class="g-page"><i>Tone</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Noise</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Colour<small>white ↔ pink</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Noise</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Colour<small>white ↔ pink</small></span></div>
         </div>
       </div>
@@ -427,7 +427,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
         <div class="g-btn">EDIT</div>
         <div class="pstack">
         <div class="g-page"><i>Osc</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>X‑Wave<small>sine → square</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>PW<small>square width</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>X‑Wave<small>sine → square</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>PW<small>square width</small></span></div>
-        <div class="g-page"><i>Sub · Drive</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Osc mix<small>osc ↔ sub · + SEL: sub wave</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Drive</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Osc mix<small>osc ↔ sub · + SEL: sub wave</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Drive</span></div>
+        <div class="g-page"><i>Sub · Drive</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Osc/Sub<small>osc ↔ sub · + SEL: sub wave</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Drive</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Osc/Sub<small>osc ↔ sub · + SEL: sub wave</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Drive</span></div>
         </div>
       </div>
       <div class="pblock">
@@ -473,9 +473,9 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">LFO</div>
         <div class="pstack">
-        <div class="g-page drones"><i>LFO depths</i><b class="dl d1">Drone I</b><span class="k d1"><span class="sr">Knob 1, drone I: </span>Osc depth</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Filt depth</span><b class="dl d2">Drone II</b><span class="k d2"><span class="sr">Knob 3, drone II: </span>Osc depth</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Filt depth</span></div>
-        <div class="g-page"><i>Mods</i><span class="k both"><span class="sr">Knob 1: </span>Rate mod<small>LFO speed</small></span><span class="k both"><span class="sr">Knob 2: </span>Mod by<small>which wave</small></span><span class="k d2"><span class="sr">Knob 3, drone II: </span>X-mod amt<small>how deep</small></span><span class="k both"><span class="sr">Knob 4: </span>Dly LFO<small>LFO on delay time</small></span></div>
-        <p class="pnote">Depths: the middle is none; either side moves the opposite way</p>
+        <div class="g-page drones"><i>LFO sends</i><b class="dl d1">Drone I</b><span class="k d1"><span class="sr">Knob 1, drone I: </span>Pitch<small>or X-Wave (key 2 / 7)</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Cutoff<small>or Reso (key 3 / 8)</small></span><b class="dl d2">Drone II</b><span class="k d2"><span class="sr">Knob 3, drone II: </span>Pitch<small>or X-Wave (key 2 / 7)</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Cutoff<small>or Reso (key 3 / 8)</small></span></div>
+        <div class="g-page"><i>Mods</i><span class="k both"><span class="sr">Knob 1: </span>Speed mod<small>LFO speed</small></span><span class="k both"><span class="sr">Knob 2: </span>Source<small>which LFO</small></span><span class="k both"><span class="sr">Knob 3: </span>Delay mod<small>LFO on delay time</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Cross-mod<small>how deep</small></span></div>
+        <p class="pnote">Sends: the middle is none; either side moves the opposite way</p>
         </div>
       </div>
       <div class="pblock">
@@ -490,7 +490,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
 
   <div class="g-card narrow-r">
     <h3>The LFO <span class="g-sub">the three knobs at the top left, and OCT− · OCT+ below them</span></h3>
-    <svg class="minimap" viewBox="0 0 1000 640" role="img" aria-label="The FM‑1 from above: SELECT (rate) and ALGORITHM (Movement) are knobs at the top left, OCT− and OCT+ (Wave I and Wave II) the buttons below them">
+    <svg class="minimap" viewBox="0 0 1000 640" role="img" aria-label="The FM‑1 from above: SELECT (rate) and ALGORITHM (Movement) are knobs at the top left, OCT− and OCT+ (LFO I and LFO II) the buttons below them">
       <rect x="4" y="4" width="992" height="632" rx="44" fill="#1d1d20"/>
       <rect x="318" y="62" width="200" height="200" rx="14" fill="#0a0a0b"/>
       <circle cx="105" cy="100" r="26" fill="#14000f"/>
@@ -507,12 +507,12 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
     <div class="g-trio">
       <div><b>SELECT</b><span>Rate</span></div>
       <div><b>ALGORITHM</b><span>Movement</span></div>
-      <div><b>OCT− · OCT+</b><span>Wave I · II</span></div>
+      <div><b>OCT− · OCT+</b><span>LFO I · II</span></div>
     </div>
     <dl class="acts">
-      <div><dt>Movement</dt><dd>scales every LFO depth you’ve set (LFO depths, and Dly LFO on Mods): still (0%), as set (100%), double (200%)</dd></div>
-      <div><dt>Wave I</dt><dd>triangle · square · saw · roundtooth · 2× tri · 2× exp · 4× pattern · random · AND · OR (two squares, 1× and 3×: 2 or 4 steps)</dd></div>
-      <div><dt>Wave II</dt><dd>tri 90° · square 90° · exp saw · log tri · 2× saw · 2× pattern · 4× exp · random glide · AND · OR (1× and 5×)</dd></div>
+      <div><dt>Movement</dt><dd>scales every LFO send you’ve set (LFO sends, and Delay mod on Mods): still (0%), as set (100%), double (200%)</dd></div>
+      <div><dt>LFO I</dt><dd>triangle · square · saw · roundtooth · 2× tri · 2× exp · 4× pattern · random · AND · OR (two squares, 1× and 3×: 2 or 4 steps)</dd></div>
+      <div><dt>LFO II</dt><dd>tri 90° · square 90° · exp saw · log tri · 2× saw · 2× pattern · 4× exp · random glide · AND · OR (1× and 5×)</dd></div>
       <div><dt><span class="cap">OCT−</span> <span class="cap">OCT+</span></dt><dd>Tap: the next shape, round and round · with <span class="cap">SEL</span>: the one before</dd></div>
     </dl>
   </div>
@@ -551,8 +551,8 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">GLO</div>
         <div class="pstack">
-        <div class="g-page"><i>Setup 1</i><span class="k both"><span class="sr">Knob 1: </span>Fade<small>PLAY’s fade</small></span><span class="k both"><span class="sr">Knob 2: </span>Switch time<small>black keys, LFO waves</small></span><span class="k both"><span class="sr">Knob 3: </span>Scene time<small>between scenes</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
-        <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 2: </span>Stereo<small>width</small></span><span class="k both"><span class="sr">Knob 3: </span>Pressure<small>light ↔ firm</small></span><span class="k both"><span class="sr">Knob 4: </span>Tuning<small>the pitch knobs’ notes</small></span></div>
+        <div class="g-page"><i>Setup 1</i><span class="k both"><span class="sr">Knob 1: </span>Fade<small>PLAY’s fade</small></span><span class="k both"><span class="sr">Knob 2: </span>Morph<small>black keys, LFO waves</small></span><span class="k both"><span class="sr">Knob 3: </span>Scene time<small>between scenes</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
+        <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Tuning<small>the pitch knobs’ notes</small></span><span class="k both"><span class="sr">Knob 2: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 3: </span>Stereo<small>width</small></span><span class="k both"><span class="sr">Knob 4: </span>Pressure<small>light ↔ firm</small></span></div>
         </div>
       </div>
     </div>
@@ -673,10 +673,10 @@ function button(x, y, w, h, label, what, col = PALE) {   // the printed name, an
   buttons[label] = { g, bit: BTN[label] };
 }
 el("rect", { x: 58, y: 262, width: 210, height: 58, rx: 14, fill: TRAY });
-button(72, 272, 82, 38, "OCT-", "Wave I", LILAC); button(170, 272, 82, 38, "OCT+", "Wave II", LILAC);
+button(72, 272, 82, 38, "OCT-", "LFO I", LILAC); button(170, 272, 82, 38, "OCT+", "LFO II", LILAC);
 el("rect", { x: 300, y: 44, width: 236, height: 236, rx: 26, fill: "#0a0a0b" });
 el("rect", { x: 568, y: 160, width: 400, height: 140, rx: 18, fill: TRAY });
-const ROW1 = [["FX", "Delay"], ["SEL", "Fine"], ["ENV", "Life"], ["LFO", "Depths"], ["EDIT", "Osc"], ["GLO", "Setup"]],
+const ROW1 = [["FX", "Delay"], ["SEL", "Fine"], ["ENV", "Life"], ["LFO", "Sends"], ["EDIT", "Osc"], ["GLO", "Setup"]],
       ROW2 = [["HOME", "Drones"], ["SAVE", "Store"], ["ARP", "Swell"], ["SEQ", "Partner"], ["PLAY", "On/off"], ["REC", "Loop"]];
 for (let i = 0; i < 6; i++) {
   button(582 + i * 63, 174, 54, 48, ...ROW1[i]);
@@ -742,10 +742,10 @@ function hit(c, cls) {
 }
 // what each control does, on hover (the Buttons list below says the same)
 const TIP = { FX: "Delay: drive, time, repeats, mix; SEL + KNOB 4: the delay type (again: Reverb: length to Inf, damp, type, mix; SEL + KNOB 4: what goes into it)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
-  ENV: "Life: character, feedback, age, drift (again: Tone: noise and its colour, white to pink); hold to peek", LFO: "LFO depths: each drone's osc and filter depth; the keys pick the routing (again: Mods: rate mod, mod by, X-mod amount, delay LFO)",
+  ENV: "Life: feedback, drift, character, age (again: Tone: noise and its colour, white to pink); hold to peek", LFO: "LFO sends: each drone's pitch and cutoff sends; the keys pick the routing (again: Mods: speed mod, source, delay mod, cross-mod)",
   EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, with SEL the sub's wave; drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure, tuning)",
   HOME: "Drones 1: pitch, cutoff (again: Drones 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in bank A, B or C)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
-  PLAY: "Drones in / out (with SEL: drone II alone)", REC: "Motion loop: tap to record knob moves, gestures and scenes, again to loop, again to stop", "OCT-": "LFO Wave I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO Wave II: tap for the next shape (with SEL: the one before)",
+  PLAY: "Drones in / out (with SEL: drone II alone)", REC: "Motion loop: tap to record knob moves, gestures and scenes, again to loop, again to stop", "OCT-": "LFO I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "Gesture time: how long every gesture takes, left slower, right faster", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
 for (const [n, c] of [...Object.entries(buttons), ...Object.entries(knobs)]) if (TIP[n]) c.g.setAttribute("aria-description", TIP[n]);

@@ -1,5 +1,5 @@
 # the page pictures (screenshots to look at): every page, with values that show something.
-# Pages: 0 Drones 1 1 Drones 2 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO depths 7 Mods 8 Partner 9 Pitch moves
+# Pages: 0 Drones 1 1 Drones 2 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO sends 7 Mods 8 Partner 9 Pitch moves
 # 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
 # the one-time tips (v0.3) aren't in the manual's pictures
 notips
@@ -16,14 +16,14 @@ shot play2.png
 # Life: some character and feedback, a little Age
 tap ENV
 expect view 2
-spin K1 40
-spin K2 25
-spin K3 30
+spin K3 40
+spin K1 25
+spin K4 30
 wait 1500
 shot life.png
-spin K1 -40
-spin K2 -25
-spin K3 -30
+spin K3 -40
+spin K1 -25
+spin K4 -30
 # Tone: drone I a little pinkish noise under its tones, drone II white noise at the top (then both back to none)
 tap ENV
 expect view 3
@@ -70,8 +70,8 @@ shot lfo.png
 tap LFO
 expect view 7
 spin K1 40
-spin K3 20
-spin K4 50
+spin K4 20
+spin K3 50
 wait 300
 shot lfo2.png
 # Partner: drone I detuned (beating), drone II an octave up and a fifth
@@ -103,14 +103,14 @@ shot setup.png
 # Setup 2: tuned a little sharp, wider, the keys a little more sensitive (then back)
 tap GLO
 expect view 11
-spin K1 6
-spin K2 30
-spin K3 20
+spin K2 6
+spin K3 30
+spin K4 20
 wait 300
 shot setup2.png
-spin K1 -6
-spin K2 -30
-spin K3 -20
+spin K2 -6
+spin K3 -30
+spin K4 -20
 # Swell (hold ARP to peek at its page): some swing
 expect par55 1
 press ARP

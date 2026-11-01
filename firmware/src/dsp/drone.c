@@ -24,7 +24,7 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
 /* ------------------------------------------------------------ parameters --- */
 #define VOICE_PARAMS(pitch, wave, ival, mix, cut, level, olfo, flfo, fdep)                                           \
     {"Pitch", DR_PITCH_LO, DR_PITCH_HI, pitch}, {"X-Wave", 0, 100, wave}, {"PW", 0, 100, 30},               \
-        {"Interval", 0, DR_NINTERVALS - 1, ival}, {"Detune", 0, 100, 12}, {"Osc mix", 0, 100, mix},            \
+        {"Interval", 0, DR_NINTERVALS - 1, ival}, {"Detune", 0, 100, 12}, {"Osc/Sub", 0, 100, mix},            \
         {"Sub oct", 1, 6, 1}, {"Cutoff", 0, 1000, cut}, {"Reso", 0, 1000, 250}, {"Mode", DR_LP, DR_HP, DR_LP},    \
         {"Drive", 0, 100, 20}, {"Level", 0, 100, level}, {"Partner", 0, 1, 1},                                 \
         {"Osc LFO", DR_LFO_OFF, DR_LFO_BOTH, olfo}, {"Osc depth", -100, 100, 0},                                \
@@ -46,9 +46,9 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Stereo", 0, 100, 60}, {"Tune", -50, 50, 0},
     {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", -100, 100, -25}, {"Swing", 0, 50, 0},
     {"Time", 0, DR_DLY_TMAX, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
-    {"Type", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Dly LFO", -100, 100, 20},
-    {"LFO lock", 0, 1, 0}, {"Rate mod", -100, 100, 0}, {"Mod by", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
-    {"Switch time", 0, 100, 47}, {"Scene time", 0, 100, 63}, {"II out", 0, 1, 0}, {"Speaker", 0, 100, 0},
+    {"Type", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Delay mod", -100, 100, 20},
+    {"LFO lock", 0, 1, 0}, {"Speed mod", -100, 100, 0}, {"Source", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
+    {"Morph", 0, 100, 47}, {"Scene time", 0, 100, 63}, {"II out", 0, 1, 0}, {"Speaker", 0, 100, 0},
     {"Pitch lock", 0, 1, 1}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
     {"Wander", 0, 100, 0}, {"Age", 0, 100, 0}, {"Shift move", 0, 2 * DR_SHIFT_MID, 2 * DR_SHIFT_MID}, {"Scale", 0, DR_NWSCALE - 1, 0},
     {"D5 depth", 0, 100, 70}, {"E5 depth", 0, 100, 100}, {"F5 depth", 0, 100, 100}, {"G5 depth", 0, 100, 70},
@@ -384,9 +384,14 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_NOTE_NAME[(unsigned)v < DR_NNOTE ? v : 5]);
     else if (i == P_SCENE_BARS)
         copy_s(b, DR_BARS_NAME[(unsigned)v < DR_NBARS ? v : 2]);
-    else if (i == P_PULSE_SHAPE && v >= 0) {     /* "even"; "ramp 40" (the right half) */
+    else if (i == P_PULSE_SHAPE) {               /* "gate", "pulse 50", "even", "ramp 40": named on both sides */
         if (v == 0) {
             copy_s(b, "even");
+        } else if (v <= -100) {
+            copy_s(b, "gate");
+        } else if (v < 0) {
+            copy_s(b, "pulse ");
+            itoa_s(-v, b + 6);
         } else {
             copy_s(b, "ramp ");
             itoa_s(v, b + 5);
