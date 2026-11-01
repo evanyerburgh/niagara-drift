@@ -222,6 +222,9 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 | Drones 1 | I pitch | I cutoff | II pitch | II cutoff |
 | Drones 2 | I level | I resonance | II level | II resonance |
 
+- **Drones 2** draws each drone's filter curve, as high as the drone is loud, its level in dB under it. The resonance's
+  last dot is red: there the filter rings on its own.
+
 - **The picture** (Drones 1) draws each drone's wave as a few strands: they lie on one line while the drone is still
   and fan out as Drift, detune or an LFO moves it. Each wave fills its half, however quiet (Drones 2 shows the
   levels). Beside **II**, its interval from drone I, to the nearest semitone, and an arrow: up or down ("5th ↑").
@@ -274,12 +277,14 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 - **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width. The sine and the triangle are a
   little louder than the saw, so they still carry on a small speaker, and the square a little quieter, level with the
-  saw there.
+  saw there. Without a square in the wave, PW does nothing: its value goes grey, "at square" under it.
 - **Osc/Sub** crossfades the oscillators with the sub (the knob reads "Osc/Sb"); **drive** pushes each drone into its filter.
+  The picture shows each drone's two lanes, **osc** and **sub**, each as loud as its share of the crossfade, shaped by
+  the drive.
 - **The sub's wave**: hold SEL and turn a drone's Osc/Sub knob: **Square** (as it starts), **Sine** (pure weight, the
   deepest on headphones, the least for a small speaker), **Triangle**, **Saw** (the brightest). Each is as loud as the
-  square, and a change glides through, as the sub's octave does. The card shows both: the mix above, "+ SEL Wave"
-  below.
+  square, and a change glides through, as the sub's octave does. Above each Osc/Sub knob the screen names it ("SEL
+  Square"); with SEL held the column shows the sub's wave instead ("Sub wave").
 
 #### Partner · SEQ
 

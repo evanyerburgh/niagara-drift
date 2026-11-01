@@ -541,3 +541,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   picture: each drone's wave as six strands, 2 px, scaled to its own loudness; the interval from drone I to the
   nearest semitone with an up or down arrow (no cents, no "above I"). The other pages as they were until their PR;
   the key map and the big readout too. The same sound.
+- 2026-11-01 (Evan): **Drones 2, Osc and Sub · Drive in the new look**: Drones 2 each drone's filter curve as six
+  strands (its last cutoffs) as high as its level, the level in dB under it, Resonance's last dot red; Osc each wave as
+  six offset strands, EDIT's stripe gauges (X-Wave's with its four waves marked), X-Wave's values short ("saw",
+  "tri", "saw/sqr"), PW grey with "at square" when it does nothing; Sub · Drive the osc and sub lanes, each its share
+  of the equal-power crossfade, through the drive's soft clip, Osc/Sub's crossfader meter, the sub's wave on a SEL tag
+  above the knob ("mix 40" while SEL is held, when the column shows "Sub wave" and its four segments). The same sound.
