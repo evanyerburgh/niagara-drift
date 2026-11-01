@@ -53,6 +53,7 @@ jobs:
     # The sound and the screen against main: every fixed render (tests/golden), every scenario and the engine's own
     # scenes, played by this branch and by main on the same machine, compared sample by sample and pixel by pixel.
     # A PR that means to change the sound carries the label "changes-sound": the differences are listed, not failed.
+    # One that means to change only the screen carries "changes-screen": screenshots may differ, the sound may not.
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
@@ -68,4 +69,4 @@ jobs:
           CC: cc -D_DEFAULT_SOURCE -Wl,--no-as-needed -lm
         run: |
           git worktree add -q --detach ../base origin/${{ github.base_ref }}
-          python3 tools/same_samples.py ../base . ${{ contains(github.event.pull_request.labels.*.name, 'changes-sound') && '--allow-change' || '' }}
+          python3 tools/same_samples.py ../base . ${{ contains(github.event.pull_request.labels.*.name, 'changes-sound') && '--allow-change' || '' }} ${{ contains(github.event.pull_request.labels.*.name, 'changes-screen') && '--allow-screen' || '' }}

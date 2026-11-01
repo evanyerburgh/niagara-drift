@@ -533,3 +533,11 @@ at the end. The current state is in the [README](../README.md) and the code.
   forms Feedbk, Char., Press., X-mod, Speed, Delay, Osc/Sb, Repeat, Morph, Scene. The old pictures follow the knobs,
   the left half KNOB 1-2. Parameters keep their numbers: no PROJ_FORMAT change, saved sounds load as they were; the
   sound is the same sample for sample (30 renders, main's scripts on main against the remapped ones here).
+- 2026-11-01 (Evan): **0.3's new look, its foundation and Drones 1** (`firmware/src/app/look.c`): the header, the
+  banner and the tip, the SEL tag, the values row and the dot meter, at the sizes Evan judged on the FM-1 (the page
+  name 22 bold, knob names 20 falling back to 18 and 17, values 26 / 21 with the unit smaller, the banner 19, small
+  words 16-18; every line on one baseline: gen_font.py writes each font's). The header, full: the sound's name gives
+  way first, then PLAY's state to its short form, the "1/2", SWELL, the key; never the page's name. Drones 1's
+  picture: each drone's wave as six strands, 2 px, scaled to its own loudness; the interval from drone I to the
+  nearest semitone with an up or down arrow (no cents, no "above I"). The other pages as they were until their PR;
+  the key map and the big readout too. The same sound.

@@ -222,6 +222,10 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 | Drones 1 | I pitch | I cutoff | II pitch | II cutoff |
 | Drones 2 | I level | I resonance | II level | II resonance |
 
+- **The picture** (Drones 1) draws each drone's wave as a few strands: they lie on one line while the drone is still
+  and fan out as Drift, detune or an LFO moves it. Each wave fills its half, however quiet (Drones 2 shows the
+  levels). Beside **II**, its interval from drone I, to the nearest semitone, and an arrow: up or down ("5th ↑").
+
 - **Pitch** goes from 1.6 kHz down to 2 Hz. Under 27 Hz (where the screen shows Hz, not a note) a drone stops being a
   tone and becomes a pulse of clicks, a click a cycle: rhythm, and through a drive they ping against the other drone.
   The speaker can't play the low part: listen on headphones.

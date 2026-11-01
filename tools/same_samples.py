@@ -15,8 +15,9 @@ the same samples. Each file is:
     different   anything more: listen to it
 A script that differs between the trees (renumbered, extended) isn't compared: its files are listed as "script changed".
 A script only in HEAD (a new render) is played by both. Exit status 1 when anything is different, when a run fails,
-or when nothing was compared, unless --allow-change (a PR that means to change the sound). Needs numpy (and Pillow
-for a closer look at screens).
+or when nothing was compared, unless --allow-change (a PR that means to change the sound); with --allow-screen (a PR
+that means to change only the screen) a different screen passes and a different sound still fails. Needs numpy (and
+Pillow for a closer look at screens).
 """
 import argparse
 import os
@@ -129,6 +130,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("trees", nargs="*")
     ap.add_argument("--allow-change", action="store_true")
+    ap.add_argument("--allow-screen", action="store_true")    # a PR that means to change only the screen
     a = ap.parse_args()
     if len(a.trees) == 2:
         base, head = (Path(t).resolve() for t in a.trees)
@@ -193,10 +195,11 @@ def main():
         for p in problems:
             print(f"::error title=Same samples: a run went wrong::{p}")
         sys.exit(1)
-    if counts["different"] and not a.allow_change:
-        for v, n, _ in rows:
-            if v == "different":
-                print(f"::error title=Sound or screen changed::{n}")
+    failed = [n for v, n, _ in rows if v == "different" and not a.allow_change
+              and not (a.allow_screen and n.endswith(".png"))]
+    if failed:
+        for n in failed:
+            print(f"::error title={'Sound changed' if a.allow_screen else 'Sound or screen changed'}::{n}")
         sys.exit(1)
 
 

@@ -60,9 +60,10 @@ jobs:
             redistributable): the owner's Mac builds it, and a PR that touches firmware/ carries tools/budget.py's
             line ("**Budget** ...") in its body from that build. Say if it's missing.
 
-            Reading same-samples: without the label `changes-sound`, any "different" file is a real failure (the
-            change was meant to keep the sound and screen): name the files. With the label, differences are
-            expected and the check passes: compare the files listed with what the PR says it changes (a sound
+            Reading same-samples: without the label `changes-sound` or `changes-screen`, any "different" file is a
+            real failure (the change was meant to keep the sound and screen): name the files. With `changes-screen`
+            only screenshots may differ (a different WAV still fails the check: name it). With `changes-sound`
+            differences are expected and the check passes: compare the files listed with what the PR says it changes (a sound
             change should differ only in renders that exercise it, a screen change only in screenshots), and flag
             any that differ but shouldn't. "Not compared, the script changed" lists scripts this PR edits: fine when
             the PR renumbers or extends them. A failed run superseded by a later one on the same commit (as when
