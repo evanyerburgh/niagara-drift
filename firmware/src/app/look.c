@@ -415,7 +415,9 @@ static void lk_values(void)
             char big[16];
             const int nb = (int)(sp - t);
             const char *unit = *sp == ' ' ? sp + 1 : sp;
-            memcpy(big, t, (size_t)nb);
+            int c;
+            for (c = 0; c < nb; c++)
+                big[c] = t[c];
             big[nb] = 0;
             wb = text_w(fb, big);
             ws = *unit ? (*sp == ' ' ? 3 : 1) + text_w(fs, unit) : 0;
