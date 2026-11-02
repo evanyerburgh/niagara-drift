@@ -289,6 +289,26 @@ static void lk_plot(int32_t x0, const int16_t *y, int n, uint16_t c)
     }
 }
 
+/* a still shape as a bundle of six strands (the Figma boards' look): the light one in front, each deeper one further
+ * back by (dx, dy), with a gap between them so it reads as strands, not a band (Evan, 2026-11-02: "the Figma looks
+ * great"). The shapes on Osc and Sub · Drive don't move with the music, so the spread is fixed */
+#define LK_BDX 2                             /* Osc and Drones 2: each strand 2 px right, 4 down */
+#define LK_BDY 4
+#define LK_SDX 0                             /* Sub · Drive's lanes are small: 3 px down */
+#define LK_SDY 3
+static void lk_bundle(int32_t x0, const int16_t *y, int n, int g, int dx, int dy)
+{
+    int j, i;
+    for (j = 0; j < 6; j++) {                  /* the deepest, furthest back, first */
+        const int32_t ox = x0 + dx * (5 - j), oy = dy * (5 - j);
+        const uint16_t c = lk_ramp(g, (float)j / 5.0f);
+        for (i = 1; i < n; i++) {
+            cv_line(ox + 2 * (i - 1), y[i - 1] + oy, ox + 2 * i, y[i] + oy, c);
+            cv_line(ox + 2 * (i - 1), y[i - 1] + oy + 1, ox + 2 * i, y[i] + oy + 1, c);
+        }
+    }
+}
+
 /* ------------------------------------------------- Drones 1's picture --- */
 /* drone II's interval from drone I, by the nearest semitone: "5th", "m10", "2 8ve 4th" (12-tone names: the Tunings'
  * ratios come with Setup 2's PR). No cents (Pitch's value shows them); which way is an arrow (Evan, 2026-11-01) */
@@ -381,7 +401,8 @@ static void lk_pic_drones2(void)
             int16_t y[51];
             for (i = 0; i <= 50; i++) {
                 const float d = filt_db(g, lk_cut_hist[g][j], 100.0f * (float)i / 50.0f);
-                y[i] = (int16_t)(bot - (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f * (float)h * lf));
+                y[i] = (int16_t)(bot - LK_BDY * (j + 1) -
+                                 (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f * (float)(h - 6 * LK_BDY) * lf));
             }
             lk_plot(x0, y, 51, lk_ramp(g, (float)j / (float)(LK_STRANDS - 1)));
         }
@@ -420,10 +441,9 @@ static void lk_pic_osc(void)
         for (i = 0; i <= 50; i++) {
             float ph = 2.0f * (float)i / 50.0f;
             ph -= (float)(int)ph;
-            y[i] = (int16_t)(top + half - (int32_t)(xwave_at(x, pw, ph) * (float)half * 0.4f));
+            y[i] = (int16_t)(top + half - 5 * LK_BDY / 2 - (int32_t)(xwave_at(x, pw, ph) * (float)half * 0.4f));
         }
-        lk_plot(x0, y, 51, LK_DRONE[g]);
-        lk_plot(x0 + 1, y, 51, LK_DRONE[g]);
+        lk_bundle(x0, y, 51 - 5 * LK_BDX / 2, g, LK_BDX, LK_BDY);
     }
     for (i = 0; i < 4; i++) {                  /* Width without a square in the wave: why, above it */
         const int p = knob_param(i);
@@ -465,14 +485,13 @@ static void lk_pic_source(void)
             cv_text(x0, yc - (int32_t)LK_F_TAG.h / 2, &LK_F_TAG, k ? "sub" : "osc", LK_LABEL);
             {                                  /* the wave after its lane's name */
                 int16_t y[37];
-                for (i = 0; i <= 36; i++) {
-                    float ph = 2.0f * (float)i / 36.0f, v;
+                for (i = 0; i <= 36 - 5 * LK_SDX / 2; i++) {
+                    float ph = 2.0f * (float)i / (36.0f - (float)(5 * LK_SDX / 2)), v;
                     ph -= (float)(int)ph;
                     v = share[k] * (k ? lk_sub_at(sw, ph) : xwave_at(x, pw, ph));
-                    y[i] = (int16_t)(yc - (int32_t)(fm_tanhf(drv * v) / td * (float)amp));
+                    y[i] = (int16_t)(yc - 5 * LK_SDY / 2 - (int32_t)(fm_tanhf(drv * v) / td * (float)amp));
                 }
-                lk_plot(x0 + 28, y, 37, LK_DRONE[g]);
-                lk_plot(x0 + 29, y, 37, LK_DRONE[g]);
+                lk_bundle(x0 + 28, y, 37 - 5 * LK_SDX / 2, g, LK_SDX, LK_SDY);
             }
         }
     }
@@ -570,11 +589,11 @@ static void lk_life_drift(int32_t cx, int32_t top, int32_t bot)
 }
 
 /* CHARACTER: the sound's first nine harmonics, drone I's filled, drone II's outlined over them, each as the engine
- * makes them: a saw's 1/n, rolled off by Character's one-pole (its corner 8 kHz .. 1.2 kHz, at the drone's pitch)
+ * makes them: a saw's 1/n, rolled off by Character's one-pole (its corner 8 kHz .. 500 Hz, at the drone's pitch)
  * and the evens lifted by its bend (asym); a short tick where a clean saw's reach */
 static void lk_life_char(int32_t x0, int32_t top, int32_t bot)
 {
-    const float chr = (float)proj.par[P_CHAR] * 0.01f, asym = 0.25f * chr, fc = 8000.0f * fm_exp2f(-2.73697f * chr);
+    const float chr = (float)proj.par[P_CHAR] * 0.01f, asym = CHR_ASYM * chr, fc = 8000.0f * fm_exp2f(-CHR_K * chr);
     const float hh = (float)(bot - top);
     int g, n;
     for (n = 1; n <= 9; n++)                   /* the clean saw's */
@@ -613,7 +632,7 @@ static void lk_life_age(int32_t x0, int32_t cy, int32_t top, int32_t bot)
         int32_t px = 0, py = 0;
         for (i = -10; i <= 26; i++) {          /* two cycles over 52 px, 10 points to settle the rounding */
             const float x = (float)i / 13.0f;
-            float u = x + a * 0.12f * fm_sinf(tw * 0.21f + 0.9f * x) + 0.03f * fl, s;
+            float u = x + a * (0.12f / 14.0f * (float)AGE_WOW) * fm_sinf(tw * 0.21f + 0.9f * x) + 0.03f * fl, s;
             u -= (float)(int)(u + 8.0f) - 8.0f;
             s = 1.0f - 2.0f * u;
             r += (s - r) * k;
