@@ -117,6 +117,7 @@ const TEXT = {
     stockbad: "That isn't M-VAVE's FM-1 V16 or V15 file. Choose a file from the links above.",
     stockhead: "Nothing was written. The FM-1 takes back only the version whose bootloader it already has: choose the other file (V16 or V15) and press the button again.",
     stockdone: "Done. The FM-1 has restarted with M-VAVE's firmware.",
+    stockfirst: "First, Niagara Drift is updated to {ND}, which takes back either M-VAVE version. Then M-VAVE's firmware: ",
     nomidi: "This browser can't do it. Open the page in Chrome or Edge.", loadfail: "Couldn't load the firmware: ",
     start: "Starting", verify: "Checking", loader: "Switching to update mode", write: "Writing",
     reboot: "Restarting", done: "Done: the FM-1 runs Niagara Drift. Press PLAY.", stopped: "Stopped. Replug the USB cable and press Install again.",
@@ -152,7 +153,7 @@ const TEXT = {
 };
 const lang = "en";
 let stockV = "";                                   /* the stock version chosen: {V} in the texts */
-const t = (k) => (TEXT[lang][k] || "").replace("{V}", stockV);
+const t = (k) => (TEXT[lang][k] || "").replace("{V}", stockV).replace("{ND}", meta.version);
 let lastKey = null, lastArg = "";
 function applyLang() {
   document.documentElement.lang = lang;
@@ -263,6 +264,18 @@ async function run(img, product, isStock) {
       if (b) {
         $("saved").textContent = t("savedto") + b.name + (isStock ? "." : t("savedhint"));
         $("saved").hidden = false;
+      }
+      if (isStock && image) {
+        /* Niagara Drift before 0.2.1 takes back only the M-VAVE version whose bootloader the FM-1 has: update it
+           first (its sound kept), then write M-VAVE's. A release's identity is FM-1_8XXYYZZ; dev builds are left be */
+        const dev = await up.find((id) => !/^ota-/i.test(id.model));
+        const v = dev ? dev.id.version : 0;
+        if (dev) dev.link.close();
+        if (dev && dev.id.model === "FM-1" && v >= 8000000 && v < 8000201) {
+          const first = (k, a) => { log(`first ${k} ${a ?? ""}`); $("status").textContent = t("stockfirst") + (k === "done" ? "" : t(k)); };
+          await up.install(image, meta.product, first);
+          await new Promise((r) => setTimeout(r, 3000));   /* the new firmware starting */
+        }
       }
       await up.install(img, product, step);
       if (b && !isStock)
