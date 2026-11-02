@@ -42,7 +42,7 @@ run drone-render sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Wno-mi
 run storage sh -c "$CC -O2 -o $OUT/storage_test tests/storage_test.c && $OUT/storage_test"
 # the update path, against the firmware package (Felucca's tests; needs ./build.sh)
 if [ -f build/omni.fwsc ]; then
-    run ota-entry sh -c "$CC -o $OUT/ota_test tests/ota_test.c && $OUT/ota_test build/omni.fwsc $FM1_STOCK"   # FM1_STOCK: M-VAVE's V15 / V16 .fwsc, optional
+    run ota-entry sh -c "$CC -o $OUT/ota_test tests/ota_test.c && $OUT/ota_test build/omni.fwsc ${FM1_STOCK:-}"   # FM1_STOCK: M-VAVE's V15 / V16 .fwsc, optional
     if [ -z "${AC79_SDK:-}" ]; then
         echo "  skip update-loader (needs AC79_SDK, as the build)"
     else
