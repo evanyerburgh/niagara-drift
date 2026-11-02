@@ -83,11 +83,23 @@ minute without either). Your sounds and scenes then change all together, or not 
 halfway (the next power-on finishes it), and the FM-1 restarts with them. Afterwards it holds exactly what the backup
 held.
 
-**Going back:** the installer's "Back to M-VAVE's firmware" writes M-VAVE's own FM-1 V15 back over the
-same cable (or use M-VAVE's updater, M-UPGRADE, from [m-vave.com/download](https://www.m-vave.com/download)).
+**Going back, or to another firmware:** the installer's "Back to M-VAVE's firmware" writes M-VAVE's own
+firmware back over the same cable, V16 or V15 (or use M-VAVE's updater, M-UPGRADE, from
+[m-vave.com/download](https://www.m-vave.com/download)). Install other firmwares from there: most expect M-VAVE's.
 If it ever fails to start twice in a row it comes up in **safe mode** (no sound, USB on), where the installer
-still works. If an FM-1 won't start at all, a Mac can still put the stock firmware back: see
-[BUILDING.md](BUILDING.md#install). Installing firmware is at your own risk.
+still works. Installing firmware is at your own risk.
+
+**If an install doesn't take:**
+
+- Use a USB data cable straight into the computer, close other apps that use MIDI (a DAW, M-UPGRADE), replug and try
+  again. Nothing is written until the FM-1 has checked the whole package, so trying again is safe.
+- Going back, and the installer says nothing was written: choose the other M-VAVE file (V16 or V15). An FM-1 takes
+  back only the version whose bootloader it already has.
+- Still stuck: hold **OCT− and OCT+ for 5 seconds**. The FM-1 goes into its chip's own update mode, which no
+  firmware can get in the way of, and [M-Flasher](https://github.com/jvitkauskas/m-flasher) (Windows, Mac, Linux)
+  puts M-VAVE's firmware back from there. If an FM-1 won't start at all, see [BUILDING.md](BUILDING.md#install).
+- Up to 0.2, Niagara Drift didn't recognize the memory chip of some newer FM-1s: on those it couldn't save, and it
+  ignored installs (it just started again). On such an FM-1 running 0.2, use the step above to leave it.
 
 ## Playing it
 

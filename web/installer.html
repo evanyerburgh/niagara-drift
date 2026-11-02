@@ -77,7 +77,8 @@ input[type=file] { font: inherit; font-size: .9rem; color: var(--muted); max-wid
     <p class="small" data-t="stockwhy"></p>
     <ol class="small">
       <li><span data-t="stock1"></span> <a id="stocklink" href="https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc">FM-1.fwsc</a>
-        <span data-t="stockalt"></span> <a href="https://www.m-vave.com/download" target="_blank" rel="noopener">m-vave.com/download</a>)</li>
+        (V16, <span data-t="stockalt"></span> <a href="https://www.m-vave.com/download" target="_blank" rel="noopener">m-vave.com/download</a>)<br>
+        <span data-t="stock1b"></span> <a id="stocklink15" href="https://web.archive.org/web/20261009203224id_/https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc">FM-1.fwsc</a> (V15)</li>
       <li><span data-t="stock2"></span><br><input type="file" id="stockfile" accept=".fwsc"></li>
       <li data-t="stock3"></li>
     </ol>
@@ -105,14 +106,16 @@ const TEXT = {
     brick: "If an FM-1 won't start at all, a Mac can still put M-VAVE's firmware back:",
     bricklink: "recovering an FM-1 that won't start",
     stockh: "Back to M-VAVE's firmware",
-    stockwhy: "This writes M-VAVE's own FM-1 V15 back, over the same cable, from Niagara Drift or its safe mode. Your Niagara Drift sound and scenes are lost.",
-    stock1: "Download M-VAVE's FM-1 V15:",
-    stockalt: "(or from",
+    stockwhy: "This writes M-VAVE's own FM-1 firmware (V16 or V15) back, over the same cable, from Niagara Drift or its safe mode. Your Niagara Drift sound and scenes are lost.",
+    stock1: "Download M-VAVE's FM-1 firmware:",
+    stockalt: "also on",
+    stock1b: "If the FM-1 doesn't take it, V15 (from the Internet Archive):",
     stock2: "Choose the file you downloaded:",
     stock3: "Connect the FM-1 by USB and press the button below.",
     stockinstall: "Install M-VAVE's firmware",
-    stockok: "That is M-VAVE's FM-1 V15. Press the button to install it.",
-    stockbad: "That isn't M-VAVE's FM-1 V15 file. Choose the file from the link above.",
+    stockok: "That is M-VAVE's FM-1 {V}. Press the button to install it.",
+    stockbad: "That isn't M-VAVE's FM-1 V16 or V15 file. Choose a file from the links above.",
+    stockhead: "Nothing was written. The FM-1 takes back only the version whose bootloader it already has: choose the other file (V16 or V15) and press the button again.",
     stockdone: "Done. The FM-1 has restarted with M-VAVE's firmware.",
     nomidi: "This browser can't do it. Open the page in Chrome or Edge.", loadfail: "Couldn't load the firmware: ",
     start: "Starting", verify: "Checking", loader: "Switching to update mode", write: "Writing",
@@ -148,7 +151,8 @@ const TEXT = {
   },
 };
 const lang = "en";
-const t = (k) => TEXT[lang][k];
+let stockV = "";                                   /* the stock version chosen: {V} in the texts */
+const t = (k) => (TEXT[lang][k] || "").replace("{V}", stockV);
 let lastKey = null, lastArg = "";
 function applyLang() {
   document.documentElement.lang = lang;
@@ -207,9 +211,13 @@ window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault
   } catch (e) { sayK("loadfail", e.message); }
 })();
 
-/* stock firmware: M-VAVE's FM-1 V15, chosen by the user (M-VAVE's server allows no cross-site
-   download) and checked against its SHA-256 before anything is written */
-const STOCK_SHA256 = "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a";
+/* stock firmware: M-VAVE's FM-1 V16 or V15, chosen by the user (M-VAVE's server allows no cross-site
+   download) and checked against its SHA-256 before anything is written. The FM-1 takes back only the one whose
+   flash head it has (firmware/src/ota.c: M-VAVE's loader rewrites the head; M-UPGRADE gives V16 its own) */
+const STOCK = {
+  "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a": "V15",
+  "d017fb65e70aca97ee29d944470c3515a74581df5c0576bf70de917c7b2b61d5": "V16",
+};
 let stock = null;
 $("stockfile").addEventListener("change", async (e) => {
   stock = null;
@@ -219,8 +227,9 @@ $("stockfile").addEventListener("change", async (e) => {
   try {
     const raw = new Uint8Array(await f.arrayBuffer());
     const hex = [...new Uint8Array(await crypto.subtle.digest("SHA-256", raw))].map((b) => b.toString(16).padStart(2, "0")).join("");
-    if (hex !== STOCK_SHA256) { sayK("stockbad"); return; }
+    if (!STOCK[hex]) { sayK("stockbad"); return; }
     stock = { image: logicalImage(raw), product: productOf(raw) };
+    stockV = STOCK[hex];
     $("stockgo").disabled = writing;
     sayK("stockok");
   } catch (err) { sayK("error", err && err.message); }
@@ -261,6 +270,7 @@ async function run(img, product, isStock) {
     }
   } catch (e) {
     if (isStock && e && e.code === "mismatch") { $("bar").value = 100; sayK("stockdone"); }   /* stock names itself its own way */
+    else if (isStock && e && e.code === "stopped" && e.step === 1) sayK("stockhead");          /* the other version's head */
     else if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
     else sayK("error", e && e.message);
     log(String(e && e.stack || e));
