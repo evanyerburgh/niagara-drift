@@ -1192,6 +1192,7 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
 }
 
 float dr_wander(void) { return wand_st; }
+float dr_wander_to(void) { return wand_to; }
 int dr_heard(int p) { return p >= 0 && p < DR_NPARAMS ? par[p] : 0; }
 float dr_mac_pitch(int g) { return g >= 0 && g < DR_NGROUPS ? mac_p[g] : 0.0f; }
 float dr_gest_pitch(int g) { return g >= 0 && g < DR_NGROUPS ? mac_gp[g] : 0.0f; }

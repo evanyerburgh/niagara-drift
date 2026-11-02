@@ -60,6 +60,15 @@ static uint16_t lk_mix(uint32_t a, uint32_t b, float t)   /* 0xRRGGBB a -> b */
     return RGB(r, g, bl);
 }
 static uint16_t lk_ramp(int g, float t) { return lk_mix(LK_RAMP[g][0], LK_RAMP[g][1], t); }
+static uint32_t lk_ramp888(int g, float t)   /* the same, 0xRRGGBB (to dim it) */
+{
+    const uint32_t a = LK_RAMP[g][0], b = LK_RAMP[g][1];
+    uint32_t c = 0;
+    int sh;
+    for (sh = 16; sh >= 0; sh -= 8)
+        c |= (uint32_t)((float)(a >> sh & 255u) + ((float)(b >> sh & 255u) - (float)(a >> sh & 255u)) * t) << sh;
+    return c;
+}
 
 /* a message's color, by who said it (the callers still pass the old palette's): gold the scenes and saves, amber
  * and cyan the drones, violet the LFO and the gestures, the neutral the rest */
@@ -309,17 +318,22 @@ static void lk_plot(int32_t x0, const int16_t *y, int n, uint16_t c)
 #define LK_BDY 4
 #define LK_SDX 0                             /* Sub · Drive's lanes are small: 3 px down */
 #define LK_SDY 3
-static void lk_bundle(int32_t x0, const int16_t *y, int n, int g, int dx, int dy)
-{
+static void lk_bundle_n(int32_t x0, const int16_t *y, int n, int g, int dx, int dy, int ns, float bright)
+{                                              /* ns strands over the whole ramp, at bright of its light (0..1) */
     int j, i;
-    for (j = 0; j < 6; j++) {                  /* the deepest, furthest back, first */
-        const int32_t ox = x0 + dx * (5 - j), oy = dy * (5 - j);
-        const uint16_t c = lk_ramp(g, (float)j / 5.0f);
+    for (j = 0; j < ns; j++) {                 /* the deepest, furthest back, first */
+        const int32_t ox = x0 + dx * (ns - 1 - j), oy = dy * (ns - 1 - j);
+        const float t = (float)j / (float)(ns - 1);
+        const uint16_t c = bright < 1.0f ? lk_mix(0x07060Bu, lk_ramp888(g, t), bright) : lk_ramp(g, t);
         for (i = 1; i < n; i++) {
             cv_line(ox + 2 * (i - 1), y[i - 1] + oy, ox + 2 * i, y[i] + oy, c);
             cv_line(ox + 2 * (i - 1), y[i - 1] + oy + 1, ox + 2 * i, y[i] + oy + 1, c);
         }
     }
+}
+static void lk_bundle(int32_t x0, const int16_t *y, int n, int g, int dx, int dy)
+{
+    lk_bundle_n(x0, y, n, g, dx, dy, 6, 1.0f);
 }
 
 /* ------------------------------------------------- Drones 1's picture --- */
@@ -503,15 +517,20 @@ static void lk_pic_source(void)
         for (k = 0; k < 2; k++) {              /* osc above, sub below */
             const int32_t yc = top + lane * k + lane / 2;
             cv_text(x0, yc - (int32_t)LK_F_TAG.h / 2, &LK_F_TAG, k ? "sub" : "osc", LK_LABEL);
-            {                                  /* the wave after its lane's name */
+            {   /* the wave after its lane's name: four strands (Evan, 2026-11-02: six were too many), dimming
+                 * toward its share's 0, most of the change near it; at 0 one thin dim line, plainly off */
+                const float v0 = k ? mix : 1.0f - mix, d = 1.0f - v0;
                 int16_t y[37];
-                for (i = 0; i <= 36 - 5 * LK_SDX / 2; i++) {
-                    float ph = 2.0f * (float)i / (36.0f - (float)(5 * LK_SDX / 2)), v;
+                for (i = 0; i <= 36; i++) {
+                    float ph = 2.0f * (float)i / 36.0f, v;
                     ph -= (float)(int)ph;
                     v = share[k] * (k ? lk_sub_at(sw, ph) : xwave_at(x, pw, ph));
-                    y[i] = (int16_t)(yc - 5 * LK_SDY / 2 - (int32_t)(fm_tanhf(drv * v) / td * (float)amp));
+                    y[i] = (int16_t)(yc - 3 * LK_SDY / 2 - (int32_t)(fm_tanhf(drv * v) / td * (float)amp));
                 }
-                lk_bundle(x0 + 28, y, 37 - 5 * LK_SDX / 2, g, LK_SDX, LK_SDY);
+                if (v0 < 0.005f)
+                    cv_rect(x0 + 28, yc, 72, 1, LK_UNLIT);
+                else
+                    lk_bundle_n(x0 + 28, y, 37, g, LK_SDX, LK_SDY, 4, 0.35f + 0.65f * (1.0f - d * d * d));
             }
         }
     }
@@ -948,11 +967,11 @@ static void lk_pic_moves(void)
 #define LK_SY(s) (bot - (int32_t)(((s) - lo) * px + 0.5f))
     cv_text(8, 1, &LK_F_SMALL, "Shift", in ? LK_WHITE : LK_LABEL);   /* "Shift [E5]": the gesture's key */
     lk_key(8 + text_w(&LK_F_SMALL, "Shift") + 5, 1 + LK_B(LK_F_SMALL), "E5");
-    lk_note(dr_pitch[1] + dr_mac_pitch(1), t);
-    {
-        const int32_t w = text_w(&LK_F_SMALL, t);
-        const int32_t nb = 1 + LK_B(LK_F_SMALL), nx = 232 - w - 10;   /* a quarter note before it (Evan) */
-        cv_text(232 - w, 1, &LK_F_SMALL, t, LK_DRONE[1]);
+    lk_note(dr_pitch[1] + dr_mac_pitch(1) + dr_wander_to() - dr_wander(), t);   /* where Wander is going, not the
+                                                                                     * notes it glides through (Evan) */
+    {   /* the note's name, then a quarter note at the right edge, so it stays put (Evan, 2026-11-02) */
+        const int32_t nb = 1 + LK_B(LK_F_SMALL), nx = 226;
+        cv_text(nx - 4 - text_w(&LK_F_SMALL, t), 1, &LK_F_SMALL, t, LK_DRONE[1]);
         cv_round(nx - 1, nb - 4, 6, 5, 2, LK_LABEL);
         cv_rect(nx + 3, nb - 14, 2, 12, LK_LABEL);
     }

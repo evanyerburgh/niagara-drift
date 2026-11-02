@@ -170,6 +170,7 @@ extern const uint8_t DR_GEST_DEPTH[DR_NGTYPE], DR_GEST_TIME[DR_NGTYPE];   /* eac
 extern const char *const DR_WSCALE_NAME[DR_NWSCALE];
 void dr_gesture(int g, int amt);               /* gesture key g's amount now, 0..1000 (the UI swells it) */
 float dr_wander(void);                         /* Wander's move of drone II now, semitones (the screen) */
+float dr_wander_to(void);                      /* ... and where it's going (the screen) */
 int dr_wander_degs(float *deg);                /* Wander's scale over drone I, on the Tuning, semitones; how many
                                                 * (up to 8; the screen) */
 float dr_tun_iv(float cur, int j);             /* a scale's note on the Tuning over drone I, semitones:
