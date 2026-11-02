@@ -50,7 +50,7 @@ static int lk_page(int v)
     return v == V_PLAY || v == V_PLAY2 || v == V_LIFE || v == V_TONE || v == V_OSC || v == V_SOURCE || v == V_PARTNER ||
            v == V_MOVES || v == V_LFO || v == V_LFO2;
 }
-static int lk_on(void) { return lk_page(ui.view) && !keymap_on() && plat_ms() >= ui.glab_until; }
+static int lk_on(void) { return lk_page(ui.view) && !keymap_on(); }
 
 static uint16_t lk_mix(uint32_t a, uint32_t b, float t)   /* 0xRRGGBB a -> b */
 {
@@ -495,12 +495,12 @@ static float lk_sub_at(int w, float ph)        /* the sub's waves: Square, Sine,
     }
 }
 
-/* Sub · Drive's strands (Evan, 2026-11-02): as many as the drive is fat, 3 at Drive 0 to 6 from 60, gliding (the
+/* Sub · Drive's strands (Evan, 2026-11-02): as many as the drive is fat, 4 at Drive 0 to 6 from 60 (Evan: from 3 the drive outweighed the crossfade), gliding (the
  * next one fades in, the colors slide along the ramp, so it always spans the whole ramp); 3 px apart, closing up
  * into one line as the lane's share (v0) nears 0, so nothing jumps on the way to the thin "off" line */
 static void lk_drive_bundle(int32_t x0, const int16_t *y, int n, int g, float drive, float v0, float bright)
 {
-    const float nf = 3.0f + 3.0f * fm_clampf(drive / 60.0f, 0.0f, 1.0f), sp = 3.0f * fm_minf(1.0f, v0 / 0.15f);
+    const float nf = 4.0f + 2.0f * fm_clampf(drive / 60.0f, 0.0f, 1.0f), sp = 3.0f * fm_minf(1.0f, v0 / 0.15f);
     const int nn = (int)(nf + 0.999f);
     int j, i;
     for (j = nn - 1; j >= 0; j--) {            /* the deepest, furthest down, first; the light one in front */
@@ -1562,6 +1562,33 @@ static void lk_ruler(int32_t cx, int32_t y, float frac, int g, int centred)
     cv_rect(m - 1, y - 2, 2, 11, LK_WHITE);
 }
 
+/* SELECT, ALGORITHM or PRESETS turning (ui.glab): its name and value across the whole values row in one violet
+ * outline (the spec); the page's picture stays (Evan, 2026-11-02: the old page showed behind it) */
+static int lk_readout(void)
+{
+    const char *q;
+    uint32_t h = hash(2166136261u, 0x4C47u);
+    const felucca_font_t *fb;
+    if (plat_ms() >= ui.glab_until)
+        return 0;
+    for (q = ui.glab[0]; *q; q++)
+        h = hash(h, (uint32_t)*q);
+    for (q = ui.glab[1]; *q; q++)
+        h = hash(h, (uint32_t)*q << 8);
+    if (h == ui.sig[2])
+        return 1;
+    ui.sig[2] = h;
+    cv_begin(240, LK_VAL_H, LK_BG);
+    cv_rect(8, 0, 224, 1, LK_RULE);
+    cv_round(9, 4, 222, 81, 5, LK_VIOLET);
+    cv_round(10, 5, 220, 79, 4, LK_BG);
+    text_c(120, 9, &FONT_T20, ui.glab[0], LK_VIOLET);
+    fb = text_w(&FONT_N1, ui.glab[1]) <= 210 ? &FONT_N1 : &FONT_N2;
+    text_c(120, 9 + (int32_t)FONT_T20.h + (62 - (int32_t)FONT_T20.h - (int32_t)fb->h) / 2, fb, ui.glab[1], LK_WHITE);
+    cv_blit(0, LK_VAL_Y);
+    return 1;
+}
+
 static void lk_values(void)
 {
     const int held = (int)(ui.btn >> B_SEL & 1u);
@@ -1736,6 +1763,7 @@ static int lk_frame(void)
         return 0;
     lk_bar();
     lk_pic();
-    lk_values();
+    if (!lk_readout())
+        lk_values();
     return 1;
 }
