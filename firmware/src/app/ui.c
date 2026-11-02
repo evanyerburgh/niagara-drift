@@ -2030,6 +2030,7 @@ static const char *card_name(int p)
     case P_FEEDBACK: return "Feedbk";
     case P_LFO_RMOD: return "Speed";           /* Speed mod */
     case P_DLY_LFO_DEPTH: return "Delay";      /* Delay mod */
+    case P_LFO_RMOD_SRC: return "Source";      /* Mod by */
     case P_MORPH: return "Morph";
     case P_DLY_REPEATS: return "Repeat";
     case P_GLIDE: return "Glide";              /* Pitch glide */

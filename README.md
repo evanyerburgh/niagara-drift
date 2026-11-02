@@ -301,7 +301,8 @@ pink specks are as many as Color says.
   saw there. Without a square in the wave, Width does nothing: its value and meter go gray, "needs sqr" above it.
 - **Osc/Sub** crossfades the oscillators with the sub (the knob reads "Osc/Sb"); **drive** pushes each drone into its filter.
   The picture shows each drone's two lanes, **osc** and **sub**, each as loud as its share of the crossfade, shaped by
-  the drive.
+  the drive. Beside each drone's name, its sub's octave ("-1 oct") and the black key that steps it (G#3 for drone I, G#4
+  for drone II).
 - **The sub's wave**: hold SEL and turn a drone's Osc/Sub knob: **Square** (as it starts), **Sine** (pure weight, the
   deepest on headphones, the least for a small speaker), **Triangle**, **Saw** (the brightest). Each is as loud as the
   square, and a change glides through, as the sub's octave does. Above each Osc/Sub knob the screen names it ("SEL
@@ -327,8 +328,14 @@ pink specks are as many as Color says.
 - **Wander's scale**: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just (the
   harmonics 1–8 of drone I, pure: the root, the pure major third, fifth and the seventh harmonic). Its notes take the
   Tuning's (Setup 2): see Tuning.
+- The picture is one pitch scale with drone I's root as home: on the left Shift's move between the fifths above and
+  below (filling as the gesture comes in), on the right drone II's last four Wander jumps on the scale's notes, ending
+  at now, with drone II's note at the top right.
 
-- The partner oscillator sits an interval above or below each drone; **detune** makes them beat.
+- The partner oscillator sits an interval above or below each drone; **detune** makes them beat. The picture draws
+  each drone with its partner as a knot (a Lissajous figure): the interval sets its shape, and the beating rolls it,
+  as fast as it beats ("beats 2.0/s"); a just interval with no detune stands still. Beside each drone's name, whether
+  its partner is on and the black key that switches it (F#3 for drone I, F#4 for drone II).
 - Each **interval** comes twice: tempered, then **just** ("+5th just"), a pure ratio (a fifth is exactly 3/2) that
   doesn't beat; detune still adds beating on purpose. Octaves and unison are both at once.
 
@@ -342,7 +349,10 @@ pink specks are as many as Color says.
 | Mods | speed mod | source (LFO) | delay mod | cross-mod |
 
 - **The sends** and **speed mod** are centered: the middle is none. Each send is named for what it moves: Pitch, or
-  X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 3 / 8.
+  X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 3 / 8. Under each value, how far it swings
+  in what you hear ("±12c", "±3.6 oct"), with the Movement. The picture shows LFO I and II, the five things they can
+  move, each a slider for its knob, and a line from each LFO that reaches it (gray: at 0, or only from an LFO that's
+  off); under the waves the rate, the Movement when it isn't 100 %, and the Swell lock.
 - **Mods**, the LFO moving other things, and cross-mod's amount:
   - **Speed mod** ("Speed" on the knob): the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
   - **Source**: which LFO does that (I, II or both).
@@ -353,6 +363,9 @@ pink specks are as many as Color says.
     tangles them into one restless, metallic sound); or, with **Snarl**, how far the finished sound, echoes and all,
     bends both drones' pitch (growly with two different pitches; on a single plain drone it only reshapes the tone).
     Their pitches stay where you set them: the bending is around them.
+  - The picture: the LFO's clock feeding LFO I and II (as Speed mod warps them), linked to the LFO's speed (the loop back
+    into the clock) and the delay's time; under it, cross-mod as it is now ("I moves II's cutoff", "bend each other",
+    "Snarl" or off) and its key, F#5.
   - Movement (ALGORITHM) scales the delay's wobble too, as it does the LFO sends; not Speed mod or Cross-mod (see
     [The LFO](#the-lfo)).
 - The LFO's rate and waves are on the top-left knobs; see [The LFO](#the-lfo) below.

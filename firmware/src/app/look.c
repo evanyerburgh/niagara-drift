@@ -47,7 +47,8 @@ static const uint32_t LK_RAMP[DR_NGROUPS + 1][2] = {{0xFF8A1Fu, 0xFFF4D6u}, {0x6
 /* the pages in the new look (the rest as they were, until their PR) */
 static int lk_page(int v)
 {
-    return v == V_PLAY || v == V_PLAY2 || v == V_LIFE || v == V_TONE || v == V_OSC || v == V_SOURCE;
+    return v == V_PLAY || v == V_PLAY2 || v == V_LIFE || v == V_TONE || v == V_OSC || v == V_SOURCE || v == V_PARTNER ||
+           v == V_MOVES || v == V_LFO || v == V_LFO2;
 }
 static int lk_on(void) { return lk_page(ui.view) && !keymap_on() && plat_ms() >= ui.glab_until; }
 
@@ -243,6 +244,18 @@ static void lk_sel_tag(int col, const char *job, int held)
         cv_round(x + 1, ty + 1, tw - 2, th - 2, 2, LK_BG);
     cv_text(x + 3, ty + 1, &LK_F_SEL, "SEL", held ? LK_BG : LK_LABEL);
     cv_text(x + tw + 3, ty + LK_B(LK_F_SEL) + 1 - LK_B(LK_F_SMALL), &LK_F_SMALL, job, LK_INK);
+}
+
+/* a key named by its note in a box, as the SEL tag's ("F#5"), never its number (Evan, 2026-11-02: the spec's rule
+ * 18), its text on the baseline base; returns where it ends */
+static const char *const LK_BKEY[11] = {"F#3", "G#3", "A#3", "C#4", "D#4", "F#4", "G#4", "A#4", "C#5", "D#5", "F#5"};
+static int32_t lk_key(int32_t x, int32_t base, const char *key)
+{
+    const int32_t w = text_w(&LK_F_SEL, key) + 6, th = (int32_t)LK_F_SEL.h + 1, ty = base - LK_B(LK_F_SEL) - 1;
+    cv_round(x, ty, w, th, 2, LK_LABEL);
+    cv_round(x + 1, ty + 1, w - 2, th - 2, 2, LK_BG);
+    cv_text(x + 3, ty + 1, &LK_F_SEL, key, LK_INK);
+    return x + w;
 }
 
 /* why a knob does nothing heard ("needs sqr"), gray on the rule above its name, in its drone's half (Evan,
@@ -474,6 +487,13 @@ static void lk_pic_source(void)
     const int32_t lane = (bot - top) / 2, amp = lane / 4;   /* half its lane (Evan, 2026-11-02) */
     int g, i, k;
     lk_halves();
+    for (g = 0; g < DR_NGROUPS; g++) {         /* the sub's octave beside the drone's name, and its key (Evan,
+                                                * 2026-11-02: players didn't know what it was or where) */
+        const int32_t base = 2 + LK_B(LK_F_DRONE), x1 = (g ? 130 : 10) + text_w(&LK_F_DRONE, g ? "II" : "I") + 6;
+        char t[12];
+        dr_param_text(DR_GP(g, GP_SUBOCT), gpar(g, GP_SUBOCT), t);
+        lk_key(cv_text(x1, base - LK_B(LK_F_SMALL), &LK_F_SMALL, t, LK_DRONE[g]) + 5, base, LK_BKEY[g ? 6 : 1]);
+    }
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 130 : 10;
         const float mix = (float)gpar(g, GP_MIX) * 0.01f, drv = 0.5f * fm_exp2f((float)gpar(g, GP_DRIVE) * 0.05f);
@@ -773,6 +793,439 @@ static void lk_pic_tone(void)
     }
 }
 
+/* ---------------------------------------------------- Partner's picture --- */
+/* a Lissajous knot a drone (the spec, Evan 2026-10-31): x the oscillator, y its partner; the interval's nearest small
+ * ratio p:q sets the knot (unison 1:1, 5th 3:2, octave 2:1, Oct+5 3:1) and the beating rolls it, at q·f2 − p·f1 (a
+ * just interval with no Detune stands still). Six strands, the knot just before now, fanned wider the faster it
+ * rolls (at most a 14th of a beat). On / off and its key beside the drone's name (Evan, 2026-11-02) */
+static float lk_knot_th[DR_NGROUPS];
+static uint32_t lk_knot_ms;
+
+static void lk_ratio(float r, int *p, int *q)      /* the nearest p/q to r, q 1..4 */
+{
+    float best = 1e9f;
+    int a, b;
+    *p = *q = 1;
+    for (b = 1; b <= 4; b++) {
+        a = (int)(r * (float)b + 0.5f);
+        if (a >= 1 && fm_fabsf((float)a / (float)b - r) < best - 1e-4f) {
+            best = fm_fabsf((float)a / (float)b - r);
+            *p = a;
+            *q = b;
+        }
+    }
+}
+
+static void lk_pic_partner(void)
+{
+    const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 2, bot = LK_PIC_H - (int32_t)LK_F_SMALL.h - 4;
+    const int32_t ry = (bot - top) / 2 - 1, cy = top + (bot - top) / 2;
+    const uint32_t now = plat_ms();
+    const float dt = fm_minf((float)(now - lk_knot_ms) * 0.001f, 0.2f);
+    int g, j, i;
+    lk_knot_ms = now;
+    lk_halves();
+    for (g = 0; g < DR_NGROUPS; g++) {
+        const int32_t x0 = g ? 130 : 10, cx = x0 + 50, base = 2 + LK_B(LK_F_DRONE);
+        const int on = gpar(g, GP_PARTNER) != 0, iv = gpar(g, GP_INTERVAL);
+        const float semi = DR_IV_SEMI[(unsigned)iv < DR_NINTERVALS ? iv : DR_IV_UNISON];
+        const float r = fm_exp2f((semi + (float)gpar(g, GP_DETUNE) * 0.003f) / 12.0f);
+        const float f1 = 8.1757989f * fm_exp2f(dr_pitch[g] / 12.0f);
+        float beat, fan;
+        int p, q, n;
+        char t[16], *s;
+        lk_ratio(fm_exp2f(semi / 12.0f), &p, &q);
+        beat = (float)q * f1 * r - (float)p * f1;     /* beats a second, signed */
+        lk_knot_th[g] += 6.2831853f * beat / (float)q * dt;
+        lk_knot_th[g] -= 6.2831853f * fm_floorf(lk_knot_th[g] * 0.15915494f);
+        fan = 6.2831853f / (float)q * fm_minf(fm_fabsf(beat) * 0.12f, 1.0f / 14.0f) / (float)(LK_STRANDS - 1);
+        if (beat < 0.0f)
+            fan = -fan;
+        lk_key(cv_text((g ? 130 : 10) + text_w(&LK_F_DRONE, g ? "II" : "I") + 6, base - LK_B(LK_F_SMALL),
+                       &LK_F_SMALL, on ? "on" : "off", on ? LK_DRONE[g] : LK_LABEL) + 5, base, LK_BKEY[g ? 5 : 0]);
+        n = 36 * (p > q ? p : q);
+        if (n > 144)
+            n = 144;
+        for (j = on ? 0 : LK_STRANDS - 1; j < LK_STRANDS; j++) {   /* the oldest first, deep; now last, light */
+            const float th = lk_knot_th[g] - fan * (float)(LK_STRANDS - 1 - j);
+            const uint16_t c = on ? lk_ramp(g, (float)j / (float)(LK_STRANDS - 1)) : LK_UNLIT;
+            int32_t px = 0, py = 0;
+            for (i = 0; i <= n; i++) {
+                const float sv = (float)q * (float)i / (float)n;
+                const int32_t x = cx + (int32_t)(fm_sinf(6.2831853f * sv) * 48.0f);
+                const int32_t y = cy - (int32_t)(fm_sinf(6.2831853f * sv * (float)p / (float)q + th) * (float)ry);
+                if (i) {
+                    cv_line(px, py, x, y, c);
+                    if (on)
+                        cv_line(px, py + 1, x, y + 1, c);
+                }
+                px = x;
+                py = y;
+            }
+        }
+        if (!on) {
+            scopy(t, "partner off");
+        } else if (fm_fabsf(beat) < 0.05f) {
+            scopy(t, "still");
+        } else {
+            s = scopy(t, "beats ");
+            if (fm_fabsf(beat) < 9.95f)
+                s = dec1(fm_fabsf(beat), s);
+            else
+                itoa_u((uint32_t)(fm_fabsf(beat) + 0.5f), s);
+            while (*s)
+                s++;
+            scopy(s, "/s");
+        }
+        cv_text(x0, LK_PIC_H - (int32_t)LK_F_SMALL.h - 1, &LK_F_SMALL, t, on ? LK_DRONE[g] : LK_LABEL);
+    }
+}
+
+/* ------------------------------------------------ Pitch moves' picture --- */
+/* one pitch scale, 3.5 px a semitone (the spec: 7 on the boards), drone I's root the home. Left, Shift as a range:
+ * the fifths above and below, a tick a semitone, the move as a box from home and how far the gesture has come in it
+ * filled. Right, drone II's pitch over the last four Wander jumps, ending at now on the right edge, on the scale's
+ * rungs (named from drone I's root); drone II's note now at the top right */
+#define LK_WN 54                             /* the trail's points, 2 px apart */
+static float lk_wtrail[LK_WN], lk_wlo = -10.0f, lk_wpx = 3.5f;
+static uint32_t lk_wtrail_ms;
+
+static void lk_note(float m, char *t)        /* a MIDI note, its nearest name: "C3" */
+{
+    static const char *const NN[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    const int k = (int)fm_floorf(m + 0.5f), o = (k < 0 ? k - 11 : k) / 12;
+    char *q = scopy(t, NN[(k % 12 + 12) % 12]);
+    if (o - 1 < 0)
+        *q++ = '-';
+    itoa_u((uint32_t)(o - 1 < 0 ? 1 - o : o - 1), q);
+}
+
+static const char *lk_rung(float s)          /* a rung's name from drone I's root, or none */
+{
+    static const struct { int8_t st; const char *n; } R[] = {{-12, "-8ve"}, {-7, "-5th"}, {-5, "-4th"}, {0, "root"},
+        {5, "+4th"}, {7, "+5th"}, {12, "+8ve"}, {17, "8ve+4"}, {19, "8ve+5"}, {24, "2 8ves"}};
+    unsigned i;
+    for (i = 0; i < sizeof R / sizeof R[0]; i++)
+        if (fm_fabsf(s - (float)R[i].st) < 0.3f)
+            return R[i].n;
+    return 0;
+}
+
+static void lk_pic_moves(void)
+{
+    const int32_t top = (int32_t)LK_F_SMALL.h + 6, bot = LK_PIC_H - 4;
+    float px, span;
+    const int mv = proj.par[P_SHIFT_MOVE] - DR_SHIFT_MID, in = ui.g_amt[DR_G_SHIFT] > 0.0f || proj.par[P_GL_0 + DR_G_SHIFT];
+    const uint32_t now = plat_ms();
+    float lo, hi = -99.0f, mn = 99.0f, wgap = 25.0f, deg[8];
+    int i, o, k, nd;
+    int32_t y, ly = -99;
+    char t[12];
+    {   /* the trail: drone II from drone I's root, sampled so LK_WN points hold four jumps */
+        if (proj.par[P_WANDER] > 0) {
+            const float a = (float)(proj.par[P_WANDER] - 1) * (1.0f / 99.0f);
+            wgap = 0.5f * (25.0f * fm_exp2f(-5.643856f * a) + 30.0f * fm_exp2f(-3.906891f * a));   /* wander_gap's */
+        }
+        if (now - lk_wtrail_ms >= (uint32_t)(4.0f * wgap * 1000.0f / (float)LK_WN)) {
+            lk_wtrail_ms = now;
+            for (i = 0; i < LK_WN - 1; i++)
+                lk_wtrail[i] = lk_wtrail[i + 1];
+        }
+        lk_wtrail[LK_WN - 1] = dr_pitch[1] + dr_mac_pitch(1) - dr_pitch[0] - dr_mac_pitch(0);   /* with Wander;
+                                                                                * Shift moves both: it cancels */
+        for (i = 0; i < LK_WN; i++) {
+            hi = fm_maxf(hi, lk_wtrail[i]);
+            mn = fm_minf(mn, lk_wtrail[i]);
+        }
+        lo = fm_minf(mn - 1.5f, -10.0f);         /* Shift's fifths with their names always in, the trail too: */
+        hi = fm_maxf(hi + 1.5f, 9.0f);           /* 3.5 px a semitone, closer when it must */
+        px = fm_minf(3.5f, (float)(bot - top) / (hi - lo));
+        lk_wpx += (px - lk_wpx) * 0.25f;
+        px = lk_wpx;
+        span = (float)(bot - top) / px;
+        if (hi > lo + span)
+            lo = hi - span;
+        lk_wlo += (lo - lk_wlo) * 0.25f;
+        lo = lk_wlo;
+    }
+#define LK_SY(s) (bot - (int32_t)(((s) - lo) * px + 0.5f))
+    cv_text(8, 1, &LK_F_SMALL, "Shift", in ? LK_WHITE : LK_LABEL);   /* "Shift [E5]": the gesture's key */
+    lk_key(8 + text_w(&LK_F_SMALL, "Shift") + 5, 1 + LK_B(LK_F_SMALL), "E5");
+    lk_note(dr_pitch[1] + dr_mac_pitch(1), t);
+    {
+        const int32_t w = text_w(&LK_F_SMALL, t);
+        cv_text(232 - w, 1, &LK_F_SMALL, t, LK_DRONE[1]);
+        cv_text(232 - w - 4 - text_w(&LK_F_SMALL, "now"), 1, &LK_F_SMALL, "now", LK_LABEL);
+    }
+    /* Shift: the fifths, home, a tick a semitone */
+    for (k = -7; k <= 7; k++) {
+        y = LK_SY((float)k);
+        if (k == 0 || k == 7 || k == -7)
+            cv_rect(8, y, 26, 1, k ? LK_LABEL : LK_INK);
+        else
+            cv_rect(8, y, k == 5 || k == -5 ? 7 : 4, 1, LK_UNLIT);
+    }
+    cv_text(37, LK_SY(7.0f) - LK_B(LK_F_SMALL) / 2 - 1, &LK_F_SMALL, "+5th", LK_LABEL);
+    cv_text(37, LK_SY(0.0f) - LK_B(LK_F_SMALL) / 2 - 1, &LK_F_SMALL, "home", LK_INK);
+    cv_text(37, LK_SY(-7.0f) - LK_B(LK_F_SMALL) / 2 - 1, &LK_F_SMALL, "-5th", LK_LABEL);
+    if (mv) {                                  /* the move, a box from home; how far in, filled */
+        const int32_t y0 = LK_SY(0.0f), y1 = LK_SY((float)mv * 0.01f);
+        const float at = mv ? fm_clampf(dr_gest_pitch(0) * 100.0f / (float)mv, 0.0f, 1.0f) : 0.0f;
+        const int32_t yf = y0 + (int32_t)((float)(y1 - y0) * at);
+        lk_box(16, y1 < y0 ? y1 : y0, 8, (y1 < y0 ? y0 - y1 : y1 - y0) + 1, in ? LK_INK : LK_LABEL);
+        if (yf != y0)
+            cv_rect(17, yf < y0 ? yf : y0, 6, yf < y0 ? y0 - yf : yf - y0, LK_INK);
+    }
+    /* Wander: the scale's rungs, a dotted line each, named from drone I's root where there's room */
+    nd = dr_wander_degs(deg);
+    for (o = -2; o <= 3; o++)
+        for (i = 0; i < nd; i++) {
+            const float s = deg[i] + 12.0f * (float)o;
+            const char *nm = lk_rung(s);
+            if (s < lo - 0.2f || s > lo + span + 0.2f)
+                continue;
+            y = LK_SY(s);
+            for (k = 80; k < 190; k += 4)
+                cv_rect(k, y, 2, 1, LK_UNLIT);
+            if (nm && nm[1] == '4' && lo + span > s + 2.0f && s - 2.0f > lo &&
+                ((int)(s + 120.5f) % 12 == 5 || (int)(s + 120.5f) % 12 == 7))
+                for (k = 0; k < nd; k++)       /* a fourth gives way to a fifth two semitones off */
+                    if (fm_fabsf(fm_fabsf(deg[k] + 12.0f * (float)o - s) - 2.0f) < 0.3f && lk_rung(deg[k] + 12.0f * (float)o))
+                        nm = 0;
+            if (nm && (ly < -90 || ly - y >= (int32_t)LK_F_SMALL.h - 6 || y - ly >= (int32_t)LK_F_SMALL.h - 6) &&
+                y - LK_B(LK_F_SMALL) / 2 - 1 >= top - 2) {
+                cv_text(232 - text_w(&LK_F_SMALL, nm), y - LK_B(LK_F_SMALL) / 2 - 1, &LK_F_SMALL, nm, LK_LABEL);
+                ly = y;
+            }
+        }
+    {   /* drone II's trail, six strands a pixel apart, the light one on top */
+        int16_t yy[LK_WN];
+        for (k = LK_STRANDS - 1; k >= 0; k--) {
+            for (i = 0; i < LK_WN; i++)
+                yy[i] = (int16_t)(LK_SY(lk_wtrail[i]) + k);
+            lk_plot(80, yy, LK_WN, lk_ramp(1, 1.0f - (float)k / (float)(LK_STRANDS - 1)));
+        }
+    }
+#undef LK_SY
+}
+
+/* ------------------------------------------------- the LFO pages' parts --- */
+static const uint32_t LK_LFO_TINT[2] = {0xA98BFFu, 0xFF5FD2u};   /* LFO I lilac (OCT-), LFO II pink (OCT+) */
+
+/* a send's slider (its knob, -100..100, or 0..100 one-sided): a thin track the same length on every row, the centre
+ * tick behind the fill, the fill from the centre in the row's color, a white mark at the value */
+static void lk_slider(int32_t x0, int32_t y, int v, int one_sided, uint16_t c)
+{
+    const int32_t w = 48, cx = one_sided ? x0 : x0 + w / 2;
+    const int32_t m = one_sided ? x0 + v * w / 100 : cx + v * (w / 2) / 100;
+    cv_rect(x0, y, w + 1, 1, LK_UNLIT);
+    if (!one_sided)
+        cv_rect(cx, y - 2, 1, 5, LK_LABEL);
+    if (m != cx)
+        cv_rect(m > cx ? cx : m, y - 1, m > cx ? m - cx : cx - m, 3, c);
+    cv_rect(m - 1, y - 3, 2, 7, v ? LK_WHITE : LK_LABEL);
+}
+
+/* a horizontal arrow, 2 px (the fonts have none) */
+static void lk_harrow(int32_t x, int32_t y, int32_t w, int right, uint16_t c)
+{
+    const int32_t tip = right ? x + w : x, d = right ? -4 : 4;
+    cv_rect(x, y, w + 1, 2, c);
+    cv_line(tip, y, tip + d, y - 4, c);
+    cv_line(tip, y + 1, tip + d, y + 5, c);
+}
+
+/* one cycle of a wave across w, as the engine plays it (random: this cycle's phases), y in -amp..amp; and the x of
+ * the phase now on it */
+static void lk_lfo_line(int tap, int32_t x0, int32_t yc, int32_t amp, int n, const float *phs, int lit)
+{
+    const int sh = proj.par[tap ? P_LFO_W2 : P_LFO_W1];
+    const float r0 = sh == DR_LFO_RANDOM ? 1.0f : 0.0f, ph = dr_lfo_ph;
+    int16_t y[64];
+    int i, at = 0;
+    for (i = 0; i < n; i++) {
+        const float p = phs ? phs[i] : 0.9999f * (float)i / (float)(n - 1);
+        y[i] = (int16_t)(yc - (int32_t)(dr_lfo_wave(tap, sh, r0 + p) * (float)amp));
+        if (p <= ph)
+            at = i;
+    }
+    if (!sh) {
+        lk_plot(x0, y, n, LK_UNLIT);
+        return;
+    }
+    lk_plot(x0, y, n, lk_mix(0x07060Bu, LK_LFO_TINT[tap], lit ? 0.7f : 0.45f));
+    if (at > 0)                                /* brighter just behind the dot */
+        lk_plot(x0 + 2 * (at > 6 ? at - 6 : 0), y + (at > 6 ? at - 6 : 0), (at > 6 ? 6 : at) + 1,
+                lk_mix(0x07060Bu, LK_LFO_TINT[tap], 1.0f));
+    cv_round(x0 + 2 * at - 3, y[at] - 3, 7, 7, 3, LK_WHITE);
+}
+
+static int lk_wave_on(int route, int w)        /* a route (DR_LFO_*) takes wave w, and it isn't Off */
+{
+    return (route == w + 1 || route == DR_LFO_BOTH) && proj.par[w ? P_LFO_W2 : P_LFO_W1] != 0;
+}
+
+/* -------------------------------------------------- LFO sends' picture --- */
+/* left, LFO I and II, one cycle each in its tint, one dot running along both (one clock); the rate under them, the
+ * Movement when it isn't 100 % and the Swell lock in words. Right, five rows, each its slider, linked from the waves
+ * its key picks (both: two links); a row at 0, or fed only by an Off wave, gray with its link (the spec, 2026-10-31) */
+static void lk_pic_lfo(void)
+{
+    const int clock = dr_ext_spb > 0.0f, lock = proj.par[P_LFO_LOCK] != 0, moved = proj.par[P_MOVE] != 50;
+    const int nl = 1 + moved + lock;
+    const int32_t lh = (int32_t)LK_F_SMALL.h - 3, tb = LK_PIC_H - 1 - nl * lh, wh = tb / 2;
+    int32_t wy[2];
+    int w, d;
+    char t[24], *q;
+    for (w = 0; w < 2; w++) {                  /* "I Triangle", its wave under it */
+        const int sh = proj.par[w ? P_LFO_W2 : P_LFO_W1];
+        const int32_t ny = w * wh;
+        const int32_t x = cv_text(8, ny, &LK_F_SMALL, w ? "II" : "I", lk_mix(0x07060Bu, LK_LFO_TINT[w], 1.0f));
+        dr_param_text(w ? P_LFO_W2 : P_LFO_W1, sh, t);
+        cv_text(x + 5, ny, &LK_F_SMALL, t, sh ? LK_INK : LK_LABEL);
+        wy[w] = ny + (int32_t)LK_F_SMALL.h + (wh - (int32_t)LK_F_SMALL.h) / 2;
+        lk_lfo_line(w, 10, wy[w], (wh - (int32_t)LK_F_SMALL.h) / 2 - 3, 41, 0, 1);
+    }
+    q = scopy(t, clock ? "cycle " : "rate ");
+    dr_param_text(clock ? P_LFO_DIV : P_LFO_RATE, proj.par[clock ? P_LFO_DIV : P_LFO_RATE], q);
+    cv_text(8, tb, &LK_F_SMALL, t, LK_INK);
+    if (moved) {
+        q = scopy(t, "movement ");
+        itoa_u((uint32_t)proj.par[P_MOVE] * 2u, q);
+        while (*q)
+            q++;
+        scopy(q, "%");
+        cv_text(8, tb + lh, &LK_F_SMALL, t, LK_VIOLET);
+    }
+    if (lock)
+        cv_text(8, tb + lh * (1 + moved), &LK_F_SMALL, proj.par[P_PULSE] ? "restarts with Swell" : "lock waits for Swell",
+                LK_CORAL);
+    for (d = 0; d < 5; d++) {                  /* the rows: I pitch, I cutoff, II pitch, II cutoff, delay */
+        const int g = d / 2, osc = d % 2 == 0;
+        const int route = d < 4 ? gpar(g, osc ? GP_OLFO : GP_FLFO) : proj.par[P_DLY_LFO];
+        const int depth = d < 4 ? gpar(g, osc ? GP_OLFO_DEPTH : GP_FLFO_DEPTH) : proj.par[P_DLY_LFO_DEPTH];
+        const int heard = depth && proj.par[P_MOVE] && (lk_wave_on(route, 0) || lk_wave_on(route, 1));
+        const int32_t ny = d * 24, sy = ny + 19, sx = 152;
+        const uint16_t col = d < 4 ? LK_DRONE[g] : LK_NEUTRAL;
+        if (d < 4)
+            scopy(scopy(t, g ? "II " : "I "), osc ? (gpar(g, GP_OLFO_DEST) == DR_TO_XWAVE ? "X-Wave" : "pitch")
+                                                  : (gpar(g, GP_FLFO_DEST) == DR_TO_RESO ? "reso" : "cutoff"));
+        else
+            scopy(t, "delay");
+        {
+            const int32_t x = cv_text(sx, ny, &LK_F_SMALL, t, heard ? col : LK_LABEL);
+            if (d == 4)                        /* its knob is on Mods */
+                cv_text(x + 4, ny, &LK_F_SMALL, "Mods", LK_LABEL);
+        }
+        lk_slider(sx, sy, depth, 0, heard ? col : LK_UNLIT);
+        for (w = 0; w < 2; w++)                /* a link from each wave the route takes, in its tint */
+            if (route == w + 1 || route == DR_LFO_BOTH)
+                cv_line(94, wy[w], sx - 3, sy, heard && lk_wave_on(route, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
+                                                                              : LK_UNLIT);
+    }
+}
+
+/* ------------------------------------------------------- Mods' picture --- */
+/* two bands (the spec, 2026-10-31). The LFO band: the clock (SELECT's time in a pill) branching to LFO I and II, each
+ * a cycle warped as the engine warps the clock (rmod_k, the phase rate rk · 2^(rm · source)), one dot on both; on the
+ * right Speed mod's row ("LFO speed", linked from its Source, a loop arrow back into the clock) and Delay mod's
+ * ("delay time", from key 10's LFO). The cross-mod band: what it does and its key ("CROSS-MOD  I moves II's cutoff
+ * [F#5]"; Evan, 2026-11-02), then drone I, the amount, drone II, gray when off */
+static void lk_pic_mods(void)
+{
+    const int w1 = proj.par[P_LFO_W1], w2 = proj.par[P_LFO_W2], src = proj.par[P_LFO_RMOD_SRC], rmd = proj.par[P_LFO_RMOD];
+    const float rm = (float)rmd * 0.03f, rk = dr_lfo_rmod_k(rm, src, w1, w2);
+    const int xm = proj.par[P_XMOD], amt = proj.par[P_XMOD_AMT];
+    float phs[37], ph = 0.0f;
+    int32_t wy[2], x;
+    int i, w;
+    char t[24];
+    for (i = 0; i < 37; i++) {                 /* the clock's phase across one plain cycle, warped */
+        const float v0 = dr_lfo_wave(0, w1, ph), v1 = dr_lfo_wave(1, w2, ph);
+        const float s = src == DR_LFO_BOTH ? fm_clampf(v0 + v1, -1.0f, 1.0f) : src == DR_LFO_II ? v1 : v0;
+        phs[i] = fm_minf(ph, 0.9999f);
+        ph += (1.0f / 36.0f) * rk * fm_exp2f(rm * s);
+        ph -= fm_floorf(ph);
+    }
+    {   /* the clock */
+        dr_param_text(dr_ext_spb > 0.0f ? P_LFO_DIV : P_LFO_RATE, proj.par[dr_ext_spb > 0.0f ? P_LFO_DIV : P_LFO_RATE], t);
+        x = text_w(&LK_F_TAG, t) + 8;
+        cv_round(4, 22, x, (int32_t)LK_F_TAG.h + 2, 6, LK_LABEL);
+        cv_round(5, 23, x - 2, (int32_t)LK_F_TAG.h, 5, LK_BG);
+        cv_text(8, 23, &LK_F_TAG, t, LK_INK);
+        x += 4;
+    }
+    for (w = 0; w < 2; w++) {                  /* "I · Triangle", its warped cycle */
+        const int sh = w ? w2 : w1;
+        const int32_t ny = w * 30, xn = x + 10;
+        const char *nm = (w ? DR_LFO_W2_NAME : DR_LFO_W1_NAME)[(unsigned)sh < DR_LFO_NSHAPES ? sh : 0];
+        scopy(scopy(t, w ? "II \xC2\xB7 " : "I \xC2\xB7 "), nm);
+        cv_text(xn, ny, &LK_F_SMALL, t, sh ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 1.0f) : LK_LABEL);
+        wy[w] = ny + (int32_t)LK_F_SMALL.h + 2;
+        cv_line(x, 29, xn - 2, wy[w], LK_LABEL);      /* the clock branching to both */
+        lk_lfo_line(w, xn, wy[w], 4, 37, phs, 1);
+    }
+    {   /* the rows: Speed mod from its Source, Delay mod from key 10's LFO */
+        const int dl = proj.par[P_DLY_LFO], dd = proj.par[P_DLY_LFO_DEPTH];
+        const int sp_on = rmd && proj.par[P_MOVE] && (lk_wave_on(src, 0) || lk_wave_on(src, 1));
+        const int dl_on = dd && proj.par[P_MOVE] && (lk_wave_on(dl, 0) || lk_wave_on(dl, 1));
+        cv_text(156, 0, &LK_F_SMALL, "LFO speed", sp_on ? LK_INK : LK_LABEL);
+        lk_slider(158, 22, rmd, 0, sp_on ? LK_VIOLET : LK_UNLIT);
+        cv_text(156, 30, &LK_F_SMALL, "delay time", dl_on ? LK_INK : LK_LABEL);
+        lk_slider(158, 52, dd, 0, dl_on ? LK_NEUTRAL : LK_UNLIT);
+        for (w = 0; w < 2; w++) {
+            if (src == w + 1 || src == DR_LFO_BOTH)
+                cv_line(x + 86, wy[w], 155, 22, sp_on && lk_wave_on(src, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
+                                                                              : LK_UNLIT);
+            if (dl == w + 1 || dl == DR_LFO_BOTH)
+                cv_line(x + 86, wy[w], 155, 52, dl_on && lk_wave_on(dl, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
+                                                                             : LK_UNLIT);
+        }
+        {   /* the loop: out of LFO speed, round the right edge and under the waves, back up into the clock */
+            const uint16_t c = sp_on ? LK_LABEL : LK_UNLIT;
+            cv_rect(208, 22, 25, 1, c);
+            cv_rect(232, 22, 1, 40, c);
+            cv_rect(14, 61, 219, 1, c);
+            cv_rect(14, 23 + (int32_t)LK_F_TAG.h + 2, 1, 61 - 23 - (int32_t)LK_F_TAG.h - 2, c);
+            cv_line(14, 25 + (int32_t)LK_F_TAG.h, 11, 28 + (int32_t)LK_F_TAG.h, c);
+            cv_line(14, 25 + (int32_t)LK_F_TAG.h, 17, 28 + (int32_t)LK_F_TAG.h, c);
+        }
+    }
+    cv_rect(8, 66, 224, 1, LK_RULE);
+    {   /* cross-mod: what it does, its key */
+        static const char *const DOES[4] = {"off", "I moves II's cutoff", "bend each other", "Snarl"};
+        const int on = xm > 0 && amt > 0;
+        const uint16_t ci = on ? LK_DRONE[0] : LK_LABEL, cii = on ? LK_DRONE[1] : LK_LABEL;
+        int16_t y[34];
+        int g;
+        const int32_t hb = 69 + LK_B(FONT_B);
+        x = cv_text(8, hb - LK_B(FONT_U1), &FONT_U1, "CROSS-MOD", xm ? LK_INK : LK_LABEL);
+        x = cv_text(x + 4, hb - LK_B(LK_F_TAG), &LK_F_TAG, DOES[(unsigned)xm < 4u ? xm : 0], LK_LABEL);
+        lk_key(x + 4, hb, LK_BKEY[10]);
+        cv_text(8, 90, &LK_F_TAG, "drone I", ci);
+        cv_text(84, 90, &LK_F_TAG, "amount", on ? LK_INK : LK_LABEL);
+        cv_text(144, 90, &LK_F_TAG, xm == DR_XMOD_CUT ? "drone II cutoff" : "drone II", cii);
+        for (g = 0; g < 2; g++) {              /* each drone's sound now, small, scaled to its own peak */
+            float m = 0.05f;
+            for (i = 0; i < DR_SCOPE_N; i++)
+                m = fm_maxf(m, fm_fabsf(dr_scope[g][i]));
+            for (i = 0; i < 34; i++)
+                y[i] = (int16_t)(116 - (int32_t)(dr_scope[g][i * DR_SCOPE_N / 34] / m * 5.0f));
+            lk_plot(g ? 166 : 8, y, g ? 34 : 30, g ? cii : ci);
+        }
+        lk_slider(86, 115, amt, 1, on ? LK_NEUTRAL : LK_UNLIT);
+        if (xm >= DR_XMOD_FM) {                /* both drones bent: both ways */
+            lk_harrow(68, 110, 12, 1, ci);
+            lk_harrow(68, 119, 12, 0, cii);
+            lk_harrow(142, 110, 16, 1, ci);
+            lk_harrow(142, 119, 16, 0, cii);
+        } else {
+            lk_harrow(68, 115, 12, 1, ci);
+            lk_harrow(142, 115, 16, 1, on ? LK_INK : LK_LABEL);
+        }
+    }
+}
+
 static void lk_pic(void)
 {
     const int msg = plat_ms() < ui.msg_until;
@@ -789,6 +1242,10 @@ static void lk_pic(void)
     case V_TONE: lk_pic_tone(); break;
     case V_OSC: lk_pic_osc(); break;
     case V_SOURCE: lk_pic_source(); break;
+    case V_PARTNER: lk_pic_partner(); break;
+    case V_MOVES: lk_pic_moves(); break;
+    case V_LFO: lk_pic_lfo(); break;
+    case V_LFO2: lk_pic_mods(); break;
     default: lk_pic_drones1(); break;
     }
     if (msg)
@@ -884,6 +1341,17 @@ static void lk_one_of(int32_t cx, int32_t y, int n, int at, int g)   /* one of n
     }
 }
 
+static void lk_one_of_dots(int32_t cx, int32_t y, int n, int at, int g)   /* Scale's: one dot of n lit */
+{
+    const int32_t step = 8, x0 = cx - (step * (n - 1)) / 2 - 2;
+    int k;
+    for (k = 0; k < n; k++) {
+        cv_round(x0 + k * step, y, 5, 5, 2, k == at ? (g == LK_G ? LK_INK : LK_DRONE[g]) : LK_UNLIT);
+        if (k != at)
+            cv_round(x0 + k * step + 1, y + 1, 3, 3, 1, LK_BG);
+    }
+}
+
 static const felucca_font_t *lk_name_font(const char *s)
 {
     return text_w(&FONT_T20, s) <= 52 ? &FONT_T20 : text_w(&FONT_T18, s) <= 52 ? &FONT_T18 : &FONT_Q17;
@@ -893,6 +1361,22 @@ static const felucca_font_t *lk_name_font(const char *s)
 static void lk_text(int p, int v, char *t)
 {
     dr_param_text(p, v, t);
+    if (p == P_LFO_RMOD_SRC) {                 /* "LFO I", "LFO II", "LFO I+II" */
+        char b[8];
+        scopy(b, t);
+        scopy(scopy(t, "LFO "), b);
+        return;
+    }
+    if (p == P_WANDER) {                       /* "4.4-9s": no ".0" (the spec) */
+        char *q, *o;
+        for (q = o = t; *q; q++)
+            if (!(q[0] == '.' && q[1] == '0' && (q[2] == '-' || q[2] == 's')))
+                *o++ = *q;
+            else
+                q++;
+        *o = 0;
+        return;
+    }
     if (p < P_XMOD && p % GP_N == GP_WAVE) {
         char *q;
         if (t[0] == 'T' && t[1] == 'r' && t[2] == 'i' && t[3] == 'a')
@@ -911,6 +1395,129 @@ static const char *lk_unheard(int p)
     return 0;
 }
 
+/* a value's second line (the boards'): "just" under a just interval and Shift's interval under its cents (1: under the
+ * value, raised); the LFO pages' swing in real units in the meter band, their sliders the meters (2; a leading '>'
+ * draws an arrow); Scale's long names on two lines at the value's size (3). 0: none */
+static void lk_swing(char *q, float x, const char *unit)   /* "±3.6 oct", "±12c", one decimal below 10 */
+{
+    q = scopy(q, "\xC2\xB1");
+    if (x < 9.95f)
+        q = dec1(x, q);
+    else {
+        itoa_u((uint32_t)(x + 0.5f), q);
+        while (*q)
+            q++;
+    }
+    scopy(q, unit);
+}
+
+static int lk_line2(int p, int v, char *t, char *t2)
+{
+    const int gp = p < P_XMOD ? p % GP_N : -1;
+    const float mv = (float)proj.par[P_MOVE] * 0.02f, d = (float)v * 0.01f, c = d * fm_fabsf(d) * mv;
+    char *q;
+    t2[0] = 0;
+    if (gp == GP_INTERVAL) {                   /* "+5th just": "just" under it */
+        for (q = t; *q && *q != ' '; q++)
+            ;
+        if (*q) {
+            *q = 0;
+            scopy(t2, q + 1);
+            return 1;
+        }
+        return 0;
+    }
+    if (p == P_SHIFT_MOVE) {                   /* plain cents, the fourths and fifths named under them */
+        const int ct = v - DR_SHIFT_MID, a = ct < 0 ? -ct : ct;
+        if (!ct) {
+            scopy(t, "none");
+            return 0;
+        }
+        q = t;
+        *q++ = ct < 0 ? '-' : '+';
+        itoa_u((uint32_t)a, q);
+        while (*q)
+            q++;
+        scopy(q, "c");
+        if (a == 700 || a == 500) {
+            scopy(scopy(t2, a == 700 ? "5th " : "4th "), ct < 0 ? "down" : "up");
+            return 1;
+        }
+        return 0;
+    }
+    if (p == P_WSCALE) {                       /* "Minor / pent", "5ths + / 8ves" */
+        char *sp = 0;
+        for (q = t; *q; q++)
+            if (*q == ' ')
+                sp = q;
+        if (!sp)
+            return 0;
+        *sp = 0;
+        scopy(t2, sp + 1);
+        return 3;
+    }
+    if (gp == GP_OLFO_DEPTH || gp == GP_FLFO_DEPTH) {   /* LFO sends: the swing, its unit following the key */
+        const int g = p / GP_N;
+        if (!v)
+            scopy(t2, "none");
+        else if (gp == GP_OLFO_DEPTH && gpar(g, GP_OLFO_DEST) == DR_TO_XWAVE)
+            lk_swing(t2, fm_fabsf(c) * 100.0f, "%");
+        else if (gp == GP_OLFO_DEPTH)
+            fm_fabsf(c) * 24.0f < 1.0f ? lk_swing(t2, fm_fabsf(c) * 2400.0f, "c") : lk_swing(t2, fm_fabsf(c) * 24.0f, " st");
+        else if (gpar(g, GP_FLFO_DEST) == DR_TO_RESO)
+            lk_swing(t2, fm_fabsf(d) * mv * 100.0f, "%");
+        else
+            lk_swing(t2, fm_fabsf(c) * 5.0f, " oct");
+        return 2;
+    }
+    if (p == P_LFO_RMOD) {                     /* "×0.5-2.6": how far the speed swings */
+        const float rm = (float)v * 0.03f, rk = dr_lfo_rmod_k(rm, proj.par[P_LFO_RMOD_SRC], proj.par[P_LFO_W1],
+                                                             proj.par[P_LFO_W2]);
+        if (!v) {
+            scopy(t2, "none");
+            return 2;
+        }
+        q = dec1(rk * fm_exp2f(-fm_fabsf(rm)), scopy(t2, "\xC3\x97"));
+        dec1(rk * fm_exp2f(fm_fabsf(rm)), scopy(q, "-"));
+        return 2;
+    }
+    if (p == P_DLY_LFO_DEPTH) {                /* up to ±25 % of the time */
+        if (!v)
+            scopy(t2, "none");
+        else
+            lk_swing(t2, fm_fabsf(c) * 25.0f, "%");
+        return 2;
+    }
+    if (p == P_XMOD_AMT) {                     /* what it moves, after an arrow: cutoff, pitch, snarl, off */
+        const int m = proj.par[P_XMOD];
+        scopy(t2, m == DR_XMOD_CUT ? ">cutoff" : m == DR_XMOD_FM ? ">pitch" : m ? ">snarl" : "off");
+        return 2;
+    }
+    if (p == P_LFO_RMOD_SRC)
+        return 2;
+    return 0;
+}
+
+/* SEQ's ruler: ten ticks, lit tall, unlit short, a white mark at the value; centred (Shift's) lit from the middle */
+static void lk_ruler(int32_t cx, int32_t y, float frac, int g, int centred)
+{
+    const float f = fm_clampf(frac, 0.0f, 1.0f);
+    const int32_t m = cx - 25 + (int32_t)(f * 50.0f + 0.5f);
+    int i;
+    for (i = 0; i < 10; i++) {
+        const int32_t x = cx - 24 + 5 * i;
+        const float at = ((float)i + 0.5f) / 10.0f;
+        const int on = centred ? (f >= 0.5f ? at > 0.5f && at < f : at < 0.5f && at > f) : at < f;
+        if (on)
+            cv_rect(x, y, 2, 7, g == LK_G ? LK_INK : lk_ramp(g, (float)i / 9.0f));
+        else
+            cv_rect(x, y + 4, 2, 3, LK_UNLIT);
+    }
+    if (centred)
+        cv_rect(cx - 1, y + 9, 1, 2, LK_LABEL);
+    cv_rect(m - 1, y - 2, 2, 11, LK_WHITE);
+}
+
 static void lk_values(void)
 {
     const int held = (int)(ui.btn >> B_SEL & 1u);
@@ -925,9 +1532,14 @@ static void lk_values(void)
     for (i = 0; i < 4; i++) {
         const int p = knob_param((int)i);
         h = hash(h, (p < 0 ? 0xFFFFu : (uint32_t)(uint16_t)proj.par[p]) | (uint32_t)lit((int)i) << 16);
-        if (VIEW_KNOB[ui.view][i].g < G)       /* a drone's knob may follow another of its settings (PW the wave) */
-            h = hash(h, (uint32_t)gpar(VIEW_KNOB[ui.view][i].g, GP_WAVE));
+        if (VIEW_KNOB[ui.view][i].g < G)       /* a drone's knob may follow another of its settings (PW the wave,
+                                                * a send its key) */
+            h = hash(h, (uint32_t)gpar(VIEW_KNOB[ui.view][i].g, GP_WAVE) |
+                            (uint32_t)gpar(VIEW_KNOB[ui.view][i].g, GP_OLFO_DEST) << 8 |
+                            (uint32_t)gpar(VIEW_KNOB[ui.view][i].g, GP_FLFO_DEST) << 9);
     }
+    h = hash(h, (uint32_t)proj.par[P_MOVE] | (uint32_t)proj.par[P_XMOD] << 8 | (uint32_t)proj.par[P_LFO_RMOD_SRC] << 12 |
+                    (uint32_t)proj.par[P_LFO_W1] << 16 | (uint32_t)proj.par[P_LFO_W2] << 20);
     if (h == ui.sig[2])
         return;
     ui.sig[2] = h;
@@ -943,8 +1555,8 @@ static void lk_values(void)
         const char *why = second ? 0 : lk_unheard(p), *name;
         int on = lit((int)i), v, lo, hi;
         const felucca_font_t *fb, *fs, *fn;
-        char t[16], *sp;
-        int pre;
+        char t[16], t2[16], *sp;
+        int pre, mode;
         int32_t wb, ws, y;
         if (p < 0)
             continue;
@@ -964,10 +1576,23 @@ static void lk_values(void)
         name = second ? "Sub wave" : card_name(p);
         fn = lk_name_font(name);
         text_c(cx, 7 + (int32_t)(FONT_T20.h - fn->h) / 2, fn, name, on || second ? LK_DRONE[g] : LK_LABEL);
+        if (ui.view == V_LFO)                  /* the sends: each name underlined in its drone's color */
+            cv_rect(cx - 22, 28, 44, 1, LK_DRONE[g]);
         lk_text(p, v, t);
+        mode = second ? 0 : lk_line2(p, v, t, t2);
+        if (mode == 3) {                       /* two lines at the value's size */
+            const felucca_font_t *f2 = text_w(&FONT_N2, t) <= 58 && text_w(&FONT_N2, t2) <= 58 ? &FONT_N2 : &FONT_U1;
+            text_c(cx, 27, f2, t, LK_WHITE);
+            text_c(cx, 27 + (int32_t)f2->h - 4, f2, t2, LK_WHITE);
+            lk_one_of_dots(cx, 72, dr_param_info(p)->hi - lo + 1, v - lo, g);
+            continue;
+        }
         sp = t;                                /* "D2 +2": the note large, the cents smaller; "177ms": the unit */
         while (*sp && *sp != ' ')
             sp++;
+        if (p == P_LFO_RMOD_SRC)               /* "LFO II": one word */
+            while (*sp)
+                sp++;
         pre = *sp == ' ' && t[0] >= 'A' && t[0] <= 'Z' && sp[1] >= '0' && sp[1] <= '9';   /* "Pink 70": the word
                                                                                        * smaller, before it */
         if (!*sp)
@@ -998,6 +1623,8 @@ static void lk_values(void)
                     break;
             }
             y = 9 + (int32_t)FONT_T20.h + (62 - (int32_t)FONT_T20.h - (int32_t)fb->h) / 2;
+            if (mode == 1)                     /* raised for the line under it */
+                y -= 8;
             if (pre) {
                 cv_text(cx - (wb + ws) / 2, y + (int32_t)(fb->h - fs->h) - 2, fs, unit, LK_WHITE);
                 cv_text(cx - (wb + ws) / 2 + ws, y, fb, big, LK_WHITE);
@@ -1008,10 +1635,27 @@ static void lk_values(void)
                             why ? LK_LABEL : LK_WHITE);
             }
         }
+        if (mode == 1)
+            text_c(cx, y + (int32_t)fb->h - 6, &LK_F_TAG, t2, LK_WHITE);
+        if (mode == 2) {                       /* the swing in the meter band (the sliders are in the picture) */
+            const int arrow = t2[0] == '>';
+            const char *w2 = t2 + arrow;
+            const felucca_font_t *f2 = text_w(&LK_F_TAG, w2) + (arrow ? 12 : 0) <= 54 ? &LK_F_TAG : &FONT_U2;
+            const int32_t ww = text_w(f2, w2) + (arrow ? 12 : 0), x2 = cx - ww / 2;
+            const uint16_t c2 = !v || !proj.par[P_MOVE] || (p == P_XMOD_AMT && !proj.par[P_XMOD]) ? LK_LABEL
+                              : p == P_XMOD_AMT && proj.par[P_XMOD] == DR_XMOD_CUT ? LK_DRONE[1] : LK_WHITE;
+            if (arrow)
+                lk_harrow(x2, 70, 8, 1, c2);
+            cv_text(x2 + (arrow ? 12 : 0), 62 + (int32_t)(LK_B(LK_F_TAG) - (f2 == &FONT_U2 ? LK_B(FONT_U2) : LK_B(LK_F_TAG))), f2,
+                    w2, c2);
+            continue;
+        }
         {   /* the meter, the page's kind */
             const int gp = p < P_XMOD ? p % GP_N : -1;
             const float frac = hi > lo ? (float)(v - lo) / (float)(hi - lo) : 0.0f;
-            if (gp == GP_NCOLOR && ui.view == V_TONE)   /* a crossfade, white to pink (Evan, 2026-11-02) */
+            if (ui.view == V_PARTNER || ui.view == V_MOVES)   /* SEQ's rulers; Shift's from the middle */
+                lk_ruler(cx, 70, frac, g, p == P_SHIFT_MOVE);
+            else if (gp == GP_NCOLOR && ui.view == V_TONE)   /* a crossfade, white to pink (Evan, 2026-11-02) */
                 lk_xfade_col(cx, 70, frac);
             else if (ui.view == V_LIFE || ui.view == V_TONE)   /* ENV's square cells */
                 lk_cells(cx, 70, frac, LK_RAMP[g][0], LK_RAMP[g][1], p == P_FEEDBACK);

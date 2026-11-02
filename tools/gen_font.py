@@ -97,7 +97,8 @@ def render(ttf, px, scale, pixel, first, last):
     h = asc + desc - top
     glyphs = []
     for c in range(first, last + 1):
-        ch = "\u00b7" if c == 0x60 else chr(c)          # the backtick's slot holds a middle dot (UTF-8 "·", gfx.c)
+        ch = {0x60: "\u00b7", 0x5E: "\u00b1", 0x7E: "\u00d7"}.get(c, chr(c))   # spare slots (gfx.c): the backtick's holds
+        #   a middle dot ("·"), the caret's "±", the tilde's "×" (nothing on screen uses those three)
         adv = int(round(font.getlength(ch, features=feats)))
         bw = adv + 2 * PAD
         img = Image.new("L", (bw, asc + desc), 0)
