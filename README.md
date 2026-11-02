@@ -510,7 +510,7 @@ key.
 | 1 | I partner | I osc wave (I, II, both) |
 | 2 | I sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | I osc LFO → X-Wave (instead of pitch) |
 | 3 | I filter: LP, BP, HP | I filter LFO → resonance (instead of cutoff) |
-| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are; on when you first start: turn a pitch knob and the screen says "PITCH LOCKED · KEY 4") | I filter wave (I, II, both) |
+| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are; on when you first start: turn a pitch knob and the screen says "PITCH LOCKED  unlock C#4") | I filter wave (I, II, both) |
 | 5 | LFO reset | LFO reset |
 | 6 | II partner | II osc wave (I, II, both) |
 | 7 | II sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | II osc LFO → X-Wave |
@@ -526,7 +526,7 @@ key.
 - A **filter key** goes round with each tap: low-pass (dark), band-pass (winking), high-pass (lit).
 - A **sub key** goes round with each tap: −1 octave (dark), −2 octaves (lit), then the subharmonics ⅓
   and ⅕ of the pitch (winking). With the drone's OSC MIX at 0 (Sub · Drive) the sub isn't heard: the screen says
-  so ("OSC MIX 0 · EDIT x2").
+  so ("OSC MIX 0 · EDIT x2", EDIT in a box).
 
 ### MIDI
 
