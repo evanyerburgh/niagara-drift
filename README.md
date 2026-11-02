@@ -255,7 +255,7 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 #### Life and Tone · ENV
 
-<img src="docs/img/page-tone.png" width="488" alt="The Life and Tone pages: a drawing above each of Life's knobs (feedback rings, a flame, the harmonics, a worn wave); each drone's noise as snow, through its filter">
+<img src="docs/img/page-tone.png" width="488" alt="The Life and Tone pages: a drawing above each of Life's knobs (feedback rings, a flame, a hand-drawn wave, a worn wave); each drone's noise as snow, through its filter">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
@@ -264,9 +264,10 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 Life draws one picture above each knob, all moving: Feedback as rings feeding on themselves (more as you turn it,
 breathing with its share of the sound, the outer one red once it sings), Drift as a flame swaying as far as it lets
-the drones wander, Character as the drones' first nine harmonics (drone I's filled, drone II's outlined), and Age as
-drone I's saw worn as you hear it, its corners rounding and hiss coming in. Tone shows each drone's noise as snow,
-low to high: as high as it's loud, sloping down towards the highs as it goes pink, cut off by the drone's filter; the
+the drones wander, Character as each drone's wave going from a crisp ruled line to a thick, soft, trembling hand-drawn
+stroke (drone I's filled, drone II's outlined), and Age as drone I's saw worn as you hear it, its corners rounding,
+wavering, dimming and hiss coming in. Tone shows each drone's noise as snow, low to high: as tall as it sounds loud
+(twice as tall for every 10 dB), sloping down towards the highs as it goes pink, cut off by the drone's filter; the
 pink specks are as many as Colour says.
 
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
