@@ -482,6 +482,14 @@ static void lk_pic_drones2(void)
     const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 4, bot = LK_PIC_H - (int32_t)LK_F_SMALL.h - 6, h = bot - top;
     int g, j, i;
     lk_halves();
+    for (g = 0; g < DR_NGROUPS; g++) {         /* the filter's mode beside the drone's name, and its key (Evan,
+                                                * 2026-11-02: the curve shows it, the key says where), as Sub · Drive */
+        static const char *const MODE[3] = {"LP", "BP", "HP"};
+        const int32_t base = 2 + LK_B(LK_F_DRONE), x1 = (g ? 130 : 10) + text_w(&LK_F_DRONE, g ? "II" : "I") + 6;
+        const int m = gpar(g, GP_MODE);
+        lk_key(cv_text(x1, base - LK_B(LK_F_SMALL), &LK_F_SMALL, MODE[(unsigned)m < 3u ? m : 0], LK_DRONE[g]) + 5, base,
+               LK_BKEY[g ? 7 : 2]);
+    }
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 130 : 10;
         const float l = dr_level[g], db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
