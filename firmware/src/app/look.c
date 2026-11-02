@@ -327,6 +327,9 @@ static void lk_bundle_n(int32_t x0, const int16_t *y, int n, int g, int dx, int 
         const float t = (float)j / (float)(ns - 1);
         const uint16_t c = bright < 1.0f ? lk_mix(0x07060Bu, lk_ramp888(g, t), bright) : lk_ramp(g, t);
         for (i = 1; i < n; i++) {
+            if (j < ns - 1 && !dx && (y[i] - y[i - 1] > 3 * dy || y[i - 1] - y[i] > 3 * dy))
+                continue;                      /* a jump (a saw's, a square's): the front strand's alone, or stacked
+                                                * straight down they'd fill it in as a solid bar (Evan, 2026-11-02) */
             cv_line(ox + 2 * (i - 1), y[i - 1] + oy, ox + 2 * i, y[i] + oy, c);
             cv_line(ox + 2 * (i - 1), y[i - 1] + oy + 1, ox + 2 * i, y[i] + oy + 1, c);
         }
