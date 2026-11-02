@@ -260,18 +260,18 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Life | feedback | drift | character | age |
-| Tone | I noise | I colour | II noise | II colour |
+| Tone | I noise | I color | II noise | II color |
 
 Life draws one picture above each knob, all moving: Feedback as rings feeding on themselves (more as you turn it,
 breathing with its share of the sound, the outer one red once it sings), Drift as a flame swaying as far as it lets
 the drones wander, Character as each drone's wave going from a crisp ruled line to a thick, soft, trembling hand-drawn
 stroke (drone I's filled, drone II's outlined), and Age as drone I's saw worn as you hear it, its corners rounding,
 wavering, dimming and hiss coming in. Tone shows each drone's noise as snow, low to high: as tall as it sounds loud
-(twice as tall for every 10 dB), sloping down towards the highs as it goes pink, cut off by the drone's filter; the
-pink specks are as many as Colour says.
+(twice as tall for every 10 dB), sloping down toward the highs as it goes pink, cut off by the drone's filter; the
+pink specks are as many as Color says.
 
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
-  thickening colour that grows with the knob, as strong on a quiet, dry sound as on a loud one. Over the top of
+  thickening color that grows with the knob, as strong on a quiet, dry sound as on a loud one. Over the top of
   its turn (past about 70) it starts to sing on its own and takes the sound over, held close to the same loudness.
   It rings in key, on drone I's harmonics, and fades with the drones when you stop.
 - **Drift** keeps the drones from ever being quite still: besides a little pitch wander, each drone's
@@ -285,7 +285,7 @@ pink specks are as many as Colour says.
 - **Noise** is the noise's level beside the oscillators, as in a synth's mixer: they stay as they are.
   It's heard all along the knob, and at the top it's about as loud as them (100 is level with a saw, 50 about −7 dB, 25 −12; a sine is quieter). It
   goes through the drone's filter with them, so the cutoff, resonance, LFO and Drift shape it.
-- **Colour** blends from white (left) to pink (right).
+- **Color** blends from white (left) to pink (right).
 
 #### Osc · EDIT
 
@@ -298,7 +298,7 @@ pink specks are as many as Colour says.
 
 - **X-Wave** blends sine → triangle → saw → square; **Width** is the square's pulse width. The sine and the triangle are a
   little louder than the saw, so they still carry on a small speaker, and the square a little quieter, level with the
-  saw there. Without a square in the wave, Width does nothing: its value and meter go grey, "needs sqr" above it.
+  saw there. Without a square in the wave, Width does nothing: its value and meter go gray, "needs sqr" above it.
 - **Osc/Sub** crossfades the oscillators with the sub (the knob reads "Osc/Sb"); **drive** pushes each drone into its filter.
   The picture shows each drone's two lanes, **osc** and **sub**, each as loud as its share of the crossfade, shaped by
   the drive.
@@ -341,7 +341,7 @@ pink specks are as many as Colour says.
 | LFO sends | I pitch (or X-Wave) | I cutoff (or resonance) | II pitch (or X-Wave) | II cutoff (or resonance) |
 | Mods | speed mod | source (LFO) | delay mod | cross-mod |
 
-- **The sends** and **speed mod** are centred: the middle is none. Each send is named for what it moves: Pitch, or
+- **The sends** and **speed mod** are centered: the middle is none. Each send is named for what it moves: Pitch, or
   X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 3 / 8.
 - **Mods**, the LFO moving other things, and cross-mod's amount:
   - **Speed mod** ("Speed" on the knob): the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).

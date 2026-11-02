@@ -30,7 +30,7 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
         {"Osc LFO", DR_LFO_OFF, DR_LFO_BOTH, olfo}, {"Osc depth", -100, 100, 0},                                \
         {"Osc LFO to", DR_TO_PITCH, DR_TO_XWAVE, DR_TO_PITCH}, {"Filter LFO", DR_LFO_OFF, DR_LFO_BOTH, flfo},     \
         {"Filt depth", -100, 100, fdep}, {"Filt LFO to", DR_TO_CUTOFF, DR_TO_RESO, DR_TO_CUTOFF},           \
-        {"Noise", 0, 100, 0}, {"Colour", 0, 100, 100}
+        {"Noise", 0, 100, 0}, {"Color", 0, 100, 100}
 
 /* THE STARTING SOUND (2026-10-17, Evan: Lyra-like; measured against two Lyra-8 recordings: changes mostly slower
  * than one every two seconds, ~16 dB of slow loudness swell, ~1.6 octaves of brightness): each voice's LFO taps

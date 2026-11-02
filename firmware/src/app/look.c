@@ -60,7 +60,7 @@ static uint16_t lk_mix(uint32_t a, uint32_t b, float t)   /* 0xRRGGBB a -> b */
 }
 static uint16_t lk_ramp(int g, float t) { return lk_mix(LK_RAMP[g][0], LK_RAMP[g][1], t); }
 
-/* a message's colour, by who said it (the callers still pass the old palette's): gold the scenes and saves, amber
+/* a message's color, by who said it (the callers still pass the old palette's): gold the scenes and saves, amber
  * and cyan the drones, violet the LFO and the gestures, the neutral the rest */
 static uint16_t lk_msg_col(uint16_t c)
 {
@@ -193,7 +193,7 @@ static void lk_bar(void)
 }
 
 /* ------------------------------------------- the picture's frame: overlays --- */
-/* the banner (a message): a dark band, a bar and the key word (up to the first space) in who said it's colour, the
+/* the banner (a message): a dark band, a bar and the key word (up to the first space) in who said it's color, the
  * rest white; the tip: outlined in gold, a filled TIP tag, "once" at the right (Evan, 2026-11-01: banner B) */
 static void lk_banner(void)
 {
@@ -227,7 +227,7 @@ static void lk_banner(void)
 }
 
 /* a knob's second job with SEL, on the rule above its name (Evan, 2026-11-01): "SEL" outlined in its box and the job
- * after it, centred on the knob's column; SEL held, the box fills. Drawn last in the picture, on a dark patch */
+ * after it, centered on the knob's column; SEL held, the box fills. Drawn last in the picture, on a dark patch */
 static void lk_sel_tag(int col, const char *job, int held)
 {
     const int32_t tw = text_w(&LK_F_SEL, "SEL") + 6, w = tw + 3 + text_w(&LK_F_SMALL, job);
@@ -245,8 +245,8 @@ static void lk_sel_tag(int col, const char *job, int held)
     cv_text(x + tw + 3, ty + LK_B(LK_F_SEL) + 1 - LK_B(LK_F_SMALL), &LK_F_SMALL, job, LK_INK);
 }
 
-/* why a knob does nothing heard ("needs sqr"), grey on the rule above its name, in its drone's half (Evan,
- * 2026-11-02: clear of the meters; its value and meter grey too) */
+/* why a knob does nothing heard ("needs sqr"), gray on the rule above its name, in its drone's half (Evan,
+ * 2026-11-02: clear of the meters; its value and meter gray too) */
 static void lk_why_tag(int col, const char *why)
 {
     const int32_t w = text_w(&LK_F_SMALL, why), ty = LK_PIC_H - (int32_t)LK_F_SMALL.h - 1, cx = 8 + 56 * col + 28;
@@ -423,7 +423,7 @@ static void lk_pic_drones2(void)
 }
 
 /* ----------------------------------------------------- Osc's picture --- */
-/* each drone's wave, one 2 px line in its colour (Evan, 2026-11-02: strands are for what moves; here they read as a
+/* each drone's wave, one 2 px line in its color (Evan, 2026-11-02: strands are for what moves; here they read as a
  * lo-fi band): X-Wave morphs it sine, triangle, saw, square; Width changes it only near square, as it does the sound.
  * About a third of the picture's height: lower than before, not filling it (Evan, 2026-11-02) */
 static const char *lk_unheard(int p);
@@ -598,28 +598,28 @@ static void lk_soft_vline(float x0, int32_t y0, float x1, int32_t y1, uint16_t c
     }
 }
 
-/* DRIFT: a flame (the Figma's): nine smooth 1 px strands, side by side at the base, gathering and twisting round each
- * other into a thin tip, the ones behind dimmer; the flame swaying, more towards the tip, as far as Drift lets it,
- * its strands opening over Drift's first 15. Its motion from the clock (never a rhythm). At 0 one still line */
+/* DRIFT: a flame, nine smooth 1 px strands from one root, opening toward the tip (widest two-thirds up, up to 3.5 px
+ * apart) and swaying as one bundle, a little apart in phase, more toward the tip; the ones behind dimmer. The opening
+ * and the sway grow evenly with Drift (Evan, 2026-11-02: an even spread from 1 to 100); the motion from the clock
+ * (never a rhythm). At 0 one still line */
 static void lk_life_drift(int32_t cx, int32_t top, int32_t bot)
 {
-    const float d = (float)proj.par[P_DRIFT] * 0.01f, t = (float)plat_ms() * 0.001f;
-    const float fan = fm_minf(d * 6.7f, 1.0f), spin = t * (0.25f + 0.5f * d);
+    const float d = (float)proj.par[P_DRIFT] * 0.01f, t = (float)plat_ms() * 0.001f, spin = t * (0.25f + 0.5f * d);
     const int ns = d > 0.0f ? 9 : 1;
     int j, i;
     for (j = 0; j < ns; j++) {
+        const float o = ns > 1 ? (float)j - 4.0f : 0.0f;
         float px = 0.0f;
         int32_t py = 0;
         for (i = 0; i <= 24; i++) {
-            const float h = (float)i / 24.0f, o = ns > 1 ? (float)j - 4.0f : 0.0f, fb = 1.0f - h;
-            const float a = 0.6981317f * (float)j + 7.0f * h + spin, tw = fan * 5.0f * fm_sinf(3.1415927f * h);
-            const float sw = 0.6f * fm_sinf(t * 0.53f + 4.0f * h) + 0.4f * fm_sinf(t * 0.29f + 6.5f * h);
-            const float x = (float)cx + fan * o * (2.6f * fb * fm_sqrtf(fb) + 0.6f - 0.6f * h * h * h) +
-                            tw * fm_cosf(a) + d * sw * 14.0f * h * fm_sqrtf(h);
+            const float h = (float)i / 24.0f, a = 0.6981317f * (float)j + 3.0f * h + spin;
+            const float sw = 0.6f * fm_sinf(t * 0.53f + 0.35f * (float)j + 4.0f * h) +
+                             0.4f * fm_sinf(t * 0.29f + 0.6f * (float)j + 6.5f * h);
+            const float x = (float)cx + (0.15f + 0.85f * d) * o * 0.55f * (3.0f + 7.0f * fm_sinf(2.8f * h)) * h +
+                            d * sw * 14.0f * h * fm_sqrtf(h);
             const int32_t y = bot - (int32_t)((float)(bot - top) * h);
             if (i)
-                lk_soft_vline(px, py, x, y, lk_ramp(LK_G, ns > 1 ? 0.6f + 0.4f * fm_sinf(a) * fm_sinf(3.1415927f * h)
-                                                               : 1.0f));
+                lk_soft_vline(px, py, x, y, lk_ramp(LK_G, ns > 1 ? 0.6f + 0.4f * fm_sinf(a) * h : 1.0f));
             px = x;
             py = y;
         }
@@ -734,8 +734,8 @@ static uint32_t lk_rnd(uint32_t x)            /* a well-mixed hash (the snow, th
 
 /* each drone's noise as TV snow, low to high: as tall as it sounds loud (Evan, 2026-11-02: twice as tall for each
  * 10 dB, so 10, 20 dB under, is a quarter up; the top: noise at 100, as loud as the oscillators), its low end there,
- * then flat at White and falling 3 dB an octave at Pink (Colour blends them) over 36 dB, rolled off by the drone's
- * filter as heard; its edge drawn bright. Square specks, white or pink (pink as often as Colour says), at 60 %; each
+ * then flat at White and falling 3 dB an octave at Pink (Color blends them) over 36 dB, rolled off by the drone's
+ * filter as heard; its edge drawn bright. Square specks, white or pink (pink as often as Color says), at 60 %; each
  * changes about once in seven pictures, at its own time, so it shimmers without strobing (no buffer: from a hash) */
 static void lk_pic_tone(void)
 {
@@ -832,13 +832,13 @@ static void lk_cells(int32_t cx, int32_t y, float frac, uint32_t c0, uint32_t c1
     }
 }
 
-static void lk_stripes(int32_t cx, int32_t y, float frac, int g, int grey)   /* EDIT's gauge: 10 bars of 3 x 11 */
+static void lk_stripes(int32_t cx, int32_t y, float frac, int g, int gray)   /* EDIT's gauge: 10 bars of 3 x 11 */
 {
     int i, n = (int)(fm_clampf(frac, 0.0f, 1.0f) * 10.0f + 0.5f);
     for (i = 0; i < 10; i++) {
         const int32_t x = cx - 24 + 5 * i;
         if (i < n) {
-            cv_rect(x, y, 3, 11, grey ? LK_UNLIT : lk_ramp(g, (float)i / 9.0f));
+            cv_rect(x, y, 3, 11, gray ? LK_UNLIT : lk_ramp(g, (float)i / 9.0f));
         } else {
             cv_rect(x, y + 7, 3, 4, LK_UNLIT);
         }
@@ -852,7 +852,7 @@ static void lk_ticks4(int32_t cx, int32_t y)    /* under X-Wave's gauge: sine, t
         cv_rect(cx - 24 + (int32_t)(k * 46 / 3), y, 1, 3, LK_LABEL);
 }
 
-static void lk_xfader(int32_t cx, int32_t y, float frac, int g)   /* Osc/Sub: the oscillators' colour to a white mark,
+static void lk_xfader(int32_t cx, int32_t y, float frac, int g)   /* Osc/Sub: the oscillators' color to a white mark,
                                                                     * the sub's lighter tint after it */
 {
     const int32_t x0 = cx - 25, w = 50, m = x0 + (int32_t)(fm_clampf(frac, 0.0f, 1.0f) * (float)w);
@@ -862,7 +862,7 @@ static void lk_xfader(int32_t cx, int32_t y, float frac, int g)   /* Osc/Sub: th
     cv_rect(m - 1, y - 2, 2, 9, LK_WHITE);
 }
 
-static void lk_xfade_col(int32_t cx, int32_t y, float frac)   /* Tone's Colour, as lk_xfader: pink as far as it
+static void lk_xfade_col(int32_t cx, int32_t y, float frac)   /* Tone's Color, as lk_xfader: pink as far as it
                                                                  * goes, white after it, a white mark */
 {
     const int32_t x0 = cx - 25, w = 50, m = x0 + (int32_t)(fm_clampf(frac, 0.0f, 1.0f) * (float)w);
@@ -1023,7 +1023,7 @@ static void lk_values(void)
                 lk_stripes(cx, 64, frac, g, 0);
                 lk_ticks4(cx, 77);
             } else if (gp == GP_WIDTH || gp == GP_DRIVE)
-                lk_stripes(cx, 66, frac, g, why != 0);   /* grey with its value when unheard */
+                lk_stripes(cx, 66, frac, g, why != 0);   /* gray with its value when unheard */
             else
                 lk_dots(cx, 70, frac, g, gp == GP_RESO);
         }
