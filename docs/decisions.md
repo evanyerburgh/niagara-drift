@@ -565,3 +565,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   doubled. The Presets and Weight keep their approved sound with lower values: Character 40 → 27, 30 → 21, Tape's
   Age 80 → 35 and Character 98 → 67, Weight's Character +25 → +17. Life's pictures read the same constants
   (drone.h), so Character's harmonics now fall visibly from the clean saw's ticks.
+- 2026-11-02: A gesture never brings back a drone at Level 0 (Evan, on the FM-1: Weight brought it back at about
+  -28 dB, and no other gesture does). Weight's level lift fades in over the knob's bottom tenth: none at 0, as approved
+  from Level 10. A key is named by its note, in a box like SEL's, never its number ("[F#5]", not "key 11"). Partner,
+  Pitch moves, LFO sends and Mods in the new look (PR E); strands 1 px with a gap where they'd blend (Wander, Partner),
+  Osc's stacked straight down as Drones 2's; a drone's strands follow the level heard, closing up and dimming toward
+  silence (Drones 1, 2, Sub · Drive). The same sound otherwise.
