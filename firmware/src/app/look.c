@@ -967,13 +967,18 @@ static void lk_pic_moves(void)
     cv_text(37, LK_SY(7.0f) - LK_B(LK_F_SMALL) / 2 - 1, &LK_F_SMALL, "+5th", LK_LABEL);
     cv_text(37, LK_SY(0.0f) - LK_B(LK_F_SMALL) / 2 - 1, &LK_F_SMALL, "home", LK_INK);
     cv_text(37, LK_SY(-7.0f) - LK_B(LK_F_SMALL) / 2 - 1, &LK_F_SMALL, "-5th", LK_LABEL);
-    if (mv) {                                  /* the move, a box from home; how far in, filled */
+    if (mv) {                                  /* the move, six 1 px strands from home in the neutral ramp (the
+                                                * board's); dim to the move, full as far as the gesture has come */
         const int32_t y0 = LK_SY(0.0f), y1 = LK_SY((float)mv * 0.01f);
-        const float at = mv ? fm_clampf(dr_gest_pitch(0) * 100.0f / (float)mv, 0.0f, 1.0f) : 0.0f;
+        const float at = fm_clampf(dr_gest_pitch(0) * 100.0f / (float)mv, 0.0f, 1.0f);
         const int32_t yf = y0 + (int32_t)((float)(y1 - y0) * at);
-        lk_box(16, y1 < y0 ? y1 : y0, 8, (y1 < y0 ? y0 - y1 : y1 - y0) + 1, in ? LK_INK : LK_LABEL);
-        if (yf != y0)
-            cv_rect(17, yf < y0 ? yf : y0, 6, yf < y0 ? y0 - yf : yf - y0, LK_INK);
+        for (k = 0; k < LK_STRANDS; k++) {
+            const uint16_t c = lk_mix(0xA29EAEu, 0xEFE6FFu, (float)k / (float)(LK_STRANDS - 1));
+            const int32_t x = 15 + 2 * k;
+            cv_rect(x, y1 < y0 ? y1 : y0, 1, (y1 < y0 ? y0 - y1 : y1 - y0) + 1, lk_mix(0x07060Bu, 0xA29EAEu, 0.45f));
+            if (yf != y0)
+                cv_rect(x, yf < y0 ? yf : y0, 1, (yf < y0 ? y0 - yf : yf - y0) + 1, c);
+        }
     }
     /* Wander: the scale's rungs, a dotted line each, named from drone I's root where there's room */
     nd = dr_wander_degs(deg);
