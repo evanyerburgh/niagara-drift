@@ -314,7 +314,8 @@ static void lk_plot(int32_t x0, const int16_t *y, int n, uint16_t c)
 /* a still shape as a bundle of six strands (the Figma boards' look): the light one in front, each deeper one further
  * back by (dx, dy), with a gap between them so it reads as strands, not a band (Evan, 2026-11-02: "the Figma looks
  * great"). The shapes on Osc and Sub · Drive don't move with the music, so the spread is fixed */
-#define LK_BDX 2                             /* Osc and Drones 2: each strand 2 px right, 4 down */
+#define LK_BDX 0                             /* Osc and Drones 2: each strand straight down, 4 px (Evan, 2026-11-02:
+                                              * Osc as Drones 2; it was 2 px right too) */
 #define LK_BDY 4
 #define LK_SDX 0                             /* Sub · Drive's lanes are small: 3 px down */
 #define LK_SDY 3
@@ -424,14 +425,15 @@ static void lk_pic_drones2(void)
         for (j = 0; j < LK_STRANDS - 1; j++)
             lk_cut_hist[g][j] = lk_cut_hist[g][j + 1];
         lk_cut_hist[g][LK_STRANDS - 1] = dr_cut[g];
-        for (j = 0; j < LK_STRANDS; j++) {     /* the oldest first, deep; the newest last, light */
+        for (j = 1; j < LK_STRANDS; j++) {     /* five (Evan, 2026-11-02: one fewer, the same ramp): the oldest
+                                                * first, deep; the newest last, light */
             int16_t y[51];
             for (i = 0; i <= 50; i++) {
                 const float d = filt_db(g, lk_cut_hist[g][j], 100.0f * (float)i / 50.0f);
-                y[i] = (int16_t)(bot - LK_BDY * (j + 1) -
-                                 (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f * (float)(h - 6 * LK_BDY) * lf));
+                y[i] = (int16_t)(bot - LK_BDY * j -
+                                 (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f * (float)(h - 5 * LK_BDY) * lf));
             }
-            lk_plot(x0, y, 51, lk_ramp(g, (float)j / (float)(LK_STRANDS - 1)));
+            lk_plot(x0, y, 51, lk_ramp(g, (float)(j - 1) / (float)(LK_STRANDS - 2)));
         }
         if (db > -60.0f) {                     /* "-10 dB" */
             char *q = t;
