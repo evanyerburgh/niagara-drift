@@ -567,28 +567,59 @@ static void lk_life_fb(int32_t cx, int32_t cy)
     }
 }
 
-/* DRIFT: a flame, six 2 px strands from one root, 4 px apart in the middle (the fan opening over Drift's first 15),
- * swaying as one bundle, more towards the tip, as far as Drift lets it; its motion from the clock (never a rhythm).
- * At 0 one still line */
+/* a soft pixel: c at a share a (0..1) of its brightness, the brighter of it and what's there kept (on the black
+ * ground that is the edge of a line drawn smooth) */
+static void lk_soft_px(int32_t x, int32_t y, uint16_t c, float a)
+{
+    uint32_t i, o, r, g, b;
+    y += cv_oy;
+    if ((uint32_t)x >= cv_w || y < cv_y0 || y >= cv_y1)
+        return;
+    i = (uint32_t)y * cv_w + (uint32_t)x;
+    o = swap16(cv_px[i]);
+    r = (uint32_t)((float)(c >> 11) * a);
+    g = (uint32_t)((float)(c >> 5 & 63u) * a);
+    b = (uint32_t)((float)(c & 31u) * a);
+    if (r < (o >> 11)) r = o >> 11;
+    if (g < (o >> 5 & 63u)) g = o >> 5 & 63u;
+    if (b < (o & 31u)) b = o & 31u;
+    cv_px[i] = swap16((uint16_t)(r << 11 | g << 5 | b));
+}
+
+/* a 1 px smooth line, mostly upright (each row split between the two pixels it crosses) */
+static void lk_soft_vline(float x0, int32_t y0, float x1, int32_t y1, uint16_t c)
+{
+    const int32_t n = y1 > y0 ? y1 - y0 : y0 - y1, sy = y1 > y0 ? 1 : -1;
+    int32_t k;
+    for (k = 0; k <= n; k++) {
+        const float x = x0 + (x1 - x0) * (n ? (float)k / (float)n : 0.0f), f = x - fm_floorf(x);
+        lk_soft_px((int32_t)fm_floorf(x), y0 + sy * k, c, 1.0f - f);
+        lk_soft_px((int32_t)fm_floorf(x) + 1, y0 + sy * k, c, f);
+    }
+}
+
+/* DRIFT: a flame (the Figma's): nine smooth 1 px strands, side by side at the base, gathering and twisting round each
+ * other into a thin tip, the ones behind dimmer; the flame swaying, more towards the tip, as far as Drift lets it,
+ * its strands opening over Drift's first 15. Its motion from the clock (never a rhythm). At 0 one still line */
 static void lk_life_drift(int32_t cx, int32_t top, int32_t bot)
 {
     const float d = (float)proj.par[P_DRIFT] * 0.01f, t = (float)plat_ms() * 0.001f;
-    const float fan = fm_minf(d * 6.7f, 1.0f) * (0.7f + 0.3f * d);
-    const int ns = d > 0.0f ? 6 : 1;
+    const float fan = fm_minf(d * 6.7f, 1.0f), spin = t * (0.25f + 0.5f * d);
+    const int ns = d > 0.0f ? 9 : 1;
     int j, i;
     for (j = 0; j < ns; j++) {
-        const float o = ns > 1 ? (float)j - 2.5f : 0.0f;
-        const uint16_t c = lk_ramp(LK_G, ns > 1 ? (float)j / 5.0f : 1.0f);
-        int32_t px = cx, py = bot;
-        for (i = 1; i <= 16; i++) {
-            const float h = (float)i / 16.0f;
-            const float sw = 0.6f * fm_sinf(t * 0.53f + 0.35f * (float)j + 4.0f * h) +   /* one bundle, a little */
-                             0.4f * fm_sinf(t * 0.29f + 0.6f * (float)j + 6.5f * h);       /* apart in phase */
-            const int32_t x = cx + (int32_t)(d * sw * 16.0f * h * fm_sqrtf(h) +
-                                             fan * o * (3.0f + 7.0f * fm_sinf(2.8f * h)) * h);
+        float px = 0.0f;
+        int32_t py = 0;
+        for (i = 0; i <= 24; i++) {
+            const float h = (float)i / 24.0f, o = ns > 1 ? (float)j - 4.0f : 0.0f, fb = 1.0f - h;
+            const float a = 0.6981317f * (float)j + 7.0f * h + spin, tw = fan * 5.0f * fm_sinf(3.1415927f * h);
+            const float sw = 0.6f * fm_sinf(t * 0.53f + 4.0f * h) + 0.4f * fm_sinf(t * 0.29f + 6.5f * h);
+            const float x = (float)cx + fan * o * (2.6f * fb * fm_sqrtf(fb) + 0.6f - 0.6f * h * h * h) +
+                            tw * fm_cosf(a) + d * sw * 14.0f * h * fm_sqrtf(h);
             const int32_t y = bot - (int32_t)((float)(bot - top) * h);
-            cv_line(px, py, x, y, c);
-            cv_line(px + 1, py, x + 1, y, c);
+            if (i)
+                lk_soft_vline(px, py, x, y, lk_ramp(LK_G, ns > 1 ? 0.6f + 0.4f * fm_sinf(a) * fm_sinf(3.1415927f * h)
+                                                               : 1.0f));
             px = x;
             py = y;
         }
