@@ -78,8 +78,9 @@ still works. Installing firmware is at your own risk.
 
 - Use a USB data cable straight into the computer, close other apps that use MIDI (a DAW, M-UPGRADE), replug and try
   again. Nothing is written until the FM-1 has checked the whole package, so trying again is safe.
-- Going back, and the installer says nothing was written: choose the other M-VAVE file (V16 or V15). An FM-1 takes
-  back only the version whose bootloader it already has.
+- Going back from 0.2 (or from another firmware), and the installer says nothing was written: choose the other
+  M-VAVE file (V16 or V15). Those take back only the version whose bootloader the FM-1 already has; from 0.2.1 on,
+  Niagara Drift takes either.
 - Still stuck: hold **OCT− and OCT+ for 5 seconds**. The FM-1 goes into its chip's own update mode, which no
   firmware can get in the way of, and [M-Flasher](https://github.com/jvitkauskas/m-flasher) (Windows, Mac, Linux)
   puts M-VAVE's firmware back from there. If an FM-1 won't start at all, see [BUILDING.md](BUILDING.md#install).
