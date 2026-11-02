@@ -547,3 +547,14 @@ at the end. The current state is in the [README](../README.md) and the code.
   "tri", "saw/sqr"), PW grey with "at square" when it does nothing; Sub · Drive the osc and sub lanes, each its share
   of the equal-power crossfade, through the drive's soft clip, Osc/Sub's crossfader meter, the sub's wave on a SEL tag
   above the knob ("mix 40" while SEL is held, when the column shows "Sub wave" and its four segments). The same sound.
+- 2026-11-02 (Evan, on the FM-1): **Osc and Sub · Drive redrawn, PW renamed Width**: each wave one 2 px line in its
+  drone's colour (strands are for what moves; still, they read as a lo-fi band), Osc's about a third of the picture
+  tall, Sub · Drive's half its lane. PW is **Width**; while the wave has no square its value and meter go grey and
+  "needs sqr" sits on the rule above it, clear of the meters. The same sound.
+- 2026-11-02: **Life and Tone in the new look**: Life a drawing above each knob, all moving, in the neutral ramp:
+  Feedback's rings (one a 20, shaped by drone I's sound, breathing with its share; from 70 spread wide, the outer one a
+  thin red ring rippling), Drift's flame (nine strands, as far as Drift lets them), Character's first nine harmonics
+  (drone I filled, drone II outlined, a clean saw's as ticks), Age's worn saw (from Age as heard: rounding, wow,
+  flutter, hiss). Tone each drone's noise as snow, low to high, as high as its level, tilted by Colour and cut by the
+  filter, its specks pink as often as Colour says, each changing about once in seven pictures. ENV's meters square
+  cells (Feedback's last two red, Colour white to pink); "Pink 70" with the word small. The same sound.

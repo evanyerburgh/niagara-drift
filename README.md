@@ -242,17 +242,24 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 #### Life and Tone · ENV
 
-<img src="docs/img/page-tone.png" width="488" alt="The Life and Tone pages: the feedback, Drift, the character and Age; each drone's noise through its filter, and its colour">
+<img src="docs/img/page-tone.png" width="488" alt="The Life and Tone pages: a drawing above each of Life's knobs (feedback rings, a flame, the harmonics, a worn wave); each drone's noise as snow, through its filter">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Life | feedback | drift | character | age |
 | Tone | I noise | I colour | II noise | II colour |
 
+Life draws one picture above each knob, all moving: Feedback as rings feeding on themselves (more as you turn it,
+breathing with its share of the sound, the outer one red once it sings), Drift as a flame swaying as far as it lets
+the drones wander, Character as the drones' first nine harmonics (drone I's filled, drone II's outlined), and Age as
+drone I's saw worn as you hear it, its corners rounding and hiss coming in. Tone shows each drone's noise as snow,
+low to high: as high as it's loud, sloping down towards the highs as it goes pink, cut off by the drone's filter; the
+pink specks are as many as Colour says.
+
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant,
   thickening colour that grows with the knob, as strong on a quiet, dry sound as on a loud one. Over the top of
   its turn (past about 70) it starts to sing on its own and takes the sound over, held close to the same loudness.
-  It rings in key, on drone I's harmonics, and fades with the drones when you stop. The meter shows its share.
+  It rings in key, on drone I's harmonics, and fades with the drones when you stop.
 - **Drift** keeps the drones from ever being quite still: besides a little pitch wander, each drone's
   cutoff, timbre (X-Wave), level and partner detune slowly wander on their own, around where you've set
   them, never repeating. Gentle by default; 0 holds everything exactly where you put it.
