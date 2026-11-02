@@ -942,8 +942,11 @@ static int heard(int i)                          /* the sound's own value with t
     int v = moff[i] == MOFF_ON ? PARAMS[i].hi : moff[i] == MOFF_OFF ? PARAMS[i].lo : base[i] + moff[i];
     if (i < P_XMOD && i % GP_N == GP_LEVEL && moff[i] && moff[i] != MOFF_ON && moff[i] != MOFF_OFF) {
         /* a level's moves are in the knob's units before its taper (v^2 / 100): the same dips and lifts in dB as
-         * Evan approved (Weight +40, Wash -15 and its breath -14), at any level */
-        float l = fm_clampf((float)(base[i] * base[i]) * 0.01f + (float)moff[i], 0.0f, 100.0f);
+         * Evan approved (Weight +40, Wash -15 and its breath -14), at any level from 10; under 10 a lift fades out
+         * with the level, so a drone turned to 0 stays silent, as under every other gesture (Evan, 2026-11-02:
+         * Weight brought it back at about -28 dB) */
+        const float m = moff[i] > 0 ? (float)moff[i] * fm_minf(1.0f, (float)base[i] * 0.1f) : (float)moff[i];
+        float l = fm_clampf((float)(base[i] * base[i]) * 0.01f + m, 0.0f, 100.0f);
         v = (int)(10.0f * fm_sqrtf(l) + 0.5f);
     }
     return v < PARAMS[i].lo ? PARAMS[i].lo : v > PARAMS[i].hi ? PARAMS[i].hi : v;

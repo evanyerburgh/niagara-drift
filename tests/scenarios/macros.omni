@@ -241,3 +241,13 @@ wait 1500
 expect gam0 0
 spin PRESET -50
 expect mtime 50
+# WEIGHT on a drone turned to 0 (2026-11-02): it stays silent, as under every other gesture (it had come back at
+# about -28 dB); from Level 10 its lift is as approved
+set 32 0
+wait 500
+key w12 down
+wait 3000
+expect heard32 0
+expect lvl1 -99
+key w12 up
+wait 3000
