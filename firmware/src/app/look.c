@@ -567,87 +567,118 @@ static void lk_life_fb(int32_t cx, int32_t cy)
     }
 }
 
-/* DRIFT: a flame, nine strands from one root, swaying unevenly, more towards the tip; as far as Drift lets it, its
- * motion from the clock (never a rhythm). At 0 one still line */
+/* DRIFT: a flame, six 2 px strands from one root, 4 px apart in the middle (the fan opening over Drift's first 15),
+ * swaying as one bundle, more towards the tip, as far as Drift lets it; its motion from the clock (never a rhythm).
+ * At 0 one still line */
 static void lk_life_drift(int32_t cx, int32_t top, int32_t bot)
 {
     const float d = (float)proj.par[P_DRIFT] * 0.01f, t = (float)plat_ms() * 0.001f;
+    const float fan = fm_minf(d * 6.7f, 1.0f) * (0.7f + 0.3f * d);
+    const int ns = d > 0.0f ? 6 : 1;
     int j, i;
-    for (j = 0; j < 9; j++) {
+    for (j = 0; j < ns; j++) {
+        const float o = ns > 1 ? (float)j - 2.5f : 0.0f;
+        const uint16_t c = lk_ramp(LK_G, ns > 1 ? (float)j / 5.0f : 1.0f);
         int32_t px = cx, py = bot;
-        for (i = 1; i <= 14; i++) {
-            const float h = (float)i / 14.0f;
-            const float sw = 0.6f * fm_sinf(t * (0.53f + 0.04f * (float)j) + 0.9f * (float)j + 4.0f * h) +
-                             0.4f * fm_sinf(t * (0.29f + 0.03f * (float)j) + 2.1f * (float)j + 6.5f * h);
-            const int32_t x = cx + (int32_t)(d * (sw * 24.0f * h * fm_sqrtf(h) + (float)(j - 4) * 1.6f * h));
+        for (i = 1; i <= 16; i++) {
+            const float h = (float)i / 16.0f;
+            const float sw = 0.6f * fm_sinf(t * 0.53f + 0.35f * (float)j + 4.0f * h) +   /* one bundle, a little */
+                             0.4f * fm_sinf(t * 0.29f + 0.6f * (float)j + 6.5f * h);       /* apart in phase */
+            const int32_t x = cx + (int32_t)(d * sw * 16.0f * h * fm_sqrtf(h) +
+                                             fan * o * (3.0f + 7.0f * fm_sinf(2.8f * h)) * h);
             const int32_t y = bot - (int32_t)((float)(bot - top) * h);
-            cv_line(px, py, x, y, lk_ramp(LK_G, (float)j / 8.0f));
+            cv_line(px, py, x, y, c);
+            cv_line(px + 1, py, x + 1, y, c);
             px = x;
             py = y;
         }
     }
 }
 
-/* CHARACTER: the sound's first nine harmonics, drone I's filled, drone II's outlined over them, each as the engine
- * makes them: a saw's 1/n, rolled off by Character's one-pole (its corner 8 kHz .. 500 Hz, at the drone's pitch)
- * and the evens lifted by its bend (asym); a short tick where a clean saw's reach */
-static void lk_life_char(int32_t x0, int32_t top, int32_t bot)
-{
-    const float chr = (float)proj.par[P_CHAR] * 0.01f, asym = CHR_ASYM * chr, fc = 8000.0f * fm_exp2f(-CHR_K * chr);
-    const float hh = (float)(bot - top);
-    int g, n;
-    for (n = 1; n <= 9; n++)                   /* the clean saw's */
-        cv_rect(x0 + 6 * (n - 1), bot - (int32_t)(hh / (float)n), 6, 1, LK_LABEL);
-    for (g = 0; g < DR_NGROUPS; g++) {
-        const float f0 = 8.1757989f * fm_exp2f(dr_pitch[g] / 12.0f);
-        for (n = 1; n <= 9; n++) {
-            const float q = (float)n * f0 / fc;
-            float a = 1.0f / (float)n;
-            int32_t h;
-            if (!(n & 1))
-                a += 0.6f * asym / (float)n;
-            a /= fm_sqrtf(1.0f + q * q);
-            h = (int32_t)(hh * fm_minf(a, 1.0f));
-            if (h < 1)
-                continue;
-            if (g == 0)
-                cv_rect(x0 + 6 * (n - 1), bot - h, 4, h, lk_ramp(0, (float)(n - 1) / 8.0f));
-            else
-                lk_box(x0 + 6 * (n - 1) + 2, bot - h, 4, h, LK_DRONE[1]);
-        }
-    }
-}
-
 /* AGE: drone I's saw worn as heard (Age's 20 s wear-in, never the knob): its corners round off as the highs go, six
- * strands bending with the wow and fraying with the flutter, hiss specks coming in. Sharp and single at 0 */
+ * strands bending with the wow and fraying with the flutter (both drawn larger than heard, to be seen), hiss specks
+ * coming in, dimming as it darkens. Sharp, bright and single at 0 */
 static void lk_life_age(int32_t x0, int32_t cy, int32_t top, int32_t bot)
 {
     float ph;
-    const float a = dr_age_now(&ph), k = 1.0f - 0.85f * a, tw = 6.2831853f * ph;
+    const float a = dr_age_now(&ph), k = 1.0f - 0.75f * a, tw = 6.2831853f * ph;
     const int ns = a > 0.01f ? 6 : 1;
     int j, i;
     for (j = 0; j < ns; j++) {
-        const float fl = a * (0.7f * fm_sinf(tw * 5.7f + 1.3f * (float)j) + 0.3f * fm_sinf(tw * 8.9f + 2.9f * (float)j));
+        const float fl = a * (0.7f * fm_sinf(tw * 5.7f + 1.3f * (float)j) +
+                              0.3f * fm_sinf(tw * 8.9f + 2.9f * (float)j));
+        const uint16_t c = lk_ramp(LK_G, (1.0f - 0.7f * a) * (ns > 1 ? 0.4f + 0.6f * (float)j / 5.0f : 1.0f));
         float r = 0.0f;
         int32_t px = 0, py = 0;
-        for (i = -10; i <= 26; i++) {          /* two cycles over 52 px, 10 points to settle the rounding */
+        for (i = -10; i <= 26; i++) {
             const float x = (float)i / 13.0f;
-            float u = x + a * (0.12f / 14.0f * (float)AGE_WOW) * fm_sinf(tw * 0.21f + 0.9f * x) + 0.03f * fl, s;
+            float u = x + a * (0.24f / 14.0f * (float)AGE_WOW) * fm_sinf(tw * 0.21f + 0.9f * x) + 0.06f * fl, sv;
             u -= (float)(int)(u + 8.0f) - 8.0f;
-            s = 1.0f - 2.0f * u;
-            r += (s - r) * k;
+            sv = 1.0f - 2.0f * u;
+            r += (sv - r) * k;
             if (i >= 0) {
-                const int32_t xx = x0 + 2 * i, yy = cy - (int32_t)(r * 18.0f + 2.0f * fl);
-                if (i)
-                    cv_line(px, py, xx, yy, lk_ramp(LK_G, ns > 1 ? (float)j / 5.0f : 1.0f));
+                const int32_t xx = x0 + 2 * i, yy = cy - (int32_t)(r * 20.0f + 3.0f * fl);
+                if (i) {
+                    cv_line(px, py, xx, yy, c);
+                    cv_line(px, py + 1, xx, yy + 1, c);
+                }
                 px = xx;
                 py = yy;
             }
         }
     }
-    for (i = 0; i < (int)(a * 24.0f); i++) {   /* hiss */
+    for (i = 0; i < (int)(a * 30.0f); i++) {   /* hiss */
         const uint32_t hv = lk_rnd((uint32_t)i * 0x9E3779B9u ^ ui.frame / SCOPE_EVERY * 0x85EBCA6Bu);
         cv_rect(x0 + (int32_t)(hv % 52u), top + (int32_t)((hv >> 8) % (uint32_t)(bot - top)), 1, 1, LK_LABEL);
+    }
+}
+
+/* Character's saw at x (cycles), bowed as its asym bends it (the DC out, as the engine's) */
+static float lk_chr_saw(float x, float chr)
+{
+    float u = x - fm_floorf(x), sv = 1.0f - 2.0f * u;
+    return sv + 1.4f * CHR_ASYM * chr * (0.6666667f - sv * sv);
+}
+
+/* CHARACTER: ruler to hand (Evan, 2026-11-02). Each drone's wave, two cycles running: a crisp thin line at 0; at 100
+ * drawn by hand, thick and soft, its corners round and the stroke trembling with the jitter. Drone I's stroke filled,
+ * glowing (its ramp's pale end at the core, amber at the edges); drone II's outlined, in its own ramp */
+static void lk_life_char(int32_t x0, int32_t cy, int32_t top, int32_t bot)
+{
+    const float chr = (float)proj.par[P_CHAR] * 0.01f, k = 1.0f - 0.8f * chr, t = (float)plat_ms() * 0.001f;
+    const float amp = (float)(bot - top) * 0.36f;
+    int g, i, j;
+    for (g = 0; g < DR_NGROUPS; g++) {
+        float r = 0.0f;
+        int32_t py = 0, pw = 2;
+        for (i = -14; i < 52; i++) {
+            const float x = (float)i / 26.0f + t * (0.3f + 0.1f * (float)g) + 0.37f * (float)g;
+            const uint32_t hv = lk_rnd((uint32_t)(i + 64) * 0x9E3779B9u ^ (uint32_t)g ^
+                                       ui.frame / SCOPE_EVERY * 0x85EBCA6Bu);
+            const float tr = chr * 1.5f * ((float)(hv & 255u) / 127.5f - 1.0f);
+            const int32_t w = 2 + (int32_t)(chr * (6.0f + (float)((hv >> 8) & 1u)));   /* 2 px at 0, 8-9 at 100 */
+            r += (lk_chr_saw(x, chr) - r) * k;
+            if (i >= 0) {
+                const int32_t xx = x0 + i, yy = cy - (int32_t)(r * amp + tr);
+                if (g == 0) {
+                    for (j = 0; j < w; j++) {  /* the core pale, the edges amber */
+                        const float e = fm_fabsf((float)j - 0.5f * (float)(w - 1)) / (0.5f * (float)w);
+                        if (i)
+                            cv_line(xx - 1, py - pw / 2 + j * pw / w, xx, yy - w / 2 + j, lk_ramp(0, 1.0f - e));
+                    }
+                } else if (i) {
+                    if (w < 4) {               /* thin: one line */
+                        cv_line(xx - 1, py, xx, yy, lk_ramp(1, 0.75f));
+                        cv_line(xx - 1, py + 1, xx, yy + 1, lk_ramp(1, 0.75f));
+                    } else {                   /* thick: its stroke's two edges */
+                        cv_line(xx - 1, py - pw / 2, xx, yy - w / 2, lk_ramp(1, 0.6f));
+                        cv_line(xx - 1, py + pw / 2, xx, yy + w / 2, lk_ramp(1, 0.6f));
+                    }
+                }
+                py = yy;
+                pw = w;
+            }
+        }
     }
 }
 
@@ -656,7 +687,7 @@ static void lk_pic_life(void)
     const int32_t top = 6, bot = LK_PIC_H - 6, cy = (top + bot) / 2;
     lk_life_fb(8 + 28, cy);
     lk_life_drift(64 + 28, top, bot);
-    lk_life_char(120 + 1, top, bot);
+    lk_life_char(120 + 2, cy, top, bot);
     lk_life_age(176 + 2, cy, top, bot);
 }
 
@@ -670,8 +701,9 @@ static uint32_t lk_rnd(uint32_t x)            /* a well-mixed hash (the snow, th
     return x ^ x >> 16;
 }
 
-/* each drone's noise as TV snow, low to high: as high as its level (the top: noise at 100, as loud as the
- * oscillators), flat at White and falling 3 dB an octave at Pink (Colour blends them), then rolled off by the drone's
+/* each drone's noise as TV snow, low to high: as tall as it sounds loud (Evan, 2026-11-02: twice as tall for each
+ * 10 dB, so 10, 20 dB under, is a quarter up; the top: noise at 100, as loud as the oscillators), its low end there,
+ * then flat at White and falling 3 dB an octave at Pink (Colour blends them) over 36 dB, rolled off by the drone's
  * filter as heard; its edge drawn bright. Square specks, white or pink (pink as often as Colour says), at 60 %; each
  * changes about once in seven pictures, at its own time, so it shimmers without strobing (no buffer: from a hash) */
 static void lk_pic_tone(void)
@@ -684,13 +716,13 @@ static void lk_pic_tone(void)
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 128 : 8;
         const int nv = gpar(g, GP_NOISE), cv = gpar(g, GP_NCOLOR);
-        const float slope = -3.0f * (float)cv * 0.01f, share = 6.0206f * fm_log2f(fm_maxf((float)nv * 0.01f, 1e-3f));
+                const float slope = -3.0f * (float)cv * 0.01f, lv = fm_powf((float)nv * 0.01f, 0.60206f);
         int32_t px = 0, py = 0;
         if (nv > 0)
             for (c = 0; c < 35; c++) {         /* 35 columns of 3 px */
                 const float f = 100.0f * (float)c / 34.0f;
-                const float db = share + slope * (f * 0.0981378f - 2.3219281f) + filt_db(g, dr_cut[g], f);
-                const int32_t edge = base - (int32_t)((float)hh * fm_clampf((db + 36.0f) / 36.0f, 0.0f, 1.0f));
+                const float db = slope * f * 0.0981378f + filt_db(g, dr_cut[g], f);   /* 0 at the low end */
+                const int32_t edge = base - (int32_t)((float)hh * lv * fm_clampf((db + 36.0f) / 36.0f, 0.0f, 1.0f));
                 const int32_t x = x0 + 1 + 3 * c;
                 int32_t y;
                 for (y = base - 2; y >= edge; y -= 3) {
