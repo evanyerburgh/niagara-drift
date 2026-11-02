@@ -1206,8 +1206,9 @@ static int lk_wave_on(int route, int w)        /* a route (DR_LFO_*) takes wave 
  * its key picks (both: two links); a row at 0, or fed only by an Off wave, gray with its link (the spec, 2026-10-31) */
 static void lk_pic_lfo(void)
 {
-    const int clock = dr_ext_spb > 0.0f, lock = proj.par[P_LFO_LOCK] != 0, moved = proj.par[P_MOVE] != 50;
-    const int nl = 1 + moved + lock;
+    const int clock = dr_ext_spb > 0.0f, lock = proj.par[P_LFO_LOCK] != 0;
+    const int nl = 2 + lock;                   /* the rate, the Movement (always, 100 % too: coming and going it moved
+                                                * the page; Evan, 2026-11-02), the lock */
     const int32_t lh = (int32_t)LK_F_SMALL.h - 3, tb = LK_PIC_H - 1 - nl * lh, wh = tb / 2;
     int32_t wy[2];
     int w, d;
@@ -1224,16 +1225,16 @@ static void lk_pic_lfo(void)
     q = scopy(t, clock ? "cycle " : "rate ");
     dr_param_text(clock ? P_LFO_DIV : P_LFO_RATE, proj.par[clock ? P_LFO_DIV : P_LFO_RATE], q);
     cv_text(8, tb, &LK_F_SMALL, t, LK_INK);
-    if (moved) {
+    {
         q = scopy(t, "movement ");
         itoa_u((uint32_t)proj.par[P_MOVE] * 2u, q);
         while (*q)
             q++;
         scopy(q, "%");
-        cv_text(8, tb + lh, &LK_F_SMALL, t, LK_VIOLET);
+        cv_text(8, tb + lh, &LK_F_SMALL, t, proj.par[P_MOVE] != 50 ? LK_VIOLET : LK_LABEL);   /* as set: gray */
     }
     if (lock)
-        cv_text(8, tb + lh * (1 + moved), &LK_F_SMALL, proj.par[P_PULSE] ? "restarts with Swell" : "lock waits for Swell",
+        cv_text(8, tb + lh * 2, &LK_F_SMALL, proj.par[P_PULSE] ? "restarts with Swell" : "lock waits for Swell",
                 LK_CORAL);
     for (d = 0; d < 5; d++) {                  /* the rows: I pitch, I cutoff, II pitch, II cutoff, delay */
         const int g = d / 2, osc = d % 2 == 0;
