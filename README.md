@@ -2,7 +2,7 @@
 
 **A drone synth for the M-VAVE FM-1.**
 
-> **This is the manual for 0.2.** For 0.1 beta, see
+> **This is the manual for 0.2.1.** For 0.1 beta, see
 > [the README of 0.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.1-beta/README.md).
 
 Niagara Drift is open-source firmware that turns the M-VAVE
