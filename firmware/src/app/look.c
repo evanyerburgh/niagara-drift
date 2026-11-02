@@ -862,6 +862,16 @@ static void lk_xfader(int32_t cx, int32_t y, float frac, int g)   /* Osc/Sub: th
     cv_rect(m - 1, y - 2, 2, 9, LK_WHITE);
 }
 
+static void lk_xfade_col(int32_t cx, int32_t y, float frac)   /* Tone's Colour, as lk_xfader: pink as far as it
+                                                                 * goes, white after it, a white mark */
+{
+    const int32_t x0 = cx - 25, w = 50, m = x0 + (int32_t)(fm_clampf(frac, 0.0f, 1.0f) * (float)w);
+    cv_rect(x0, y + 1, w, 3, lk_mix(0x07060Bu, 0xFFFFFFu, 0.6f));
+    if (m > x0)
+        cv_rect(x0, y + 1, m - x0, 3, lk_mix(0x07060Bu, LK_PINK, 1.0f));
+    cv_rect(m - 1, y - 2, 2, 9, LK_WHITE);
+}
+
 static void lk_one_of(int32_t cx, int32_t y, int n, int at, int g)   /* one of n segments, the chosen one lit */
 {
     const int32_t sw = (50 - 2 * (n - 1)) / n;
@@ -1001,9 +1011,10 @@ static void lk_values(void)
         {   /* the meter, the page's kind */
             const int gp = p < P_XMOD ? p % GP_N : -1;
             const float frac = hi > lo ? (float)(v - lo) / (float)(hi - lo) : 0.0f;
-            if (ui.view == V_LIFE || ui.view == V_TONE)   /* ENV's square cells: Colour white to pink */
-                lk_cells(cx, 70, frac, gp == GP_NCOLOR ? 0xFFFFFFu : LK_RAMP[g][0],
-                         gp == GP_NCOLOR ? LK_PINK : LK_RAMP[g][1], p == P_FEEDBACK);
+            if (gp == GP_NCOLOR && ui.view == V_TONE)   /* a crossfade, white to pink (Evan, 2026-11-02) */
+                lk_xfade_col(cx, 70, frac);
+            else if (ui.view == V_LIFE || ui.view == V_TONE)   /* ENV's square cells */
+                lk_cells(cx, 70, frac, LK_RAMP[g][0], LK_RAMP[g][1], p == P_FEEDBACK);
             else if (second)
                 lk_one_of(cx, 70, DR_NSUBW, v, g);
             else if (gp == GP_MIX)
