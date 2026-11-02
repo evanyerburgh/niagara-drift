@@ -75,6 +75,22 @@ input[type=file] { font: inherit; font-size: .9rem; color: var(--muted); max-wid
     </ol>
     <p><button id="stockgo" disabled data-t="stockinstall"></button></p>
   </div>
+  <div class="card" id="trouble">
+    <h2 data-t="trubh"></h2>
+    <p class="small" data-t="trubwhy"></p>
+    <ol class="small">
+      <li><span data-t="trub1"></span> <a href="https://github.com/jvitkauskas/m-flasher/releases/latest" target="_blank" rel="noopener">M-Flasher</a>
+        <span data-t="trub1b"></span></li>
+      <li data-t="trub2"></li>
+      <li data-t="trub3"></li>
+      <li><span data-t="trub4"></span> <a href="https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc">FM-1.fwsc</a>
+        <span data-t="trub4b"></span></li>
+      <li data-t="trub5"></li>
+      <li data-t="trub6"></li>
+    </ol>
+    <p class="small"><span data-t="trubmore"></span>
+      <a href="https://github.com/jvitkauskas/m-flasher/blob/main/docs/usage.md" target="_blank" rel="noopener" data-t="trubmorelink"></a></p>
+  </div>
   <p class="foot">Niagara Drift is free, open-source firmware (GPL-3.0, no warranty), not made or endorsed by M-VAVE. This installer
     is Felucca's, by Leo Kuroshita (<a href="https://hugelton.com" target="_blank" rel="noopener">Hügelton Instruments</a>), by way of
     X0X and FoMni by Charles Vestal. M-VAVE and FM-1 are trademarks of their owners.
@@ -108,10 +124,22 @@ const TEXT = {
     stockbad: "That isn't M-VAVE's FM-1 V16 or V15 file. Choose a file from the links above.",
     stockhead: "Nothing was written. The FM-1 takes back only the version whose bootloader it already has: choose the other file (V16 or V15) and press the button again.",
     stockdone: "Done. The FM-1 has restarted with M-VAVE's firmware.",
+    trubh: "Trouble installing?",
+    trubwhy: "If nothing here reaches the FM-1 (a newer FM-1 running Niagara Drift 0.2 ignores every install), M-Flasher, a free app by Julius Vitkauskas, puts M-VAVE's firmware back from outside. It takes about ten minutes, once; then this page works again.",
+    trub1: "Download",
+    trub1b: "for your computer: on a Mac the .dmg, on Windows the .zip.",
+    trub2: "Open it. It isn't signed, so the first time your computer warns you. On Windows: \"More info\", then \"Run anyway\". On a Mac: System Settings → Privacy & Security → \"Open Anyway\". It asks for your password: it needs it to reach the FM-1.",
+    trub3: "Connect the FM-1 with a USB data cable, straight into the computer. M-Flasher finds it: press DOWNLOAD MODE.",
+    trub4: "Choose M-VAVE's",
+    trub4b: "(V16) and press REVIEW & FLASH. It backs up the whole FM-1 before it writes anything.",
+    trub5: "When it's done, unplug the FM-1 and switch it off and on: it starts with M-VAVE's firmware.",
+    trub6: "Come back to this page and press Install.",
+    trubmore: "More on each step:",
+    trubmorelink: "M-Flasher's guide",
     stockfirst: "First, Niagara Drift is updated to {ND}, which takes back either M-VAVE version. Then M-VAVE's firmware: ",
     nomidi: "This browser can't do it. Open the page in Chrome or Edge.", loadfail: "Couldn't load the firmware: ",
     start: "Starting", verify: "Checking", loader: "Switching to update mode", write: "Writing",
-    reboot: "Restarting", done: "Done: the FM-1 runs Niagara Drift. Press PLAY.", stopped: "Stopped. Replug the USB cable and press Install again.",
+    reboot: "Restarting", done: "Done: the FM-1 runs Niagara Drift. Press PLAY.", stopped: "Stopped. Replug the USB cable and press Install again. If it stops again, see \"Trouble installing?\" below.",
     error: "Error: ",
     denied: "MIDI access wasn't allowed. Allow MIDI in the site settings (the address bar) and press Install again.",
     notfound: "No FM-1 found. Check the cable is a data cable, straight into the computer, close other apps that use MIDI, and press Install again.",
@@ -125,8 +153,8 @@ const TEXT = {
   },
 };
 const lang = "en";
-let stockV = "";                                   /* the stock version chosen: {V} in the texts */
-const t = (k) => (TEXT[lang][k] || "").replace("{V}", stockV).replace("{ND}", meta.version);
+let stockV = "", ndV = "";                         /* the stock version chosen, this page's Niagara Drift: {V}, {ND} */
+const t = (k) => (TEXT[lang][k] || "").replace("{V}", stockV).replace("{ND}", ndV);
 let lastKey = null, lastArg = "";
 function applyLang() {
   document.documentElement.lang = lang;
@@ -139,6 +167,7 @@ const say = (txt) => { lastKey = null; $("status").textContent = txt; };
 const log = (t) => { $("log").textContent += t + "\n"; };
 let image = null;
 const meta = /*META*/;
+ndV = meta.version;
 
 let writing = false;
 window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault(); e.returnValue = t("leave"); } });
