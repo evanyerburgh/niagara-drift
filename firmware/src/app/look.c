@@ -1148,20 +1148,6 @@ static void lk_pic_moves(void)
 static void lk_swing(char *q, float x, const char *unit);
 static const uint32_t LK_LFO_TINT[2] = {0xA98BFFu, 0xFF5FD2u};   /* LFO I lilac (OCT-), LFO II pink (OCT+) */
 
-/* a send's slider (its knob, -100..100, or 0..100 one-sided): a thin track the same length on every row, the centre
- * tick behind the fill, the fill from the centre in the row's color, a white mark at the value */
-static void lk_slider(int32_t x0, int32_t y, int v, int one_sided, uint16_t c)
-{
-    const int32_t w = 48, cx = one_sided ? x0 : x0 + w / 2;
-    const int32_t m = one_sided ? x0 + v * w / 100 : cx + v * (w / 2) / 100;
-    cv_rect(x0, y, w + 1, 1, LK_UNLIT);
-    if (!one_sided)
-        cv_rect(cx, y - 2, 1, 5, LK_LABEL);
-    if (m != cx)
-        cv_rect(m > cx ? cx : m, y - 1, m > cx ? m - cx : cx - m, 3, c);
-    cv_rect(m - 1, y - 3, 2, 7, v ? LK_WHITE : LK_LABEL);
-}
-
 /* a horizontal arrow, 2 px (the fonts have none) */
 static void lk_harrow(int32_t x, int32_t y, int32_t w, int right, uint16_t c)
 {
@@ -1348,7 +1334,6 @@ static void lk_pic_mods(void)
         x = cv_text(x + 4, hb - LK_B(LK_F_TAG), &LK_F_TAG, DOES[(unsigned)xm < 4u ? xm : 0], LK_LABEL);
         lk_key(x + 4, hb, LK_BKEY[10]);
         cv_text(8, 90, &LK_F_TAG, "drone I", ci);
-        cv_text(84, 90, &LK_F_TAG, "amount", on ? LK_INK : LK_LABEL);
         cv_text(144, 90, &LK_F_TAG, xm == DR_XMOD_CUT ? "drone II cutoff" : "drone II", cii);
         for (g = 0; g < 2; g++) {              /* each drone's sound now, small, scaled to its own peak */
             float m = 0.05f;
@@ -1358,15 +1343,12 @@ static void lk_pic_mods(void)
                 y[i] = (int16_t)(116 - (int32_t)(dr_scope[g][i * DR_SCOPE_N / 34] / m * 5.0f));
             lk_plot(g ? 166 : 8, y, g ? 34 : 30, g ? cii : ci);
         }
-        lk_slider(86, 115, amt, 1, on ? LK_NEUTRAL : LK_UNLIT);
-        if (xm >= DR_XMOD_FM) {                /* both drones bent: both ways */
-            lk_harrow(68, 110, 12, 1, ci);
-            lk_harrow(68, 119, 12, 0, cii);
-            lk_harrow(142, 110, 16, 1, ci);
-            lk_harrow(142, 119, 16, 0, cii);
+        if (xm >= DR_XMOD_FM) {                /* drone I to drone II, both ways when both are bent; no amount bar,
+                                                * X-mod's value says it (Evan, 2026-11-02) */
+            lk_harrow(70, 110, 88, 1, ci);
+            lk_harrow(70, 119, 88, 0, cii);
         } else {
-            lk_harrow(68, 115, 12, 1, ci);
-            lk_harrow(142, 115, 16, 1, on ? LK_INK : LK_LABEL);
+            lk_harrow(70, 115, 88, 1, ci);
         }
     }
 }
