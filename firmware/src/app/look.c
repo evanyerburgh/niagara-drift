@@ -365,6 +365,18 @@ static void lk_interval(char *t, int c)
 static int8_t lk_hist[DR_NGROUPS][LK_STRANDS][DR_SCOPE_N];
 static float lk_peak[DR_NGROUPS];
 
+/* how a drone's strands follow the level heard (dr_level, so a gesture's or a scene's level moves count), as Sub ·
+ * Drive's lanes do (Evan, 2026-11-02): over -48..0 dB, dimming toward silence with most of the change near it,
+ * closing up below about -34 dB; silent (under -48 dB): one thin gray line. Returns 0 when silent */
+static int lk_heard(int g, float *bright, float *close)
+{
+    const float l = dr_level[g], db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
+    const float lf = fm_clampf((db + 48.0f) / 48.0f, 0.0f, 1.0f), d = 1.0f - lf;
+    *bright = 0.35f + 0.65f * (1.0f - d * d * d);
+    *close = fm_minf(1.0f, lf / 0.3f);
+    return lf > 0.0f;
+}
+
 static void lk_pic_drones1(void)
 {
     const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 2, bot = LK_PIC_H - 2, mid = (top + bot) / 2, half = (bot - top) / 2;
@@ -383,11 +395,20 @@ static void lk_pic_drones1(void)
             sc_disp[g][i] += (dr_scope[g][i] - sc_disp[g][i]) * 0.45f;
             lk_hist[g][LK_STRANDS - 1][i] = (int8_t)fm_clampf(sc_disp[g][i] * k, (float)-half, (float)half);
         }
-        for (j = 0; j < LK_STRANDS; j++) {     /* the oldest first, deep; the newest last, light */
-            const uint16_t c = lk_ramp(g, (float)j / (float)(LK_STRANDS - 1));
-            for (i = 1; i < DR_SCOPE_N; i++) {
-                cv_line(x0 + i - 1, mid - lk_hist[g][j][i - 1], x0 + i, mid - lk_hist[g][j][i], c);
-                cv_line(x0 + i - 1, mid + 1 - lk_hist[g][j][i - 1], x0 + i, mid + 1 - lk_hist[g][j][i], c);
+        {   /* scaled to its own loudness, but as quiet as it is heard near silence: smaller and dimmer, then a
+             * thin gray line */
+            float br, cl;
+            if (!lk_heard(g, &br, &cl)) {
+                cv_rect(x0, mid, DR_SCOPE_N, 1, LK_UNLIT);
+                continue;
+            }
+            for (j = 0; j < LK_STRANDS; j++) { /* the oldest first, deep; the newest last, light */
+                const uint16_t c = lk_mix(0x07060Bu, lk_ramp888(g, (float)j / (float)(LK_STRANDS - 1)), br);
+                for (i = 1; i < DR_SCOPE_N; i++) {
+                    const int32_t a = (int32_t)((float)lk_hist[g][j][i - 1] * cl), b = (int32_t)((float)lk_hist[g][j][i] * cl);
+                    cv_line(x0 + i - 1, mid - a, x0 + i, mid - b, c);
+                    cv_line(x0 + i - 1, mid + 1 - a, x0 + i, mid + 1 - b, c);
+                }
             }
         }
     }
@@ -428,15 +449,23 @@ static void lk_pic_drones2(void)
         for (j = 0; j < LK_STRANDS - 1; j++)
             lk_cut_hist[g][j] = lk_cut_hist[g][j + 1];
         lk_cut_hist[g][LK_STRANDS - 1] = dr_cut[g];
-        for (j = 1; j < LK_STRANDS; j++) {     /* five (Evan, 2026-11-02: one fewer, the same ramp): the oldest
-                                                * first, deep; the newest last, light */
-            int16_t y[51];
-            for (i = 0; i <= 50; i++) {
-                const float d = filt_db(g, lk_cut_hist[g][j], 100.0f * (float)i / 50.0f);
-                y[i] = (int16_t)(bot - LK_BDY * j -
-                                 (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f * (float)(h - 5 * LK_BDY) * lf));
-            }
-            lk_plot(x0, y, 51, lk_ramp(g, (float)(j - 1) / (float)(LK_STRANDS - 2)));
+        {
+            float br, cl;
+            if (!lk_heard(g, &br, &cl))        /* silent: one thin gray line */
+                cv_rect(x0, bot - LK_BDY, 101, 1, LK_UNLIT);
+            else
+                for (j = 1; j < LK_STRANDS; j++) {   /* five (Evan, 2026-11-02: one fewer, the same ramp), closing
+                                                      * up and dimming near silence: the oldest first, deep; the
+                                                      * newest last, light */
+                    int16_t y[51];
+                    const int32_t oy = (int32_t)((float)(LK_BDY * j) * cl + (float)LK_BDY * (1.0f - cl) + 0.5f);
+                    for (i = 0; i <= 50; i++) {
+                        const float d = filt_db(g, lk_cut_hist[g][j], 100.0f * (float)i / 50.0f);
+                        y[i] = (int16_t)(bot - oy - (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f *
+                                                              (float)(h - 5 * LK_BDY) * lf));
+                    }
+                    lk_plot(x0, y, 51, lk_mix(0x07060Bu, lk_ramp888(g, (float)(j - 1) / (float)(LK_STRANDS - 2)), br));
+                }
         }
         if (db > -60.0f) {                     /* "-10 dB" */
             char *q = t;
