@@ -395,34 +395,28 @@ static void lk_pic_drones2(void)
 }
 
 /* ----------------------------------------------------- Osc's picture --- */
-/* each drone's wave as six strands, each 1 px lower and a touch later: X-Wave morphs it sine, triangle, saw, square;
- * Width changes it only near square, as it does the sound. Two-thirds of the picture's height (Evan, 2026-11-02) */
+/* each drone's wave, one 2 px line in its colour (Evan, 2026-11-02: strands are for what moves; here they read as a
+ * lo-fi band): X-Wave morphs it sine, triangle, saw, square; Width changes it only near square, as it does the sound.
+ * About a third of the picture's height: lower than before, not filling it (Evan, 2026-11-02) */
 static const char *lk_unheard(int p);
 
 static void lk_pic_osc(void)
 {
     const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 4, half = (LK_PIC_H - top - 16) / 2;
-    int g, j, i;
+    int g, i;
     lk_halves();
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 130 : 10;
         const int x = gpar(g, GP_WAVE);
         const float pw = pw_of(g);
-        for (j = 0; j < LK_STRANDS; j++) {
-            const int32_t yc = top + half + (LK_STRANDS - 1 - j) - 2;
-            const float ph0 = 0.005f * (float)(LK_STRANDS - 1 - j);
-            int16_t y[51];
-            for (i = 0; i <= 50; i++) {
-                float ph = ph0 + 2.0f * (float)i / 50.0f;
-                ph -= (float)(int)ph;
-                y[i] = (int16_t)(yc - (int32_t)(xwave_at(x, pw, ph) * (float)half * 0.6f));
-            }
-            if (j == LK_STRANDS - 1)           /* the newest 2 px, the older ones a line each: strands, not a band */
-                lk_plot(x0, y, 51, lk_ramp(g, 1.0f));
-            else
-                for (i = 1; i <= 50; i++)
-                    cv_line(x0 + 2 * (i - 1), y[i - 1], x0 + 2 * i, y[i], lk_ramp(g, (float)j / (float)(LK_STRANDS - 1)));
+        int16_t y[51];
+        for (i = 0; i <= 50; i++) {
+            float ph = 2.0f * (float)i / 50.0f;
+            ph -= (float)(int)ph;
+            y[i] = (int16_t)(top + half - (int32_t)(xwave_at(x, pw, ph) * (float)half * 0.4f));
         }
+        lk_plot(x0, y, 51, LK_DRONE[g]);
+        lk_plot(x0 + 1, y, 51, LK_DRONE[g]);
     }
     for (i = 0; i < 4; i++) {                  /* Width without a square in the wave: why, above it */
         const int p = knob_param(i);
