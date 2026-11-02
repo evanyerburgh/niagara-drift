@@ -238,6 +238,21 @@ static void lk_sel_tag(int col, const char *job, int held)
     cv_text(x + tw + 3, ty + LK_B(LK_F_SEL) + 1 - LK_B(LK_F_SMALL), &LK_F_SMALL, job, LK_INK);
 }
 
+/* why a knob does nothing heard ("needs sqr"), grey on the rule above its name, in its drone's half (Evan,
+ * 2026-11-02: clear of the meters; its value and meter grey too) */
+static void lk_why_tag(int col, const char *why)
+{
+    const int32_t w = text_w(&LK_F_SMALL, why), ty = LK_PIC_H - (int32_t)LK_F_SMALL.h - 1, cx = 8 + 56 * col + 28;
+    const int32_t lo = col < 2 ? 8 : 122, hi = col < 2 ? 118 : 232;
+    int32_t x = cx - w / 2;
+    if (x + w > hi)
+        x = hi - w;
+    if (x < lo)
+        x = lo;
+    cv_rect(x - 3, ty, w + 6, LK_PIC_H - ty, LK_BG);
+    cv_text(x, ty, &LK_F_SMALL, why, LK_LABEL);
+}
+
 /* an up or down arrow, 2 px, its foot on the baseline (the fonts have none) */
 static void lk_arrow(int32_t x, int32_t base, int32_t h, int up, uint16_t c)
 {
@@ -380,8 +395,10 @@ static void lk_pic_drones2(void)
 }
 
 /* ----------------------------------------------------- Osc's picture --- */
-/* each drone's wave as six offset strands, each a little lower and a touch later: X-Wave morphs it sine, triangle,
- * saw, square; PW changes it only near square, as it does the sound */
+/* each drone's wave as six strands, each 1 px lower and a touch later: X-Wave morphs it sine, triangle, saw, square;
+ * Width changes it only near square, as it does the sound. Two-thirds of the picture's height (Evan, 2026-11-02) */
+static const char *lk_unheard(int p);
+
 static void lk_pic_osc(void)
 {
     const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 4, half = (LK_PIC_H - top - 16) / 2;
@@ -392,13 +409,13 @@ static void lk_pic_osc(void)
         const int x = gpar(g, GP_WAVE);
         const float pw = pw_of(g);
         for (j = 0; j < LK_STRANDS; j++) {
-            const int32_t yc = top + half + 2 * (LK_STRANDS - 1 - j);
-            const float ph0 = 0.012f * (float)(LK_STRANDS - 1 - j);
+            const int32_t yc = top + half + (LK_STRANDS - 1 - j) - 2;
+            const float ph0 = 0.005f * (float)(LK_STRANDS - 1 - j);
             int16_t y[51];
             for (i = 0; i <= 50; i++) {
                 float ph = ph0 + 2.0f * (float)i / 50.0f;
                 ph -= (float)(int)ph;
-                y[i] = (int16_t)(yc - (int32_t)(xwave_at(x, pw, ph) * (float)half * 0.9f));
+                y[i] = (int16_t)(yc - (int32_t)(xwave_at(x, pw, ph) * (float)half * 0.6f));
             }
             if (j == LK_STRANDS - 1)           /* the newest 2 px, the older ones a line each: strands, not a band */
                 lk_plot(x0, y, 51, lk_ramp(g, 1.0f));
@@ -407,13 +424,19 @@ static void lk_pic_osc(void)
                     cv_line(x0 + 2 * (i - 1), y[i - 1], x0 + 2 * i, y[i], lk_ramp(g, (float)j / (float)(LK_STRANDS - 1)));
         }
     }
+    for (i = 0; i < 4; i++) {                  /* Width without a square in the wave: why, above it */
+        const int p = knob_param(i);
+        const char *why = p < 0 || (ui.btn >> B_SEL & 1u) ? 0 : lk_unheard(p);
+        if (why)
+            lk_why_tag(i, why);
+    }
 }
 
 /* ------------------------------------------------ Sub · Drive's picture --- */
 /* two lanes a drone, like two mixer channels: "osc" the oscillators' wave, "sub" the sub's (the wave SEL + Osc/Sub
  * picks), each as large as its share of the equal-power crossfade (the engine's sqrt(1 - mix), sqrt(mix)), then the
  * drive's soft clip as the engine's (drv = 0.5 * 2^(drive / 20), tanh(drv x) / tanh(drv)): the peaks stay, the shape
- * fattens. Six strands, a touch later each */
+ * fattens. One line a lane, 2 px across its edges too (Evan, 2026-11-02: the drawings are small) */
 static float lk_sub_at(int w, float ph)        /* the sub's waves: Square, Sine, Triangle, Saw */
 {
     switch (w) {
@@ -427,8 +450,8 @@ static float lk_sub_at(int w, float ph)        /* the sub's waves: Square, Sine,
 static void lk_pic_source(void)
 {
     const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 2, bot = LK_PIC_H - (int32_t)LK_F_SEL.h - 6;   /* over the tags */
-    const int32_t lane = (bot - top) / 2, amp = lane / 2 - 2;
-    int g, j, i, k;
+    const int32_t lane = (bot - top) / 2, amp = lane / 4;   /* half its lane (Evan, 2026-11-02) */
+    int g, i, k;
     lk_halves();
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 130 : 10;
@@ -439,16 +462,16 @@ static void lk_pic_source(void)
         for (k = 0; k < 2; k++) {              /* osc above, sub below */
             const int32_t yc = top + lane * k + lane / 2;
             cv_text(x0, yc - (int32_t)LK_F_TAG.h / 2, &LK_F_TAG, k ? "sub" : "osc", LK_LABEL);
-            for (j = 0; j < LK_STRANDS; j++) {  /* the wave after its lane's name */
-                const float ph0 = 0.012f * (float)(LK_STRANDS - 1 - j);
+            {                                  /* the wave after its lane's name */
                 int16_t y[37];
                 for (i = 0; i <= 36; i++) {
-                    float ph = ph0 + 2.0f * (float)i / 36.0f, v;
+                    float ph = 2.0f * (float)i / 36.0f, v;
                     ph -= (float)(int)ph;
                     v = share[k] * (k ? lk_sub_at(sw, ph) : xwave_at(x, pw, ph));
                     y[i] = (int16_t)(yc - (int32_t)(fm_tanhf(drv * v) / td * (float)amp));
                 }
-                lk_plot(x0 + 28, y, 37, lk_ramp(g, (float)j / (float)(LK_STRANDS - 1)));
+                lk_plot(x0 + 28, y, 37, LK_DRONE[g]);
+                lk_plot(x0 + 29, y, 37, LK_DRONE[g]);
             }
         }
     }
@@ -566,11 +589,11 @@ static void lk_text(int p, int v, char *t)
     }
 }
 
-/* a knob that does nothing heard just now, and why: PW without a square in the wave */
+/* a knob that does nothing heard just now, and why: Width (the pulse width) without a square in the wave */
 static const char *lk_unheard(int p)
 {
     if (p < P_XMOD && p % GP_N == GP_WIDTH && gpar(p / GP_N, GP_WAVE) < 70)
-        return "at square";
+        return "needs sqr";
     return 0;
 }
 
@@ -651,7 +674,7 @@ static void lk_values(void)
                                                                  * edges (a note and its cents, "Ab3 +17"); else 16 */
                     break;
             }
-            y = 9 + (int32_t)FONT_T20.h + (62 - (int32_t)FONT_T20.h - (int32_t)fb->h) / 2 - (why ? 6 : 0);
+            y = 9 + (int32_t)FONT_T20.h + (62 - (int32_t)FONT_T20.h - (int32_t)fb->h) / 2;
             cv_text(cx - (wb + ws) / 2, y, fb, big, why ? LK_LABEL : LK_WHITE);
             if (ws)
                 cv_text(cx - (wb + ws) / 2 + wb + sep, y + (int32_t)(fb->h - fs->h) - 2, fs, unit,
@@ -660,9 +683,7 @@ static void lk_values(void)
         {   /* the meter, the page's kind */
             const int gp = p < P_XMOD ? p % GP_N : -1;
             const float frac = hi > lo ? (float)(v - lo) / (float)(hi - lo) : 0.0f;
-            if (why)                           /* nothing heard: why, in the meter's place */
-                text_c(cx, 64, &FONT_Q17, why, LK_LABEL);
-            else if (second)
+            if (second)
                 lk_one_of(cx, 70, DR_NSUBW, v, g);
             else if (gp == GP_MIX)
                 lk_xfader(cx, 70, frac, g);
@@ -670,7 +691,7 @@ static void lk_values(void)
                 lk_stripes(cx, 64, frac, g, 0);
                 lk_ticks4(cx, 77);
             } else if (gp == GP_WIDTH || gp == GP_DRIVE)
-                lk_stripes(cx, 66, frac, g, 0);
+                lk_stripes(cx, 66, frac, g, why != 0);   /* grey with its value when unheard */
             else
                 lk_dots(cx, 70, frac, g, gp == GP_RESO);
         }

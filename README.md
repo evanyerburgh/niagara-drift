@@ -272,12 +272,12 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Osc | I X-Wave | I PW (pulse width) | II X-Wave | II PW |
+| Osc | I X-Wave | I Width (pulse width) | II X-Wave | II Width |
 | Sub · Drive | I osc/sub (+ SEL: sub wave) | I drive | II osc/sub (+ SEL: sub wave) | II drive |
 
-- **X-Wave** blends sine → triangle → saw → square; **PW** is the square's pulse width. The sine and the triangle are a
+- **X-Wave** blends sine → triangle → saw → square; **Width** is the square's pulse width. The sine and the triangle are a
   little louder than the saw, so they still carry on a small speaker, and the square a little quieter, level with the
-  saw there. Without a square in the wave, PW does nothing: its value goes grey, "at square" under it.
+  saw there. Without a square in the wave, Width does nothing: its value and meter go grey, "needs sqr" above it.
 - **Osc/Sub** crossfades the oscillators with the sub (the knob reads "Osc/Sb"); **drive** pushes each drone into its filter.
   The picture shows each drone's two lanes, **osc** and **sub**, each as loud as its share of the crossfade, shaped by
   the drive.

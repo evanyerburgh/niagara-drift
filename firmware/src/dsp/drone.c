@@ -23,7 +23,7 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
 
 /* ------------------------------------------------------------ parameters --- */
 #define VOICE_PARAMS(pitch, wave, ival, mix, cut, level, olfo, flfo, fdep)                                           \
-    {"Pitch", DR_PITCH_LO, DR_PITCH_HI, pitch}, {"X-Wave", 0, 100, wave}, {"PW", 0, 100, 30},               \
+    {"Pitch", DR_PITCH_LO, DR_PITCH_HI, pitch}, {"X-Wave", 0, 100, wave}, {"Width", 0, 100, 30},               \
         {"Interval", 0, DR_NINTERVALS - 1, ival}, {"Detune", 0, 100, 12}, {"Osc/Sub", 0, 100, mix},            \
         {"Sub oct", 1, 6, 1}, {"Cutoff", 0, 1000, cut}, {"Reso", 0, 1000, 250}, {"Mode", DR_LP, DR_HP, DR_LP},    \
         {"Drive", 0, 100, 20}, {"Level", 0, 100, level}, {"Partner", 0, 1, 1},                                 \
