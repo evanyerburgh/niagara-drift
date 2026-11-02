@@ -1652,7 +1652,9 @@ static void lk_values(void)
         {   /* the meter, the page's kind */
             const int gp = p < P_XMOD ? p % GP_N : -1;
             const float frac = hi > lo ? (float)(v - lo) / (float)(hi - lo) : 0.0f;
-            if (ui.view == V_PARTNER || ui.view == V_MOVES)   /* SEQ's rulers; Shift's from the middle */
+            if (p == P_WSCALE)                 /* Scale's dots, one-word names too (Evan: Dorian had a ruler) */
+                lk_one_of_dots(cx, 72, hi - lo + 1, v - lo, g);
+            else if (ui.view == V_PARTNER || ui.view == V_MOVES)   /* SEQ's rulers; Shift's from the middle */
                 lk_ruler(cx, 70, frac, g, p == P_SHIFT_MOVE);
             else if (gp == GP_NCOLOR && ui.view == V_TONE)   /* a crossfade, white to pink (Evan, 2026-11-02) */
                 lk_xfade_col(cx, 70, frac);
