@@ -606,6 +606,9 @@ static void sw_flip(sw_t w)
     case S_DTAP: param_set(tp, nx); q = a; what = "DELAY LFO"; st = WAVES[nx]; break;
     default: return;
     }
+    if ((w.s == S_PARTNER && ui.view == V_PARTNER) || (w.s == S_SUBOCT && ui.view == V_SOURCE))
+        return;                                /* the page shows it and its key at the top: no banner (Evan,
+                                                * 2026-11-02) */
     scopy(q, what);
     say_c(a, st, w.s == S_LFORESET || w.s == S_DTAP ? RGB(183, 145, 255) : w.g ? RGB(69, 227, 211) : RGB(255, 176, 74));
     if (next)
