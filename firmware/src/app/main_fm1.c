@@ -220,8 +220,8 @@ static void safe_main(void)
         ota_service();
         if (usb.ota_req) {
             usb.ota_req = 0;
-            if (flash_ok)
-                ota_session();                      /* an install commits and resets; else back here */
+            ota_session();                          /* an install commits and resets; else back here (whatever
+                                                     * the flash: ota.c checks every write, commits only on success) */
         }
         if (usb.uboot_req)
             enter_uboot("UBOOT (USB)");
@@ -302,7 +302,7 @@ static void fm1_main(void)
     uint32_t last_frame = 0;
     {
         uint32_t f = irq_save();
-        flash_ok = FL_FAR(fl_jedec_ram)() == 0x856014u;   /* the expected 1 MiB part, else RAM only */
+        flash_ok = (uint8_t)fl_id_ok(FL_FAR(fl_jedec_ram)());   /* a standard NOR part, else RAM only */
         irq_restore(f);
         if (flash_ok)
             ota_boot_cleanup();
@@ -399,8 +399,8 @@ static void fm1_main(void)
             usb.ota_req = 0;
             dr_play(0);
             dr_panic();
-            if (flash_ok)
-                ota_session();                      /* returns only if nothing was committed */
+            ota_session();                          /* returns only if nothing was committed; an unknown flash
+                                                     * too, so an FM-1 can always leave (ota.c checks every write) */
             ui_init();
         }
         if (usb.uboot_req)

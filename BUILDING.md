@@ -109,7 +109,8 @@ python3 tools/fm1_install.py --info          # identity of the connected FM-1
 
 Installing firmware is at your own risk. Hold OCT− and OCT+ for 5 seconds for Felucca's update
 mode. If the FM-1 no longer starts but reaches the chip's update mode (4C4A:8057 on USB),
-`tools/fm1_rescue.sh` puts stock firmware back from a Mac; otherwise recovery needs
+`tools/fm1_rescue.sh` (X0X's, Mac or Linux) puts stock firmware back, V16 or V15, whichever the FM-1's bootloader
+is; so does [M-Flasher](https://github.com/jvitkauskas/m-flasher) (Windows too). Otherwise recovery needs
 [FM-1-transporter](https://github.com/kurogedelic/FM-1-transporter).
 
 ## Publishing a release

@@ -68,11 +68,28 @@ input[type=file] { font: inherit; font-size: .9rem; color: var(--muted); max-wid
     <p class="small" data-t="stockwhy"></p>
     <ol class="small">
       <li><span data-t="stock1"></span> <a id="stocklink" href="https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc">FM-1.fwsc</a>
-        <span data-t="stockalt"></span> <a href="https://www.m-vave.com/download" target="_blank" rel="noopener">m-vave.com/download</a>)</li>
+        (V16, <span data-t="stockalt"></span> <a href="https://www.m-vave.com/download" target="_blank" rel="noopener">m-vave.com/download</a>)<br>
+        <span data-t="stock1b"></span> <a id="stocklink15" href="https://web.archive.org/web/20261009203224id_/https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc">FM-1.fwsc</a> (V15)</li>
       <li><span data-t="stock2"></span><br><input type="file" id="stockfile" accept=".fwsc"></li>
       <li data-t="stock3"></li>
     </ol>
     <p><button id="stockgo" disabled data-t="stockinstall"></button></p>
+  </div>
+  <div class="card" id="trouble">
+    <h2 data-t="trubh"></h2>
+    <p class="small" data-t="trubwhy"></p>
+    <ol class="small">
+      <li><span data-t="trub1"></span> <a href="https://github.com/jvitkauskas/m-flasher/releases/latest" target="_blank" rel="noopener">M-Flasher</a>
+        <span data-t="trub1b"></span></li>
+      <li data-t="trub2"></li>
+      <li data-t="trub3"></li>
+      <li><span data-t="trub4"></span> <a href="https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc">FM-1.fwsc</a>
+        <span data-t="trub4b"></span></li>
+      <li data-t="trub5"></li>
+      <li data-t="trub6"></li>
+    </ol>
+    <p class="small"><span data-t="trubmore"></span>
+      <a href="https://github.com/jvitkauskas/m-flasher/blob/main/docs/usage.md" target="_blank" rel="noopener" data-t="trubmorelink"></a></p>
   </div>
   <p class="foot">Niagara Drift is free, open-source firmware (GPL-3.0, no warranty), not made or endorsed by M-VAVE. This installer
     is Felucca's, by Leo Kuroshita (<a href="https://hugelton.com" target="_blank" rel="noopener">Hügelton Instruments</a>), by way of
@@ -96,18 +113,33 @@ const TEXT = {
     brick: "If an FM-1 won't start at all, a Mac can still put M-VAVE's firmware back:",
     bricklink: "recovering an FM-1 that won't start",
     stockh: "Back to M-VAVE's firmware",
-    stockwhy: "This writes M-VAVE's own FM-1 V15 back, over the same cable, from Niagara Drift or its safe mode. Your Niagara Drift sound and scenes are lost.",
-    stock1: "Download M-VAVE's FM-1 V15:",
-    stockalt: "(or from",
+    stockwhy: "This writes M-VAVE's own FM-1 firmware (V16 or V15) back, over the same cable, from Niagara Drift or its safe mode. Your Niagara Drift sound and scenes are lost.",
+    stock1: "Download M-VAVE's FM-1 firmware:",
+    stockalt: "also on",
+    stock1b: "If the FM-1 doesn't take it, V15 (from the Internet Archive):",
     stock2: "Choose the file you downloaded:",
     stock3: "Connect the FM-1 by USB and press the button below.",
     stockinstall: "Install M-VAVE's firmware",
-    stockok: "That is M-VAVE's FM-1 V15. Press the button to install it.",
-    stockbad: "That isn't M-VAVE's FM-1 V15 file. Choose the file from the link above.",
+    stockok: "That is M-VAVE's FM-1 {V}. Press the button to install it.",
+    stockbad: "That isn't M-VAVE's FM-1 V16 or V15 file. Choose a file from the links above.",
+    stockhead: "Nothing was written. The FM-1 takes back only the version whose bootloader it already has: choose the other file (V16 or V15) and press the button again.",
     stockdone: "Done. The FM-1 has restarted with M-VAVE's firmware.",
+    trubh: "Trouble installing?",
+    trubwhy: "If nothing here reaches the FM-1 (a newer FM-1 running Niagara Drift 0.2 ignores every install), M-Flasher, a free app by Julius Vitkauskas, puts M-VAVE's firmware back from outside. It takes about ten minutes, once; then this page works again.",
+    trub1: "Download",
+    trub1b: "for your computer: on a Mac the .dmg, on Windows the .zip.",
+    trub2: "Open it. It isn't signed, so the first time your computer warns you. On Windows: \"More info\", then \"Run anyway\". On a Mac: System Settings → Privacy & Security → \"Open Anyway\". It asks for your password: it needs it to reach the FM-1.",
+    trub3: "Connect the FM-1 with a USB data cable, straight into the computer. M-Flasher finds it: press DOWNLOAD MODE.",
+    trub4: "Choose M-VAVE's",
+    trub4b: "(V16) and press REVIEW & FLASH. It backs up the whole FM-1 before it writes anything.",
+    trub5: "When it's done, unplug the FM-1 and switch it off and on: it starts with M-VAVE's firmware.",
+    trub6: "Come back to this page and press Install.",
+    trubmore: "More on each step:",
+    trubmorelink: "M-Flasher's guide",
+    stockfirst: "First, Niagara Drift is updated to {ND}, which takes back either M-VAVE version. Then M-VAVE's firmware: ",
     nomidi: "This browser can't do it. Open the page in Chrome or Edge.", loadfail: "Couldn't load the firmware: ",
     start: "Starting", verify: "Checking", loader: "Switching to update mode", write: "Writing",
-    reboot: "Restarting", done: "Done: the FM-1 runs Niagara Drift. Press PLAY.", stopped: "Stopped. Replug the USB cable and press Install again.",
+    reboot: "Restarting", done: "Done: the FM-1 runs Niagara Drift. Press PLAY.", stopped: "Stopped. Replug the USB cable and press Install again. If it stops again, see \"Trouble installing?\" below.",
     error: "Error: ",
     denied: "MIDI access wasn't allowed. Allow MIDI in the site settings (the address bar) and press Install again.",
     notfound: "No FM-1 found. Check the cable is a data cable, straight into the computer, close other apps that use MIDI, and press Install again.",
@@ -121,7 +153,8 @@ const TEXT = {
   },
 };
 const lang = "en";
-const t = (k) => TEXT[lang][k];
+let stockV = "", ndV = "";                         /* the stock version chosen, this page's Niagara Drift: {V}, {ND} */
+const t = (k) => (TEXT[lang][k] || "").replace("{V}", stockV).replace("{ND}", ndV);
 let lastKey = null, lastArg = "";
 function applyLang() {
   document.documentElement.lang = lang;
@@ -134,6 +167,7 @@ const say = (txt) => { lastKey = null; $("status").textContent = txt; };
 const log = (t) => { $("log").textContent += t + "\n"; };
 let image = null;
 const meta = /*META*/;
+ndV = meta.version;
 
 let writing = false;
 window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault(); e.returnValue = t("leave"); } });
@@ -151,9 +185,13 @@ window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault
   } catch (e) { sayK("loadfail", e.message); }
 })();
 
-/* stock firmware: M-VAVE's FM-1 V15, chosen by the user (M-VAVE's server allows no cross-site
-   download) and checked against its SHA-256 before anything is written */
-const STOCK_SHA256 = "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a";
+/* stock firmware: M-VAVE's FM-1 V16 or V15, chosen by the user (M-VAVE's server allows no cross-site
+   download) and checked against its SHA-256 before anything is written. The FM-1 takes back only the one whose
+   flash head it has (firmware/src/ota.c: M-VAVE's loader rewrites the head; M-UPGRADE gives V16 its own) */
+const STOCK = {
+  "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a": "V15",
+  "d017fb65e70aca97ee29d944470c3515a74581df5c0576bf70de917c7b2b61d5": "V16",
+};
 let stock = null;
 $("stockfile").addEventListener("change", async (e) => {
   stock = null;
@@ -163,8 +201,9 @@ $("stockfile").addEventListener("change", async (e) => {
   try {
     const raw = new Uint8Array(await f.arrayBuffer());
     const hex = [...new Uint8Array(await crypto.subtle.digest("SHA-256", raw))].map((b) => b.toString(16).padStart(2, "0")).join("");
-    if (hex !== STOCK_SHA256) { sayK("stockbad"); return; }
+    if (!STOCK[hex]) { sayK("stockbad"); return; }
     stock = { image: logicalImage(raw), product: productOf(raw) };
+    stockV = STOCK[hex];
     $("stockgo").disabled = writing;
     sayK("stockok");
   } catch (err) { sayK("error", err && err.message); }
@@ -189,6 +228,18 @@ async function run(img, product, isStock) {
       if (k === "done") { $("bar").value = 100; sayK(isStock ? "stockdone" : "done"); }
     };
     const ota = await up.find((id) => /^ota-/i.test(id.model));
+    if (!ota && isStock && image) {
+      /* Niagara Drift before 0.2.1 takes back only the M-VAVE version whose bootloader the FM-1 has: update it
+         first (its sound kept), then write M-VAVE's. A release's identity is FM-1_8XXYYZZ; dev builds are left be */
+      const dev = await up.find((id) => !/^ota-/i.test(id.model));
+      const v = dev ? dev.id.version : 0;
+      if (dev) dev.link.close();
+      if (dev && dev.id.model === "FM-1" && v >= 8000000 && v < 8000201) {
+        const first = (k, a) => { log(`first ${k} ${a ?? ""}`); $("status").textContent = t("stockfirst") + (k === "done" ? "" : t(k)); };
+        await up.install(image, meta.product, first);
+        await new Promise((r) => setTimeout(r, 3000));     /* the new firmware starting */
+      }
+    }
     if (ota) {
       ota.link.close();
       sayK((await up.resume(img, step)) ? (isStock ? "stockdone" : "done") : "stopped");
@@ -197,6 +248,7 @@ async function run(img, product, isStock) {
     }
   } catch (e) {
     if (isStock && e && e.code === "mismatch") { $("bar").value = 100; sayK("stockdone"); }   /* stock names itself its own way */
+    else if (isStock && e && e.code === "stopped" && e.step === 1) sayK("stockhead");          /* the other version's head */
     else if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
     else sayK("error", e && e.message);
     log(String(e && e.stack || e));

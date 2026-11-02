@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.1 (2026-11)
+
+Getting on and off Niagara Drift, on every FM-1. The sound is the same as 0.2's, and an update from 0.2 keeps your
+sound and scenes. Tested on an older FM-1; the newer FM-1s' memory chip hasn't been tried here yet.
+
+- **Newer FM-1s:** 0.2 didn't recognize the memory chip of some newer FM-1s, so on those it couldn't save and ignored
+  every install (it just started again). 0.2.1 works with any standard memory chip, and never ignores an install. An
+  FM-1 like that still on 0.2 needs [M-Flasher](https://github.com/jvitkauskas/m-flasher) once to leave it: the
+  install page's "Trouble installing?" shows how.
+- **Back to M-VAVE's V16 or V15,** whichever bootloader the FM-1 has (0.2 took back only the version whose bootloader
+  it already had, so an FM-1 with V15's refused V16). Charles Vestal's fix, from felucca-bsp.
+- **The installer takes M-VAVE's V16** as well as V15 (M-VAVE's link now gives V16; V15 is linked on the Internet
+  Archive). From 0.2, "Back to M-VAVE's firmware" updates Niagara Drift to 0.2.1 first, then writes M-VAVE's: one
+  button.
+- **"Trouble installing?"** on the install page, and in the manual: what to do when an install doesn't take.
+
 ## 0.2 (2026-10)
 
 A calmer, deeper instrument: slow movement by default, gestures and presets to play, scenes in banks you can
