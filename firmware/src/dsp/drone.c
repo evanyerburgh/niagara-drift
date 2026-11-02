@@ -23,14 +23,14 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
 
 /* ------------------------------------------------------------ parameters --- */
 #define VOICE_PARAMS(pitch, wave, ival, mix, cut, level, olfo, flfo, fdep)                                           \
-    {"Pitch", DR_PITCH_LO, DR_PITCH_HI, pitch}, {"X-Wave", 0, 100, wave}, {"PW", 0, 100, 30},               \
+    {"Pitch", DR_PITCH_LO, DR_PITCH_HI, pitch}, {"X-Wave", 0, 100, wave}, {"Width", 0, 100, 30},               \
         {"Interval", 0, DR_NINTERVALS - 1, ival}, {"Detune", 0, 100, 12}, {"Osc/Sub", 0, 100, mix},            \
         {"Sub oct", 1, 6, 1}, {"Cutoff", 0, 1000, cut}, {"Reso", 0, 1000, 250}, {"Mode", DR_LP, DR_HP, DR_LP},    \
         {"Drive", 0, 100, 20}, {"Level", 0, 100, level}, {"Partner", 0, 1, 1},                                 \
         {"Osc LFO", DR_LFO_OFF, DR_LFO_BOTH, olfo}, {"Osc depth", -100, 100, 0},                                \
         {"Osc LFO to", DR_TO_PITCH, DR_TO_XWAVE, DR_TO_PITCH}, {"Filter LFO", DR_LFO_OFF, DR_LFO_BOTH, flfo},     \
         {"Filt depth", -100, 100, fdep}, {"Filt LFO to", DR_TO_CUTOFF, DR_TO_RESO, DR_TO_CUTOFF},           \
-        {"Noise", 0, 100, 0}, {"Colour", 0, 100, 100}
+        {"Noise", 0, 100, 0}, {"Color", 0, 100, 100}
 
 /* THE STARTING SOUND (2026-10-17, Evan: Lyra-like; measured against two Lyra-8 recordings: changes mostly slower
  * than one every two seconds, ~16 dB of slow loudness swell, ~1.6 octaves of brightness): each voice's LFO taps
@@ -828,7 +828,7 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
      {DR_GP(0, GP_CUTOFF), MK_ADD, -10, 0, 50, 40, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -10, 0, 50, 40, 100},
      {DR_GP(0, GP_RESO), MK_ADD, -40, 0, 50, 40, 100}, {DR_GP(1, GP_RESO), MK_ADD, -40, 0, 50, 40, 100},
      {DR_GP(0, GP_DRIVE), MK_ADD, 25, 20, 100, 20, 100}, {DR_GP(1, GP_DRIVE), MK_ADD, 25, 20, 100, 20, 100},
-     {P_CHAR, MK_ADD, 25, 30, 100, 30, 100}, {DR_GP(0, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100},
+     {P_CHAR, MK_ADD, 17, 30, 100, 30, 100}, {DR_GP(0, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100},
      {DR_GP(1, GP_NOISE), MK_ADD, -20, 0, 50, 50, 100}, {DR_GP(0, GP_LEVEL), MK_ADD, 40, 20, 100, 0, 60},
      {DR_GP(1, GP_LEVEL), MK_ADD, 40, 20, 100, 0, 60}},
     /* SHIFT: a new chord, a voice at a time (the Lyra-8 manual's chord changes): drone I glides there first, drone
@@ -888,10 +888,11 @@ static const move_t MACRO_MV[DR_NGTYPE][MV_N] = {
 };
 /* AGE (Life), a state: as the old tape wears, darker, a little hiss, the pitch wavering slowly (wow) and a little
  * quickly (flutter); it wears in (and out) over AGE_S. Not Character (Evan, 2026-10-20: the two knobs overlapped) */
+static float age_mk = 1.0f;                      /* that makeup now, as a gain, by Age as heard */
 static const move_t AGE_MV[MV_N] = {
-    {DR_GP(0, GP_CUTOFF), MK_ADD, -70, 0, 100, 0, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, -70, 0, 100, 0, 100},
-    {DR_GP(0, GP_NOISE), MK_ADD, 15, 0, 100, 0, 100}, {DR_GP(1, GP_NOISE), MK_ADD, 15, 0, 100, 0, 100},
-    {0, MK_WOW, 14, 0, 100, 0, 100}, {1, MK_WOW, 14, 0, 100, 0, 100},
+    {DR_GP(0, GP_CUTOFF), MK_ADD, AGE_CUT, 0, 100, 0, 100}, {DR_GP(1, GP_CUTOFF), MK_ADD, AGE_CUT, 0, 100, 0, 100},
+    {DR_GP(0, GP_NOISE), MK_ADD, AGE_NZ, 0, 100, 0, 100}, {DR_GP(1, GP_NOISE), MK_ADD, AGE_NZ, 0, 100, 0, 100},
+    {0, MK_WOW, AGE_WOW, 0, 100, 0, 100}, {1, MK_WOW, AGE_WOW, 0, 100, 0, 100},
 };
 #define AGE_S 20.0f                              /* Age wears in from none to full this long */
 static float mv_lvl[DR_NGEST][MV_N];             /* each key's moves' levels now, 0..1 (gliding) */
@@ -922,6 +923,7 @@ static void macro_reset(void)
     mac_out = 0;
     mv_moving = 0;
     mac_ph = age_l = age_ph = 0.0f;
+    age_mk = 1.0f;
     wand_st = wand_to = 0.0f;
     wand_n = 0;
     wand_v = 0;
@@ -1062,7 +1064,7 @@ static void mv_add(const move_t *v, float l, float *off, uint8_t *on, float *pm,
     case MK_DOWN: off[v->p] += fm_minf((float)(v->d - base[v->p]), 0.0f) * l; break;
     case MK_SHIFT: pm[v->p] += (float)(base[P_SHIFT_MOVE] - DR_SHIFT_MID) * 0.01f * l; break;
     case MK_PULSE: off[v->p] += (float)v->d * l * (0.5f - 0.5f * fm_cosf(6.2831853f * mac_ph)); *flags |= 2; break;
-    case MK_WOW: {                               /* two slow sines a drone, apart (wow: +-14 cents at full), and two
+    case MK_WOW: {                               /* two slow sines a drone, apart (wow: +-AGE_WOW cents at full), and two
                                                   * quick ones (flutter, 5.7 and 8.9 Hz: +-4 cents) */
         float ph = 6.2831853f * age_ph, g = (float)v->p;
         pm[v->p] += (float)v->d * 0.01f * l * (0.6f * fm_sinf(ph * 0.21f + 2.0f * g) + 0.4f * fm_sinf(ph * (0.13f + 0.04f * g)));
@@ -1141,6 +1143,7 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
         float to = (float)base[P_AGE] * 0.01f, s = (float)n / (AGE_S * DR_SR);
         if (age_l != to) {
             age_l = age_l < to ? fm_minf(age_l + s, to) : fm_maxf(age_l - s, to);
+            age_mk = fm_exp2f(AGE_MK * (1.0f / 6.0206f) * age_l);
             mv_moving = 1;
         }
         if (age_l > 0.0f)
@@ -1185,6 +1188,11 @@ float dr_wander(void) { return wand_st; }
 int dr_heard(int p) { return p >= 0 && p < DR_NPARAMS ? par[p] : 0; }
 float dr_mac_pitch(int g) { return g >= 0 && g < DR_NGROUPS ? mac_p[g] : 0.0f; }
 float dr_gest_pitch(int g) { return g >= 0 && g < DR_NGROUPS ? mac_gp[g] : 0.0f; }
+float dr_age_now(float *ph)
+{
+    *ph = age_ph;
+    return age_l;
+}
 
 static void drain(void)
 {
@@ -1737,12 +1745,12 @@ static void render_group(int g, uint32_t n)
      * 25 was barely heard): 50 swings it half its range */
     const float ramt = pv[GP_FLFO_DEPTH] * 0.01f * mv;
     const float mstep = (float)CR / (morph_s() * DR_SR);    /* a switch's move a control tick */
-    /* CHARACTER (clean .. vintage): softer edges (a one-pole, its corner 8 kHz .. 1.2 kHz in even steps, so the
+    /* CHARACTER (clean .. vintage): softer edges (a one-pole, its corner 8 kHz .. 500 Hz in even steps, so the
      * middle of the knob is heard: in a straight line it was ~6.4 kHz at 50, now ~3 kHz), a little x^2 (a bent
-     * saw, even harmonics; its DC taken out), pitch jitter (about +-6 cents, ~20 Hz: it was ~0.5), the drones
+     * saw, even harmonics; its DC taken out), pitch jitter (about +-12 cents, ~20 Hz), the drones
      * apart (II up to 6 cents sharp), a whisper of noise (-44 dB) */
-    const float chr = pfs[P_CHAR] * 0.01f, asym = 0.25f * chr, nz = 0.006f * chr;
-    const float rk = 1.0f - fm_exp2f(-9.06472f * 8000.0f * fm_exp2f(-2.73697f * chr) * (1.0f / DR_SR));
+    const float chr = pfs[P_CHAR] * 0.01f, asym = CHR_ASYM * chr, nz = 0.006f * chr;
+    const float rk = 1.0f - fm_exp2f(-9.06472f * 8000.0f * fm_exp2f(-CHR_K * chr) * (1.0f / DR_SR));
     const float mm = g == 1 ? 0.06f * chr : 0.0f;
     /* FEEDBACK: its gain into the filter, in a straight line, bounded by its ceiling (it ran away from ~50 at
      * 1.6 with none). Evan, on the FM-1: 0.85 / 0.35 too mild, 1.05 / 0.6 (singing) too strong: 0.9 / 0.45, a
@@ -1779,7 +1787,7 @@ static void render_group(int g, uint32_t n)
      * octave under the cutoff, times (1 - rin), so the passband stays level and the peak is left alone */
     const float r0 = pv[GP_RESO] * 0.001f;
     float k = 2.0f - 2.1f * r0, rin = 1.0f - 0.6f * r0 * r0;    /* per tick, when the LFO moves the resonance */
-    const float lvl = pv[GP_LEVEL] * pv[GP_LEVEL] * 0.0001f * 0.6f;   /* an audio taper: squared (50 is -12 dB) */
+    const float lvl = pv[GP_LEVEL] * pv[GP_LEVEL] * 0.0001f * 0.6f * age_mk;   /* an audio taper: squared (50 is -12 dB) */
     /* drone I left, drone II right, as far apart as Width says (as it glides: read raw, each detent clicked) */
     const float width = pfs[P_WIDTH] * 0.01f, pan = g ? 0.5f + 0.5f * width : 0.5f - 0.5f * width;
     const float gl1 = fm_sqrtf(1.0f - pan) * 1.41421356f, gr1 = fm_sqrtf(pan) * 1.41421356f;
@@ -1941,9 +1949,9 @@ static void render_group(int g, uint32_t n)
         }
         if (chr > 0.0f)                          /* the jitter: noise, low-passed to ~20 Hz */
             v->jit += (rnd() - v->jit) * 0.045f;
-        inc = note_inc(v->ps2 + tune + pmod + v->drift[0] * drift_c + chr * (0.4f * v->jit + mm) + mac_p[g]);
+        inc = note_inc(v->ps2 + tune + pmod + v->drift[0] * drift_c + chr * (CHR_JIT * v->jit + mm) + mac_p[g]);
         pinc = note_inc(v->ps2 + tune + pmod + mac_p[g] + ival + detune + dw * 0.1f * v->wn[3] + v->drift[1] * drift_c +
-                        chr * (0.4f * v->jit + mm));
+                        chr * (CHR_JIT * v->jit + mm));
         const int tick = tick_d[g] > 0.0f || tick_u[g] > 0.0f;
         float sd = v->sdiv;
         if (tick) {                              /* TICK (v0.3), log2: from the sub as heard down to -7, then up by 4 */

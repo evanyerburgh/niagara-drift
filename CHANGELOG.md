@@ -40,7 +40,7 @@ bank A, 13–16 to B1–B4).
 - **The left encoders, always live:** SELECT the LFO rate, ALGORITHM Movement, PRESETS Gesture time; OCT− / OCT+
   pick LFO Wave I / II. Two pages on most page buttons (a button opens the one you last used).
 - **New sounds and moves:** Age (tape: darker, hiss, wow and flutter), Wander (drone II's slow random melody on a
-  scale), Pitch glide, Shift's move, the 17 partner intervals (each tempered, then just), a noise colour blend.
+  scale), Pitch glide, Shift's move, the 17 partner intervals (each tempered, then just), a noise color blend.
 - **New effects,** after ChoralRoot's (Quixotic7), written anew: a stereo delay (Tape, Wide, Ping-pong, Clean) and
   an eight-line reverb (Room, Hall, Cathedral, Chorus hall; length to Inf, a freeze). Feedback rings in key and holds
   its loudness.
@@ -48,14 +48,14 @@ bank A, 13–16 to B1–B4).
   range. MASTER's top fifth drives the output harder at the same loudness.
 - **Level** is an audio taper (saved sounds keep their loudness; the numbers read higher). Band-pass and high-pass
   keep their loudness at high resonance.
-- **The screen** in the site's colours: what's turning shown large; SEL held draws the black keys as on the
+- **The screen** in the site's colors: what's turning shown large; SEL held draws the black keys as on the
   keyboard, and touching one names it. Lights at several brightnesses: the OCT lights pulse with the LFO waves, ARP
   breathes with the Swell.
 - **Knobs** catch every click on slow, paused turns.
 - **Saving and backups:** autosave 4 s after the last change, at most every 30 s. `fm1_install.py --backup` saves
   your sound, scenes and settings to a file and `--restore FILE` puts them back; installing over Niagara Drift from
   the terminal saves a backup first, in `~/niagara-drift-backups/` (the web installer doesn't yet).
-- **The website:** the emulator's FM-1 labelled with what every control does, the manual in the order you meet it
+- **The website:** the emulator's FM-1 labeled with what every control does, the manual in the order you meet it
   (presets, gestures, scenes first), a link preview and an icon.
 
 Thanks to [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) (Quixotic7) for the effects' design, the crossfade

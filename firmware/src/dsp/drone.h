@@ -275,6 +275,15 @@ float dr_lfo_wave(int tap, int shape, float ph);   /* a tap's shape (1..10; 0 of
                                                     * random, ph 0..1 the last cycle, 1..2 this one */
 float dr_lfo_rmod_k(float rm, int src, int w1, int w2);  /* rate mod's speed scale (the screen's picture) */
 float dr_pulse_wave(float ph);                 /* the pulse's gain at ph (0..2) as set now, 0..1 */
+/* Age and Character at full (Evan, 2026-11-02: "stronger"; the pictures on Life read them too) */
+#define AGE_CUT -250                    /* Age: the cutoff, of its 1000, about 2.5 octaves darker (was -70) */
+#define AGE_NZ 20                       /* its hiss (was 15) */
+#define AGE_WOW 25                      /* its wow, +-cents (was 14; the flutter +-4) */
+#define AGE_MK 5.0f                     /* dB of level made up, so it darkens without going quieter */
+#define CHR_K 4.0f                      /* Character: the highs rolled off from 8 kHz / 2^CHR_K, 500 Hz (was 1.2 kHz) */
+#define CHR_ASYM 0.35f                  /* the saw's bend, lifting the even harmonics (was 0.25) */
+#define CHR_JIT 0.8f                    /* the pitch jitter (was 0.4) */
+float dr_age_now(float *ph);                   /* Age as heard now (its 20 s wear-in), 0..1; *ph its wow's phase, s */
 /* each drone's sound, for the screen: DR_SCOPE_N points spanning about two cycles of its oscillator,
  * starting where a cycle starts (so the picture stands still), as it sounds (after its filter and level);
  * renewed about 30 times a second */

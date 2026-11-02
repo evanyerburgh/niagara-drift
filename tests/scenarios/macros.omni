@@ -175,10 +175,10 @@ set 78 0
 set 81 0
 wait 30000
 expect wander 0
-# AGE (Life): wears in over 20 s: darker, a wow
+# AGE (Life): wears in over 20 s: darker (the cutoff 250 down, AGE_CUT), a wow
 set 79 100
 wait 21000
-expect heard7 630
+expect heard7 450
 # not Character any more (2026-10-20: the tape's wear, not the oscillators')
 expect heard77 0
 set 79 0

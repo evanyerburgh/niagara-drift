@@ -33,7 +33,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      * The LFOs on the resonance, very slowly: it swells and rings */
     {I_(GP_PITCH), 5000, II_(GP_PITCH), 4700, I_(GP_WAVE), 67, II_(GP_WAVE), 100, II_(GP_WIDTH), 70,
      I_(GP_INTERVAL), 0, II_(GP_DETUNE), 30, I_(GP_MIX), 45, I_(GP_SUBOCT), 3, I_(GP_CUTOFF), 650, II_(GP_CUTOFF), 610,
-     I_(GP_RESO), 450, II_(GP_RESO), 450, I_(GP_DRIVE), 70, II_(GP_DRIVE), 60, P_CHAR, 40, P_FEEDBACK, 30,
+     I_(GP_RESO), 450, II_(GP_RESO), 450, I_(GP_DRIVE), 70, II_(GP_DRIVE), 60, P_CHAR, 27, P_FEEDBACK, 30,
      P_LFO_RATE, 3, P_REV_TYPE, 1, P_REV_LEN, 75, P_REV_DAMP, 80, P_REV_MIX, 40, I_(GP_NOISE), 8, I_(GP_LEVEL), 89,
      II_(GP_LEVEL), 89, P_DLY_TYPE, 1, P_DLY_TIME, 85, P_DLY_REPEATS, 45, P_DLY_MIX, 15, I_(GP_FLFO_DEST), DR_TO_RESO,
      I_(GP_FLFO_DEPTH), 55, II_(GP_FLFO_DEST), DR_TO_RESO, II_(GP_FLFO_DEPTH), -55, -1},
@@ -65,14 +65,14 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      * once a second, swung; a hall. The LFO slow and gentle */
     {II_(GP_PITCH), 4500, I_(GP_WAVE), 67, II_(GP_WAVE), 67, I_(GP_INTERVAL), 14, II_(GP_INTERVAL), 14,
      I_(GP_DETUNE), 6, II_(GP_DETUNE), 6, I_(GP_MIX), 0, II_(GP_MIX), 0, I_(GP_CUTOFF), 820, II_(GP_CUTOFF), 780,
-     I_(GP_RESO), 320, II_(GP_RESO), 320, I_(GP_DRIVE), 40, II_(GP_DRIVE), 40, P_CHAR, 40, P_PULSE_RATE, 50,
+     I_(GP_RESO), 320, II_(GP_RESO), 320, I_(GP_DRIVE), 40, II_(GP_DRIVE), 40, P_CHAR, 27, P_PULSE_RATE, 50,
      P_PULSE_DEPTH, 45, P_PULSE_SHAPE, -40, P_PULSE_SWING, 15, P_MOVE, 30, P_REV_TYPE, 1, P_REV_LEN, 55,
      P_REV_MIX, 30, P_DLY_MIX, 10, I_(GP_LEVEL), 73, II_(GP_LEVEL), 68, -1},
     /* P7 TAPE: worn: a minor third apart (D3, F3), a wide square and a saw, Age and a lot of Character, a tape delay,
      * hiss, darker, the sub an octave down.
      * Tape wow: the oscillator LFO on both pitches, slow and small (about 2 s, +-12 cents) */
     {I_(GP_PITCH), 5000, II_(GP_PITCH), 5300, I_(GP_WAVE), 100, I_(GP_WIDTH), 35, II_(GP_WAVE), 67, I_(GP_MIX), 30,
-     P_AGE, 80, P_CHAR, 98, P_DLY_TYPE, 3, P_DLY_MIX, 35, P_DLY_REPEATS, 55, I_(GP_CUTOFF), 720,
+     P_AGE, 35, P_CHAR, 67, P_DLY_TYPE, 3, P_DLY_MIX, 35, P_DLY_REPEATS, 55, I_(GP_CUTOFF), 720,
      II_(GP_CUTOFF), 700, I_(GP_NOISE), 18, II_(GP_NOISE), 12, I_(GP_LEVEL), 70, II_(GP_LEVEL), 70, P_REV_TYPE, 0,
      P_REV_LEN, 35, P_REV_MIX, 25, I_(GP_OLFO_DEPTH), 7, II_(GP_OLFO), DR_LFO_I, II_(GP_OLFO_DEPTH), 6, P_LFO_RATE, 40,
      I_(GP_FLFO_DEPTH), 40, II_(GP_FLFO_DEPTH), -40, -1},
@@ -86,7 +86,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     /* P9 HOWL: low, a semitone apart (they grind), the feedback high, resonant, drone II band-passed, driven, dark;
      * a short tape slap in a small room.
      * The LFO in random steps on drone I's resonance: the howl flares unpredictably */
-    {I_(GP_PITCH), 3800, II_(GP_PITCH), 3900, P_FEEDBACK, 85, P_CHAR, 30, II_(GP_MODE), DR_BP, I_(GP_CUTOFF), 740,
+    {I_(GP_PITCH), 3800, II_(GP_PITCH), 3900, P_FEEDBACK, 85, P_CHAR, 21, II_(GP_MODE), DR_BP, I_(GP_CUTOFF), 740,
      II_(GP_CUTOFF), 780, I_(GP_RESO), 600, II_(GP_RESO), 600, I_(GP_DRIVE), 75, II_(GP_DRIVE), 75, P_DLY_TIME, 20,
      P_DLY_REPEATS, 45, P_DLY_MIX, 40, P_REV_TYPE, 0, P_REV_LEN, 40, P_REV_MIX, 50, P_MOVE, 40, I_(GP_LEVEL), 89,
      II_(GP_LEVEL), 89, P_LFO_W1, DR_LFO_RANDOM, P_LFO_RATE, 20, I_(GP_FLFO_DEST), DR_TO_RESO, I_(GP_FLFO_DEPTH), 50,
