@@ -979,6 +979,7 @@ static void lk_pic_moves(void)
             if (yf != y0)
                 cv_rect(x, yf < y0 ? yf : y0, 1, (yf < y0 ? y0 - yf : yf - y0) + 1, c);
         }
+        cv_rect(8, y0, 26, 1, LK_INK);         /* home in front of them (Evan) */
     }
     /* Wander: the scale's rungs, a dotted line each, named from drone I's root where there's room */
     nd = dr_wander_degs(deg);
