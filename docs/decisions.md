@@ -571,3 +571,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   Pitch moves, LFO sends and Mods in the new look (PR E); strands 1 px with a gap where they'd blend (Wander, Partner),
   Osc's stacked straight down as Drones 2's; a drone's strands follow the level heard, closing up and dimming toward
   silence (Drones 1, 2, Sub · Drive). The same sound otherwise.
+- 2026-11-02: Every button and key on screen in a box, and a message says what to do ("II OFF  turn on SEL + PLAY",
+  SEL and PLAY boxed). Nothing jumps: a line that comes and goes keeps its place, gray when idle (LFO sends'
+  Movement and Swell lock). No sliders on LFO sends or Mods, nor cross-mod's amount bar: the knobs' values say it.
+  A setting shown at the page's top with its key (Partner, the sub's octave, the filter) gets no banner there.
