@@ -3,7 +3,9 @@
 /* Host test of firmware/src/ota.c: a fake M-UPGRADE serves a real .fwsc over
  * the SysEx protocol (pack7, cmd 0x30 reads, 0xE0000000 -> "success") and a
  * simulated NOR plays the flash.
- *   cc -o ota_test tests/ota_test.c && ./ota_test FILE.fwsc
+ *   cc -o ota_test tests/ota_test.c && ./ota_test FILE.fwsc [STOCK.fwsc...]
+ * STOCK.fwsc... (optional, never committed): M-VAVE's FM-1 packages (V15, V16), staged over another head, refused
+ * with a damaged boot area (after fm1-base's test, Charles Vestal, MPL-2.0)
  */
 #include <stdint.h>
 #include <stdio.h>
@@ -150,22 +152,31 @@ static void reset_dev(void)
     mute_after = 0xFFFFFFFFu; corrupt_at = NULL; bad_erase = 0;
 }
 
-int main(int argc, char **argv)
+static int load(const char *path)                   /* the package's logical image */
 {
     FILE *f;
     uint8_t *raw;
     size_t n, i;
-    int bad = 0, rc;
-    if (argc < 2) { printf("usage: ota_test FILE.fwsc\n"); return 2; }
-    f = fopen(argv[1], "rb");
-    if (!f) { perror(argv[1]); return 2; }
+    f = fopen(path, "rb");
+    if (!f) { perror(path); return 1; }
     raw = malloc(0x200000);
     n = fread(raw, 1, 0x200000, f);
     fclose(f);
+    free(logical);
     logical = malloc(n);
     for (i = 0; i < 20; i++) memcpy(logical + i * 47, raw + i * 48, 47);   /* drop the marker bytes */
     memcpy(logical + 20 * 47, raw + 20 * 48, n - 20 * 48);
     logical_len = n - 20;
+    free(raw);
+    return 0;
+}
+
+int main(int argc, char **argv)
+{
+    int bad = 0, rc, i;
+    if (argc < 2) { printf("usage: ota_test FILE.fwsc [STOCK.fwsc...]\n"); return 2; }
+    if (load(argv[1]))
+        return 2;
 
     /* handshake outside a session */
     reset_dev();
@@ -216,6 +227,23 @@ int main(int argc, char **argv)
         mute_after = total - 1;                            /* answer everything but the confirmation */
         rc = ota_session();
         bad += check("no 'success' -> -13, no commit, area clean", rc == -13 && !committed && area_erased());
+    }
+
+    /* M-VAVE's packages (optional, never committed): staged over another head (V16 over V15's and back) */
+    for (i = 2; i < argc; i++) {
+        char what[96];
+        const char *name = strrchr(argv[i], '/') ? strrchr(argv[i], '/') + 1 : argv[i];
+        if (load(argv[i]))
+            return 2;
+        reset_dev();
+        nor[0x1000] ^= 0x01;                               /* the device's head differs from the package's */
+        rc = ota_session();
+        snprintf(what, sizeof what, "%s over another head commits", name);
+        bad += check(what, rc == 0 && committed);
+        reset_dev();
+        corrupt_at = logical + 0x400 + 0xA0 + 0x800;       /* its boot area's payload */
+        rc = ota_session();
+        bad += check("  ... with a damaged boot area -> -5", rc == -5 && !committed && area_erased());
     }
 
     printf("%s\n", bad ? "OTA TEST FAILED" : "ota test passed");
