@@ -1145,6 +1145,7 @@ static void lk_pic_moves(void)
 }
 
 /* ------------------------------------------------- the LFO pages' parts --- */
+static void lk_swing(char *q, float x, const char *unit);
 static const uint32_t LK_LFO_TINT[2] = {0xA98BFFu, 0xFF5FD2u};   /* LFO I lilac (OCT-), LFO II pink (OCT+) */
 
 /* a send's slider (its knob, -100..100, or 0..100 one-sided): a thin track the same length on every row, the centre
@@ -1241,19 +1242,26 @@ static void lk_pic_lfo(void)
         const int route = d < 4 ? gpar(g, osc ? GP_OLFO : GP_FLFO) : proj.par[P_DLY_LFO];
         const int depth = d < 4 ? gpar(g, osc ? GP_OLFO_DEPTH : GP_FLFO_DEPTH) : proj.par[P_DLY_LFO_DEPTH];
         const int heard = depth && proj.par[P_MOVE] && (lk_wave_on(route, 0) || lk_wave_on(route, 1));
-        const int32_t ny = d * 24, sy = ny + 19, sx = 152;
+        const int32_t ny = 2 + d * 24, sy = ny + (int32_t)LK_F_SMALL.h / 2, sx = 152;   /* the row's middle */
         const uint16_t col = d < 4 ? LK_DRONE[g] : LK_NEUTRAL;
         if (d < 4)
             scopy(scopy(t, g ? "II " : "I "), osc ? (gpar(g, GP_OLFO_DEST) == DR_TO_XWAVE ? "X-Wave" : "pitch")
                                                   : (gpar(g, GP_FLFO_DEST) == DR_TO_RESO ? "reso" : "cutoff"));
         else
             scopy(t, "delay");
-        {
-            const int32_t x = cv_text(sx, ny, &LK_F_SMALL, t, heard ? col : LK_LABEL);
-            if (d == 4)                        /* its knob is on Mods */
-                cv_text(x + 4, ny, &LK_F_SMALL, "Mods", LK_LABEL);
+        {   /* no sliders: the knobs' values say it (Evan, 2026-11-02); the delay's knob is on Mods, so its swing here */
+            int32_t x = cv_text(sx, ny, &LK_F_SMALL, t, heard ? col : LK_LABEL);
+            if (d == 4) {
+                char sw[12];
+                if (depth) {                   /* its swing; at 0, where its knob is (both don't fit) */
+                    const float dv = (float)depth * 0.01f;
+                    lk_swing(sw, dv * dv * (float)proj.par[P_MOVE] * 0.02f * 25.0f, "%");
+                    cv_text(x + 4, ny, &LK_F_SMALL, sw, heard ? col : LK_LABEL);
+                } else {
+                    cv_text(x + 4, ny, &LK_F_SMALL, "Mods", LK_LABEL);
+                }
+            }
         }
-        lk_slider(sx, sy, depth, 0, heard ? col : LK_UNLIT);
         for (w = 0; w < 2; w++)                /* a link from each wave the route takes, in its tint */
             if (route == w + 1 || route == DR_LFO_BOTH)
                 cv_line(94, wy[w], sx - 3, sy, heard && lk_wave_on(route, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
@@ -1305,22 +1313,23 @@ static void lk_pic_mods(void)
         const int dl = proj.par[P_DLY_LFO], dd = proj.par[P_DLY_LFO_DEPTH];
         const int sp_on = rmd && proj.par[P_MOVE] && (lk_wave_on(src, 0) || lk_wave_on(src, 1));
         const int dl_on = dd && proj.par[P_MOVE] && (lk_wave_on(dl, 0) || lk_wave_on(dl, 1));
-        cv_text(156, 0, &LK_F_SMALL, "LFO speed", sp_on ? LK_INK : LK_LABEL);
-        lk_slider(158, 22, rmd, 0, sp_on ? LK_VIOLET : LK_UNLIT);
-        cv_text(156, 30, &LK_F_SMALL, "delay time", dl_on ? LK_INK : LK_LABEL);
-        lk_slider(158, 52, dd, 0, dl_on ? LK_NEUTRAL : LK_UNLIT);
+        const int32_t ry0 = wy[0] - (int32_t)LK_F_SMALL.h / 2, ry1 = wy[1] - (int32_t)LK_F_SMALL.h / 2;   /* level
+                                                                                         * with the waves */
+        const int32_t sx_end = cv_text(158, ry0, &LK_F_SMALL, "LFO speed", sp_on ? LK_INK : LK_LABEL);   /* no
+                                                                                         * sliders (Evan) */
+        cv_text(158, ry1, &LK_F_SMALL, "delay time", dl_on ? LK_INK : LK_LABEL);
         for (w = 0; w < 2; w++) {
             if (src == w + 1 || src == DR_LFO_BOTH)
-                cv_line(x + 86, wy[w], 155, 22, sp_on && lk_wave_on(src, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
+                cv_line(x + 86, wy[w], 155, wy[0], sp_on && lk_wave_on(src, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
                                                                               : LK_UNLIT);
             if (dl == w + 1 || dl == DR_LFO_BOTH)
-                cv_line(x + 86, wy[w], 155, 52, dl_on && lk_wave_on(dl, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
+                cv_line(x + 86, wy[w], 155, wy[1], dl_on && lk_wave_on(dl, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
                                                                              : LK_UNLIT);
         }
         {   /* the loop: out of LFO speed, round the right edge and under the waves, back up into the clock */
             const uint16_t c = sp_on ? LK_LABEL : LK_UNLIT;
-            cv_rect(208, 22, 25, 1, c);
-            cv_rect(232, 22, 1, 40, c);
+            cv_rect(sx_end + 3, wy[0], 233 - sx_end - 3, 1, c);
+            cv_rect(232, wy[0], 1, 62 - wy[0], c);
             cv_rect(14, 61, 219, 1, c);
             cv_rect(14, 23 + (int32_t)LK_F_TAG.h + 2, 1, 61 - 23 - (int32_t)LK_F_TAG.h - 2, c);
             cv_line(14, 25 + (int32_t)LK_F_TAG.h, 11, 28 + (int32_t)LK_F_TAG.h, c);

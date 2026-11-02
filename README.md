@@ -353,8 +353,8 @@ pink specks are as many as Color says.
 - **The sends** and **speed mod** are centered: the middle is none. Each send is named for what it moves: Pitch, or
   X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 3 / 8. Under each value, how far it swings
   in what you hear ("±12c", "±3.6 oct"), with the Movement. The picture shows LFO I and II, the five things they can
-  move, each a slider for its knob, and a line from each LFO that reaches it (gray: at 0, or only from an LFO that's
-  off); under the waves the rate, the Movement when it isn't 100 %, and the Swell lock.
+  move, and a line from each LFO that reaches it (gray: at 0, or only from an LFO that's off; the delay's row says how
+  far Delay mod, on Mods, swings it); under the waves the rate, the Movement and the Swell lock (D#4 locks it).
 - **Mods**, the LFO moving other things, and cross-mod's amount:
   - **Speed mod** ("Speed" on the knob): the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
   - **Source**: which LFO does that (I, II or both).
