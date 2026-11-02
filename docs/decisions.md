@@ -558,3 +558,10 @@ at the end. The current state is in the [README](../README.md) and the code.
   flutter, hiss). Tone each drone's noise as snow, low to high, as high as its level, tilted by Colour and cut by the
   filter, its specks pink as often as Colour says, each changing about once in seven pictures. ENV's meters square
   cells (Feedback's last two red, Colour white to pink); "Pink 70" with the word small. The same sound.
+- 2026-11-02: AGE and CHARACTER stronger (Evan, by ear on renders: both "Stronger"). Age at full: the cutoff -250 of
+  its 1000 (about 2.5 octaves darker; was -70, under a third of an octave), hiss +20 (was 15), a wow of +-25 cents
+  (was 14), and 5 dB of level made up as it wears in, so it darkens without going quieter (within 0.2 dB on a steady
+  sound). Character at full: the highs rolled off from 500 Hz (was 1.2 kHz), the bend 0.35 (was 0.25), the jitter
+  doubled. The Presets and Weight keep their approved sound with lower values: Character 40 → 27, 30 → 21, Tape's
+  Age 80 → 35 and Character 98 → 67, Weight's Character +25 → +17. Life's pictures read the same constants
+  (drone.h), so Character's harmonics now fall visibly from the clean saw's ticks.
