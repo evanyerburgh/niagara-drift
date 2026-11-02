@@ -495,6 +495,25 @@ static float lk_sub_at(int w, float ph)        /* the sub's waves: Square, Sine,
     }
 }
 
+/* Sub · Drive's strands (Evan, 2026-11-02): as many as the drive is fat, 3 at Drive 0 to 6 from 60, gliding (the
+ * next one fades in, the colors slide along the ramp, so it always spans the whole ramp); 3 px apart, closing up
+ * into one line as the lane's share (v0) nears 0, so nothing jumps on the way to the thin "off" line */
+static void lk_drive_bundle(int32_t x0, const int16_t *y, int n, int g, float drive, float v0, float bright)
+{
+    const float nf = 3.0f + 3.0f * fm_clampf(drive / 60.0f, 0.0f, 1.0f), sp = 3.0f * fm_minf(1.0f, v0 / 0.15f);
+    const int nn = (int)(nf + 0.999f);
+    int j, i;
+    for (j = nn - 1; j >= 0; j--) {            /* the deepest, furthest down, first; the light one in front */
+        const float t = 1.0f - (float)j / (nf - 1.0f), a = j + 1 <= (int)nf ? 1.0f : nf - (float)(int)nf;
+        const int32_t oy = (int32_t)((float)j * sp - (nf - 1.0f) * sp * 0.5f + 0.5f);
+        const uint16_t c = lk_mix(0x07060Bu, lk_ramp888(g, fm_clampf(t, 0.0f, 1.0f)), bright * a);
+        for (i = 1; i < n; i++) {
+            cv_line(x0 + 2 * (i - 1), y[i - 1] + oy, x0 + 2 * i, y[i] + oy, c);
+            cv_line(x0 + 2 * (i - 1), y[i - 1] + oy + 1, x0 + 2 * i, y[i] + oy + 1, c);
+        }
+    }
+}
+
 static void lk_pic_source(void)
 {
     const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 2, bot = LK_PIC_H - (int32_t)LK_F_SEL.h - 6;   /* over the tags */
@@ -517,20 +536,21 @@ static void lk_pic_source(void)
         for (k = 0; k < 2; k++) {              /* osc above, sub below */
             const int32_t yc = top + lane * k + lane / 2;
             cv_text(x0, yc - (int32_t)LK_F_TAG.h / 2, &LK_F_TAG, k ? "sub" : "osc", LK_LABEL);
-            {   /* the wave after its lane's name: four strands (Evan, 2026-11-02: six were too many), dimming
-                 * toward its share's 0, most of the change near it; at 0 one thin dim line, plainly off */
+            {   /* the wave after its lane's name, dimming toward its share's 0, most of the change near it; at 0 one
+                 * thin dim line, plainly off (Evan, 2026-11-02) */
                 const float v0 = k ? mix : 1.0f - mix, d = 1.0f - v0;
                 int16_t y[37];
                 for (i = 0; i <= 36; i++) {
                     float ph = 2.0f * (float)i / 36.0f, v;
                     ph -= (float)(int)ph;
                     v = share[k] * (k ? lk_sub_at(sw, ph) : xwave_at(x, pw, ph));
-                    y[i] = (int16_t)(yc - 3 * LK_SDY / 2 - (int32_t)(fm_tanhf(drv * v) / td * (float)amp));
+                    y[i] = (int16_t)(yc - (int32_t)(fm_tanhf(drv * v) / td * (float)amp));
                 }
                 if (v0 < 0.005f)
                     cv_rect(x0 + 28, yc, 72, 1, LK_UNLIT);
                 else
-                    lk_bundle_n(x0 + 28, y, 37, g, LK_SDX, LK_SDY, 4, 0.35f + 0.65f * (1.0f - d * d * d));
+                    lk_drive_bundle(x0 + 28, y, 37, g, (float)gpar(g, GP_DRIVE), v0,
+                                    0.35f + 0.65f * (1.0f - d * d * d));
             }
         }
     }
