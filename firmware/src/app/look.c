@@ -433,7 +433,8 @@ static void lk_pic_drones1(void)
 
 /* ------------------------------------------------- Drones 2's picture --- */
 /* each drone's filter curve (its resonance's peak growing) as six strands, the last six pictures' cutoffs (an LFO or
- * Drift on it fans them), as high as the drone is loud (Evan, 2026-11-01: by Level); its level in dB under it */
+ * Drift on it fans them), in place at any level, closing up and dimming toward silence (Evan, 2026-11-02); its
+ * level in dB under it */
 static float lk_cut_hist[DR_NGROUPS][LK_STRANDS];
 
 static void lk_pic_drones2(void)
@@ -444,16 +445,22 @@ static void lk_pic_drones2(void)
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 130 : 10;
         const float l = dr_level[g], db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
-        const float lf = fm_clampf((db + 48.0f) / 48.0f, 0.0f, 1.0f);
         char t[12];
         for (j = 0; j < LK_STRANDS - 1; j++)
             lk_cut_hist[g][j] = lk_cut_hist[g][j + 1];
         lk_cut_hist[g][LK_STRANDS - 1] = dr_cut[g];
         {
             float br, cl;
-            if (!lk_heard(g, &br, &cl))        /* silent: one thin gray line */
-                cv_rect(x0, bot - LK_BDY, 101, 1, LK_UNLIT);
-            else
+            if (!lk_heard(g, &br, &cl)) {      /* silent: the curve as one thin gray line, where it was */
+                int32_t py = 0, yy;
+                for (i = 0; i <= 50; i++) {
+                    const float d = filt_db(g, lk_cut_hist[g][LK_STRANDS - 1], 100.0f * (float)i / 50.0f);
+                    yy = bot - LK_BDY - (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f * (float)(h - 5 * LK_BDY));
+                    if (i)
+                        cv_line(x0 + 2 * (i - 1), py, x0 + 2 * i, yy, LK_UNLIT);
+                    py = yy;
+                }
+            } else
                 for (j = 1; j < LK_STRANDS; j++) {   /* five (Evan, 2026-11-02: one fewer, the same ramp), closing
                                                       * up and dimming near silence: the oldest first, deep; the
                                                       * newest last, light */
@@ -462,7 +469,9 @@ static void lk_pic_drones2(void)
                     for (i = 0; i <= 50; i++) {
                         const float d = filt_db(g, lk_cut_hist[g][j], 100.0f * (float)i / 50.0f);
                         y[i] = (int16_t)(bot - oy - (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f *
-                                                              (float)(h - 5 * LK_BDY) * lf));
+                                                              (float)(h - 5 * LK_BDY)));   /* in place at any level
+                                                                                             * (Evan, 2026-11-02: it
+                                                                                             * sank as it got quiet) */
                     }
                     lk_plot(x0, y, 51, lk_mix(0x07060Bu, lk_ramp888(g, (float)(j - 1) / (float)(LK_STRANDS - 2)), br));
                 }
