@@ -854,11 +854,8 @@ static void lk_pic_partner(void)
                 const float sv = (float)q * (float)i / (float)n;
                 const int32_t x = cx + (int32_t)(fm_sinf(6.2831853f * sv) * 48.0f);
                 const int32_t y = cy - (int32_t)(fm_sinf(6.2831853f * sv * (float)p / (float)q + th) * (float)ry);
-                if (i) {
+                if (i)                         /* 1 px, as the boards (Evan, 2026-11-02: 2 px blended them) */
                     cv_line(px, py, x, y, c);
-                    if (on)
-                        cv_line(px, py + 1, x, y + 1, c);
-                }
                 px = x;
                 py = y;
             }
@@ -954,8 +951,10 @@ static void lk_pic_moves(void)
     lk_note(dr_pitch[1] + dr_mac_pitch(1), t);
     {
         const int32_t w = text_w(&LK_F_SMALL, t);
+        const int32_t nb = 1 + LK_B(LK_F_SMALL), nx = 232 - w - 10;   /* a quarter note before it (Evan) */
         cv_text(232 - w, 1, &LK_F_SMALL, t, LK_DRONE[1]);
-        cv_text(232 - w - 4 - text_w(&LK_F_SMALL, "now"), 1, &LK_F_SMALL, "now", LK_LABEL);
+        cv_round(nx - 1, nb - 4, 6, 5, 2, LK_LABEL);
+        cv_rect(nx + 3, nb - 14, 2, 12, LK_LABEL);
     }
     /* Shift: the fifths, home, a tick a semitone */
     for (k = -7; k <= 7; k++) {
@@ -998,12 +997,12 @@ static void lk_pic_moves(void)
                 ly = y;
             }
         }
-    {   /* drone II's trail, six strands a pixel apart, the light one on top */
-        int16_t yy[LK_WN];
+    {   /* drone II's trail, six 1 px strands 2 px apart (Evan, 2026-11-02: a pixel apart they blended), the light
+         * one on top */
         for (k = LK_STRANDS - 1; k >= 0; k--) {
-            for (i = 0; i < LK_WN; i++)
-                yy[i] = (int16_t)(LK_SY(lk_wtrail[i]) + k);
-            lk_plot(80, yy, LK_WN, lk_ramp(1, 1.0f - (float)k / (float)(LK_STRANDS - 1)));
+            const uint16_t c = lk_ramp(1, 1.0f - (float)k / (float)(LK_STRANDS - 1));
+            for (i = 1; i < LK_WN; i++)
+                cv_line(80 + 2 * (i - 1), LK_SY(lk_wtrail[i - 1]) + 2 * k, 80 + 2 * i, LK_SY(lk_wtrail[i]) + 2 * k, c);
         }
     }
 #undef LK_SY
