@@ -242,8 +242,9 @@ static void mark_dirty(void) { ui.dirty = 1; ui.chg_t = plat_ms(); }
  * what's been seen, the player's, as the Gesture time is). A tip waits for the screen: after any message */
 enum { TIP_BLEND, TIP_NAMES, TIP_GEST, TIP_FX, TIP_INTO, TIP_XMOD, TIP_CLOCK, TIP_UNDO, NTIPS };
 static const char *const TIP_TEXT[NTIPS] = {   /* one line, the banner's width (~23) */
-    "PRESS HARDER: BLEND", "HOLD SEL: KEY NAMES", "HOLD: IN · TAP: LATCH", "TAP FX: REVERB",
-    "SEL + KNOB 4: INTO REV", "KEY 11: PITCH, SNARL", "SWELL KNOB 1: DIVISION", "SEL + SAVE: UNDO"};
+    "PRESS HARDER: BLEND", "HOLD [SEL]: KEY NAMES", "HOLD: IN · TAP: LATCH", "TAP [FX]: REVERB",
+    "[SEL]+KNOB 4: INTO REV", "[F#5]: PITCH, SNARL", "SWELL KNOB 1: DIVISION", "[SEL] + [SAVE]: UNDO"};
+/* (a button or key in [ ]: the new look draws it in a box, the spec's rule 19; the old screen drops the brackets) */
 #define TIP_MS 3500u
 static int tip_seen(int t) { return proj.seen[t >> 3] >> (t & 7) & 1u; }
 static void tip(int t)
@@ -294,6 +295,13 @@ static char *scopy(char *d, const char *s)          /* copies, returns the end *
     while ((*d = *s++))
         d++;
     return d;
+}
+static void unbox(char *d, const char *s)               /* a message without its keys' [ ] (the old screen) */
+{
+    for (; *s; s++)
+        if (*s != '[' && *s != ']')
+            *d++ = *s;
+    *d = 0;
 }
 
 /* ------------------------------------------------------------ values --- */
@@ -378,7 +386,7 @@ static void pitch_turn(int g, int p, int role, int32_t s)
     uint32_t now = plat_ms(), dt = now - ui.enc_t[role], a = (uint32_t)(s < 0 ? -s : s), slide;
     int cents, ti = tun_i(p);
     if (proj.par[P_PLOCK]) {                           /* locked against a bumped knob */
-        say_c("PITCH LOCKED", "KEY 4", K_GOLD);
+        say_c("PITCH LOCKED", "unlock [C#4]", K_GOLD);
         return;
     }
     ui.enc_t[role] = now;
@@ -465,7 +473,7 @@ static void depth_hint(int p)
     if (proj.par[P_MOVE] == 0)
         say_c("MOVEMENT 0%", "ALGORITHM", K_LFO);
     else if ((tap == DR_LFO_I && !w1) || (tap == DR_LFO_II && !w2) || (tap == DR_LFO_BOTH && !w1 && !w2))
-        say_c(tap == DR_LFO_II ? "LFO II OFF" : "LFO I OFF", tap == DR_LFO_II ? "tap OCT+" : "tap OCT-", K_LFO);
+        say_c(tap == DR_LFO_II ? "LFO II OFF" : "LFO I OFF", tap == DR_LFO_II ? "tap [OCT+]" : "tap [OCT-]", K_LFO);
 }
 
 /* A KNOB OVER A LIST OF NAMED CHOICES GOES ROUND (Evan, 2026-10-25: the rule for every such knob): past the last
@@ -494,7 +502,7 @@ static void knob_turn(int i, int32_t e)
         }               /* SEL let go: not a tap */
     }
     if (proj.par[P_II_OUT] && k.g == 1)        /* drone II out: say how it comes back, on any page (Evan, 2026-10-18) */
-        say_c("II OFF", "SEL + PLAY", K_DRONE[1]);
+        say_c("II OFF", "turn on [SEL] + [PLAY]", K_DRONE[1]);   /* (Evan, 2026-11-02: say what to do) */
     if (k.p == GP_PITCH && k.g < G)
         pitch_turn(k.g, p, EN_K1 + i, e);
     else if (dr_param_info(p)->hi - dr_param_info(p)->lo > 24)
@@ -574,7 +582,7 @@ static void sw_flip(sw_t w)
         what = "SUB";
         st = SUB[v];
         if (proj.par[base + GP_MIX] <= 2)      /* not heard: OSC MIX (Sub · Drive, EDIT twice) is at the oscillators */
-            next = "OSC MIX 0 · EDIT x2";
+            next = "OSC MIX 0 · [EDIT] x2";
         break;
     }
     case S_PLOCK: param_set(P_PLOCK, on); q = a; what = "PITCH LOCK"; st = on ? "ON" : "OFF"; break;
@@ -999,7 +1007,7 @@ static void save_run(void)                             /* each look at the input
 static void scene_store(int n)                         /* SAVE held + a white key: and into the flash */
 {
     if (proj.bank == BANK_PRESETS) {                   /* the Presets stay as they are (Evan, 2026-10-19) */
-        say_c("PRESETS ARE FIXED", "SEL+D5-G5: BANK", K_GOLD);
+        say_c("PRESETS ARE FIXED", "[SEL]+[D5]-[G5]: BANK", K_GOLD);
         return;
     }
     scene_put(proj.bank, n);
@@ -1070,7 +1078,7 @@ static void scene_recall(int n, int keep)              /* a white key: morph the
     int k;
     scene_name(t + 6, proj.bank, n);
     if (!sc) {
-        say(t, "EMPTY: SAVE+KEY");
+        say(t, "EMPTY: [SAVE]+KEY");
         return;
     }
     if (keep)
@@ -1730,7 +1738,7 @@ static int rq_input(uint32_t btn)                      /* asking: SEL or HOME an
     ui.keys = plat_keys();
     for (i = 0; i < NE; i++)
         plat_enc((int)i);                              /* turns while asking: dropped */
-    say_c((plat_ms() - rq_t) / 1500u & 1u ? "SEL YES - HOME NO" : "RESTORE FROM USB?", 0, K_GOLD);   /* (one line:
+    say_c((plat_ms() - rq_t) / 1500u & 1u ? "[SEL] YES - [HOME] NO" : "RESTORE FROM USB?", 0, K_GOLD);   /* (one line:
                                                         * the question and its keys in turn) */
     return 1;
 }
@@ -3052,10 +3060,13 @@ static void draw_pic(void)
         int32_t x;
         cv_round(6, 6, 228, 26, 6, K_CARD);
         cv_frame(6, 6, 228, 26, c);
-        x = 120 - (text_w(&FONT_B, ui.msg[0]) + (ui.msg[1][0] ? 8 + text_w(&FONT_B, ui.msg[1]) : 0)) / 2;
-        x = cv_text(x, 11, &FONT_B, ui.msg[0], c);
-        if (ui.msg[1][0])
-            cv_text(x + 8, 11, &FONT_B, ui.msg[1], K_TEXT);
+        char m0[24], m1[24];
+        unbox(m0, ui.msg[0]);
+        unbox(m1, ui.msg[1]);
+        x = 120 - (text_w(&FONT_B, m0) + (m1[0] ? 8 + text_w(&FONT_B, m1) : 0)) / 2;
+        x = cv_text(x, 11, &FONT_B, m0, c);
+        if (m1[0])
+            cv_text(x + 8, 11, &FONT_B, m1, K_TEXT);
     }
     cv_blit(0, PIC_Y);
 }

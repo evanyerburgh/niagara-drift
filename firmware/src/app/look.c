@@ -85,6 +85,9 @@ static uint16_t lk_msg_col(uint16_t c)
     return LK_NEUTRAL;
 }
 
+static int32_t lk_ktext(int32_t x, int32_t y, const felucca_font_t *f, const char *s, uint16_t c);
+static int32_t lk_ktext_w(const felucca_font_t *f, const char *s);
+
 /* ------------------------------------------------------------ header --- */
 /* left to right the page's name, its "1/2", what's running (REC or LOOP, SWELL, VISIT, II OUT); at the right PLAY's
  * state, then the sound: its key, and a Preset's name only with room for both. When it's full, what gives way, in
@@ -147,8 +150,8 @@ static void lk_bar(void)
         badge[nb] = "II OUT";
         bcol[nb++] = LK_DRONE[1];
     }
-    state = !ui.playing ? (fade_q() > 0 ? "FADING OUT" : "PLAY to start") : fade_q() < 20 ? "FADING IN" : 0;
-    st_short = !ui.playing && fade_q() == 0 ? "PLAY" : "FADING";
+    state = !ui.playing ? (fade_q() > 0 ? "FADING OUT" : "[PLAY] to start") : fade_q() < 20 ? "FADING IN" : 0;
+    st_short = !ui.playing && fade_q() == 0 ? "[PLAY]" : "FADING";
     if (ui.scene_at >= 0) {
         scene_name(key, proj.bank, ui.scene_at);
         sound = proj.bank == BANK_PRESETS ? preset_name(ui.scene_at) : 0;
@@ -163,7 +166,7 @@ static void lk_bar(void)
             if (!(i == swell && drop >= 4))
                 x += 12 + text_w(&LK_F_TAG, badge[i]);
         if (state) {
-            rx -= text_w(&LK_F_TAG, st);
+            rx -= lk_ktext_w(&LK_F_TAG, st);
             gap = 10;
         }
         if (sound && drop < 1) {
@@ -187,8 +190,8 @@ static void lk_bar(void)
             if (!(i == swell && drop >= 4))
                 x = cv_text(x + 12, bl - LK_B(LK_F_TAG), &LK_F_TAG, badge[i], bcol[i]);
         if (state) {
-            rx -= text_w(&LK_F_TAG, state);
-            cv_text(rx, bl - LK_B(LK_F_TAG), &LK_F_TAG, state, LK_LABEL);
+            rx -= lk_ktext_w(&LK_F_TAG, state);
+            lk_ktext(rx, bl - LK_B(LK_F_TAG), &LK_F_TAG, state, LK_LABEL);
             gap = 10;
         }
         if (sound && drop < 1) {
@@ -218,7 +221,7 @@ static void lk_banner(void)
         cv_round(9, 4, 222, bh - 2, 3, LK_BG);
         cv_round(13, 6, tw, bh - 6, 2, c);
         cv_text(17, 3 + (bh - (int32_t)LK_F_SEL.h) / 2, &LK_F_SEL, "TIP", LK_BG);
-        x = cv_text(13 + tw + 6, ty, &LK_F_MSG, ui.msg[0], c);
+        x = lk_ktext(13 + tw + 6, ty, &LK_F_MSG, ui.msg[0], c);
         if (x + 8 + text_w(&LK_F_SMALL, "once") <= 226)
             cv_text(226 - text_w(&LK_F_SMALL, "once"), ty + LK_B(LK_F_MSG) - LK_B(LK_F_SMALL), &LK_F_SMALL, "once",
                     LK_LABEL);
@@ -226,14 +229,14 @@ static void lk_banner(void)
     }
     cv_round(8, 3, 224, bh, 3, LK_BAND);
     cv_rect(11, 6, 3, bh - 6, c);
-    while (*rest && *rest != ' ' && n < 23)
+    while (*rest && *rest != ' ' && *rest != '[' && n < 23)
         kw[n++] = *rest++;
     kw[n] = 0;
     x = cv_text(20, ty, &LK_F_MSG, kw, c);
     if (*rest)
-        x = cv_text(x, ty, &LK_F_MSG, rest, LK_INK);
+        x = lk_ktext(x, ty, &LK_F_MSG, rest, LK_INK);
     if (ui.msg[1][0])
-        cv_text(x + 5, ty, &LK_F_MSG, ui.msg[1], LK_INK);
+        lk_ktext(x + 5, ty, &LK_F_MSG, ui.msg[1], LK_INK);
 }
 
 /* a knob's second job with SEL, on the rule above its name (Evan, 2026-11-01): "SEL" outlined in its box and the job
@@ -266,6 +269,43 @@ static int32_t lk_key(int32_t x, int32_t base, const char *key)
     cv_text(x + 3, ty + 1, &LK_F_SEL, key, LK_INK);
     return x + w;
 }
+
+/* text with its buttons and keys in boxes (the spec's rule 19, Evan 2026-11-02): "turn on [SEL] + [PLAY]" draws SEL
+ * and PLAY as lk_key's boxes; returns where it ends (draw 0: only measures) */
+static int32_t lk_fbase(const felucca_font_t *f)
+{
+    return f == &FONT_S ? FONT_S_BASE : f == &FONT_B ? FONT_B_BASE : f == &FONT_T18 ? FONT_T18_BASE
+         : f == &FONT_Q17 ? FONT_Q17_BASE : f == &FONT_T20 ? FONT_T20_BASE : FONT_U1_BASE;
+}
+static int32_t lk_ktext_(int32_t x, int32_t y, const felucca_font_t *f, const char *s, uint16_t c, int draw)
+{
+    char seg[24];
+    int n;
+    while (*s) {
+        const int box = *s == '[';
+        if (box)
+            s++;
+        for (n = 0; *s && n < 23 && (box ? *s != ']' : *s != '['); )
+            seg[n++] = *s++;
+        seg[n] = 0;
+        if (box && *s == ']')
+            s++;
+        if (box) {
+            const int32_t w = text_w(&LK_F_SEL, seg) + 6;
+            if (draw)
+                lk_key(x + 1, y + lk_fbase(f), seg);
+            x += w + 2;
+        } else {
+            x = draw ? cv_text(x, y, f, seg, c) : x + text_w(f, seg);
+        }
+    }
+    return x;
+}
+static int32_t lk_ktext(int32_t x, int32_t y, const felucca_font_t *f, const char *s, uint16_t c)
+{
+    return lk_ktext_(x, y, f, s, c, 1);
+}
+static int32_t lk_ktext_w(const felucca_font_t *f, const char *s) { return lk_ktext_(0, 0, f, s, 0, 0); }
 
 /* why a knob does nothing heard ("needs sqr"), gray on the rule above its name, in its drone's half (Evan,
  * 2026-11-02: clear of the meters; its value and meter gray too) */
