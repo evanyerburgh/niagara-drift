@@ -2254,6 +2254,13 @@ float dr_pulse_wave(float ph)
     return pulse_gain(ph, pulse_depth(par[P_PULSE_DEPTH]), (float)par[P_PULSE_SHAPE] * 0.01f,
                       1.0f + (float)par[P_PULSE_SWING] * 0.01f, pulse_hz(par[P_PULSE_RATE]));
 }
+float dr_pulse_hz(int v)                       /* the screen's: as pulse_run's rate */
+{
+    const float dbeats = DIV_BEATS[(unsigned)par[P_PULSE_DIV] < DR_NDIV ? par[P_PULSE_DIV] : 2];
+    if (v >= 0)
+        return pulse_hz(v);
+    return dr_ext_spb > 0.0f ? DR_SR / (dbeats * dr_ext_spb) : pulse_hz(par[P_PULSE_RATE]);
+}
 /* THE SWELL ON A MIDI CLOCK (v0.3, step 3; Evan, 2026-10-26): a breath a division of the beat (P_PULSE_DIV), its speed the
  * clock's tempo, its place steered toward the clock's beat (a gentle phase lock, ~0.3 s): it can't drift from the
  * master however its pulses wobble. The beat the UI last counted, carried on by the samples since (and on at the last

@@ -575,3 +575,10 @@ at the end. The current state is in the [README](../README.md) and the code.
   SEL and PLAY boxed). Nothing jumps: a line that comes and goes keeps its place, gray when idle (LFO sends'
   Movement and Swell lock). No sliders on LFO sends or Mods, nor cross-mod's amount bar: the knobs' values say it.
   A setting shown at the page's top with its key (Partner, the sub's octave, the filter) gets no banner there.
+- 2026-11-03: Swell, Delay and Reverb in the new look. The Swell: a bar of its two breaths in dB, six strands meeting
+  at the dot (the fan 0.09 / (1 + 2.2 Hz) of a bar), nine coral pills a meter; Shape as its number with its kind
+  under it (gate 100, pulse, even 0, ramp), since the picture shows the shape. Delay and Reverb on log time axes
+  (Delay 42 + 60 ln(1 + t / 0.1 s), 2 s; Reverb 84 + 37.7 ln(1 + t / 1 s), 40 s): echoes as half-rings
+  48 sqrt(wet fb^k) tall, L blue up and R aqua down; the tail as rings as tall as it is then, drained by Damp;
+  runaway red and freeze blue in the header. KNOB 4's second job as the SEL tag above Mix (both pages say "Mix").
+  A value too wide at 16 px steps down to 13 ("Cathedral").
