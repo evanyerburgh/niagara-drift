@@ -354,7 +354,8 @@ pink specks are as many as Color says.
   X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 4 / 9. Under each value, how far it swings
   in what you hear ("±12c", "±3.6 oct"), with the Movement. The picture shows LFO I and II, the drones' four sends
   (in the knobs' order), and a line from each LFO that reaches one (gray: at 0, or only from an LFO that's off); the
-  delay's send is on Mods, with its knob; under the waves the rate, the Movement and the Swell lock (D#4 locks it).
+  delay's send is on Mods, with its knob; the waves bent by Speed mod, as on Mods; under them the rate, the Movement
+  and the Swell lock (hold D#4).
 - **Mods**, the LFO moving other things, and cross-mod's amount:
   - **Speed mod** ("Speed" on the knob): the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
   - **Source**: which LFO does that (I, II or both).
@@ -365,8 +366,8 @@ pink specks are as many as Color says.
     tangles them into one restless, metallic sound); or, with **Snarl**, how far the finished sound, echoes and all,
     bends both drones' pitch (growly with two different pitches; on a single plain drone it only reshapes the tone).
     Their pitches stay where you set them: the bending is around them.
-  - The picture: the LFO's clock feeding LFO I and II (as Speed mod warps them), linked to the LFO's speed (the loop back
-    into the clock) and the delay's time; under it, cross-mod as it is now ("I moves II's cutoff", "bend each other",
+  - The picture: the LFO's clock feeding LFO I and II (bent as Speed mod bends the clock), the Source wave's line
+    looping straight back into the clock, and a line from the delay's wave to the delay's time; under it, cross-mod as it is now ("I moves II's cutoff", "bend each other",
     "Snarl" or off) and its key, F#5.
   - Movement (ALGORITHM) scales the delay's wobble too, as it does the LFO sends; not Speed mod or Cross-mod (see
     [The LFO](#the-lfo)).
