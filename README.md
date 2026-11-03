@@ -521,8 +521,8 @@ key.
 | 10 | hard sync (II to I) | which LFO moves the delay's time (I, II, both) |
 | 11 | cross-mod: off, I → II cutoff (lit), pitch I ↔ II (winking), Snarl: the finished sound bends both (winking) | the same |
 
-- A **wave key** goes round with each tap: LFO I (dark), LFO II (lit), both (winking). The screen says what moves and
-  which LFO moves it ("I PITCH ← LFO II").
+- A **wave key** goes round with each tap: LFO I (dark), LFO II (lit), both (winking). The screen says which LFO now
+  moves what ("LFO II → I PITCH").
 - **LFO reset:** tap to restart the LFO. Hold it half a second to lock the LFO to the Swell (it then
   restarts every bar; the key stays lit). Hold again to free it.
 - With **pitch link** on, KNOB 3 sets the gap between the drones, in semitones and cents ("+7 st", "+8 st +20").

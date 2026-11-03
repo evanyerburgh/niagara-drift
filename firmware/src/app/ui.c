@@ -564,8 +564,7 @@ static void link_set(int on)
 static void sw_flip(sw_t w)
 {
     static const char *const DR[2] = {"I ", "II "};
-    static const char *const WAVES[4] = {"\\ OFF", "\\ LFO I", "\\ LFO II", "\\ LFO I+II"};   /* "\\": a left
-                                                                                * arrow (gen_font.py) */
+    static const char *const WAVES[4] = {"NO LFO", "LFO I", "LFO II", "LFO I+II"};
     char a[24];
     const char *what = 0, *st = 0, *next = 0;
     int on = !sw_get(w), base = DR_GP(w.g, 0), tp = -1, nx;
@@ -595,7 +594,7 @@ static void sw_flip(sw_t w)
         st = MODE[m];
         break;
     }
-    /* the LFO pages: what moves, then the wave moving it ("I PITCH <- LFO II"; Evan, 2026-11-03) */
+    /* the LFO pages: the wave, then what it moves, as the picture reads ("LFO II -> I PITCH"; Evan, 2026-11-03) */
     case S_OTAP: param_set(tp, nx); what = proj.par[base + GP_OLFO_DEST] == DR_TO_XWAVE ? "X-WAVE" : "PITCH";
         st = WAVES[nx]; break;
     case S_ODEST: param_set(base + GP_OLFO_DEST, on); what = on ? "X-WAVE" : "PITCH"; st = WAVES[proj.par[base + GP_OLFO]];
@@ -624,6 +623,14 @@ static void sw_flip(sw_t w)
         (w.s == S_HP && ui.view == V_PLAY2))
         return;                                /* the page shows it and its key at the top: no banner (Evan,
                                                 * 2026-11-02) */
+    if (w.s == S_OTAP || w.s == S_ODEST || w.s == S_FDEST || w.s == S_FTAP || w.s == S_DTAP) {
+        char b[24];
+        scopy(scopy(scopy(b, "\\ "), q == a ? "" : DR[w.g]), what);   /* "\\": a right arrow (gen_font.py) */
+        say_c(st, b, RGB(183, 145, 255));      /* in the LFO's lilac */
+        if (next)
+            scopy(ui.msg_next, next);
+        return;
+    }
     scopy(q, what);
     say_c(a, st, w.s == S_LFORESET || w.s == S_DTAP ? RGB(183, 145, 255) : w.g ? RGB(69, 227, 211) : RGB(255, 176, 74));
     if (next)

@@ -101,8 +101,8 @@ def render(ttf, px, scale, pixel, first, last):
         #   a middle dot ("·"), the caret's "±", the tilde's "×" (nothing on screen uses those three)
         adv = int(round(font.getlength(ch, features=feats)))
         bw = adv + 2 * PAD
-        if c == 0x5C:                                  # the backslash's slot: a left arrow ("<-" in gfx.c), drawn,
-            adv = int(round(font.getlength("-", features=feats) * 2.2))   # Barlow has none (the banner's "I PITCH <- LFO II")
+        if c == 0x5C:                                  # the backslash's slot: a right arrow, drawn (Barlow has
+            adv = int(round(font.getlength("-", features=feats) * 2.2))   # none): the banner's "LFO II -> I PITCH"
             bw = adv + 2 * PAD
         img = Image.new("L", (bw, asc + desc), 0)
         if c == 0x5C:
@@ -111,7 +111,7 @@ def render(ttf, px, scale, pixel, first, last):
             y = (my[1] + my[3]) / 2
             x0, x1, hh = PAD + 0.5, PAD + adv - 1.0, max(2.0, px * 0.2)
             d.line([(x0, y), (x1, y)], fill=255, width=sw)
-            d.line([(x0 + hh, y - hh), (x0, y), (x0 + hh, y + hh)], fill=255, width=sw, joint="curve")
+            d.line([(x1 - hh, y - hh), (x1, y), (x1 - hh, y + hh)], fill=255, width=sw, joint="curve")
         else:
             ImageDraw.Draw(img).text((PAD, 0), ch, font=font, fill=255, features=feats)
         img = img.crop((0, top, bw, top + h))
