@@ -119,8 +119,10 @@ typedef struct {
 static const sw_t SW_NORMAL[11] = {{S_PARTNER, 0}, {S_SUBOCT, 0}, {S_HP, 0}, {S_PLOCK, 0}, {S_LFORESET, 0},
                                    {S_PARTNER, 1}, {S_SUBOCT, 1}, {S_HP, 1}, {S_PLINK, 1}, {S_SYNC, 1},
                                    {S_XMOD, 1}};
-static const sw_t SW_LFO[11] = {{S_OTAP, 0}, {S_ODEST, 0}, {S_FDEST, 0}, {S_FTAP, 0}, {S_LFORESET, 0},
-                                {S_OTAP, 1}, {S_ODEST, 1}, {S_FDEST, 1}, {S_FTAP, 1}, {S_DTAP, 1},
+/* the LFO pages: each drone's keys in one order, the pitch send's LFO and target, then the cutoff send's (Evan,
+ * 2026-11-03) */
+static const sw_t SW_LFO[11] = {{S_OTAP, 0}, {S_ODEST, 0}, {S_FTAP, 0}, {S_FDEST, 0}, {S_LFORESET, 0},
+                                {S_OTAP, 1}, {S_ODEST, 1}, {S_FTAP, 1}, {S_FDEST, 1}, {S_DTAP, 1},
                                 {S_XMOD, 1}};
 
 /* the screen's colours: dark, glowing (Evan, 2026-10-09; Figma "Screen concepts", concept D), in the site's palette
@@ -242,8 +244,9 @@ static void mark_dirty(void) { ui.dirty = 1; ui.chg_t = plat_ms(); }
  * what's been seen, the player's, as the Gesture time is). A tip waits for the screen: after any message */
 enum { TIP_BLEND, TIP_NAMES, TIP_GEST, TIP_FX, TIP_INTO, TIP_XMOD, TIP_CLOCK, TIP_UNDO, NTIPS };
 static const char *const TIP_TEXT[NTIPS] = {   /* one line, the banner's width (~23) */
-    "PRESS HARDER: BLEND", "HOLD SEL: KEY NAMES", "HOLD: IN · TAP: LATCH", "TAP FX: REVERB",
-    "SEL + KNOB 4: INTO REV", "KEY 11: PITCH, SNARL", "SWELL KNOB 1: DIVISION", "SEL + SAVE: UNDO"};
+    "PRESS HARDER: BLEND", "HOLD [SEL]: KEY NAMES", "HOLD: IN · TAP: LATCH", "TAP [FX]: REVERB",
+    "[SEL]+KNOB 4: INTO REV", "[F#5]: PITCH, SNARL", "SWELL KNOB 1: DIVISION", "[SEL] + [SAVE]: UNDO"};
+/* (a button or key in [ ]: the new look draws it in a box, the spec's rule 19; the old screen drops the brackets) */
 #define TIP_MS 3500u
 static int tip_seen(int t) { return proj.seen[t >> 3] >> (t & 7) & 1u; }
 static void tip(int t)
@@ -294,6 +297,13 @@ static char *scopy(char *d, const char *s)          /* copies, returns the end *
     while ((*d = *s++))
         d++;
     return d;
+}
+static void unbox(char *d, const char *s)               /* a message without its keys' [ ] (the old screen) */
+{
+    for (; *s; s++)
+        if (*s != '[' && *s != ']')
+            *d++ = *s;
+    *d = 0;
 }
 
 /* ------------------------------------------------------------ values --- */
@@ -378,7 +388,7 @@ static void pitch_turn(int g, int p, int role, int32_t s)
     uint32_t now = plat_ms(), dt = now - ui.enc_t[role], a = (uint32_t)(s < 0 ? -s : s), slide;
     int cents, ti = tun_i(p);
     if (proj.par[P_PLOCK]) {                           /* locked against a bumped knob */
-        say_c("PITCH LOCKED", "KEY 4", K_GOLD);
+        say_c("PITCH LOCKED", "unlock [C#4]", K_GOLD);
         return;
     }
     ui.enc_t[role] = now;
@@ -465,7 +475,7 @@ static void depth_hint(int p)
     if (proj.par[P_MOVE] == 0)
         say_c("MOVEMENT 0%", "ALGORITHM", K_LFO);
     else if ((tap == DR_LFO_I && !w1) || (tap == DR_LFO_II && !w2) || (tap == DR_LFO_BOTH && !w1 && !w2))
-        say_c(tap == DR_LFO_II ? "LFO II OFF" : "LFO I OFF", tap == DR_LFO_II ? "tap OCT+" : "tap OCT-", K_LFO);
+        say_c(tap == DR_LFO_II ? "LFO II OFF" : "LFO I OFF", tap == DR_LFO_II ? "tap [OCT+]" : "tap [OCT-]", K_LFO);
 }
 
 /* A KNOB OVER A LIST OF NAMED CHOICES GOES ROUND (Evan, 2026-10-25: the rule for every such knob): past the last
@@ -474,7 +484,7 @@ static void depth_hint(int p)
 static int knob_list(int p)
 {
     return p == P_DLY_TYPE || p == P_REV_TYPE || p == P_DLY_ROUTE || p == P_WSCALE || p == P_SUBW_0 || p == P_SUBW_1 ||
-           p == P_TUNING;
+           p == P_TUNING || p == P_LFO_RMOD_SRC;   /* Mods' Source: I, II, I+II, I again (Evan, 2026-11-03) */
 }
 
 static void knob_turn(int i, int32_t e)
@@ -494,7 +504,7 @@ static void knob_turn(int i, int32_t e)
         }               /* SEL let go: not a tap */
     }
     if (proj.par[P_II_OUT] && k.g == 1)        /* drone II out: say how it comes back, on any page (Evan, 2026-10-18) */
-        say_c("II OFF", "SEL + PLAY", K_DRONE[1]);
+        say_c("II OFF", "turn on [SEL] + [PLAY]", K_DRONE[1]);   /* (Evan, 2026-11-02: say what to do) */
     if (k.p == GP_PITCH && k.g < G)
         pitch_turn(k.g, p, EN_K1 + i, e);
     else if (dr_param_info(p)->hi - dr_param_info(p)->lo > 24)
@@ -556,7 +566,7 @@ static void link_set(int on)
 static void sw_flip(sw_t w)
 {
     static const char *const DR[2] = {"I ", "II "};
-    static const char *const WAVES[4] = {"OFF", "LFO I", "LFO II", "LFO I+II"};
+    static const char *const WAVES[4] = {"NO LFO", "LFO I", "LFO II", "LFO I+II"};
     char a[24];
     const char *what = 0, *st = 0, *next = 0;
     int on = !sw_get(w), base = DR_GP(w.g, 0), tp = -1, nx;
@@ -574,7 +584,7 @@ static void sw_flip(sw_t w)
         what = "SUB";
         st = SUB[v];
         if (proj.par[base + GP_MIX] <= 2)      /* not heard: OSC MIX (Sub · Drive, EDIT twice) is at the oscillators */
-            next = "OSC MIX 0 · EDIT x2";
+            next = "OSC MIX 0 · [EDIT] x2";
         break;
     }
     case S_PLOCK: param_set(P_PLOCK, on); q = a; what = "PITCH LOCK"; st = on ? "ON" : "OFF"; break;
@@ -586,10 +596,15 @@ static void sw_flip(sw_t w)
         st = MODE[m];
         break;
     }
-    case S_OTAP: param_set(tp, nx); what = "OSC LFO"; st = WAVES[nx]; break;
-    case S_ODEST: param_set(base + GP_OLFO_DEST, on); what = "OSC LFO TO"; st = on ? "X-WAVE" : "PITCH"; break;
-    case S_FDEST: param_set(base + GP_FLFO_DEST, on); what = "FILTER LFO TO"; st = on ? "RESONANCE" : "CUTOFF"; break;
-    case S_FTAP: param_set(tp, nx); what = "FILTER LFO"; st = WAVES[nx]; break;
+    /* the LFO pages: the wave, then what it moves, as the picture reads ("LFO II -> I PITCH"; Evan, 2026-11-03) */
+    case S_OTAP: param_set(tp, nx); what = proj.par[base + GP_OLFO_DEST] == DR_TO_XWAVE ? "X-WAVE" : "PITCH";
+        st = WAVES[nx]; break;
+    case S_ODEST: param_set(base + GP_OLFO_DEST, on); what = on ? "X-WAVE" : "PITCH"; st = WAVES[proj.par[base + GP_OLFO]];
+        break;
+    case S_FDEST: param_set(base + GP_FLFO_DEST, on); what = on ? "RESONANCE" : "CUTOFF"; st = WAVES[proj.par[base + GP_FLFO]];
+        break;
+    case S_FTAP: param_set(tp, nx); what = proj.par[base + GP_FLFO_DEST] == DR_TO_RESO ? "RESONANCE" : "CUTOFF";
+        st = WAVES[nx]; break;
     case S_PLINK: link_set(on); q = a; what = "PITCH LINK"; st = on ? "ON" : "OFF"; break;
     case S_SYNC: param_set(P_SYNC, on); q = a; what = "HARD SYNC"; st = on ? "ON" : "OFF"; break;
     case S_XMOD: {                             /* round: off, cutoff, pitch (v0.3: cross-FM), Snarl (v0.3) */
@@ -603,8 +618,20 @@ static void sw_flip(sw_t w)
         break;
     }
     case S_LFORESET: dr_lfo_reset(); q = a; what = "LFO"; st = "RESET"; break;
-    case S_DTAP: param_set(tp, nx); q = a; what = "DELAY LFO"; st = WAVES[nx]; break;
+    case S_DTAP: param_set(tp, nx); q = a; what = "DELAY"; st = WAVES[nx]; break;
     default: return;
+    }
+    if ((w.s == S_PARTNER && ui.view == V_PARTNER) || (w.s == S_SUBOCT && ui.view == V_SOURCE) ||
+        (w.s == S_HP && ui.view == V_PLAY2) || (w.s == S_XMOD && ui.view == V_LFO2))
+        return;                                /* the page shows it and its key at the top: no banner (Evan,
+                                                * 2026-11-02) */
+    if (w.s == S_OTAP || w.s == S_ODEST || w.s == S_FDEST || w.s == S_FTAP || w.s == S_DTAP) {
+        char b[24];
+        scopy(scopy(scopy(b, "\\ "), q == a ? "" : DR[w.g]), what);   /* "\\": a right arrow (gen_font.py) */
+        say_c(st, b, RGB(183, 145, 255));      /* in the LFO's lilac */
+        if (next)
+            scopy(ui.msg_next, next);
+        return;
     }
     scopy(q, what);
     say_c(a, st, w.s == S_LFORESET || w.s == S_DTAP ? RGB(183, 145, 255) : w.g ? RGB(69, 227, 211) : RGB(255, 176, 74));
@@ -996,7 +1023,7 @@ static void save_run(void)                             /* each look at the input
 static void scene_store(int n)                         /* SAVE held + a white key: and into the flash */
 {
     if (proj.bank == BANK_PRESETS) {                   /* the Presets stay as they are (Evan, 2026-10-19) */
-        say_c("PRESETS ARE FIXED", "SEL+D5-G5: BANK", K_GOLD);
+        say_c("PRESETS ARE FIXED", "[SEL]+[D5]-[G5]: BANK", K_GOLD);
         return;
     }
     scene_put(proj.bank, n);
@@ -1067,7 +1094,7 @@ static void scene_recall(int n, int keep)              /* a white key: morph the
     int k;
     scene_name(t + 6, proj.bank, n);
     if (!sc) {
-        say(t, "EMPTY: SAVE+KEY");
+        say(t, "EMPTY: [SAVE]+KEY");
         return;
     }
     if (keep)
@@ -1727,7 +1754,7 @@ static int rq_input(uint32_t btn)                      /* asking: SEL or HOME an
     ui.keys = plat_keys();
     for (i = 0; i < NE; i++)
         plat_enc((int)i);                              /* turns while asking: dropped */
-    say_c((plat_ms() - rq_t) / 1500u & 1u ? "SEL YES - HOME NO" : "RESTORE FROM USB?", 0, K_GOLD);   /* (one line:
+    say_c((plat_ms() - rq_t) / 1500u & 1u ? "[SEL] YES - [HOME] NO" : "RESTORE FROM USB?", 0, K_GOLD);   /* (one line:
                                                         * the question and its keys in turn) */
     return 1;
 }
@@ -2030,6 +2057,7 @@ static const char *card_name(int p)
     case P_FEEDBACK: return "Feedbk";
     case P_LFO_RMOD: return "Speed";           /* Speed mod */
     case P_DLY_LFO_DEPTH: return "Delay";      /* Delay mod */
+    case P_LFO_RMOD_SRC: return "Source";      /* Mod by */
     case P_MORPH: return "Morph";
     case P_DLY_REPEATS: return "Repeat";
     case P_GLIDE: return "Glide";              /* Pitch glide */
@@ -3048,10 +3076,13 @@ static void draw_pic(void)
         int32_t x;
         cv_round(6, 6, 228, 26, 6, K_CARD);
         cv_frame(6, 6, 228, 26, c);
-        x = 120 - (text_w(&FONT_B, ui.msg[0]) + (ui.msg[1][0] ? 8 + text_w(&FONT_B, ui.msg[1]) : 0)) / 2;
-        x = cv_text(x, 11, &FONT_B, ui.msg[0], c);
-        if (ui.msg[1][0])
-            cv_text(x + 8, 11, &FONT_B, ui.msg[1], K_TEXT);
+        char m0[24], m1[24];
+        unbox(m0, ui.msg[0]);
+        unbox(m1, ui.msg[1]);
+        x = 120 - (text_w(&FONT_B, m0) + (m1[0] ? 8 + text_w(&FONT_B, m1) : 0)) / 2;
+        x = cv_text(x, 11, &FONT_B, m0, c);
+        if (m1[0])
+            cv_text(x + 8, 11, &FONT_B, m1, K_TEXT);
     }
     cv_blit(0, PIC_Y);
 }

@@ -942,8 +942,11 @@ static int heard(int i)                          /* the sound's own value with t
     int v = moff[i] == MOFF_ON ? PARAMS[i].hi : moff[i] == MOFF_OFF ? PARAMS[i].lo : base[i] + moff[i];
     if (i < P_XMOD && i % GP_N == GP_LEVEL && moff[i] && moff[i] != MOFF_ON && moff[i] != MOFF_OFF) {
         /* a level's moves are in the knob's units before its taper (v^2 / 100): the same dips and lifts in dB as
-         * Evan approved (Weight +40, Wash -15 and its breath -14), at any level */
-        float l = fm_clampf((float)(base[i] * base[i]) * 0.01f + (float)moff[i], 0.0f, 100.0f);
+         * Evan approved (Weight +40, Wash -15 and its breath -14), at any level from 10; under 10 a lift fades out
+         * with the level, so a drone turned to 0 stays silent, as under every other gesture (Evan, 2026-11-02:
+         * Weight brought it back at about -28 dB) */
+        const float m = moff[i] > 0 ? (float)moff[i] * fm_minf(1.0f, (float)base[i] * 0.1f) : (float)moff[i];
+        float l = fm_clampf((float)(base[i] * base[i]) * 0.01f + m, 0.0f, 100.0f);
         v = (int)(10.0f * fm_sqrtf(l) + 0.5f);
     }
     return v < PARAMS[i].lo ? PARAMS[i].lo : v > PARAMS[i].hi ? PARAMS[i].hi : v;
@@ -964,9 +967,30 @@ static const int16_t WSCALE_J[DR_NWSCALE][WS_MAX] = {   /* ... their pure sizes,
     {0, 316, 498, 702, 1018}, {0, 204, 386, 702, 884}, {0, 702}, {0, 200, 400, 600, 800, 1000},
     {0, 204, 316, 498, 702, 884, 1018}, {0, 386, 702, 969},
 };
-static void wander_run(uint32_t n)
+static int wander_degs(float *deg)             /* the scale's notes over drone I, on the Tuning, semitones (up to 8) */
 {
     const float *sc = WSCALE[(unsigned)base[P_WSCALE] < DR_NWSCALE ? base[P_WSCALE] : 0];
+    int nd = 0, t = tun_ok(base[P_TUNING]), i, j;
+    if (t == DR_TUN_HARM) {                      /* the harmonics: all of them, whatever the scale */
+        int g1 = grid_near_a(t, base[DR_GP(0, GP_PITCH)]);
+        for (i = 0; i < 8; i++)
+            deg[nd++] = (float)(((900 + TUN_HARM[i] - g1) % 1200 + 1200) % 1200) * 0.01f;
+    } else {
+        const int16_t *sj = WSCALE_J[(unsigned)base[P_WSCALE] < DR_NWSCALE ? base[P_WSCALE] : 0];
+        for (i = 0; i < WS_MAX && sc[i] >= 0.0f; i++) {
+            float x = dr_tun_iv(sc[i], sj[i]);
+            for (j = 0; j < nd && fm_fabsf(deg[j] - x) > 0.05f; j++)
+                ;
+            if (j == nd)                         /* (two notes the Tuning puts on one: once) */
+                deg[nd++] = x;
+        }
+    }
+    return nd;
+}
+int dr_wander_degs(float *deg) { return wander_degs(deg); }
+
+static void wander_run(uint32_t n)
+{
     float a = (float)base[P_WANDER] * 0.01f, gs;
     if (a > 0.0f && base[P_WANDER] > wand_v && wand_n > n) {   /* turned up: no waiting out the slower gap drawn
                                                                 * before (QA 2026-10-20: 26 s from off to 100) */
@@ -1002,21 +1026,7 @@ static void wander_run(uint32_t n)
         } else {
             float rel = grp[0].ps2 - grp[1].ps2, deg[8];   /* drone I's root, from drone II's own pitch; the
                                                             * scale's notes over it, on the Tuning */
-            int nd = 0, t = tun_ok(base[P_TUNING]), j;
-            if (t == DR_TUN_HARM) {              /* the harmonics: all of them, whatever the scale */
-                int g1 = grid_near_a(t, base[DR_GP(0, GP_PITCH)]);
-                for (i = 0; i < 8; i++)
-                    deg[nd++] = (float)(((900 + TUN_HARM[i] - g1) % 1200 + 1200) % 1200) * 0.01f;
-            } else {
-                const int16_t *sj = WSCALE_J[(unsigned)base[P_WSCALE] < DR_NWSCALE ? base[P_WSCALE] : 0];
-                for (i = 0; i < WS_MAX && sc[i] >= 0.0f; i++) {
-                    float x = dr_tun_iv(sc[i], sj[i]);
-                    for (j = 0; j < nd && fm_fabsf(deg[j] - x) > 0.05f; j++)
-                        ;
-                    if (j == nd)                 /* (two notes the Tuning puts on one: once) */
-                        deg[nd++] = x;
-                }
-            }
+            const int nd = wander_degs(deg);
             for (o = -2; o <= 2; o++)
                 for (i = 0; i < nd; i++) {
                     float x = rel + deg[i] + 12.0f * (float)o;
@@ -1185,6 +1195,7 @@ static void macro_apply(uint32_t n)              /* the offsets again, n samples
 }
 
 float dr_wander(void) { return wand_st; }
+float dr_wander_to(void) { return wand_to; }
 int dr_heard(int p) { return p >= 0 && p < DR_NPARAMS ? par[p] : 0; }
 float dr_mac_pitch(int g) { return g >= 0 && g < DR_NGROUPS ? mac_p[g] : 0.0f; }
 float dr_gest_pitch(int g) { return g >= 0 && g < DR_NGROUPS ? mac_gp[g] : 0.0f; }

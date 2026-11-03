@@ -235,12 +235,14 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 | Drones 1 | I pitch | I cutoff | II pitch | II cutoff |
 | Drones 2 | I level | I resonance | II level | II resonance |
 
-- **Drones 2** draws each drone's filter curve, as high as the drone is loud, its level in dB under it. The resonance's
-  last dot is red: there the filter rings on its own.
+- **Drones 2** draws each drone's filter curve, its level in dB under it; as a drone goes quiet its strands close up
+  and dim, and a silent one is the curve in thin gray. Beside each drone's name, its filter (LP, BP, HP) and the black
+  key that changes it (A#3 for drone I, A#4 for drone II). The resonance's last dot is red: there the filter rings on
+  its own.
 
 - **The picture** (Drones 1) draws each drone's wave as a few strands: they lie on one line while the drone is still
-  and fan out as Drift, detune or an LFO moves it. Each wave fills its half, however quiet (Drones 2 shows the
-  levels). Beside **II**, its interval from drone I, to the nearest semitone, and an arrow: up or down ("5th ↑").
+  and fan out as Drift, detune or an LFO moves it. Each wave fills its half (Drones 2 shows the levels), until it's
+  nearly silent: then it shrinks and dims to a thin gray line. Beside **II**, its interval from drone I, to the nearest semitone, and an arrow: up or down ("5th ↑").
 
 - **Pitch** goes from 1.6 kHz down to 2 Hz. Under 27 Hz (where the screen shows Hz, not a note) a drone stops being a
   tone and becomes a pulse of clicks, a click a cycle: rhythm, and through a drive they ping against the other drone.
@@ -301,7 +303,8 @@ pink specks are as many as Color says.
   saw there. Without a square in the wave, Width does nothing: its value and meter go gray, "needs sqr" above it.
 - **Osc/Sub** crossfades the oscillators with the sub (the knob reads "Osc/Sb"); **drive** pushes each drone into its filter.
   The picture shows each drone's two lanes, **osc** and **sub**, each as loud as its share of the crossfade, shaped by
-  the drive.
+  the drive. Beside each drone's name, its sub's octave ("-1 oct") and the black key that steps it (G#3 for drone I, G#4
+  for drone II).
 - **The sub's wave**: hold SEL and turn a drone's Osc/Sub knob: **Square** (as it starts), **Sine** (pure weight, the
   deepest on headphones, the least for a small speaker), **Triangle**, **Saw** (the brightest). Each is as loud as the
   square, and a change glides through, as the sub's octave does. Above each Osc/Sub knob the screen names it ("SEL
@@ -327,8 +330,14 @@ pink specks are as many as Color says.
 - **Wander's scale**: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just (the
   harmonics 1–8 of drone I, pure: the root, the pure major third, fifth and the seventh harmonic). Its notes take the
   Tuning's (Setup 2): see Tuning.
+- The picture is one pitch scale with drone I's root as home: on the left Shift's move between the fifths above and
+  below (filling as the gesture comes in), on the right drone II's last four Wander jumps on the scale's notes, ending
+  at now, with drone II's note at the top right.
 
-- The partner oscillator sits an interval above or below each drone; **detune** makes them beat.
+- The partner oscillator sits an interval above or below each drone; **detune** makes them beat. The picture draws
+  each drone with its partner as a knot (a Lissajous figure): the interval sets its shape, and the beating rolls it,
+  as fast as it beats ("beats 2.0/s"); a just interval with no detune stands still. Beside each drone's name, whether
+  its partner is on and the black key that switches it (F#3 for drone I, F#4 for drone II).
 - Each **interval** comes twice: tempered, then **just** ("+5th just"), a pure ratio (a fifth is exactly 3/2) that
   doesn't beat; detune still adds beating on purpose. Octaves and unison are both at once.
 
@@ -342,7 +351,12 @@ pink specks are as many as Color says.
 | Mods | speed mod | source (LFO) | delay mod | cross-mod |
 
 - **The sends** and **speed mod** are centered: the middle is none. Each send is named for what it moves: Pitch, or
-  X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 3 / 8.
+  X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 4 / 9. Under each value, how far it swings
+  in what you hear ("±12c", "±3.6 oct"), with the Movement. The picture shows LFO I and II, the drones' four sends
+  (in the knobs' order), and a line from each LFO that reaches one (gray: at 0, or only from an LFO that's off); the
+  delay's send is on Mods, with its knob; the waves bent by Speed mod, as on Mods; under them the rate and the
+  Movement; under the sends the Swell lock (D#4, held to switch): free, on Swell (the LFO starts over each Swell bar)
+  or waits Swell (locked, the Swell stopped).
 - **Mods**, the LFO moving other things, and cross-mod's amount:
   - **Speed mod** ("Speed" on the knob): the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
   - **Source**: which LFO does that (I, II or both).
@@ -353,6 +367,9 @@ pink specks are as many as Color says.
     tangles them into one restless, metallic sound); or, with **Snarl**, how far the finished sound, echoes and all,
     bends both drones' pitch (growly with two different pitches; on a single plain drone it only reshapes the tone).
     Their pitches stay where you set them: the bending is around them.
+  - The picture: the LFO's clock feeding LFO I and II (bent as Speed mod bends the clock), the Source wave's line
+    looping straight back into the clock, and a line from the delay's wave to the delay's time; under it, cross-mod as it is now ("I moves II's cutoff", "bend each other",
+    "Snarl" or off) and its key, F#5.
   - Movement (ALGORITHM) scales the delay's wobble too, as it does the LFO sends; not Speed mod or Cross-mod (see
     [The LFO](#the-lfo)).
 - The LFO's rate and waves are on the top-left knobs; see [The LFO](#the-lfo) below.
@@ -494,26 +511,27 @@ key.
 
 | Key | Normally | On the LFO pages |
 |---|---|---|
-| 1 | I partner | I osc wave (I, II, both) |
-| 2 | I sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | I osc LFO → X-Wave (instead of pitch) |
-| 3 | I filter: LP, BP, HP | I filter LFO → resonance (instead of cutoff) |
-| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are; on when you first start: turn a pitch knob and the screen says "PITCH LOCKED · KEY 4") | I filter wave (I, II, both) |
+| 1 | I partner | which LFO moves I's pitch (I, II, both) |
+| 2 | I sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | I's pitch send moves X-Wave instead |
+| 3 | I filter: LP, BP, HP | which LFO moves I's cutoff (I, II, both) |
+| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are; on when you first start: turn a pitch knob and the screen says "PITCH LOCKED  unlock C#4") | I's cutoff send moves resonance instead |
 | 5 | LFO reset | LFO reset |
-| 6 | II partner | II osc wave (I, II, both) |
-| 7 | II sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | II osc LFO → X-Wave |
-| 8 | II filter: LP, BP, HP | II filter LFO → resonance |
-| 9 | pitch link (II follows I) | II filter wave (I, II, both) |
-| 10 | hard sync (II to I) | delay wave (I, II, both) |
+| 6 | II partner | which LFO moves II's pitch (I, II, both) |
+| 7 | II sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | II's pitch send moves X-Wave instead |
+| 8 | II filter: LP, BP, HP | which LFO moves II's cutoff (I, II, both) |
+| 9 | pitch link (II follows I) | II's cutoff send moves resonance instead |
+| 10 | hard sync (II to I) | which LFO moves the delay's time (I, II, both) |
 | 11 | cross-mod: off, I → II cutoff (lit), pitch I ↔ II (winking), Snarl: the finished sound bends both (winking) | the same |
 
-- A **wave key** goes round with each tap: LFO I (dark), LFO II (lit), both (winking).
+- A **wave key** goes round with each tap: LFO I (dark), LFO II (lit), both (winking). The screen says which LFO now
+  moves what ("LFO II → I PITCH").
 - **LFO reset:** tap to restart the LFO. Hold it half a second to lock the LFO to the Swell (it then
   restarts every bar; the key stays lit). Hold again to free it.
 - With **pitch link** on, KNOB 3 sets the gap between the drones, in semitones and cents ("+7 st", "+8 st +20").
 - A **filter key** goes round with each tap: low-pass (dark), band-pass (winking), high-pass (lit).
 - A **sub key** goes round with each tap: −1 octave (dark), −2 octaves (lit), then the subharmonics ⅓
   and ⅕ of the pitch (winking). With the drone's OSC MIX at 0 (Sub · Drive) the sub isn't heard: the screen says
-  so ("OSC MIX 0 · EDIT x2").
+  so ("OSC MIX 0 · EDIT x2", EDIT in a box).
 
 ### MIDI
 

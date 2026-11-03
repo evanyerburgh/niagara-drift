@@ -60,10 +60,10 @@ spin SELECT -20
 spin K2 30
 spin K4 -20
 tapkey b0
-tapkey b8
-tapkey b8
-tapkey b3
-tapkey b3
+tapkey b7
+tapkey b7
+tapkey b2
+tapkey b2
 wait 2500
 shot lfo.png
 # Mods: the rate mod, cross-mod's amount, the delay LFO's depth

@@ -140,6 +140,10 @@ static uint32_t glyph(const felucca_font_t *f, uint32_t ch)
 {
     if (ch == 0xB7u)                          /* "·" (UTF-8 C2 B7; the C2 is skipped): drawn in the backtick's slot */
         ch = f->last >= 0x60u ? 0x60u : '.';
+    else if (ch == 0xB1u)                     /* "±" (C2 B1): the caret's slot */
+        ch = 0x5Eu;
+    else if (ch == 0x97u)                     /* "×" (C3 97; the C3 is skipped): the tilde's */
+        ch = f->last >= 0x7Eu ? 0x7Eu : 'x';
     if (ch >= 'a' && ch <= 'z' && f->last < 'a')
         ch -= 32u;
     if (ch < f->first || ch > f->last || (ch >= 127u && ch < 160u))
@@ -156,7 +160,8 @@ static int32_t cv_text(int32_t x, int32_t y, const felucca_font_t *f, const char
     uint32_t r = c >> 11, g = (c >> 5) & 63u, b = c & 31u;
     for (; *s; s++) {
         uint32_t gi, gx, gy, w, bpr;
-        if ((uint8_t)*s == 0xC2u)                /* a UTF-8 lead byte ("·"): its second byte is the glyph */
+        if ((uint8_t)*s == 0xC2u || (uint8_t)*s == 0xC3u)   /* a UTF-8 lead byte ("·", "±", "×"): its second
+                                                            * byte is the glyph */
             continue;
         gi = glyph(f, (uint8_t)*s);
         const uint8_t *gd;
@@ -189,7 +194,7 @@ static int32_t text_w(const felucca_font_t *f, const char *s)
 {
     int32_t w = 0;
     for (; *s; s++)
-        if ((uint8_t)*s != 0xC2u)
+        if ((uint8_t)*s != 0xC2u && (uint8_t)*s != 0xC3u)
             w += f->adv[glyph(f, (uint8_t)*s)] + (*s == ' ' ? 0 : cv_track);
     return w;
 }

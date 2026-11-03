@@ -414,6 +414,8 @@ static int expect(const char *what, const char *val)
         for (n = 0; n < NSCENES; n++)
             got |= (scene_has(proj.bank, n) != 0) << n;
     }
+    else if (!strcmp(what, "lvl0") || !strcmp(what, "lvl1"))   /* a drone's level heard (dr_level), dB; -99 silent */
+        got = dr_level[what[3] - '0'] > 1e-5f ? (int)(20.0f * log10f(dr_level[what[3] - '0'])) : -99;
     else if (!strcmp(what, "lfo0"))                /* the LFO's Wave I now, x 100 */
         got = (int)(dr_lfo[0] * 100.0f);
     else if (!strcmp(what, "phones"))             /* the engine told: headphones in (no Speaker cut) */

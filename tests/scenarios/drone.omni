@@ -225,14 +225,14 @@ tapkey b0
 expect par13 1
 tapkey b0
 expect par13 2
-# the filter LFO onto the resonance and back (the third key)
-tapkey b2
+# the filter LFO onto the resonance and back (the fourth key)
+tapkey b3
 expect par18 1
-tapkey b2
+tapkey b3
 expect par18 0
 tapkey b1
 expect par15 1
-tapkey b8
+tapkey b7
 expect par37 3
 wait 100
 shot lfo.png
