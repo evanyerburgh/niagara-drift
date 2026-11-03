@@ -484,7 +484,7 @@ static void depth_hint(int p)
 static int knob_list(int p)
 {
     return p == P_DLY_TYPE || p == P_REV_TYPE || p == P_DLY_ROUTE || p == P_WSCALE || p == P_SUBW_0 || p == P_SUBW_1 ||
-           p == P_TUNING;
+           p == P_TUNING || p == P_LFO_RMOD_SRC;   /* Mods' Source: I, II, I+II, I again (Evan, 2026-11-03) */
 }
 
 static void knob_turn(int i, int32_t e)
