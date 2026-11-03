@@ -509,19 +509,20 @@ key.
 
 | Key | Normally | On the LFO pages |
 |---|---|---|
-| 1 | I partner | I osc wave (I, II, both) |
-| 2 | I sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | I osc LFO → X-Wave (instead of pitch) |
-| 3 | I filter: LP, BP, HP | I filter LFO → resonance (instead of cutoff) |
-| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are; on when you first start: turn a pitch knob and the screen says "PITCH LOCKED  unlock C#4") | I filter wave (I, II, both) |
+| 1 | I partner | which LFO moves I's pitch (I, II, both) |
+| 2 | I sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | I's pitch send moves X-Wave instead |
+| 3 | I filter: LP, BP, HP | I's cutoff send moves resonance instead |
+| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are; on when you first start: turn a pitch knob and the screen says "PITCH LOCKED  unlock C#4") | which LFO moves I's cutoff (I, II, both) |
 | 5 | LFO reset | LFO reset |
-| 6 | II partner | II osc wave (I, II, both) |
-| 7 | II sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | II osc LFO → X-Wave |
-| 8 | II filter: LP, BP, HP | II filter LFO → resonance |
-| 9 | pitch link (II follows I) | II filter wave (I, II, both) |
-| 10 | hard sync (II to I) | delay wave (I, II, both) |
+| 6 | II partner | which LFO moves II's pitch (I, II, both) |
+| 7 | II sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | II's pitch send moves X-Wave instead |
+| 8 | II filter: LP, BP, HP | II's cutoff send moves resonance instead |
+| 9 | pitch link (II follows I) | which LFO moves II's cutoff (I, II, both) |
+| 10 | hard sync (II to I) | which LFO moves the delay's time (I, II, both) |
 | 11 | cross-mod: off, I → II cutoff (lit), pitch I ↔ II (winking), Snarl: the finished sound bends both (winking) | the same |
 
-- A **wave key** goes round with each tap: LFO I (dark), LFO II (lit), both (winking).
+- A **wave key** goes round with each tap: LFO I (dark), LFO II (lit), both (winking). The screen says what moves and
+  which LFO moves it ("I PITCH ← LFO II").
 - **LFO reset:** tap to restart the LFO. Hold it half a second to lock the LFO to the Swell (it then
   restarts every bar; the key stays lit). Hold again to free it.
 - With **pitch link** on, KNOB 3 sets the gap between the drones, in semitones and cents ("+7 st", "+8 st +20").

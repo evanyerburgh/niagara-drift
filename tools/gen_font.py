@@ -101,8 +101,19 @@ def render(ttf, px, scale, pixel, first, last):
         #   a middle dot ("·"), the caret's "±", the tilde's "×" (nothing on screen uses those three)
         adv = int(round(font.getlength(ch, features=feats)))
         bw = adv + 2 * PAD
+        if c == 0x5C:                                  # the backslash's slot: a left arrow ("<-" in gfx.c), drawn,
+            adv = int(round(font.getlength("-", features=feats) * 2.2))   # Barlow has none (the banner's "I PITCH <- LFO II")
+            bw = adv + 2 * PAD
         img = Image.new("L", (bw, asc + desc), 0)
-        ImageDraw.Draw(img).text((PAD, 0), ch, font=font, fill=255, features=feats)
+        if c == 0x5C:
+            d, sw = ImageDraw.Draw(img), max(1, round(px / 11))
+            my = font.getbbox("-", features=feats)
+            y = (my[1] + my[3]) / 2
+            x0, x1, hh = PAD + 0.5, PAD + adv - 1.0, max(2.0, px * 0.2)
+            d.line([(x0, y), (x1, y)], fill=255, width=sw)
+            d.line([(x0 + hh, y - hh), (x0, y), (x0 + hh, y + hh)], fill=255, width=sw, joint="curve")
+        else:
+            ImageDraw.Draw(img).text((PAD, 0), ch, font=font, fill=255, features=feats)
         img = img.crop((0, top, bw, top + h))
         px_ = [(15 if v >= 128 else 0) if pixel else min(15, (v + 8) // 17) for v in img.tobytes()]
         glyphs.append((adv * scale, bw * scale, upscale(px_, bw, h, scale)))

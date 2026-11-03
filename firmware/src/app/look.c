@@ -1220,7 +1220,7 @@ static void lk_pic_lfo(void)
         scopy(q, "%");
         cv_text(8, tb + lh, &LK_F_SMALL, t, proj.par[P_MOVE] != 50 ? LK_VIOLET : LK_LABEL);   /* as set: gray */
     }
-    lk_ktext(8, tb + lh * 2, &LK_F_SMALL, !lock ? "lock to Swell [D#4]" : proj.par[P_PULSE] ? "restarts with Swell"
+    lk_ktext(8, tb + lh * 2, &LK_F_SMALL, !lock ? "hold [D#4] to lock" : proj.par[P_PULSE] ? "restarts with Swell"
                                                                                    : "lock waits for Swell",
              lock ? LK_CORAL : LK_LABEL);      /* unlocked: how to lock it, gray */
     for (d = 0; d < 5; d++) {                  /* the rows: I pitch, I cutoff, II pitch, II cutoff, delay */
@@ -1347,7 +1347,7 @@ static void lk_pic_mods(void)
                                                 * X-mod's value says it (Evan, 2026-11-02) */
             lk_harrow(70, 110, 88, 1, ci);
             lk_harrow(70, 119, 88, 0, cii);
-        } else {
+        } else if (xm) {                       /* off: no arrow (Evan, 2026-11-03) */
             lk_harrow(70, 115, 88, 1, ci);
         }
     }

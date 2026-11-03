@@ -564,7 +564,8 @@ static void link_set(int on)
 static void sw_flip(sw_t w)
 {
     static const char *const DR[2] = {"I ", "II "};
-    static const char *const WAVES[4] = {"OFF", "LFO I", "LFO II", "LFO I+II"};
+    static const char *const WAVES[4] = {"\\ OFF", "\\ LFO I", "\\ LFO II", "\\ LFO I+II"};   /* "\\": a left
+                                                                                * arrow (gen_font.py) */
     char a[24];
     const char *what = 0, *st = 0, *next = 0;
     int on = !sw_get(w), base = DR_GP(w.g, 0), tp = -1, nx;
@@ -594,10 +595,15 @@ static void sw_flip(sw_t w)
         st = MODE[m];
         break;
     }
-    case S_OTAP: param_set(tp, nx); what = "OSC LFO"; st = WAVES[nx]; break;
-    case S_ODEST: param_set(base + GP_OLFO_DEST, on); what = "OSC LFO TO"; st = on ? "X-WAVE" : "PITCH"; break;
-    case S_FDEST: param_set(base + GP_FLFO_DEST, on); what = "FILTER LFO TO"; st = on ? "RESONANCE" : "CUTOFF"; break;
-    case S_FTAP: param_set(tp, nx); what = "FILTER LFO"; st = WAVES[nx]; break;
+    /* the LFO pages: what moves, then the wave moving it ("I PITCH <- LFO II"; Evan, 2026-11-03) */
+    case S_OTAP: param_set(tp, nx); what = proj.par[base + GP_OLFO_DEST] == DR_TO_XWAVE ? "X-WAVE" : "PITCH";
+        st = WAVES[nx]; break;
+    case S_ODEST: param_set(base + GP_OLFO_DEST, on); what = on ? "X-WAVE" : "PITCH"; st = WAVES[proj.par[base + GP_OLFO]];
+        break;
+    case S_FDEST: param_set(base + GP_FLFO_DEST, on); what = on ? "RESONANCE" : "CUTOFF"; st = WAVES[proj.par[base + GP_FLFO]];
+        break;
+    case S_FTAP: param_set(tp, nx); what = proj.par[base + GP_FLFO_DEST] == DR_TO_RESO ? "RESONANCE" : "CUTOFF";
+        st = WAVES[nx]; break;
     case S_PLINK: link_set(on); q = a; what = "PITCH LINK"; st = on ? "ON" : "OFF"; break;
     case S_SYNC: param_set(P_SYNC, on); q = a; what = "HARD SYNC"; st = on ? "ON" : "OFF"; break;
     case S_XMOD: {                             /* round: off, cutoff, pitch (v0.3: cross-FM), Snarl (v0.3) */
@@ -611,7 +617,7 @@ static void sw_flip(sw_t w)
         break;
     }
     case S_LFORESET: dr_lfo_reset(); q = a; what = "LFO"; st = "RESET"; break;
-    case S_DTAP: param_set(tp, nx); q = a; what = "DELAY LFO"; st = WAVES[nx]; break;
+    case S_DTAP: param_set(tp, nx); q = a; what = "DELAY"; st = WAVES[nx]; break;
     default: return;
     }
     if ((w.s == S_PARTNER && ui.view == V_PARTNER) || (w.s == S_SUBOCT && ui.view == V_SOURCE) ||
