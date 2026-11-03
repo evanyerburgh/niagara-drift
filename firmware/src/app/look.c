@@ -1307,9 +1307,10 @@ static void lk_pic_mods(void)
     for (w = 0; w < 2; w++) {                  /* "I · Triangle", its warped cycle */
         const int sh = w ? w2 : w1;
         const int32_t ny = w * 30, xn = x + 10;
-        const char *nm = (w ? DR_LFO_W2_NAME : DR_LFO_W1_NAME)[(unsigned)sh < DR_LFO_NSHAPES ? sh : 0];
-        scopy(scopy(t, w ? "II \xC2\xB7 " : "I \xC2\xB7 "), nm);
-        cv_text(xn, ny, &LK_F_SMALL, t, sh ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 1.0f) : LK_LABEL);
+        const int32_t xe = cv_text(xn, ny, &LK_F_SMALL, w ? "II" : "I", lk_mix(0x07060Bu, LK_LFO_TINT[w], 1.0f));
+        dr_param_text(w ? P_LFO_W2 : P_LFO_W1, sh, t);
+        cv_text(xe + 5, ny, &LK_F_SMALL, t, sh ? LK_INK : LK_LABEL);    /* as LFO sends: the LFO in its tint, its
+                                                                         * shape white (Evan, 2026-11-03) */
         wy[w] = ny + (int32_t)LK_F_SMALL.h + 2;
         cv_line(x, 29, xn - 2, wy[w], LK_LABEL);      /* the clock branching to both */
         lk_lfo_line(w, xn, wy[w], 4, 37, ph, 1);
@@ -1349,11 +1350,15 @@ static void lk_pic_mods(void)
         int16_t y[34];
         int g;
         const int32_t hb = 69 + LK_B(FONT_B);
+        /* the one line in smaller type (at 18 it doesn't fit; Evan, 2026-11-03); the drones' names at 18 */
         x = cv_text(8, hb - LK_B(FONT_U1), &FONT_U1, "CROSS-MOD", xm ? LK_INK : LK_LABEL);
         x = cv_text(x + 4, hb - LK_B(LK_F_TAG), &LK_F_TAG, DOES[(unsigned)xm < 4u ? xm : 0], LK_LABEL);
         lk_key(x + 4, hb, LK_BKEY[10]);
-        cv_text(8, 90, &LK_F_TAG, "drone I", ci);
-        cv_text(144, 90, &LK_F_TAG, xm == DR_XMOD_CUT ? "drone II cutoff" : "drone II", cii);
+        cv_text(8, 89, &LK_F_SMALL, "drone I", ci);
+        {
+            const char *n2 = xm == DR_XMOD_CUT ? "drone II cutoff" : "drone II";
+            cv_text(232 - text_w(&LK_F_SMALL, n2), 89, &LK_F_SMALL, n2, cii);   /* over its sound, at the right */
+        }
         for (g = 0; g < 2; g++) {              /* each drone's sound now, small, scaled to its own peak */
             float m = 0.05f;
             for (i = 0; i < DR_SCOPE_N; i++)
@@ -1639,8 +1644,11 @@ static int lk_line2(int p, int v, char *t, char *t2)
         scopy(t2, m == DR_XMOD_CUT ? ">cutoff" : m == DR_XMOD_FM ? ">pitch" : m ? ">snarl" : "off");
         return 2;
     }
-    if (p == P_LFO_RMOD_SRC)
-        return 2;
+    if (p == P_LFO_RMOD_SRC) {                 /* "LFO" over "I+II" (and "I", "II": it doesn't jump; Evan, 2026-11-03) */
+        t[3] = 0;
+        scopy(t2, t + 4);
+        return 3;
+    }
     return 0;
 }
 
