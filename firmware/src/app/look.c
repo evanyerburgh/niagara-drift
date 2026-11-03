@@ -1233,8 +1233,9 @@ static int lk_wave_on(int route, int w)        /* a route (DR_LFO_*) takes wave 
 static void lk_pic_lfo(void)
 {
     const int clock = dr_ext_spb > 0.0f, lock = proj.par[P_LFO_LOCK] != 0;
-    const int nl = 3;                          /* the rate, the Movement and the Swell lock, always (coming and going
-                                                * they moved the page; Evan, 2026-11-02) */
+    const int nl = 2;                          /* the rate and the Movement together at the left, the lock at the
+                                                * right under the sends; always there (coming and going they moved
+                                                * the page; Evan, 2026-11-02, 2026-11-03) */
     const int32_t lh = (int32_t)LK_F_SMALL.h - 3, tb = LK_PIC_H - 1 - nl * lh, wh = tb / 2;
     int32_t wy[2];
     int w, d;
@@ -1254,22 +1255,24 @@ static void lk_pic_lfo(void)
     dr_param_text(clock ? P_LFO_DIV : P_LFO_RATE, proj.par[clock ? P_LFO_DIV : P_LFO_RATE], q);
     cv_text(8, tb, &LK_F_SMALL, t, LK_INK);
     {
-        q = scopy(t, "movement ");
+        q = scopy(t, "move ");
         itoa_u((uint32_t)proj.par[P_MOVE] * 2u, q);
         while (*q)
             q++;
         scopy(q, "%");
         cv_text(8, tb + lh, &LK_F_SMALL, t, proj.par[P_MOVE] != 50 ? LK_VIOLET : LK_LABEL);   /* as set: gray */
     }
-    lk_ktext(8, tb + lh * 2, &LK_F_SMALL, !lock ? "hold [D#4] to lock" : proj.par[P_PULSE] ? "restarts with Swell"
-                                                                                   : "lock waits for Swell",
-             lock ? LK_CORAL : LK_LABEL);      /* unlocked: how to lock it, gray */
+    {   /* the Swell lock's state, not how to lock it (Evan, 2026-11-03: "hold what?"): free, on the Swell's bars, or
+         * locked and waiting for the Swell; right-justified under the sends */
+        const char *lt = !lock ? "[D#4] free" : proj.par[P_PULSE] ? "[D#4] on Swell" : "[D#4] waits Swell";
+        lk_ktext(232 - lk_ktext_w(&LK_F_SMALL, lt), 2 + 4 * 24, &LK_F_SMALL, lt, lock ? LK_CORAL : LK_LABEL);
+    }
     for (d = 0; d < 4; d++) {                  /* the rows: I pitch, I cutoff, II pitch, II cutoff, each over its knob;
                                                 * the delay is Mods' (its knob there; Evan, 2026-11-03) */
         const int g = d / 2, osc = d % 2 == 0;
         const int route = gpar(g, osc ? GP_OLFO : GP_FLFO), depth = gpar(g, osc ? GP_OLFO_DEPTH : GP_FLFO_DEPTH);
         const int heard = depth && proj.par[P_MOVE] && (lk_wave_on(route, 0) || lk_wave_on(route, 1));
-        const int32_t ny = 2 + d * 30, sy = ny + (int32_t)LK_F_SMALL.h / 2, sx = 152;   /* the row's middle */
+        const int32_t ny = 2 + d * 24, sy = ny + (int32_t)LK_F_SMALL.h / 2, sx = 152;   /* the row's middle */
         scopy(scopy(t, g ? "II " : "I "), osc ? (gpar(g, GP_OLFO_DEST) == DR_TO_XWAVE ? "X-Wave" : "pitch")
                                               : (gpar(g, GP_FLFO_DEST) == DR_TO_RESO ? "reso" : "cutoff"));
         cv_text(sx, ny, &LK_F_SMALL, t, heard ? LK_DRONE[g] : LK_LABEL);   /* no sliders: the knobs say it (Evan,
