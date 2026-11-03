@@ -1170,6 +1170,34 @@ static void lk_harrow(int32_t x, int32_t y, int32_t w, int right, uint16_t c)
 
 /* one cycle of a wave across w, as the engine plays it (random: this cycle's phases), y in -amp..amp; and the x of
  * the phase now on it */
+/* the LFO's phase at n even steps of time across one cycle, as Speed bends the clock (a bit of the cycle takes
+ * 2^(-rm * Source)): always forward, from its start to its end (stepping by speed overran it and wrapped, and the dot
+ * stuck at the end at negative Speed; Evan, 2026-11-03). Mods and LFO sends draw the waves on it, so both show the
+ * LFO as it runs (Evan, 2026-11-03); 0 at Speed 0, the plain cycle */
+static const float *lk_lfo_phs(float *phs, int n)
+{
+    const int w1 = proj.par[P_LFO_W1], w2 = proj.par[P_LFO_W2], src = proj.par[P_LFO_RMOD_SRC];
+    const float rm = (float)proj.par[P_LFO_RMOD] * 0.03f;
+    float tm[64];
+    int i, j;
+    if (rm == 0.0f)
+        return 0;
+    tm[0] = 0.0f;
+    for (i = 0; i < n - 1; i++) {
+        const float ph = ((float)i + 0.5f) / (float)(n - 1);
+        const float v0 = dr_lfo_wave(0, w1, ph), v1 = dr_lfo_wave(1, w2, ph);
+        const float s = src == DR_LFO_BOTH ? fm_clampf(v0 + v1, -1.0f, 1.0f) : src == DR_LFO_II ? v1 : v0;
+        tm[i + 1] = tm[i] + fm_exp2f(-rm * s);
+    }
+    for (i = 0, j = 0; i < n; i++) {
+        const float tt = tm[n - 1] * (float)i / (float)(n - 1);
+        while (j < n - 2 && tm[j + 1] < tt)
+            j++;
+        phs[i] = fm_minf(((float)j + (tt - tm[j]) / fm_maxf(tm[j + 1] - tm[j], 1e-6f)) / (float)(n - 1), 0.9999f);
+    }
+    return phs;
+}
+
 static void lk_lfo_line(int tap, int32_t x0, int32_t yc, int32_t amp, int n, const float *phs, int lit)
 {
     const int sh = proj.par[tap ? P_LFO_W2 : P_LFO_W1];
@@ -1211,6 +1239,8 @@ static void lk_pic_lfo(void)
     int32_t wy[2];
     int w, d;
     char t[24], *q;
+    float phs[41];
+    const float *ph = lk_lfo_phs(phs, 41);      /* the waves bent as Speed bends the clock, as on Mods */
     for (w = 0; w < 2; w++) {                  /* "I Triangle", its wave under it */
         const int sh = proj.par[w ? P_LFO_W2 : P_LFO_W1];
         const int32_t ny = w * wh;
@@ -1218,7 +1248,7 @@ static void lk_pic_lfo(void)
         dr_param_text(w ? P_LFO_W2 : P_LFO_W1, sh, t);
         cv_text(x + 5, ny, &LK_F_SMALL, t, sh ? LK_INK : LK_LABEL);
         wy[w] = ny + (int32_t)LK_F_SMALL.h + (wh - (int32_t)LK_F_SMALL.h) / 2;
-        lk_lfo_line(w, 10, wy[w], (wh - (int32_t)LK_F_SMALL.h) / 2 - 3, 41, 0, 1);
+        lk_lfo_line(w, 10, wy[w], (wh - (int32_t)LK_F_SMALL.h) / 2 - 3, 41, ph, 1);
     }
     q = scopy(t, clock ? "cycle " : "rate ");
     dr_param_text(clock ? P_LFO_DIV : P_LFO_RATE, proj.par[clock ? P_LFO_DIV : P_LFO_RATE], q);
@@ -1260,27 +1290,12 @@ static void lk_pic_lfo(void)
 static void lk_pic_mods(void)
 {
     const int w1 = proj.par[P_LFO_W1], w2 = proj.par[P_LFO_W2], src = proj.par[P_LFO_RMOD_SRC], rmd = proj.par[P_LFO_RMOD];
-    const float rm = (float)rmd * 0.03f;
     const int xm = proj.par[P_XMOD], amt = proj.par[P_XMOD_AMT];
-    float phs[37], tm[37];
+    float phs[37];
     int32_t wy[2], x;
-    int i, w, j;
+    int i, w;
     char t[24];
-    tm[0] = 0.0f;                              /* the time to each 36th of the cycle (a bit takes 2^(-rm * wave)) */
-    for (i = 0; i < 36; i++) {
-        const float ph = ((float)i + 0.5f) * (1.0f / 36.0f);
-        const float v0 = dr_lfo_wave(0, w1, ph), v1 = dr_lfo_wave(1, w2, ph);
-        const float s = src == DR_LFO_BOTH ? fm_clampf(v0 + v1, -1.0f, 1.0f) : src == DR_LFO_II ? v1 : v0;
-        tm[i + 1] = tm[i] + fm_exp2f(-rm * s);
-    }
-    for (i = 0, j = 0; i < 37; i++) {          /* then the phase at each 36th of the time: always forward, from the
-                                                * cycle's start to its end (stepping by speed overran it and wrapped,
-                                                * and the dot stuck at the end at negative Speed; Evan, 2026-11-03) */
-        const float tt = tm[36] * (float)i * (1.0f / 36.0f);
-        while (j < 35 && tm[j + 1] < tt)
-            j++;
-        phs[i] = fm_minf(((float)j + (tt - tm[j]) / fm_maxf(tm[j + 1] - tm[j], 1e-6f)) * (1.0f / 36.0f), 0.9999f);
-    }
+    const float *ph = lk_lfo_phs(phs, 37);
     {   /* the clock */
         dr_param_text(dr_ext_spb > 0.0f ? P_LFO_DIV : P_LFO_RATE, proj.par[dr_ext_spb > 0.0f ? P_LFO_DIV : P_LFO_RATE], t);
         x = text_w(&LK_F_TAG, t) + 8;
@@ -1297,29 +1312,29 @@ static void lk_pic_mods(void)
         cv_text(xn, ny, &LK_F_SMALL, t, sh ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 1.0f) : LK_LABEL);
         wy[w] = ny + (int32_t)LK_F_SMALL.h + 2;
         cv_line(x, 29, xn - 2, wy[w], LK_LABEL);      /* the clock branching to both */
-        lk_lfo_line(w, xn, wy[w], 4, 37, phs, 1);
+        lk_lfo_line(w, xn, wy[w], 4, 37, ph, 1);
     }
     {   /* the rows: Speed mod from its Source, Delay mod from key 10's LFO */
         const int dl = proj.par[P_DLY_LFO], dd = proj.par[P_DLY_LFO_DEPTH];
         const int sp_on = rmd && proj.par[P_MOVE] && (lk_wave_on(src, 0) || lk_wave_on(src, 1));
         const int dl_on = dd && proj.par[P_MOVE] && (lk_wave_on(dl, 0) || lk_wave_on(dl, 1));
-        const int32_t ry0 = wy[0] - (int32_t)LK_F_SMALL.h / 2, ry1 = wy[1] - (int32_t)LK_F_SMALL.h / 2;   /* level
-                                                                                         * with the waves */
-        const int32_t sx_end = cv_text(158, ry0, &LK_F_SMALL, "LFO speed", sp_on ? LK_INK : LK_LABEL);   /* no
-                                                                                         * sliders (Evan) */
-        cv_text(158, ry1, &LK_F_SMALL, "delay time", dl_on ? LK_INK : LK_LABEL);
+        const int32_t my = (wy[0] + wy[1]) / 2;   /* "delay time" between the waves, the band's one way out */
+        int32_t top = 61;
+        cv_text(158, my - (int32_t)LK_F_SMALL.h / 2, &LK_F_SMALL, "delay time", dl_on ? LK_INK : LK_LABEL);
         for (w = 0; w < 2; w++) {
-            if (src == w + 1 || src == DR_LFO_BOTH)
-                cv_line(x + 86, wy[w], 155, wy[0], sp_on && lk_wave_on(src, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
-                                                                              : LK_UNLIT);
             if (dl == w + 1 || dl == DR_LFO_BOTH)
-                cv_line(x + 86, wy[w], 155, wy[1], dl_on && lk_wave_on(dl, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
-                                                                             : LK_UNLIT);
+                cv_line(x + 86, wy[w], 155, my, dl_on && lk_wave_on(dl, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
+                                                                           : LK_UNLIT);
+            if (src == w + 1 || src == DR_LFO_BOTH) {   /* Speed: the Source wave straight back into the clock */
+                cv_rect(x + 86, wy[w], 233 - x - 86, 1, sp_on && lk_wave_on(src, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
+                                                                                   : LK_UNLIT);
+                if (wy[w] < top)
+                    top = wy[w];
+            }
         }
-        {   /* the loop: out of LFO speed, round the right edge and under the waves, back up into the clock */
+        {   /* round the right edge and under the waves, up into the clock */
             const uint16_t c = sp_on ? LK_LABEL : LK_UNLIT;
-            cv_rect(sx_end + 3, wy[0], 233 - sx_end - 3, 1, c);
-            cv_rect(232, wy[0], 1, 62 - wy[0], c);
+            cv_rect(232, top, 1, 62 - top, c);
             cv_rect(14, 61, 219, 1, c);
             cv_rect(14, 23 + (int32_t)LK_F_TAG.h + 2, 1, 61 - 23 - (int32_t)LK_F_TAG.h - 2, c);
             cv_line(14, 25 + (int32_t)LK_F_TAG.h, 11, 28 + (int32_t)LK_F_TAG.h, c);
