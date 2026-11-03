@@ -208,6 +208,7 @@ static void lk_bar(void)
 /* ------------------------------------------- the picture's frame: overlays --- */
 /* the banner (a message): a dark band, a bar and the key word (up to the first space) in who said it's color, the
  * rest white; the tip: outlined in gold, a filled TIP tag, "once" at the right (Evan, 2026-11-01: banner B) */
+#define LK_BANNER_PAD 8                 /* past a banner's words */
 static void lk_banner(void)
 {
     const int32_t bh = (int32_t)LK_F_MSG.h + 6, ty = 3 + (bh - (int32_t)LK_F_MSG.h) / 2;
@@ -215,23 +216,33 @@ static void lk_banner(void)
     char kw[24];
     const char *rest = ui.msg[0];
     int32_t x, n = 0;
+    /* each banner only as wide as its words and a little padding, so the picture shows past it (Evan, 2026-11-03) */
     if (ui.msg_tip) {
-        const int32_t tw = text_w(&LK_F_SEL, "TIP") + 8;
-        cv_round(8, 3, 224, bh, 3, c);
-        cv_round(9, 4, 222, bh - 2, 3, LK_BG);
+        const int32_t tw = text_w(&LK_F_SEL, "TIP") + 8, ow = text_w(&LK_F_SMALL, "once");
+        int32_t end = 13 + tw + 6 + lk_ktext_w(&LK_F_MSG, ui.msg[0]), w;
+        const int once = end + 8 + ow + LK_BANNER_PAD <= 232;
+        if (once)
+            end += 8 + ow;
+        w = end + LK_BANNER_PAD - 8 > 224 ? 224 : end + LK_BANNER_PAD - 8;
+        cv_round(8, 3, w, bh, 3, c);
+        cv_round(9, 4, w - 2, bh - 2, 3, LK_BG);
         cv_round(13, 6, tw, bh - 6, 2, c);
         cv_text(17, 3 + (bh - (int32_t)LK_F_SEL.h) / 2, &LK_F_SEL, "TIP", LK_BG);
-        x = lk_ktext(13 + tw + 6, ty, &LK_F_MSG, ui.msg[0], c);
-        if (x + 8 + text_w(&LK_F_SMALL, "once") <= 226)
-            cv_text(226 - text_w(&LK_F_SMALL, "once"), ty + LK_B(LK_F_MSG) - LK_B(LK_F_SMALL), &LK_F_SMALL, "once",
-                    LK_LABEL);
+        lk_ktext(13 + tw + 6, ty, &LK_F_MSG, ui.msg[0], c);
+        if (once)
+            cv_text(end - ow, ty + LK_B(LK_F_MSG) - LK_B(LK_F_SMALL), &LK_F_SMALL, "once", LK_LABEL);
         return;
     }
-    cv_round(8, 3, 224, bh, 3, LK_BAND);
-    cv_rect(11, 6, 3, bh - 6, c);
     while (*rest && *rest != ' ' && *rest != '[' && n < 23)
         kw[n++] = *rest++;
     kw[n] = 0;
+    {
+        int32_t end = 20 + text_w(&LK_F_MSG, kw) + lk_ktext_w(&LK_F_MSG, rest);
+        if (ui.msg[1][0])
+            end += 5 + lk_ktext_w(&LK_F_MSG, ui.msg[1]);
+        cv_round(8, 3, end + LK_BANNER_PAD - 8 > 224 ? 224 : end + LK_BANNER_PAD - 8, bh, 3, LK_BAND);
+    }
+    cv_rect(11, 6, 3, bh - 6, c);
     x = cv_text(20, ty, &LK_F_MSG, kw, c);
     if (*rest)
         x = lk_ktext(x, ty, &LK_F_MSG, rest, LK_INK);

@@ -622,7 +622,7 @@ static void sw_flip(sw_t w)
     default: return;
     }
     if ((w.s == S_PARTNER && ui.view == V_PARTNER) || (w.s == S_SUBOCT && ui.view == V_SOURCE) ||
-        (w.s == S_HP && ui.view == V_PLAY2))
+        (w.s == S_HP && ui.view == V_PLAY2) || (w.s == S_XMOD && ui.view == V_LFO2))
         return;                                /* the page shows it and its key at the top: no banner (Evan,
                                                 * 2026-11-02) */
     if (w.s == S_OTAP || w.s == S_ODEST || w.s == S_FDEST || w.s == S_FTAP || w.s == S_DTAP) {
