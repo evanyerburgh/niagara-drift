@@ -1200,7 +1200,7 @@ static int lk_wave_on(int route, int w)        /* a route (DR_LFO_*) takes wave 
 
 /* -------------------------------------------------- LFO sends' picture --- */
 /* left, LFO I and II, one cycle each in its tint, one dot running along both (one clock); the rate under them, the
- * Movement when it isn't 100 % and the Swell lock in words. Right, five rows, each its slider, linked from the waves
+ * Movement when it isn't 100 % and the Swell lock in words. Right, the drones' four sends, linked from the waves
  * its key picks (both: two links); a row at 0, or fed only by an Off wave, gray with its link (the spec, 2026-10-31) */
 static void lk_pic_lfo(void)
 {
@@ -1234,31 +1234,16 @@ static void lk_pic_lfo(void)
     lk_ktext(8, tb + lh * 2, &LK_F_SMALL, !lock ? "hold [D#4] to lock" : proj.par[P_PULSE] ? "restarts with Swell"
                                                                                    : "lock waits for Swell",
              lock ? LK_CORAL : LK_LABEL);      /* unlocked: how to lock it, gray */
-    for (d = 0; d < 5; d++) {                  /* the rows: I pitch, I cutoff, II pitch, II cutoff, delay */
+    for (d = 0; d < 4; d++) {                  /* the rows: I pitch, I cutoff, II pitch, II cutoff, each over its knob;
+                                                * the delay is Mods' (its knob there; Evan, 2026-11-03) */
         const int g = d / 2, osc = d % 2 == 0;
-        const int route = d < 4 ? gpar(g, osc ? GP_OLFO : GP_FLFO) : proj.par[P_DLY_LFO];
-        const int depth = d < 4 ? gpar(g, osc ? GP_OLFO_DEPTH : GP_FLFO_DEPTH) : proj.par[P_DLY_LFO_DEPTH];
+        const int route = gpar(g, osc ? GP_OLFO : GP_FLFO), depth = gpar(g, osc ? GP_OLFO_DEPTH : GP_FLFO_DEPTH);
         const int heard = depth && proj.par[P_MOVE] && (lk_wave_on(route, 0) || lk_wave_on(route, 1));
-        const int32_t ny = 2 + d * 24, sy = ny + (int32_t)LK_F_SMALL.h / 2, sx = 152;   /* the row's middle */
-        const uint16_t col = d < 4 ? LK_DRONE[g] : LK_NEUTRAL;
-        if (d < 4)
-            scopy(scopy(t, g ? "II " : "I "), osc ? (gpar(g, GP_OLFO_DEST) == DR_TO_XWAVE ? "X-Wave" : "pitch")
-                                                  : (gpar(g, GP_FLFO_DEST) == DR_TO_RESO ? "reso" : "cutoff"));
-        else
-            scopy(t, "delay");
-        {   /* no sliders: the knobs' values say it (Evan, 2026-11-02); the delay's knob is on Mods, so its swing here */
-            int32_t x = cv_text(sx, ny, &LK_F_SMALL, t, heard ? col : LK_LABEL);
-            if (d == 4) {
-                char sw[12];
-                if (depth) {                   /* its swing; at 0, where its knob is (both don't fit) */
-                    const float dv = (float)depth * 0.01f;
-                    lk_swing(sw, dv * dv * (float)proj.par[P_MOVE] * 0.02f * 25.0f, "%");
-                    cv_text(x + 4, ny, &LK_F_SMALL, sw, heard ? col : LK_LABEL);
-                } else {
-                    cv_text(x + 4, ny, &LK_F_SMALL, "Mods", LK_LABEL);
-                }
-            }
-        }
+        const int32_t ny = 2 + d * 30, sy = ny + (int32_t)LK_F_SMALL.h / 2, sx = 152;   /* the row's middle */
+        scopy(scopy(t, g ? "II " : "I "), osc ? (gpar(g, GP_OLFO_DEST) == DR_TO_XWAVE ? "X-Wave" : "pitch")
+                                              : (gpar(g, GP_FLFO_DEST) == DR_TO_RESO ? "reso" : "cutoff"));
+        cv_text(sx, ny, &LK_F_SMALL, t, heard ? LK_DRONE[g] : LK_LABEL);   /* no sliders: the knobs say it (Evan,
+                                                                            * 2026-11-02) */
         for (w = 0; w < 2; w++)                /* a link from each wave the route takes, in its tint */
             if (route == w + 1 || route == DR_LFO_BOTH)
                 cv_line(94, wy[w], sx - 3, sy, heard && lk_wave_on(route, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
