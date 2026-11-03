@@ -351,7 +351,7 @@ pink specks are as many as Color says.
 | Mods | speed mod | source (LFO) | delay mod | cross-mod |
 
 - **The sends** and **speed mod** are centered: the middle is none. Each send is named for what it moves: Pitch, or
-  X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 3 / 8. Under each value, how far it swings
+  X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 4 / 9. Under each value, how far it swings
   in what you hear ("±12c", "±3.6 oct"), with the Movement. The picture shows LFO I and II, the five things they can
   move, and a line from each LFO that reaches it (gray: at 0, or only from an LFO that's off; the delay's row says how
   far Delay mod, on Mods, swings it); under the waves the rate, the Movement and the Swell lock (D#4 locks it).
@@ -511,13 +511,13 @@ key.
 |---|---|---|
 | 1 | I partner | which LFO moves I's pitch (I, II, both) |
 | 2 | I sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | I's pitch send moves X-Wave instead |
-| 3 | I filter: LP, BP, HP | I's cutoff send moves resonance instead |
-| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are; on when you first start: turn a pitch knob and the screen says "PITCH LOCKED  unlock C#4") | which LFO moves I's cutoff (I, II, both) |
+| 3 | I filter: LP, BP, HP | which LFO moves I's cutoff (I, II, both) |
+| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are; on when you first start: turn a pitch knob and the screen says "PITCH LOCKED  unlock C#4") | I's cutoff send moves resonance instead |
 | 5 | LFO reset | LFO reset |
 | 6 | II partner | which LFO moves II's pitch (I, II, both) |
 | 7 | II sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | II's pitch send moves X-Wave instead |
-| 8 | II filter: LP, BP, HP | II's cutoff send moves resonance instead |
-| 9 | pitch link (II follows I) | which LFO moves II's cutoff (I, II, both) |
+| 8 | II filter: LP, BP, HP | which LFO moves II's cutoff (I, II, both) |
+| 9 | pitch link (II follows I) | II's cutoff send moves resonance instead |
 | 10 | hard sync (II to I) | which LFO moves the delay's time (I, II, both) |
 | 11 | cross-mod: off, I → II cutoff (lit), pitch I ↔ II (winking), Snarl: the finished sound bends both (winking) | the same |
 

@@ -119,8 +119,10 @@ typedef struct {
 static const sw_t SW_NORMAL[11] = {{S_PARTNER, 0}, {S_SUBOCT, 0}, {S_HP, 0}, {S_PLOCK, 0}, {S_LFORESET, 0},
                                    {S_PARTNER, 1}, {S_SUBOCT, 1}, {S_HP, 1}, {S_PLINK, 1}, {S_SYNC, 1},
                                    {S_XMOD, 1}};
-static const sw_t SW_LFO[11] = {{S_OTAP, 0}, {S_ODEST, 0}, {S_FDEST, 0}, {S_FTAP, 0}, {S_LFORESET, 0},
-                                {S_OTAP, 1}, {S_ODEST, 1}, {S_FDEST, 1}, {S_FTAP, 1}, {S_DTAP, 1},
+/* the LFO pages: each drone's keys in one order, the pitch send's LFO and target, then the cutoff send's (Evan,
+ * 2026-11-03) */
+static const sw_t SW_LFO[11] = {{S_OTAP, 0}, {S_ODEST, 0}, {S_FTAP, 0}, {S_FDEST, 0}, {S_LFORESET, 0},
+                                {S_OTAP, 1}, {S_ODEST, 1}, {S_FTAP, 1}, {S_FDEST, 1}, {S_DTAP, 1},
                                 {S_XMOD, 1}};
 
 /* the screen's colours: dark, glowing (Evan, 2026-10-09; Figma "Screen concepts", concept D), in the site's palette
