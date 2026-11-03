@@ -1268,25 +1268,33 @@ static void lk_pic_lfo(void)
 
 /* ------------------------------------------------------- Mods' picture --- */
 /* two bands (the spec, 2026-10-31). The LFO band: the clock (SELECT's time in a pill) branching to LFO I and II, each
- * a cycle warped as the engine warps the clock (rmod_k, the phase rate rk · 2^(rm · source)), one dot on both; on the
+ * a cycle warped as the engine warps the clock (a bit of it takes 2^(-rm · source)), one dot on both; on the
  * right Speed mod's row ("LFO speed", linked from its Source, a loop arrow back into the clock) and Delay mod's
  * ("delay time", from key 10's LFO). The cross-mod band: what it does and its key ("CROSS-MOD  I moves II's cutoff
  * [F#5]"; Evan, 2026-11-02), then drone I, the amount, drone II, gray when off */
 static void lk_pic_mods(void)
 {
     const int w1 = proj.par[P_LFO_W1], w2 = proj.par[P_LFO_W2], src = proj.par[P_LFO_RMOD_SRC], rmd = proj.par[P_LFO_RMOD];
-    const float rm = (float)rmd * 0.03f, rk = dr_lfo_rmod_k(rm, src, w1, w2);
+    const float rm = (float)rmd * 0.03f;
     const int xm = proj.par[P_XMOD], amt = proj.par[P_XMOD_AMT];
-    float phs[37], ph = 0.0f;
+    float phs[37], tm[37];
     int32_t wy[2], x;
-    int i, w;
+    int i, w, j;
     char t[24];
-    for (i = 0; i < 37; i++) {                 /* the clock's phase across one plain cycle, warped */
+    tm[0] = 0.0f;                              /* the time to each 36th of the cycle (a bit takes 2^(-rm * wave)) */
+    for (i = 0; i < 36; i++) {
+        const float ph = ((float)i + 0.5f) * (1.0f / 36.0f);
         const float v0 = dr_lfo_wave(0, w1, ph), v1 = dr_lfo_wave(1, w2, ph);
         const float s = src == DR_LFO_BOTH ? fm_clampf(v0 + v1, -1.0f, 1.0f) : src == DR_LFO_II ? v1 : v0;
-        phs[i] = fm_minf(ph, 0.9999f);
-        ph += (1.0f / 36.0f) * rk * fm_exp2f(rm * s);
-        ph -= fm_floorf(ph);
+        tm[i + 1] = tm[i] + fm_exp2f(-rm * s);
+    }
+    for (i = 0, j = 0; i < 37; i++) {          /* then the phase at each 36th of the time: always forward, from the
+                                                * cycle's start to its end (stepping by speed overran it and wrapped,
+                                                * and the dot stuck at the end at negative Speed; Evan, 2026-11-03) */
+        const float tt = tm[36] * (float)i * (1.0f / 36.0f);
+        while (j < 35 && tm[j + 1] < tt)
+            j++;
+        phs[i] = fm_minf(((float)j + (tt - tm[j]) / fm_maxf(tm[j + 1] - tm[j], 1e-6f)) * (1.0f / 36.0f), 0.9999f);
     }
     {   /* the clock */
         dr_param_text(dr_ext_spb > 0.0f ? P_LFO_DIV : P_LFO_RATE, proj.par[dr_ext_spb > 0.0f ? P_LFO_DIV : P_LFO_RATE], t);
