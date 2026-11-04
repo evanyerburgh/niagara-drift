@@ -352,11 +352,12 @@ pink specks are as many as Color says.
 
 - **The sends** and **speed mod** are centered: the middle is none. Each send is named for what it moves: Pitch, or
   X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 4 / 9. Under each value, how far it swings
-  in what you hear ("±12c", "±3.6 oct"), with the Movement. The picture shows LFO I and II, the drones' four sends
-  (in the knobs' order), and a line from each LFO that reaches one (gray: at 0, or only from an LFO that's off); the
-  delay's send is on Mods, with its knob; the waves bent by Speed mod, as on Mods; under them the rate and the
-  Movement; under the sends the Swell lock (D#4, held to switch): free, on Swell (the LFO starts over each Swell bar)
-  or waits Swell (locked, the Swell stopped).
+  in what you hear ("±12c", "±3.6 oct"), with the Movement. The picture is the wiring, each drone's two sends as a
+  sentence with its keys: "[F#3] LFO II → [G#3] x-wave" (F#3 picks the LFO, G#3 what it moves), "[A#3] LFO I+II →
+  [C#4] reso"; a send at 0 (or fed only by an LFO that's off) is gray. Under them the two LFOs, each a little cycle
+  with its dot (bent by Speed mod, as on Mods), the rate, and the Swell lock (D#4, held to switch): free, on Swell (the
+  LFO starts over each Swell bar) or waits Swell (locked, the Swell stopped). The delay's send is on Mods, with its
+  knob.
 - **Mods**, the LFO moving other things, and cross-mod's amount:
   - **Speed mod** ("Speed" on the knob): the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
   - **Source**: which LFO does that (I, II or both).

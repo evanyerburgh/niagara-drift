@@ -1256,60 +1256,64 @@ static int lk_wave_on(int route, int w)        /* a route (DR_LFO_*) takes wave 
 }
 
 /* -------------------------------------------------- LFO sends' picture --- */
-/* left, LFO I and II, one cycle each in its tint, one dot running along both (one clock); the rate under them, the
- * Movement when it isn't 100 % and the Swell lock in words. Right, the drones' four sends, linked from the waves
- * its key picks (both: two links); a row at 0, or fed only by an Off wave, gray with its link (the spec, 2026-10-31) */
+/* the wiring as sentences (Evan's board, 2026-11-04, "routing try 2"): each drone its two sends, each a route from its
+ * key's LFO to its key's target: "[F#3] LFO II -> [G#3] x-wave", "[A#3] LFO I+II -> [C#4] reso", the keys where they
+ * sit (SW_LFO), the LFO in its tint (I+II white), a route at depth 0 (or fed by an Off wave, or Movement 0) all gray.
+ * Under them the two LFOs, short-named, each a little cycle with its dot (bent by Speed, as on Mods), the rate at the
+ * right; under that the Swell lock's state, right-justified. Words at 18 as every page, the arrow 12 px to fit */
+static const char *const LK_LFO_SHORT[2][DR_LFO_NSHAPES] = {
+    {"Off", "Tri", "Sqr", "Saw", "Round", "2x Tri", "2x Exp", "4x Pat", "Rnd", "AND 3", "OR 3"},
+    {"Off", "Tri 90", "Sqr 90", "Exp", "Log tri", "2x Saw", "2x Pat", "4x Exp", "Rnd", "AND 5", "OR 5"}};
 static void lk_pic_lfo(void)
 {
+    static const int32_t RY[4] = {0, 21, 45, 66};   /* the routes' tops: drone I's two, a gap, drone II's */
     const int clock = dr_ext_spb > 0.0f, lock = proj.par[P_LFO_LOCK] != 0;
-    const int nl = 2;                          /* the rate and the Movement together at the left, the lock at the
-                                                * right under the sends; always there (coming and going they moved
-                                                * the page; Evan, 2026-11-02, 2026-11-03) */
-    const int32_t lh = (int32_t)LK_F_SMALL.h - 3, tb = LK_PIC_H - 1 - nl * lh, wh = tb / 2;
-    int32_t wy[2];
+    const int32_t lb = LK_B(LK_F_SMALL), by = 88;   /* the LFOs' line */
     int w, d;
     char t[24], *q;
-    float phs[41];
-    const float *ph = lk_lfo_phs(phs, 41);      /* the waves bent as Speed bends the clock, as on Mods */
-    for (w = 0; w < 2; w++) {                  /* "I Triangle", its wave under it */
-        const int sh = proj.par[w ? P_LFO_W2 : P_LFO_W1];
-        const int32_t ny = w * wh;
-        const int32_t x = cv_text(8, ny, &LK_F_SMALL, w ? "II" : "I", lk_mix(0x07060Bu, LK_LFO_TINT[w], 1.0f));
-        dr_param_text(w ? P_LFO_W2 : P_LFO_W1, sh, t);
-        cv_text(x + 5, ny, &LK_F_SMALL, t, sh ? LK_INK : LK_LABEL);
-        wy[w] = ny + (int32_t)LK_F_SMALL.h + (wh - (int32_t)LK_F_SMALL.h) / 2;
-        lk_lfo_line(w, 10, wy[w], (wh - (int32_t)LK_F_SMALL.h) / 2 - 3, 41, ph, 1);
-    }
-    q = scopy(t, clock ? "cycle " : "rate ");
-    dr_param_text(clock ? P_LFO_DIV : P_LFO_RATE, proj.par[clock ? P_LFO_DIV : P_LFO_RATE], q);
-    cv_text(8, tb, &LK_F_SMALL, t, LK_INK);
-    {
-        q = scopy(t, "move ");
-        itoa_u((uint32_t)proj.par[P_MOVE] * 2u, q);
-        while (*q)
-            q++;
-        scopy(q, "%");
-        cv_text(8, tb + lh, &LK_F_SMALL, t, proj.par[P_MOVE] != 50 ? LK_VIOLET : LK_LABEL);   /* as set: gray */
-    }
-    {   /* the Swell lock's state, not how to lock it (Evan, 2026-11-03: "hold what?"): free, on the Swell's bars, or
-         * locked and waiting for the Swell; right-justified under the sends */
-        const char *lt = !lock ? "[D#4] free" : proj.par[P_PULSE] ? "[D#4] on Swell" : "[D#4] waits Swell";
-        lk_ktext(232 - lk_ktext_w(&LK_F_SMALL, lt), 2 + 4 * 24, &LK_F_SMALL, lt, lock ? LK_CORAL : LK_LABEL);
-    }
-    for (d = 0; d < 4; d++) {                  /* the rows: I pitch, I cutoff, II pitch, II cutoff, each over its knob;
-                                                * the delay is Mods' (its knob there; Evan, 2026-11-03) */
+    float phs[13];
+    const float *ph = lk_lfo_phs(phs, 13);      /* the waves bent as Speed bends the clock, as on Mods */
+    for (d = 0; d < 4; d++) {
         const int g = d / 2, osc = d % 2 == 0;
         const int route = gpar(g, osc ? GP_OLFO : GP_FLFO), depth = gpar(g, osc ? GP_OLFO_DEPTH : GP_FLFO_DEPTH);
         const int heard = depth && proj.par[P_MOVE] && (lk_wave_on(route, 0) || lk_wave_on(route, 1));
-        const int32_t ny = 2 + d * 24, sy = ny + (int32_t)LK_F_SMALL.h / 2, sx = 152;   /* the row's middle */
-        scopy(scopy(t, g ? "II " : "I "), osc ? (gpar(g, GP_OLFO_DEST) == DR_TO_XWAVE ? "X-Wave" : "pitch")
-                                              : (gpar(g, GP_FLFO_DEST) == DR_TO_RESO ? "reso" : "cutoff"));
-        cv_text(sx, ny, &LK_F_SMALL, t, heard ? LK_DRONE[g] : LK_LABEL);   /* no sliders: the knobs say it (Evan,
-                                                                            * 2026-11-02) */
-        for (w = 0; w < 2; w++)                /* a link from each wave the route takes, in its tint */
-            if (route == w + 1 || route == DR_LFO_BOTH)
-                cv_line(94, wy[w], sx - 3, sy, heard && lk_wave_on(route, w) ? lk_mix(0x07060Bu, LK_LFO_TINT[w], 0.85f)
-                                                                              : LK_UNLIT);
+        const int32_t ny = RY[d], base = ny + lb;
+        const uint16_t lc = !heard ? LK_LABEL : route == DR_LFO_BOTH ? LK_INK
+                          : lk_mix(0x07060Bu, LK_LFO_TINT[route == DR_LFO_II], 1.0f);
+        const int32_t ay = ny + (int32_t)LK_F_SMALL.h / 2;   /* columns, as the board: the LFO, the arrow, the target */
+        const int32_t xl = lk_key(38, base, LK_BKEY[g * 5 + (osc ? 0 : 2)]) + 3;
+        const int32_t xa = xl + text_w(&LK_F_SMALL, "LFO I+II") + 3;   /* the widest LFO sets the arrow's column */
+        cv_text(xl, ny, &LK_F_SMALL, route == DR_LFO_BOTH ? "LFO I+II" : route == DR_LFO_II ? "LFO II" : "LFO I", lc);
+        cv_rect(xa, ay, 9, 1, lc);             /* a thin arrow, its head 3 px */
+        cv_line(xa + 6, ay - 3, xa + 9, ay, lc);
+        cv_line(xa + 6, ay + 3, xa + 9, ay, lc);
+        const int32_t x = lk_key(xa + 12, base, LK_BKEY[g * 5 + (osc ? 1 : 3)]) + 3;
+        cv_text(x, ny, &LK_F_SMALL, osc ? (gpar(g, GP_OLFO_DEST) == DR_TO_XWAVE ? "x-wave" : "pitch")
+                                        : (gpar(g, GP_FLFO_DEST) == DR_TO_RESO ? "reso" : "cutoff"),
+                heard ? LK_INK : LK_LABEL);
+        if (!osc) {                            /* the drone's name and its bus, beside its two routes */
+            const int32_t y0 = RY[d - 1] + 3, y1 = ny + (int32_t)LK_F_SMALL.h - 3;
+            cv_text(8, (y0 + y1) / 2 - (int32_t)LK_F_SMALL.h / 2, &LK_F_SMALL, g ? "d II" : "d I", LK_DRONE[g]);
+            cv_rect(33, y0, 1, y1 - y0, LK_DRONE[g]);
+        }
+    }
+    {   /* the LFOs: "I Tri", its little cycle; "II Rnd", its; the rate at the right */
+        int32_t x = 8;
+        for (w = 0; w < 2; w++) {
+            const int sh = proj.par[w ? P_LFO_W2 : P_LFO_W1];
+            x = cv_text(x, by, &LK_F_SMALL, w ? "II" : "I", lk_mix(0x07060Bu, LK_LFO_TINT[w], 1.0f));
+            x = cv_text(x + 3, by, &LK_F_SMALL, LK_LFO_SHORT[w][(unsigned)sh < DR_LFO_NSHAPES ? sh : 0],
+                        sh ? LK_INK : LK_LABEL);
+            lk_lfo_line(w, x + 4, by + (int32_t)LK_F_SMALL.h / 2, 4, 13, ph, 1);
+            x += 4 + 24 + 10;
+        }
+        q = scopy(t, clock ? "cycle " : "rate ");
+        dr_param_text(clock ? P_LFO_DIV : P_LFO_RATE, proj.par[clock ? P_LFO_DIV : P_LFO_RATE], q);
+        cv_text(232 - text_w(&LK_F_SMALL, t), by, &LK_F_SMALL, t, LK_INK);
+    }
+    {   /* the Swell lock's state (Evan, 2026-11-03: "hold what?"), right-justified under the rate */
+        const char *lt = !lock ? "[D#4] free" : proj.par[P_PULSE] ? "[D#4] on Swell" : "[D#4] waits Swell";
+        lk_ktext(232 - lk_ktext_w(&LK_F_SMALL, lt), by + 17, &LK_F_SMALL, lt, lock ? LK_CORAL : LK_LABEL);
     }
 }
 

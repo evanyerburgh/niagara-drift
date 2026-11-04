@@ -622,9 +622,12 @@ static void sw_flip(sw_t w)
     default: return;
     }
     if ((w.s == S_PARTNER && ui.view == V_PARTNER) || (w.s == S_SUBOCT && ui.view == V_SOURCE) ||
-        (w.s == S_HP && ui.view == V_PLAY2) || (w.s == S_XMOD && ui.view == V_LFO2))
-        return;                                /* the page shows it and its key at the top: no banner (Evan,
-                                                * 2026-11-02) */
+        (w.s == S_HP && ui.view == V_PLAY2) || (w.s == S_XMOD && ui.view == V_LFO2) ||
+        (ui.view == V_LFO && (w.s == S_OTAP || w.s == S_ODEST || w.s == S_FTAP || w.s == S_FDEST)) ||
+        (w.s == S_DTAP && ui.view == V_LFO2))
+        return;                                /* the page shows it and its key: no banner (Evan, 2026-11-02; the LFO
+                                                * pages' keys, 2026-11-04: the routes on LFO sends, the delay's LFO
+                                                * and cross-mod on Mods; the rest keep theirs) */
     if (w.s == S_OTAP || w.s == S_ODEST || w.s == S_FDEST || w.s == S_FTAP || w.s == S_DTAP) {
         char b[24];
         scopy(scopy(scopy(b, "\\ "), q == a ? "" : DR[w.g]), what);   /* "\\": a right arrow (gen_font.py) */
