@@ -1315,6 +1315,9 @@ static void lk_pic_lfo(void)
         const char *lt = !lock ? "[D#4] free" : proj.par[P_PULSE] ? "[D#4] on Swell" : "[D#4] waits Swell";
         lk_ktext(232 - lk_ktext_w(&LK_F_SMALL, lt), by + 17, &LK_F_SMALL, lt, lock ? LK_CORAL : LK_LABEL);
     }
+    if (!proj.par[P_MOVE])                     /* why every route is gray: ALGORITHM's Movement at 0 (in empty space at
+                                                * the left of the lock's line, so nothing moves; Evan, 2026-11-04) */
+        cv_text(8, by + 17, &LK_F_SMALL, "movement 0%", LK_VIOLET);
 }
 
 /* ------------------------------------------------------- Mods' picture --- */
