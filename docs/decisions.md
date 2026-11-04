@@ -582,3 +582,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   48 sqrt(wet fb^k) tall, L blue up and R aqua down; the tail as rings as tall as it is then, drained by Damp;
   runaway red and freeze blue in the header. KNOB 4's second job as the SEL tag above Mix (both pages say "Mix").
   A value too wide at 16 px steps down to 13 ("Cathedral").
+- 2026-11-04: LFO sends is the wiring as sentences (Evan's board): each drone's two sends "[F#3] LFO II → [G#3]
+  x-wave", "[A#3] LFO I+II → [C#4] reso", the keys where they sit, a send at 0 gray; under them the LFOs small and live,
+  the rate, the Swell lock; "movement 0%" when Movement grays every route. The same keys on both LFO pages; no banner
+  for a key whose change the page shows (the routes on LFO sends, the delay's LFO and cross-mod on Mods). The key
+  order stays (D#4 the reset between the drones).
