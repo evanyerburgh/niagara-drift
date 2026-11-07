@@ -385,7 +385,7 @@ pink specks are as many as Color says.
 
 - Tap ARP for this page; tap it again here to start or stop the Swell (the header says **on**, or **off · tap ARP**).
   The picture shows a bar of it, its two breaths, the level falling down the picture in dB (the dip is the Depth), as
-  six strands that meet at a dot where the Swell is now: wide when it's slow, nearly one line when it's fast. **Shape**
+  five strands that meet at a dot where the Swell is now: wide when it's slow, nearly one line when it's fast. **Shape**
   shows its number with its kind under it (gate, pulse, even, ramp).
 - **The Swell** runs from a 33-second breath to a buzz (the starting sound has it on: a slow breath, 40 deep).
 - **Depth** is how far it dips, in dB (down to −30; all the way, silence). **Shape** runs both ways from the

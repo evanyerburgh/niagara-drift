@@ -1427,11 +1427,13 @@ static void lk_pic_mods(void)
 
 /* ------------------------------------------------------ the Swell's picture --- */
 /* a bar of the Swell, its two breaths as the engine shapes them (dr_pulse_wave: the first longer with Swing), the level
- * down the picture in dB (the top full, the bottom -30 dB or silence: the dip is the Depth). Six 1 px strands in the
+ * down the picture in dB (the top full, the bottom -30 dB or silence: the dip is the Depth). Five 2 px strands in the
  * Swell's coral ramp: the breath just before and after the dot, meeting at the dot and fanning out with distance from
  * it, the fan 0.09 / (1 + 2.2 Hz) of a bar (wide when slow, nearly one line when fast, so it doesn't blur); a white dot
  * where the Swell is now. Off: one gray line, still, no dot (the spec, 2026-10-31; the board, ARP 262:4) */
 #define LK_SW_N 109                            /* 2 px a point: x 12 .. 228 */
+#define LK_SW_S 5                              /* strands, 2 px as on every page (Evan, 2026-11-07: they were 1 px,
+                                                * thinner and rougher than the rest; five, as Drones 2) */
 static int16_t lk_swell_y(float ph, int32_t top, int32_t h)
 {
     const float g = fm_maxf(dr_pulse_wave(ph), 1e-4f), db = fm_log2f(g) * 6.0206f;
@@ -1444,15 +1446,14 @@ static void lk_pic_swell(void)
     const int32_t x0 = 12, top = 7, h = 100;
     int16_t y[LK_SW_N];
     int s, i;
-    for (s = on ? 0 : 5; s < 6; s++) {         /* the coral one at the back, the cream one in front */
-        const float o = ((float)s - 2.5f) * (1.0f / 2.5f);
-        const uint16_t c = on ? lk_mix(0xFF8F73u, 0xFFF0E6u, (float)s / 5.0f) : LK_UNLIT;
+    for (s = on ? 0 : LK_SW_S - 1; s < LK_SW_S; s++) {   /* the coral one at the back, the cream one in front */
+        const float o = ((float)s - 0.5f * (LK_SW_S - 1)) * (2.0f / (LK_SW_S - 1));
+        const uint16_t c = on ? lk_mix(0xFF8F73u, 0xFFF0E6u, (float)s / (float)(LK_SW_S - 1)) : LK_UNLIT;
         for (i = 0; i < LK_SW_N; i++) {
             const float p = 2.0f * (float)i / (float)(LK_SW_N - 1);
             y[i] = lk_swell_y(on ? p + o * fan * fm_fabsf(p - dot) * 0.5f : p, top, h);
         }
-        for (i = 1; i < LK_SW_N; i++)
-            cv_line(x0 + 2 * (i - 1), y[i - 1], x0 + 2 * i, y[i], c);
+        lk_plot(x0, y, LK_SW_N, c);
     }
     if (on) {
         const int32_t px = x0 + (int32_t)(dot * (float)(LK_SW_N - 1) + 0.5f), py = lk_swell_y(dot, top, h);
