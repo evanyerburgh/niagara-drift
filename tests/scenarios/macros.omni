@@ -4,10 +4,10 @@
 # macros (cents). 7 drone I's cutoff, 5 its osc mix, 11 its level, 25 drone II's detune, 63 the reverb mix, 42
 # cross-mod, 60-62 the delay's time, repeats, mix, 66 the delay LFO's depth, 17 drone I's filter LFO depth, 77
 # Character; 78 Wander, 79 Age, 80 Shift's move, 81 Wander's scale; 90-93 the keys' latches.
-# a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
+# a new FM-1 plays the Presets; these scenes go in bank A (SEL + G4)
 expect bank 3
 press SEL
-tapkey w12
+tapkey w8
 release SEL
 expect bank 0
 # scenes switch in ~4 s here (the Scene time at 46; ~15 s on a new FM-1 since 2026-10-25)
@@ -211,12 +211,12 @@ reboot
 wait 5000
 expect par93 100
 expect heard63 >60
-# SAVE again with nothing changed: nothing is written (each write is a late block while playing); two so far: the
-# project, and bank C with P9-P12 on a new FM-1 (v0.3)
-expect store_writes 2
+# SAVE again with nothing changed: nothing is written (each write is a late block while playing); one so far: the
+# project
+expect store_writes 1
 tap SAVE
 wait 500
-expect store_writes 2
+expect store_writes 1
 # GESTURE TIME (PRESETS), respread (Evan, 2026-10-28): slower evenly in seconds to x12 (Weight in over ~34 s), faster
 # only to x4 (~0.7 s). A tap latches at the time set and comes in by itself
 expect mtime 50

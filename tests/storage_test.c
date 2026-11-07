@@ -90,19 +90,25 @@ int main(void)
     nor[st_sector(OBJ_PANEL, 0) + 8] ^= 0x01;    /* both headers broken */
     nor[st_sector(OBJ_PANEL, 1) + 8] ^= 0x01;
     bad += check("both headers broken -> nothing", st_load(OBJ_PANEL, got, sizeof got) < 0);
-    {   /* OMNI map: every object in a data region, none in the sample slots (0xA0000..0xDBFFF), no overlaps */
-        uint32_t o, p, ok = 1;
-        for (o = 0; o < OBJ_NOBJ; o++) {
-            uint32_t a0 = st_sector(o, 0), a1 = st_sector(o, 1) + 4096;
-            int in_data = (a0 >= 0x97000 && a1 <= 0xA0000) || (a0 >= 0xDC000 && a1 <= 0xE0000) ||
-                          (a0 >= 0xFC000 && a1 <= 0xFF000);
-            if (!in_data || a1 - a0 != 8192)
-                ok = 0;
-            for (p = 0; p < o; p++)
-                if (a0 < st_sector(p, 1) + 4096 && st_sector(p, 0) < a1)
+    {   /* OMNI map: every copy of every object a sector in a data region, none in the sample slots
+         * (0xA0000..0xDBFFF) or the key_mac sector (0xFF000), no two the same (F's two copies apart, as Felucca's) */
+        uint32_t o, p, c, d, ok = 1;
+        for (o = 0; o < OBJ_NOBJ; o++)
+            for (c = 0; c < 2; c++) {
+                uint32_t a0 = st_sector(o, c), a1 = a0 + 4096;
+                int in_data = (a0 >= 0x97000 && a1 <= 0xA0000) || (a0 >= 0xDC000 && a1 <= 0xE0000) ||
+                              (a0 >= 0xFC000 && a1 <= 0xFF000);
+                if (!in_data || (a0 & 0xFFFu))
                     ok = 0;
-        }
+                for (p = 0; p <= o; p++)
+                    for (d = 0; d < 2; d++)
+                        if ((p != o || d != c) && st_sector(p, d) == a0)
+                            ok = 0;
+            }
         bad += check("objects in data regions, clear of the sample slots", (int)ok);
+        bad += check("D, E, F at 0x9D000, 0xDE000, 0x9F000 / 0xFE000",
+                     st_sector(OBJ_BANKD, 0) == 0x9D000u && st_sector(OBJ_BANKE, 1) == 0xDF000u &&
+                         st_sector(OBJ_BANKF, 0) == 0x9F000u && st_sector(OBJ_BANKF, 1) == 0xFE000u);
     }
     printf("%s\n", bad ? "STORAGE TEST FAILED" : "storage test passed");
     return bad != 0;

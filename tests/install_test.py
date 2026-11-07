@@ -70,10 +70,11 @@ class FakeFM1:
     """a MIDI backend with one FM-1 on it"""
 
     def __init__(self, image, identity="FM-1_015", name="FM-1", unplug_after=None, after_write="FM-1_900",
-                 stall_after=None, bad_addr=None, stored=None, nobj=5, safe=False, answer="sel"):
+                 stall_after=None, bad_addr=None, stored=None, nobj=8, safe=False, answer="sel"):
         self.image, self.unplug_after, self.after_write = image, unplug_after, after_write
         self.stored = stored                  # Niagara Drift's objects {obj: bytes}; None: no backup commands
-        self.nobj = nobj                      # objects this firmware knows (older ones: 4, no Presets bank)
+        self.nobj = nobj                      # objects this firmware knows (older ones: 4, no Presets bank; 5, no
+                                              # banks D-F)
         self.buf, self.restarted = bytearray(3840), 0
         self.safe, self.answer, self.staged, self.asked_with = safe, answer, {}, None   # 0.3's safe restore
         self.stall_after, self.bad_addr = stall_after, bad_addr
@@ -123,7 +124,9 @@ class FakeFM1:
             self.stored[b[0]] = bytes(self.buf[:b[1] | b[2] << 8])
             self.tx(I.nd_msg(0x72, bytes([b[0], 0])))
         elif cmd == 0x74:
-            if self.safe:                     # staged, checked against the CRC-32: nothing changes yet
+            if self.safe and b[0] >= self.nobj:   # an object it doesn't know: refused (main_fm1.c rx_index)
+                self.tx(I.nd_msg(0x74, bytes([b[0], 1])))
+            elif self.safe:                   # staged, checked against the CRC-32: nothing changes yet
                 n, c = b[1] | b[2] << 8, int.from_bytes(b[3:7], "little")
                 data = bytes(self.buf[:n])
                 if zlib.crc32(data) == c:
@@ -131,7 +134,8 @@ class FakeFM1:
                 self.tx(I.nd_msg(0x74, bytes([b[0], 0 if zlib.crc32(data) == c else 2])))
         elif cmd == 0x75:
             if self.safe:
-                if b[0] != 0b11101 or set(self.staged) != {0, 2, 3, 4}:   # every object of the backup's list
+                want = {k for k in range(self.nobj) if k != 1}   # every object of the backup's list
+                if b[0] != sum(1 << k for k in want) or set(self.staged) != want:
                     self.tx(I.nd_msg(0x75, b"\x02"))
                     return True
                 self.tx(I.nd_msg(0x75, b"\xff"))
@@ -334,7 +338,8 @@ def against_js():
 
 def backups():
     image = I.logical_image(package())
-    objs = {0: bytes(range(256)) * 5 + b"proj", 1: b"panel-cal", 2: b"", 3: b"bank C " * 40, 4: b"presets " * 30}
+    objs = {0: bytes(range(256)) * 5 + b"proj", 1: b"panel-cal", 2: b"", 3: b"bank C " * 40, 4: b"presets " * 30,
+            5: b"bank D " * 20, 6: b"", 7: b""}
     dev = FakeFM1(image, identity="FM-1_800", stored=dict(objs))
     f = TMP / "b.json"
     rc, out, err = cli(["--backup", str(f)], dev)
@@ -370,6 +375,25 @@ def backups():
     rc, out, err = cli(["--restore", str(f), "--yes"], dev6)
     ok(rc == 1 and dev6.stored == {0: b"mine"} and "kept" in out and not dev6.restarted,
        "... HOME: nothing changed")
+    nod = TMP / "no-d.json"                     # a backup with banks D-F empty (or from before them)
+    jn = json.loads(f.read_text())
+    for k in ("5", "6", "7"):
+        jn["objects"].pop(k, None)
+        jn["crc32"].pop(k, None)
+    nod.write_text(json.dumps(jn))
+    dev7 = FakeFM1(image, identity="FM-1_800", stored={0: b"mine"}, safe=True, answer="sel", nobj=5)
+    rc, out, err = cli(["--restore", str(nod), "--yes"], dev7)
+    ok(rc == 0 and dev7.stored == {k: v for k, v in mine.items() if k < 5} and dev7.restarted == 1,
+       "... onto a 0.3 build from before banks D-F: their empty objects left out")
+    dfile = TMP / "with-d.json"                 # a backup holding bank D, onto one without it: refused, nothing changed
+    jd = json.loads(f.read_text())
+    jd["objects"]["5"] = base64.b64encode(b"bank D " * 10).decode()
+    jd["crc32"]["5"] = zlib.crc32(b"bank D " * 10)
+    dfile.write_text(json.dumps(jd))
+    dev8 = FakeFM1(image, identity="FM-1_800", stored={0: b"mine"}, safe=True, answer="sel", nobj=5)
+    rc, out, err = cli(["--restore", str(dfile), "--yes"], dev8)
+    ok(rc != 0 and dev8.stored == {0: b"mine"} and not dev8.restarted,
+       "... one holding bank D onto it: refused, nothing changed")
     old = {k: v for k, v in objs.items() if k < 4}
     rc, out, err = cli(["--backup", str(TMP / "old.json")], FakeFM1(image, identity="FM-1_800", stored=dict(old), nobj=4))
     ok(rc == 0 and I.read_backup(str(TMP / "old.json")) == {k: v for k, v in old.items() if k != 1},

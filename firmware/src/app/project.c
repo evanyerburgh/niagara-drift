@@ -5,8 +5,12 @@
  * gives the defaults; 0.1's (19) and v0.2's first (20) are converted. Part of the unity build, after app.h. */
 project_t proj;
 static bank_t bank_bc[2];                  /* banks B and C */
-static uint8_t bank_dirty;                 /* bit 1 B, bit 2 C, bit 3 the old Presets object: to be written with the next
-                                            * save */
+static bank8_t bank_x[3];                  /* banks D, E, F (v0.3; 8 scenes each, 5.4 KB of RAM) */
+static uint8_t bank_dirty;                 /* bit 1 B, bit 2 C, bit 3 the old Presets object, bits 4-6 D-F: to be written
+                                            * with the next save */
+static const uint8_t BANKX_OBJ[3] = {OBJ_BANKD, OBJ_BANKE, OBJ_BANKF};
+#define BX(b) ((b) - BANK_D)               /* bank D, E, F (4-6) -> 0..2 */
+#define BANK_X(b) ((b) >= BANK_D && (b) < BANK_D + 3)
 static uint16_t p_moved;                   /* the old Presets object's scenes moved to the banks, to be cleared there */
 static const uint8_t BANK_OBJ[3] = {OBJ_BANKB, OBJ_BANKC, OBJ_BANKP};
 static uint32_t proj_h;                    /* a hash of the project as on the flash, 0 = unknown: a save that
@@ -143,6 +147,12 @@ static void bank_blank(bank_t *b)
     b->magic = BANK_MAGIC;
     b->format = PROJ_FORMAT;
 }
+static void bankx_blank(bank8_t *b)
+{
+    memset(b, 0, sizeof *b);
+    b->magic = BANK_MAGIC;
+    b->format = PROJ_FORMAT;
+}
 
 void project_defaults(void)
 {
@@ -158,13 +168,10 @@ void project_defaults(void)
     proj.seen[1] = SEEN1_MOVED;
     bank_blank(&bank_bc[0]);
     bank_blank(&bank_bc[1]);
+    for (i = 0; i < 3; i++)
+        bankx_blank(&bank_x[i]);
     p_moved = 0;
-    proj.bank = BANK_PRESETS;                  /* a new FM-1: the keys play the Presets */
-    for (i = NPLAY; i < NPRESETS; i++) {       /* ... P1-P8; P9-P12 start in C1-C4 (v0.3: keys 9-12 are gestures) */
-        memcpy(bank_bc[1].scene[i - NPLAY], preset_get(i), sizeof bank_bc[1].scene[0]);
-        bank_bc[1].used |= (uint16_t)(1u << (i - NPLAY));
-    }
-    bank_dirty |= 1u << 2;                     /* ... and onto the flash with the first save */
+    proj.bank = BANK_PRESETS;                  /* a new FM-1: the keys play the Presets (P9-P12 in their second bank) */
 }
 
 int scene_has(int bank, int n)                 /* scene n of a bank holds a sound (builds nothing) */
@@ -174,7 +181,9 @@ int scene_has(int bank, int n)                 /* scene n of a bank holds a soun
     switch (bank) {
     case 0: return proj.scene_used >> n & 1u;
     case 1: case 2: return bank_bc[bank - 1].used >> n & 1u;
-    case BANK_PRESETS: return n < NPLAY;   /* P1-P8 on keys (P9-P12 copied into the banks, v0.3) */
+    case BANK_D: case BANK_D + 1: case BANK_D + 2: return n < NPLAY && (bank_x[BX(bank)].used >> n & 1u);
+    case BANK_PRESETS: return n < NPLAY;   /* P1-P8 on keys */
+    case BANK_PRESETS2: return n < NPRESETS - NPLAY;   /* P9 .. on keys 1 .. */
     default: return 0;
     }
 }
@@ -186,8 +195,12 @@ const int16_t *scene_get(int bank, int n)      /* a Preset's stays as given unti
     switch (bank) {
     case 0: return proj.scene_used >> n & 1u ? proj.scene[n] : 0;
     case 1: case 2: return bank_bc[bank - 1].used >> n & 1u ? bank_bc[bank - 1].scene[n] : 0;
+    case BANK_D: case BANK_D + 1: case BANK_D + 2:
+        return n < NPLAY && (bank_x[BX(bank)].used >> n & 1u) ? bank_x[BX(bank)].scene[n] : 0;
     case BANK_PRESETS:                         /* the firmware's, fixed (2026-10-19) */
         return n < NPRESETS ? preset_get(n) : 0;
+    case BANK_PRESETS2:
+        return n < NPRESETS - NPLAY ? preset_get(NPLAY + n) : 0;
     default: return 0;
     }
 }
@@ -196,9 +209,14 @@ int scene_put(int bank, int n)
 {
     int16_t *d;
     int k;
-    if (n < 0 || n >= NSCENES || bank < 0 || bank >= BANK_PRESETS)   /* the Presets are fixed */
+    if (n < 0 || n >= NSCENES || bank < 0 || bank >= NBANKS || BANK_IS_PRESETS(bank) ||   /* the Presets are fixed */
+        (BANK_X(bank) && n >= NPLAY))
         return -1;
-    if (bank == 0) {
+    if (BANK_X(bank)) {
+        d = bank_x[BX(bank)].scene[n];
+        bank_x[BX(bank)].used |= (uint16_t)(1u << n);
+        bank_dirty |= (uint8_t)(1u << (bank - BANK_D + 4));
+    } else if (bank == 0) {
         d = proj.scene[n];
         proj.scene_used |= (uint16_t)(1u << n);
     } else {
@@ -502,6 +520,7 @@ static union {
     proj_v20_t o20;
     proj_v21_t o21;
     bank_t b;
+    bank8_t x;
     bank_v21_t b21;
     proj_v22_t o22;
     bank_v22_t b22;
@@ -602,6 +621,24 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
     }
     k->format = PROJ_FORMAT;
     for (i = 0; i < NSCENES; i++)
+        if ((k->used >> i & 1u) && !in_range(k->scene[i]))
+            k->used &= (uint16_t)~(1u << i);
+}
+
+/* D, E or F (j 0..2) from its object: new in format 43, so only this format is read yet (a later format converts it
+ * here, as bank_load does B and C) */
+static void bankx_load(int j)
+{
+    bank8_t *k = &bank_x[j];
+    int i;
+    bankx_blank(k);
+    memset(ld.raw, 0, sizeof ld.raw);
+    if (plat_store_load(BANKX_OBJ[j], ld.raw, sizeof ld.raw) < (int)sizeof *k || ld.x.magic != BANK_MAGIC ||
+        ld.x.format != PROJ_FORMAT)
+        return;
+    *k = ld.x;
+    k->used &= (uint16_t)((1u << NPLAY) - 1u);
+    for (i = 0; i < NPLAY; i++)
         if ((k->used >> i & 1u) && !in_range(k->scene[i]))
             k->used &= (uint16_t)~(1u << i);
 }
@@ -729,6 +766,8 @@ int project_load(void)
     p_moved = 0;
     bank_blank(&bank_bc[0]);
     bank_blank(&bank_bc[1]);
+    for (i = 0; i < 3; i++)
+        bankx_blank(&bank_x[i]);
     memset(ld.raw, 0, sizeof ld.raw);
     n = plat_store_load(OBJ_PROJ, ld.raw, sizeof ld.raw);
     from = ld.p.format;
@@ -867,6 +906,8 @@ int project_load(void)
         bank_load(1);
         bank_load(2);
     }
+    for (i = 0; i < 3; i++)                    /* D, E, F (v0.3): none before */
+        bankx_load(i);
     moved_a = 0;
     presets_move();
     proj_note_moved = proj_note_stored = proj_note_presets = 0;
@@ -901,6 +942,12 @@ int project_save(void)                         /* the banks first, then the proj
             rc = plat_store_save(BANK_OBJ[b - 1], &bank_bc[b - 1], sizeof bank_bc[b - 1]);
             if (!rc)
                 bank_dirty &= (uint8_t)~(1u << b);
+        }
+    for (b = 0; b < 3; b++)                    /* D, E, F */
+        if (!rc && (bank_dirty >> (b + 4) & 1u)) {
+            rc = plat_store_save(BANKX_OBJ[b], &bank_x[b], sizeof bank_x[b]);
+            if (!rc)
+                bank_dirty &= (uint8_t)~(1u << (b + 4));
         }
     if (rc)
         return rc;

@@ -17,7 +17,7 @@ notips
 set 71 24
 set 74 0
 press SEL
-tapkey w12
+tapkey w8
 release SEL
 tap PLAY
 wait 1500

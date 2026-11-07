@@ -71,7 +71,7 @@ expect par90 >30
 expect par90 <70
 # the scene keys are 1-8: SAVE + key 9 doesn't store, it's a gesture (A4, Chord)
 press SEL
-tapkey w12
+tapkey w8
 release SEL
 press SAVE
 key w9 down

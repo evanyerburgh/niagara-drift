@@ -46,8 +46,14 @@
                                           * effects, 7: the pulse, 6: scenes) */
 #define NSCENES 12                       /* a bank's slots: the 12 lower white keys (F3 .. C5, which sense pressure) */
 #define NPLAY 8                          /* ... the scenes it plays: keys 1-8 (F3 .. F4); 9-12 are gestures (v0.3) */
-#define NBANKS 4                         /* A, B, C (yours), and the Presets (fixed, in the firmware) */
+#define NBANKS 8                         /* the banks, by number: A, B, C (yours), the Presets (P1-P8, fixed, in the
+                                          * firmware), D, E, F (yours, v0.3), the Presets' second bank (P9-P16): numbered
+                                          * so a project from before keeps its bank (3 the Presets); on the keys in a
+                                          * row, A .. F, P1-P8, P9-P16 (ui.c KEY_BANK) */
 #define BANK_PRESETS 3
+#define BANK_PRESETS2 7
+#define BANK_D 4                         /* D, E, F: 4, 5, 6 (their own flash objects, 8 scenes each) */
+#define BANK_IS_PRESETS(b) ((b) == BANK_PRESETS || (b) == BANK_PRESETS2)
 #define PRESET_LOCKED 11                 /* P12, the clean sound */
 
 typedef struct {
@@ -76,6 +82,13 @@ typedef struct {                         /* banks B and C, and the Presets saved
     int16_t scene[NSCENES][DR_NPARAMS];
 } bank_t;
 _Static_assert(sizeof(bank_t) <= PLAT_STORE_MAX, "a bank must fit one flash object");
+typedef struct {                         /* banks D, E, F (v0.3): an object each, keys 1-8 only (9-12 are gestures) */
+    uint32_t magic, format;
+    uint16_t used;
+    uint16_t rsv;
+    int16_t scene[NPLAY][DR_NPARAMS];
+} bank8_t;
+_Static_assert(sizeof(bank8_t) <= PLAT_STORE_MAX, "a bank must fit one flash object");
 #define MTIME_DEF 50                     /* Gesture time to start: the gestures' own swells */
 #define BANK_MAGIC 0x314B4E42u           /* "BNK1" */
 
@@ -88,7 +101,7 @@ extern int proj_note_moved, proj_note_stored, proj_note_presets;   /* the load's
 int scene_has(int bank, int n);                 /* scene n of a bank holds a sound */
 const int16_t *scene_get(int bank, int n);   /* scene n of a bank, or 0 if empty (a Preset's: until another is asked for) */
 const char *preset_name(int n);          /* the Preset's name (P1 "NIAGARA" ..) */
-int scene_put(int bank, int n);         /* the sound now into scene n of bank A..C (marks it to save); 0 ok */
+int scene_put(int bank, int n);         /* the sound now into scene n of a bank of yours (marks it to save); 0 ok */
 void project_apply(void);                /* every value to the engine (boot, load) */
 
 void ui_init(void);

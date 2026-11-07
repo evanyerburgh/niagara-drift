@@ -7,7 +7,7 @@ set 71 24
 set 74 0
 # bank A (a new FM-1 starts on the Presets, which are fixed)
 press SEL
-tapkey w12
+tapkey w8
 release SEL
 pressure w0 0
 tap PLAY

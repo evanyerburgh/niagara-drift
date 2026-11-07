@@ -221,9 +221,11 @@ def pair_output(name, outs):
 
 # -------------------------------------------------------- backup / restore ---
 # Niagara Drift's stored objects (firmware/src/app/main_fm1.c, backup_cmd): the sound and bank A, the panel
-# calibration, banks B and C, read and written as they lie on the flash.
-OBJECTS = {0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C", 4: "presets saved over"}
-OPTIONAL = {4}                     # firmware older than the Presets bank (v0.2) has no such object: none to keep
+# calibration, banks B and C (and D, E, F since 0.3's eight banks), read and written as they lie on the flash.
+OBJECTS = {0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C", 4: "presets saved over",
+           5: "bank D", 6: "bank E", 7: "bank F"}
+OPTIONAL = {4, 5, 6, 7}            # firmware older than the Presets bank (v0.2) has no 4, older than 0.3's eight banks
+                                   # no 5-7: none to keep from it, and an empty one isn't restored to it
 UNIT = {1}                         # the panel's calibration belongs to the unit: never in a backup, never restored
                                    # from one (Evan, 2026-10-30: as fm1-base's; a backup goes onto any FM-1)
 BACKUP_DIR = os.path.join(os.path.expanduser("~"), "niagara-drift-backups")
@@ -320,6 +322,8 @@ def nd_restore(link, objs, out, on_ask=lambda: None):
         if not old:
             r = nd_transact(link, 0x74, bytes([obj, n & 0xFF, n >> 8]) + c.to_bytes(4, "little"),
                             lambda r: len(r) >= 2 and r[0] == obj)
+            if r is not None and r[1] == 1 and not n and obj in OPTIONAL and mask:
+                continue                     # an empty bank this firmware hasn't got
             if r is None and not mask:
                 old = True
                 print("(this firmware writes them one at a time)", file=out)

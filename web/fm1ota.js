@@ -110,8 +110,10 @@ async function handshake(link, tries = 3) {
 // BACKUP / RESTORE (Niagara Drift v0.2 on; firmware/src/app/main_fm1.c backup_cmd, tools/fm1_install.py nd_backup): the
 // stored objects as they lie on the flash, read 24 bytes at a time (0x70), written back 128 at a time (0x71), staged
 // (0x74) and switched to together on a yes on the FM-1 (0x75; before 0.3, each committed, 0x72, then a restart). The file is tools/fm1_install.py's: either tool restores the other's.
-export const ND_OBJECTS = { 0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C", 4: "presets saved over" };
-const ND_OPTIONAL = new Set([4]);              // firmware older than the Presets bank (v0.2) has no such object
+export const ND_OBJECTS = { 0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C", 4: "presets saved over",
+                            5: "bank D", 6: "bank E", 7: "bank F" };
+const ND_OPTIONAL = new Set([4, 5, 6, 7]);     // firmware older than the Presets bank (v0.2) has no 4, older than 0.3's
+                                               // eight banks no 5-7: not read from it, and not restored to it when empty
 const ND_UNIT = new Set([1]);                  // the panel's calibration belongs to the unit: never in a backup, never
                                                // restored from one (as fm1-base's: a backup goes onto any FM-1)
 // zlib's CRC-32 (Python's zlib.crc32): each object's, in the file, checked before anything is written back
@@ -205,6 +207,7 @@ export async function ndRestore(link, objs, log = () => {}, onAsk = () => {}) {
     const c = ndCrc32(data), n = data.length;
     if (!old) {
       const r = await ndTransact(link, 0x74, [k, n & 0xFF, n >> 8, c & 0xFF, (c >>> 8) & 0xFF, (c >>> 16) & 0xFF, c >>> 24], (r) => r.length >= 2 && r[0] === k);
+      if (r && r[1] === 1 && !n && ND_OPTIONAL.has(k) && mask) continue;   // an empty bank this firmware hasn't
       if (!r && !mask) { old = true; log("(this firmware writes them one at a time)"); if (!n) continue; }
       else if (!r || r[1]) throw fail("lost", `restore: the ${ND_OBJECTS[k]} couldn't be staged (${r ? ["", "refused", "damaged on the way", "flash"][r[1]] : "no answer"}): nothing changed`);
       else { mask |= 1 << k; log(`staged: ${ND_OBJECTS[k]} (${n} bytes)`); }
