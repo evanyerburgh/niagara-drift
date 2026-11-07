@@ -46,14 +46,6 @@ static const uint32_t LK_RAMP[DR_NGROUPS + 1][2] = {{0xFF8A1Fu, 0xFFF4D6u}, {0x6
 #define LK_B_(f) f##_BASE
 #define LK_B(f) LK_B_(f)                     /* a font's baseline from the top of its cell */
 
-/* the pages in the new look (the rest as they were, until their PR) */
-static int lk_page(int v)
-{
-    return v == V_PLAY || v == V_PLAY2 || v == V_LIFE || v == V_TONE || v == V_OSC || v == V_SOURCE || v == V_PARTNER ||
-           v == V_MOVES || v == V_LFO || v == V_LFO2 || v == V_PULSE || v == V_FX || v == V_FX2 || v == V_SETUP ||
-           v == V_SETUP2;
-}
-static int lk_on(void) { return lk_page(ui.view) && !keymap_on(); }
 
 static uint16_t lk_mix(uint32_t a, uint32_t b, float t)   /* 0xRRGGBB a -> b */
 {
@@ -92,33 +84,148 @@ static int32_t lk_ktext(int32_t x, int32_t y, const felucca_font_t *f, const cha
 static int32_t lk_ktext_w(const felucca_font_t *f, const char *s);
 
 /* ------------------------------------------------------------ header --- */
-/* left to right the page's name, its "1/2", what's running (REC or LOOP, SWELL, VISIT, II OUT); at the right PLAY's
- * state, then the sound: its key, and a Preset's name only with room for both. When it's full, what gives way, in
- * order: the name, PLAY's state to its short form ("PLAY", as before), the "1/2", SWELL, the key; the page's name
- * never (Evan, 2026-11-01) */
-static void lk_bar(void)
+/* a page's name in capitals, its number dropped when the header shows its "1/2" ("Drones 1": DRONES) */
+static void lk_page_name(int v, char *name)
 {
-    uint32_t rec_s = ui.loop == L_REC ? (plat_ms() - ui.loop_t0) / 1000u : 0u;
-    int visiting = ui.visit >= 0 && plat_ms() - ui.visit_t >= HOLD_MS, i, drop;
-    uint32_t h = hash(hash(2166136261u ^ rec_s ^ (ui.view == V_PULSE ? (uint32_t)ui_clock_bpm() << 20 : 0u), 0x4C42u | ui.view << 16 | ui.playing << 21 | ui.loop << 22 |
-                                                    (uint32_t)proj.par[P_PULSE] << 24 | (uint32_t)proj.par[P_II_OUT] << 25),
-                      (uint32_t)fade_q() | (uint32_t)(visiting ? ui.visit + 1 : 0) << 8 |
-                          (uint32_t)(uint8_t)ui.scene_at << 16 | (uint32_t)proj.bank << 24 |
-                          (uint32_t)(ui.view == V_PULSE && dr_ext_spb > 0.0f) << 28 |
-                          (uint32_t)(ui.view == V_FX && proj.par[P_DLY_REPEATS] > 85) << 29 |
-                          (uint32_t)(ui.view == V_FX2 && proj.par[P_REV_LEN] >= 100) << 30);
-    char name[20], half[6] = "", rec[12] = "REC ", visit[12] = "VISIT ", key[8] = "";
-    const char *badge[4], *sound = 0, *state, *st_short;
-    uint16_t bcol[4], st_col = LK_LABEL, name_col = LK_WHITE;
-    int nb = 0, swell = -1;
-    if (h == ui.sig[0])
-        return;
-    ui.sig[0] = h;
-    for (i = 0; VIEW_NAME[ui.view][i] && i < 19; i++) {
-        char c = VIEW_NAME[ui.view][i];
+    int i, b;
+    for (i = 0; VIEW_NAME[v][i] && i < 19; i++) {
+        char c = VIEW_NAME[v][i];
         name[i] = (char)(c >= 'a' && c <= 'z' ? c - 32 : c);
     }
     name[i] = 0;
+    for (b = 0; b < (int)NPAGE_BTN; b++)
+        if (v >= PAGE_BTN[b].first && v < PAGE_BTN[b].first + PAGE_BTN[b].n && PAGE_BTN[b].n > 1 && i > 2 &&
+            name[i - 2] == ' ' && name[i - 1] == '1' + v - PAGE_BTN[b].first)
+            name[i - 2] = 0;
+}
+
+/* the sound at the right: the scene it came from (bank << 4 | key; -1 none), and whether a hand has moved it since
+ * (the spec: "A5 changed"). A bank picked (SEL + D5-G5) leaves the sound as it was: not a change */
+static int16_t lk_at = -1;
+static uint8_t lk_chg;
+static void lk_sound_at(void)
+{
+    static int8_t prev = -1;
+    static uint8_t prev_bank;
+    if (ui.scene_at >= 0 && ui.morph < 0 && ui.press < 0) {   /* there (a glide on its way names where it's from) */
+        lk_at = (int16_t)(proj.bank << 4 | ui.scene_at);
+        lk_chg = 0;
+    } else if (ui.scene_at < 0 && prev >= 0 && proj.bank == prev_bank && lk_at >= 0) {
+        lk_chg = 1;
+    }
+    prev = ui.scene_at;
+    prev_bank = proj.bank;
+}
+
+/* the gesture to show: the one last pressed of those in or on their way (-1 none) */
+static int lk_gesture(void)
+{
+    int g, best = -1;
+    for (g = 0; g < DR_NGEST; g++)
+        if ((ui.g_amt[g] > 0.005f || proj.par[gl_par(g)]) && (best < 0 || (int32_t)(ui.g_t0[g] - ui.g_t0[best]) > 0))
+            best = g;
+    return best;
+}
+#define LK_TRACK RGB(119, 114, 138)          /* the glide's line, before it fills */
+/* a badge's width; a gesture's with its % takes the room of "100%" whatever the number, so nothing after it moves */
+static int32_t lk_badge_w(int pct, const char *s)
+{
+    int32_t w = text_w(&LK_F_TAG, s);
+    if (pct) {
+        const char *p = s;
+        int32_t wn = 0;
+        while (*p && *p != ' ')
+            p++;
+        wn = text_w(&LK_F_TAG, p);
+        w += text_w(&LK_F_TAG, " 100%") - wn;
+    }
+    return w;
+}
+
+/* a scene on its way (tapped, a blend held, gliding back): the scene it's going to (-2: back to a sound of the
+ * player's own; -1 none), its bank, and the line's fill. Shown at least LK_GLIDE_MIN, as a subtitle is (Evan,
+ * 2026-11-07: at a short Scene time it flashed by): the line then fills slower than the sound gets there */
+#define LK_GLIDE_MIN 1500u
+static struct {
+    uint32_t t0, ms, real;
+    int8_t on, to;
+    uint8_t bank;
+} lk_gl;
+static int lk_glide(uint32_t now, float *line, int *bank)
+{
+    if (ui.press >= 0) {                       /* a scene key held: the blend follows the finger */
+        lk_gl.on = 0;
+        *line = ui.press_x;
+        *bank = proj.bank;
+        return ui.press;
+    }
+    if (ui.morph >= 0 && (!lk_gl.on || lk_gl.t0 != ui.morph_t0)) {   /* a glide begun */
+        lk_gl.on = 1;
+        lk_gl.t0 = ui.morph_t0;
+        lk_gl.real = ui.morph_ms;
+        lk_gl.ms = ui.morph_ms > LK_GLIDE_MIN ? ui.morph_ms : LK_GLIDE_MIN;
+        lk_gl.to = (int8_t)(ui.morph == VISIT_BACK ? (ui.scene_at >= 0 ? ui.scene_at : -2) : ui.morph);
+        lk_gl.bank = proj.bank;
+    }
+    if (lk_gl.on) {
+        const uint32_t el = now - lk_gl.t0;
+        if (ui.morph < 0 && (el < lk_gl.real || el >= lk_gl.ms || (lk_gl.to >= 0 && ui.scene_at != lk_gl.to)))
+            lk_gl.on = 0;                      /* stopped by a hand, or shown long enough */
+        else {
+            *line = el >= lk_gl.ms ? 1.0f : (float)el / (float)lk_gl.ms;
+            *bank = lk_gl.bank;
+            return lk_gl.to;
+        }
+    }
+    if (ui.visit >= 0 && now - ui.visit_t >= HOLD_MS) {   /* the emulator's held key: there, until let go */
+        *line = 1.0f;
+        *bank = proj.bank;
+        return ui.visit;
+    }
+    return -1;
+}
+
+/* left to right the page's name, its "1/2" (or PEEK), what's running (REC or LOOP, SWELL, a gesture, II OUT); at the
+ * right PLAY's state, then the sound: its key, and a Preset's name only with room for both ("changed" once a hand has
+ * moved it); on its way to a scene, where to, in gold ("→ P3 EERIE"); peeking, where letting go goes ("let go:
+ * DRONES"). A glide or a fade fills a gold line under it. When it's full, what gives way, in order: the name, PLAY's
+ * state to its short form ("PLAY", as before), the "1/2", "changed", SWELL, the key (Evan, 2026-11-01), then a latched
+ * gesture's word, PLAY's state; the page's name never */
+static void lk_bar(void)
+{
+    const uint32_t now = plat_ms();
+    uint32_t rec_s = ui.loop == L_REC ? (now - ui.loop_t0) / 1000u : 0u;
+    int i, drop, gest, glide, gbank = 0, gest_pct = -1;
+    const int peek = ui.hold_btn >= 0 && !ui.hold_cycle && (ui.hold_turned || now - ui.hold_t >= HOLD_MS);
+    float line = -1.0f;                      /* the line under the header, 0..1 (a glide's or the fade's), or none */
+    uint32_t h;
+    char name[20], half[6] = "", rec[12] = "REC ", gname[20], key[8] = "", back[28] = "let go: ";
+    const char *badge[6], *sound = 0, *state, *st_short, *chg = 0;
+    uint16_t bcol[6], st_col = LK_LABEL, name_col = LK_WHITE, key_col = LK_LABEL;
+    int nb = 0, swell = -1, gb = -1, glen = 0, show_half, show_chg, show_name;
+    lk_sound_at();
+    gest = lk_gesture();
+    glide = lk_glide(now, &line, &gbank);
+    if (glide == -1 && (ui.playing ? fade_q() < 20 : fade_q() > 0)) {   /* PLAY's fade in or out, as it runs */
+        line = ui.playing ? dr_fade : 1.0f - dr_fade;
+    }
+    if (gest >= 0 && !(proj.par[gl_par(gest)] && !(ui.g_held >> gest & 1u)))
+        gest_pct = (int)(ui.g_amt[gest] * 100.0f + 0.5f);   /* coming in or going: how far, in % (Evan, 2026-11-07:
+                                                              * the number says more than four cells did) */
+    h = hash(hash(2166136261u ^ rec_s ^ (ui.view == V_PULSE ? (uint32_t)ui_clock_bpm() << 20 : 0u),
+                  0x4C42u | ui.view << 16 | ui.playing << 21 | ui.loop << 22 | (uint32_t)proj.par[P_PULSE] << 24 |
+                      (uint32_t)proj.par[P_II_OUT] << 25 | (uint32_t)peek << 26 | (uint32_t)lk_chg << 27),
+             (uint32_t)fade_q() | (uint32_t)(glide + 2) << 8 | (uint32_t)(uint8_t)lk_at << 16 |
+                 (uint32_t)proj.bank << 24 | (uint32_t)(ui.view == V_PULSE && dr_ext_spb > 0.0f) << 28 |
+                 (uint32_t)(ui.view == V_FX && proj.par[P_DLY_REPEATS] > 85) << 29 |
+                 (uint32_t)(ui.view == V_FX2 && proj.par[P_REV_LEN] >= 100) << 30);
+    h = hash(hash(h, (uint32_t)(gest + 1) | (uint32_t)ui.hold_from << 8 |
+                         (uint32_t)(line < 0.0f ? 0xFFFu : (uint32_t)(line * 224.0f)) << 12),
+             (uint32_t)(gest_pct + 1));
+    if (h == ui.sig[0])
+        return;
+    ui.sig[0] = h;
+    lk_page_name(ui.view, name);
     for (i = 0; i < (int)NPAGE_BTN; i++)       /* which of its button's pages: "1/2" */
         if (on_pages(i) && PAGE_BTN[i].n > 1) {
             half[0] = (char)('1' + ui.view - PAGE_BTN[i].first);
@@ -126,10 +233,6 @@ static void lk_bar(void)
             half[2] = (char)('0' + PAGE_BTN[i].n);
             half[3] = 0;
         }
-    for (i = 0; name[i]; i++)                  /* "Drones 1" with its "1/2": DRONES 1/2 */
-        ;
-    if (half[0] && i > 2 && name[i - 2] == ' ' && name[i - 1] == half[0])
-        name[i - 2] = 0;
     if (ui.loop != L_IDLE) {                   /* "REC 1:05" (white: REC is never red), or LOOP */
         char *q = rec + 4;
         itoa_u(rec_s / 60u, q);
@@ -147,9 +250,20 @@ static void lk_bar(void)
         badge[nb] = "SWELL";
         bcol[nb++] = LK_CORAL;
     }
-    if (visiting) {
-        scene_name(visit + 6, proj.bank, ui.visit);
-        badge[nb] = visit;
+    if (gest >= 0) {                           /* "WASH 40%", or "CHORD latched" (gold: the spec) */
+        char *q = scopy(gname, GESTURE[gest]);
+        glen = (int)(q - gname);
+        if (gest_pct < 0)
+            scopy(q, " latched");
+        else {
+            *q++ = ' ';
+            itoa_u((uint32_t)gest_pct, q);
+            while (*q)
+                q++;
+            scopy(q, "%");
+        }
+        gb = nb;
+        badge[nb] = gname;
         bcol[nb++] = LK_GOLD;
     }
     if (ui.view == V_FX2 && proj.par[P_REV_LEN] >= 100) {   /* Inf: the tail holds (the spec) */
@@ -160,15 +274,28 @@ static void lk_bar(void)
         badge[nb] = "runaway";
         bcol[nb++] = LK_RED;
     }
-    if (proj.par[P_II_OUT]) {
+    if (proj.par[P_II_OUT] && nb < 6) {
         badge[nb] = "II OUT";
         bcol[nb++] = LK_DRONE[1];
     }
     state = !ui.playing ? (fade_q() > 0 ? "FADING OUT" : "[PLAY] to start") : fade_q() < 20 ? "FADING IN" : 0;
     st_short = !ui.playing && fade_q() == 0 ? "[PLAY]" : "FADING";
-    if (ui.scene_at >= 0) {
-        scene_name(key, proj.bank, ui.scene_at);
-        sound = proj.bank == BANK_PRESETS ? preset_name(ui.scene_at) : 0;
+    if (lk_at >= 0) {
+        scene_name(key, lk_at >> 4, lk_at & 15);
+        sound = lk_at >> 4 == BANK_PRESETS && !lk_chg ? preset_name(lk_at & 15) : 0;
+        if (lk_chg)
+            chg = "changed";
+    }
+    if (glide != -1) {                         /* on its way: where to, in the sound's place, gold ("→ P3 EERIE",
+                                                * "→ A5", "→ back"; Evan, 2026-11-07: one place, no banner) */
+        char *q = scopy(key, "\\ ");
+        if (glide == -2)
+            scopy(q, "back");
+        else
+            scene_name(q, gbank, glide);
+        sound = gbank == BANK_PRESETS && glide >= 0 && glide < NPRESETS ? preset_name(glide) : 0;
+        chg = 0;
+        key_col = LK_GOLD;
     }
     if (ui.view == V_PULSE) {                  /* SWELL alone, in its coral; at the right whether it's on (the spec) */
         static char bpm[20];
@@ -184,18 +311,34 @@ static void lk_bar(void)
         st_col = proj.par[P_PULSE] ? LK_SWELL : LK_LABEL;
         name_col = LK_CORAL;
         sound = 0;
+        chg = 0;
         key[0] = 0;
     }
-    for (drop = 0; drop < 6; drop++) {         /* 0 all; 1 no name; 2 PLAY's state short; 3 no 1/2; 4 no SWELL; 5 no
-                                                * key: as drawn below */
-        const char *st = drop >= 2 ? st_short : state;
+    if (peek) {                                /* a page button held: where letting go goes, in the sound's place */
+        lk_page_name(ui.hold_from, back + 8);
+        state = back;
+        st_short = back + 8;
+        st_col = LK_LABEL;
+        sound = 0;
+        chg = 0;
+        key[0] = 0;
+    }
+    for (drop = 0; drop < 9; drop++) {         /* 0 all; 1 no name; 2 PLAY's state short; 3 no 1/2; 4 no "changed";
+                                                * 5 no SWELL; 6 no key (or "→ P3"); 7 a latched gesture by its fill,
+                                                * alone ("CHORD"); 8 no PLAY's state (a peek keeps where
+                                                * it goes) */
+        const char *st = !state || (drop >= 8 && !peek) ? 0 : drop >= 2 ? st_short : state;
         int32_t x = 8 + text_w(&LK_F_PAGE, name), rx = 232, gap = 0;
-        if (half[0] && drop < 3)
+        if (drop == 7 && gb >= 0 && gest_pct < 0)
+            gname[glen] = 0;
+        if (peek)
+            x += 6 + text_w(&LK_F_SEL, "PEEK") + 6;
+        else if (half[0] && drop < 3)
             x += 4 + text_w(&LK_F_HALF, half);
         for (i = 0; i < nb; i++)
-            if (!(i == swell && drop >= 4))
-                x += 12 + text_w(&LK_F_TAG, badge[i]);
-        if (state) {
+            if (!(i == swell && drop >= 5))
+                x += 12 + lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
+        if (st) {
             rx -= lk_ktext_w(&LK_F_TAG, st);
             gap = 10;
         }
@@ -203,34 +346,103 @@ static void lk_bar(void)
             rx -= gap + text_w(&LK_F_SOUND, sound);
             gap = 6;
         }
-        if (key[0] && drop < 5)
+        if (chg && drop < 4) {
+            rx -= gap + text_w(&LK_F_TAG, chg);
+            gap = 6;
+        }
+        if (key[0] && drop < 6)
             rx -= gap + text_w(&LK_F_TAG, key);
         if (rx >= x + 12)
             break;
     }
-    if (state && drop >= 2)
-        state = st_short;
+    show_half = drop < 3;
+    show_chg = drop < 4;
+    show_name = drop < 1;
+    if (state)
+        state = drop >= 8 && !peek ? 0 : drop >= 2 ? st_short : state;
+    {                                          /* what gave way comes back where it fits again (SWELL gone, the
+                                                * "1/2" has room): "changed", then the "1/2", then the sound's name */
+        int32_t x = 8 + text_w(&LK_F_PAGE, name) + (peek ? 12 + text_w(&LK_F_SEL, "PEEK") : 0), rx = 232, gap = 0;
+        for (i = 0; i < nb; i++)
+            if (!(i == swell && drop >= 5))
+                x += 12 + lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
+        if (half[0] && !peek && drop < 3)
+            x += 4 + text_w(&LK_F_HALF, half);
+        if (state) {
+            rx -= lk_ktext_w(&LK_F_TAG, state);
+            gap = 10;
+        }
+        if (sound && show_name) {
+            rx -= gap + text_w(&LK_F_SOUND, sound);
+            gap = 6;
+        }
+        if (chg && show_chg) {
+            rx -= gap + text_w(&LK_F_TAG, chg);
+            gap = 6;
+        }
+        if (key[0] && drop < 6) {
+            rx -= gap + text_w(&LK_F_TAG, key);
+            gap = 6;
+        }
+        if (chg && !show_chg && rx - 6 - text_w(&LK_F_TAG, chg) >= x + 12) {
+            show_chg = 1;
+            rx -= 6 + text_w(&LK_F_TAG, chg);
+        }
+        if (half[0] && !peek && !show_half && rx >= x + 4 + text_w(&LK_F_HALF, half) + 12) {
+            show_half = 1;
+            x += 4 + text_w(&LK_F_HALF, half);
+        }
+        if (sound && !show_name && rx - 6 - text_w(&LK_F_SOUND, sound) >= x + 12)
+            show_name = 1;
+    }
     cv_begin(240, LK_BAR_H, LK_BG);
     {
         const int32_t bl = (LK_BAR_H - (int32_t)LK_F_PAGE.h) / 2 + LK_B(LK_F_PAGE);   /* the header's baseline */
-        int32_t x = cv_text(8, bl - LK_B(LK_F_PAGE), &LK_F_PAGE, name, name_col), rx = 232, gap = 0;
-        if (half[0] && drop < 3)
-            x = cv_text(x + 4, bl - LK_B(LK_F_HALF), &LK_F_HALF, half, lk_mix(0x07060Bu, 0xFFFFFFu, 0.6f));
-        for (i = 0; i < nb; i++)
-            if (!(i == swell && drop >= 4))
-                x = cv_text(x + 12, bl - LK_B(LK_F_TAG), &LK_F_TAG, badge[i], bcol[i]);
-        if (state) {
+        int32_t x, rx = 232, gap = 0;
+        if (state) {                           /* the right first: the badges stop short of it */
             rx -= lk_ktext_w(&LK_F_TAG, state);
             lk_ktext(rx, bl - LK_B(LK_F_TAG), &LK_F_TAG, state, st_col);
             gap = 10;
         }
-        if (sound && drop < 1) {
+        if (sound && show_name) {
             rx -= gap + text_w(&LK_F_SOUND, sound);
             cv_text(rx, bl - LK_B(LK_F_SOUND), &LK_F_SOUND, sound, LK_WHITE);
             gap = 6;
         }
-        if (key[0] && drop < 5 && rx - gap - text_w(&LK_F_TAG, key) >= x + 12)
-            cv_text(rx - gap - text_w(&LK_F_TAG, key), bl - LK_B(LK_F_TAG), &LK_F_TAG, key, LK_LABEL);
+        if (chg && show_chg) {
+            rx -= gap + text_w(&LK_F_TAG, chg);
+            cv_text(rx, bl - LK_B(LK_F_TAG), &LK_F_TAG, chg, LK_LABEL);
+            gap = 6;
+        }
+        if (key[0] && drop < 6) {
+            rx -= gap + text_w(&LK_F_TAG, key);
+            cv_text(rx, bl - LK_B(LK_F_TAG), &LK_F_TAG, key, key_col);
+        }
+        x = cv_text(8, bl - LK_B(LK_F_PAGE), &LK_F_PAGE, name, name_col);
+        if (peek) {                            /* PEEK in a white box (the board) */
+            const int32_t w = text_w(&LK_F_SEL, "PEEK") + 6, th = (int32_t)LK_F_SEL.h + 1, ty = bl - LK_B(LK_F_SEL) - 1;
+            cv_round(x + 6, ty, w, th, 2, LK_INK);
+            cv_round(x + 7, ty + 1, w - 2, th - 2, 2, LK_BG);
+            cv_text(x + 9, ty + 1, &LK_F_SEL, "PEEK", LK_INK);
+            x += 6 + w;
+        } else if (half[0] && show_half) {
+            x = cv_text(x + 4, bl - LK_B(LK_F_HALF), &LK_F_HALF, half, lk_mix(0x07060Bu, 0xFFFFFFu, 0.6f));
+        }
+        for (i = 0; i < nb; i++) {             /* the badges, as many as fit (still too many: the last go) */
+            const int32_t w = lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
+            if (i == swell && drop >= 5)
+                continue;
+            if (x + 12 + w > rx - 12)
+                break;
+            cv_text(x + 12, bl - LK_B(LK_F_TAG), &LK_F_TAG, badge[i], bcol[i]);
+            x += 12 + w;
+        }
+        if (line >= 0.0f) {                    /* the glide's or the fade's line, filling in gold (the board) */
+            const int32_t w = (int32_t)(line * 224.0f + 0.5f);
+            cv_rect(8, LK_BAR_H - 4, 224, 1, LK_TRACK);
+            if (w > 0)
+                cv_rect(8, LK_BAR_H - 4, w, 1, LK_GOLD);
+        }
     }
     cv_blit(0, 0);
 }
@@ -316,7 +528,8 @@ static int32_t lk_key(int32_t x, int32_t base, const char *key)
 static int32_t lk_fbase(const felucca_font_t *f)
 {
     return f == &FONT_S ? FONT_S_BASE : f == &FONT_B ? FONT_B_BASE : f == &FONT_T18 ? FONT_T18_BASE
-         : f == &FONT_Q17 ? FONT_Q17_BASE : f == &FONT_T20 ? FONT_T20_BASE : FONT_U1_BASE;
+         : f == &FONT_Q17 ? FONT_Q17_BASE : f == &FONT_T20 ? FONT_T20_BASE : f == &FONT_N2 ? FONT_N2_BASE
+         : f == &FONT_N1 ? FONT_N1_BASE : FONT_U1_BASE;
 }
 static int32_t lk_ktext_(int32_t x, int32_t y, const felucca_font_t *f, const char *s, uint16_t c, int draw)
 {
@@ -1446,7 +1659,7 @@ static void lk_pic_setup1(void)
 {
     static const char *const PRE[3] = {"Time to ", "Time to ", "Time to switch "},
                              *const BOLD[3] = {"fade", "morph", "scenes"},
-                             *const POST[3] = {" in / out on PLAY", " keys and LFOs", ""};
+                             *const POST[3] = {" in / out on [PLAY]", " keys and LFOs", ""};   /* PLAY in its box (rule 19) */
     const float frac[3] = {(float)proj.par[P_FADE] * 0.01f, (float)proj.par[P_MORPH] * 0.01f,
                            dr_ext_spb > 0.0f ? (float)proj.par[P_SCENE_BARS] / (float)(DR_NBARS - 1)
                                              : (float)proj.par[P_SCENE_T] * 0.01f};
@@ -1459,7 +1672,7 @@ static void lk_pic_setup1(void)
                                                 * longest, morph's, 215 px */
         x = cv_text(x, base - LK_B(LK_F_SMALL), &LK_F_SMALL, PRE[r], LK_LABEL);
         x = cv_text(x, base - LK_B(FONT_B), &FONT_B, BOLD[r], LK_INK);
-        cv_text(x, base - LK_B(LK_F_SMALL), &LK_F_SMALL, POST[r], LK_LABEL);
+        lk_ktext(x, base - LK_B(LK_F_SMALL), &LK_F_SMALL, POST[r], LK_LABEL);
         for (s = r ? 0 : 1; s < 2; s++) {     /* s 0: a going out; 1: b coming in (Fade's rise) */
             for (i = 0; i <= 100; i++) {
                 const int32_t xi = 20 + 2 * i;
@@ -1507,7 +1720,6 @@ static void lk_circle(int32_t cx, int32_t cy, int32_t r, uint16_t c)   /* 1 px, 
         }
     }
 }
-static float lk_wrap12(float c) { return c - 1200.0f * fm_floorf(c * (1.0f / 1200.0f)); }
 static void lk_polar(int32_t cx, int32_t cy, float c, float r, int32_t *x, int32_t *y)   /* c cents clockwise from the
                                                                                          * top */
 {
@@ -1661,9 +1873,17 @@ static void lk_pic_swell(void)
     static int bar;
     const float ph = dr_pulse_ph, fan = 0.09f / (1.0f + 2.2f * dr_pulse_hz(-1));   /* in phase: a bar is 2 */
     float dot;
-    const int32_t x0 = 12, top = 7, h = 100;
+    const int32_t x0 = 12, h = 100;
+    int32_t top, lo = 9999, hi = -9999;
     int16_t y[LK_SW_N];
     int s, i;
+    for (i = 0; i < LK_SW_N; i++) {            /* centered up and down (Evan, 2026-11-07: it sat at the top): the
+                                                * breaths' highest and lowest, the middle of the picture between */
+        const int32_t yi = lk_swell_y(4.0f * (float)i / (float)(LK_SW_N - 1), 0, h);
+        lo = yi < lo ? yi : lo;
+        hi = yi > hi ? yi : hi;
+    }
+    top = LK_PIC_H / 2 - (lo + hi) / 2;
     if (ph < last - 1.0f)
         bar ^= 1;
     last = ph;
@@ -2289,9 +2509,15 @@ static void lk_values(void)
         sp = t;                                /* "D2 +2": the note large, the cents smaller; "177ms": the unit */
         while (*sp && *sp != ' ')
             sp++;
-        if (p == P_LFO_RMOD_SRC)               /* "LFO II": one word */
-            while (*sp)
-                sp++;
+        {                                      /* words alone are one name, on one line in one size: "LFO II",
+                                                * "Chorus hall" (Evan, 2026-11-07: "hall" sat above "Chorus", as a unit) */
+            const char *d = t;
+            while (*d && !(*d >= '0' && *d <= '9'))
+                d++;
+            if (!*d || p == P_LFO_RMOD_SRC)
+                while (*sp)
+                    sp++;
+        }
         pre = *sp == ' ' && t[0] >= 'A' && t[0] <= 'Z' && sp[1] >= '0' && sp[1] <= '9';   /* "Pink 70": the word
                                                                                        * smaller, before it */
         if (!*sp)
@@ -2400,22 +2626,158 @@ static void lk_values(void)
     cv_blit(0, LK_VAL_Y);
 }
 
-/* a frame of the new look, or false on a page not moved to it yet (or while the key map or a readout has the
- * screen: those come with their PR) */
-static int lk_frame(void)
+/* ---------------------------------------------------- SEL held: the key map --- */
+/* the keyboard in the picture's place (the board 321:284): the white keys dark, each black key lit in its group's
+ * color when on (drone I amber, the global two neutral, drone II cyan, the links green; on the LFO pages the LFO's
+ * routing), the groups named above a bracket each, the one touched outlined in white with a mark under it; the top
+ * four whites the banks (A B C P), the one playing in gold. In the values' place the key touched, its group and
+ * setting ("LINKS · [D#5]", "HARD SYNC ON"); none yet, how to ask. The header "KEYS [SEL] held" */
+typedef struct {
+    uint8_t k0, n;
+    const char *name;
+    uint32_t col;
+} lk_kgroup_t;
+static const lk_kgroup_t LK_KG[2][4] = {
+    {{0, 3, "I", 0xFF9A1Fu}, {3, 2, "global", 0xE8E4F0u}, {5, 3, "II", 0x1FC8FFu}, {8, 3, "links", 0x7FE0A8u}},
+    {{0, 4, "I", 0xFF9A1Fu}, {4, 1, "both", 0xE8E4F0u}, {5, 4, "II", 0x1FC8FFu}, {9, 2, "mods", 0xC9A6FFu}}};
+static const uint8_t LK_KX[11] = {11, 26, 41, 71, 86, 116, 131, 146, 176, 191, 221};   /* each black key's left */
+#define LK_KEY_Y 20                          /* the keys' top in the picture (the board's y 96) */
+#define LK_KEY_BH 62                         /* a black key's height (124) */
+#define LK_KEY_WH 100                        /* a white key's (200) */
+#define LK_WHITE_KEY RGB(46, 43, 56)
+static const lk_kgroup_t *lk_kgroup(int k)
 {
-    static int was = -1;                       /* into or out of the new look: every band afresh */
-    const int on = lk_on();
-    if (on != was) {
-        was = on;
-        ui.sig[0] = ui.sig[1] = ui.sig[2] = 0;
-        lcd_fill(0, 0, 240, 240, on ? LK_BG : K_BG);
+    const lk_kgroup_t *g = LK_KG[sw_layer() == SW_LFO];
+    int i;
+    for (i = 0; i < 3; i++)
+        if (k < g[i].k0 + g[i].n)
+            return &g[i];
+    return &g[3];
+}
+static int lk_key_on(int k)
+{
+    return sw_layer()[k].s == S_LFORESET ? proj.par[P_LFO_LOCK] != 0 : sw_get(sw_layer()[k]);
+}
+static uint32_t lk_keymap_sig(void)
+{
+    uint32_t h = hash(2166136261u, 0x4B4Du | (uint32_t)(uint8_t)ui.km_key << 16 | (uint32_t)proj.bank << 24 |
+                                       (uint32_t)(sw_layer() == SW_LFO) << 28);
+    int i;
+    for (i = 0; i < 11; i++)
+        h = hash(h, (uint32_t)lk_key_on(i) | (uint32_t)proj.par[P_LFO_LOCK] << 4);
+    return h;
+}
+
+static void lk_keymap(void)
+{
+    const uint32_t h = lk_keymap_sig();
+    const lk_kgroup_t *gs = LK_KG[sw_layer() == SW_LFO];
+    int i;
+    if (h == ui.sig[1])
+        return;
+    ui.sig[0] = ui.sig[1] = ui.sig[2] = h;
+    cv_begin(240, LK_BAR_H, LK_BG);            /* the header: KEYS [SEL] held */
+    {
+        const int32_t bl = (LK_BAR_H - (int32_t)LK_F_PAGE.h) / 2 + LK_B(LK_F_PAGE);
+        int32_t x = cv_text(8, bl - LK_B(LK_F_PAGE), &LK_F_PAGE, "KEYS", LK_WHITE);
+        lk_ktext(x + 8, bl - LK_B(LK_F_TAG), &LK_F_TAG, "[SEL] held", LK_LABEL);
     }
-    if (!on)
-        return 0;
+    cv_blit(0, 0);
+    cv_begin(240, LK_PIC_H, LK_BG);            /* the keyboard */
+    for (i = 0; i < 16; i++)                   /* the white keys, 15 px each, as outlines on the ground (Evan, 2026-11-07:
+                                                * the filled slate keyboard was the one big flat fill on any screen) */
+        lk_box(i * 15, LK_KEY_Y, 14, LK_KEY_WH, LK_WHITE_KEY);
+    {                                          /* D5-G5 with SEL: the banks */
+        const int32_t base = LK_KEY_Y + 87;
+        cv_text(12 * 15 - 4 - text_w(&LK_F_SMALL, "banks"), base - LK_B(LK_F_SMALL), &LK_F_SMALL, "banks", LK_LABEL);
+        for (i = 0; i < NBANKS; i++) {
+            const int32_t cx = (NSCENES + i) * 15 + 7, on = proj.bank == i;
+            char l[2] = {BANK_L[i], 0};
+            if (on)
+                cv_round(cx - 6, base - 13, 12, 17, 2, LK_GOLD);
+            cv_text(cx - text_w(&LK_F_SMALL, l) / 2, base - LK_B(LK_F_SMALL), &LK_F_SMALL, l, on ? LK_BG : LK_LABEL);
+        }
+    }
+    for (i = 0; i < 11; i++) {                 /* the black keys, lit as the panel's */
+        const int32_t x = LK_KX[i];
+        const int on = lk_key_on(i);
+        const uint32_t c = lk_kgroup(i)->col;
+        cv_rect(x - 1, LK_KEY_Y, 11, LK_KEY_BH + 1, LK_BG);   /* the gap around it, as on the keyboard */
+        if (on) {                              /* lit: outlined in its group's color, glowing dimly inside (a third
+                                                * choice, half as bright) */
+            const uint32_t cc = on == 2 ? lk_mix888(0x07060Bu, c, 0.5f) : c;
+            cv_round(x, LK_KEY_Y, 9, LK_KEY_BH, 2, lk_mix(cc, cc, 0.0f));
+            cv_round(x + 2, LK_KEY_Y + 2, 5, LK_KEY_BH - 4, 1, lk_mix(0x07060Bu, cc, 0.3f));
+        } else {
+            cv_round(x, LK_KEY_Y, 9, LK_KEY_BH, 2, LK_TRACK);
+            cv_round(x + 1, LK_KEY_Y + 1, 7, LK_KEY_BH - 2, 1, LK_BG);
+        }
+        if (i == ui.km_key) {                  /* the one touched: outlined in white, marked */
+            lk_box(x - 2, LK_KEY_Y - 1, 13, LK_KEY_BH + 2, LK_WHITE);
+            cv_rect(x - 2, LK_KEY_Y + LK_KEY_BH + 3, 13, 2, LK_WHITE);
+        }
+    }
+    for (i = 0; i < 4; i++) {                  /* the groups: a bracket over their keys, the name above it */
+        const int32_t a = LK_KX[gs[i].k0], b = LK_KX[gs[i].k0 + gs[i].n - 1] + 9;
+        const uint16_t c = lk_mix(gs[i].col, gs[i].col, 0.0f);
+        int32_t x = (a + b) / 2 - text_w(&FONT_U1, gs[i].name) / 2;
+        cv_rect(a, LK_KEY_Y - 4, b - a, 2, c);
+        if (x + text_w(&FONT_U1, gs[i].name) > 236)
+            x = 236 - text_w(&FONT_U1, gs[i].name);
+        cv_text(x, 12 - LK_B(FONT_U1), &FONT_U1, gs[i].name, c);
+    }
+    cv_blit(0, LK_PIC_Y);
+    cv_begin(240, LK_VAL_H, LK_BG);            /* the values' place: the key touched */
+    cv_rect(8, 0, 224, 1, LK_RULE);
+    if (ui.km_key < 0) {
+        lk_box(9, 4, 222, 64, LK_UNLIT);
+        text_c(120, 36 - (int32_t)FONT_T20.h / 2, &FONT_T20, "touch a key: what it does", LK_LABEL);
+    } else {
+        const lk_kgroup_t *g = lk_kgroup(ui.km_key);
+        const uint16_t c = lk_mix(g->col, g->col, 0.0f);
+        const char *name, *st;
+        char t[24], v[28], *q;
+        const felucca_font_t *f;
+        int n;
+        sw_text(sw_layer()[ui.km_key], &name, &st);
+        cv_round(9, 4, 222, 64, 5, c);
+        cv_round(10, 5, 220, 62, 4, LK_BG);
+        for (n = 0, q = t; g->name[n]; n++)    /* "LINKS · [D#5]" */
+            *q++ = (char)(g->name[n] >= 'a' && g->name[n] <= 'z' ? g->name[n] - 32 : g->name[n]);
+        q = scopy(scopy(scopy(q, " \xC2\xB7 ["), LK_BKEY[ui.km_key]), "]");
+        lk_ktext(120 - lk_ktext_w(&FONT_T20, t) / 2, 9, &FONT_T20, t, c);
+        for (q = v; *name && q < v + 13; name++)   /* "HARD SYNC ON": the setting and its state, in capitals */
+            *q++ = (char)(*name >= 'a' && *name <= 'z' ? *name - 32 : *name);
+        *q++ = ' ';
+        for (; *st && q < v + sizeof v - 1; st++)
+            *q++ = (char)(*st >= 'a' && *st <= 'z' ? *st - 32 : *st);
+        *q = 0;
+        f = text_w(&FONT_N2, v) <= 210 ? &FONT_N2 : &FONT_U1;
+        text_c(120, 59 - lk_fbase(f), f, v, LK_WHITE);   /* on the board's line (y 382-432) */
+    }
+    {                                          /* what SEL does with the white keys and OCT */
+        const char *hint = "[D5]-[G5] bank \xC2\xB7 [OCT] wave back";
+        lk_ktext(120 - lk_ktext_w(&LK_F_SMALL, hint) / 2, 70, &LK_F_SMALL, hint, LK_LABEL);
+    }
+    cv_blit(0, LK_VAL_Y);
+}
+
+/* a frame of the new look (every page since 0.3's PR H), the key map while SEL is held */
+static void lk_frame(void)
+{
+    static int was = -1;                       /* into or out of the key map: every band afresh */
+    const int km = keymap_on();
+    if (km != was) {
+        was = km;
+        ui.sig[0] = ui.sig[1] = ui.sig[2] = 0;
+        lcd_fill(0, 0, 240, 240, LK_BG);
+    }
+    if (km) {
+        lk_keymap();
+        return;
+    }
     lk_bar();
     lk_pic();
     if (!lk_readout())
         lk_values();
-    return 1;
 }

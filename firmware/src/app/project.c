@@ -155,6 +155,7 @@ void project_defaults(void)
         proj.par[i] = dr_param_info(i)->def;
     proj.leds = 1;
     proj.mtime = MTIME_DEF;
+    proj.seen[1] = SEEN1_MOVED;
     bank_blank(&bank_bc[0]);
     bank_blank(&bank_bc[1]);
     p_moved = 0;

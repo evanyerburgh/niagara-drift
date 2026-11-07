@@ -150,7 +150,7 @@ made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE
 | | |
 |---|---|
 | **White key** 1–8 (F3–F4): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Tuning, Sync, Pitch lock, Fade, Morph and Scene time stay as they are |
-| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where you were ("A5 BACK"). **Tap SEL** while holding and the blend stays right there ("A5 40% KEPT"), however you press after; let go when you like. It's a sound of its own between the two (SEL + SAVE takes you back to where you were before it) |
+| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where you were (the header: "→ A5"). **Tap SEL** while holding and the blend stays right there ("A5 40% KEPT"), however you press after; let go when you like. It's a sound of its own between the two (SEL + SAVE takes you back to where you were before it) |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **SEL + SAVE** | **undo**: back to the sound before your last scene tap or blend, gliding over the Scene time (a knob turned since goes back too; the room's settings, such as Stereo or the Scene time, stay). Again, and it goes forward to where you were. Keep SEL down until you've let go of SAVE |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A, B or C) |
@@ -160,7 +160,8 @@ made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE
 
 Updating from 0.2: keys 9–12 used to hold scenes. On the first start of 0.3, each scene you had there moves to the
 first empty key 1–8 of its own bank, then of another; one with no room left stays stored, unplayed (the installer
-backs everything up first). The screen says how many moved.
+backs everything up first). The screen says how many moved. Three knobs moved too: Feedback is KNOB 1 on Life,
+Cross-mod KNOB 4 on Mods, Tune KNOB 2 on Setup 2; each page says so once, the first time you open it.
 
 ### The gestures
 
@@ -189,6 +190,7 @@ parts come in one after another, and go in their own order when you let go. Scen
   it goes half way in); ease off and it comes back; let go and it goes.
 - On any gesture key, a **tap** (a press under half a second) takes it all the way and keeps it; tap again and it
   goes. **Tap SEL while holding one** and it stays where it has got to. Its key glows dimly, and lights as it comes in.
+  The header shows the last one you played: its name and how far in it is ("WASH 40%"), or "latched".
 - **PRESETS is Gesture time**: how long every gesture takes, coming in and going out. The screen shows Weight's time
   ("GESTURE TIME 2.8 s"); the others scale with it. The middle is each gesture's own time: Weight 2.8 s, Shift 3.9 s,
   Clean and Wash 3.3 s, Tick, Chord, Snarl and Stutter 6.5 s. Left is slower, each detent a little more time, up to
@@ -220,9 +222,15 @@ knob you're turning.
 ### Pages
 
 Tap a page button and the knobs stay on that page. Hold it to peek: turn a knob, let go, and you're
-back. Tap it again for its next page (FX has three); "1/2" by the page's name shows which of its pages you're on. A page
-button opens the page you last used there (HOME always opens Drones 1), so after visiting Reverb, holding FX
-peeks at Reverb.
+back (the header says PEEK, and where letting go takes you: "let go: DRONES"). Tap it again for its next page (FX has
+three); "1/2" by the page's name shows which of its pages you're on. A page button opens the page you last used there
+(HOME always opens Drones 1), so after visiting Reverb, holding FX peeks at Reverb.
+
+The header, left to right: the page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT. At the
+right, the sound: its bank and key ("A5"; a Preset's name too, "P3 EERIE", where there's room), "changed" once you've
+moved it from there; stopped, what PLAY does. On its way to a scene it says where, in gold ("→ P3 EERIE", "→ A5" as a
+blend glides back), a gold line filling under the header as it goes, for at least 1.5 s however short the Scene time;
+PLAY's fade fills the line too. When it's full, the sound's name goes first, the page's name never.
 Each page's screen shows a picture of what its knobs do, and the four values below it. Every knob
 glides: a slow turn is a smooth sweep, never steps; turn faster to go further. The levels follow your ear: halfway is about a quarter as loud.
 
@@ -527,9 +535,11 @@ Lit means on. They follow the page: on the LFO pages they set the LFO's routing.
 by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8), the links (9–11).
 
 **Hold SEL** for a moment and the screen draws the black keys as they sit on the keyboard, lit as on the panel,
-with their groups named, and the top four white keys as the banks they pick (A, B, C, P), the one playing lit.
-**Touch a black key while SEL is held** and the screen names it and its setting ("I: SUB
--1 OCT"), without switching it: let go of SEL to play it. The map steps aside while you turn a knob or hold a white
+with their groups named, and the top four white keys as the banks they pick (A, B, C, P), the one playing lit. On a
+page where a knob has a second job with SEL (Sub · Drive, Delay, Reverb) it waits longer, 1.5 s, and
+once you've turned that job, until you let go, so SEL + a knob never flashes the map.
+**Touch a black key while SEL is held** and the screen names it, its group and its setting ("I · G#3", "SUB -1
+OCT"), without switching it: let go of SEL to play it. The map steps aside while you turn a knob or hold a white
 key.
 
 <img src="docs/img/page-keys.png" width="244" alt="The black keys' map while SEL is held: the keyboard with its black keys lit as on the panel and their groups named, and the key touched named with its setting">

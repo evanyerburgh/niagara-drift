@@ -27,8 +27,8 @@ FONTSETS = {
     "barlow": [("XS", "BarlowSemiCondensed-SemiBold.ttf", 15, 1, False, 32, 126),
                ("S", "BarlowSemiCondensed-Medium.ttf", 19, 1, False, 32, 126),
                ("B", "BarlowSemiCondensed-Bold.ttf", 19, 1, False, 32, 126),
-               ("M", "BarlowSemiCondensed-SemiBold.ttf", 28, 1, False, 32, 95),
-               ("L", "BarlowSemiCondensed-Bold.ttf", 31, 1, False, 32, 126),
+               # (M, 28, was the old screen's values: out with it, 0.3's PR H)
+               ("L", "BarlowSemiCondensed-Bold.ttf", 31, 1, False, 32, 126),   # the start's name, calibration
                # 0.3's new look (the screen spec, sizes judged on the FM-1 by Evan, 2026-11-01): values selected and at
                # rest, their units; the page's name; the drones' names; knob names and their fallbacks; tags
                ("N1", "BarlowSemiCondensed-Bold.ttf", 26, 1, False, 32, 126),
