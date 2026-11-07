@@ -591,6 +591,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   the fan as before, meeting at the dot. The picture two bars across at every speed (four breaths, 54 px each; was
   one bar): the rhythm reads as a rhythm; the dot crosses both, the screen counting which bar it's in; the fan half
   as wide a breath, so its widest spread stays.
+- 2026-11-07: Delay's and Reverb's rings 2 px, as every page (were 1 px); Drive thickens the Delay's from there (3 px
+  from Drive 34, 4 at 100).
 - 2026-11-07: LFO sends: the LFOs above the routes, I over II (on one row the longest names ran into the rate), their
   waves in one column, 13 px tall and 54 long (were 9 and 24); the rate right of LFO I, the lock right of LFO II;
   locked with the Swell stopped, "on Swell" dimmed (was "waits Swell", too wide beside the waves); "mvmt 0%" in the

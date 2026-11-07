@@ -1513,7 +1513,8 @@ static void lk_pic_delay(void)
                                                           : 70.0f * fm_exp2f((float)proj.par[P_DLY_TIME] * 0.026845f);
     const float fb = fm_minf((float)proj.par[P_DLY_REPEATS] * 0.0115f, 1.0f), mix = (float)proj.par[P_DLY_MIX] * 0.01f;
     const float wet = mix > 0.0f ? 0.25f + 0.75f * mix : 0.0f;
-    const int w = (int)(1.0f + (float)proj.par[P_DLY_DRIVE] * 0.015f + 0.5f);   /* 1 px, 2 from Drive 34, 3 at 100 */
+    const int w = (int)(2.0f + (float)proj.par[P_DLY_DRIVE] * 0.015f + 0.5f);   /* 2 px as every page, 3 from Drive 34,
+                                                                                  * 4 at 100 (Evan, 2026-11-07) */
     const int32_t mid = 61;
     static const uint32_t C[2][2] = {{0xB4D9FFu, 0x1F6BFFu}, {0xB8FFF0u, 0x3CBFAFu}};   /* new, old: L blue, R aqua */
     int side, k;
@@ -1550,7 +1551,7 @@ static void lk_pic_delay(void)
  * every Length from 0.3 s to 40 s draws differently: a ring at 0 and then each 1.75 times later, each as tall as the
  * tail is then (its dB falling in a line to -60 at the Length), none once it has died away, the first as tall as the mix
  * (12 + 46 mix px); as wide as the room (Room narrow, Cathedral wide); new ones pale, older ones the FX blue, drained
- * toward gray by Damp. Inf: all one height, "freeze" in the header. At the left what goes in (Into), lit when the
+ * toward gray by Damp; 2 px, as every page (Evan, 2026-11-07). Inf: all one height, "freeze" in the header. At the left what goes in (Into), lit when the
  * reverb hears it (the spec, 2026-10-31, round 2; the board, FX 268:2) */
 static void lk_pic_reverb(void)
 {
@@ -1569,7 +1570,7 @@ static void lk_pic_reverb(void)
         if (x > 222.0f || ry < 2.0f)           /* off the axis, or died away */
             break;
         c = lk_mix888(lk_mix888(0xC9F6FFu, 0x507FCEu, fm_minf(age, 1.0f)), 0x3A3646u, fm_minf(damp * age, 0.85f));
-        lk_ring((int32_t)(x + 0.5f), mid, 6.0f + WIDE[ty] * ry, ry, 0, 1, mix > 0.0f ? lk_mix(0x07060Bu, c, 1.0f)
+        lk_ring((int32_t)(x + 0.5f), mid, 6.0f + WIDE[ty] * ry, ry, 0, 2, mix > 0.0f ? lk_mix(0x07060Bu, c, 1.0f)
                                                                                     : LK_UNLIT);
     }
     cv_text(12, 38, &LK_F_SMALL, "echoes", mix > 0.0f && into != 2 ? LK_INK : LK_LABEL);   /* Into: Both, Echoes, */
