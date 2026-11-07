@@ -12,6 +12,7 @@
 #pragma once
 #include <stdint.h>
 #include "fm1_xip.h"
+#include "fm1_flash_id.h"
 
 #define RAMFN  __attribute__((section(".ram_text"), noinline, used))
 #define RAMINL static inline __attribute__((always_inline))
@@ -143,14 +144,7 @@ RAMINL int fl_wait_ready(uint32_t max_us, uint32_t *took_us)
 
 /* ---- entry points: IRQs OFF, args/buffers in RAM ---- */
 
-/* a JEDEC id that is a standard SPI NOR of 1 to 16 MiB: the first FM-1s carry 0x856014 (Puya, 1 MiB); a newer
- * run may carry another part (issue #66). Every such part takes the commands used here (06 05 20 02 0B), and the
- * update loader writes and checks the whole app with them on whatever part is there. */
-static inline int fl_id_ok(uint32_t id)
-{
-    uint32_t maker = id >> 16, size = id & 0xFFu;
-    return maker != 0u && maker != 0xFFu && size >= 0x14u && size <= 0x18u;
-}
+/* fl_id_ok(): which flash parts the storage and the updater take (fm1_flash_id.h, tested on the host) */
 
 static RAMFN uint32_t fl_jedec_ram(void)                 /* 0x856014 on the first FM-1s: fl_id_ok() */
 {
