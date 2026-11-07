@@ -605,8 +605,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   Scene time back on their knobs), a Start too; under it "no clock", "120 BPM", "keeps 120" or "free time"; a room
   setting (`P_CLK_SYNC`, the 112th value; `P_SYNC` is hard sync). Setup 2: Tuning and Tune one ring (an octave
   clockwise, a tick a note, A named, Tune turning it from a fixed notch; the 1/1 named: LMY C, Harrison and Partch G,
-  Harmonics A, Just and Shruti drone I at the top), the drones as dots, each one's nearest note lit, beads I to II, the
-  interval under it (a ratio up to 32/32 within 4 cents on the pure Tunings, else its name); Stereo the two waves as far
+  Harmonics A, Just and Shruti drone I at the top), centered in the picture; no drones or interval on it (Evan: the
+  page sets the tuning; Drones 1 shows the interval); Stereo the two waves as far
   apart as it puts them; Pressure the curve with the key pressed ("[C4] 62%"). **Tune in Hz**: A's pitch in tenths of
   a Hz from 440 (427.0 .. 453.0), 1 Hz a click, 0.1 with SEL; a saved Tune in cents becomes the nearest 0.1 Hz (at
   most 0.2 cents off: -32 cents is 431.9 Hz). PROJ_FORMAT 41 (39-40's 111 values widened). Meters: Tuning a marker on

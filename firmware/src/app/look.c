@@ -1478,9 +1478,8 @@ static void lk_pic_setup1(void)
 /* the board (GLO 130:1913; every Tuning's ring 301:17): Tuning and Tune as one ring over KNOB 1-2, an octave clockwise,
  * a tick a note (dr_tun_c), Tune turning it away from the fixed notch at the top (440), A named on its tick; the
  * Tuning's 1/1 named on its (LMY on C, Harrison and Partch on G, Harmonics on A; Just and Shruti on drone I, the ring
- * turned to put it at the top); inside, its notes and its 1/1. The drones on it as dots where they sound, each one's
- * nearest note lit in its color, beads from drone I up to drone II; under it the interval, a ratio on the pure ones
- * when it's simple (both up to 32), else its name. Stereo: the two drones' waves upright, L and R as far apart as it
+ * turned to put it at the top); inside, its notes and its 1/1. No drones or interval: the page sets the tuning (Evan,
+ * 2026-11-07; Drones 1 shows the interval). Stereo: the two drones' waves upright, L and R as far apart as it
  * puts them. Pressure: what a press gives, light .. firm, and the key pressed now on it */
 #define LK_RING RGB(119, 114, 138)
 static void lk_circle(int32_t cx, int32_t cy, int32_t r, uint16_t c)   /* 1 px, the midpoint way */
@@ -1519,77 +1518,48 @@ static void lk_spoke(int32_t cx, int32_t cy, float c, float r0, float r1, int w,
         cv_line(x0 + !up, y0 + up, x1 + !up, y1 + up, col);
     }
 }
-static int lk_simple(int c, int *p, int *q)    /* the simplest p/q (both up to 32) within 4 cents of c > 0 */
-{
-    int a, b, best = 99;
-    for (b = 1; b <= 32; b++)
-        for (a = b + 1; a <= 32; a++) {
-            const float rc = 1200.0f * fm_log2f((float)a / (float)b);
-            if (fm_fabsf(rc - (float)c) <= 4.0f && a + b < best) {
-                best = a + b;
-                *p = a;
-                *q = b;
-            }
-        }
-    return best < 99;
-}
 static const char *const LK_NOTE12[12] = {"A", "Bb", "B", "C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#"};
 static void lk_pic_setup2(void)
 {
     const int t = (unsigned)proj.par[P_TUNING] < DR_NTUNING ? proj.par[P_TUNING] : DR_TUN_12;
     const int n = dr_tun_n(t), moves = DR_TUN_MOVES(t), pure = t >= DR_TUN_JUST;
     const float tc = 1200.0f * fm_log2f(1.0f + (float)proj.par[P_TUNE] * (1.0f / 4400.0f));
-    const int32_t cx = 52, cy = 52, R = 34;     /* the ring, its ticks out to R + 9, A at R + 12: clear of the
-                                                * header and the interval */
-    float pc[2];
+    const int32_t cx = 56, cy = 66, R = 38;     /* the ring, its ticks out to R + 9, A off them: centered in the left of
+                                                * the picture, clear of the header;
+                                                * the picture's height, the interval gone (Evan, 2026-11-07: this page
+                                                * sets the tuning; the drones' interval is on Drones 1) */
     int g, i, k;
     char tx[24];
-    for (g = 0; g < 2; g++) {                  /* the pitches as set, Shift's move in them */
-        const int set = g && proj.par[P_PLINK] ? proj.par[DR_GP(0, GP_PITCH)] + proj.par[P_PLINK_OFF]
-                                               : proj.par[DR_GP(g, GP_PITCH)];
-        pc[g] = (float)set + dr_gest_pitch(g) * 100.0f;
-    }
-    {   /* the ring, its notes, A, the 1/1, the drones */
-        const float rot = moves ? -pc[0] + 6900.0f : tc;   /* cents from A to the ring's angle */
-        int near[2];
+    {   /* the ring, its notes, A, the 1/1 */
         lk_circle(cx, cy, R, LK_RING);
         if (!moves) {                          /* the fixed notch: A at 440 */
             cv_rect(cx - 2, cy - R - 13, 5, 1, LK_LABEL);   /* a small triangle, point down, over the top */
             cv_rect(cx - 1, cy - R - 12, 3, 1, LK_LABEL);
             cv_rect(cx, cy - R - 11, 1, 1, LK_LABEL);
         }
-        for (g = 0; g < 2; g++) {              /* each drone's nearest note */
-            const float d = lk_wrap12(pc[g] - 6900.0f + (moves ? 6900.0f - pc[0] : 0.0f));
-            float bd = 1e9f;
-            near[g] = 0;
-            for (k = 0; k < n; k++) {
-                const float e = fm_fabsf(lk_wrap12(d - (float)dr_tun_c(t, k) + 600.0f) - 600.0f);
-                if (e < bd) {
-                    bd = e;
-                    near[g] = k;
-                }
-            }
-        }
-        for (k = 0; k < n; k++) {
-            const float c = (float)dr_tun_c(t, k) + (moves ? 0.0f : tc);
-            const int lit0 = near[0] == k, lit1 = near[1] == k;
-            if (lit0 || lit1)
-                lk_spoke(cx, cy, c, (float)R + 2.0f, (float)R + 9.0f, 2, LK_DRONE[lit1 && !lit0 ? 1 : 0]);
-            else
-                lk_spoke(cx, cy, c, (float)R + 3.0f, (float)R + (n > 24 ? 6.0f : 8.0f), 1, LK_NEUTRAL);
-        }
+        for (k = 0; k < n; k++)
+            lk_spoke(cx, cy, (float)dr_tun_c(t, k) + (moves ? 0.0f : tc), (float)R + 3.0f,
+                     (float)R + (n > 24 ? 6.0f : 8.0f), 1, LK_NEUTRAL);
         if (!moves) {                          /* A on its tick */
             int32_t ax, ay;
-            lk_polar(cx, cy, tc, (float)R + 10.0f, &ax, &ay);   /* beside its tick's tip, right of the notch, a
-                                                * little off the ring (Evan, 2026-11-07) */
-            cv_text(ax + 6, ay - LK_B(LK_F_SMALL) / 2 - 3, &LK_F_SMALL, "A", LK_WHITE);
+            lk_polar(cx, cy, tc, (float)R + 20.0f, &ax, &ay);   /* straight out past its tick and the notch, with
+                                                * room round it (Evan, 2026-11-07) */
+            text_c(ax, ay - LK_B(LK_F_SMALL) + 6, &LK_F_SMALL, "A", LK_WHITE);
         }
         {   /* the 1/1 on its tick (none on the equal ones) */
             const int one = t == DR_TUN_LMY ? 294 : t == DR_TUN_HARRISON || t == DR_TUN_PARTCH ? 996 : 0;
             if (pure && t != DR_TUN_HARM && !moves) {
                 int32_t ox, oy;
                 lk_polar(cx, cy, (float)one + tc, (float)R + 22.0f, &ox, &oy);   /* off the ring (Evan) */
-                ox = ox < 12 ? 12 : ox > 110 ? 110 : ox;   /* on the screen (Harrison's, Partch's at the left) */
+                if (ox < 14) {                 /* no room at the left (Harrison's, Partch's, up-left): as far left as
+                                                * it goes, raised along the ring until its corner clears the ticks'
+                                                * tips (Evan, 2026-11-07: it sat on them) */
+                    const float dx = (float)(14 - cx), rr = (float)R + 20.0f;
+                    const int32_t top = cy - (int32_t)fm_sqrtf(fm_maxf(rr * rr - dx * dx, 0.0f)) - 6;
+                    ox = 14;
+                    oy = oy < top ? oy : top;
+                }
+                ox = ox > 110 ? 110 : ox;
                 text_c(ox, oy - LK_B(LK_F_TAG) / 2 - 2, &LK_F_TAG, "1/1", LK_NEUTRAL);
             }
             /* inside: its notes, its 1/1 */
@@ -1597,47 +1567,11 @@ static void lk_pic_setup2(void)
             scopy(tx + (n >= 10 ? 2 : 1), " notes");
             text_c(cx, pure ? cy - 16 : cy - 9, &LK_F_SMALL, tx, LK_WHITE);
             if (pure) {
-                {
-                    char *q = scopy(tx, "1/1 on ");
-                    scopy(q, moves ? "I" : t == DR_TUN_HARM ? "A" : LK_NOTE12[(one + 50) / 100 % 12]);
-                }
+                char *q = scopy(tx, "1/1 on ");
+                scopy(q, moves ? "I" : t == DR_TUN_HARM ? "A" : LK_NOTE12[(one + 50) / 100 % 12]);
                 text_c(cx, cy + 1, &LK_F_TAG, tx, LK_LABEL);
             }
         }
-        {   /* beads from drone I up to drone II, inside the ring */
-            const float a0 = lk_wrap12(pc[0] - 6900.0f + rot), span = lk_wrap12(pc[1] - pc[0]);
-            const int nb = (int)(span * (24.0f / 1200.0f));
-            for (i = 1; i < nb; i++) {
-                int32_t bx, by;
-                const float u = (float)i / (float)nb;
-                lk_polar(cx, cy, a0 + span * u, (float)R - 5.0f, &bx, &by);
-                cv_round(bx - 1, by - 1, 3, 3, 1, lk_mix(0x07060Bu, u < 0.5f ? 0xFF9A1Fu : 0x1FC8FFu, 0.45f + 0.25f * (u < 0.5f ? u : 1.0f - u) * 2.0f));
-            }
-            for (g = 1; g >= 0; g--) {         /* the drones where they sound */
-                int32_t dx, dy;
-                lk_polar(cx, cy, lk_wrap12(pc[g] - 6900.0f + rot), (float)R, &dx, &dy);
-                cv_round(dx - 3, dy - 3, 7, 7, 3, LK_DRONE[g]);
-            }
-        }
-    }
-    {   /* the interval, drone II from drone I: a simple ratio on the pure ones, else its name */
-        const int d = (int)(pc[1] - pc[0] + (pc[1] >= pc[0] ? 0.5f : -0.5f)), a = d < 0 ? -d : d;
-        int p = 1, q = 1;
-        int32_t w, x;
-        if (pure && a > 4 && lk_simple(a, &p, &q)) {
-            char *z = tx;
-            itoa_u((uint32_t)p, z);
-            while (*z)
-                z++;
-            *z++ = '/';
-            itoa_u((uint32_t)q, z);
-        } else {
-            lk_interval(tx, d);
-        }
-        w = text_w(&LK_F_DRONE, tx) + (a > 4 ? 14 : 0);
-        x = cv_text(cx - w / 2, LK_PIC_H - 2 - (int32_t)LK_F_DRONE.h, &LK_F_DRONE, tx, LK_DRONE[1]);
-        if (a > 4)
-            lk_arrow(x + 4, LK_PIC_H - 2 - (int32_t)LK_F_DRONE.h + LK_B(LK_F_DRONE) - 1, 13, d > 0, LK_DRONE[1]);
     }
     {   /* STEREO: each drone's wave upright, as far apart as it puts them */
         const float wid = (float)proj.par[P_WIDTH] * 0.01f;
