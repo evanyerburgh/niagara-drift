@@ -620,5 +620,5 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-11-07: the meters one family (Evan: "dots, cells and pills look the same"): every plain amount a row of 8 dots
   of 5 px in its page's own colors (ENV's cells, ARP's pills, EDIT's stripe gauges and SEQ's rulers before it); kept:
   a caution's red (Reso's last dot, Feedback's last two), the centered rows from the middle (Shift, Tune, the Swell's
-  Shape), the crossfaders (Osc/Sub, Color, Stereo), X-Wave's ticks; a knob of up to 6 choices shows them as segments,
-  one lit (Evan: "if there are three or five options, pills are better"), a longer list a dot.
+  Shape), the crossfaders (Osc/Sub, Color, Stereo), X-Wave's ticks; Wander's Scale as six segments, one lit (Evan: "if
+  there are three or five options, pills are better"); Mods' Source keeps its three dots (Evan).
