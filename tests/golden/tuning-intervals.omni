@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): Partner and Shift on the Tunings (Evan, 2026-11-07). Drone I on D3,
+# drone II on A3, both partners on (par12, par33), no Detune (par4, par25), drone I's a fifth (par3 12), drone II's a
+# just fifth (par24 13); the Swell, Drift and Movement off (par55, par52, par75). 12-tone, then LMY (par110 7), 19-tone
+# (2), Harmonics (6): the partners on each Tuning's fifth; then Shift latched (E5, w13): its +700c is no note of LMY or
+# 19-tone, so it moves 700c; a click down (Pitch moves' KNOB 1) lands on 19-tone's note, "+5th" (695c). The Partner
+# page on 19-tone ("+5th", no "just"), Pitch moves on LMY. Not a test of its own.
+notips
+set 74 0
+set 51 0
+set 55 0
+set 52 0
+set 75 0
+set 0 5000
+set 21 5700
+set 12 1
+set 33 1
+set 4 0
+set 25 0
+set 3 12
+set 24 13
+tap PLAY
+wait 1500
+wav tuning-intervals.wav
+wait 4000
+set 110 7
+wait 4000
+set 110 2
+wait 4000
+tap GLO
+tap GLO
+set 110 2
+spin K1 1
+spin K1 -1
+tap SEQ
+expect view 8
+wait 600
+shot tuning-partner.png
+set 110 6
+wait 4000
+set 110 7
+tapkey w13
+wait 4000
+set 110 2
+wait 2000
+tap SEQ
+tap SEQ
+spin K1 -1
+wait 2000
+tap GLO
+tap GLO
+set 110 7
+spin K1 1
+spin K1 -1
+tap SEQ
+tap SEQ
+expect view 9
+wait 600
+shot tuning-shift.png
+tapkey w13
+wait 3000
+wavstop

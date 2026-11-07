@@ -668,17 +668,68 @@ static int chord_vi;
  * Partch, Harmonics): the Tuning's note nearest j over drone I's. From drone I's nearest note on a fixed grid; on a
  * movable one (Just, Shruti) from drone I itself, so pure over it */
 static int grid_near_a(int t, int v) { return dr_grid_at(t, dr_grid_k(t, v, 900), 900); }   /* on A */
-float dr_tun_iv(float cur, int j)
+/* ... and over drone g (Partner and Shift follow the Tuning too, Evan 2026-11-07): from drone g's nearest note, on
+ * the grid as Wander's (a movable Tuning still built on drone I) */
+float dr_tun_over(int g, float cur, int j)
 {
     int t = tun_ok(base[P_TUNING]), p1 = base[DR_GP(0, GP_PITCH)], root, k, g1;
     if (t == DR_TUN_12 || t == DR_TUN_24)
         return cur;
     root = DR_TUN_MOVES(t) ? p1 : 900;
-    k = dr_grid_k(t, p1, root);
+    k = dr_grid_k(t, base[DR_GP(g & 1, GP_PITCH)], root);
     g1 = dr_grid_at(t, k, root);
     if (dr_tun_n(t) == 12)
         return (float)(dr_grid_at(t, k + (int)fm_floorf(cur + 0.5f), root) - g1) * 0.01f;
     return (float)(dr_grid_at(t, dr_grid_k(t, g1 + j, root), root) - g1) * 0.01f;
+}
+float dr_tun_iv(float cur, int j) { return dr_tun_over(0, cur, j); }
+/* the partner's interval as heard, semitones: on 12-tone and Quarter as picked (tempered or just); on another Tuning
+ * the Tuning's interval over drone g, from the interval's pure size (both "+5th" and "+5th just" its fifth) */
+static const int16_t IV_J[DR_NINTERVALS] = {-1200, -702, -702, -498, -498, 0, 316, 316, 386, 386, 498, 498, 702, 702,
+                                            1200, 1902, 1902};
+float dr_partner_semi(int g, int iv)
+{
+    const int t = tun_ok(base[P_TUNING]);
+    iv = (unsigned)iv < DR_NINTERVALS ? iv : DR_IV_UNISON;
+    if (t == DR_TUN_12 || t == DR_TUN_24)
+        return DR_IV_SEMI[iv];
+    return dr_tun_over(g, fm_floorf(DR_IV_SEMI[iv] + 0.5f), IV_J[iv]);
+}
+/* SHIFT along the Tuning (Evan, 2026-11-07): its knob steps from note to note of the Tuning over drone I (SEL: a cent,
+ * off the notes); on a note the move is so many of the Tuning's notes, and each drone moves that many from its own
+ * nearest note; off a note, its cents (an older sound's +700c on 19-tone stays 700c) */
+static int shift_root(int t, int p1) { return DR_TUN_MOVES(t) ? p1 : 900; }
+int dr_shift_on(int t, int p1, int ct)               /* 1: ct (cents) is a note of the Tuning over drone I (p1) */
+{
+    const int r = shift_root(t, p1), g1 = dr_grid_at(t, dr_grid_k(t, p1, r), r);
+    return dr_grid_at(t, dr_grid_k(t, g1 + ct, r), r) == g1 + ct;
+}
+int dr_shift_step(int t, int p1, int ct, int n)      /* n notes on from ct (to the next note first), within +-700 */
+{
+    const int r = shift_root(t, p1), g1 = dr_grid_at(t, dr_grid_k(t, p1, r), r);
+    int k = dr_grid_k(t, g1 + ct, r), at = dr_grid_at(t, k, r) - g1, v;
+    if (n > 0 && at > ct)                            /* off a note: its nearest in the turn's way counts as one */
+        n--;
+    else if (n < 0 && at < ct)
+        n++;
+    v = dr_grid_at(t, k + n, r) - g1;
+    while (v > 700)
+        v = dr_grid_at(t, --k + n, r) - g1;
+    while (v < -700)
+        v = dr_grid_at(t, ++k + n, r) - g1;
+    return v;
+}
+float dr_shift_semi(int g)
+{
+    const int t = tun_ok(base[P_TUNING]), p1 = base[DR_GP(0, GP_PITCH)], ct = base[P_SHIFT_MOVE] - DR_SHIFT_MID;
+    int r, k1, kt, kg;
+    if (t == DR_TUN_12 || t == DR_TUN_24 || !dr_shift_on(t, p1, ct))
+        return (float)ct * 0.01f;
+    r = shift_root(t, p1);
+    k1 = dr_grid_k(t, p1, r);
+    kt = dr_grid_k(t, dr_grid_at(t, k1, r) + ct, r);
+    kg = dr_grid_k(t, base[DR_GP(g & 1, GP_PITCH)], r);
+    return (float)(dr_grid_at(t, kg + kt - k1, r) - dr_grid_at(t, kg, r)) * 0.01f;
 }
 static const float CHORD_T[DR_NWSCALE][2] = {
     {3.15641f, 10.17596f}, {3.86314f, 8.84359f}, {7.01955f, 12.0f}, {4.0f, 8.0f}, {3.15641f, 8.84359f}, {3.86314f, 9.68826f}};
@@ -1090,7 +1141,7 @@ static void mv_add(const move_t *v, float l, float *off, uint8_t *on, float *pm,
     case MK_ZERO: off[v->p] -= (float)base[v->p] * l * (v->d ? (float)v->d * 0.01f : 1.0f); break;
     case MK_TO: off[v->p] += fm_maxf((float)(v->d - base[v->p]), 0.0f) * l; break;
     case MK_DOWN: off[v->p] += fm_minf((float)(v->d - base[v->p]), 0.0f) * l; break;
-    case MK_SHIFT: pm[v->p] += (float)(base[P_SHIFT_MOVE] - DR_SHIFT_MID) * 0.01f * l; break;
+    case MK_SHIFT: pm[v->p] += dr_shift_semi(v->p) * l; break;
     case MK_PULSE: off[v->p] += (float)v->d * l * (0.5f - 0.5f * fm_cosf(6.2831853f * mac_ph)); *flags |= 2; break;
     case MK_WOW: {                               /* two slow sines a drone, apart (wow: +-AGE_WOW cents at full), and two
                                                   * quick ones (flutter, 5.7 and 8.9 Hz: +-4 cents) */
@@ -1837,8 +1888,8 @@ static void render_group(int g, uint32_t n)
     const float dw = pfs[P_DRIFT] * 0.01f;
     const int iv = (unsigned)p[GP_INTERVAL] < DR_NINTERVALS ? p[GP_INTERVAL] : DR_IV_UNISON;
     /* the partner's interval: tempered, or just (pure ratios, so a fifth or a third doesn't beat; Detune
-     * still adds beating on purpose) */
-    const float ival = v->ovon ? v->ov : DR_IV_SEMI[iv];
+     * still adds beating on purpose); on another Tuning, the Tuning's (dr_partner_semi) */
+    const float ival = v->ovon ? v->ov : dr_partner_semi(g, iv);
     const float detune = pv[GP_DETUNE] * 0.003f;            /* semitones: 30 cents at 100 */
     /* Unison with no Detune is one fat oscillator: the partner is pulled into phase with the main (~25 ms),
      * so it can't sit half a cycle out and cancel it (it did: -20 dB, depending on what came before), and

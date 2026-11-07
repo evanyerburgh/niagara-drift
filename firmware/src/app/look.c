@@ -1220,7 +1220,7 @@ static void lk_pic_partner(void)
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 130 : 10, cx = x0 + 50, base = 2 + LK_B(LK_F_DRONE);
         const int on = gpar(g, GP_PARTNER) != 0, iv = gpar(g, GP_INTERVAL);
-        const float semi = DR_IV_SEMI[(unsigned)iv < DR_NINTERVALS ? iv : DR_IV_UNISON];
+        const float semi = dr_partner_semi(g, iv);   /* as heard: on a Tuning, the Tuning's interval */
         const float r = fm_exp2f((semi + (float)gpar(g, GP_DETUNE) * 0.003f) / 12.0f);
         const float f1 = 8.1757989f * fm_exp2f(dr_pitch[g] / 12.0f);
         float beat, fan;
@@ -2277,6 +2277,8 @@ static void lk_swing(char *q, float x, const char *unit)   /* "±3.6 oct", "±12
     scopy(q, unit);
 }
 
+/* on a Tuning other than 12-tone and Quarter */
+static int lk_tuned(void) { return proj.par[P_TUNING] != DR_TUN_12 && proj.par[P_TUNING] != DR_TUN_24; }
 static int lk_line2(int p, int v, char *t, char *t2)
 {
     const int gp = p < P_XMOD ? p % GP_N : -1;
@@ -2300,9 +2302,14 @@ static int lk_line2(int p, int v, char *t, char *t2)
         }
         return 1;
     }
-    if (gp == GP_INTERVAL) {                   /* "+5th just": "just" under it */
+    if (gp == GP_INTERVAL) {                   /* "+5th just": "just" under it; on a Tuning the name alone (that
+                                                * Tuning's fifth: tempered or just means nothing there) */
         for (q = t; *q && *q != ' '; q++)
             ;
+        if (lk_tuned()) {
+            *q = 0;
+            return 0;
+        }
         if (*q) {
             *q = 0;
             scopy(t2, q + 1);
@@ -2318,14 +2325,21 @@ static int lk_line2(int p, int v, char *t, char *t2)
         }
         q = t;
         *q++ = ct < 0 ? '-' : '+';
+        if (dr_shift_on(proj.par[P_TUNING], proj.par[DR_GP(0, GP_PITCH)], ct)) {
+            /* on a note of the Tuning: its interval by name (Evan, 2026-11-07), the nearest 12-tone one: on 19-tone
+             * "+5th" is 19-tone's fifth */
+            static const char *const N[8] = {"", "m2", "M2", "m3", "M3", "4th", "tritone", "5th"};
+            const int n = (a + 50) / 100;
+            scopy(q, N[n < 8 ? n : 7]);
+            if (!n)                            /* a quarter tone or less: its cents */
+                goto cents;
+            return 0;
+        }
+cents:
         itoa_u((uint32_t)a, q);
         while (*q)
             q++;
         scopy(q, "c");
-        if (a == 700 || a == 500) {
-            scopy(scopy(t2, a == 700 ? "5th " : "4th "), ct < 0 ? "down" : "up");
-            return 1;
-        }
         return 0;
     }
     if (p == P_WSCALE) {                       /* "Minor / pent", "5ths + / 8ves" */
@@ -2568,9 +2582,11 @@ static void lk_values(void)
                             why ? LK_LABEL : LK_WHITE);
             }
         }
-        if (mode == 1)
+        if (mode == 1)                  /* the word under a value at its units' size, as the "c" in "+700c"
+                                                * and the "th" in "+5th" ("just", "pulse"; Evan,
+                                                * 2026-11-07: smaller, across the firmware); Sync's line keeps its */
             text_c(cx, p == P_CLK_SYNC ? 78 - LK_B(LK_F_TAG) : y + (int32_t)fb->h - 6,
-                   text_w(&LK_F_TAG, t2) <= 54 ? &LK_F_TAG : &FONT_U2, t2,
+                   p != P_CLK_SYNC || text_w(&LK_F_TAG, t2) > 54 ? &FONT_U2 : &LK_F_TAG, t2,
                    p == P_CLK_SYNC && !clk.following ? LK_LABEL : LK_WHITE);   /* Sync: the tempo white, else gray;
                                                                                 * "keeps 120" smaller to fit */
         if (p == P_CLK_SYNC)                   /* no meter: its line says it (the board) */

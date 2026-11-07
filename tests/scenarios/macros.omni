@@ -85,12 +85,12 @@ expect par90 <60
 tapkey w12
 wait 4000
 expect par90 0
-# SHIFT: its move on Pitch moves' KNOB 1 (80, in cents + 700: a 5th up to start, 120 detents down: a 4th down); a
+# SHIFT: its move on Pitch moves' KNOB 1 (80, in cents + 700: a 5th up to start, 12 detents down, a note each: a 4th down); a
 # gesture key held, ALGORITHM is still the Movement and PRESETS Gesture time (3.9 s)
 tap SEQ
 tap SEQ
 expect view 9
-spin K1 -120
+spin K1 -12
 expect par80 200
 tap HOME
 key w13 down

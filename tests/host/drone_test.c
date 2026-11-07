@@ -254,6 +254,50 @@ int main(void)
         }
         check("Wander's and Chord's notes on each Tuning", ok);
     }
+    {   /* PARTNER's and SHIFT's intervals on the Tuning (Evan, 2026-11-07): 12-tone and Quarter as picked; on another
+         * Tuning its interval over the drone, from the pure size ("+5th" and "+5th just" alike) */
+        struct { int tun, g, p, iv, shift; float want; const char *what; } c[] = {
+            {DR_TUN_12, 0, 5000, 12, 0, 7.0f, "12-tone: +5th tempered"},
+            {DR_TUN_12, 0, 5000, 13, 0, 7.01955f, "12-tone: +5th just"},
+            {DR_TUN_24, 1, 5700, 9, 0, 3.86314f, "Quarter: +M3 just as picked"},
+            {DR_TUN_19, 0, 5000, 12, 0, 6.947f, "19-tone: +5th is 11 steps (695c)"},
+            {DR_TUN_19, 1, 5700, 13, 0, 6.947f, "19-tone: +5th just the same"},
+            {DR_TUN_JUST, 0, 5037, 12, 0, 7.01955f, "Just over drone I anywhere: 3/2"},
+            {DR_TUN_JUST, 1, 5737, 8, 0, 3.86314f, "Just, drone II a 5th over I: +M3 is 15/8 over I (5/4 of 3/2)"},
+            {DR_TUN_53, 0, 5700, 6, 0, 3.17f, "53-tone: +m3 the nearest to 6/5, 14 steps"},
+            {DR_TUN_LMY, 1, 5700, 12, 0, 7.02f, "LMY on A, drone II on A: +5th is 3/2"},
+            {DR_TUN_12, 0, 5000, 0, 700, 7.0f, "Shift on 12-tone: 700c"},
+            {DR_TUN_19, 0, 5000, 0, 695, 6.947f, "Shift on 19-tone's fifth: 11 steps"},
+            {DR_TUN_19, 0, 5000, 0, 700, 7.0f, "Shift +700c on 19-tone, off its notes: 700c as before"},
+            {DR_TUN_JUST, 0, 5037, 0, 316, 3.16f, "Shift on Just's 6/5 over drone I"},
+            {DR_TUN_JUST, 0, 5037, 0, 340, 3.40f, "Shift +340c on Just, off its notes: 340c"},
+        };
+        int k, ok = 1;
+        dr_init();
+        for (k = 0; k < (int)(sizeof c / sizeof c[0]); k++) {
+            float v;
+            dr_set(P_TUNING, c[k].tun);
+            dr_set(DR_GP(0, GP_PITCH), c[k].g ? 5000 : c[k].p);
+            dr_set(DR_GP(1, GP_PITCH), c[k].p);
+            if (c[k].g && c[k].tun == DR_TUN_JUST)
+                dr_set(DR_GP(0, GP_PITCH), 5037);
+            dr_set(P_SHIFT_MOVE, DR_SHIFT_MID + c[k].shift);
+            dr_render(buf, 256, 3277);
+            v = c[k].shift ? dr_shift_semi(c[k].g) : dr_partner_semi(c[k].g, c[k].iv);
+            if (fabsf(v - c[k].want) > 0.006f) {
+                printf("    %s: %.4f, not %.4f\n", c[k].what, (double)v, (double)c[k].want);
+                ok = 0;
+            }
+        }
+        dr_set(P_SHIFT_MOVE, DR_SHIFT_MID);
+        check("Partner's and Shift's intervals on each Tuning", ok);
+        check("Shift's knob along the notes: 12-tone 500 +1 is 600, 700 +1 stays 700 (the end)",
+              dr_shift_step(DR_TUN_12, 5000, 500, 1) == 600 && dr_shift_step(DR_TUN_12, 5000, 700, 1) == 700);
+        check("... 19-tone 0 +11 is its fifth (695); off a note (700) -1 lands on 695",
+              dr_shift_step(DR_TUN_19, 5000, 0, 11) == 695 && dr_shift_step(DR_TUN_19, 5000, 700, -1) == 695);
+        check("... -700 -1 stays within the range; Just over drone I: 0 +7 is 3/2 (702 is past 700: 6 notes, 4/3+)",
+              dr_shift_step(DR_TUN_12, 5000, -700, -1) == -700 && dr_shift_on(DR_TUN_JUST, 5037, dr_shift_step(DR_TUN_JUST, 5037, 0, 7)));
+    }
     dry_init();
     run(secs(1.0f));
     check("silent before PLAY", nonzero == 0);

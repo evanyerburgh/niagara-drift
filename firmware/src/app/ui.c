@@ -438,7 +438,12 @@ static void cont_turn(int p, int role, int32_t s)
         }
     }
     dr_pslide(p, (int)slide);
-    param_set(p, proj.par[p] + steps);
+    if (p == P_SHIFT_MOVE && !(ui.btn >> B_SEL & 1u))   /* SHIFT along the Tuning's notes (Evan, 2026-11-07): a
+                                                        * detent the next note over drone I; SEL, a cent */
+        param_set(p, DR_SHIFT_MID + dr_shift_step(proj.par[P_TUNING], proj.par[DR_GP(0, GP_PITCH)],
+                                                  proj.par[p] - DR_SHIFT_MID, steps / 10));
+    else
+        param_set(p, proj.par[p] + steps);
     loop_note(p, proj.par[p], slide);
 }
 
