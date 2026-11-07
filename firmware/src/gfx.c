@@ -147,7 +147,7 @@ static uint32_t glyph(const felucca_font_t *f, uint32_t ch)
     if (ch >= 'a' && ch <= 'z' && f->last < 'a')
         ch -= 32u;
     if (ch < f->first || ch > f->last || (ch >= 127u && ch < 160u))
-        ch = '?';
+        ch = f->first <= '?' && f->last >= '?' ? '?' : f->first;   /* (a font of a few letters has no '?') */
     return ch - f->first;
 }
 
