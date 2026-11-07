@@ -274,6 +274,8 @@ extern volatile float dr_level[DR_NGROUPS];    /* each drone's output level, 0..
 extern volatile float dr_fade;                 /* the PLAY fade, 0..1 */
 extern volatile uint8_t dr_phones;             /* headphones in: the Speaker low cut stays out (the UI sets it) */
 extern volatile float dr_duck_level;           /* the dip now, 1 (none) .. 0 (out) */
+extern volatile float dr_tail;                 /* the effects' output, the last block's peak (0 resting): a save
+                                                * (its erase cuts the audio for a few ms) dips first while it's heard */
 extern volatile float dr_lfo[2];               /* the LFO taps now, -1..1 (the DS-2's rate lights) */
 extern volatile float dr_pulse;                /* the pulse's gain now, 0..1 (1: open, or off) */
 extern volatile float dr_lfo_ph;               /* the LFO's phase now, 0..1 (cycles) */

@@ -150,7 +150,8 @@ static struct {
     uint32_t act_t;
     uint32_t chg_t;                    /* the last change to the project, by a hand or not (a scene gliding, the loop) */
     uint32_t saved_t;                  /* the last autosave tried */
-    int8_t save_q;                     /* a save waiting for the dip (playing): -2 none, -1 the sound, N scene N */
+    int8_t save_q;                     /* a save waiting for the dip (something heard): -2 none, -1 the sound, -3 the
+                                        * autosave, N scene N */
     uint32_t save_t;                   /* ... asked then */
     uint8_t page_last[8];              /* each page button's page last shown (0: its first): opened again there */
     uint32_t sel_t;                    /* when SEL went down (held 0.4 s: the black keys' map) */
@@ -1005,7 +1006,8 @@ static void scene_name(char *t, int bank, int n)
     itoa_u((uint32_t)n + 1u + (bank == BANK_PRESETS2 ? NPLAY : 0u), t + 1);
 }
 
-/* into the flash now: n = -1 the sound (SAVE), else scene n (just stored) */
+#define SAVE_AUTO (-3)                                 /* save_now / save_ask: the autosave (no banner) */
+/* into the flash now: n = -1 the sound (SAVE), SAVE_AUTO the autosave, else scene n (just stored) */
 static void save_now(int n)
 {
     char t[12] = "SCENE ";
@@ -1017,7 +1019,8 @@ static void save_now(int n)
     ok = project_save() == 0;
     if (ok)
         ui.dirty = 0;
-    if (n < 0) {
+    if (n == SAVE_AUTO) {                              /* the autosave: no banner */
+    } else if (n < 0) {
         say(ok ? "SAVED" : "NOT SAVED", ok ? 0 : "FLASH ERROR");
     } else {
         scene_name(t + 6, proj.bank, n);
@@ -1025,11 +1028,13 @@ static void save_now(int n)
     }
 }
 
-/* a save: while the drone sounds, the output dips out first (the write stops the audio for a few ms, measured
- * on the FM-1: under one 5.8 ms block), then comes back; Evan, 2026-10-14: no more waiting for PLAY to stop */
+/* a save: while anything sounds (the drones, or the effects' tails ringing on after PLAY), the output dips out
+ * first (the erase stops the audio for a few ms, measured on the FM-1: under one 5.8 ms block; cut in a tail it
+ * popped, Evan 2026-11-07), then comes back; Evan, 2026-10-14: no more waiting for PLAY to stop */
+#define TAIL_HEARD 1e-4f                               /* the effects' peak over -80 dB: a cut there is heard */
 static void save_ask(int n)
 {
-    if (!ui.playing && dr_fade <= 0.0f) {
+    if (!ui.playing && dr_fade <= 0.0f && dr_tail < TAIL_HEARD) {
         save_now(n);
         return;
     }
@@ -2341,16 +2346,19 @@ static void leds(void)
  * flickering with each). And never more often than AUTOSAVE_EVERY, whatever happens, nor again soon after a fail */
 #define AUTOSAVE_QUIET 4000u
 #define AUTOSAVE_EVERY 30000u
+#define AUTOSAVE_TAIL 15000u                   /* the tails still heard this long after the last touch (a long reverb,
+                                                * a freeze): saved with the dip, rather than not at all */
 static void autosave(void)
 {
     uint32_t now = plat_ms();
     if (!ui.dirty || ui.playing || dr_fade > 0.0f || ui.btn || ui.keys || now - ui.act_t < AUTOSAVE_QUIET ||
         now - ui.chg_t < AUTOSAVE_QUIET || ui.morph >= 0 || ui.press >= 0 ||
-        (ui.saved_t && now - ui.saved_t < AUTOSAVE_EVERY) || plat_store_held())
+        (ui.saved_t && now - ui.saved_t < AUTOSAVE_EVERY) || plat_store_held() || ui.save_q != -2 ||
+        (dr_tail >= TAIL_HEARD && now - ui.act_t < AUTOSAVE_TAIL))   /* the tails fade out first (a save cut in
+                                                                        * them popped, Evan 2026-11-07) */
         return;
     ui.saved_t = now;
-    if (project_save() == 0)
-        ui.dirty = 0;
+    save_ask(SAVE_AUTO);                       /* (still heard: with the dip) */
 }
 
 void ui_init(void)
