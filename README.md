@@ -331,7 +331,9 @@ pink specks are as many as Color says.
 | Pitch moves | Shift's move | pitch glide | II wander | Wander's scale |
 
 - **Shift's move** is where the Shift gesture takes the drones: from a fifth down through none in the middle to a
-  fifth up, 10 cents a detent, 1 with SEL held; it lights while Shift (E5) is in. See [The gestures](#the-gestures).
+  fifth up, a note of the Tuning a detent (on 12-tone a semitone), named by its interval ("+5th", "-4th", "+m3"; on
+  another Tuning, that Tuning's own fifth, fourth, third); with SEL held, a cent a detent, off the notes ("+503c"); it
+  lights while Shift (E5) is in. See [The gestures](#the-gestures).
 - **Wander** gives drone II a slow random melody: it jumps from note to note in no order, the notes of a scale on
   drone I (in any octave, up to an octave from its own pitch), and only now and then comes home. The knob is **how
   often**, at random times within a range: 25–30 s apart at the bottom, 0.5–2 s at the top; the screen shows the
@@ -350,7 +352,9 @@ pink specks are as many as Color says.
   as fast as it beats ("beats 2.0/s"); a just interval with no detune stands still. Beside each drone's name, whether
   its partner is on and the black key that switches it (F#3 for drone I, F#4 for drone II).
 - Each **interval** comes twice: tempered, then **just** ("+5th just"), a pure ratio (a fifth is exactly 3/2) that
-  doesn't beat; detune still adds beating on purpose. Octaves and unison are both at once.
+  doesn't beat; detune still adds beating on purpose. Octaves and unison are both at once. On a Tuning other than
+  12-tone and Quarter, both are the Tuning's own interval (a 19-tone fifth is 695 cents), and the value shows only its
+  name.
 
 #### LFO · LFO
 
@@ -498,6 +502,9 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
     other 12-note Tunings (Just, LMY, Harrison) Wander's scale plays the same keys, so a minor pentatonic on LMY takes
     LMY's own intervals; on the rest, each note is the Tuning's nearest to the pure interval (a 31-tone minor third is
     310 cents). On Harmonics, Wander moves between all the harmonics, whatever the scale.
+  - **So do Partner and Shift.** A partner's interval is the Tuning's, over its own drone; Shift's knob steps from
+    note to note of the Tuning over drone I, and each drone moves as many of the Tuning's notes from its own. A Shift
+    set off the notes (with SEL, or a sound from before) moves its cents exactly.
   - It only decides where a turn goes: a sound or scene plays its pitches as they were saved, until you turn the knob
     (the first click goes to the Tuning's next note).
 

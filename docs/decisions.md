@@ -54,6 +54,13 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-07: the Ultra LFO: one rate, two taps (Wave I, Wave II) of Off + 7 shapes + random, routed per drone
   to pitch or X-WAVE and to cutoff or resonance, with bipolar depths. 2026-10-14: rate 0.02 Hz (a cycle in 50 s,
   the DS-2's slowest) .. 70 Hz; longer arcs come from Scene switch and the motion loop.
+- 2026-11-07: Partner and Shift follow the Tuning (ledger item 8), as Wander and Chord since #63: on a Tuning other
+  than 12-tone and Quarter a partner's interval is the Tuning's over its drone, from the interval's pure size
+  ("+5th" and "+5th just" the same; the value shows the name alone); Shift's knob steps from note to note of the
+  Tuning over drone I (SEL: a cent, off the notes), named by the nearest 12-tone interval ("+5th", "-4th", "+m3"; Evan:
+  "700 -> 695 seems weird"), each drone moving as many notes from its own; a move off the notes stays exact cents.
+  Drift stays (a wobble, not an interval). The word under a value at its units' size (13 px, as the "c" in "+503c";
+  Evan: smaller, across the firmware).
 - 2026-11-07: the LFO's slowest rate a cycle in 100 s (0.01 Hz, as the Sub 37's slowest; was 50 s), the top still
   70 Hz, the slow rates given most of the dial (Evan: a drone synth is about slow changes; then, on the FM-1, each
   second on the dial): 0..152, a click a second from 100 s to 10 s (v 0..90), then 62 steps of the same size (10 s to

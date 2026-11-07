@@ -178,6 +178,11 @@ int dr_wander_degs(float *deg);                /* Wander's scale over drone I, o
                                                 * (up to 8; the screen) */
 float dr_tun_iv(float cur, int j);             /* a scale's note on the Tuning over drone I, semitones:
                                                 * cur on 12-tone, j its pure size, cents (Wander, Chord; tests) */
+float dr_tun_over(int g, float cur, int j);    /* ... over drone g */
+float dr_partner_semi(int g, int iv);          /* drone g's partner interval iv as heard on the Tuning, semitones */
+float dr_shift_semi(int g);                    /* Shift's move as heard over drone g on the Tuning, semitones */
+int dr_shift_on(int t, int p1, int ct);        /* Shift's ct (cents) a note of Tuning t over drone I (p1) */
+int dr_shift_step(int t, int p1, int ct, int n);   /* ... n of its notes on, within +-700 */
 int dr_heard(int p);                           /* a value as heard: the sound's own plus the macros (tests) */
 float dr_mac_pitch(int g);                     /* drone g's pitch move by the macros now, semitones (tests) */
 float dr_gest_pitch(int g);                    /* ... by the gestures alone (Shift's; the screen) */
