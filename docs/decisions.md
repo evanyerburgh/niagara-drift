@@ -54,6 +54,10 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-10-07: the Ultra LFO: one rate, two taps (Wave I, Wave II) of Off + 7 shapes + random, routed per drone
   to pitch or X-WAVE and to cutoff or resonance, with bipolar depths. 2026-10-14: rate 0.02 Hz (a cycle in 50 s,
   the DS-2's slowest) .. 70 Hz; longer arcs come from Scene switch and the motion loop.
+- 2026-11-07: the LFO's slowest rate a cycle in 100 s (0.01 Hz, as the Sub 37's slowest; was 50 s), the top still
+  70 Hz, on a power curve that gives the slow rates more of the dial (Evan: a drone synth is about slow changes):
+  0.01 * 7000^((v/100)^1.3) Hz, 50 s at 14, 10 s at 35, 1 Hz at 60, 10 Hz at 83. Saved sounds keep their rate at the
+  nearest step (within 5 %).
 - 2026-10-11: rate mod is linear (+-100 = +-3 octaves) and keeps the tempo; Random draws a new level at every
   restart, seeded at the first PLAY.
 - 2026-10-11: PRESETS is Wave I, ALGORITHM is Wave II, SELECT is the LFO rate.

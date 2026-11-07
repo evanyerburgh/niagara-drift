@@ -34,7 +34,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     {I_(GP_PITCH), 5000, II_(GP_PITCH), 4700, I_(GP_WAVE), 67, II_(GP_WAVE), 100, II_(GP_WIDTH), 70,
      I_(GP_INTERVAL), 0, II_(GP_DETUNE), 30, I_(GP_MIX), 45, I_(GP_SUBOCT), 3, I_(GP_CUTOFF), 650, II_(GP_CUTOFF), 610,
      I_(GP_RESO), 450, II_(GP_RESO), 450, I_(GP_DRIVE), 70, II_(GP_DRIVE), 60, P_CHAR, 27, P_FEEDBACK, 30,
-     P_LFO_RATE, 3, P_REV_TYPE, 1, P_REV_LEN, 75, P_REV_DAMP, 80, P_REV_MIX, 40, I_(GP_NOISE), 8, I_(GP_LEVEL), 89,
+     P_LFO_RATE, 18, P_REV_TYPE, 1, P_REV_LEN, 75, P_REV_DAMP, 80, P_REV_MIX, 40, I_(GP_NOISE), 8, I_(GP_LEVEL), 89,
      II_(GP_LEVEL), 89, P_DLY_TYPE, 1, P_DLY_TIME, 85, P_DLY_REPEATS, 45, P_DLY_MIX, 15, I_(GP_FLFO_DEST), DR_TO_RESO,
      I_(GP_FLFO_DEPTH), 55, II_(GP_FLFO_DEST), DR_TO_RESO, II_(GP_FLFO_DEPTH), -55, -1},
     /* P3 EERIE: a tritone apart, near-sines, drone II through a ringing band-pass with a breath of white noise,
@@ -74,7 +74,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     {I_(GP_PITCH), 5000, II_(GP_PITCH), 5300, I_(GP_WAVE), 100, I_(GP_WIDTH), 35, II_(GP_WAVE), 67, I_(GP_MIX), 30,
      P_AGE, 35, P_CHAR, 67, P_DLY_TYPE, 3, P_DLY_MIX, 35, P_DLY_REPEATS, 55, I_(GP_CUTOFF), 720,
      II_(GP_CUTOFF), 700, I_(GP_NOISE), 18, II_(GP_NOISE), 12, I_(GP_LEVEL), 70, II_(GP_LEVEL), 70, P_REV_TYPE, 0,
-     P_REV_LEN, 35, P_REV_MIX, 25, I_(GP_OLFO_DEPTH), 7, II_(GP_OLFO), DR_LFO_I, II_(GP_OLFO_DEPTH), 6, P_LFO_RATE, 40,
+     P_REV_LEN, 35, P_REV_MIX, 25, I_(GP_OLFO_DEPTH), 7, II_(GP_OLFO), DR_LFO_I, II_(GP_OLFO_DEPTH), 6, P_LFO_RATE, 54,
      I_(GP_FLFO_DEPTH), 40, II_(GP_FLFO_DEPTH), -40, -1},
     /* P8 WHISTLE: the filters' resonance at its edge, so they sing as sines of their own: drone I's at D5 and
      * drone II's at A5, over soft low drones (D2, A2) that feed them; the filter LFO drifts the whistles a little;
@@ -89,7 +89,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     {I_(GP_PITCH), 3800, II_(GP_PITCH), 3900, P_FEEDBACK, 85, P_CHAR, 21, II_(GP_MODE), DR_BP, I_(GP_CUTOFF), 740,
      II_(GP_CUTOFF), 780, I_(GP_RESO), 600, II_(GP_RESO), 600, I_(GP_DRIVE), 75, II_(GP_DRIVE), 75, P_DLY_TIME, 20,
      P_DLY_REPEATS, 45, P_DLY_MIX, 40, P_REV_TYPE, 0, P_REV_LEN, 40, P_REV_MIX, 50, P_MOVE, 40, I_(GP_LEVEL), 89,
-     II_(GP_LEVEL), 89, P_LFO_W1, DR_LFO_RANDOM, P_LFO_RATE, 20, I_(GP_FLFO_DEST), DR_TO_RESO, I_(GP_FLFO_DEPTH), 50,
+     II_(GP_LEVEL), 89, P_LFO_W1, DR_LFO_RANDOM, P_LFO_RATE, 36, I_(GP_FLFO_DEST), DR_TO_RESO, I_(GP_FLFO_DEPTH), 50,
      -1},
     /* P10 CATHEDRAL: a major sixth apart (D3, B3), soft waves, drone I's sub a third's subharmonic below (49 Hz), a long dark
      * reverb, almost a freeze.
@@ -105,7 +105,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      I_(GP_RESO), 650, II_(GP_RESO), 400, I_(GP_DRIVE), 55, II_(GP_DRIVE), 55, P_REV_TYPE, 0, P_REV_MIX, 25,
      I_(GP_LEVEL), 73, II_(GP_LEVEL), 73, P_DLY_TYPE, 0, P_DLY_TIME, 10, P_DLY_REPEATS, 30, P_DLY_MIX, 25,
      I_(GP_OLFO_DEST), DR_TO_XWAVE, I_(GP_OLFO_DEPTH), 45, II_(GP_OLFO), DR_LFO_II, II_(GP_OLFO_DEST), DR_TO_XWAVE,
-     II_(GP_OLFO_DEPTH), 45, P_LFO_RATE, 45, I_(GP_FLFO_DEPTH), 50, II_(GP_FLFO_DEPTH), -50, -1},
+     II_(GP_OLFO_DEPTH), 45, P_LFO_RATE, 58, I_(GP_FLFO_DEPTH), 50, II_(GP_FLFO_DEPTH), -50, -1},
     /* P12 CLEAN (locked): one oscillator, drone I's saw alone through an open filter, everything else off; drone II
      * out on its own (SEL + PLAY brings it in, as it is) */
     {P_II_OUT, 1, I_(GP_PARTNER), 0, II_(GP_PARTNER), 0, I_(GP_MIX), 0, I_(GP_CUTOFF), 1000, I_(GP_RESO), 0,
@@ -289,6 +289,13 @@ static void convert(int16_t *v, uint32_t from)
                 v[TP[j]] = (int16_t)fm_clampf(y > 0.0f ? 100.0f * fm_exp2f(fm_log2f(y) * E[j]) + 0.5f : 0.0f, 0.0f, 100.0f);
             }
         }
+    }
+    if (from <= 41u) {                          /* the LFO rate to 100 s on a power curve (Evan, 2026-11-07): it was
+                                                 * 0.02 * 3500^(v/100) Hz, now 0.01 * 7000^((v/100)^1.3); the same
+                                                 * rate, the nearest step (within 5 %) */
+        const float o = fm_log2f(2.0f) + (float)v[P_LFO_RATE] * 0.117733931f;   /* log2(hz / 0.01) */
+        v[P_LFO_RATE] = (int16_t)fm_clampf(100.0f * fm_exp2f(fm_log2f(o * (1.0f / 12.773139f)) * (1.0f / 1.3f)) + 0.5f,
+                                           0.0f, 100.0f);
     }
 }
 
@@ -521,6 +528,11 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
     bank_fmt[b - 1] = ld.b.format;
     if (ld.b.format == PROJ_FORMAT) {
         *k = ld.b;
+    } else if (ld.b.format == 41u) {           /* 41: as now, the LFO rate on its old curve */
+        *k = ld.b;
+        for (i = 0; i < NSCENES; i++)
+            convert(k->scene[i], 41u);
+        bank_dirty |= (uint8_t)(1u << b);
     } else if (ld.b.format == 39u || ld.b.format == 40u) {   /* 39, 40: 111 values a sound (Tune in cents; 39 the
                                                                * Tunings in their old order) */
         const bank_v40_t *o = &ld.b40;
@@ -599,7 +611,7 @@ static const int16_t *old_scene(int n, uint32_t *from)   /* scene n of the bank 
 {
     uint32_t f = ld.b.format;
     *from = f;
-    if (f == PROJ_FORMAT) return ld.b.scene[n];
+    if (f == PROJ_FORMAT || f == 41u) return ld.b.scene[n];
     if (f == 39u || f == 40u) return ld.b40.scene[n];
     if (f == 37u || f == 38u) return ld.b38.scene[n];
     if (f == 36u) return ld.b36.scene[n];
@@ -722,6 +734,11 @@ int project_load(void)
     }
     if (from == PROJ_FORMAT) {
         proj = ld.p;
+    } else if (from == 41u) {                  /* 41: as now, the LFO rate on its old curve */
+        proj = ld.p;
+        convert(proj.par, 41u);
+        for (i = 0; i < NSCENES; i++)
+            convert(proj.scene[i], 41u);
     } else if (from == 39u || from == 40u) {   /* 39, 40: 111 values a sound (Tune in cents; 39 the Tunings in
                                                 * their old order) */
         const proj_v40_t *o = &ld.o40;

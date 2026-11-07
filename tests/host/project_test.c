@@ -86,7 +86,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 41, on bank A", proj.format == 41u && PROJ_FORMAT == 41u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 42, on bank A", proj.format == 42u && PROJ_FORMAT == 42u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -536,8 +536,8 @@ int main(void)
                                                  scene_has(0, 1) && scene_has(1, 2));
         check("... the Tuning 12-tone, no offsets (39, 2026-10-30)", proj.par[P_TUNING] == DR_TUN_12 &&
               scene_get(1, 2)[P_TUNING] == DR_TUN_12 && !proj.tun_off[0] && !proj.tun_off[1] && !proj.tun_off[2]);
-        check("... and saved as 41", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 41u &&
-                                     ((const bank_t *)store[OBJ_BANKB])->format == 41u);
+        check("... and saved as 42", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 42u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 42u);
     }
     {   /* 40: the Tunings reordered, simplest to richest (Evan, 2026-10-30): a 39 sound keeps its Tuning */
         static proj_v40_t o;
@@ -572,8 +572,8 @@ int main(void)
         check("... each keeps its Tuning: LMY, Shruti, Harmonics", proj.par[P_TUNING] == DR_TUN_LMY &&
               scene_get(0, 0) && scene_get(0, 0)[P_TUNING] == DR_TUN_SHRUTI && scene_get(1, 1) &&
               scene_get(1, 1)[P_TUNING] == DR_TUN_HARM);
-        check("... and saved as 41", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 41u &&
-                                     ((const bank_t *)store[OBJ_BANKB])->format == 41u);
+        check("... and saved as 42", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 42u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 42u);
     }
     {   /* 41: Tune in Hz, Sync (Evan, 2026-11-01): a 40 Tune in cents becomes the nearest 0.1 Hz; Sync on */
         static proj_v40_t o;
@@ -610,8 +610,49 @@ int main(void)
               scene_get(0, 0)[P_TUNE] == 129 && scene_get(1, 3)[P_TUNE] == -125);
         check("... Sync on, the fine tuning kept", proj.par[P_CLK_SYNC] == 1 && scene_get(1, 3)[P_CLK_SYNC] == 1 &&
                                                    proj.tun_off[1] == 7);
-        check("... and saved as 41", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 41u &&
-                                     ((const bank_t *)store[OBJ_BANKB])->format == 41u);
+        check("... and saved as 42", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 42u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 42u);
+    }
+    {   /* 42: the LFO rate to 100 s on a power curve (Evan, 2026-11-07): a 41 rate becomes the nearest step of the
+         * same speed (0: 50 s, 8: 26 s, 40: 0.52 Hz, 100: 70 Hz) */
+        static project_t o;
+        static bank_t bb;
+        int i, k;
+        memset(store_n, 0, sizeof store_n);
+        project_defaults();
+        memset(&o, 0, sizeof o);
+        o.magic = PROJ_MAGIC;
+        o.format = 41u;
+        o.mtime = MTIME_DEF;
+        for (k = 0; k < DR_NPARAMS; k++)
+            o.par[k] = dr_param_info(k)->def;
+        o.par[P_LFO_RATE] = 8;
+        o.tun_off[1] = 7;
+        for (k = 0; k < DR_NPARAMS; k++)
+            o.scene[0][k] = dr_param_info(k)->def;
+        o.scene_used = 0x001u;
+        o.scene[0][P_LFO_RATE] = 0;
+        memcpy(store[OBJ_PROJ], &o, sizeof o);
+        store_n[OBJ_PROJ] = (int)sizeof o;
+        memset(&bb, 0, sizeof bb);
+        bb.magic = BANK_MAGIC;
+        bb.format = 41u;
+        bb.used = 3u << 3;
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < DR_NPARAMS; k++)
+                bb.scene[i][k] = dr_param_info(k)->def;
+        bb.scene[3][P_LFO_RATE] = 40;
+        bb.scene[4][P_LFO_RATE] = 100;
+        memcpy(store[OBJ_BANKB], &bb, sizeof bb);
+        store_n[OBJ_BANKB] = (int)sizeof bb;
+        check("a format-41 project loads", project_load() == 0 && proj.format == PROJ_FORMAT);
+        printf("    LFO rate 8 -> %d, 0 -> %d, 40 -> %d, 100 -> %d\n", proj.par[P_LFO_RATE], scene_get(0, 0)[P_LFO_RATE],
+               scene_get(1, 3)[P_LFO_RATE], scene_get(1, 4)[P_LFO_RATE]);
+        check("... LFO rate 8 (26 s) is 23, 0 (50 s) 14, 40 (0.52 Hz) 54, 100 (70 Hz) 100", proj.par[P_LFO_RATE] == 23 &&
+              scene_get(0, 0)[P_LFO_RATE] == 14 && scene_get(1, 3)[P_LFO_RATE] == 54 && scene_get(1, 4)[P_LFO_RATE] == 100);
+        check("... the rest kept", proj.tun_off[1] == 7 && proj.par[P_TUNE] == 0 && scene_get(1, 3)[P_CLK_SYNC] == 1);
+        check("... and saved as 42", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 42u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 42u);
     }
     printf("project: %s\n", fails ? "FAILED" : "all ok");
     return fails != 0;

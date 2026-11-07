@@ -657,7 +657,7 @@ int main(int argc, char **argv)
         else if (!strcmp(cmd, "classic")) {         /* the starting sound before 2026-10-17, for the scenarios made on
                                                     * it (they test the controls, not the starting sound) */
             static const int16_t OLD[][2] = {{DR_GP(0, GP_FLFO_DEPTH), 25}, {DR_GP(1, GP_FLFO_DEPTH), -25},
-                {DR_GP(0, GP_RESO), 350}, {DR_GP(1, GP_RESO), 350}, {P_LFO_RATE, 30}, {P_LFO_W2, 1},
+                {DR_GP(0, GP_RESO), 350}, {DR_GP(1, GP_RESO), 350}, {P_LFO_RATE, 45}, {P_LFO_W2, 1},
                 {P_DLY_REPEATS, 35}, {P_DLY_MIX, 0}, {P_REV_MIX, 25}, {P_DLY_LFO_DEPTH, 0}, {P_PULSE, 0},
                 {P_PULSE_RATE, 45}, {P_PULSE_DEPTH, 48}};
             uint32_t i;

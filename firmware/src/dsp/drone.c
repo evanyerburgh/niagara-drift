@@ -41,7 +41,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     VOICE_PARAMS(5000, 67, DR_IV_UNISON, 30, 700, 75, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
     VOICE_PARAMS(5700, 33, DR_IV_UNISON + 9, 15, 680, 61, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
     {"Cross-mod", 0, DR_XMOD_OUT, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
-    {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
+    {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 23}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 25}, {"Drift", 0, 100, 30},
     {"Stereo", 0, 100, 60}, {"Tune", -130, 130, 0},
     {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", -100, 100, -25}, {"Swing", 0, 50, 0},
@@ -211,9 +211,14 @@ static void itoa_s(int v, char *b)
     *b = 0;
 }
 
-/* the LFO's rate in Hz: 0.02 * 3500^(v/100), 0.02 .. 70 Hz */
-static float lfo_hz(int v) { return 0.02f * fm_exp2f((float)v * 0.117733931f); }
-static float lfo_hz_f(float v) { return 0.02f * fm_exp2f(v * 0.117733931f); }
+/* the LFO's rate in Hz: 0.01 * 7000^((v/100)^1.3), 0.01 (a cycle in 100 s) .. 70 Hz; the power gives the slow rates
+ * more of the dial (Evan, 2026-11-07: 50 s at 14, 10 s at 35, 1 Hz at 60, 10 Hz at 83) */
+static float lfo_hz_f(float v)
+{
+    const float x = v * 0.01f;
+    return x > 0.0f ? 0.01f * fm_exp2f(12.773139f * fm_exp2f(1.3f * fm_log2f(x))) : 0.01f;
+}
+static float lfo_hz(int v) { return lfo_hz_f((float)v); }
 
 /* the pulse's rate: 0.03 * 533^(v/100), 0.03 .. 16 a second (slow: a breath, a shruti's bellows) */
 static float pulse_hz(int v) { return 0.03f * fm_exp2f((float)v * 0.0905875f); }
