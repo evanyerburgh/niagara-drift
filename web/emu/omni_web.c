@@ -59,6 +59,7 @@ __attribute__((used, visibility("default"))) uint32_t web_lit_buttons(void) { re
 __attribute__((used, visibility("default"))) uint32_t web_lit_keys(void) { return lit_keys; }
 __attribute__((used, visibility("default"))) uint32_t web_keys_lfo(void) { return sw_layer() == SW_LFO; }   /* the black keys' LFO layer */
 __attribute__((used, visibility("default"))) uint8_t *web_btn_levels(void) { return lvl_btn; }
+__attribute__((used, visibility("default"))) uint8_t *web_key_levels(void) { return lvl_keys; }   /* 27, from F3 */
 __attribute__((used, visibility("default"))) uint16_t *web_fb(void) { return fb; }
 __attribute__((used, visibility("default"))) uint32_t web_blits(void) { return blits; }
 __attribute__((used, visibility("default"))) uint32_t web_now(void) { return now_ms; }

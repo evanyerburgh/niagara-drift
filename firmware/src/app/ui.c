@@ -231,12 +231,13 @@ static void mark_dirty(void) { ui.dirty = 1; ui.chg_t = plat_ms(); }
 /* ONE-TIME TIPS (v0.3): the first time a player does a thing, a line on what's next to it, once (the project keeps
  * what's been seen, the player's, as the Gesture time is). A tip waits for the screen: after any message */
 enum { TIP_BLEND, TIP_NAMES, TIP_GEST, TIP_FX, TIP_INTO, TIP_XMOD, TIP_CLOCK, TIP_UNDO, TIP_KN_LIFE, TIP_KN_MODS,
-       TIP_KN_SETUP2, NTIPS };
+       TIP_KN_SETUP2, TIP_KEEP, NTIPS };
 static const char *const TIP_TEXT[NTIPS] = {   /* one line, the banner's width (~23) */
     "PRESS HARDER: BLEND", "HOLD [SEL]: KEY NAMES", "HOLD: IN · TAP: LATCH", "TAP [FX]: REVERB",
     "[SEL]+KNOB 4: INTO REV", "[F#5]: PITCH, SNARL", "SWELL KNOB 1: DIVISION", "[SEL] + [SAVE]: UNDO",
     /* the knobs 0.3 moved (Evan, 2026-11-01), the first time a player from 0.2 opens their page (SEEN1_MOVED) */
-    "FEEDBACK NOW KNOB 1", "X-MOD NOW KNOB 4", "TUNE NOW KNOB 2"};
+    "FEEDBACK NOW KNOB 1", "X-MOD NOW KNOB 4", "TUNE NOW KNOB 2",
+    "TAP [SEL]: KEEP IT"};                     /* SEL glowing while a blend or a gesture can be kept */
 /* (a button or key in [ ]: the new look draws it in a box, the spec's rule 19; the old screen drops the brackets) */
 #define TIP_MS 3500u
 static int tip_seen(int t) { return proj.seen[t >> 3] >> (t & 7) & 1u; }
@@ -536,6 +537,24 @@ static int sw_get(sw_t w)                              /* 1: lit (on, or the sec
     case S_XMOD: return proj.par[P_XMOD] >= DR_XMOD_FM ? 2 : proj.par[P_XMOD] != 0;   /* cutoff lit; pitch, Snarl winking */
     case S_DTAP: return tap_lit(proj.par[P_DLY_LFO]);
     default: return 0;
+    }
+}
+/* how a black key lights (the lights review, Evan 2026-11-07: dark always means off): 0 dark, 1 dim (the first of
+ * two or three live choices: -1 oct, LP, Pitch, Cutoff, LFO I), 2 lit (on, or the second choice), 3 winking (a third).
+ * A plain switch (Partner, Pitch lock, the links, hard sync) is dark off, lit on */
+static int sw_look(sw_t w)
+{
+    const int16_t *p = &proj.par[DR_GP(w.g, 0)];
+    int v;
+    switch (w.s) {
+    case S_SUBOCT: return p[GP_SUBOCT] == 3 || p[GP_SUBOCT] == 4 ? 3 : p[GP_SUBOCT] <= 1 ? 1 : 2;
+    case S_HP: return p[GP_MODE] == DR_HP ? 2 : p[GP_MODE] == DR_BP ? 3 : 1;
+    case S_ODEST: case S_FDEST: return sw_get(w) ? 2 : 1;
+    case S_OTAP: case S_FTAP: case S_DTAP:
+        v = (w.s == S_DTAP ? proj.par[P_DLY_LFO] : p[w.s == S_OTAP ? GP_OLFO : GP_FLFO]) & 3;
+        return v == DR_LFO_BOTH ? 3 : v == DR_LFO_II ? 2 : v ? 1 : 0;
+    case S_LFORESET: return proj.par[P_LFO_LOCK] ? 2 : 0;
+    default: v = sw_get(w); return v == 2 ? 3 : v ? 2 : 0;
     }
 }
 
@@ -2161,48 +2180,150 @@ static void sw_text(sw_t w, const char **name, const char **st)
 /* a wave -1..1 as a light's level: dark at its bottom, lit at its top */
 static uint8_t wave_lvl(float w) { return (uint8_t)(fm_clampf(0.5f + 0.5f * w, 0.0f, 1.0f) * 255.0f + 0.5f); }
 
+/* THE LIGHTS (Evan, 2026-11-07, after the lights review: ~/niagara-drift-notes/reviews/2026-11-07-lights.md). One
+ * clock for every slow blink; a dim step for a first choice, visible beside dark (2 frames of 32: the gesture glow's
+ * 40 is 1); stopped, PLAY breathes and nothing else moves */
+#define LED_DIM 64
+#define BLINK_MS 1200u
+static int blink(uint32_t on_ms) { return plat_ms() % BLINK_MS < on_ms; }
+static int lk_glide(uint32_t now, float *line, int *bank);   /* look.c: a scene on its way, as the header shows it */
+
+/* a key or button a message names in a box ("turn on [SEL] + [PLAY]", "unlock [C#4]", "[D5]-[G5] bank") blinks
+ * quickly over its own light while the message shows, so the box on the screen points at the panel */
+static int key_of_note(const char *n)          /* "F#3" .. "G5": its key (0 = F3), or -1 */
+{
+    static const int8_t PC[7] = {9, 11, 0, 2, 4, 5, 7};   /* A .. G */
+    int pc, oct, k;
+    if (n[0] < 'A' || n[0] > 'G')
+        return -1;
+    pc = PC[n[0] - 'A'] + (n[1] == '#');
+    oct = n[1 + (n[1] == '#')] - '0';
+    if (oct < 0 || oct > 9 || n[2 + (n[1] == '#')])
+        return -1;
+    k = oct * 12 + pc - (3 * 12 + 5);
+    return k >= 0 && k < NKEYS ? k : -1;
+}
+static int txt_eq(const char *a, const char *b)
+{
+    while (*a && *a == *b)
+        a++, b++;
+    return *a == *b;
+}
+static void boxed_blink(uint8_t *b, uint8_t *k)
+{
+    static const struct {
+        const char *n;
+        uint8_t b;
+    } BTN[] = {{"SEL", B_SEL}, {"PLAY", B_PLAY}, {"SAVE", B_SAVE}, {"HOME", B_HOME}, {"ENV", B_ENV}, {"EDIT", B_EDIT},
+               {"LFO", B_LFO}, {"SEQ", B_SEQ}, {"GLO", B_GLO}, {"FX", B_FX}, {"ARP", B_ARP}, {"REC", B_REC},
+               {"OCT-", B_OCTDN}, {"OCT+", B_OCTUP}, {"OCT", B_OCTDN}};
+    const uint8_t lv = plat_ms() % 300u < 150u ? 255 : 0;
+    int m, last = -1;
+    if (plat_ms() >= ui.msg_until)
+        return;
+    for (m = 0; m < 2; m++) {
+        const char *q = ui.msg[m];
+        for (; *q; q++) {
+            char n[8];
+            int i = 0, kk, range;
+            if (*q != '[')
+                continue;
+            range = q > ui.msg[m] + 1 && q[-1] == '-' && q[-2] == ']';
+            for (q++; *q && *q != ']' && i < 7; q++)
+                n[i++] = *q;
+            n[i] = 0;
+            for (i = 0; i < (int)(sizeof BTN / sizeof BTN[0]); i++)
+                if (txt_eq(n, BTN[i].n)) {
+                    b[BTN[i].b] = lv;
+                    if (BTN[i].b == B_OCTDN && !n[3])
+                        b[B_OCTUP] = lv;              /* "[OCT]": both */
+                }
+            if ((kk = key_of_note(n)) >= 0) {
+                for (i = range && last >= 0 && last < kk ? last : kk; i <= kk; i++)
+                    k[i] = lv;                         /* "[D5]-[G5]": the keys between too */
+                last = kk;
+            }
+            if (!*q)
+                break;
+        }
+    }
+}
+
 static void leds(void)
 {
     uint8_t b[NB] = {0}, k[NKEYS] = {0};
+    const uint32_t now = plat_ms();
+    const int still = !ui.playing && dr_fade <= 0.0f;    /* stopped: nothing moves but PLAY */
     uint32_t i;
     for (i = 0; i < NPAGE_BTN; i++)                  /* the button of the page shown */
         if (on_pages((int)i))
             b[PAGE_BTN[i].btn] = 255;
     if (ui.playing)
         b[B_PLAY] = 255;
+    else                                               /* stopped: PLAY breathes, the one thing to press (the header
+                                                        * says "[PLAY] to start") */
+        b[B_PLAY] = (uint8_t)(40.0f + 215.0f * (0.5f - 0.5f * fm_cosf(6.2831853f * (float)(now % 3600u) / 3600.0f)));
     if (ui.dirty)                                      /* SAVE: a dim glow while something isn't saved yet */
         b[B_SAVE] = 90;
-    if (proj.par[P_LFO_W1])                            /* OCT- / OCT+: each wave, pulsing with it */
-        b[B_OCTDN] = wave_lvl(dr_lfo[0]);
+    if (proj.par[P_LFO_W1])                            /* OCT- / OCT+: each wave, pulsing with it; stopped, still */
+        b[B_OCTDN] = still ? LED_DIM : wave_lvl(dr_lfo[0]);
     if (proj.par[P_LFO_W2])
-        b[B_OCTUP] = wave_lvl(dr_lfo[1]);
-    if (proj.par[P_PULSE]) {                           /* ARP: breathing with the swell, a beat a breath */
+        b[B_OCTUP] = still ? LED_DIM : wave_lvl(dr_lfo[1]);
+    if (proj.par[P_PULSE]) {                           /* ARP: breathing with the swell, a beat a breath; stopped,
+                                                        * still */
         float b1 = 1.0f + (float)proj.par[P_PULSE_SWING] * 0.01f, ph = dr_pulse_ph;
         float u = ph < b1 ? ph / b1 : (ph - b1) / (2.0f - b1);
-        b[B_ARP] = wave_lvl(fm_cosf(6.2831853f * u));
+        b[B_ARP] = still ? LED_DIM : wave_lvl(fm_cosf(6.2831853f * u));
     }
-    if (ui.loop == L_PLAY || (ui.loop == L_REC && (ui.frame / 8u) & 1u))
-        b[B_REC] = 255;                                /* REC: blinking recording, steady looping */
-    for (i = 0; i < 11u; i++) {                      /* the black keys: the switches that are on */
-        sw_t w = sw_layer()[i];
-        int v = w.s == S_LFORESET ? (int)(ui.keys >> BLACK_K[i] & 1u) || proj.par[P_LFO_LOCK] != 0 : sw_get(w);
-        if (v == 2)                                    /* a third state (both LFO waves): lit, winking */
-            v = plat_ms() % 1200u < 1000u;
-        if (v)
-            k[BLACK_K[i]] = 255;
+    if (ui.loop == L_PLAY)                             /* REC: steady looping; recording, once a second, fast in the
+                                                        * last 20 s before it's full (fast all along was an alarm) */
+        b[B_REC] = 255;
+    else if (ui.loop == L_REC)
+        b[B_REC] = now - ui.loop_t0 + 20000u >= LOOP_MS ? ((ui.frame / 8u) & 1u ? 255 : 0) : now % 1000u < 500u ? 255 : 0;
+    {                                                  /* SEL: glows while it can keep what a hand holds (a blend, a
+                                                        * gesture past its tap) */
+        int keep = ui.press >= 0 && !ui.press_done && now - ui.press_t0 >= PR_WAIT_MS;
+        for (i = 0; i < DR_NGEST; i++)
+            if ((ui.g_held >> i & 1u) && !(ui.g_rel >> i & 1u) && now - ui.g_t0[i] >= GEST_TAP_MS)
+                keep = 1;
+        if (keep) {
+            b[B_SEL] = 128;
+            tip(TIP_KEEP);
+        }
+    }
+    for (i = 0; i < 11u; i++) {                      /* the black keys: dark off, dim a first choice, lit, winking */
+        int v = sw_look(sw_layer()[i]);
+        if (sw_layer()[i].s == S_LFORESET && (ui.keys >> BLACK_K[i] & 1u))
+            v = 2;
+        k[BLACK_K[i]] = v == 1 ? LED_DIM : v == 2 || (v == 3 && blink(1000u)) ? 255 : 0;
     }
     for (i = 0; i < NPLAY; i++)                      /* the scene keys: the bank's slots that hold a scene; the */
         if (scene_has(proj.bank, (int)i) &&            /* one the sound is, blinking slowly */
-            (ui.scene_at != (int8_t)i || plat_ms() % 1000u < 600u))
+            (ui.scene_at != (int8_t)i || blink(720u)))
             k[WHITE_K[i]] = 255;
+    {                                                  /* a scene on its way: its key as bright as the header's line,
+                                                        * then blinking once there; gliding back, the left one dims */
+        float x = 0.0f;
+        int bank, n = lk_glide(now, &x, &bank);
+        if (n >= 0 && n < NPLAY && ui.press < 0 && bank == proj.bank)
+            k[WHITE_K[n]] = (uint8_t)(40.0f + 215.0f * x);
+        if (ui.morph == VISIT_BACK && ui.visit <= -2 && -2 - ui.visit < NPLAY && ui.morph_ms)
+            k[WHITE_K[-2 - ui.visit]] = (uint8_t)(255.0f - 215.0f * fm_clampf((float)(now - ui.morph_t0) /
+                                                                              (float)ui.morph_ms, 0.0f, 1.0f));
+    }
     if (ui.press >= 0)                                 /* the key pressed into: as bright as how far in */
         k[WHITE_K[ui.press]] = (uint8_t)(40.0f + 215.0f * ui.press_x);
-    if (ui.flash_t && plat_ms() - ui.flash_t < 480u && ui.scene_at >= 0)   /* taken: three quick flashes */
-        k[WHITE_K[ui.scene_at]] = (plat_ms() - ui.flash_t) % 160u < 80u ? 255 : 0;
-    else if (ui.flash_t && ui.press >= 0 && plat_ms() - ui.flash_t < 480u)
-        k[WHITE_K[ui.press]] = (plat_ms() - ui.flash_t) % 160u < 80u ? 255 : 0;
+    if (ui.flash_t && now - ui.flash_t < 480u && ui.scene_at >= 0)   /* taken: three quick flashes */
+        k[WHITE_K[ui.scene_at]] = (now - ui.flash_t) % 160u < 80u ? 255 : 0;
+    else if (ui.flash_t && ui.press >= 0 && now - ui.flash_t < 480u)
+        k[WHITE_K[ui.press]] = (now - ui.flash_t) % 160u < 80u ? 255 : 0;
     for (i = 0; i < DR_NGEST; i++)                   /* the gestures: a dim glow, lit as far as each is in */
         k[gkey((int)i)] = (uint8_t)(40.0f + 215.0f * ui.g_amt[i]);
+    if (keymap_on())                                   /* SEL held, the map on screen: the top four keys are the
+                                                        * banks, the one playing lit (as the map draws them) */
+        for (i = 0; i < NBANKS; i++)
+            k[WHITE_K[NSCENES + i]] = proj.bank == i ? 255 : LED_DIM;
+    boxed_blink(b, k);
     plat_leds(b, k);
 }
 

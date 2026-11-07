@@ -2654,9 +2654,11 @@ static const lk_kgroup_t *lk_kgroup(int k)
             return &g[i];
     return &g[3];
 }
-static int lk_key_on(int k)
+static int lk_key_on(int k)                   /* as the panel lights it: 0 dark, 1 dim, 2 lit (a third choice winking
+                                               * with the panel's clock) */
 {
-    return sw_layer()[k].s == S_LFORESET ? proj.par[P_LFO_LOCK] != 0 : sw_get(sw_layer()[k]);
+    const int v = sw_look(sw_layer()[k]);
+    return v == 3 ? (blink(1000u) ? 2 : 0) : v;
 }
 static uint32_t lk_keymap_sig(void)
 {
@@ -2703,11 +2705,11 @@ static void lk_keymap(void)
         const int on = lk_key_on(i);
         const uint32_t c = lk_kgroup(i)->col;
         cv_rect(x - 1, LK_KEY_Y, 11, LK_KEY_BH + 1, LK_BG);   /* the gap around it, as on the keyboard */
-        if (on) {                              /* lit: outlined in its group's color, glowing dimly inside (a third
-                                                * choice, half as bright) */
-            const uint32_t cc = on == 2 ? lk_mix888(0x07060Bu, c, 0.5f) : c;
+        if (on) {                              /* lit: outlined in its group's color, glowing dimly inside; dim (a first
+                                                * choice), outlined only, darker */
+            const uint32_t cc = on == 1 ? lk_mix888(0x07060Bu, c, 0.55f) : c;   /* dim: a first choice */
             cv_round(x, LK_KEY_Y, 9, LK_KEY_BH, 2, lk_mix(cc, cc, 0.0f));
-            cv_round(x + 2, LK_KEY_Y + 2, 5, LK_KEY_BH - 4, 1, lk_mix(0x07060Bu, cc, 0.3f));
+            cv_round(x + 2, LK_KEY_Y + 2, 5, LK_KEY_BH - 4, 1, on == 1 ? LK_BG : lk_mix(0x07060Bu, cc, 0.3f));
         } else {
             cv_round(x, LK_KEY_Y, 9, LK_KEY_BH, 2, LK_TRACK);
             cv_round(x + 1, LK_KEY_Y + 1, 7, LK_KEY_BH - 2, 1, LK_BG);
