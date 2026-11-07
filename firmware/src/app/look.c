@@ -1905,6 +1905,45 @@ static void lk_pic(void)
 /* ---------------------------------------------------------- values row --- */
 /* four columns of 56, each its name (20, else 18, else 17), its value (26 turning, 21 at rest, the unit smaller,
  * shrinking when long) on one baseline, and its meter; the knob turning in its drone's outline */
+/* THE METERS' ONE FAMILY (Evan, 2026-11-07): every plain amount a row of 8 dots of 5 px, each page in its own colors (the
+ * cells, pills, stripes and rulers before it); the meaningful ones keep their own: a caution's red, the centered rows,
+ * the crossfaders, one of n, X-Wave's ticks */
+static void lk_dotrow(int32_t cx, int32_t y, float frac, uint32_t c0, uint32_t c1, int red, int gray)   /* red: the last
+                                                                                                  * n red, the value
+                                                                                                  * rounding up into
+                                                                                                  * them; gray: lit
+                                                                                                  * but unheard */
+{
+    const float v = fm_clampf(frac, 0.0f, 1.0f) * 8.0f;
+    int i, n = red && v > (float)(8 - red) ? (int)(v + 0.999f) : (int)(v + 0.5f);
+    for (i = 0; i < 8; i++) {
+        const int32_t x = cx - 25 + (int32_t)((float)i * 6.5f + 0.5f);
+        const int r = red && i >= 8 - red;
+        if (i < n) {
+            cv_round(x, y, 5, 5, 2, r ? LK_RED : gray ? LK_UNLIT : lk_mix(c0, c1, (float)i / 7.0f));
+        } else {
+            cv_round(x, y, 5, 5, 2, r ? LK_RED : LK_UNLIT);
+            cv_round(x + 1, y + 1, 3, 3, 1, LK_BG);
+        }
+    }
+}
+static void lk_cdots_c(int32_t cx, int32_t y, float frac, uint32_t c0, uint32_t c1)   /* 9 dots lit from the middle
+                                                                                     * toward the value, c0 at the
+                                                                                     * middle to c1 at the ends */
+{
+    const int k = (int)((fm_clampf(frac, 0.0f, 1.0f) - 0.5f) * 8.0f + (frac >= 0.5f ? 0.5f : -0.5f));
+    const int a = k < 0 ? 4 + k : 4, b = k < 0 ? 4 : 4 + k;
+    int i;
+    for (i = 0; i < 9; i++) {
+        const int32_t x = cx - 26 + (int32_t)((float)i * 5.75f + 0.5f);
+        if (i >= a && i <= b) {
+            cv_round(x, y, 5, 5, 2, lk_mix(c0, c1, (float)(i < 4 ? 4 - i : i - 4) / 4.0f));
+        } else {
+            cv_round(x, y, 5, 5, 2, LK_UNLIT);
+            cv_round(x + 1, y + 1, 3, 3, 1, LK_BG);
+        }
+    }
+}
 static void lk_dots(int32_t cx, int32_t y, float frac, int g, int caution)   /* a dot row: 8 of 5 px; caution:
                                                                                * the last one red */
 {
@@ -1923,57 +1962,33 @@ static void lk_dots(int32_t cx, int32_t y, float frac, int g, int caution)   /* 
 
 /* the Swell's meter: 9 pills of 5 in its coral ramp, unlit ones outlined; centred (Shape): from the middle one toward
  * gate (left) or ramp (right), even lighting the middle alone (the spec; the board, ARP 262:4) */
-static void lk_pills(int32_t cx, int32_t y, float frac, int centred)
+static void lk_dotrow(int32_t cx, int32_t y, float frac, uint32_t c0, uint32_t c1, int red, int gray);
+static void lk_cdots_c(int32_t cx, int32_t y, float frac, uint32_t c0, uint32_t c1);
+static void lk_pills(int32_t cx, int32_t y, float frac, int centred)   /* ARP's: a dot row in the Swell's coral, Shape's
+                                                                       * from the middle (one meter family: Evan,
+                                                                       * 2026-11-07, "dots, cells and pills look the
+                                                                       * same") */
 {
-    int i, a = 0, b;
-    frac = fm_clampf(frac, 0.0f, 1.0f);
-    if (centred) {
-        const int k = (int)((frac - 0.5f) * 8.0f + (frac >= 0.5f ? 0.5f : -0.5f));
-        a = k < 0 ? 4 + k : 4;
-        b = k < 0 ? 4 : 4 + k;
-    } else {
-        b = (int)(frac * 9.0f + 0.5f) - 1;
-    }
-    for (i = 0; i < 9; i++) {
-        const int32_t x = cx - 26 + (int32_t)((float)i * 5.75f + 0.5f);
-        if (i >= a && i <= b) {
-            cv_round(x, y, 5, 5, 2, lk_mix(0xFF8F73u, 0xFFF0E6u, centred ? (float)(i < 4 ? 4 - i : i - 4) / 4.0f
-                                                                        : (float)i / 8.0f));
-        } else {
-            cv_round(x, y, 5, 5, 2, LK_UNLIT);
-            cv_round(x + 1, y + 1, 3, 3, 1, LK_BG);
-        }
-    }
+    if (centred)
+        lk_cdots_c(cx, y, frac, 0xFF8F73u, 0xFFF0E6u);
+    else
+        lk_dotrow(cx, y, frac, 0xFF8F73u, 0xFFF0E6u, 0, 0);
 }
 
-static void lk_cells(int32_t cx, int32_t y, float frac, uint32_t c0, uint32_t c1, int caution)   /* ENV's: 8 squares
-                                                                                          * of 5; caution: the
-                                                                                          * last two red, the
-                                                                                          * value rounding up */
+static void lk_cells(int32_t cx, int32_t y, float frac, uint32_t c0, uint32_t c1, int caution)   /* ENV's: a dot row
+                                                                                          * in its colors; caution
+                                                                                          * (Feedback): the last two
+                                                                                          * red */
 {
-    const float v = fm_clampf(frac, 0.0f, 1.0f) * 8.0f;
-    int i, n = caution && v > 6.0f ? (int)(v + 0.999f) : (int)(v + 0.5f);
-    for (i = 0; i < 8; i++) {
-        const int32_t x = cx - 25 + (int32_t)((float)i * 6.5f + 0.5f);
-        const int red = caution && i >= 6;
-        if (i < n)
-            cv_rect(x, y, 5, 5, red ? LK_RED : lk_mix(c0, c1, (float)i / 7.0f));
-        else
-            lk_box(x, y, 5, 5, red ? LK_RED : LK_UNLIT);
-    }
+    lk_dotrow(cx, y, frac, c0, c1, caution ? 2 : 0, 0);
 }
 
-static void lk_stripes(int32_t cx, int32_t y, float frac, int g, int gray)   /* EDIT's gauge: 10 bars of 3 x 11 */
+static void lk_stripes(int32_t cx, int32_t y, float frac, int g, int gray)   /* EDIT's: a dot row in the drone's
+                                                                                * ramp (was a stripe gauge), gray when
+                                                                                * unheard */
 {
-    int i, n = (int)(fm_clampf(frac, 0.0f, 1.0f) * 10.0f + 0.5f);
-    for (i = 0; i < 10; i++) {
-        const int32_t x = cx - 24 + 5 * i;
-        if (i < n) {
-            cv_rect(x, y, 3, 11, gray ? LK_UNLIT : lk_ramp(g, (float)i / 9.0f));
-        } else {
-            cv_rect(x, y + 7, 3, 4, LK_UNLIT);
-        }
-    }
+    (void)y;
+    lk_dotrow(cx, 70, frac, LK_RAMP[g][0], LK_RAMP[g][1], 0, gray);
 }
 
 static void lk_ticks4(int32_t cx, int32_t y)    /* under X-Wave's gauge: sine, triangle, saw, square */
@@ -1983,21 +1998,9 @@ static void lk_ticks4(int32_t cx, int32_t y)    /* under X-Wave's gauge: sine, t
         cv_rect(cx - 24 + (int32_t)(k * 46 / 3), y, 1, 3, LK_LABEL);
 }
 
-static void lk_cdots(int32_t cx, int32_t y, float frac)   /* 9 dots, lit from the middle toward the value, the far
-                                                            * one brightest (Tune) */
+static void lk_cdots(int32_t cx, int32_t y, float frac)   /* Tune's: from the middle, in the neutral ramp */
 {
-    const int k = (int)((fm_clampf(frac, 0.0f, 1.0f) - 0.5f) * 8.0f + (frac >= 0.5f ? 0.5f : -0.5f));
-    const int a = k < 0 ? 4 + k : 4, b = k < 0 ? 4 : 4 + k;
-    int i;
-    for (i = 0; i < 9; i++) {
-        const int32_t x = cx - 26 + (int32_t)((float)i * 5.75f + 0.5f);
-        if (i >= a && i <= b) {
-            cv_round(x, y, 5, 5, 2, lk_ramp(LK_G, (float)(i < 4 ? 4 - i : i - 4) / 4.0f));
-        } else {
-            cv_round(x, y, 5, 5, 2, LK_UNLIT);
-            cv_round(x + 1, y + 1, 3, 3, 1, LK_BG);
-        }
-    }
+    lk_cdots_c(cx, y, frac, LK_RAMP[LK_G][0], LK_RAMP[LK_G][1]);
 }
 static void lk_xfader(int32_t cx, int32_t y, float frac, int g)   /* Osc/Sub: the oscillators' color to a white mark,
                                                                     * the sub's lighter tint after it */
@@ -2031,8 +2034,14 @@ static void lk_one_of(int32_t cx, int32_t y, int n, int at, int g)   /* one of n
     }
 }
 
-static void lk_one_of_dots(int32_t cx, int32_t y, int n, int at, int g)   /* Scale's: one dot of n lit */
+static void lk_one_of_dots(int32_t cx, int32_t y, int n, int at, int g)   /* one dot of n lit; up to 6 choices the
+                                                                        * segments instead (Evan, 2026-11-07: "if there
+                                                                        * are three or five options, pills are better") */
 {
+    if (n <= 6) {
+        lk_one_of(cx, y - 2, n, at, g);
+        return;
+    }
     const int32_t step = 8, x0 = cx - (step * (n - 1)) / 2 - 2;
     int k;
     for (k = 0; k < n; k++) {
@@ -2234,23 +2243,14 @@ static int lk_line2(int p, int v, char *t, char *t2)
 }
 
 /* SEQ's ruler: ten ticks, lit tall, unlit short, a white mark at the value; centred (Shift's) lit from the middle */
-static void lk_ruler(int32_t cx, int32_t y, float frac, int g, int centred)
+static void lk_ruler(int32_t cx, int32_t y, float frac, int g, int centred)   /* SEQ's: a dot row (was a ruler),
+                                                                                 * Shift's from the middle */
 {
-    const float f = fm_clampf(frac, 0.0f, 1.0f);
-    const int32_t m = cx - 25 + (int32_t)(f * 50.0f + 0.5f);
-    int i;
-    for (i = 0; i < 10; i++) {
-        const int32_t x = cx - 24 + 5 * i;
-        const float at = ((float)i + 0.5f) / 10.0f;
-        const int on = centred ? (f >= 0.5f ? at > 0.5f && at < f : at < 0.5f && at > f) : at < f;
-        if (on)
-            cv_rect(x, y, 2, 7, g == LK_G ? LK_INK : lk_ramp(g, (float)i / 9.0f));
-        else
-            cv_rect(x, y + 4, 2, 3, LK_UNLIT);
-    }
+    const uint32_t c0 = g == LK_G ? 0xF2EEF8u : LK_RAMP[g][0], c1 = g == LK_G ? 0xF2EEF8u : LK_RAMP[g][1];
     if (centred)
-        cv_rect(cx - 1, y + 9, 1, 2, LK_LABEL);
-    cv_rect(m - 1, y - 2, 2, 11, LK_WHITE);
+        lk_cdots_c(cx, y, frac, c1, c0);
+    else
+        lk_dotrow(cx, y, frac, c0, c1, 0, 0);
 }
 
 /* SELECT, ALGORITHM or PRESETS turning (ui.glab): its name and value across the whole values row in one violet
@@ -2459,8 +2459,8 @@ static void lk_values(void)
             else if (gp == GP_MIX)
                 lk_xfader(cx, 70, frac, g);
             else if (gp == GP_WAVE) {
-                lk_stripes(cx, 64, frac, g, 0);
-                lk_ticks4(cx, 77);
+                lk_stripes(cx, 70, frac, g, 0);
+                lk_ticks4(cx, 77);             /* under the dots: sine, triangle, saw, square */
             } else if (gp == GP_WIDTH || gp == GP_DRIVE)
                 lk_stripes(cx, 66, frac, g, why != 0);   /* gray with its value when unheard */
             else
