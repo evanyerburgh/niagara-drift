@@ -588,7 +588,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   for a key whose change the page shows (the routes on LFO sends, the delay's LFO and cross-mod on Mods). The key
   order stays (D#4 the reset between the drones).
 - 2026-11-07: the Swell's strands 2 px, five of them (were six of 1 px: thinner and rougher than every other page's);
-  the fan as before, meeting at the dot.
+  the fan as before, meeting at the dot. The picture two bars across at every speed (four breaths, 54 px each; was
+  one bar): the rhythm reads as a rhythm; the dot crosses both, the screen counting which bar it's in; the fan half
+  as wide a breath, so its widest spread stays.
 - 2026-11-07: LFO sends: the LFOs above the routes, I over II (on one row the longest names ran into the rate), their
   waves in one column, 13 px tall and 54 long (were 9 and 24); the rate right of LFO I, the lock right of LFO II;
   locked with the Swell stopped, "on Swell" dimmed (was "waits Swell", too wide beside the waves); "mvmt 0%" in the
