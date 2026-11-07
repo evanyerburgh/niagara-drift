@@ -39,6 +39,9 @@ static void classic(void)
     dr_set(P_PULSE, 0);
     dr_set(P_PULSE_RATE, 45);
     dr_set(P_PULSE_DEPTH, 48);
+    dr_set(P_GLIDE, 0);                             /* the times these checks were made with (the defaults since */
+    dr_set(P_FADE, 25);                             /* 2026-11-07: a little glide, a 1.5 s fade, 7.8 s scenes; the */
+    dr_set(P_SCENE_T, 48);                          /* Morph's checks set their own) */
 }
 static void dry_init(void)
 {

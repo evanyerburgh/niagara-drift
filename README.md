@@ -100,7 +100,9 @@ still works. Installing firmware is at your own risk.
   firmware can get in the way of, and [M-Flasher](https://github.com/jvitkauskas/m-flasher) (Windows, Mac, Linux)
   puts M-VAVE's firmware back from there. If an FM-1 won't start at all, see [BUILDING.md](BUILDING.md#install).
 - Up to 0.2, Niagara Drift didn't recognize the memory chip of some newer FM-1s: on those it couldn't save, and it
-  ignored installs (it just started again). On such an FM-1 running 0.2, use the step above to leave it.
+  ignored installs (it just started again). On such an FM-1 running 0.2, use the step above to leave it. Since
+  0.2.1 it takes any standard memory chip, the newer FM-1s' (a UC25HQ80, chip ID B36014) as well as the first ones'
+  (a Puya P25Q80, 856014).
 
 ## Playing it
 
@@ -338,8 +340,8 @@ pink specks are as many as Color says.
   drone I (in any octave, up to an octave from its own pitch), and only now and then comes home. The knob is **how
   often**, at random times within a range: 25–30 s apart at the bottom, 0.5–2 s at the top; the screen shows the
   range. It doesn't glide by itself: **Pitch glide** slides it. At 0 it's off.
-- **Pitch glide** is how long a drone takes to reach a new pitch (up to 10 s; off by default): a pitch knob, a scene,
-  Wander's notes.
+- **Pitch glide** is how long a drone takes to reach a new pitch (up to 10 s; 0.2 s to start, so Wander's notes slide
+  a little): a pitch knob, a scene, Wander's notes.
 - **Wander's scale**: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just (the
   harmonics 1–8 of drone I, pure: the root, the pure major third, fifth and the seventh harmonic). Its notes take the
   Tuning's (Setup 2): see Tuning.
@@ -467,9 +469,10 @@ pink specks are as many as Color says.
 Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't change it.
 
 - Each knob gives most of its turn to slow times, a second about a quarter of the way.
-- **Fade** is how long PLAY takes (up to 60 s); **Morph** is how long a black key or a new LFO wave (OCT) takes
-  to move the sound to its new setting (0.02–30 s); **Scene time** is how long every scene move takes: a tap, a
-  crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about 15 s to start). The picture
+- **Fade** is how long PLAY takes (up to 60 s; 1.5 s to start); **Morph** is how long a black key or a new LFO
+  wave (OCT) takes to move the sound to its new setting (0.02–30 s; 2 s to start); **Scene time** is how long every
+  scene move takes: a tap, a crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about
+  8 s to start). These are the FM-1's own settings, not a sound's: an FM-1 already set keeps its own. The picture
   is a row for each, its knob's whole range across it: the fade a line up from silence, Morph and the scenes a
   crossfade (a out, b in), each change ending where its knob is (a dot there while you turn it).
 - **Sync** (KNOB 4): **On** follows a MIDI clock (see MIDI below), **Off** ignores it, so the Swell, the LFO, the
