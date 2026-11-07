@@ -212,6 +212,9 @@ int main(void)
         check("... B3 as it was, its drive off", scene_get(1, 2) && scene_get(1, 2)[P_REV_LEN] == 91 &&
                                                    scene_get(1, 2)[P_DLY_DRIVE] == 0 &&
                                                    scene_get(1, 2)[P_PRESS_SENS] == 63);
+        check("... the tips on the knobs 0.3 moved still to come (a new FM-1 starts with them seen)",
+              !(proj.seen[1] & SEEN1_MOVED) && (project_defaults(), (proj.seen[1] & SEEN1_MOVED) == SEEN1_MOVED));
+        project_load();
         store_n[OBJ_BANKB] = 0;
     }
     {   /* PR #10's (21): bank A in the project, B in its own object, 78 values each */
