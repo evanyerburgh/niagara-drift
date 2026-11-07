@@ -377,7 +377,7 @@ pink specks are as many as Color says.
 
 #### Swell · ARP
 
-<img src="docs/img/page-swell.png" width="244" alt="The Swell page: a bar of the Swell's two breaths as strands meeting at a dot">
+<img src="docs/img/page-swell.png" width="244" alt="The Swell page: two bars of the Swell, four breaths, as strands meeting at a dot">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
