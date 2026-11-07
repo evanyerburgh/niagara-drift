@@ -2636,8 +2636,9 @@ static void lk_keymap(void)
     }
     cv_blit(0, 0);
     cv_begin(240, LK_PIC_H, LK_BG);            /* the keyboard */
-    for (i = 0; i < 16; i++)                   /* the white keys, 15 px each, a gap between */
-        cv_rect(i * 15, LK_KEY_Y, 14, LK_KEY_WH, LK_WHITE_KEY);
+    for (i = 0; i < 16; i++)                   /* the white keys, 15 px each, as outlines on the ground (Evan, 2026-11-07:
+                                                * the filled slate keyboard was the one big flat fill on any screen) */
+        lk_box(i * 15, LK_KEY_Y, 14, LK_KEY_WH, LK_WHITE_KEY);
     {                                          /* D5-G5 with SEL: the banks */
         const int32_t base = LK_KEY_Y + 87;
         cv_text(12 * 15 - 4 - text_w(&LK_F_SMALL, "banks"), base - LK_B(LK_F_SMALL), &LK_F_SMALL, "banks", LK_LABEL);
@@ -2649,14 +2650,17 @@ static void lk_keymap(void)
             cv_text(cx - text_w(&LK_F_SMALL, l) / 2, base - LK_B(LK_F_SMALL), &LK_F_SMALL, l, on ? LK_BG : LK_LABEL);
         }
     }
-    for (i = 0; i < 11; i++) {                 /* the black keys: lit as the panel's (a third choice: half) */
+    for (i = 0; i < 11; i++) {                 /* the black keys, lit as the panel's */
         const int32_t x = LK_KX[i];
         const int on = lk_key_on(i);
         const uint32_t c = lk_kgroup(i)->col;
         cv_rect(x - 1, LK_KEY_Y, 11, LK_KEY_BH + 1, LK_BG);   /* the gap around it, as on the keyboard */
-        if (on)
-            cv_round(x, LK_KEY_Y, 9, LK_KEY_BH, 2, on == 2 ? lk_mix(0x07060Bu, c, 0.5f) : lk_mix(c, c, 0.0f));
-        else {
+        if (on) {                              /* lit: outlined in its group's color, glowing dimly inside (a third
+                                                * choice, half as bright) */
+            const uint32_t cc = on == 2 ? lk_mix888(0x07060Bu, c, 0.5f) : c;
+            cv_round(x, LK_KEY_Y, 9, LK_KEY_BH, 2, lk_mix(cc, cc, 0.0f));
+            cv_round(x + 2, LK_KEY_Y + 2, 5, LK_KEY_BH - 4, 1, lk_mix(0x07060Bu, cc, 0.3f));
+        } else {
             cv_round(x, LK_KEY_Y, 9, LK_KEY_BH, 2, LK_TRACK);
             cv_round(x + 1, LK_KEY_Y + 1, 7, LK_KEY_BH - 2, 1, LK_BG);
         }
