@@ -2331,7 +2331,7 @@ static int lk_line2(int p, int v, char *t, char *t2)
             static const char *const N[8] = {"", "m2", "M2", "m3", "M3", "4th", "tritone", "5th"};
             const int n = (a + 50) / 100;
             scopy(q, N[n < 8 ? n : 7]);
-            if (!n)                            /* a quarter tone or less: its cents */
+            if (!n)                            /* under a quarter tone: its cents */
                 goto cents;
             return 0;
         }

@@ -620,6 +620,8 @@ typedef struct {
     float ig;                                     /* a gesture's interval for the partner coming or going: its gain */
     float ov;                                     /* ... or a gesture's own (semitones; CHORD), when ovon */
     int ovon;
+    float ivs;                                    /* the partner's interval on the Tuning, gliding (dr_partner_semi) */
+    int ivi;                                      /* ... the interval it's for (-1: none yet) */
     float sg, sdiv;                               /* the sub's swap: its gain (down, swap, up), the octave */
     uint8_t sw;                                   /* ... and its wave (P_SUBW_*, swapped as the octave is) */
     float sy;                                     /* hard sync's swap (drone II): its gain */
@@ -1725,6 +1727,7 @@ static void morph_snap(int g)                    /* all of a drone's switches wh
     v->ovon = 0;
     v->ov = 0.0f;
     v->ig = 1.0f;
+    v->ivi = -1;
     v->nc = (float)p[GP_NCOLOR] * 0.01f;
     v->sg = 1.0f;
     v->sdiv = sub_div(p[GP_SUBOCT]);
@@ -1889,7 +1892,18 @@ static void render_group(int g, uint32_t n)
     const int iv = (unsigned)p[GP_INTERVAL] < DR_NINTERVALS ? p[GP_INTERVAL] : DR_IV_UNISON;
     /* the partner's interval: tempered, or just (pure ratios, so a fifth or a third doesn't beat; Detune
      * still adds beating on purpose); on another Tuning, the Tuning's (dr_partner_semi) */
-    const float ival = v->ovon ? v->ov : dr_partner_semi(g, iv);
+    float ival;
+    {   /* on a Tuning the interval follows the drone's note (dr_partner_semi): when the drone's pitch moves under it, it
+         * glides there (~20 ms) as the pitch does, no step; a new interval switches at once, as it always has (and on
+         * 12-tone and Quarter it never moves) */
+        const float it = dr_partner_semi(g, iv);
+        if (v->ivi != iv || fm_fabsf(it - v->ivs) < 1e-4f)
+            v->ivs = it;
+        else
+            v->ivs += (it - v->ivs) * fm_minf((float)n * (1.0f / (0.02f * DR_SR)), 1.0f);
+        v->ivi = iv;
+        ival = v->ovon ? v->ov : v->ivs;
+    }
     const float detune = pv[GP_DETUNE] * 0.003f;            /* semitones: 30 cents at 100 */
     /* Unison with no Detune is one fat oscillator: the partner is pulled into phase with the main (~25 ms),
      * so it can't sit half a cycle out and cancel it (it did: -20 dB, depending on what came before), and
