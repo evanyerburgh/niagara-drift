@@ -130,36 +130,71 @@ static int lk_gesture(void)
 #define LK_GCELL_W (LK_GCELLS * 6 - 2)
 #define LK_TRACK RGB(119, 114, 138)          /* the glide's line, before it fills */
 
-/* left to right the page's name, its "1/2" (or PEEK), what's running (REC or LOOP, SWELL, a gesture, a glide "→ B3",
- * II OUT); at the right PLAY's state, then the sound: its key, and a Preset's name only with room for both ("changed"
- * once a hand has moved it); peeking, where letting go goes ("let go: DRONES"). A glide or a fade fills a gold line
- * under it. When it's full, what gives way, in order: the name, PLAY's state to its short form ("PLAY", as before),
- * the "1/2", "changed", SWELL, the key (Evan, 2026-11-01), then a latched gesture's word, a glide's name (its line
- * stays), PLAY's state; the page's name never */
+/* a scene on its way (tapped, a blend held, gliding back): the scene it's going to (-2: back to a sound of the
+ * player's own; -1 none), its bank, and the line's fill. Shown at least LK_GLIDE_MIN, as a subtitle is (Evan,
+ * 2026-11-07: at a short Scene time it flashed by): the line then fills slower than the sound gets there */
+#define LK_GLIDE_MIN 1500u
+static struct {
+    uint32_t t0, ms, real;
+    int8_t on, to;
+    uint8_t bank;
+} lk_gl;
+static int lk_glide(uint32_t now, float *line, int *bank)
+{
+    if (ui.press >= 0) {                       /* a scene key held: the blend follows the finger */
+        lk_gl.on = 0;
+        *line = ui.press_x;
+        *bank = proj.bank;
+        return ui.press;
+    }
+    if (ui.morph >= 0 && (!lk_gl.on || lk_gl.t0 != ui.morph_t0)) {   /* a glide begun */
+        lk_gl.on = 1;
+        lk_gl.t0 = ui.morph_t0;
+        lk_gl.real = ui.morph_ms;
+        lk_gl.ms = ui.morph_ms > LK_GLIDE_MIN ? ui.morph_ms : LK_GLIDE_MIN;
+        lk_gl.to = (int8_t)(ui.morph == VISIT_BACK ? (ui.scene_at >= 0 ? ui.scene_at : -2) : ui.morph);
+        lk_gl.bank = proj.bank;
+    }
+    if (lk_gl.on) {
+        const uint32_t el = now - lk_gl.t0;
+        if (ui.morph < 0 && (el < lk_gl.real || el >= lk_gl.ms || (lk_gl.to >= 0 && ui.scene_at != lk_gl.to)))
+            lk_gl.on = 0;                      /* stopped by a hand, or shown long enough */
+        else {
+            *line = el >= lk_gl.ms ? 1.0f : (float)el / (float)lk_gl.ms;
+            *bank = lk_gl.bank;
+            return lk_gl.to;
+        }
+    }
+    if (ui.visit >= 0 && now - ui.visit_t >= HOLD_MS) {   /* the emulator's held key: there, until let go */
+        *line = 1.0f;
+        *bank = proj.bank;
+        return ui.visit;
+    }
+    return -1;
+}
+
+/* left to right the page's name, its "1/2" (or PEEK), what's running (REC or LOOP, SWELL, a gesture, II OUT); at the
+ * right PLAY's state, then the sound: its key, and a Preset's name only with room for both ("changed" once a hand has
+ * moved it); on its way to a scene, where to, in gold ("→ P3 EERIE"); peeking, where letting go goes ("let go:
+ * DRONES"). A glide or a fade fills a gold line under it. When it's full, what gives way, in order: the name, PLAY's
+ * state to its short form ("PLAY", as before), the "1/2", "changed", SWELL, the key (Evan, 2026-11-01), then a latched
+ * gesture's word, PLAY's state; the page's name never */
 static void lk_bar(void)
 {
     const uint32_t now = plat_ms();
     uint32_t rec_s = ui.loop == L_REC ? (now - ui.loop_t0) / 1000u : 0u;
-    int visiting = ui.visit >= 0 && now - ui.visit_t >= HOLD_MS, i, drop, gest, glide = -1, gest_cells = -1;
+    int i, drop, gest, glide, gbank = 0, gest_cells = -1;
     const int peek = ui.hold_btn >= 0 && !ui.hold_cycle && (ui.hold_turned || now - ui.hold_t >= HOLD_MS);
     float line = -1.0f;                      /* the line under the header, 0..1 (a glide's or the fade's), or none */
     uint32_t h;
-    char name[20], half[6] = "", rec[12] = "REC ", gl[12] = "\\ ", gname[20], key[8] = "", back[28] = "let go: ";
+    char name[20], half[6] = "", rec[12] = "REC ", gname[20], key[8] = "", back[28] = "let go: ";
     const char *badge[6], *sound = 0, *state, *st_short, *chg = 0;
-    uint16_t bcol[6], st_col = LK_LABEL, name_col = LK_WHITE;
-    int nb = 0, swell = -1, gb = -1, glb = -1, glen = 0;
+    uint16_t bcol[6], st_col = LK_LABEL, name_col = LK_WHITE, key_col = LK_LABEL;
+    int nb = 0, swell = -1, gb = -1, glen = 0;
     lk_sound_at();
     gest = lk_gesture();
-    if (ui.press >= 0) {                       /* a scene key held: the blend's way in */
-        glide = ui.press;
-        line = ui.press_x;
-    } else if (ui.morph >= 0) {                /* a scene tapped (or the way back) over the Scene time */
-        glide = ui.morph;
-        line = ui.morph_ms ? fm_clampf((float)(now - ui.morph_t0) / (float)ui.morph_ms, 0.0f, 1.0f) : 1.0f;
-    } else if (visiting) {                     /* the emulator's held key: there, until let go */
-        glide = ui.visit;
-        line = 1.0f;
-    } else if (ui.playing ? fade_q() < 20 : fade_q() > 0) {   /* PLAY's fade in or out, as it runs */
+    glide = lk_glide(now, &line, &gbank);
+    if (glide == -1 && (ui.playing ? fade_q() < 20 : fade_q() > 0)) {   /* PLAY's fade in or out, as it runs */
         line = ui.playing ? dr_fade : 1.0f - dr_fade;
     }
     if (gest >= 0 && !(proj.par[gl_par(gest)] && !(ui.g_held >> gest & 1u)))
@@ -167,7 +202,7 @@ static void lk_bar(void)
     h = hash(hash(2166136261u ^ rec_s ^ (ui.view == V_PULSE ? (uint32_t)ui_clock_bpm() << 20 : 0u),
                   0x4C42u | ui.view << 16 | ui.playing << 21 | ui.loop << 22 | (uint32_t)proj.par[P_PULSE] << 24 |
                       (uint32_t)proj.par[P_II_OUT] << 25 | (uint32_t)peek << 26 | (uint32_t)lk_chg << 27),
-             (uint32_t)fade_q() | (uint32_t)(glide + 1) << 8 | (uint32_t)(uint8_t)lk_at << 16 |
+             (uint32_t)fade_q() | (uint32_t)(glide + 2) << 8 | (uint32_t)(uint8_t)lk_at << 16 |
                  (uint32_t)proj.bank << 24 | (uint32_t)(ui.view == V_PULSE && dr_ext_spb > 0.0f) << 28 |
                  (uint32_t)(ui.view == V_FX && proj.par[P_DLY_REPEATS] > 85) << 29 |
                  (uint32_t)(ui.view == V_FX2 && proj.par[P_REV_LEN] >= 100) << 30);
@@ -210,15 +245,6 @@ static void lk_bar(void)
         badge[nb] = gname;
         bcol[nb++] = LK_GOLD;
     }
-    if (glide >= 0) {                          /* "→ B3", "→ back" (was VISIT B3) */
-        if (glide == VISIT_BACK)
-            scopy(gl + 2, "back");
-        else
-            scene_name(gl + 2, proj.bank, glide);
-        glb = nb;
-        badge[nb] = gl;
-        bcol[nb++] = LK_GOLD;
-    }
     if (ui.view == V_FX2 && proj.par[P_REV_LEN] >= 100) {   /* Inf: the tail holds (the spec) */
         badge[nb] = "freeze";
         bcol[nb++] = LK_FX;
@@ -238,6 +264,17 @@ static void lk_bar(void)
         sound = lk_at >> 4 == BANK_PRESETS && !lk_chg ? preset_name(lk_at & 15) : 0;
         if (lk_chg)
             chg = "changed";
+    }
+    if (glide != -1) {                         /* on its way: where to, in the sound's place, gold ("→ P3 EERIE",
+                                                * "→ A5", "→ back"; Evan, 2026-11-07: one place, no banner) */
+        char *q = scopy(key, "\\ ");
+        if (glide == -2)
+            scopy(q, "back");
+        else
+            scene_name(q, gbank, glide);
+        sound = gbank == BANK_PRESETS && glide >= 0 && glide < NPRESETS ? preset_name(glide) : 0;
+        chg = 0;
+        key_col = LK_GOLD;
     }
     if (ui.view == V_PULSE) {                  /* SWELL alone, in its coral; at the right whether it's on (the spec) */
         static char bpm[20];
@@ -265,11 +302,11 @@ static void lk_bar(void)
         chg = 0;
         key[0] = 0;
     }
-    for (drop = 0; drop < 10; drop++) {        /* 0 all; 1 no name; 2 PLAY's state short; 3 no 1/2; 4 no "changed";
-                                                * 5 no SWELL; 6 no key; 7 a latched gesture by its fill, full ("CHORD"
-                                                * and four cells); 8 no glide's name (its line goes on); 9 no PLAY's
-                                                * state (a peek keeps where it goes) */
-        const char *st = !state || (drop >= 9 && !peek) ? 0 : drop >= 2 ? st_short : state;
+    for (drop = 0; drop < 9; drop++) {         /* 0 all; 1 no name; 2 PLAY's state short; 3 no 1/2; 4 no "changed";
+                                                * 5 no SWELL; 6 no key (or "→ P3"); 7 a latched gesture by its fill,
+                                                * full ("CHORD" and four cells); 8 no PLAY's state (a peek keeps where
+                                                * it goes) */
+        const char *st = !state || (drop >= 8 && !peek) ? 0 : drop >= 2 ? st_short : state;
         int32_t x = 8 + text_w(&LK_F_PAGE, name), rx = 232, gap = 0;
         if (drop == 7 && gb >= 0 && gest_cells < 0) {
             gname[glen] = 0;
@@ -280,7 +317,7 @@ static void lk_bar(void)
         else if (half[0] && drop < 3)
             x += 4 + text_w(&LK_F_HALF, half);
         for (i = 0; i < nb; i++)
-            if (!(i == swell && drop >= 5) && !(i == glb && drop >= 8))
+            if (!(i == swell && drop >= 5))
                 x += 12 + text_w(&LK_F_TAG, badge[i]) + (i == gb && gest_cells >= 0 ? 4 + LK_GCELL_W : 0);
         if (st) {
             rx -= lk_ktext_w(&LK_F_TAG, st);
@@ -300,7 +337,7 @@ static void lk_bar(void)
             break;
     }
     if (state)
-        state = drop >= 9 && !peek ? 0 : drop >= 2 ? st_short : state;
+        state = drop >= 8 && !peek ? 0 : drop >= 2 ? st_short : state;
     cv_begin(240, LK_BAR_H, LK_BG);
     {
         const int32_t bl = (LK_BAR_H - (int32_t)LK_F_PAGE.h) / 2 + LK_B(LK_F_PAGE);   /* the header's baseline */
@@ -322,7 +359,7 @@ static void lk_bar(void)
         }
         if (key[0] && drop < 6) {
             rx -= gap + text_w(&LK_F_TAG, key);
-            cv_text(rx, bl - LK_B(LK_F_TAG), &LK_F_TAG, key, LK_LABEL);
+            cv_text(rx, bl - LK_B(LK_F_TAG), &LK_F_TAG, key, key_col);
         }
         x = cv_text(8, bl - LK_B(LK_F_PAGE), &LK_F_PAGE, name, name_col);
         if (peek) {                            /* PEEK in a white box (the board) */
@@ -337,7 +374,7 @@ static void lk_bar(void)
         for (i = 0; i < nb; i++) {             /* the badges, as many as fit (still too many: the last go) */
             const int cells = i == gb && gest_cells >= 0;
             int c;
-            if ((i == swell && drop >= 5) || (i == glb && drop >= 8))
+            if (i == swell && drop >= 5)
                 continue;
             if (x + 12 + text_w(&LK_F_TAG, badge[i]) + (cells ? 4 + LK_GCELL_W : 0) > rx - 12)
                 break;

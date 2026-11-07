@@ -1105,7 +1105,7 @@ static void scene_recall(int n, int keep)              /* a white key: morph the
     ui.scene_at = (int8_t)n;
     ui.morph_t0 = plat_ms();
     ui.morph_ms = (uint32_t)(scene_s() * 1000.0f);
-    say_c(t, proj.bank == BANK_PRESETS ? preset_name(n) : 0, K_GOLD);   /* "SCENE P3" / "EERIE" */
+    /* (no banner: the header says where it's going, "→ P3 EERIE"; Evan, 2026-11-07) */
     loop_note(LP_SCENE, proj.bank << 4 | n, 0);
 }
 
@@ -1137,8 +1137,7 @@ static void scene_back(void)
     ui.morph = VISIT_BACK;
     ui.scene_at = ui.visit_from;
     ui.morph_t0 = plat_ms();
-    ui.morph_ms = (uint32_t)(scene_s() * 1000.0f);
-    say("BACK", 0);
+    ui.morph_ms = (uint32_t)(scene_s() * 1000.0f);   /* (the header says "→ A5") */
 }
 
 /* the sound moved x of the way from one set of values to another: smooth values glide, steps flip half way;
@@ -1346,10 +1345,7 @@ static void press_end(void)                            /* the key let go */
                                                         * (Evan, 2026-10-30: SEL is what keeps it) */
         ui.morph = VISIT_BACK;
         ui.visit = (int8_t)(-2 - n);                   /* (pressed again on the way: picked up from there) */
-        ui.scene_at = ui.visit_from;
-        t[0] = 0;
-        scene_name(t, proj.bank, n);
-        say_c(t, "BACK", K_GOLD);
+        ui.scene_at = ui.visit_from;                   /* (the header says "→ A5", "→ back") */
         loop_note(LP_BLEND_X, 0, ui.morph_ms);         /* the loop: back (its slide 0.5 s at most), and let go */
         loop_note(LP_BLEND_END, 0, 0);
     }

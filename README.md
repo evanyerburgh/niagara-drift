@@ -150,7 +150,7 @@ made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE
 | | |
 |---|---|
 | **White key** 1–8 (F3–F4): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Tuning, Sync, Pitch lock, Fade, Morph and Scene time stay as they are |
-| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where you were ("A5 BACK"). **Tap SEL** while holding and the blend stays right there ("A5 40% KEPT"), however you press after; let go when you like. It's a sound of its own between the two (SEL + SAVE takes you back to where you were before it) |
+| **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where you were (the header: "→ A5"). **Tap SEL** while holding and the blend stays right there ("A5 40% KEPT"), however you press after; let go when you like. It's a sound of its own between the two (SEL + SAVE takes you back to where you were before it) |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **SEL + SAVE** | **undo**: back to the sound before your last scene tap or blend, gliding over the Scene time (a knob turned since goes back too; the room's settings, such as Stereo or the Scene time, stay). Again, and it goes forward to where you were. Keep SEL down until you've let go of SAVE |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A, B or C) |
@@ -226,11 +226,11 @@ back (the header says PEEK, and where letting go takes you: "let go: DRONES"). T
 three); "1/2" by the page's name shows which of its pages you're on. A page button opens the page you last used there
 (HOME always opens Drones 1), so after visiting Reverb, holding FX peeks at Reverb.
 
-The header, left to right: the page's name, then what's running: REC or LOOP, SWELL, a gesture, a scene on its way
-("→ B3", or "→ back" as a blend glides back, a gold line filling under the header as it goes; PLAY's fade fills it
-too), II OUT. At the right, the sound: its bank and key ("A5"; a Preset's name too, "P3 EERIE", where there's room),
-"changed" once you've moved it from there; stopped, what PLAY does. When it's full, the sound's name goes first, the
-page's name never.
+The header, left to right: the page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT. At the
+right, the sound: its bank and key ("A5"; a Preset's name too, "P3 EERIE", where there's room), "changed" once you've
+moved it from there; stopped, what PLAY does. On its way to a scene it says where, in gold ("→ P3 EERIE", "→ A5" as a
+blend glides back), a gold line filling under the header as it goes, for at least 1.5 s however short the Scene time;
+PLAY's fade fills the line too. When it's full, the sound's name goes first, the page's name never.
 Each page's screen shows a picture of what its knobs do, and the four values below it. Every knob
 glides: a slow turn is a smooth sweep, never steps; turn faster to go further. The levels follow your ear: halfway is about a quarter as loud.
 

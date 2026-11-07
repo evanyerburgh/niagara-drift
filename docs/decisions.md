@@ -630,12 +630,14 @@ at the end. The current state is in the [README](../README.md) and the code.
   three: the tag, the note with the offset under it, or nothing).
 - 2026-11-07: 0.3's overlays in the new look (PR H, the board 321:2), and the old screen's code out (`draw_bar`,
   `draw_pic` and its `pic_*`, `draw_values`, the old key map, its palette and the font M: about 1,200 lines). The
-  header: a gesture as a gold badge with four cells filling ("WASH"), "latched" once a tap or SEL keeps it; a scene on
-  its way "→ B3" ("→ back" gliding back), a gold line under the header filling as it goes, PLAY's fade too; at the
+  header: a gesture as a gold badge with four cells filling ("WASH"), "latched" once a tap or SEL keeps it; at the
   right the sound's key (a Preset's name with room), "changed" once a hand has moved it (a bank picked isn't a
-  change); a page button held "PEEK" and "let go: DRONES". When it's full, what gives way, in order: the sound's name,
-  PLAY's state to its short form, the "1/2", "changed", SWELL, the key, a latched gesture's word, a glide's name (its
-  line stays), PLAY's state; the page's name never. No gesture banners (the header shows them; Evan: the rule holds).
+  change); on its way to a scene, where to in the sound's place, gold ("→ P3 EERIE", "→ A5" back), a gold line under
+  the header filling as it goes, shown at least 1.5 s as a subtitle is (Evan, on the FM-1 at a 0.1 s Scene time: it
+  flashed by), PLAY's fade too; a page button held "PEEK" and "let go: DRONES". When it's full, what gives way, in
+  order: the sound's name, PLAY's state to its short form, the "1/2", "changed", SWELL, the key, a latched gesture's
+  word, PLAY's state; the page's name never. No gesture or scene banners ("SCENE P3 EERIE", "A5 BACK"): the header
+  shows them (Evan: one place).
   The key map: KEYS [SEL] held, the black keys lit in their groups' colors (I, global, II, links; on the LFO pages I,
   both, II, mods), the one touched outlined in white, "LINKS · [D#5]" and "HARD SYNC ON" under it. The tips for the
   knobs 0.3 moved (Feedback KNOB 1, Cross-mod 4, Tune 2), once, for a player from 0.2 (a new FM-1 starts with them
