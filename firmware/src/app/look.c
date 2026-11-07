@@ -126,9 +126,21 @@ static int lk_gesture(void)
             best = g;
     return best;
 }
-#define LK_GCELLS 4                          /* a gesture's fill: 4 cells of 4 x 9, 6 apart (the board's 8 x 18, 11) */
-#define LK_GCELL_W (LK_GCELLS * 6 - 2)
 #define LK_TRACK RGB(119, 114, 138)          /* the glide's line, before it fills */
+/* a badge's width; a gesture's with its % takes the room of "100%" whatever the number, so nothing after it moves */
+static int32_t lk_badge_w(int pct, const char *s)
+{
+    int32_t w = text_w(&LK_F_TAG, s);
+    if (pct) {
+        const char *p = s;
+        int32_t wn = 0;
+        while (*p && *p != ' ')
+            p++;
+        wn = text_w(&LK_F_TAG, p);
+        w += text_w(&LK_F_TAG, " 100%") - wn;
+    }
+    return w;
+}
 
 /* a scene on its way (tapped, a blend held, gliding back): the scene it's going to (-2: back to a sound of the
  * player's own; -1 none), its bank, and the line's fill. Shown at least LK_GLIDE_MIN, as a subtitle is (Evan,
@@ -183,14 +195,14 @@ static void lk_bar(void)
 {
     const uint32_t now = plat_ms();
     uint32_t rec_s = ui.loop == L_REC ? (now - ui.loop_t0) / 1000u : 0u;
-    int i, drop, gest, glide, gbank = 0, gest_cells = -1;
+    int i, drop, gest, glide, gbank = 0, gest_pct = -1;
     const int peek = ui.hold_btn >= 0 && !ui.hold_cycle && (ui.hold_turned || now - ui.hold_t >= HOLD_MS);
     float line = -1.0f;                      /* the line under the header, 0..1 (a glide's or the fade's), or none */
     uint32_t h;
     char name[20], half[6] = "", rec[12] = "REC ", gname[20], key[8] = "", back[28] = "let go: ";
     const char *badge[6], *sound = 0, *state, *st_short, *chg = 0;
     uint16_t bcol[6], st_col = LK_LABEL, name_col = LK_WHITE, key_col = LK_LABEL;
-    int nb = 0, swell = -1, gb = -1, glen = 0;
+    int nb = 0, swell = -1, gb = -1, glen = 0, show_half, show_chg, show_name;
     lk_sound_at();
     gest = lk_gesture();
     glide = lk_glide(now, &line, &gbank);
@@ -198,7 +210,8 @@ static void lk_bar(void)
         line = ui.playing ? dr_fade : 1.0f - dr_fade;
     }
     if (gest >= 0 && !(proj.par[gl_par(gest)] && !(ui.g_held >> gest & 1u)))
-        gest_cells = (int)(ui.g_amt[gest] * (float)LK_GCELLS + 0.5f);   /* coming in or going: its fill */
+        gest_pct = (int)(ui.g_amt[gest] * 100.0f + 0.5f);   /* coming in or going: how far, in % (Evan, 2026-11-07:
+                                                              * the number says more than four cells did) */
     h = hash(hash(2166136261u ^ rec_s ^ (ui.view == V_PULSE ? (uint32_t)ui_clock_bpm() << 20 : 0u),
                   0x4C42u | ui.view << 16 | ui.playing << 21 | ui.loop << 22 | (uint32_t)proj.par[P_PULSE] << 24 |
                       (uint32_t)proj.par[P_II_OUT] << 25 | (uint32_t)peek << 26 | (uint32_t)lk_chg << 27),
@@ -206,8 +219,9 @@ static void lk_bar(void)
                  (uint32_t)proj.bank << 24 | (uint32_t)(ui.view == V_PULSE && dr_ext_spb > 0.0f) << 28 |
                  (uint32_t)(ui.view == V_FX && proj.par[P_DLY_REPEATS] > 85) << 29 |
                  (uint32_t)(ui.view == V_FX2 && proj.par[P_REV_LEN] >= 100) << 30);
-    h = hash(h, (uint32_t)(gest + 1) | (uint32_t)(gest_cells + 1) << 4 | (uint32_t)ui.hold_from << 8 |
-                    (uint32_t)(line < 0.0f ? 0xFFFu : (uint32_t)(line * 224.0f)) << 12);
+    h = hash(hash(h, (uint32_t)(gest + 1) | (uint32_t)ui.hold_from << 8 |
+                         (uint32_t)(line < 0.0f ? 0xFFFu : (uint32_t)(line * 224.0f)) << 12),
+             (uint32_t)(gest_pct + 1));
     if (h == ui.sig[0])
         return;
     ui.sig[0] = h;
@@ -236,11 +250,18 @@ static void lk_bar(void)
         badge[nb] = "SWELL";
         bcol[nb++] = LK_CORAL;
     }
-    if (gest >= 0) {                           /* "WASH" and its fill, or "CHORD latched" (gold: the spec) */
+    if (gest >= 0) {                           /* "WASH 40%", or "CHORD latched" (gold: the spec) */
         char *q = scopy(gname, GESTURE[gest]);
         glen = (int)(q - gname);
-        if (gest_cells < 0)
+        if (gest_pct < 0)
             scopy(q, " latched");
+        else {
+            *q++ = ' ';
+            itoa_u((uint32_t)gest_pct, q);
+            while (*q)
+                q++;
+            scopy(q, "%");
+        }
         gb = nb;
         badge[nb] = gname;
         bcol[nb++] = LK_GOLD;
@@ -304,21 +325,19 @@ static void lk_bar(void)
     }
     for (drop = 0; drop < 9; drop++) {         /* 0 all; 1 no name; 2 PLAY's state short; 3 no 1/2; 4 no "changed";
                                                 * 5 no SWELL; 6 no key (or "→ P3"); 7 a latched gesture by its fill,
-                                                * full ("CHORD" and four cells); 8 no PLAY's state (a peek keeps where
+                                                * alone ("CHORD"); 8 no PLAY's state (a peek keeps where
                                                 * it goes) */
         const char *st = !state || (drop >= 8 && !peek) ? 0 : drop >= 2 ? st_short : state;
         int32_t x = 8 + text_w(&LK_F_PAGE, name), rx = 232, gap = 0;
-        if (drop == 7 && gb >= 0 && gest_cells < 0) {
+        if (drop == 7 && gb >= 0 && gest_pct < 0)
             gname[glen] = 0;
-            gest_cells = LK_GCELLS;
-        }
         if (peek)
             x += 6 + text_w(&LK_F_SEL, "PEEK") + 6;
         else if (half[0] && drop < 3)
             x += 4 + text_w(&LK_F_HALF, half);
         for (i = 0; i < nb; i++)
             if (!(i == swell && drop >= 5))
-                x += 12 + text_w(&LK_F_TAG, badge[i]) + (i == gb && gest_cells >= 0 ? 4 + LK_GCELL_W : 0);
+                x += 12 + lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
         if (st) {
             rx -= lk_ktext_w(&LK_F_TAG, st);
             gap = 10;
@@ -336,8 +355,46 @@ static void lk_bar(void)
         if (rx >= x + 12)
             break;
     }
+    show_half = drop < 3;
+    show_chg = drop < 4;
+    show_name = drop < 1;
     if (state)
         state = drop >= 8 && !peek ? 0 : drop >= 2 ? st_short : state;
+    {                                          /* what gave way comes back where it fits again (SWELL gone, the
+                                                * "1/2" has room): "changed", then the "1/2", then the sound's name */
+        int32_t x = 8 + text_w(&LK_F_PAGE, name) + (peek ? 12 + text_w(&LK_F_SEL, "PEEK") : 0), rx = 232, gap = 0;
+        for (i = 0; i < nb; i++)
+            if (!(i == swell && drop >= 5))
+                x += 12 + lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
+        if (half[0] && !peek && drop < 3)
+            x += 4 + text_w(&LK_F_HALF, half);
+        if (state) {
+            rx -= lk_ktext_w(&LK_F_TAG, state);
+            gap = 10;
+        }
+        if (sound && show_name) {
+            rx -= gap + text_w(&LK_F_SOUND, sound);
+            gap = 6;
+        }
+        if (chg && show_chg) {
+            rx -= gap + text_w(&LK_F_TAG, chg);
+            gap = 6;
+        }
+        if (key[0] && drop < 6) {
+            rx -= gap + text_w(&LK_F_TAG, key);
+            gap = 6;
+        }
+        if (chg && !show_chg && rx - 6 - text_w(&LK_F_TAG, chg) >= x + 12) {
+            show_chg = 1;
+            rx -= 6 + text_w(&LK_F_TAG, chg);
+        }
+        if (half[0] && !peek && !show_half && rx >= x + 4 + text_w(&LK_F_HALF, half) + 12) {
+            show_half = 1;
+            x += 4 + text_w(&LK_F_HALF, half);
+        }
+        if (sound && !show_name && rx - 6 - text_w(&LK_F_SOUND, sound) >= x + 12)
+            show_name = 1;
+    }
     cv_begin(240, LK_BAR_H, LK_BG);
     {
         const int32_t bl = (LK_BAR_H - (int32_t)LK_F_PAGE.h) / 2 + LK_B(LK_F_PAGE);   /* the header's baseline */
@@ -347,12 +404,12 @@ static void lk_bar(void)
             lk_ktext(rx, bl - LK_B(LK_F_TAG), &LK_F_TAG, state, st_col);
             gap = 10;
         }
-        if (sound && drop < 1) {
+        if (sound && show_name) {
             rx -= gap + text_w(&LK_F_SOUND, sound);
             cv_text(rx, bl - LK_B(LK_F_SOUND), &LK_F_SOUND, sound, LK_WHITE);
             gap = 6;
         }
-        if (chg && drop < 4) {
+        if (chg && show_chg) {
             rx -= gap + text_w(&LK_F_TAG, chg);
             cv_text(rx, bl - LK_B(LK_F_TAG), &LK_F_TAG, chg, LK_LABEL);
             gap = 6;
@@ -368,26 +425,17 @@ static void lk_bar(void)
             cv_round(x + 7, ty + 1, w - 2, th - 2, 2, LK_BG);
             cv_text(x + 9, ty + 1, &LK_F_SEL, "PEEK", LK_INK);
             x += 6 + w;
-        } else if (half[0] && drop < 3) {
+        } else if (half[0] && show_half) {
             x = cv_text(x + 4, bl - LK_B(LK_F_HALF), &LK_F_HALF, half, lk_mix(0x07060Bu, 0xFFFFFFu, 0.6f));
         }
         for (i = 0; i < nb; i++) {             /* the badges, as many as fit (still too many: the last go) */
-            const int cells = i == gb && gest_cells >= 0;
-            int c;
+            const int32_t w = lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
             if (i == swell && drop >= 5)
                 continue;
-            if (x + 12 + text_w(&LK_F_TAG, badge[i]) + (cells ? 4 + LK_GCELL_W : 0) > rx - 12)
+            if (x + 12 + w > rx - 12)
                 break;
-            x = cv_text(x + 12, bl - LK_B(LK_F_TAG), &LK_F_TAG, badge[i], bcol[i]);
-            if (!cells)
-                continue;
-            for (c = 0; c < LK_GCELLS; c++) {  /* the gesture's fill: lit cells filled, the rest outlined */
-                const int32_t cx = x + 4 + 6 * c, cy = bl - 10;
-                cv_rect(cx, cy, 4, 9, bcol[i]);
-                if (c >= gest_cells)
-                    cv_rect(cx + 1, cy + 1, 2, 7, LK_BG);
-            }
-            x += 4 + LK_GCELL_W;
+            cv_text(x + 12, bl - LK_B(LK_F_TAG), &LK_F_TAG, badge[i], bcol[i]);
+            x += 12 + w;
         }
         if (line >= 0.0f) {                    /* the glide's or the fade's line, filling in gold (the board) */
             const int32_t w = (int32_t)(line * 224.0f + 0.5f);

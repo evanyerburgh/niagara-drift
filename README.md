@@ -190,7 +190,7 @@ parts come in one after another, and go in their own order when you let go. Scen
   it goes half way in); ease off and it comes back; let go and it goes.
 - On any gesture key, a **tap** (a press under half a second) takes it all the way and keeps it; tap again and it
   goes. **Tap SEL while holding one** and it stays where it has got to. Its key glows dimly, and lights as it comes in.
-  The header shows the last one you played: its name and how far in it is, four cells filling ("WASH"), or "latched".
+  The header shows the last one you played: its name and how far in it is ("WASH 40%"), or "latched".
 - **PRESETS is Gesture time**: how long every gesture takes, coming in and going out. The screen shows Weight's time
   ("GESTURE TIME 2.8 s"); the others scale with it. The middle is each gesture's own time: Weight 2.8 s, Shift 3.9 s,
   Clean and Wash 3.3 s, Tick, Chord, Snarl and Stutter 6.5 s. Left is slower, each detent a little more time, up to
