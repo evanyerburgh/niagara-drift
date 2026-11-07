@@ -2399,7 +2399,8 @@ static void lk_values(void)
                     break;
             }
             y = 9 + (int32_t)FONT_T20.h + (62 - (int32_t)FONT_T20.h - (int32_t)fb->h) / 2;
-            if (mode == 1)                     /* raised for the line under it */
+            if (mode == 1 && p != P_CLK_SYNC)  /* raised for the line under it (Sync's: in the meters' place, its
+                                                * value on the others' line; Evan, 2026-11-07) */
                 y -= 8;
             if (pre) {
                 cv_text(cx - (wb + ws) / 2, y + (int32_t)(fb->h - fs->h) - 2, fs, unit, LK_WHITE);
@@ -2412,7 +2413,8 @@ static void lk_values(void)
             }
         }
         if (mode == 1)
-            text_c(cx, y + (int32_t)fb->h - 6, text_w(&LK_F_TAG, t2) <= 54 ? &LK_F_TAG : &FONT_U2, t2,
+            text_c(cx, p == P_CLK_SYNC ? 78 - LK_B(LK_F_TAG) : y + (int32_t)fb->h - 6,
+                   text_w(&LK_F_TAG, t2) <= 54 ? &LK_F_TAG : &FONT_U2, t2,
                    p == P_CLK_SYNC && !clk.following ? LK_LABEL : LK_WHITE);   /* Sync: the tempo white, else gray;
                                                                                 * "keeps 120" smaller to fit */
         if (p == P_CLK_SYNC)                   /* no meter: its line says it (the board) */
