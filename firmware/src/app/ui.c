@@ -516,6 +516,10 @@ static void knob_turn(int i, int32_t e)
         int n = in->hi - in->lo + 1, v = (proj.par[p] - in->lo + (e > 0 ? 1 : -1)) % n;
         param_set(p, in->lo + (v < 0 ? v + n : v));
         loop_note(p, proj.par[p], 0);
+        if (p == P_TUNING)                             /* a new Tuning: SEL's fine tuning let go, the knobs land on
+                                                        * its own notes (Evan, 2026-11-07: an offset set against one
+                                                        * Tuning's notes means nothing on another's) */
+            memset(proj.tun_off, 0, sizeof proj.tun_off);
     } else {
         param_set(p, proj.par[p] + accel(EN_K1 + i, e, dr_param_info(p)->hi - dr_param_info(p)->lo));
         loop_note(p, proj.par[p], 0);

@@ -250,7 +250,8 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **Turning a pitch knob** moves it a note of the **Tuning** a click (Setup 2, KNOB 1; semitones to start), however
   far apart the Tuning's notes are, and the screen shows the note it's going to. It glides from note to note, so a
   steady turn is one slide. **SEL** held, the knob moves a cent at a time: that's how to tune a drone a little sharp
-  or flat, and the knob keeps it there, so +3 cents over one note moves to +3 over the next. With Pitch link on,
+  or flat, and the knob keeps it there, so +3 cents over one note moves to +3 over the next (until you change the
+  Tuning, which lets it go: the knobs land on the new Tuning's own notes). With Pitch link on,
   drone II's knob turns the gap between the drones, a step of the Tuning's intervals a click.
 - **MASTER**: past about four-fifths of its turn it drives into overdrive, at about the same loudness: thicker,
   but the breathing flattens (the swells and dips get much smaller).

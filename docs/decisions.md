@@ -622,3 +622,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   a caution's red (Reso's last dot, Feedback's last two), the centered rows from the middle (Shift, Tune, the Swell's
   Shape), the crossfaders (Osc/Sub, Color, Stereo), X-Wave's ticks, the segments for a few choices (Reverb's Type,
   the Sub wave); Mods' Source and Wander's Scale keep their dots, one lit (Evan, after trying segments).
+- 2026-11-07: changing the Tuning (Setup 2) clears SEL's fine tuning (`proj.tun_off`, each pitch knob's offset off the
+  grid): an offset set by ear against one Tuning's notes means nothing on another's (Evan); the drones keep sounding
+  where they are until their knob turns.

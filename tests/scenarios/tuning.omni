@@ -30,14 +30,10 @@ expect par110 10
 spin K1 1
 spin K1 1
 expect par110 1
-# ... a detent is a quarter tone, still +3
+# ... a detent is a quarter tone, and the new Tuning let SEL's +3 go (Evan, 2026-11-07): from 5503 to the next
+# quarter tone, 5550
 tap HOME
 spin K1 1
-expect par0 5553
-# SEL back on the grid (-3: the offset 0 again)
-press SEL
-spin K1 -3
-release SEL
 expect par0 5550
 # just intonation (5, Ptolemy's, movable: built on drone I, Evan 2026-10-30): drone I's knob picks the tonic in
 # semitones, from 5550 (off the semitones) down four: 5500 5400 5300 5200
