@@ -598,9 +598,9 @@ at the end. The current state is in the [README](../README.md) and the code.
   locked with the Swell stopped, "on Swell" dimmed (was "waits Swell", too wide beside the waves); "mvmt 0%" in the
   rate's place when Movement is 0 (the rate isn't heard then).
 - 2026-11-07: Setup 1 and 2 in the new look (PR G; the overlays moved to their own PR, H). Setup 1: a row per time,
-  its title with the knob's word bold, a symbol on one log scale (0.02 s at x 20 .. 5 min at x 220): Fade three strands
-  up from silence, Morph a crossfade (a out, b in), Scene four settings in straight lines; a dot runs the row of the
-  knob being turned at its time, then rests a second; on a clock, Scene's symbol is its bars at the tempo. KNOB 4
+  its title with the knob's word bold, a symbol across the row ending where its knob is (the knob's whole range the
+  row; Evan: turned all the way it reaches the end): Fade one thick line up from silence, Morph and Scene a crossfade
+  (a out, b in); the knob being turned marks its time with a dot there; on a clock, Scene's knob is its bars. KNOB 4
   **Sync**: on (default) follows a MIDI clock, off ignores it and forgets its tempo (the Swell, LFO, delay, Wander and
   Scene time back on their knobs), a Start too; under it "no clock", "120 BPM", "keeps 120" or "free time"; a room
   setting (`P_CLK_SYNC`, the 112th value; `P_SYNC` is hard sync). Setup 2: Tuning and Tune one ring (an octave
@@ -610,4 +610,5 @@ at the end. The current state is in the [README](../README.md) and the code.
   apart as it puts them; Pressure the curve with the key pressed ("[C4] 62%"). **Tune in Hz**: A's pitch in tenths of
   a Hz from 440 (427.0 .. 453.0), 1 Hz a click, 0.1 with SEL; a saved Tune in cents becomes the nearest 0.1 Hz (at
   most 0.2 cents off: -32 cents is 431.9 Hz). PROJ_FORMAT 41 (39-40's 111 values widened). Meters: Tuning a marker on
-  a track, Tune a dot row from the middle, Stereo a slider; Sync none, its line says it.
+  a track, Tune a dot row from the middle, Stereo a slider; Sync none, its line says it. A long Tuning's name steps
+  down to 15 ("Harrison") or 12 ("Harmonics", a new 12 px font) to fit 52 px; A and the 1/1 a little off the ring.

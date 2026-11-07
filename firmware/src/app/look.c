@@ -1428,83 +1428,49 @@ static void lk_pic_mods(void)
 
 /* ---------------------------------------------------- Setup 1's picture --- */
 /* a row per time (the board, GLO 130:1852; the spec, 2026-11-01): its title, the knob's word bold ("Time to fade in /
- * out on PLAY"), and a symbol on one log time scale (0.02 s at x 20 .. 5 min at x 220, unlabeled) ending at the knob's
- * time: Fade the drones rising from silence; Morph a crossfade, a going out as b comes in; Scene the settings gliding
- * each in a straight line to the scene's. The knob being turned gets a dot running its symbol at its time, then a rest;
- * on a MIDI clock the Scene time is its bars at the tempo */
-static int32_t lk_t_x(float s)                 /* a time on the scale */
-{
-    return 20 + (int32_t)(200.0f * fm_clampf(fm_logf(fm_maxf(s, 0.02f) * 50.0f) * (1.0f / 9.6158f), 0.0f, 1.0f) + 0.5f);
-}
+ * out on PLAY"), and a symbol across the row ending where its knob is: the knob's whole range is the row (Evan,
+ * 2026-11-07: turned all the way, it reaches the end), so the change takes the row's first part and the rest is its
+ * new setting. Fade one thick line up from silence (the board's); Morph and Scene a crossfade, a out as b comes in (he
+ * liked Morph's better than Scene's straight lines). The knob being turned marks its time with a dot where the change
+ * ends; on a MIDI clock Scene's knob is its bars */
 static float lk_ease(float u) { u = fm_clampf(u, 0.0f, 1.0f); return u * u * (3.0f - 2.0f * u); }
 static void lk_pic_setup1(void)
 {
     static const char *const PRE[3] = {"Time to ", "Time to ", "Time to switch "},
                              *const BOLD[3] = {"fade", "morph", "scenes"},
                              *const POST[3] = {" in / out on PLAY", " keys and LFOs", ""};
-    const float secs[3] = {fade_s(), morph_ms() * 0.001f,
-                           dr_ext_spb > 0.0f ? (float)DR_BARS_N[(unsigned)proj.par[P_SCENE_BARS] < DR_NBARS ?
-                                                                 proj.par[P_SCENE_BARS] : 2] * 4.0f * dr_ext_spb / DR_SR
-                                             : 0.1f * fm_exp2f((float)proj.par[P_SCENE_T] * 0.115507f)};
+    const float frac[3] = {(float)proj.par[P_FADE] * 0.01f, (float)proj.par[P_MORPH] * 0.01f,
+                           dr_ext_spb > 0.0f ? (float)proj.par[P_SCENE_BARS] / (float)(DR_NBARS - 1)
+                                             : (float)proj.par[P_SCENE_T] * 0.01f};
     int r, i, s;
     for (r = 0; r < 3; r++) {
-        const int32_t base = 16 + 40 * r, top = base + (r ? 7 : 5), bot = base + (r ? 21 : 15), xe = lk_t_x(secs[r]);   /* Fade's
-                                                * strands below it, to 21 */
-        const int on = lit(r);
+        const int32_t base = 16 + 40 * r, top = base + 7, bot = base + 21;
+        const int32_t xe = 20 + (int32_t)(fm_clampf(frac[r], 0.0f, 1.0f) * 200.0f + 0.5f);
         int16_t y[101];
         int32_t x = 12;                        /* words at 18, the knob's in bold (19: the one bold near it); the
                                                 * longest, morph's, 215 px */
-        float dot = -1.0f;                     /* the dot's place in the change, 0..1 (-1: none) */
         x = cv_text(x, base - LK_B(LK_F_SMALL), &LK_F_SMALL, PRE[r], LK_LABEL);
         x = cv_text(x, base - LK_B(FONT_B), &FONT_B, BOLD[r], LK_INK);
         cv_text(x, base - LK_B(LK_F_SMALL), &LK_F_SMALL, POST[r], LK_LABEL);
-        if (on) {                              /* running at the knob's time, then a rest of a second */
-            const float t = secs[r], e = (float)(plat_ms() % (uint32_t)(1000.0f * (t + 1.0f) + 0.5f)) * 0.001f;
-            dot = e < t ? (float)(lk_t_x(e) - 20) / (float)(xe > 20 ? xe - 20 : 1) : 1.0f;
-        }
-        if (r == 0) {                          /* FADE: silence up to full, three strands */
+        for (s = r ? 0 : 1; s < 2; s++) {     /* s 0: a going out; 1: b coming in (Fade's rise) */
             for (i = 0; i <= 100; i++) {
                 const int32_t xi = 20 + 2 * i;
-                y[i] = (int16_t)(bot - (int32_t)((float)(bot - top) * (xi >= xe ? 1.0f : lk_ease((float)(xi - 20) / (float)(xe > 20 ? xe - 20 : 1))) + 0.5f));
+                const float u = xi >= xe ? 1.0f : lk_ease((float)(xi - 20) / (float)(xe > 20 ? xe - 20 : 1));
+                y[i] = (int16_t)(s ? bot - (int32_t)((float)(bot - top) * u + 0.5f) : top + (int32_t)((float)(bot - top) * u + 0.5f));
             }
-            lk_bundle_n(20, y, 101, LK_G, 0, 3, 3, 1.0f);   /* 3 px apart, as Sub · Drive's */
-            if (dot >= 0.0f) {
-                const int32_t px = 20 + (int32_t)(dot * (float)(xe - 20)), py = bot - (int32_t)((float)(bot - top) * lk_ease(dot));
-                cv_round(px - 3, py - 3, 7, 7, 3, LK_WHITE);
-            }
-        } else if (r == 1) {                   /* MORPH: a out, b in */
-            for (s = 0; s < 2; s++) {
-                for (i = 0; i <= 100; i++) {
-                    const int32_t xi = 20 + 2 * i;
-                    const float u = xi >= xe ? 1.0f : lk_ease((float)(xi - 20) / (float)(xe > 20 ? xe - 20 : 1));
-                    y[i] = (int16_t)(s ? bot - (int32_t)((float)(bot - top) * u + 0.5f) : top + (int32_t)((float)(bot - top) * u + 0.5f));
-                }
-                lk_plot(20, y, 101, s ? LK_WHITE : LK_UNLIT);
-                if (dot >= 0.0f) {
-                    const float u = lk_ease(dot);
-                    const int32_t px = 20 + (int32_t)(dot * (float)(xe - 20)),
-                                  py = s ? bot - (int32_t)((float)(bot - top) * u) : top + (int32_t)((float)(bot - top) * u);
-                    cv_round(px - (s ? 3 : 2), py - (s ? 3 : 2), s ? 7 : 5, s ? 7 : 5, s ? 3 : 2, LK_WHITE);
-                }
-            }
-            cv_text(10, top - LK_B(LK_F_SMALL) + 5, &LK_F_SMALL, "a", LK_LABEL);   /* beside where each starts */
-            cv_text(10, bot - LK_B(LK_F_SMALL) + 5, &LK_F_SMALL, "b", LK_WHITE);
-        } else {                               /* SCENE: four settings, each a straight line to the scene's */
-            static const int8_t A[4] = {14, 0, 7, 0}, B[4] = {0, 12, 2, 6};
-            for (s = 0; s < 4; s++) {
-                for (i = 0; i <= 100; i++) {
-                    const int32_t xi = 20 + 2 * i;
-                    const float u = xi >= xe ? 1.0f : (float)(xi - 20) / (float)(xe > 20 ? xe - 20 : 1);
-                    y[i] = (int16_t)(top + A[s] + (int32_t)((float)(B[s] - A[s]) * u + (B[s] > A[s] ? 0.5f : -0.5f)));
-                }
-                lk_plot(20, y, 101, s == 0 ? LK_WHITE : lk_ramp(LK_G, 1.0f - 0.33f * (float)s));
-                if (dot >= 0.0f) {
-                    const int32_t px = 20 + (int32_t)(dot * (float)(xe - 20)),
-                                  py = top + A[s] + (int32_t)((float)(B[s] - A[s]) * dot);
-                    cv_round(px - (s ? 2 : 3), py - (s ? 2 : 3), s ? 5 : 7, s ? 5 : 7, s ? 2 : 3, LK_WHITE);
-                }
+            lk_plot(20, y, 101, s ? LK_WHITE : LK_UNLIT);
+            if (!r) {                          /* Fade: one thick line, 3 px */
+                for (i = 0; i <= 100; i++)
+                    y[i]++;
+                lk_plot(20, y, 101, LK_WHITE);
             }
         }
+        if (r) {
+            cv_text(10, top - LK_B(LK_F_SMALL) + 5, &LK_F_SMALL, "a", LK_LABEL);   /* beside where each starts */
+            cv_text(10, bot - LK_B(LK_F_SMALL) + 5, &LK_F_SMALL, "b", LK_WHITE);
+        }
+        if (lit(r))                            /* the knob's time: where the change ends */
+            cv_round(xe - 3, top - 3 + (r ? 0 : 1), 7, 7, 3, LK_WHITE);
     }
 }
 
@@ -1614,14 +1580,15 @@ static void lk_pic_setup2(void)
         }
         if (!moves) {                          /* A on its tick */
             int32_t ax, ay;
-            lk_polar(cx, cy, tc, (float)R + 8.0f, &ax, &ay);   /* beside its tick's tip, right of the notch */
-            cv_text(ax + 5, ay - LK_B(LK_F_SMALL) + 3, &LK_F_SMALL, "A", LK_WHITE);
+            lk_polar(cx, cy, tc, (float)R + 10.0f, &ax, &ay);   /* beside its tick's tip, right of the notch, a
+                                                * little off the ring (Evan, 2026-11-07) */
+            cv_text(ax + 6, ay - LK_B(LK_F_SMALL) / 2 - 3, &LK_F_SMALL, "A", LK_WHITE);
         }
         {   /* the 1/1 on its tick (none on the equal ones) */
             const int one = t == DR_TUN_LMY ? 294 : t == DR_TUN_HARRISON || t == DR_TUN_PARTCH ? 996 : 0;
             if (pure && t != DR_TUN_HARM && !moves) {
                 int32_t ox, oy;
-                lk_polar(cx, cy, (float)one + tc, (float)R + 18.0f, &ox, &oy);
+                lk_polar(cx, cy, (float)one + tc, (float)R + 22.0f, &ox, &oy);   /* off the ring (Evan) */
                 ox = ox < 12 ? 12 : ox > 110 ? 110 : ox;   /* on the screen (Harrison's, Partch's at the left) */
                 text_c(ox, oy - LK_B(LK_F_TAG) / 2 - 2, &LK_F_TAG, "1/1", LK_NEUTRAL);
             }
@@ -2401,8 +2368,12 @@ static void lk_values(void)
             for (sp = t; *sp && !(*sp >= 'a' && *sp <= 'z' && sp > t && sp[-1] >= '0' && sp[-1] <= '9'); sp++)
                 ;
         {
-            static const felucca_font_t *const BIG[4] = {&FONT_N1, &FONT_N2, &FONT_U1, &FONT_U2},
-                                         *const SMALL[4] = {&FONT_U1, &FONT_U2, &FONT_U2, &FONT_U2};
+            static const felucca_font_t *const BIG[6] = {&FONT_N1, &FONT_N2, &FONT_U1, &FONT_U2, &FONT_XS, &FONT_U3},
+                                         *const SMALL[6] = {&FONT_U1, &FONT_U2, &FONT_U2, &FONT_U2, &FONT_U2, &FONT_U2};
+            static const uint8_t TUN_STEP[6] = {0, 1, 2, 4, 3, 5};   /* the Tuning's: 26, 21, 16, 15, 13, 12, to fit 52
+                                                                      * px ("Harrison" 15, "Harmonics" 12; Evan,
+                                                                      * 2026-11-07: a little smaller) */
+            const int tun = p == P_TUNING;
             char big[16];
             const int nb = (int)(sp - t), sep = *sp == ' ' ? 3 : 1;
             const char *unit = *sp == ' ' ? sp + 1 : sp;
@@ -2417,12 +2388,14 @@ static void lk_values(void)
             }
             for (;; f++) {                     /* as large as fits: 26 turning, 21 at rest, else 16, else 13 (a long
                                                 * name: "Cathedral", "Chorus hall", the board's size) */
-                fb = BIG[f];
-                fs = SMALL[f];
+                const int k = tun ? TUN_STEP[f] : f;
+                fb = BIG[k];
+                fs = SMALL[k];
                 wb = text_w(fb, big);
                 ws = *unit ? sep + text_w(fs, unit) : 0;
-                if (wb + ws <= (f == 0 ? 50 : 58) || f == 3)   /* 26 inside the outline; 21 may touch the column's
-                                                                 * edges (a note and its cents, "Ab3 +17") */
+                if (wb + ws <= (f == 0 ? 50 : tun ? 52 : 58) || f == (tun ? 5 : 3))   /* 26 inside the outline; 21
+                                                                 * may touch the column's edges (a note and its cents,
+                                                                 * "Ab3 +17") */
                     break;
             }
             y = 9 + (int32_t)FONT_T20.h + (62 - (int32_t)FONT_T20.h - (int32_t)fb->h) / 2;

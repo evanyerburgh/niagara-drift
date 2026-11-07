@@ -454,8 +454,8 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
 - **Fade** is how long PLAY takes (up to 60 s); **Morph** is how long a black key or a new LFO wave (OCT) takes
   to move the sound to its new setting (0.02–30 s); **Scene time** is how long every scene move takes: a tap, a
   crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about 15 s to start). The picture
-  is a row for each, on one time scale: a fade up from silence, a crossfade (a out, b in), the settings gliding in
-  straight lines; turn a knob and a dot runs its row at that time.
+  is a row for each, its knob's whole range across it: the fade a line up from silence, Morph and the scenes a
+  crossfade (a out, b in), each change ending where its knob is (a dot there while you turn it).
 - **Sync** (KNOB 4): **On** follows a MIDI clock (see MIDI below), **Off** ignores it, so the Swell, the LFO, the
   delay, Wander and the Scene time run on their own knobs again. Under it, what the clock is doing: "no clock",
   "120 BPM", "keeps 120" (stopped or unplugged, at the last tempo) or "free time" (off).
