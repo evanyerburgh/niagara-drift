@@ -597,3 +597,17 @@ at the end. The current state is in the [README](../README.md) and the code.
   waves in one column, 13 px tall and 54 long (were 9 and 24); the rate right of LFO I, the lock right of LFO II;
   locked with the Swell stopped, "on Swell" dimmed (was "waits Swell", too wide beside the waves); "mvmt 0%" in the
   rate's place when Movement is 0 (the rate isn't heard then).
+- 2026-11-07: Setup 1 and 2 in the new look (PR G; the overlays moved to their own PR, H). Setup 1: a row per time,
+  its title with the knob's word bold, a symbol on one log scale (0.02 s at x 20 .. 5 min at x 220): Fade three strands
+  up from silence, Morph a crossfade (a out, b in), Scene four settings in straight lines; a dot runs the row of the
+  knob being turned at its time, then rests a second; on a clock, Scene's symbol is its bars at the tempo. KNOB 4
+  **Sync**: on (default) follows a MIDI clock, off ignores it and forgets its tempo (the Swell, LFO, delay, Wander and
+  Scene time back on their knobs), a Start too; under it "no clock", "120 BPM", "keeps 120" or "free time"; a room
+  setting (`P_CLK_SYNC`, the 112th value; `P_SYNC` is hard sync). Setup 2: Tuning and Tune one ring (an octave
+  clockwise, a tick a note, A named, Tune turning it from a fixed notch; the 1/1 named: LMY C, Harrison and Partch G,
+  Harmonics A, Just and Shruti drone I at the top), the drones as dots, each one's nearest note lit, beads I to II, the
+  interval under it (a ratio up to 32/32 within 4 cents on the pure Tunings, else its name); Stereo the two waves as far
+  apart as it puts them; Pressure the curve with the key pressed ("[C4] 62%"). **Tune in Hz**: A's pitch in tenths of
+  a Hz from 440 (427.0 .. 453.0), 1 Hz a click, 0.1 with SEL; a saved Tune in cents becomes the nearest 0.1 Hz (at
+  most 0.2 cents off: -32 cents is 431.9 Hz). PROJ_FORMAT 41 (39-40's 111 values widened). Meters: Tuning a marker on
+  a track, Tune a dot row from the middle, Stereo a slider; Sync none, its line says it.

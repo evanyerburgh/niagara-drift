@@ -84,7 +84,8 @@ enum {
     P_DRIFT,                        /* 0..100: DRIFT, the drones never quite still: pitch (+-8 cents), and slow
                                      * random wanders of each drone's cutoff, X-WAVE, level and detune */
     P_WIDTH,                        /* stereo: 0 mono .. 100 drone I left, drone II right */
-    P_TUNE,                         /* cents, -50..50 */
+    P_TUNE,                         /* A's pitch in tenths of a Hz from 440: -130..130 = 427.0 .. 453.0 Hz (v0.3, Evan
+                                     * 2026-11-01; cents, -50..50, before PROJ_FORMAT 41) */
     P_PULSE,                        /* the PULSE on (1) / off (0): both drones chopped in time (a switch) */
     P_PULSE_RATE,                   /* 0..100 = 0.03 .. 16 pulses a second, exponential (a 33 s breath .. a buzz) */
     P_PULSE_DEPTH,                  /* 0..100: how far the level drops between pulses */
@@ -152,6 +153,8 @@ enum {
                                           * each as loud (RMS) as the square (v0.3, Evan 2026-10-28) */
     P_TUNING,                       /* where a pitch knob lands when it stops (DR_TUNING_NAME, the UI's; a room setting,
                                      * v0.3, Evan 2026-10-30): 0 12-tone .. 8 the 22 shrutis */
+    P_CLK_SYNC,                     /* follow a MIDI clock (1, as since v0.3's step 3) or not (0: the clock ignored, its
+                                     * tempo forgotten); a room setting (v0.3, Evan 2026-11-01, ledger item 5) */
     DR_NPARAMS
 };
 

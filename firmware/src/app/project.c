@@ -273,6 +273,11 @@ static void convert(int16_t *v, uint32_t from)
         int t = v[P_TUNING];
         v[P_TUNING] = (int16_t)((unsigned)t < DR_NTUNING ? T39[t] : DR_TUN_12);
     }
+    if (from <= 40u) {                          /* Tune in Hz (Evan, 2026-11-01): cents then, tenths of a Hz from 440
+                                                 * now, the nearest */
+        const float d = 4400.0f * fm_exp2f((float)v[P_TUNE] * (1.0f / 1200.0f)) - 4400.0f;
+        v[P_TUNE] = (int16_t)fm_clampf(d + (d < 0.0f ? -0.5f : 0.5f), -130.0f, 130.0f);
+    }
 }
 
 static int in_range(const int16_t *v)
@@ -291,7 +296,7 @@ static int in_range(const int16_t *v)
  * the effects' four); 23-31 as now with 98 (before the delay's drive), 32 with 99 (before the reverb's route), 33 with 100
  * (before the Swell's division), 34 with 101 (before the LFO's, the delay's and the scenes' clock values), 35 with 104
  * (before the pressure keys' gestures' latches), 36 with 108 (before the sub waves), 37 and 38 with 110 (before the
- * Tuning). A value added since takes its default. */
+ * Tuning), 39 and 40 with 111 (before Sync). A value added since takes its default. */
 #define NP21 78
 #define NP22 94
 #define NP31 98
@@ -301,6 +306,7 @@ static int in_range(const int16_t *v)
 #define NP35 104
 #define NP36 108
 #define NP38 110                               /* 37 and 38 */
+#define NP40 111                               /* 39 and 40 */
 _Static_assert(DR_NPARAMS >= NP36, "the values only grow");
 typedef struct {
     uint32_t magic, format;
@@ -436,6 +442,22 @@ typedef struct {
     uint16_t used, rsv;
     int16_t scene[NSCENES][NP38];
 } bank_v38_t;
+typedef struct {                               /* 39 and 40 (as now, 111 values a sound) */
+    uint32_t magic, format;
+    int16_t par[NP40];
+    uint8_t leds, bank, mtime;
+    uint8_t gkey_old[4];
+    uint8_t seen[2];
+    int8_t tun_off[3];
+    uint8_t rsv[4];
+    uint16_t scene_used;
+    int16_t scene[NSCENES][NP40];
+} proj_v40_t;
+typedef struct {
+    uint32_t magic, format;
+    uint16_t used, rsv;
+    int16_t scene[NSCENES][NP40];
+} bank_v40_t;
 static union {
     project_t p;
     proj_v31_t o31;
@@ -452,6 +474,8 @@ static union {
     bank_v36_t b36;
     proj_v38_t o38;
     bank_v38_t b38;
+    proj_v40_t o40;
+    bank_v40_t b40;
     proj_v20_t o20;
     proj_v21_t o21;
     bank_t b;
@@ -464,7 +488,7 @@ static union {
 static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old sound: the new values' defaults */
 {
     int k;
-    const int np = from >= 39u ? DR_NPARAMS : from >= 37u ? NP38 : from >= 36u ? NP36 : from >= 35u ? NP35 : from >= 34u ? NP34 : from >= 33u ? NP33 : from >= 32u ? NP32 : from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
+    const int np = from >= 41u ? DR_NPARAMS : from >= 39u ? NP40 : from >= 37u ? NP38 : from >= 36u ? NP36 : from >= 35u ? NP35 : from >= 34u ? NP34 : from >= 33u ? NP33 : from >= 32u ? NP32 : from >= 23u ? NP31 : from >= 22u ? NP22 : NP21;
     for (k = 0; k < DR_NPARAMS; k++)
         dst[k] = k < np ? src[k] : dr_param_info(k)->def;
     if (dst[P_LFO_RATE] < 0)                   /* slower than 50 s, as it went before 2026-10-14: the slowest */
@@ -485,10 +509,12 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
     bank_fmt[b - 1] = ld.b.format;
     if (ld.b.format == PROJ_FORMAT) {
         *k = ld.b;
-    } else if (ld.b.format == 39u) {           /* 39: as now, the Tunings in their old order */
-        *k = ld.b;
+    } else if (ld.b.format == 39u || ld.b.format == 40u) {   /* 39, 40: 111 values a sound (Tune in cents; 39 the
+                                                               * Tunings in their old order) */
+        const bank_v40_t *o = &ld.b40;
+        k->used = o->used;
         for (i = 0; i < NSCENES; i++)
-            convert(k->scene[i], 39u);
+            widen(k->scene[i], o->scene[i], ld.b.format);
         bank_dirty |= (uint8_t)(1u << b);
     } else if (ld.b.format == 37u || ld.b.format == 38u) {   /* 37, 38: 110 values a sound (37 the Shape the other
                                                                * way round) */
@@ -561,7 +587,8 @@ static const int16_t *old_scene(int n, uint32_t *from)   /* scene n of the bank 
 {
     uint32_t f = ld.b.format;
     *from = f;
-    if (f == PROJ_FORMAT || f == 39u) return ld.b.scene[n];   /* (39: as now; widen remaps it) */
+    if (f == PROJ_FORMAT) return ld.b.scene[n];
+    if (f == 39u || f == 40u) return ld.b40.scene[n];
     if (f == 37u || f == 38u) return ld.b38.scene[n];
     if (f == 36u) return ld.b36.scene[n];
     if (f == 35u) return ld.b35.scene[n];
@@ -683,11 +710,19 @@ int project_load(void)
     }
     if (from == PROJ_FORMAT) {
         proj = ld.p;
-    } else if (from == 39u) {                  /* 39: as now, the Tunings in their old order */
-        proj = ld.p;
-        convert(proj.par, 39u);
+    } else if (from == 39u || from == 40u) {   /* 39, 40: 111 values a sound (Tune in cents; 39 the Tunings in
+                                                * their old order) */
+        const proj_v40_t *o = &ld.o40;
+        memset(&proj, 0, sizeof proj);
+        widen(proj.par, o->par, from);
+        proj.leds = o->leds;
+        proj.bank = o->bank;
+        proj.mtime = o->mtime;
+        memcpy(proj.seen, o->seen, sizeof proj.seen);
+        memcpy(proj.tun_off, o->tun_off, sizeof proj.tun_off);
+        proj.scene_used = o->scene_used & ((1u << NSCENES) - 1u);
         for (i = 0; i < NSCENES; i++)
-            convert(proj.scene[i], 39u);
+            widen(proj.scene[i], o->scene[i], from);
     } else if (from == 37u || from == 38u) {   /* 37, 38: 110 values a sound (37 the Shape the other way round) */
         const proj_v38_t *o = &ld.o38;
         memset(&proj, 0, sizeof proj);

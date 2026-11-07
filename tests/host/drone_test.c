@@ -282,12 +282,12 @@ int main(void)
         printf("    A3: %.2f Hz\n", (double)hz);
         check("note 57 sounds at 220 Hz (+-1)", fabsf(hz - 220.0f) < 1.0f);
     }
-    dr_set(P_TUNE, 50);
+    dr_set(P_TUNE, -80);                            /* A at 432 Hz: A3 at 216 */
     run(secs(0.2f));
     run(secs(2.0f));
     {
-        float hz = (float)upcross / ((float)frames / DR_SR), want = 220.0f * powf(2.0f, 50.0f / 1200.0f);
-        check("Tune +50 cents", fabsf(hz - want) < 1.0f);
+        float hz = (float)upcross / ((float)frames / DR_SR), want = 216.0f;
+        check("Tune at 432 Hz", fabsf(hz - want) < 1.0f);
     }
     dr_set(P_TUNE, 0);
     dr_set(DR_GP(0, GP_PITCH), 5737);               /* between notes: A3 + 37 cents */

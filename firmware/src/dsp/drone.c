@@ -43,7 +43,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Cross-mod", 0, DR_XMOD_OUT, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
-    {"Stereo", 0, 100, 60}, {"Tune", -50, 50, 0},
+    {"Stereo", 0, 100, 60}, {"Tune", -130, 130, 0},
     {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", -100, 100, -25}, {"Swing", 0, 50, 0},
     {"Time", 0, DR_DLY_TMAX, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
     {"Type", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Delay mod", -100, 100, 20},
@@ -60,6 +60,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"G4 latch", 0, 100, 0}, {"A4 latch", 0, 100, 0}, {"B4 latch", 0, 100, 0}, {"C5 latch", 0, 100, 0},
     {"Sub wave", 0, DR_NSUBW - 1, DR_SUBW_SQUARE}, {"Sub wave", 0, DR_NSUBW - 1, DR_SUBW_SQUARE},
     {"Tuning", 0, DR_NTUNING - 1, DR_TUN_12},
+    {"Sync", 0, 1, 1},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
 const char *const DR_DIV_NAME[DR_NDIV] = {"32 bars", "16 bars", "8 bars", "4 bars", "2 bars", "1 bar", "1/2", "1/4"};
@@ -376,6 +377,19 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_SUBW_NAME[(unsigned)v < DR_NSUBW ? v : 0]);
     else if (i == P_TUNING)
         copy_s(b, DR_TUNING_NAME[(unsigned)v < DR_NTUNING ? v : 0]);
+    else if (i == P_CLK_SYNC)
+        copy_s(b, v ? "On" : "Off");
+    else if (i == P_TUNE) {                   /* A in Hz: "432Hz", "432.5Hz" */
+        const int d = 4400 + v;
+        itoa_s(d / 10, b);
+        while (*b)
+            b++;
+        if (d % 10) {
+            *b++ = '.';
+            *b++ = (char)('0' + d % 10);
+        }
+        copy_s(b, "Hz");
+    }
     else if (i == P_PULSE_DIV)
         copy_s(b, DR_DIV_NAME[(unsigned)v < DR_NDIV ? v : 2]);
     else if (i == P_LFO_DIV)
@@ -519,7 +533,7 @@ void dr_param_text(int i, int v, char *b)
     } else if (gp == GP_SUBOCT)
         copy_s(b, v == 6 ? "-4 oct" : v == 5 ? "-3 oct" : v == 4 ? "1/5" : v == 3 ? "1/3" : v == 2 ? "-2 oct" : "-1 oct");
     else {
-        if ((i == P_TUNE || i == P_PLINK_OFF || i == P_DLY_LFO_DEPTH || i == P_LFO_RMOD || gp == GP_OLFO_DEPTH || gp == GP_FLFO_DEPTH) && v > 0)
+        if ((i == P_PLINK_OFF || i == P_DLY_LFO_DEPTH || i == P_LFO_RMOD || gp == GP_OLFO_DEPTH || gp == GP_FLFO_DEPTH) && v > 0)
             *b++ = '+';
         itoa_s(v, b);
     }
@@ -1826,7 +1840,8 @@ static void render_group(int g, uint32_t n)
      * so it can't sit half a cycle out and cancel it (it did: -20 dB, depending on what came before), and
      * Drift's wanders don't beat them. Any Detune lets it go. */
     const int plock = !v->ovon && iv == DR_IV_UNISON && pv[GP_DETUNE] < 0.5f;
-    const float tune = (float)par[P_TUNE] * 0.01f, target = (float)p[GP_PITCH] * 0.01f;
+    const float tune = 12.0f * fm_log2f(1.0f + (float)par[P_TUNE] * (1.0f / 4400.0f)),   /* A in Hz, as semitones */
+                target = (float)p[GP_PITCH] * 0.01f;
     /* the cutoff, 0..1000 = log2 20 .. log2 18000 */
     const float cut_t = 4.32192809f + pv[GP_CUTOFF] * 0.00981378f;
     /* the links, on drone II: hard sync, pitch link, cross-mod (12 octaves a unit of drone I's sound, at
