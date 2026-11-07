@@ -2034,8 +2034,8 @@ static void lk_one_of(int32_t cx, int32_t y, int n, int at, int g)   /* one of n
     }
 }
 
-static void lk_one_of_dots(int32_t cx, int32_t y, int n, int at, int g)   /* one dot of n lit (Mods' Source: Evan,
-                                                                        * 2026-11-07, its three dots, not segments) */
+static void lk_one_of_dots(int32_t cx, int32_t y, int n, int at, int g)   /* one dot of n lit (Mods' Source, Wander's
+                                                                        * Scale: Evan, 2026-11-07, dots, not segments) */
 {
     const int32_t step = 8, x0 = cx - (step * (n - 1)) / 2 - 2;
     int k;
@@ -2347,8 +2347,6 @@ static void lk_values(void)
             text_c(cx, 27 + (int32_t)f2->h - 4, f2, t2, LK_WHITE);
             if (ui.view == V_PULSE)
                 lk_pills(cx, 70, hi > lo ? (float)(v - lo) / (float)(hi - lo) : 0.0f, p == P_PULSE_SHAPE);
-            else if (p == P_WSCALE)            /* Scale's six as segments; Source's three dots (Evan, 2026-11-07) */
-                lk_one_of(cx, 70, dr_param_info(p)->hi - lo + 1, v - lo, g);
             else
                 lk_one_of_dots(cx, 72, dr_param_info(p)->hi - lo + 1, v - lo, g);
             continue;
@@ -2443,9 +2441,8 @@ static void lk_values(void)
                 lk_xfader(cx, 70, frac, LK_G);
             else if (ui.view == V_PULSE)       /* ARP's pills; Shape's from the middle */
                 lk_pills(cx, 70, frac, p == P_PULSE_SHAPE);
-            else if (p == P_WSCALE)            /* Scale's segments, one-word names too (Evan: Dorian had a ruler) */
-                lk_one_of(cx, 70, hi - lo + 1, v - lo, g);   /* Scale's six as segments (Evan, 2026-11-07:
-                                                                 * "pills are better" for a few choices) */
+            else if (p == P_WSCALE)            /* Scale's dots, one-word names too (Evan: Dorian had a ruler) */
+                lk_one_of_dots(cx, 72, hi - lo + 1, v - lo, g);
             else if (ui.view == V_PARTNER || ui.view == V_MOVES)   /* SEQ's rulers; Shift's from the middle */
                 lk_ruler(cx, 70, frac, g, p == P_SHIFT_MOVE);
             else if (gp == GP_NCOLOR && ui.view == V_TONE)   /* a crossfade, white to pink (Evan, 2026-11-02) */
