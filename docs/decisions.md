@@ -56,7 +56,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   the DS-2's slowest) .. 70 Hz; longer arcs come from Scene switch and the motion loop.
 - 2026-11-07: the defaults review (Evan, item 9): the FM-1's own times for a new FM-1, Fade 1.5 s (29, was 0.99 s),
   Morph 2.0 s (34, was 0.63 s), Scene time 7.8 s (40, was 16 s: a player pressing a scene key also sees how far in it
-  is); and the sound's Pitch glide 0.2 s (14, was off), so Wander's notes slide a little (every Preset that leaves it
+  is); and the sound's Pitch glide 0.05 s (7, was off; Evan picked it of 0.05, 0.1 and 0.2 s by ear), so Wander's notes slide a little (every Preset that leaves it
   alone too). Everything else kept. The flash chips: fl_id_ok() (any standard SPI NOR of 1-16 MiB, since 0.2.1) in its
   own header with a host test: the Puya P25Q80 (856014) and the newer FM-1s' UC25HQ80 (B36014) both.
 - 2026-11-07: Partner and Shift follow the Tuning (ledger item 8), as Wander and Chord since #63: on a Tuning other

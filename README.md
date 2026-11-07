@@ -340,8 +340,8 @@ pink specks are as many as Color says.
   drone I (in any octave, up to an octave from its own pitch), and only now and then comes home. The knob is **how
   often**, at random times within a range: 25–30 s apart at the bottom, 0.5–2 s at the top; the screen shows the
   range. It doesn't glide by itself: **Pitch glide** slides it. At 0 it's off.
-- **Pitch glide** is how long a drone takes to reach a new pitch (up to 10 s; 0.2 s to start, so Wander's notes slide
-  a little): a pitch knob, a scene, Wander's notes.
+- **Pitch glide** is how long a drone takes to reach a new pitch (up to 10 s; 0.05 s to start, so Wander's notes
+  slide a little): a pitch knob, a scene, Wander's notes.
 - **Wander's scale**: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just (the
   harmonics 1–8 of drone I, pure: the root, the pure major third, fifth and the seventh harmonic). Its notes take the
   Tuning's (Setup 2): see Tuning.
