@@ -300,7 +300,7 @@ static void rv_coefs(float ease)
     int inf = rt <= 0.0f;
     uint32_t i;
     if (inf && fade_target <= 0.0f) {   /* stopped or stopping: a freeze lets go, over about twice the Fade */
-        fsec = fm_maxf(2.0f * 0.05f * fm_exp2f((float)par[P_FADE] * 0.102288f), 1.5f);
+        fsec = fm_maxf(2.0f * dr_time_s(P_FADE, par[P_FADE]), 1.5f);
         rt = fsec;
         inf = 0;
     }

@@ -2,7 +2,7 @@
 # A preset picked with a long scene switch (Setup 1 KNOB 3 at 70, ~27 s) once wrote the flash 660 times in
 # 20 s on the FM-1 (Evan, 2026-10-19), each write flickering the lights.
 pressure w1 0
-set 71 70
+set 71 55
 wait 6000
 expect store_writes 0
 tapkey w1

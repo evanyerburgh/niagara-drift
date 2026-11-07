@@ -612,3 +612,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   most 0.2 cents off: -32 cents is 431.9 Hz). PROJ_FORMAT 41 (39-40's 111 values widened). Meters: Tuning a marker on
   a track, Tune a dot row from the middle, Stereo a slider; Sync none, its line says it. A long Tuning's name steps
   down to 15 ("Harrison") or 12 ("Harmonics", a new 12 px font) to fit 52 px; A and the 1/1 a little off the ring.
+- 2026-11-07: the time knobs (Setup 1) on a power curve (Evan: an exponential one gave 40 % of the dial to under a
+  second; a drone is about slow changes): Fade 0.05 + 59.95 x^3 s, Morph 0.02 + 29.98 x^2.5 s, Scene time 0.1 + 299.9
+  x^4 s (`dr_time_s`), 1 s near a quarter on each (25, 25, 23 %), the ranges kept. Saved ones converted to the same
+  time (PROJ_FORMAT 41); the defaults 25, 21, 48 (0.99 s, 0.63 s, 16 s; were 42, 47, 63). The starting passage
+  measured on main and G: the fade in to -3 dB 1.70 s on both, the loudness 0.09 dB apart on average.

@@ -14,7 +14,7 @@ pressure w9 0
 pressure w10 0
 pressure w11 0
 notips
-set 71 30
+set 71 24
 set 74 0
 press SEL
 tapkey w12

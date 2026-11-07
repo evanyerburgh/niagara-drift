@@ -451,6 +451,7 @@ pink specks are as many as Color says.
 
 Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't change it.
 
+- Each knob gives most of its turn to slow times, a second about a quarter of the way.
 - **Fade** is how long PLAY takes (up to 60 s); **Morph** is how long a black key or a new LFO wave (OCT) takes
   to move the sound to its new setting (0.02–30 s); **Scene time** is how long every scene move takes: a tap, a
   crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about 15 s to start). The picture

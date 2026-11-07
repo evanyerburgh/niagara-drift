@@ -1,8 +1,8 @@
 # the pressure crossfade (v0.2): a scene key held is a fader into its scene. Drone I's cutoff (par7) shows
 # where the sound is: scene A1 at 700, the sound before it at 300. The pressure is where the sound heads; it
-# glides there no faster than the whole way in a Scene time (here 1.1 s: Setup 1 KNOB 3 at 30), after the
+# glides there no faster than the whole way in a Scene time (here 1.1 s: Setup 1 KNOB 3 at 24), after the
 # first 250 ms (a tap so far)
-set 71 30
+set 71 24
 # Pitch lock off (on at start since 2026-10-19): these move the pitch
 set 74 0
 # bank A (a new FM-1 starts on the Presets, which are fixed)
@@ -154,7 +154,7 @@ spin ALGO 30
 wait 300
 expect par75 80
 tap GLO
-spin K3 20
+spin K3 13
 tap HOME
 tapkey w1
 wait 400

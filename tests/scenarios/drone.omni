@@ -1,7 +1,7 @@
 # from the starting sound before 2026-10-17 (these checks were made on it)
 classic
 # scenes switch in 1.1 s here (the Scene time at 30; 46, ~4 s, on a new FM-1 since 2026-10-19)
-set 71 30
+set 71 24
 # Pitch lock starts on (Evan, 2026-10-19: a turned pitch knob says where its key is); off for what follows
 expect par74 1
 tapkey b3
@@ -443,8 +443,8 @@ tap SEQ
 expect view 9
 tap GLO
 expect view 10
-spin K1 10
-expect par51 52
+spin K1 7
+expect par51 32
 wait 100
 shot setup.png
 # GLO again: Setup 2, the room's: Tune, Stereo, Pressure (KNOB 4 nothing: the speaker's cut is automatic); again: Setup 1
@@ -502,7 +502,7 @@ expect dirty 1
 wait 5000
 expect dirty 1
 expect store_writes 2
-# PLAY again: out over the fade (Fade is 52 now: 2.0 s), then the autosave
+# PLAY again: out over the fade (Fade is 32 now: 2.0 s), then the autosave
 tap PLAY
 expect playing 0
 wait 2500
@@ -680,7 +680,7 @@ release SEL
 expect bscenes 4
 # a black key during a scene change is the hand's: the scene leaves it alone (2026-10-25: the Sub key showed its next
 # step but held until the scene landed)
-set 71 60
+set 71 45
 press SAVE
 tapkey w5
 release SAVE
@@ -693,7 +693,7 @@ tapkey b1
 expect par6 4
 wait 12000
 expect par6 4
-set 71 30
+set 71 24
 # the types go round both ways: the delay's (SEL + KNOB 4 on Delay) from Wide (1) to Clean, Self, Clean, Wide; the
 # reverb's (KNOB 3 on Reverb) from the hall (1) to the room, the chorus hall, the room, the hall
 tap FX

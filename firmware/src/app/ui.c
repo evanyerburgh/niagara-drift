@@ -720,7 +720,7 @@ static void page_up(int b)
     ui.hold_btn = -1;
 }
 
-static float morph_ms(void) { return 20.0f * fm_exp2f((float)proj.par[P_MORPH] * 0.105507f); }
+static float morph_ms(void) { return 1000.0f * dr_time_s(P_MORPH, proj.par[P_MORPH]); }
 
 /* OCT- / OCT+: the LFO's two waves (v0.2): a tap is the next shape, round and round (Off, the seven, random,
  * AND, OR);
@@ -1036,7 +1036,7 @@ static void scene_store(int n)                         /* SAVE held + a white ke
     save_ask(n);
 }
 
-static float fade_s(void) { return 0.05f * fm_exp2f((float)proj.par[P_FADE] * 0.102288f); }
+static float fade_s(void) { return dr_time_s(P_FADE, proj.par[P_FADE]); }
 static float clk_bar_frac(void);
 /* the Scene time, s. On a MIDI clock (v0.3): its bars (P_SCENE_BARS), ending on a bar line: the rest of this bar and
  * the bars after it (less than half a bar left of this one: a bar more) */
@@ -1049,7 +1049,7 @@ static float scene_s(void)
             bars += 1.0f;
         return bars * 4.0f * dr_ext_spb * (1.0f / DR_SR);
     }
-    return 0.1f * fm_exp2f((float)proj.par[P_SCENE_T] * 0.115507f);
+    return dr_time_s(P_SCENE_T, proj.par[P_SCENE_T]);
 }
 
 #define VISIT_BACK NSCENES                     /* the morph's target: ui.visit_back (a visit's way back, an undo) */

@@ -277,6 +277,17 @@ static void convert(int16_t *v, uint32_t from)
                                                  * now, the nearest */
         const float d = 4400.0f * fm_exp2f((float)v[P_TUNE] * (1.0f / 1200.0f)) - 4400.0f;
         v[P_TUNE] = (int16_t)fm_clampf(d + (d < 0.0f ? -0.5f : 0.5f), -130.0f, 130.0f);
+        {   /* the time knobs a power curve now (Evan, 2026-11-07): the same time, the nearest step */
+            static const uint8_t TP[3] = {P_FADE, P_MORPH, P_SCENE_T};
+            static const float MN[3] = {0.05f, 0.02f, 0.1f}, K[3] = {0.102288f, 0.105507f, 0.115507f},
+                               E[3] = {1.0f / 3.0f, 0.4f, 0.25f};
+            int j;
+            for (j = 0; j < 3; j++) {
+                const float t = MN[j] * fm_exp2f((float)v[TP[j]] * K[j]), lo = dr_time_s(TP[j], 0),
+                            hi = dr_time_s(TP[j], 100), y = (t - lo) / (hi - lo);
+                v[TP[j]] = (int16_t)fm_clampf(y > 0.0f ? 100.0f * fm_exp2f(fm_log2f(y) * E[j]) + 0.5f : 0.0f, 0.0f, 100.0f);
+            }
+        }
     }
 }
 
