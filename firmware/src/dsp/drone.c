@@ -41,7 +41,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     VOICE_PARAMS(5000, 67, DR_IV_UNISON, 30, 700, 75, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
     VOICE_PARAMS(5700, 33, DR_IV_UNISON + 9, 15, 680, 61, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
     {"Cross-mod", 0, DR_XMOD_OUT, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
-    {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
+    {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 152, 74}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 25}, {"Drift", 0, 100, 30},
     {"Stereo", 0, 100, 60}, {"Tune", -130, 130, 0},
     {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", -100, 100, -25}, {"Swing", 0, 50, 0},
@@ -211,9 +211,14 @@ static void itoa_s(int v, char *b)
     *b = 0;
 }
 
-/* the LFO's rate in Hz: 0.02 * 3500^(v/100), 0.02 .. 70 Hz */
-static float lfo_hz(int v) { return 0.02f * fm_exp2f((float)v * 0.117733931f); }
-static float lfo_hz_f(float v) { return 0.02f * fm_exp2f(v * 0.117733931f); }
+/* the LFO's rate in Hz, 0..152: a cycle in 100 s, then every second down to 10 s (Evan on the FM-1, 2026-11-07: each
+ * second on the dial), then on in steps of the same size (10 s to 9 s, x 700^(1/62), ~11 %) to 70 Hz: 1 / (100 - v)
+ * to v 90, 0.1 * 700^((v - 90) / 62) after */
+static float lfo_hz_f(float v)
+{
+    return v < 90.0f ? 1.0f / (100.0f - v) : 0.1f * fm_exp2f((v - 90.0f) * 0.152438f);
+}
+static float lfo_hz(int v) { return lfo_hz_f((float)v); }
 
 /* the pulse's rate: 0.03 * 533^(v/100), 0.03 .. 16 a second (slow: a breath, a shruti's bellows) */
 static float pulse_hz(int v) { return 0.03f * fm_exp2f((float)v * 0.0905875f); }
@@ -224,7 +229,7 @@ static void secs_text(float t, char *b);
 static void rate_text(int v, char *b)
 {
     float hz = lfo_hz(v);
-    if (hz < 0.1f) {                             /* slow: its period ("21s", "50s") */
+    if (hz < 0.1005f) {                          /* slow, to 10 s: its period ("21s", "1m40") */
         secs_text(1.0f / hz, b);
         return;
     }

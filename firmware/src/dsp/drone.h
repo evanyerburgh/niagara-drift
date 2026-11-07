@@ -24,7 +24,7 @@
  * restarts with drone I's), PITCH LINK (drone II follows drone I's pitch, at an offset) and CROSS-MOD
  * (drone I's sound moves drone II's cutoff, at audio rate: the DS-2's DRONE I OUT -> CUTOFF II cable).
  *
- * The ULTRA LFO (after the DS-2's): one Rate, 0.02 .. 70 Hz, two taps (Wave I, Wave II), each Off or one
+ * The ULTRA LFO (after the DS-2's): one Rate, 0.01 .. 70 Hz, two taps (Wave I, Wave II), each Off or one
  * of ten shapes (the DS-2's seven, random, and the Lyra-8's AND / OR), locked to the same clock. Each drone routes a tap to its oscillator (pitch or X-WAVE)
  * and a tap to its filter (cutoff or resonance), each with a bipolar depth (0: none, negative: inverted).
  *
@@ -75,7 +75,7 @@ enum {
     P_SYNC,                         /* drone II's oscillator hard-synced to drone I's (1) / free (0): a switch */
     P_PLINK,                        /* drone II's pitch linked to drone I's (1) / its own (0): a switch */
     P_PLINK_OFF,                    /* linked: drone II's pitch = drone I's + this, in cents (-2400..2400) */
-    P_LFO_RATE,                     /* 0..100 = 0.02 (a cycle in 50 s, the DS-2's slowest) .. 70 Hz, exponential */
+    P_LFO_RATE,                     /* 0..152: a cycle in 100 - v s to v 90 (10 s), then 0.1 * 700^((v - 90) / 62) Hz to 70 Hz */
     P_LFO_W1,                       /* Wave I: 0 off, 1..10 (DR_LFO_W1_NAME) (a switch) */
     P_LFO_W2,                       /* Wave II: 0 off, 1..10 (DR_LFO_W2_NAME) (a switch) */
     P_GLIDE,                        /* 0..100 = 0 .. 10 s to reach a new pitch (quadratic); 0 by default: a pitch
