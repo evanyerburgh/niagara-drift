@@ -477,7 +477,8 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
   (11-limit): the equal ones by size, then the rest simplest to richest. The knob goes round both ways.
   - **The picture** is the Tuning and Tune as one ring: an octave clockwise, a tick a note, A named on its tick, and
     Tune turning the ring away from the small mark at the top (440). Inside, how many notes and, on the pure ones,
-    where their 1/1 is (LMY on C, Harrison and Partch on G, Harmonics on A, Just and Shruti on drone I). The
+    where their 1/1 is (LMY on C, Harrison and Partch on G, Harmonics on A, Just and Shruti on drone I), its tick the
+    long white one. The
     interval between the drones is on Drones 1. Beside it Stereo, the drones' two waves as far apart as it puts them, and Pressure, what a press gives from light
     to firm, with the key you're pressing on it ("[C4] 62%").
   - **Just and Shruti move with drone I**, as just intonation does (a movable do; drone I is do, or Sa): drone I's

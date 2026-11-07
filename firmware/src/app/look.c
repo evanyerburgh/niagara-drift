@@ -1545,32 +1545,25 @@ static void lk_pic_setup2(void)
             cv_rect(cx - 1, cy - R - 12, 3, 1, LK_LABEL);
             cv_rect(cx, cy - R - 11, 1, 1, LK_LABEL);
         }
-        for (k = 0; k < n; k++)
-            lk_spoke(cx, cy, (float)dr_tun_c(t, k) + (moves ? 0.0f : tc), (float)R + 3.0f,
-                     (float)R + (n > 24 ? 6.0f : 8.0f), 1, LK_NEUTRAL);
+        {   /* its notes, a tick each; the 1/1's longer and white (Evan, 2026-11-07: the tick marked, not a label
+             * squeezed beside it; inside, "1/1 on C" names it) */
+            const int one = t == DR_TUN_LMY ? 294 : t == DR_TUN_HARRISON || t == DR_TUN_PARTCH ? 996 : 0;
+            for (k = 0; k < n; k++) {
+                const float c = (float)dr_tun_c(t, k) + (moves ? 0.0f : tc);
+                if (pure && dr_tun_c(t, k) == one)
+                    lk_spoke(cx, cy, c, (float)R + 2.0f, (float)R + 11.0f, 2, LK_WHITE);
+                else
+                    lk_spoke(cx, cy, c, (float)R + 3.0f, (float)R + (n > 24 ? 6.0f : 8.0f), 1, LK_NEUTRAL);
+            }
+        }
         if (!moves) {                          /* A on its tick */
             int32_t ax, ay;
             lk_polar(cx, cy, tc, (float)R + 20.0f, &ax, &ay);   /* straight out past its tick and the notch, with
                                                 * room round it (Evan, 2026-11-07) */
             text_c(ax, ay - LK_B(LK_F_SMALL) + 6, &LK_F_SMALL, "A", LK_WHITE);
         }
-        {   /* the 1/1 on its tick (none on the equal ones) */
+        {   /* inside: its notes, its 1/1 */
             const int one = t == DR_TUN_LMY ? 294 : t == DR_TUN_HARRISON || t == DR_TUN_PARTCH ? 996 : 0;
-            if (pure && t != DR_TUN_HARM && !moves) {
-                int32_t ox, oy;
-                lk_polar(cx, cy, (float)one + tc, (float)R + 22.0f, &ox, &oy);   /* off the ring (Evan) */
-                if (ox < 14) {                 /* no room at the left (Harrison's, Partch's, up-left): as far left as
-                                                * it goes, raised along the ring until its corner clears the ticks'
-                                                * tips (Evan, 2026-11-07: it sat on them) */
-                    const float dx = (float)(14 - cx), rr = (float)R + 20.0f;
-                    const int32_t top = cy - (int32_t)fm_sqrtf(fm_maxf(rr * rr - dx * dx, 0.0f)) - 6;
-                    ox = 14;
-                    oy = oy < top ? oy : top;
-                }
-                ox = ox > 110 ? 110 : ox;
-                text_c(ox, oy - LK_B(LK_F_TAG) / 2 - 2, &LK_F_TAG, "1/1", LK_NEUTRAL);
-            }
-            /* inside: its notes, its 1/1 */
             itoa_u((uint32_t)n, tx);
             scopy(tx + (n >= 10 ? 2 : 1), " notes");
             text_c(cx, pure ? cy - 16 : cy - 9, &LK_F_SMALL, tx, LK_WHITE);
