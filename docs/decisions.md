@@ -624,4 +624,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   the Sub wave); Mods' Source and Wander's Scale keep their dots, one lit (Evan, after trying segments).
 - 2026-11-07: changing the Tuning (Setup 2) clears SEL's fine tuning (`proj.tun_off`, each pitch knob's offset off the
   grid): an offset set by ear against one Tuning's notes means nothing on another's (Evan); the drones keep sounding
-  where they are until their knob turns.
+  where they are until their knob turns. The "fine" tag over a turning pitch knob (Drones 1) shows the offset ("fine
+  +3", "fine 0"): on the Tunings besides 12-tone the note's own cents hid it (LMY's Bb3 -37 became -34; Evan, of
+  three: the tag, the note with the offset under it, or nothing).

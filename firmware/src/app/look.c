@@ -507,9 +507,17 @@ static void lk_pic_drones1(void)
         if (c2 != c1)
             lk_arrow(ax + 5, iy + LK_B(LK_F_SMALL) - 1, 11, c2 > c1, LK_DRONE[1]);
     }
-    for (i = 0; i < 4; i += 2)                 /* a pitch knob turning: its fine tuning, SEL's job */
-        if (lit(i) && !proj.par[P_PLOCK])
-            lk_sel_tag(i, "fine", (int)(ui.btn >> B_SEL & 1u));
+    for (i = 0; i < 4; i += 2)                 /* a pitch knob turning: its fine tuning, SEL's job, and how far
+                                                * it has the knob off the Tuning's notes ("fine +3"; Evan,
+                                                * 2026-11-07: on the other Tunings the note's own cents hid it) */
+        if (lit(i) && !proj.par[P_PLOCK]) {
+            const int p = knob_param(i), off = p >= 0 ? proj.tun_off[tun_i(p)] : 0;
+            char t[12], *q = scopy(t, "fine ");
+            if (off)
+                *q++ = off > 0 ? '+' : '-';
+            itoa_u((uint32_t)(off < 0 ? -off : off), q);
+            lk_sel_tag(i, t, (int)(ui.btn >> B_SEL & 1u));
+        }
 }
 
 /* ------------------------------------------------- Drones 2's picture --- */
