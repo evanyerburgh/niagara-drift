@@ -30,7 +30,7 @@ static void classic(void)
     dr_set(DR_GP(1, GP_FLFO_DEPTH), -25);
     dr_set(DR_GP(0, GP_RESO), 350);
     dr_set(DR_GP(1, GP_RESO), 350);
-    dr_set(P_LFO_RATE, 45);
+    dr_set(P_LFO_RATE, 98);
     dr_set(P_LFO_W2, 1);
     dr_set(P_DLY_REPEATS, 35);
     dr_set(P_DLY_MIX, 0);
@@ -347,10 +347,10 @@ int main(void)
     }
     {   /* the LFO: its rate, and every shape of both taps inside -1..1 and moving */
         int sh, tap, bad_shape = 0;
-        float want = 0.01f * powf(7000.0f, powf(0.7f, 1.3f)), hz;
+        float want = 0.1f * powf(2.0f, 31.0f * 0.152438f), hz;
         long ups = 0;
         float last;
-        dr_set(P_LFO_RATE, 70);                     /* 0.01 * 7000^(0.7^1.3) = 2.6 Hz */
+        dr_set(P_LFO_RATE, 121);                    /* 0.1 * 700^(31/62) = 2.6 Hz */
         dr_set(P_LFO_W1, 1);
         run(1);
         last = dr_lfo[0];
@@ -360,7 +360,7 @@ int main(void)
             last = dr_lfo[0];
         }
         hz = (float)ups / 4.0f;
-        printf("    LFO rate 70: %.2f Hz (want %.2f)\n", (double)hz, (double)want);
+        printf("    LFO rate 121: %.2f Hz (want %.2f)\n", (double)hz, (double)want);
         check("LFO rate (Wave I triangle at 2.6 Hz)", fabsf(hz - want) < 0.3f);
         for (tap = 0; tap < 2; tap++)
             for (sh = 1; sh < DR_LFO_NSHAPES; sh++) {
@@ -408,7 +408,7 @@ int main(void)
         }
         printf("    rises a cycle: 2x Exp %d, 4x Exp %d\n", ups[0], ups[1]);
         check("2x Exp rises twice a cycle, 4x Exp four times", ups[0] == 2 && ups[1] == 4);
-        dr_set(P_LFO_RATE, 58);
+        dr_set(P_LFO_RATE, 110);
         dr_set(P_LFO_W1, 1);
         dr_set(P_MORPH, 21);                        /* 0.6 s, the default */
         run(secs(1.0f));
@@ -438,7 +438,7 @@ int main(void)
         want = 40.0f * 0.01f;
         printf("    the slowest LFO: %.4f of a cycle in 40 s (want %.4f)\n", (double)ph, (double)want);
         check("the slowest LFO rate on time (within 0.5 %)", fabsf(ph / want - 1.0f) < 0.005f);
-        dr_set(P_LFO_RATE, 70);
+        dr_set(P_LFO_RATE, 121);
         dr_set(P_LFO_W1, 1);
         dr_set(P_LFO_W2, 3);
         for (k = 0; k < 4; k++) {
@@ -485,12 +485,12 @@ int main(void)
         run(1);
         check("an LFO reset draws a new random level", dr_lfo[0] != v);
         dr_set(P_LFO_W1, 1);
-        dr_set(P_LFO_RATE, 70);
+        dr_set(P_LFO_RATE, 121);
     }
     {   /* the filter's LFO swings the level; the oscillator's (pitch) swings the pitch */
         float mn = 9.0f, mx = 0.0f;
         int k;
-        dr_set(P_LFO_RATE, 58);                     /* ~0.8 Hz */
+        dr_set(P_LFO_RATE, 110);                    /* ~0.8 Hz */
         dr_set(DR_GP(0, GP_PITCH), 4500);
         dr_set(DR_GP(0, GP_WAVE), 67);              /* a saw, so the cutoff matters */
         dr_set(DR_GP(0, GP_CUTOFF), 400);
@@ -544,7 +544,7 @@ int main(void)
         mx = 0.0f;
         run(secs(0.5f));
         dr_lfo_reset();                             /* from the cycle's start: not wherever the tests before left it */
-        for (k = 0; k < 35; k++) {                  /* 35 windows of 0.2 s: a whole cycle (4.3 s at rate 45) after the
+        for (k = 0; k < 35; k++) {                  /* 35 windows of 0.2 s: a whole cycle (4.3 s at rate 98) after the
                                                      * restart's ease, wherever it began (the tests before move it) */
             float hz;
             run(secs(0.2f));
@@ -1094,7 +1094,7 @@ int main(void)
         dry_init();
         dr_set(P_LFO_W1, DR_LFO_RANDOM);
         dr_set(P_LFO_W2, DR_LFO_RANDOM);
-        dr_set(P_LFO_RATE, 79);                         /* ~6.8 Hz: ~25 blocks a cycle */
+        dr_set(P_LFO_RATE, 130);                        /* ~6.8 Hz: ~25 blocks a cycle */
         dr_lfo_reset();
         run(secs(0.3f));
         last = dr_lfo[1];
@@ -1126,7 +1126,7 @@ int main(void)
         dry_init();
         dr_set(P_PULSE_RATE, 67);                       /* 2 a second */
         dr_set(P_PULSE, 1);
-        dr_set(P_LFO_RATE, 26);                         /* 0.047 Hz */
+        dr_set(P_LFO_RATE, 78);                         /* a cycle in 22 s */
         for (lk = 0; lk < 2; lk++) {
             dr_set(P_LFO_LOCK, lk);
             dr_lfo_reset();
@@ -1149,7 +1149,7 @@ int main(void)
         int r, b, n;
         dry_init();
         dr_set(P_LFO_W1, 1);
-        dr_set(P_LFO_RATE, 70);                         /* ~2.6 Hz */
+        dr_set(P_LFO_RATE, 121);                        /* ~2.6 Hz */
         dr_set(P_LFO_RMOD_SRC, DR_LFO_I);
         for (r = 0; r < 2; r++) {
             dr_set(P_LFO_RMOD, r ? 100 : 0);
@@ -1403,7 +1403,7 @@ int main(void)
         pure_tone();
         dr_set(DR_GP(0, GP_WAVE), 67);
         dr_set(DR_GP(0, GP_CUTOFF), 400);
-        dr_set(P_LFO_RATE, 58);
+        dr_set(P_LFO_RATE, 110);
         dr_set(DR_GP(0, GP_FLFO), DR_LFO_I);
         dr_set(DR_GP(0, GP_FLFO_DEPTH), 50);
         for (m = 0; m < 3; m++) {
@@ -1852,7 +1852,7 @@ int main(void)
             if (k == 2)
                 dr_seed(4321u);
             dr_set(P_LFO_W1, DR_LFO_RANDOM);
-            dr_set(P_LFO_RATE, 70);
+            dr_set(P_LFO_RATE, 121);
             for (i = 0; i < 12; i++) {
                 run(secs(0.5f));
                 seq[k][i] = dr_lfo[0];

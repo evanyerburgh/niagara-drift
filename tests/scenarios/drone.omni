@@ -481,7 +481,7 @@ expect view 13
 tap HOME
 # SELECT: the LFO rate; PRESETS: nothing yet (the macro to come), the waves stay
 spin SELECT 10
-expect par47 55
+expect par47 108
 spin PRESET 2
 expect par48 1
 expect par49 1

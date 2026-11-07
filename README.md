@@ -505,7 +505,7 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
 
 | Knob | Sets |
 |---|---|
-| SELECT | the rate, from one cycle in 100 seconds to 70 Hz, most of the turn for the slow rates (a cycle in 10 seconds about a third of the way, 1 Hz past halfway); below 0.1 Hz the screen shows a cycle's length ("21s", "1m40"). While SELECT, ALGORITHM or PRESETS turns, its value fills the bottom of the screen, large |
+| SELECT | the rate, from one cycle in 100 seconds to 70 Hz: below 100 seconds each click is a second, down to 10 seconds (most of the turn), then steps of the same size up to 70 Hz; below 0.1 Hz the screen shows a cycle's length ("21s", "1m40"). While SELECT, ALGORITHM or PRESETS turns, its value fills the bottom of the screen, large |
 | ALGORITHM | the **Movement**: every LFO depth together, from still (0%) to double (200%) |
 | OCT− · OCT+ | LFO I's · LFO II's shape: tap for the next (or off), round and round; SEL + OCT for the one before |
 

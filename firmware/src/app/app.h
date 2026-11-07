@@ -11,7 +11,9 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 42u                  /* 42: the LFO rate to 100 s, a power curve (41's read, converted);
+#define PROJ_FORMAT 43u                  /* 43: the LFO rate 0..152, every second from 100 s to 10 s (41's and 42's
+                                          * read, converted);
+                                          * 42: the LFO rate to 100 s, a power curve (a test build of #78);
                                           * 41: Tune in Hz, Sync (112 values; 39-40's widened, Tune converted);
                                           * 40: the Tunings reordered, simplest to richest (39's read, remapped);
                                           * 39: the pitch knobs' Tuning (111 values; 38's widened);
