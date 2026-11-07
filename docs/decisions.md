@@ -597,3 +597,34 @@ at the end. The current state is in the [README](../README.md) and the code.
   waves in one column, 13 px tall and 54 long (were 9 and 24); the rate right of LFO I, the lock right of LFO II;
   locked with the Swell stopped, "on Swell" dimmed (was "waits Swell", too wide beside the waves); "mvmt 0%" in the
   rate's place when Movement is 0 (the rate isn't heard then).
+- 2026-11-07: Setup 1 and 2 in the new look (PR G; the overlays moved to their own PR, H). Setup 1: a row per time,
+  its title with the knob's word bold, a symbol across the row ending where its knob is (the knob's whole range the
+  row; Evan: turned all the way it reaches the end): Fade one thick line up from silence, Morph and Scene a crossfade
+  (a out, b in); the knob being turned marks its time with a dot there; on a clock, Scene's knob is its bars. KNOB 4
+  **Sync**: on (default) follows a MIDI clock, off ignores it and forgets its tempo (the Swell, LFO, delay, Wander and
+  Scene time back on their knobs), a Start too; under it "no clock", "120 BPM", "keeps 120" or "free time"; a room
+  setting (`P_CLK_SYNC`, the 112th value; `P_SYNC` is hard sync). Setup 2: Tuning and Tune one ring (an octave
+  clockwise, a tick a note, A named, Tune turning it from a fixed notch; the 1/1 named: LMY C, Harrison and Partch G,
+  Harmonics A, Just and Shruti drone I at the top: its tick long and white, no label outside; Evan), centered in the
+  picture; no drones or interval on it (Evan: the
+  page sets the tuning; Drones 1 shows the interval); Stereo the two waves as far
+  apart as it puts them; Pressure the curve with the key pressed ("[C4] 62%"). **Tune in Hz**: A's pitch in tenths of
+  a Hz from 440 (427.0 .. 453.0), 1 Hz a click, 0.1 with SEL; a saved Tune in cents becomes the nearest 0.1 Hz (at
+  most 0.2 cents off: -32 cents is 431.9 Hz). PROJ_FORMAT 41 (39-40's 111 values widened). Meters: Tuning a marker on
+  a track, Tune a dot row from the middle, Stereo a slider; Sync none, its line says it. A long Tuning's name steps
+  down to 15 ("Harrison") or 12 ("Harmonics", a new 12 px font) to fit 52 px; A and the 1/1 a little off the ring.
+- 2026-11-07: the time knobs (Setup 1) on a power curve (Evan: an exponential one gave 40 % of the dial to under a
+  second; a drone is about slow changes): Fade 0.05 + 59.95 x^3 s, Morph 0.02 + 29.98 x^2.5 s, Scene time 0.1 + 299.9
+  x^4 s (`dr_time_s`), 1 s near a quarter on each (25, 25, 23 %), the ranges kept. Saved ones converted to the same
+  time (PROJ_FORMAT 41); the defaults 25, 21, 48 (0.99 s, 0.63 s, 16 s; were 42, 47, 63). The starting passage
+  measured on main and G: the fade in to -3 dB 1.70 s on both, the loudness 0.09 dB apart on average.
+- 2026-11-07: the meters one family (Evan: "dots, cells and pills look the same"): every plain amount a row of 8 dots
+  of 5 px in its page's own colors (ENV's cells, ARP's pills, EDIT's stripe gauges and SEQ's rulers before it); kept:
+  a caution's red (Reso's last dot, Feedback's last two), the centered rows from the middle (Shift, Tune, the Swell's
+  Shape), the crossfaders (Osc/Sub, Color, Stereo), X-Wave's ticks, the segments for a few choices (Reverb's Type,
+  the Sub wave); Mods' Source and Wander's Scale keep their dots, one lit (Evan, after trying segments).
+- 2026-11-07: changing the Tuning (Setup 2) clears SEL's fine tuning (`proj.tun_off`, each pitch knob's offset off the
+  grid): an offset set by ear against one Tuning's notes means nothing on another's (Evan); the drones keep sounding
+  where they are until their knob turns. The "fine" tag over a turning pitch knob (Drones 1) shows the offset ("fine
+  +3", "fine 0"): on the Tunings besides 12-tone the note's own cents hid it (LMY's Bb3 -37 became -34; Evan, of
+  three: the tag, the note with the offset under it, or nothing).

@@ -282,12 +282,12 @@ int main(void)
         printf("    A3: %.2f Hz\n", (double)hz);
         check("note 57 sounds at 220 Hz (+-1)", fabsf(hz - 220.0f) < 1.0f);
     }
-    dr_set(P_TUNE, 50);
+    dr_set(P_TUNE, -80);                            /* A at 432 Hz: A3 at 216 */
     run(secs(0.2f));
     run(secs(2.0f));
     {
-        float hz = (float)upcross / ((float)frames / DR_SR), want = 220.0f * powf(2.0f, 50.0f / 1200.0f);
-        check("Tune +50 cents", fabsf(hz - want) < 1.0f);
+        float hz = (float)upcross / ((float)frames / DR_SR), want = 216.0f;
+        check("Tune at 432 Hz", fabsf(hz - want) < 1.0f);
     }
     dr_set(P_TUNE, 0);
     dr_set(DR_GP(0, GP_PITCH), 5737);               /* between notes: A3 + 37 cents */
@@ -410,7 +410,7 @@ int main(void)
         check("2x Exp rises twice a cycle, 4x Exp four times", ups[0] == 2 && ups[1] == 4);
         dr_set(P_LFO_RATE, 45);
         dr_set(P_LFO_W1, 1);
-        dr_set(P_MORPH, 47);                        /* 0.6 s, the default */
+        dr_set(P_MORPH, 21);                        /* 0.6 s, the default */
         run(secs(1.0f));
         last = dr_lfo[0];
         dr_set(P_LFO_W1, 5);                        /* Triangle to 2x Tri */
@@ -1181,7 +1181,7 @@ int main(void)
         dr_set(DR_GP(0, GP_PITCH), 3300);                /* 55 Hz */
         dr_set(DR_GP(0, GP_CUTOFF), 500);
         run(secs(0.3f));                                 /* the setup settled (at Morph 0) */
-        dr_set(P_MORPH, 64);                             /* 0.02 x 2^6.75 = 2.15 s */
+        dr_set(P_MORPH, 35);                             /* 0.02 + 29.98 x 0.35^2.5 = 2.19 s */
         run(secs(0.7f));
         capture(w, 4410, 0);
         lo0 = tone_level(w, 4410, 55.0f);
@@ -1203,7 +1203,7 @@ int main(void)
         lo_fast = tone_level(w, 4410, 55.0f);
         check("morph 0: a switch is done in ~20 ms", lo_fast > 0.9f * lo0);
         /* the pulse, switched on with Morph 2.1 s: deepens over it (depth 100: closed at the end) */
-        dr_set(P_MORPH, 64);
+        dr_set(P_MORPH, 35);
         dr_set(P_PULSE_RATE, 67);                       /* 2 a second (the default is slower now) */
         dr_set(P_PULSE_DEPTH, 100);
         dr_set(P_PULSE_SHAPE, -100);
@@ -1237,7 +1237,7 @@ int main(void)
         dr_set(DR_GP(0, GP_MIX), 100);                  /* the sub alone */
         dr_set(DR_GP(0, GP_CUTOFF), 400);
         run(secs(0.5f));
-        dr_set(P_MORPH, 55);
+        dr_set(P_MORPH, 27);                        /* 1.16 s */
         run(secs(0.5f));
         for (j = 0; j < 160; j++) {
             if (j == 40)

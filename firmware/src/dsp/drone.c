@@ -42,13 +42,13 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     VOICE_PARAMS(5700, 33, DR_IV_UNISON + 9, 15, 680, 61, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
     {"Cross-mod", 0, DR_XMOD_OUT, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 100, 8}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
-    {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 42}, {"Drift", 0, 100, 30},
-    {"Stereo", 0, 100, 60}, {"Tune", -50, 50, 0},
+    {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 0}, {"Fade", 0, 100, 25}, {"Drift", 0, 100, 30},
+    {"Stereo", 0, 100, 60}, {"Tune", -130, 130, 0},
     {"Pulse", 0, 1, 1}, {"Rate", 0, 100, 6}, {"Depth", 0, 100, 40}, {"Shape", -100, 100, -25}, {"Swing", 0, 50, 0},
     {"Time", 0, DR_DLY_TMAX, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
     {"Type", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Delay mod", -100, 100, 20},
     {"LFO lock", 0, 1, 0}, {"Speed mod", -100, 100, 0}, {"Source", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
-    {"Morph", 0, 100, 47}, {"Scene time", 0, 100, 63}, {"II out", 0, 1, 0}, {"Speaker", 0, 100, 0},
+    {"Morph", 0, 100, 21}, {"Scene time", 0, 100, 48}, {"II out", 0, 1, 0}, {"Speaker", 0, 100, 0},
     {"Pitch lock", 0, 1, 1}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
     {"Wander", 0, 100, 0}, {"Age", 0, 100, 0}, {"Shift move", 0, 2 * DR_SHIFT_MID, 2 * DR_SHIFT_MID}, {"Scale", 0, DR_NWSCALE - 1, 0},
     {"D5 depth", 0, 100, 70}, {"E5 depth", 0, 100, 100}, {"F5 depth", 0, 100, 100}, {"G5 depth", 0, 100, 70},
@@ -60,6 +60,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"G4 latch", 0, 100, 0}, {"A4 latch", 0, 100, 0}, {"B4 latch", 0, 100, 0}, {"C5 latch", 0, 100, 0},
     {"Sub wave", 0, DR_NSUBW - 1, DR_SUBW_SQUARE}, {"Sub wave", 0, DR_NSUBW - 1, DR_SUBW_SQUARE},
     {"Tuning", 0, DR_NTUNING - 1, DR_TUN_12},
+    {"Sync", 0, 1, 1},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
 const char *const DR_DIV_NAME[DR_NDIV] = {"32 bars", "16 bars", "8 bars", "4 bars", "2 bars", "1 bar", "1/2", "1/4"};
@@ -376,6 +377,19 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, DR_SUBW_NAME[(unsigned)v < DR_NSUBW ? v : 0]);
     else if (i == P_TUNING)
         copy_s(b, DR_TUNING_NAME[(unsigned)v < DR_NTUNING ? v : 0]);
+    else if (i == P_CLK_SYNC)
+        copy_s(b, v ? "On" : "Off");
+    else if (i == P_TUNE) {                   /* A in Hz: "432Hz", "432.5Hz" */
+        const int d = 4400 + v;
+        itoa_s(d / 10, b);
+        while (*b)
+            b++;
+        if (d % 10) {
+            *b++ = '.';
+            *b++ = (char)('0' + d % 10);
+        }
+        copy_s(b, "Hz");
+    }
     else if (i == P_PULSE_DIV)
         copy_s(b, DR_DIV_NAME[(unsigned)v < DR_NDIV ? v : 2]);
     else if (i == P_LFO_DIV)
@@ -454,8 +468,7 @@ void dr_param_text(int i, int v, char *b)
         copy_s(b, TAP[(unsigned)v < 4u ? v : 1]);
     else if (i == P_MORPH || i == P_FADE || i == P_SCENE_T) {
         /* a time: "0.62s", "4.2s", "25s", "2m30" */
-        float t = i == P_MORPH ? 0.02f * fm_exp2f((float)v * 0.105507f)
-                : i == P_FADE ? 0.05f * fm_exp2f((float)v * 0.102288f) : 0.1f * fm_exp2f((float)v * 0.115507f);
+        float t = dr_time_s(i, v);
         secs_text(t, b);
     } else if (i == P_GLIDE) {                     /* "Off", "2.5s": 0 .. 10 s, quadratic (QA 2026-10-20: it showed "50") */
         if (!v)
@@ -519,7 +532,7 @@ void dr_param_text(int i, int v, char *b)
     } else if (gp == GP_SUBOCT)
         copy_s(b, v == 6 ? "-4 oct" : v == 5 ? "-3 oct" : v == 4 ? "1/5" : v == 3 ? "1/3" : v == 2 ? "-2 oct" : "-1 oct");
     else {
-        if ((i == P_TUNE || i == P_PLINK_OFF || i == P_DLY_LFO_DEPTH || i == P_LFO_RMOD || gp == GP_OLFO_DEPTH || gp == GP_FLFO_DEPTH) && v > 0)
+        if ((i == P_PLINK_OFF || i == P_DLY_LFO_DEPTH || i == P_LFO_RMOD || gp == GP_OLFO_DEPTH || gp == GP_FLFO_DEPTH) && v > 0)
             *b++ = '+';
         itoa_s(v, b);
     }
@@ -727,7 +740,7 @@ static float rnd(void)                            /* -1..1 */
 
 static float fade_rate(void)                      /* per sample: 0.05 s * 1200^(v/100) for a full fade */
 {
-    float s = 0.05f * fm_exp2f((float)par[P_FADE] * 0.102288f);
+    float s = dr_time_s(P_FADE, par[P_FADE]);
     return 1.0f / (s * DR_SR);
 }
 
@@ -1634,7 +1647,7 @@ static inline float xosc(int wi, float wf, float ph, float dt, float pw)
  * The filter mode crossfades, the partner and cross-mod fade, the pulse deepens or eases out, an LFO route
  * crossfades from its old wave to its new one, a destination from one to the other; the sub's octave and
  * hard sync, which can't blend, dip out and come back changed. Stopped, all of it is where it's set. */
-static float morph_s(void) { return 0.02f * fm_exp2f((float)par[P_MORPH] * 0.105507f); }    /* 30 s at 100 */
+static float morph_s(void) { return dr_time_s(P_MORPH, par[P_MORPH]); }    /* 30 s at 100 */
 static inline float toward(float x, float t, float step)
 {
     return x < t ? fm_minf(x + step, t) : fm_maxf(x - step, t);
@@ -1826,7 +1839,8 @@ static void render_group(int g, uint32_t n)
      * so it can't sit half a cycle out and cancel it (it did: -20 dB, depending on what came before), and
      * Drift's wanders don't beat them. Any Detune lets it go. */
     const int plock = !v->ovon && iv == DR_IV_UNISON && pv[GP_DETUNE] < 0.5f;
-    const float tune = (float)par[P_TUNE] * 0.01f, target = (float)p[GP_PITCH] * 0.01f;
+    const float tune = 12.0f * fm_log2f(1.0f + (float)par[P_TUNE] * (1.0f / 4400.0f)),   /* A in Hz, as semitones */
+                target = (float)p[GP_PITCH] * 0.01f;
     /* the cutoff, 0..1000 = log2 20 .. log2 18000 */
     const float cut_t = 4.32192809f + pv[GP_CUTOFF] * 0.00981378f;
     /* the links, on drone II: hard sync, pitch link, cross-mod (12 octaves a unit of drone I's sound, at
@@ -2247,6 +2261,18 @@ static float pulse_gain(float ph, float depth, float shape, float b1, float hz)
     }
     o = fm_clampf(0.5f * fm_sinf(FM_TWO_PI * f) / (1.0f + 0.98f * shape) + 0.5f, 0.0f, 1.0f);
     return 1.0f - depth * (1.0f - o);
+}
+/* THE TIME KNOBS (Setup 1): a power of the dial over each one's range, so most of it is for slow changes, a drone's
+ * (Evan, 2026-11-07: an exponential curve gave 40 % of it to under a second): Fade 0.05 .. 60 s (a cube), Morph 0.02
+ * .. 30 s (x^2.5), Scene time 0.1 s .. 5 min (x^4), 1 s near 25 on each. Saved ones converted (PROJ_FORMAT 41) */
+float dr_time_s(int p, int v)
+{
+    const float x = fm_clampf((float)v * 0.01f, 0.0f, 1.0f), x2 = x * x;
+    if (p == P_FADE)
+        return 0.05f + 59.95f * x2 * x;
+    if (p == P_MORPH)
+        return 0.02f + 29.98f * x2 * fm_sqrtf(x);
+    return 0.1f + 299.9f * x2 * x2;
 }
 float dr_pulse_wave(float ph)
 {

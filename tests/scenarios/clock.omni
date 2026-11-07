@@ -95,3 +95,20 @@ tapkey w0
 wait 100
 expect morphms >7100
 expect morphms <9700
+# SYNC OFF (Setup 1 KNOB 4, v0.3): the clock ignored, its tempo forgotten at once, a Start too; on again, it follows
+# (parameter 111, Sync)
+clock 120
+wait 1500
+expect clkfollow 1
+set 111 0
+wait 100
+expect clkfollow 0
+wait 2000
+expect clkfollow 0
+midi FA 0 0
+wait 100
+expect clkfollow 0
+set 111 1
+wait 1500
+expect clkfollow 1
+expect clkbpm 1200

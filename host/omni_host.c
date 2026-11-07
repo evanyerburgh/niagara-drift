@@ -454,6 +454,8 @@ static int expect(const char *what, const char *val)
     }
     else if (!strcmp(what, "morphms"))            /* the scene change going on: its length, ms */
         got = (int)ui.morph_ms;
+    else if (!strcmp(what, "clkfollow"))          /* the engine on a clock's tempo (1) or free (0) */
+        got = dr_ext_spb > 0.0f;
     else if (!strcmp(what, "clkbpm"))             /* the MIDI clock in: its tempo x 10 */
         got = (int)(clk.bpm * 10.0f + 0.5f);
     else if (!strcmp(what, "clkjit"))             /* ... its jitter (RMS), us */

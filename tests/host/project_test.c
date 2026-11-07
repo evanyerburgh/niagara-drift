@@ -86,7 +86,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 40, on bank A", proj.format == 40u && PROJ_FORMAT == 40u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 41, on bank A", proj.format == 41u && PROJ_FORMAT == 41u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -533,19 +533,23 @@ int main(void)
                                                  scene_has(0, 1) && scene_has(1, 2));
         check("... the Tuning 12-tone, no offsets (39, 2026-10-30)", proj.par[P_TUNING] == DR_TUN_12 &&
               scene_get(1, 2)[P_TUNING] == DR_TUN_12 && !proj.tun_off[0] && !proj.tun_off[1] && !proj.tun_off[2]);
-        check("... and saved as 40", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 40u &&
-                                     ((const bank_t *)store[OBJ_BANKB])->format == 40u);
+        check("... and saved as 41", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 41u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 41u);
     }
     {   /* 40: the Tunings reordered, simplest to richest (Evan, 2026-10-30): a 39 sound keeps its Tuning */
-        project_t o;
-        bank_t bb;
+        static proj_v40_t o;
+        static bank_v40_t bb;
         int i, k;
         memset(store_n, 0, sizeof store_n);
         project_defaults();
-        o = proj;
+        memset(&o, 0, sizeof o);
+        o.magic = PROJ_MAGIC;
         o.format = 39u;
+        o.mtime = MTIME_DEF;
+        for (k = 0; k < NP40; k++)
+            o.par[k] = dr_param_info(k)->def;
         o.par[P_TUNING] = 6;                           /* 39's LMY */
-        for (k = 0; k < DR_NPARAMS; k++)
+        for (k = 0; k < NP40; k++)
             o.scene[0][k] = dr_param_info(k)->def;
         o.scene_used = 0x001u;
         o.scene[0][P_TUNING] = 8;                      /* 39's Shruti */
@@ -556,7 +560,7 @@ int main(void)
         bb.format = 39u;
         bb.used = 1u << 1;
         for (i = 0; i < NSCENES; i++)
-            for (k = 0; k < DR_NPARAMS; k++)
+            for (k = 0; k < NP40; k++)
                 bb.scene[i][k] = dr_param_info(k)->def;
         bb.scene[1][P_TUNING] = 7;                     /* 39's Harmonics */
         memcpy(store[OBJ_BANKB], &bb, sizeof bb);
@@ -565,8 +569,46 @@ int main(void)
         check("... each keeps its Tuning: LMY, Shruti, Harmonics", proj.par[P_TUNING] == DR_TUN_LMY &&
               scene_get(0, 0) && scene_get(0, 0)[P_TUNING] == DR_TUN_SHRUTI && scene_get(1, 1) &&
               scene_get(1, 1)[P_TUNING] == DR_TUN_HARM);
-        check("... and saved as 40", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 40u &&
-                                     ((const bank_t *)store[OBJ_BANKB])->format == 40u);
+        check("... and saved as 41", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 41u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 41u);
+    }
+    {   /* 41: Tune in Hz, Sync (Evan, 2026-11-01): a 40 Tune in cents becomes the nearest 0.1 Hz; Sync on */
+        static proj_v40_t o;
+        static bank_v40_t bb;
+        int i, k;
+        memset(store_n, 0, sizeof store_n);
+        project_defaults();
+        memset(&o, 0, sizeof o);
+        o.magic = PROJ_MAGIC;
+        o.format = 40u;
+        o.mtime = MTIME_DEF;
+        for (k = 0; k < NP40; k++)
+            o.par[k] = dr_param_info(k)->def;
+        o.par[P_TUNE] = -32;                           /* ~432 Hz, as players set it */
+        o.tun_off[1] = 7;
+        for (k = 0; k < NP40; k++)
+            o.scene[0][k] = dr_param_info(k)->def;
+        o.scene_used = 0x001u;
+        o.scene[0][P_TUNE] = 50;
+        memcpy(store[OBJ_PROJ], &o, sizeof o);
+        store_n[OBJ_PROJ] = (int)sizeof o;
+        memset(&bb, 0, sizeof bb);
+        bb.magic = BANK_MAGIC;
+        bb.format = 40u;
+        bb.used = 1u << 3;
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < NP40; k++)
+                bb.scene[i][k] = dr_param_info(k)->def;
+        bb.scene[3][P_TUNE] = -50;
+        memcpy(store[OBJ_BANKB], &bb, sizeof bb);
+        store_n[OBJ_BANKB] = (int)sizeof bb;
+        check("a format-40 project loads", project_load() == 0 && proj.format == PROJ_FORMAT);
+        check("... Tune -32 cents is 431.9 Hz, +50 452.9, -50 427.5", proj.par[P_TUNE] == -81 &&
+              scene_get(0, 0)[P_TUNE] == 129 && scene_get(1, 3)[P_TUNE] == -125);
+        check("... Sync on, the fine tuning kept", proj.par[P_CLK_SYNC] == 1 && scene_get(1, 3)[P_CLK_SYNC] == 1 &&
+                                                   proj.tun_off[1] == 7);
+        check("... and saved as 41", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 41u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 41u);
     }
     printf("project: %s\n", fails ? "FAILED" : "all ok");
     return fails != 0;

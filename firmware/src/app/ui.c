@@ -69,7 +69,7 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{0, GP_INTERVAL}, {0, GP_DETUNE}, {1, GP_INTERVAL}, {1, GP_DETUNE}},
     {{G, P_SHIFT_MOVE}, {G, P_GLIDE}, {G, P_WANDER}, {G, P_WSCALE}},   /* Shift's move, Glide; Wander, its scale */
     /* GLO: the room's settings only, none in a sound (Evan, 2026-10-18): the times, then the unit and the room */
-    {{G, P_FADE}, {G, P_MORPH}, {G, P_SCENE_T}, {NONE, 0}},
+    {{G, P_FADE}, {G, P_MORPH}, {G, P_SCENE_T}, {G, P_CLK_SYNC}},   /* Sync on KNOB 4 (v0.3) */
     {{G, P_TUNING}, {G, P_TUNE}, {G, P_WIDTH}, {G, P_PRESS_SENS}},   /* Tuning and Tune side by side (2026-11-01) */
     {{G, P_PULSE_RATE}, {G, P_PULSE_DEPTH}, {G, P_PULSE_SHAPE}, {G, P_PULSE_SWING}},
     /* FX (v0.3): the delay with the drive after it; the reverb, its type on KNOB 3. Each page's KNOB 4 has a second
@@ -443,7 +443,7 @@ static void cont_turn(int p, int role, int32_t s)
     {   /* cutoff and resonance run 0..1000, Shift's move in cents: a detent is 10, with SEL held 1 (fine, as a
          * pitch's cent) */
         int gp = p < P_XMOD ? p % GP_N : -1;
-        if (gp == GP_CUTOFF || gp == GP_RESO || p == P_SHIFT_MOVE) {
+        if (gp == GP_CUTOFF || gp == GP_RESO || p == P_SHIFT_MOVE || p == P_TUNE) {   /* Tune: 1 Hz, with SEL 0.1 */
             if (ui.btn >> B_SEL & 1u) {
                 ui.btn_used |= 1u << B_SEL;
                 steps = (int)s;
@@ -484,7 +484,8 @@ static void depth_hint(int p)
 static int knob_list(int p)
 {
     return p == P_DLY_TYPE || p == P_REV_TYPE || p == P_DLY_ROUTE || p == P_WSCALE || p == P_SUBW_0 || p == P_SUBW_1 ||
-           p == P_TUNING || p == P_LFO_RMOD_SRC;   /* Mods' Source: I, II, I+II, I again (Evan, 2026-11-03) */
+           p == P_TUNING || p == P_LFO_RMOD_SRC ||   /* Mods' Source: I, II, I+II, I again (Evan, 2026-11-03) */
+           p == P_CLK_SYNC;                    /* Sync: On, Off, On */
 }
 
 static void knob_turn(int i, int32_t e)
@@ -515,6 +516,10 @@ static void knob_turn(int i, int32_t e)
         int n = in->hi - in->lo + 1, v = (proj.par[p] - in->lo + (e > 0 ? 1 : -1)) % n;
         param_set(p, in->lo + (v < 0 ? v + n : v));
         loop_note(p, proj.par[p], 0);
+        if (p == P_TUNING)                             /* a new Tuning: SEL's fine tuning let go, the knobs land on
+                                                        * its own notes (Evan, 2026-11-07: an offset set against one
+                                                        * Tuning's notes means nothing on another's) */
+            memset(proj.tun_off, 0, sizeof proj.tun_off);
     } else {
         param_set(p, proj.par[p] + accel(EN_K1 + i, e, dr_param_info(p)->hi - dr_param_info(p)->lo));
         loop_note(p, proj.par[p], 0);
@@ -719,7 +724,7 @@ static void page_up(int b)
     ui.hold_btn = -1;
 }
 
-static float morph_ms(void) { return 20.0f * fm_exp2f((float)proj.par[P_MORPH] * 0.105507f); }
+static float morph_ms(void) { return 1000.0f * dr_time_s(P_MORPH, proj.par[P_MORPH]); }
 
 /* OCT- / OCT+: the LFO's two waves (v0.2): a tap is the next shape, round and round (Off, the seven, random,
  * AND, OR);
@@ -969,7 +974,7 @@ static int scene_step(int p)                           /* a value that steps (a 
 static int scene_room(int p)
 {
     return p == P_FADE || p == P_TUNE || p == P_SPEAKER || p == P_WIDTH || p == P_PLOCK || p == P_MORPH ||
-           p == P_SCENE_T || p == P_PRESS_SENS || p == P_SCENE_BARS || p == P_TUNING;
+           p == P_SCENE_T || p == P_PRESS_SENS || p == P_SCENE_BARS || p == P_TUNING || p == P_CLK_SYNC;
 }
 
 /* a scene's name: its bank's letter and its number ("B5"; the Presets "P2") */
@@ -1035,7 +1040,7 @@ static void scene_store(int n)                         /* SAVE held + a white ke
     save_ask(n);
 }
 
-static float fade_s(void) { return 0.05f * fm_exp2f((float)proj.par[P_FADE] * 0.102288f); }
+static float fade_s(void) { return dr_time_s(P_FADE, proj.par[P_FADE]); }
 static float clk_bar_frac(void);
 /* the Scene time, s. On a MIDI clock (v0.3): its bars (P_SCENE_BARS), ending on a bar line: the rest of this bar and
  * the bars after it (less than half a bar left of this one: a bar more) */
@@ -1048,7 +1053,7 @@ static float scene_s(void)
             bars += 1.0f;
         return bars * 4.0f * dr_ext_spb * (1.0f / DR_SR);
     }
-    return 0.1f * fm_exp2f((float)proj.par[P_SCENE_T] * 0.115507f);
+    return dr_time_s(P_SCENE_T, proj.par[P_SCENE_T]);
 }
 
 #define VISIT_BACK NSCENES                     /* the morph's target: ui.visit_back (a visit's way back, an undo) */
@@ -1440,6 +1445,17 @@ static void clk_feed(void)
     uint32_t now = plat_ms();
     float iv, f;
     char a[24];
+    if (!proj.par[P_CLK_SYNC]) {                /* Sync off (Setup 1): the clock ignored, its tempo forgotten, the
+                                                 * Swell, LFO, delay and Scene time on their knobs (Evan, 2026-11-01) */
+        if (clk.n || clk.following || dr_ext_spb > 0.0f) {
+            clk.n = 0;
+            clk.following = 0;
+            clk.shown = 0;
+            dr_ext_spb = 0.0f;
+            dr_ext_seq++;
+        }
+        return;
+    }
     if (clk.following && now - clk.last_ms > CLK_LOST_MS) {    /* lost: said once, the Swell carries on */
         clk.following = 0;
 #ifndef OM_CLOCK_TEST
@@ -1525,6 +1541,8 @@ static void midi_in(void)
     uint32_t pkt, us;
     while (plat_midi_in(&pkt, &us)) {
         uint32_t st = (pkt >> 8) & 0xFFu, n = (pkt >> 16) & 0x7Fu, v = pkt >> 24;
+        if (st >= 0xF8u && !proj.par[P_CLK_SYNC])   /* Sync off: no clock, no Start */
+            continue;
         if (st == 0xF8u) {
             clk_pulse(us);
             continue;

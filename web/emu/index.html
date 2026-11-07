@@ -551,8 +551,8 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">GLO</div>
         <div class="pstack">
-        <div class="g-page"><i>Setup 1</i><span class="k both"><span class="sr">Knob 1: </span>Fade<small>PLAY’s fade</small></span><span class="k both"><span class="sr">Knob 2: </span>Morph<small>black keys, LFO waves</small></span><span class="k both"><span class="sr">Knob 3: </span>Scene time<small>between scenes</small></span><span class="k both none"><span class="sr">Knob 4: </span>–</span></div>
-        <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Tuning<small>the pitch knobs’ notes</small></span><span class="k both"><span class="sr">Knob 2: </span>Tune<small>±50 cents</small></span><span class="k both"><span class="sr">Knob 3: </span>Stereo<small>width</small></span><span class="k both"><span class="sr">Knob 4: </span>Pressure<small>light ↔ firm</small></span></div>
+        <div class="g-page"><i>Setup 1</i><span class="k both"><span class="sr">Knob 1: </span>Fade<small>PLAY’s fade</small></span><span class="k both"><span class="sr">Knob 2: </span>Morph<small>black keys, LFO waves</small></span><span class="k both"><span class="sr">Knob 3: </span>Scene time<small>between scenes</small></span><span class="k both"><span class="sr">Knob 4: </span>Sync<small>MIDI clock on / off</small></span></div>
+        <div class="g-page"><i>Setup 2</i><span class="k both"><span class="sr">Knob 1: </span>Tuning<small>the pitch knobs’ notes</small></span><span class="k both"><span class="sr">Knob 2: </span>Tune<small>A in Hz, 427–453</small></span><span class="k both"><span class="sr">Knob 3: </span>Stereo<small>width</small></span><span class="k both"><span class="sr">Knob 4: </span>Pressure<small>light ↔ firm</small></span></div>
         </div>
       </div>
     </div>
@@ -743,7 +743,7 @@ function hit(c, cls) {
 // what each control does, on hover (the Buttons list below says the same)
 const TIP = { FX: "Delay: drive, time, repeats, mix; SEL + KNOB 4: the delay type (again: Reverb: length to Inf, damp, type, mix; SEL + KNOB 4: what goes into it)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
   ENV: "Life: feedback, drift, character, age (again: Tone: noise and its color, white to pink); hold to peek", LFO: "LFO sends: each drone's pitch and cutoff sends; the keys pick the routing (again: Mods: speed mod, source, delay mod, cross-mod)",
-  EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, with SEL the sub's wave; drive); hold to peek", GLO: "Setup 1: fade, switch time, scene time (again: Setup 2: tune, stereo width, pressure, tuning)",
+  EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, with SEL the sub's wave; drive); hold to peek", GLO: "Setup 1: fade, morph, scene time, sync (again: Setup 2: tuning, tune, stereo width, pressure)",
   HOME: "Drones 1: pitch, cutoff (again: Drones 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in bank A, B or C)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
   PLAY: "Drones in / out (with SEL: drone II alone)", REC: "Motion loop: tap to record knob moves, gestures and scenes, again to loop, again to stop", "OCT-": "LFO I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "Gesture time: how long every gesture takes, left slower, right faster", ALGORITHM: "Movement: every LFO depth together",

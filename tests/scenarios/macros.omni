@@ -11,7 +11,7 @@ tapkey w12
 release SEL
 expect bank 0
 # scenes switch in ~4 s here (the Scene time at 46; ~15 s on a new FM-1 since 2026-10-25)
-set 71 46
+set 71 34
 tap PLAY
 wait 1000
 expect heard7 700

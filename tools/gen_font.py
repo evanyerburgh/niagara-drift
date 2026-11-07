@@ -35,6 +35,8 @@ FONTSETS = {
                ("N2", "BarlowSemiCondensed-SemiBold.ttf", 21, 1, False, 32, 126),
                ("U1", "BarlowSemiCondensed-Bold.ttf", 16, 1, False, 32, 126),
                ("U2", "BarlowSemiCondensed-SemiBold.ttf", 13, 1, False, 32, 126),
+               ("U3", "BarlowSemiCondensed-SemiBold.ttf", 12, 1, False, 72, 115),   # a long Tuning's name: "Harmonics"
+               # alone needs it, so H .. s only (the full set was 5.7 KB of flash)
                ("H22", "BarlowSemiCondensed-Bold.ttf", 22, 1, False, 32, 126),
                ("T22", "BarlowSemiCondensed-Medium.ttf", 22, 1, False, 32, 126),
                ("T20", "BarlowSemiCondensed-Medium.ttf", 20, 1, False, 32, 126),

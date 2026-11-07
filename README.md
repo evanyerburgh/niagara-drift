@@ -149,7 +149,7 @@ made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE
 
 | | |
 |---|---|
-| **White key** 1–8 (F3–F4): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Pitch lock, Fade, Switch time and Scene time stay as they are |
+| **White key** 1–8 (F3–F4): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Tuning, Sync, Pitch lock, Fade, Morph and Scene time stay as they are |
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where you were ("A5 BACK"). **Tap SEL** while holding and the blend stays right there ("A5 40% KEPT"), however you press after; let go when you like. It's a sound of its own between the two (SEL + SAVE takes you back to where you were before it) |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **SEL + SAVE** | **undo**: back to the sound before your last scene tap or blend, gliding over the Scene time (a knob turned since goes back too; the room's settings, such as Stereo or the Scene time, stay). Again, and it goes forward to where you were. Keep SEL down until you've let go of SAVE |
@@ -250,7 +250,10 @@ glides: a slow turn is a smooth sweep, never steps; turn faster to go further. T
 - **Turning a pitch knob** moves it a note of the **Tuning** a click (Setup 2, KNOB 1; semitones to start), however
   far apart the Tuning's notes are, and the screen shows the note it's going to. It glides from note to note, so a
   steady turn is one slide. **SEL** held, the knob moves a cent at a time: that's how to tune a drone a little sharp
-  or flat, and the knob keeps it there, so +3 cents over one note moves to +3 over the next. With Pitch link on,
+  or flat, and the knob keeps it there, so +3 cents over one note moves to +3 over the next (until you change the
+  Tuning, which lets it go: the knobs land on the new Tuning's own notes). While a pitch knob turns, the "fine" tag
+  over it says how far it's off the Tuning's notes ("fine +3"), since on the other Tunings the notes have cents of their
+  own. With Pitch link on,
   drone II's knob turns the gap between the drones, a step of the Tuning's intervals a click.
 - **MASTER**: past about four-fifths of its turn it drives into overdrive, at about the same loudness: thicker,
   but the breathing flattens (the swells and dips get much smaller).
@@ -377,7 +380,7 @@ pink specks are as many as Color says.
 
 #### Swell · ARP
 
-<img src="docs/img/page-swell.png" width="244" alt="The Swell page: a bar of the Swell's two breaths as strands meeting at a dot">
+<img src="docs/img/page-swell.png" width="244" alt="The Swell page: two bars of the Swell, four breaths, as strands meeting at a dot">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
@@ -442,20 +445,26 @@ pink specks are as many as Color says.
 
 #### Setup · GLO
 
-<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, morph and scene times; the Tuning, tune, stereo width and the keys' pressure">
+<img src="docs/img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, morph and scene times and Sync; the Tuning's ring, Tune in Hz, the stereo width and the keys' pressure">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Setup 1 | fade | morph | scene time | |
+| Setup 1 | fade | morph | scene time | sync |
 | Setup 2 | tuning | tune | stereo | pressure |
 
 Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't change it.
 
+- Each knob gives most of its turn to slow times, a second about a quarter of the way.
 - **Fade** is how long PLAY takes (up to 60 s); **Morph** is how long a black key or a new LFO wave (OCT) takes
   to move the sound to its new setting (0.02–30 s); **Scene time** is how long every scene move takes: a tap, a
-  crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about 15 s to start).
-- **Tune** moves everything up or down by up to 50 cents. **Stereo** spreads the drones from mono to drone I
-  left, drone II right.
+  crossfade pressed all the way in at once, and the way back (0.1 s to 5 minutes; about 15 s to start). The picture
+  is a row for each, its knob's whole range across it: the fade a line up from silence, Morph and the scenes a
+  crossfade (a out, b in), each change ending where its knob is (a dot there while you turn it).
+- **Sync** (KNOB 4): **On** follows a MIDI clock (see MIDI below), **Off** ignores it, so the Swell, the LFO, the
+  delay, Wander and the Scene time run on their own knobs again. Under it, what the clock is doing: "no clock",
+  "120 BPM", "keeps 120" (stopped or unplugged, at the last tempo) or "free time" (off).
+- **Tune** is A's pitch in Hz, from 427 to 453 (440 to start): 1 Hz a click, 0.1 with SEL held ("432Hz").
+  **Stereo** spreads the drones from mono to drone I left, drone II right.
 - **The speaker** gets a low cut (about 120 Hz) for the deep bass it can't play, so it doesn't waste its loudness
   there. It's automatic: plug in headphones and the cut goes out, unplug and it comes back.
 - **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
@@ -465,12 +474,18 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
   in each octave: the drones as notes of one harmonic series), **LMY**: La Monte Young's tuning for The Well-Tuned
   Piano (built on 3s and 7s, with its septimal intervals), **Harrison**: Lou Harrison's tuning for his National Steel
   guitar (11-limit), the 22 **Shrutis** of Indian music, or **Partch**: Harry Partch's 43 notes to the octave
-  (11-limit): the equal ones by size, then the rest simplest to richest. The knob goes round both ways. The picture shows an octave of it, a tick a note.
+  (11-limit): the equal ones by size, then the rest simplest to richest. The knob goes round both ways.
+  - **The picture** is the Tuning and Tune as one ring: an octave clockwise, a tick a note, A named on its tick, and
+    Tune turning the ring away from the small mark at the top (440). Inside, how many notes and, on the pure ones,
+    where their 1/1 is (LMY on C, Harrison and Partch on G, Harmonics on A, Just and Shruti on drone I), its tick the
+    long white one. The
+    interval between the drones is on Drones 1. Beside it Stereo, the drones' two waves as far apart as it puts them, and Pressure, what a press gives from light
+    to firm, with the key you're pressing on it ("[C4] 62%").
   - **Just and Shruti move with drone I**, as just intonation does (a movable do; drone I is do, or Sa): drone I's
     knob picks the tonic in semitones, and drone II's knob, Pitch link, Wander and Chord are pure over it, wherever it
     is.
-  - **The others are built on A**, so Tune moves them (at −32 cents A is 432 Hz). LMY, Harrison and Partch are placed
-    as in Ableton's tuning files, with A at 440 one of their notes (Partch's own, G at 392 Hz, is Tune +4).
+  - **The others are built on A**, so Tune moves them (432Hz for A at 432). LMY, Harrison and Partch are placed
+    as in Ableton's tuning files, with A at 440 one of their notes (Partch's own, G at 392 Hz, is Tune 441Hz).
   - **Wander and Chord follow it too.** On 12-tone and Quarter they're as they've always been (Chord pure). On the
     other 12-note Tunings (Just, LMY, Harrison) Wander's scale plays the same keys, so a minor pentatonic on LMY takes
     LMY's own intervals; on the rest, each note is the Tuning's nearest to the pure interval (a 31-tone minor third is
@@ -563,7 +578,8 @@ beats it locks ("120 BPM · SWELL ON CLOCK"), and then:
 They follow the clock's beat however long it runs: a wobbly clock's tempo is smoothed, and nothing can drift from it.
 **Start** (playing from the top) brings the Swell and the LFO back to their tops. While synced, scenes leave the
 Swell's on / off and its division alone. When the clock stops, everything carries on at the last tempo ("CLOCK
-STOPPED · KEEPS 120"). In Logic: File → Project Settings → Synchronization → MIDI, tick Clock for the FM-1.
+STOPPED · KEEPS 120"). To get free time back, or to keep a clock out, turn **Sync** off (Setup 1, KNOB 4).
+In Logic: File → Project Settings → Synchronization → MIDI, tick Clock for the FM-1.
 
 ### Trying it in the browser
 

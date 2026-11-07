@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): Setup 1 and 2 (v0.3): Sync off on a running clock (the Swell back on
+# its own Rate), on again; Tune at 432 Hz, then 0.1 Hz steps with SEL; its pages' screens. Rendered by this branch and
+# by main (a new script: listed, then compared from the next PR on). Not a test of its own (no expectations).
+pressure w0 0
+pressure w1 0
+pressure w2 0
+pressure w3 0
+pressure w4 0
+pressure w5 0
+pressure w6 0
+pressure w7 0
+pressure w8 0
+pressure w9 0
+pressure w10 0
+pressure w11 0
+notips
+tap PLAY
+wait 1500
+tap GLO
+wait 300
+clock 120 1
+wait 3000
+wav setup.wav
+wait 4000
+shot setup1.png
+spin K4 1
+wait 6000
+spin K4 1
+wait 4000
+tap GLO
+wait 300
+spin K2 -8
+wait 3000
+press SEL
+spin K2 3
+release SEL
+wait 3000
+shot setup2.png
+clock 0
+wait 2000
+wavstop

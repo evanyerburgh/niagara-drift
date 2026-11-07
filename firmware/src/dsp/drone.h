@@ -80,11 +80,12 @@ enum {
     P_LFO_W2,                       /* Wave II: 0 off, 1..10 (DR_LFO_W2_NAME) (a switch) */
     P_GLIDE,                        /* 0..100 = 0 .. 10 s to reach a new pitch (quadratic); 0 by default: a pitch
                                      * knob answers at once */
-    P_FADE,                         /* 0..100 = 0.05 .. 60 s, the PLAY fade and the drone fades */
+    P_FADE,                         /* 0..100 = 0.05 .. 60 s (a cube: 1 s at 25), the PLAY fade and the drone fades */
     P_DRIFT,                        /* 0..100: DRIFT, the drones never quite still: pitch (+-8 cents), and slow
                                      * random wanders of each drone's cutoff, X-WAVE, level and detune */
     P_WIDTH,                        /* stereo: 0 mono .. 100 drone I left, drone II right */
-    P_TUNE,                         /* cents, -50..50 */
+    P_TUNE,                         /* A's pitch in tenths of a Hz from 440: -130..130 = 427.0 .. 453.0 Hz (v0.3, Evan
+                                     * 2026-11-01; cents, -50..50, before PROJ_FORMAT 41) */
     P_PULSE,                        /* the PULSE on (1) / off (0): both drones chopped in time (a switch) */
     P_PULSE_RATE,                   /* 0..100 = 0.03 .. 16 pulses a second, exponential (a 33 s breath .. a buzz) */
     P_PULSE_DEPTH,                  /* 0..100: how far the level drops between pulses */
@@ -104,10 +105,10 @@ enum {
                                      * runs free (0) (a switch) */
     P_LFO_RMOD,                     /* -100..100: the LFO's own wave moving its rate, up to +-3 octaves (linear); 0 none */
     P_LFO_RMOD_SRC,                 /* which wave moves it: DR_LFO_I, _II, _BOTH */
-    P_MORPH,                        /* 0..100 = 0.02 .. 30 s: how long a switch (a button or key) takes to move
+    P_MORPH,                        /* 0..100 = 0.02 .. 30 s (x^2.5: 1 s at 25): how long a switch (a button or key) takes to move
                                      * the sound to its new setting: OCT, filter mode, pulse, partner, sub, the
                                      * links, the LFO routes */
-    P_SCENE_T,                      /* 0..100 = 0.1 s .. 5 min: a scene's morph (the white keys) */
+    P_SCENE_T,                      /* 0..100 = 0.1 s .. 5 min (x^4: 1 s at 23): a scene's morph (the white keys) */
     P_II_OUT,                       /* drone II faded out on its own (1; SEL + PLAY), a sound's (P12 Clean: one
                                      * oscillator); was Tuning until 30, 0 since */
     P_SPEAKER,                      /* 0..100: a low cut for a small speaker, 0 off (headphones) .. 240 Hz */
@@ -152,6 +153,8 @@ enum {
                                           * each as loud (RMS) as the square (v0.3, Evan 2026-10-28) */
     P_TUNING,                       /* where a pitch knob lands when it stops (DR_TUNING_NAME, the UI's; a room setting,
                                      * v0.3, Evan 2026-10-30): 0 12-tone .. 8 the 22 shrutis */
+    P_CLK_SYNC,                     /* follow a MIDI clock (1, as since v0.3's step 3) or not (0: the clock ignored, its
+                                     * tempo forgotten); a room setting (v0.3, Evan 2026-11-01, ledger item 5) */
     DR_NPARAMS
 };
 
@@ -278,6 +281,8 @@ float dr_lfo_wave(int tap, int shape, float ph);   /* a tap's shape (1..10; 0 of
                                                     * random, ph 0..1 the last cycle, 1..2 this one */
 float dr_lfo_rmod_k(float rm, int src, int w1, int w2);  /* rate mod's speed scale (the screen's picture) */
 float dr_pulse_wave(float ph);                 /* the pulse's gain at ph (0..2) as set now, 0..1 */
+float dr_time_s(int p, int v);                 /* Fade, Morph, Scene time at v, seconds (v0.3: a power curve, 1 s
+                                                * near a quarter of the dial; Evan, 2026-11-07) */
 float dr_pulse_hz(int v);                      /* breaths a second at Rate v, or now (-1: the Rate, or the clock's) */
 /* Age and Character at full (Evan, 2026-11-02: "stronger"; the pictures on Life read them too) */
 #define AGE_CUT -250                    /* Age: the cutoff, of its 1000, about 2.5 octaves darker (was -70) */
