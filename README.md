@@ -153,7 +153,7 @@ made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where you were (the header: "→ A5"). **Tap SEL** while holding and the blend stays right there ("A5 40% KEPT"), however you press after; let go when you like. It's a sound of its own between the two (SEL + SAVE takes you back to where you were before it) |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **SEL + SAVE** | **undo**: back to the sound before your last scene tap or blend, gliding over the Scene time (a knob turned since goes back too; the room's settings, such as Stereo or the Scene time, stay). Again, and it goes forward to where you were. Keep SEL down until you've let go of SAVE |
-| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A, B or C) |
+| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; a scene on its way brightens its key as it glides in; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A, B or C) |
 | **SEL + a top white key** | picks the bank the 8 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
 | **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The gestures](#the-gestures)) |
 | **Keys 9–12** (G4–C5) | **gestures** too, by pressure: Tick, Chord, Snarl, Stutter (see [The gestures](#the-gestures)) |
@@ -212,12 +212,12 @@ knob you're turning.
 
 | | |
 |---|---|
-| **PLAY** | fade the drones in or out; **SEL + PLAY** fades drone II alone out or back in |
-| **OCT− / OCT+** | **LFO I** / **LFO II**: tap for the next shape, round and round; **SEL + OCT** for the one before. Each light pulses with its wave |
+| **PLAY** | fade the drones in or out; **SEL + PLAY** fades drone II alone out or back in. Stopped, PLAY breathes slowly (the one thing to press), and nothing else on the panel moves |
+| **OCT− / OCT+** | **LFO I** / **LFO II**: tap for the next shape, round and round; **SEL + OCT** for the one before. Each light pulses with its wave (stopped, it glows still) |
 | **SAVE** | save the sound, at once. While the drone plays, the sound dips out and back over about 50 ms around the write; SAVE glows dimly while something isn't written yet |
-| **SEL** (hold) | fine: a pitch knob moves in single cents, cutoff and resonance in tenths |
-| **ARP** (tap) | the Swell page, as the other page buttons open theirs (landing on it switches nothing). On the page, a tap switches the Swell on or off: both drones chopped in time, and the ARP light breathes with it. Hold ARP to peek at the page from anywhere, to set the Swell before you start it |
-| **REC** | tap to record your knob moves, gestures and scenes (tapped or blended by pressure), tap to loop them (your own keys still play on top), tap to stop (up to 5 minutes, the time shown by REC in the top bar; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
+| **SEL** (hold) | fine: a pitch knob moves in single cents, cutoff and resonance in tenths. SEL glows while it can keep what you're holding: a blend into a scene, or a gesture (tap it and it stays) |
+| **ARP** (tap) | the Swell page, as the other page buttons open theirs (landing on it switches nothing). On the page, a tap switches the Swell on or off: both drones chopped in time, and the ARP light breathes with it (stopped, it glows still). Hold ARP to peek at the page from anywhere, to set the Swell before you start it |
+| **REC** | tap to record your knob moves, gestures and scenes (tapped or blended by pressure), tap to loop them (your own keys still play on top), tap to stop (up to 5 minutes, the time shown by REC in the top bar; REC blinks once a second while it records, fast in its last 20 seconds; all four knobs turning fast for minutes fills it sooner, and it starts looping there, "FULL"; each pass glides back to the start) |
 
 ### Pages
 
@@ -531,11 +531,17 @@ depth that can't be heard says why on the screen (Movement at 0%, or its wave of
 
 ### Black keys: switches
 
-Lit means on. They follow the page: on the LFO pages they set the LFO's routing. Normally they're grouped
-by meaning: drone I (keys 1–3), the two global keys (4–5), drone II (6–8), the links (9–11).
+Dark means off, lit on. A key that goes round two or three choices that all play (the sub, the filter, an LFO
+send's wave and target) glows dimly on its first choice, is lit on the second and winks on a third, so dark always
+means off. They follow the page: on the LFO pages they set the LFO's routing. Normally they're grouped by meaning:
+drone I (keys 1–3), the two global keys (4–5), drone II (6–8), the links (9–11).
+
+When the screen names a key or button in a box ("unlock [C#4]", "turn on [SEL] + [PLAY]"), its light blinks quickly
+while the message shows, so you can find it.
 
 **Hold SEL** for a moment and the screen draws the black keys as they sit on the keyboard, lit as on the panel,
-with their groups named, and the top four white keys as the banks they pick (A, B, C, P), the one playing lit. On a
+with their groups named, and the top four white keys as the banks they pick (A, B, C, P), the one playing lit; on
+the panel those four keys light as the banks too. On a
 page where a knob has a second job with SEL (Sub · Drive, Delay, Reverb) it waits longer, 1.5 s, and
 once you've turned that job, until you let go, so SEL + a knob never flashes the map.
 **Touch a black key while SEL is held** and the screen names it, its group and its setting ("I · G#3", "SUB -1
@@ -556,15 +562,16 @@ key.
 | 8 | II filter: LP, BP, HP | which LFO moves II's cutoff (I, II, both) |
 | 9 | pitch link (II follows I) | II's cutoff send moves resonance instead |
 | 10 | hard sync (II to I) | which LFO moves the delay's time (I, II, both) |
-| 11 | cross-mod: off, I → II cutoff (lit), pitch I ↔ II (winking), Snarl: the finished sound bends both (winking) | the same |
+| 11 | cross-mod: off (dark), I → II cutoff (lit), pitch I ↔ II (winking), Snarl: the finished sound bends both (winking) | the same |
 
-- A **wave key** goes round with each tap: LFO I (dark), LFO II (lit), both (winking). The screen says which LFO now
+- A **wave key** goes round with each tap: LFO I (dim), LFO II (lit), both (winking); a **target key**: pitch or
+  cutoff (dim), X-Wave or resonance (lit). The screen says which LFO now
   moves what ("LFO II → I PITCH").
 - **LFO reset:** tap to restart the LFO. Hold it half a second to lock the LFO to the Swell (it then
   restarts every bar; the key stays lit). Hold again to free it.
 - With **pitch link** on, KNOB 3 sets the gap between the drones, in semitones and cents ("+7 st", "+8 st +20").
-- A **filter key** goes round with each tap: low-pass (dark), band-pass (winking), high-pass (lit).
-- A **sub key** goes round with each tap: −1 octave (dark), −2 octaves (lit), then the subharmonics ⅓
+- A **filter key** goes round with each tap: low-pass (dim), band-pass (winking), high-pass (lit).
+- A **sub key** goes round with each tap: −1 octave (dim), −2 octaves (lit), then the subharmonics ⅓
   and ⅕ of the pitch (winking). With the drone's OSC MIX at 0 (Sub · Drive) the sub isn't heard: the screen says
   so ("OSC MIX 0 · EDIT x2", EDIT in a box).
 

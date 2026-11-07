@@ -644,3 +644,13 @@ at the end. The current state is in the [README](../README.md) and the code.
   knobs 0.3 moved (Feedback KNOB 1, Cross-mod 4, Tune 2), once, for a player from 0.2 (a new FM-1 starts with them
   seen: `SEEN1_MOVED`). Also: a value of words alone is one name in one size ("Chorus hall" on one line); the Swell's
   breaths centered up and down (Evan).
+- 2026-11-07: the panel's lights, after an outside review of them beside the screen (Evan picked all eight): stopped,
+  PLAY breathes (40-255 over 3.6 s) and nothing else moves (OCT- / OCT+ and ARP a still dim 64, as their settings
+  stay shown); the black keys: dark always off, a plain switch lit on (Partner, Pitch lock, the links, hard sync), a
+  key of two or three live choices dim on its first (-1 oct, LP, LFO I, Pitch, Cutoff), lit on the second, winking on
+  a third; dim is 64 (2 frames of 32, beside the gesture glow's 40). One clock for the slow blinks (1.2 s: the wink on
+  1.0 s, the scene you're on 0.72 s). A scene gliding in brightens its key with the header's line; gliding back the
+  left key dims. REC blinks once a second recording, fast in the last 20 s before FULL. SEL glows (128) while it can
+  keep a blend or a gesture, with a one-time tip "TAP [SEL]: KEEP IT". SEL held, the map on screen: D5-G5 light as
+  the banks (the one playing lit, the rest dim). A key or button a message names in a box blinks quickly (150 / 150
+  ms) while it shows. The key map draws the same four looks; the emulator shows dim keys too.

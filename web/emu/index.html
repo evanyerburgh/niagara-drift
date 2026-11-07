@@ -79,6 +79,7 @@ a { color: var(--accent); }
 .lit .keyface.white { fill: var(--key-lit); }
 .lit .keyface.black { fill: var(--key-lit); }
 .lit .keyface { stroke: var(--key-glow); stroke-width: 3; filter: drop-shadow(0 0 6px var(--key-glow-soft)); }   /* lit: a light behind the key */
+.dim .keyface { stroke: var(--key-glow); stroke-width: 2; stroke-opacity: .55; }   /* dim: a first choice, a gesture's glow */
 .lit text.job.on-key { fill: var(--key-lit-text) !important; }
 .start { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; background: rgba(20, 0, 15, .45); border-radius: 4.4% / 6.9%; }
 .start button { font: 500 1.05rem "IBM Plex Mono", monospace; letter-spacing: .14em; text-transform: uppercase; padding: .9em 1.8em;
@@ -290,7 +291,7 @@ html { scroll-behavior: smooth; } @media (prefers-reduced-motion: reduce) { html
                  display: grid; align-items: end; justify-items: center; font-size: .75rem; color: var(--muted); padding-bottom: .2rem; }
 .g-scenes span.on { background: var(--pale); color: var(--black); border-color: var(--pale); }
 .g-scenes span.bank { border-style: dashed; color: var(--muted, inherit); }
-.g-scenes span.at { animation: scene-at 1s step-end infinite; }   /* as the key: 0.6 s lit, 0.4 s dark */
+.g-scenes span.at { animation: scene-at 1.2s step-end infinite; }   /* as the key: 0.72 s lit, 0.48 s dark */
 @keyframes scene-at { 60% { background: var(--ground); color: inherit; border-color: var(--rule); } }
 @media (prefers-reduced-motion: reduce) { .g-scenes span.at { animation: none; outline: 2px solid #f6b48e; outline-offset: 2px; } }
 @media (max-width: 760px) { .g-scenes { grid-template-columns: repeat(8, minmax(0, 1fr)); } .g-scenes span { height: 2.6rem; } }
@@ -443,7 +444,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
   <h2 class="sec"><span>Switches</span></h2>
 
   <div class="g-card full">
-    <h3>Black keys <span class="g-sub">some step through settings: dark → lit → winking · hold <span class="cap">SEL</span>: the map on screen; touch a key with it held to see what it does</span></h3>
+    <h3>Black keys <span class="g-sub">dark is off; a key of two or three choices: dim → lit → winking · hold <span class="cap">SEL</span>: the map on screen; touch a key with it held to see what it does</span></h3>
     <div class="kmap">
       <h4>Normal</h4>
       <div class="krow">
@@ -930,13 +931,17 @@ function drawScreen(fb) {
   }
   ctx.putImageData(img, 0, 0);
 }
-function drawLights(b, k, lv) {
+function drawLights(b, k, lv, kl) {
   for (const x of Object.values(buttons)) {
     const l = lv ? lv[x.bit] : (b & (1 << x.bit) ? 255 : 0), face = x.face || (x.face = x.g.querySelector(".btnface"));
     x.g.classList.toggle("lit", l >= 128);
     if (face) face.style.fill = l > 0 && l < 255 ? `color-mix(in srgb, var(--pale) ${Math.round(100 * (l / 255) ** 2)}%, ${BTNC})` : "";
   }
-  keys.forEach((x, i) => x.g.classList.toggle("lit", !!(k & (1 << i))));
+  keys.forEach((x, i) => {                         // lit; or dim, under half (a first choice, a gesture's glow)
+    const l = kl ? kl[i] : (k & (1 << i) ? 255 : 0);
+    x.g.classList.toggle("lit", l >= 128);
+    x.g.classList.toggle("dim", l > 0 && l < 128);
+  });
 }
 let lfoLayer = 0;
 function drawLayer(lfo) {                           // the black keys' names follow the page, as the keys do
@@ -984,7 +989,7 @@ async function switchOn() {
         if (m.type === "ready") res();
         else if (m.type === "frame") {
           if (m.fb) drawScreen(m.fb);
-          drawLights(m.buttons, m.keys, m.levels);
+          drawLights(m.buttons, m.keys, m.levels, m.keyLevels);
           drawLayer(m.lfo);
           window.omniLast = m;
           if (m.load !== undefined) cpu.textContent = `Niagara Drift uses ${m.load}% of this computer's time`;

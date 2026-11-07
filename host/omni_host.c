@@ -639,16 +639,16 @@ int main(int argc, char **argv)
             png_write(out);
         } else if (!strcmp(cmd, "leds")) {
             int i;
-            printf("  leds: buttons");
+            printf("  leds: buttons");                /* lit, or "(dim)" under half */
             for (i = 0; i < NB; i++)
-                if (lit_btn >> i & 1u)
-                    printf(" %s", BTN_N[i]);
-            printf(" | white ");
+                if (lvl_btn[i])
+                    printf(lvl_btn[i] >= 128u ? " %s" : " (%s)", BTN_N[i]);
+            printf(" | white ");                         /* # lit, - dim, . dark */
             for (i = 0; i < 16; i++)
-                printf("%c", (lit_keys >> WHITE_K[i] & 1u) ? '#' : '.');
+                printf("%c", lvl_keys[WHITE_K[i]] >= 128u ? '#' : lvl_keys[WHITE_K[i]] ? '-' : '.');
             printf(" black ");
             for (i = 0; i < 11; i++)
-                printf("%c", (lit_keys >> BLACK_K[i] & 1u) ? '#' : '.');
+                printf("%c", lvl_keys[BLACK_K[i]] >= 128u ? '#' : lvl_keys[BLACK_K[i]] ? '-' : '.');
             printf("\n");
         } else if (!strcmp(cmd, "expect"))
             fails += expect(a, b);

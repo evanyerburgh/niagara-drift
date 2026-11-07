@@ -62,7 +62,8 @@ class Omni extends AudioWorkletProcessor {
     const ex = this.ex;
     const blits = ex.web_blits();
     const msg = { type: "frame", buttons: ex.web_lit_buttons() >>> 0, keys: ex.web_lit_keys() >>> 0, lfo: ex.web_keys_lfo(),
-                  levels: Array.from(new Uint8Array(this.mem.buffer, ex.web_btn_levels(), 14)) };
+                  levels: Array.from(new Uint8Array(this.mem.buffer, ex.web_btn_levels(), 14)),
+                  keyLevels: Array.from(new Uint8Array(this.mem.buffer, ex.web_key_levels(), 27)) };
     if (this.frames >= 44100) {                       // the share of real time spent running the device
       msg.load = Math.round(100 * this.busy / (this.frames / 44.1));
       this.busy = this.frames = 0;
