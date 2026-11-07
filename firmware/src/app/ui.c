@@ -102,11 +102,16 @@ static const struct {
 /* ------------------------------------------------------------ switches --- */
 /* the black keys (key numbers, F3 = 0) and what each does: normally, and on the LFO page */
 static const uint8_t BLACK_K[11] = {1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25};
-/* the white keys: the first NSCENES (F3 .. C5, which sense pressure) the scenes of the bank; the top four
- * (D5 .. G5, no pressure) SEL + key: the bank, alone: the gestures (Weight, Shift, Clean, Wash) */
+/* the white keys: the first NPLAY (F3 .. F4) the scenes of the bank; the next four (G4 .. C5, which sense pressure
+ * too) the pressure gestures; the top four (D5 .. G5, no pressure) the gestures (Weight, Shift, Clean, Wash); SEL + any
+ * of those eight: a bank (KEY_BANK) */
 #define NWHITE 16
 static const uint8_t WHITE_K[NWHITE] = {0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26};
-static const char BANK_L[NBANKS] = {'A', 'B', 'C', 'P'};
+static const char BANK_L[NBANKS] = {'A', 'B', 'C', 'P', 'D', 'E', 'F', 'P'};
+/* SEL + the eight gesture keys (G4 .. C5, D5 .. G5, left to right): the banks in a row, A .. F, then the Presets'
+ * two (Evan, 2026-11-07: 6 yours + 2 Presets, one row) */
+static const uint8_t KEY_BANK[8] = {0, 1, 2, BANK_D, BANK_D + 1, BANK_D + 2, BANK_PRESETS, BANK_PRESETS2};
+static const char *const BANK_N[NBANKS] = {"A", "B", "C", "PRESETS 1-8", "D", "E", "F", "PRESETS 9-16"};
 static const char *const GESTURE[DR_NGTYPE] = {"WEIGHT", "SHIFT", "CLEAN", "WASH", "TICK", "CHORD", "SNARL",
                                                "STUTTER"};   /* D5-G5, then G4-C5: fixed */
 enum { S_NONE, S_PARTNER, S_SUBOCT, S_HP, S_OTAP, S_ODEST, S_FTAP, S_FDEST, S_PLINK, S_SYNC, S_XMOD, S_LFORESET, S_DTAP,
@@ -145,7 +150,8 @@ static struct {
     uint32_t act_t;
     uint32_t chg_t;                    /* the last change to the project, by a hand or not (a scene gliding, the loop) */
     uint32_t saved_t;                  /* the last autosave tried */
-    int8_t save_q;                     /* a save waiting for the dip (playing): -2 none, -1 the sound, N scene N */
+    int8_t save_q;                     /* a save waiting for the dip (something heard): -2 none, -1 the sound, -3 the
+                                        * autosave, N scene N */
     uint32_t save_t;                   /* ... asked then */
     uint8_t page_last[8];              /* each page button's page last shown (0: its first): opened again there */
     uint32_t sel_t;                    /* when SEL went down (held 0.4 s: the black keys' map) */
@@ -993,14 +999,15 @@ static int scene_room(int p)
            p == P_SCENE_T || p == P_PRESS_SENS || p == P_SCENE_BARS || p == P_TUNING || p == P_CLK_SYNC;
 }
 
-/* a scene's name: its bank's letter and its number ("B5"; the Presets "P2") */
+/* a scene's name: its bank's letter and its number ("B5"; the Presets "P2", their second bank "P9" ..) */
 static void scene_name(char *t, int bank, int n)
 {
-    t[0] = BANK_L[bank];
-    itoa_u((uint32_t)n + 1u, t + 1);
+    t[0] = BANK_L[(unsigned)bank < NBANKS ? bank : 0];
+    itoa_u((uint32_t)n + 1u + (bank == BANK_PRESETS2 ? NPLAY : 0u), t + 1);
 }
 
-/* into the flash now: n = -1 the sound (SAVE), else scene n (just stored) */
+#define SAVE_AUTO (-3)                                 /* save_now / save_ask: the autosave (no banner) */
+/* into the flash now: n = -1 the sound (SAVE), SAVE_AUTO the autosave, else scene n (just stored) */
 static void save_now(int n)
 {
     char t[12] = "SCENE ";
@@ -1012,7 +1019,8 @@ static void save_now(int n)
     ok = project_save() == 0;
     if (ok)
         ui.dirty = 0;
-    if (n < 0) {
+    if (n == SAVE_AUTO) {                              /* the autosave: no banner */
+    } else if (n < 0) {
         say(ok ? "SAVED" : "NOT SAVED", ok ? 0 : "FLASH ERROR");
     } else {
         scene_name(t + 6, proj.bank, n);
@@ -1020,11 +1028,13 @@ static void save_now(int n)
     }
 }
 
-/* a save: while the drone sounds, the output dips out first (the write stops the audio for a few ms, measured
- * on the FM-1: under one 5.8 ms block), then comes back; Evan, 2026-10-14: no more waiting for PLAY to stop */
+/* a save: while anything sounds (the drones, or the effects' tails ringing on after PLAY), the output dips out
+ * first (the erase stops the audio for a few ms, measured on the FM-1: under one 5.8 ms block; cut in a tail it
+ * popped, Evan 2026-11-07), then comes back; Evan, 2026-10-14: no more waiting for PLAY to stop */
+#define TAIL_HEARD 1e-4f                               /* the effects' peak over -80 dB: a cut there is heard */
 static void save_ask(int n)
 {
-    if (!ui.playing && dr_fade <= 0.0f) {
+    if (!ui.playing && dr_fade <= 0.0f && dr_tail < TAIL_HEARD) {
         save_now(n);
         return;
     }
@@ -1046,8 +1056,8 @@ static void save_run(void)                             /* each look at the input
 
 static void scene_store(int n)                         /* SAVE held + a white key: and into the flash */
 {
-    if (proj.bank == BANK_PRESETS) {                   /* the Presets stay as they are (Evan, 2026-10-19) */
-        say_c("PRESETS ARE FIXED", "[SEL]+[D5]-[G5]: BANK", K_GOLD);
+    if (BANK_IS_PRESETS(proj.bank)) {                  /* the Presets stay as they are (Evan, 2026-10-19) */
+        say_c("PRESETS ARE FIXED", "[SEL]+[G4]-[G5]: BANK", K_GOLD);
         return;
     }
     scene_put(proj.bank, n);
@@ -1899,7 +1909,7 @@ static void input(void)
                 if (btn >> B_SEL & 1u)
                     say_c("LET GO: UNDO", 0, K_GOLD);
                 else
-                    say_c(proj.bank == BANK_PRESETS ? "PRESETS ARE FIXED" : "KEY: STORE", "LET GO: SAVE", K_GOLD);
+                    say_c(BANK_IS_PRESETS(proj.bank) ? "PRESETS ARE FIXED" : "KEY: STORE", "LET GO: SAVE", K_GOLD);
             }
         } else {
             save_dn = 0;
@@ -1929,37 +1939,33 @@ static void input(void)
                 scene_back();
         }
     }
-    for (i = 0; i < 4u; i++) {                         /* the top four white keys */
-        if (!((ch & keys) >> WHITE_K[NSCENES + i] & 1u))
+    for (i = NPLAY; i < NWHITE; i++) {                 /* the eight gesture keys, G4 .. G5 */
+        const int g = i < NSCENES ? G_PRESS + (int)(i - NPLAY) : (int)(i - NSCENES);   /* keys 9-12: the pressure
+                                                                                          * gestures (v0.3) */
+        if (!((ch & keys) >> WHITE_K[i] & 1u))
             continue;
-        if (btn >> B_SEL & 1u) {                       /* SEL + a top key: the bank (not while a scene key is
+        if (btn >> B_SEL & 1u) {                       /* SEL + one: a bank, in a row (not while a scene key is
                                                         * held: a visit's way back stays put) */
+            const uint8_t bk = KEY_BANK[i - NPLAY];
             uint32_t j, held = 0;
-            static const char *const BANK_N[NBANKS] = {"A", "B", "C", "PRESETS"};
             ui.btn_used |= 1u << B_SEL;
             for (j = 0; j < NPLAY; j++)
                 held |= keys >> WHITE_K[j] & 1u;
             if (held)
                 continue;
-            if (proj.bank != i) {
-                proj.bank = (uint8_t)i;
+            if (proj.bank != bk) {
+                proj.bank = bk;
                 ui.scene_at = -1;
                 mark_dirty();
             }
-            say_c("BANK", BANK_N[i], K_GOLD);
+            say_c("BANK", BANK_N[bk], K_GOLD);
         } else {
-            gesture_down((int)i);                      /* the gestures (v0.2) */
+            gesture_down(g);                           /* the gestures (v0.2, v0.3) */
         }
     }
-    for (i = 0; i < 4u; i++)                         /* ... and let go */
-        if ((ch & ~keys) >> WHITE_K[NSCENES + i] & 1u)
-            gesture_up((int)i);
-    for (i = NPLAY; i < NSCENES; i++) {              /* keys 9-12: the pressure gestures (v0.3) */
-        if ((ch & keys) >> WHITE_K[i] & 1u)
-            gesture_down(G_PRESS + (int)(i - NPLAY));
-        else if ((ch & ~keys) >> WHITE_K[i] & 1u)
-            gesture_up(G_PRESS + (int)(i - NPLAY));
-    }
+    for (i = NPLAY; i < NWHITE; i++)                 /* ... and let go (one that picked a bank: nothing) */
+        if ((ch & ~keys) >> WHITE_K[i] & 1u)
+            gesture_up(i < NSCENES ? G_PRESS + (int)(i - NPLAY) : (int)(i - NSCENES));
     if (btn || keys || ch)
         ui.act_t = plat_ms();
     loop_run();
@@ -2326,10 +2332,10 @@ static void leds(void)
         k[WHITE_K[ui.press]] = (now - ui.flash_t) % 160u < 80u ? 255 : 0;
     for (i = 0; i < DR_NGEST; i++)                   /* the gestures: a dim glow, lit as far as each is in */
         k[gkey((int)i)] = (uint8_t)(40.0f + 215.0f * ui.g_amt[i]);
-    if (keymap_on())                                   /* SEL held, the map on screen: the top four keys are the
-                                                        * banks, the one playing lit (as the map draws them) */
-        for (i = 0; i < NBANKS; i++)
-            k[WHITE_K[NSCENES + i]] = proj.bank == i ? 255 : LED_DIM;
+    if (keymap_on())                                   /* SEL held, the map on screen: the eight gesture keys are
+                                                        * the banks, the one playing lit (as the map draws them) */
+        for (i = 0; i < 8u; i++)
+            k[WHITE_K[NPLAY + i]] = proj.bank == KEY_BANK[i] ? 255 : LED_DIM;
     boxed_blink(b, k);
     plat_leds(b, k);
 }
@@ -2340,16 +2346,19 @@ static void leds(void)
  * flickering with each). And never more often than AUTOSAVE_EVERY, whatever happens, nor again soon after a fail */
 #define AUTOSAVE_QUIET 4000u
 #define AUTOSAVE_EVERY 30000u
+#define AUTOSAVE_TAIL 15000u                   /* the tails still heard this long after the last touch (a long reverb,
+                                                * a freeze): saved with the dip, rather than not at all */
 static void autosave(void)
 {
     uint32_t now = plat_ms();
     if (!ui.dirty || ui.playing || dr_fade > 0.0f || ui.btn || ui.keys || now - ui.act_t < AUTOSAVE_QUIET ||
         now - ui.chg_t < AUTOSAVE_QUIET || ui.morph >= 0 || ui.press >= 0 ||
-        (ui.saved_t && now - ui.saved_t < AUTOSAVE_EVERY) || plat_store_held())
+        (ui.saved_t && now - ui.saved_t < AUTOSAVE_EVERY) || plat_store_held() || ui.save_q != -2 ||
+        (dr_tail >= TAIL_HEARD && now - ui.act_t < AUTOSAVE_TAIL))   /* the tails fade out first (a save cut in
+                                                                        * them popped, Evan 2026-11-07) */
         return;
     ui.saved_t = now;
-    if (project_save() == 0)
-        ui.dirty = 0;
+    save_ask(SAVE_AUTO);                       /* (still heard: with the dip) */
 }
 
 void ui_init(void)

@@ -15,7 +15,7 @@ note. It's inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the S
 *Your FM-1 with Niagara Drift installed: what each knob, button and key now does. Amber is drone I,
 teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO pages they set the
 LFO's routing, and cross-mod lets drone I move drone II's filter, or the drones and their sound bend each other's pitch); white keys 1–8 hold scenes, in
-banks you pick with SEL and the top four; keys 9–12 and the top four are gestures. The page buttons' pages, each tap the next: HOME
+eight banks you pick with SEL and the gesture keys; keys 9–12 and the top four are gestures. The page buttons' pages, each tap the next: HOME
 Drones 1, 2 · ENV Life, Tone · EDIT Osc, Sub · Drive · SEQ Partner, Pitch moves · LFO LFO sends, Mods · ARP Swell ·
 FX Delay, Reverb · GLO Setup 1, 2.*
 
@@ -25,11 +25,12 @@ FX Delay, Reverb · GLO Setup 1, 2.*
 ## What it does
 
 - **Presets** to start from, each a different side of the instrument: Niagara, Abyss, Eerie, Glass, Heaven,
-  Tanpura, Tape and Whistle on keys 1–8 of the Presets bank, and Howl, Cathedral, Metal and Clean in bank C.
+  Tanpura, Tape and Whistle on keys 1–8 of the Presets bank, and Howl, Cathedral, Metal and Clean on keys 1–4 of
+  the second.
 - **Eight gestures**, each several settings moving together on top of your sound: **Weight**, **Shift**, **Clean** and
   **Wash** on the top keys, in while you hold and out as slowly as you held; **Tick**, **Chord**, **Snarl** and
   **Stutter** on keys 9–12, as deep as you press. Tap any of them in to stay.
-- **Scenes**: 8 on the white keys in each of three banks (24 of yours), plus the Presets, recalled gliding over the
+- **Scenes**: 8 on the white keys in each of six banks (48 of yours), plus the Presets' two, recalled gliding over the
   Scene time, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob moves, gestures and scenes.
 - **It moves on its own**: the LFO, the Swell, **Drift**, **Wander** (drone II's slow random melody on a scale) and
   **Age** (tape wear) keep it breathing without a hand on it.
@@ -114,7 +115,7 @@ still works. Installing firmware is at your own risk.
    Stutter), pressed harder for more ([The gestures](#the-gestures)).
 4. **Tune each drone**: black key 4 turns Pitch lock off, then KNOB 1 and KNOB 3 on the Drones page.
 5. **Change the sound**: the page buttons (ENV, EDIT, LFO, …) and KNOB 1–4 ([Pages](#pages)).
-6. **Save your sound**: SEL + D5 picks bank A, then hold SAVE and tap a white key.
+6. **Save your sound**: SEL + G4 picks bank A, then hold SAVE and tap a white key.
 7. **PLAY** again: the drones fade out.
 
 The keys aren't notes: the drones play on their own. White keys 1–8 hold presets and scenes, keys 9–12 and the top
@@ -124,13 +125,13 @@ a gesture, open the effects…) the screen shows a one-line tip about what's nex
 ### The Presets
 
 Twelve sounds to start from, each showing a part of what Niagara Drift does: P1–P8 on keys 1–8 of the Presets bank
-(SEL + G5), P9–P12 in bank C (keys 1–4 on a new FM-1; on one updated from 0.2, in the first empty keys of C, B or A),
-where they're yours to change and store over. Most
+(SEL + F5), P9–P12 on keys 1–4 of the second (SEL + G5). Most
 have drone I on D, so moving between them keeps the root and changes the interval and the sound. With **Pitch lock**
 on (as a new FM-1 starts) they keep the pitch you're on, so you hear the textures first; turn it off (black key 4)
 and each plays at its own pitches, as described below. They're levelled to sound alike in loudness with the lock on,
 and within about 3 dB at their own pitches. The screen names the one you pick ("SCENE P3 EERIE"). They're fixed: to keep a sound you
-made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE + a key).
+made from one, pick one of your banks, A to F (SEL + G4 to E5), and store it there (SAVE + a key). (On an FM-1
+updated from 0.2, copies of P9–P12 are also in the first empty keys of C, B or A, yours to change.)
 
 | Key | Preset | What it shows |
 |---|---|---|
@@ -155,14 +156,15 @@ made from one, pick bank A, B or C (SEL + D5, E5 or F5) and store it there (SAVE
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where you were (the header: "→ A5"). **Tap SEL** while holding and the blend stays right there ("A5 40% KEPT"), however you press after; let go when you like. It's a sound of its own between the two (SEL + SAVE takes you back to where you were before it) |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **SEL + SAVE** | **undo**: back to the sound before your last scene tap or blend, gliding over the Scene time (a knob turned since goes back too; the room's settings, such as Stereo or the Scene time, stay). Again, and it goes forward to where you were. Keep SEL down until you've let go of SAVE |
-| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; a scene on its way brightens its key as it glides in; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A, B or C) |
-| **SEL + a top white key** | picks the bank the 8 scene keys play: D5 bank **A**, E5 **B**, F5 **C** (yours), G5 the **Presets** (below; a new FM-1 starts there). The screen names scenes by bank: "B5" |
+| **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; a scene on its way brightens its key as it glides in; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A to F) |
+| **SEL + a gesture key** | picks the bank the 8 scene keys play, in a row: G4 bank **A**, A4 **B**, B4 **C**, C5 **D**, D5 **E**, E5 **F** (yours), F5 the **Presets** P1–P8 and G5 their second bank, P9–P16 (below; a new FM-1 starts on the Presets). The screen names scenes by bank: "B5", "P9" |
 | **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The gestures](#the-gestures)) |
 | **Keys 9–12** (G4–C5) | **gestures** too, by pressure: Tick, Chord, Snarl, Stutter (see [The gestures](#the-gestures)) |
 
 Updating from 0.2: keys 9–12 used to hold scenes. On the first start of 0.3, each scene you had there moves to the
 first empty key 1–8 of its own bank, then of another; one with no room left stays stored, unplayed (the installer
-backs everything up first). The screen says how many moved. Three knobs moved too: Feedback is KNOB 1 on Life,
+backs everything up first). The screen says how many moved. The banks moved too: SEL with any of the eight gesture keys picks one, A, B and C now on G4,
+A4 and B4, the Presets on F5. Three knobs moved too: Feedback is KNOB 1 on Life,
 Cross-mod KNOB 4 on Mods, Tune KNOB 2 on Setup 2; each page says so once, the first time you open it.
 
 ### The gestures
@@ -550,8 +552,8 @@ When the screen names a key or button in a box ("unlock [C#4]", "turn on [SEL] +
 while the message shows, so you can find it.
 
 **Hold SEL** for a moment and the screen draws the black keys as they sit on the keyboard, lit as on the panel,
-with their groups named, and the top four white keys as the banks they pick (A, B, C, P), the one playing lit; on
-the panel those four keys light as the banks too. On a
+with their groups named, and the eight gesture keys as the banks they pick (A to F, P1, P2), the one playing lit;
+on the panel those eight keys light as the banks too. On a
 page where a knob has a second job with SEL (Sub · Drive, Delay, Reverb) it waits longer, 1.5 s, and
 once you've turned that job, until you let go, so SEL + a knob never flashes the map.
 **Touch a black key while SEL is held** and the screen names it, its group and its setting ("I · G#3", "SUB -1

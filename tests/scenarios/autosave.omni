@@ -10,7 +10,7 @@ wait 20000
 # still gliding: nothing written yet
 expect store_writes 0
 wait 15000
-# settled (and 4 s quiet): one save, two writes (the project, and bank C with P9-P12 on a new FM-1, v0.3)
-expect store_writes 2
+# settled (and 4 s quiet): one save, one write (the project)
+expect store_writes 1
 wait 10000
-expect store_writes 2
+expect store_writes 1

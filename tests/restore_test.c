@@ -46,7 +46,7 @@ static int st_prog(uint32_t off, const void *src, uint32_t n)
 }
 #include "../firmware/src/app/plat.h"
 #include "../firmware/src/storage.c"
-#define APP_BACKUP_OBJS {OBJ_PROJ, OBJ_BANKB, OBJ_BANKC, OBJ_BANKP}
+#define APP_BACKUP_OBJS {OBJ_PROJ, OBJ_BANKB, OBJ_BANKC, OBJ_BANKP, OBJ_BANKD, OBJ_BANKE, OBJ_BANKF}
 #include "../firmware/src/restore_core.c"
 static int rs_rec_erase(void) { return st_erase(RS_REC); }
 static int rs_rec_prog(uint32_t off, const void *src, uint32_t n)

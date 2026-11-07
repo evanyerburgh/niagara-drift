@@ -282,7 +282,8 @@ static void lk_bar(void)
     st_short = !ui.playing && fade_q() == 0 ? "[PLAY]" : "FADING";
     if (lk_at >= 0) {
         scene_name(key, lk_at >> 4, lk_at & 15);
-        sound = lk_at >> 4 == BANK_PRESETS && !lk_chg ? preset_name(lk_at & 15) : 0;
+        sound = BANK_IS_PRESETS(lk_at >> 4) && !lk_chg
+                    ? preset_name((lk_at & 15) + (lk_at >> 4 == BANK_PRESETS2 ? NPLAY : 0)) : 0;
         if (lk_chg)
             chg = "changed";
     }
@@ -293,7 +294,7 @@ static void lk_bar(void)
             scopy(q, "back");
         else
             scene_name(q, gbank, glide);
-        sound = gbank == BANK_PRESETS && glide >= 0 && glide < NPRESETS ? preset_name(glide) : 0;
+        sound = BANK_IS_PRESETS(gbank) && glide >= 0 ? preset_name(glide + (gbank == BANK_PRESETS2 ? NPLAY : 0)) : 0;
         chg = 0;
         key_col = LK_GOLD;
     }
@@ -1932,6 +1933,30 @@ static void lk_ring(int32_t cx, int32_t cy, float rx, float ry, int half, int w,
     }
 }
 
+/* a whole ring, 2 px, tilted 10 degrees one way (tilt 1, counterclockwise) or the other (-1), or upright (0: as lk_ring)
+ * (the Reverb's Chorus hall, its rings tilting in turn: the spec) */
+static void lk_ring_tilt(int32_t cx, int32_t cy, float rx, float ry, int tilt, uint16_t c)
+{
+    static const float CS[25] = {1.0f, 0.9659f, 0.8660f, 0.7071f, 0.5f, 0.2588f, 0.0f, -0.2588f, -0.5f, -0.7071f,
+                                 -0.8660f, -0.9659f, -1.0f, -0.9659f, -0.8660f, -0.7071f, -0.5f, -0.2588f, 0.0f, 0.2588f,
+                                 0.5f, 0.7071f, 0.8660f, 0.9659f, 1.0f};
+    const float tc = 0.9848f, ts = 0.1736f * (float)tilt;   /* cos, sin of 10 degrees */
+    int i, k;
+    if (!tilt) {
+        lk_ring(cx, cy, rx, ry, 0, 2, c);
+        return;
+    }
+    for (k = 0; k < 2; k++) {
+        const float ax = rx + (float)k, ay = ry + (float)k;
+        for (i = 0; i < 24; i++) {
+            const float x0 = CS[i] * ax, y0 = CS[(i + 18) % 24] * ay, x1 = CS[i + 1] * ax, y1 = CS[(i + 19) % 24] * ay;
+            const float u0 = x0 * tc - y0 * ts, v0 = x0 * ts + y0 * tc, u1 = x1 * tc - y1 * ts, v1 = x1 * ts + y1 * tc;
+            cv_line(cx + (int32_t)(u0 + (u0 < 0.0f ? -0.5f : 0.5f)), cy - (int32_t)(v0 + (v0 < 0.0f ? -0.5f : 0.5f)),
+                    cx + (int32_t)(u1 + (u1 < 0.0f ? -0.5f : 0.5f)), cy - (int32_t)(v1 + (v1 < 0.0f ? -0.5f : 0.5f)), c);
+        }
+    }
+}
+
 /* ------------------------------------------------------ the Delay's picture --- */
 /* the echoes as ripples out from the sound (a full ring, white) on a time axis that opens out near it (x 42 +
  * 60 ln(1 + t / 0.1 s): 2 s at x 224, so short and long times both read); each repeat a half-ring as big as it's still
@@ -1981,7 +2006,8 @@ static void lk_pic_delay(void)
 }
 
 /* ----------------------------------------------------- the Reverb's picture --- */
-/* the tail as rings on a time axis that opens out near the start (x 62 + 44 ln(1 + t / 1 s): 40 s at the right), so
+/* the tail as rings on a time axis that opens out near the start (x 91 + 35.8 ln(1 + t / 1 s): 40 s at the right; the
+ * first ring clear of the Into words at Mix 100 in a Cathedral, the widest), so
  * every Length from 0.3 s to 40 s draws differently: a ring at 0 and then each 1.75 times later, each as tall as the
  * tail is then (its dB falling in a line to -60 at the Length), none once it has died away, the first as tall as the mix
  * (12 + 46 mix px); as wide as the room (Room narrow, Cathedral wide); new ones pale, older ones the FX blue, drained
@@ -1998,14 +2024,14 @@ static void lk_pic_reverb(void)
     int k;
     char tx[8];
     for (k = 0; k < 9; k++, t = k == 1 ? 0.42f : t * 1.75f) {
-        const float x = 84.0f + 37.7f * fm_logf(1.0f + t), a = len <= 0.0f ? 1.0f : 1.0f - t / len;
+        const float x = 91.0f + 35.8f * fm_logf(1.0f + t), a = len <= 0.0f ? 1.0f : 1.0f - t / len;
         const float ry = r0 * a, age = (float)k / 6.0f;
         uint32_t c;
         if (x > 222.0f || ry < 2.0f)           /* off the axis, or died away */
             break;
         c = lk_mix888(lk_mix888(0xC9F6FFu, 0x507FCEu, fm_minf(age, 1.0f)), 0x3A3646u, fm_minf(damp * age, 0.85f));
-        lk_ring((int32_t)(x + 0.5f), mid, 6.0f + WIDE[ty] * ry, ry, 0, 2, mix > 0.0f ? lk_mix(0x07060Bu, c, 1.0f)
-                                                                                    : LK_UNLIT);
+        lk_ring_tilt((int32_t)(x + 0.5f), mid, 6.0f + WIDE[ty] * ry, ry, ty == 3 ? (k & 1 ? -1 : 1) : 0,
+                     mix > 0.0f ? lk_mix(0x07060Bu, c, 1.0f) : LK_UNLIT);
     }
     cv_text(12, 38, &LK_F_SMALL, "echoes", mix > 0.0f && into != 2 ? LK_INK : LK_LABEL);   /* Into: Both, Echoes, */
     cv_text(12, 50, &LK_F_SMALL, "drones", mix > 0.0f && into != 1 ? LK_INK : LK_LABEL);   /* Drones */
@@ -2705,15 +2731,18 @@ static void lk_keymap(void)
     for (i = 0; i < 16; i++)                   /* the white keys, 15 px each, as outlines on the ground (Evan, 2026-11-07:
                                                 * the filled slate keyboard was the one big flat fill on any screen) */
         lk_box(i * 15, LK_KEY_Y, 14, LK_KEY_WH, LK_WHITE_KEY);
-    {                                          /* D5-G5 with SEL: the banks */
+    {                                          /* G4-G5 with SEL: the banks, in a row (A .. F, the Presets' two) */
         const int32_t base = LK_KEY_Y + 87;
-        cv_text(12 * 15 - 4 - text_w(&LK_F_SMALL, "banks"), base - LK_B(LK_F_SMALL), &LK_F_SMALL, "banks", LK_LABEL);
-        for (i = 0; i < NBANKS; i++) {
-            const int32_t cx = (NSCENES + i) * 15 + 7, on = proj.bank == i;
-            char l[2] = {BANK_L[i], 0};
+        cv_text(NPLAY * 15 - 4 - text_w(&LK_F_SMALL, "banks"), base - LK_B(LK_F_SMALL), &LK_F_SMALL, "banks", LK_LABEL);
+        for (i = 0; i < 8; i++) {
+            const int bk = KEY_BANK[i], on = proj.bank == bk;
+            const int32_t cx = (NPLAY + i) * 15 + 7;
+            const felucca_font_t *f = BANK_IS_PRESETS(bk) ? &FONT_U2 : &LK_F_SMALL;   /* "P1", "P2" at the units' size */
+            char l[3] = {BANK_L[bk], bk == BANK_PRESETS ? '1' : bk == BANK_PRESETS2 ? '2' : 0, 0};
             if (on)
-                cv_round(cx - 6, base - 13, 12, 17, 2, LK_GOLD);
-            cv_text(cx - text_w(&LK_F_SMALL, l) / 2, base - LK_B(LK_F_SMALL), &LK_F_SMALL, l, on ? LK_BG : LK_LABEL);
+                cv_round(cx - 7, base - 13, 14, 17, 2, LK_GOLD);
+            cv_text(cx - text_w(f, l) / 2, base - (BANK_IS_PRESETS(bk) ? LK_B(FONT_U2) : LK_B(LK_F_SMALL)), f, l,
+                    on ? LK_BG : LK_LABEL);
         }
     }
     for (i = 0; i < 11; i++) {                 /* the black keys, lit as the panel's */
@@ -2774,7 +2803,7 @@ static void lk_keymap(void)
         text_c(120, 59 - lk_fbase(f), f, v, LK_WHITE);   /* on the board's line (y 382-432) */
     }
     {                                          /* what SEL does with the white keys and OCT */
-        const char *hint = "[D5]-[G5] bank \xC2\xB7 [OCT] wave back";
+        const char *hint = "[G4]-[G5] bank \xC2\xB7 [OCT] wave back";
         lk_ktext(120 - lk_ktext_w(&LK_F_SMALL, hint) / 2, 70, &LK_F_SMALL, hint, LK_LABEL);
     }
     cv_blit(0, LK_VAL_Y);

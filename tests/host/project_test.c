@@ -371,18 +371,18 @@ int main(void)
         bp.scene[1][DR_GP(0, GP_PITCH)] = 4444;
         memcpy(store[OBJ_BANKP], &bp, sizeof bp);
         store_n[OBJ_BANKP] = (int)sizeof bp;
-        check("an old-format P2 saved over loads into C5 (C1-C4: P9-P12, v0.3)", project_load() == 0 && scene_get(2, 4) &&
-                                                         scene_get(2, 4)[DR_GP(0, GP_PITCH)] == 4444);
+        check("an old-format P2 saved over loads into C1 (a new FM-1's C is empty: P9-P12 in their own bank)",
+              project_load() == 0 && scene_get(2, 0) && scene_get(2, 0)[DR_GP(0, GP_PITCH)] == 4444);
         fail_obj = OBJ_BANKC;
         check("... C's save failing: the old Presets object keeps P2", project_save() != 0 &&
                                                          (((bank_v31_t *)store[OBJ_BANKP])->used & (1u << 1)));
         fail_obj = -1;
         check("... saved: C holds it, then the old Presets object lets it go", project_save() == 0 &&
-                                                         (((bank_t *)store[OBJ_BANKC])->used & (1u << 4)) &&
+                                                         (((bank_t *)store[OBJ_BANKC])->used & (1u << 0)) &&
                                                          ((bank_v31_t *)store[OBJ_BANKP])->used == 0);
         memset(&proj, 0, sizeof proj);
-        check("... and reloaded: in C5 once, not moved again", project_load() == 0 && scene_get(2, 4) &&
-                                                         scene_get(2, 4)[DR_GP(0, GP_PITCH)] == 4444 && !scene_has(2, 5));
+        check("... and reloaded: in C1 once, not moved again", project_load() == 0 && scene_get(2, 0) &&
+                                                         scene_get(2, 0)[DR_GP(0, GP_PITCH)] == 4444 && !scene_has(2, 1));
     }
     {   /* a Preset is built when it's asked for: the same values as the table, each time */
         const int16_t *a = scene_get(BANK_PRESETS, 4);
@@ -653,6 +653,36 @@ int main(void)
         check("... the rest kept", proj.tun_off[1] == 7 && proj.par[P_TUNE] == 0 && scene_get(1, 3)[P_CLK_SYNC] == 1);
         check("... and saved as 43", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 43u &&
                                      ((const bank_t *)store[OBJ_BANKB])->format == 43u);
+    }
+    {   /* 0.3's eight banks (Evan, 2026-11-07): D, E, F yours, keys 1-8, an object each; the Presets' second bank
+         * P9-P12 on keys 1-4, fixed; a new FM-1's C empty (P9-P12 no longer copied into it) */
+        memset(store_n, 0, sizeof store_n);
+        project_defaults();
+        check("a new FM-1: C empty, the Presets' second bank P9-P12 on keys 1-4",
+              !scene_has(2, 0) && scene_has(BANK_PRESETS2, 0) && scene_has(BANK_PRESETS2, 3) &&
+                  !scene_has(BANK_PRESETS2, 4) &&
+                  memcmp(scene_get(BANK_PRESETS2, 0), preset_get(8), sizeof(int16_t) * DR_NPARAMS) == 0 &&
+                  memcmp(scene_get(BANK_PRESETS2, 3), preset_get(11), sizeof(int16_t) * DR_NPARAMS) == 0);
+        check("... fixed, as the first: none saved over", scene_put(BANK_PRESETS2, 0) != 0 && scene_put(BANK_PRESETS, 0) != 0);
+        check("D, E, F start empty", !scene_has(BANK_D, 0) && !scene_has(BANK_D + 1, 0) && !scene_has(BANK_D + 2, 7));
+        proj.par[DR_GP(0, GP_PITCH)] = 4100;
+        check("a scene into D1", scene_put(BANK_D, 0) == 0 && scene_get(BANK_D, 0)[DR_GP(0, GP_PITCH)] == 4100);
+        proj.par[DR_GP(0, GP_PITCH)] = 4200;
+        check("... and F8", scene_put(BANK_D + 2, 7) == 0 && scene_get(BANK_D + 2, 7)[DR_GP(0, GP_PITCH)] == 4200);
+        check("... not key 9 (a gesture there)", scene_put(BANK_D + 1, NPLAY) != 0 && !scene_has(BANK_D + 1, NPLAY));
+        proj.bank = BANK_D + 2;
+        check("saved: D and F written, E not", project_save() == 0 && store_n[OBJ_BANKD] == (int)sizeof(bank8_t) &&
+                                               store_n[OBJ_BANKF] == (int)sizeof(bank8_t) && store_n[OBJ_BANKE] == 0);
+        memset(&proj, 0, sizeof proj);
+        check("... reloaded: D1 and F8 as stored, on bank F", project_load() == 0 && proj.bank == BANK_D + 2 &&
+              scene_get(BANK_D, 0) && scene_get(BANK_D, 0)[DR_GP(0, GP_PITCH)] == 4100 && scene_get(BANK_D + 2, 7) &&
+              scene_get(BANK_D + 2, 7)[DR_GP(0, GP_PITCH)] == 4200 && !scene_has(BANK_D + 1, 0));
+        ((bank8_t *)store[OBJ_BANKD])->scene[0][DR_GP(0, GP_PITCH)] = 32000;   /* out of range */
+        check("... a scene out of range dropped, not the bank", project_load() == 0 && !scene_has(BANK_D, 0) &&
+              scene_has(BANK_D + 2, 7));
+        proj.bank = 9;
+        project_save();
+        check("a bank past the eight: A", project_load() == 0 && proj.bank == 0);
     }
     printf("project: %s\n", fails ? "FAILED" : "all ok");
     return fails != 0;

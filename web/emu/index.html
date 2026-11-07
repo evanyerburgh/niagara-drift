@@ -345,7 +345,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <li><span class="dir">Try a gesture</span><span class="ctls"><span class="how">hold</span> <span class="cap white">Weight</span> <span class="cap white">Snarl</span> <span class="how">…, let go</span></span></li>
       <li><span class="dir">Tune each drone</span><span class="ctls"><span class="cap">Pitch lock</span> <span class="how">off, then</span> <span class="cap knob d1">KNOB 1</span> <span class="cap knob d2">KNOB 3</span></span></li>
       <li><span class="dir">Change the sound</span><span class="ctls"><span class="cap">ENV</span> <span class="cap">EDIT</span> <span class="cap">LFO</span> …</span></li>
-      <li><span class="dir">Save your sound</span><span class="ctls"><span class="cap">SEL</span> + <span class="cap white">Weight</span> <span class="how">(bank A), then hold</span> <span class="cap">SAVE</span> <span class="how">and tap a</span> <span class="cap white">white key</span></span></li>
+      <li><span class="dir">Save your sound</span><span class="ctls"><span class="cap">SEL</span> + <span class="cap white">Tick</span> <span class="how">(bank A), then hold</span> <span class="cap">SAVE</span> <span class="how">and tap a</span> <span class="cap white">white key</span></span></li>
       <li><span class="dir">Stop the drones</span><span class="ctls"><span class="cap">PLAY</span></span></li>
     </ol>
     <p class="pnote">The keys aren’t notes: the drones play on their own. White keys 1–8 hold presets and scenes, keys 9–12 and the top four are gestures, the black keys are switches.</p>
@@ -359,12 +359,12 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <span class="bank">Tick</span><span class="bank">Chord</span><span class="bank">Snarl</span><span class="bank">Stutter</span><span class="bank">Weight</span><span class="bank">Shift</span><span class="bank">Clean</span><span class="bank">Wash</span>
     </div>
     <dl class="acts">
-      <div><dt>Presets</dt><dd>Sounds to start from, one on each key: Niagara · Abyss · Eerie · Glass · Heaven · Tanpura · Tape · Whistle. Your first bank. Four more, Howl · Cathedral · Metal · Clean, start in bank C</dd></div>
+      <div><dt>Presets</dt><dd>Sounds to start from, one on each key: Niagara · Abyss · Eerie · Glass · Heaven · Tanpura · Tape · Whistle. Your first bank. Four more, Howl · Cathedral · Metal · Clean, in the Presets’ second bank</dd></div>
       <div><dt>Go to a scene</dt><dd>Tap a <span class="cap white">white key</span>: the sound glides there</dd></div>
       <div><dt>Blend into a scene</dt><dd>On the FM‑1: hold a <span class="cap white">white key</span> and press harder to go further in; all the way to take it; let go and it goes back, tap SEL first and the blend stays. Here: hold to visit, let go to come back</dd></div>
       <div><dt>Undo a scene change</dt><dd>Hold <span class="cap">SEL</span>, tap <span class="cap">SAVE</span>: back to the sound before your last tap or blend; again, forward</dd></div>
-      <div><dt>Pick a bank</dt><dd>Hold <span class="cap">SEL</span>, tap one of the top four <span class="cap white">white keys</span>: A · B · C · Presets (alone they’re the gestures)</dd></div>
-      <div><dt>Save a sound to a scene</dt><dd>In bank A, B or C (the Presets are fixed): hold <span class="cap">SAVE</span> first, then tap a <span class="cap white">white key</span></dd></div>
+      <div><dt>Pick a bank</dt><dd>Hold <span class="cap">SEL</span>, tap one of the eight gesture keys, left to right: A · B · C · D · E · F (yours) · Presets · Presets 9–16 (alone they’re the gestures)</dd></div>
+      <div><dt>Save a sound to a scene</dt><dd>In banks A to F (the Presets are fixed): hold <span class="cap">SAVE</span> first, then tap a <span class="cap white">white key</span></dd></div>
       <div><dt>Save everything</dt><dd>Tap <span class="cap">SAVE</span></dd></div>
     </dl>
   </div>
@@ -684,7 +684,7 @@ for (let i = 0; i < 6; i++) {
   button(582 + i * 63, 236, 54, 48, ...ROW2[i]);
 }
 
-const keys = [], GESTURES = ["Tick", "Chord", "Snarl", "Stutter", "Weight", "Shift", "Clean", "Wash"], BANKS = ["A", "B", "C", "Presets"];
+const keys = [], GESTURES = ["Tick", "Chord", "Snarl", "Stutter", "Weight", "Shift", "Clean", "Wash"], BANKS = ["A", "B", "C", "D", "E", "F", "P1", "P2"];
 const BLACK_JOB = [[["Partner"], AMBER], [["Sub"], AMBER], [["Filter"], AMBER], [["Pitch", "lock"]], [["LFO", "reset"]],
   [["Partner"], TEAL], [["Sub"], TEAL], [["Filter"], TEAL], [["Pitch", "link"]], [["Hard", "sync"]], [["X-mod"]]];
 const BLACK_LFO = [["Osc", "wave"], ["Osc to", "X-Wave"], ["Filter to", "reso"], ["Filter", "wave"], null,   // on the LFO pages: what the
@@ -699,7 +699,7 @@ const blackNames = [];                                // each changing key's two
     el("rect", { x: left(i), y: wy, width: kw, height: wh, rx: kw / 2, fill: KEY_W, class: "keyface white" }, g);
     const kx = left(i) + kw / 2;                    // one label line along the bottom: scene numbers, gesture names
     text(g, kx, wy + wh - 14, i < 8 ? String(i + 1) : GESTURES[i - 8], i < 8 ? 14 : 12.5, ON_KEY, 700, "job on-key");
-    if (i >= 12) text(g, kx, wy + 22, BANKS[i - 12], 10.5, MUTED_KEY, 600, "job on-key");   // with SEL: this bank
+    if (i >= 8) text(g, kx, wy + 22, BANKS[i - 8], 10.5, MUTED_KEY, 600, "job on-key");   // with SEL: this bank
     keys[WHITE_K[i]] = { g };
   }
   BLACK_AFTER.forEach((a, k) => {
@@ -718,7 +718,7 @@ const blackNames = [];                                // each changing key's two
   });
   const capY = 451;                                 // the captions, in the strip between the rows
   bracket(left(0), left(7) + kw, capY, "Presets & scenes · tap: go · SAVE + tap: store", LEGEND, 11.5, 4);
-  bracket(left(8), left(11) + kw, capY, "Gestures · press", LEGEND, 11.5, 4);
+  bracket(left(8), left(11) + kw, capY, "Gestures · press · with SEL: bank", LEGEND, 11.5, 4);
   bracket(left(12), left(15) + kw, capY, "Gestures · with SEL: bank", LEGEND, 11.5, 4);
 })(36, 340, 928, 270);
 fitBrackets();
@@ -745,7 +745,7 @@ function hit(c, cls) {
 const TIP = { FX: "Delay: drive, time, repeats, mix; SEL + KNOB 4: the delay type (again: Reverb: length to Inf, damp, type, mix; SEL + KNOB 4: what goes into it)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
   ENV: "Life: feedback, drift, character, age (again: Tone: noise and its color, white to pink); hold to peek", LFO: "LFO sends: each drone's pitch and cutoff sends; the keys pick the routing (again: Mods: speed mod, source, delay mod, cross-mod)",
   EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, with SEL the sub's wave; drive); hold to peek", GLO: "Setup 1: fade, morph, scene time, sync (again: Setup 2: tuning, tune, stereo width, pressure)",
-  HOME: "Drones 1: pitch, cutoff (again: Drones 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in bank A, B or C)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
+  HOME: "Drones 1: pitch, cutoff (again: Drones 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in banks A to F)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
   PLAY: "Drones in / out (with SEL: drone II alone)", REC: "Motion loop: tap to record knob moves, gestures and scenes, again to loop, again to stop", "OCT-": "LFO I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "Gesture time: how long every gesture takes, left slower, right faster", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
@@ -766,11 +766,11 @@ BLACK_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", `Key ${k + 
   (BLACK_TIP[k][1] !== BLACK_TIP[k][0] ? `; on the LFO pages: ${BLACK_TIP[k][1]}` : "")));
 WHITE_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", k < 8
   ? `Scene ${k + 1} (${"QWERTYUIASDFGHJK"[k]}): tap to go there, hold to visit and let go to come back (on the FM-1, press harder to blend in); ` +
-    `in bank A, B or C, hold SAVE first, then this key, to store (the Presets are fixed); blinks while it's the sound`
+    `in banks A to F, hold SAVE first, then this key, to store (the Presets are fixed); blinks while it's the sound`
   : k < 12 ? `${GESTURES[k - 8]} (${"QWERTYUIASDFGHJK"[k]}): a gesture: hold to bring it in (on the FM-1, as deep as you press), let go and it goes; ` +
-    `tap: all the way, to stay; SEL tapped while holding: it stays where it got to`
+    `tap: all the way, to stay; SEL tapped while holding: it stays where it got to. With SEL: bank ${BANKS[k - 8]}`
   : `${GESTURES[k - 8]} (${"QWERTYUIASDFGHJK"[k]}): a gesture: hold to bring it in, let go and it leaves as slowly as you held it; ` +
-    `tap: all the way, to stay. With SEL: bank ${BANKS[k - 12]}`));
+    `tap: all the way, to stay. With SEL: bank ${BANKS[k - 8]}`));
 for (const k of Object.values(knobs)) hit(k, "knob");
 for (const b of Object.values(buttons)) hit(b);
 keys.forEach((k) => hit(k));

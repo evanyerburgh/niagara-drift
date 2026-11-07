@@ -18,7 +18,8 @@ function reply(cmd, body) {
 // the firmware's side: objects 0-3 stored (4 left out: an older FM-1 that has none), a write buffer, the commits; from
 // 0.3 (safe) the staging (0x74) and the question (0x75), answered "sel" or "home"; spoil: a byte lost on the way
 class FakeFM1 {
-  constructor(objs, answers = true, safe = false, answer = "sel") {
+  constructor(objs, answers = true, safe = false, answer = "sel", nobj = 8) {   // nobj: objects it knows (5: a 0.3 build
+    this.nobj = nobj;                                                          // from before banks D-F)
     this.store = objs; this.buf = []; this.q = []; this.answers = answers; this.restarted = false; this.reads = 0; this.onRead = null;
     this.safe = safe; this.answer = answer; this.staged = {}; this.spoil = false;
   }
@@ -37,6 +38,9 @@ class FakeFM1 {
       this.store[obj] = Uint8Array.from(this.buf.slice(0, off));
       this.buf = [];
       this.q.push(reply(0x72, [obj, 0]));
+    } else if (cmd === 0x74 && this.safe && obj >= this.nobj) {   // one it doesn't know: refused (rx_index)
+      this.buf = [];
+      this.q.push(reply(0x74, [obj, 1]));
     } else if (cmd === 0x74 && this.safe) {
       const d = Uint8Array.from(this.buf.slice(0, off)), c = (b[3] | (b[4] << 8) | (b[5] << 16) | (b[6] << 24)) >>> 0;
       if (this.spoil) d[5] ^= 1;
@@ -45,7 +49,8 @@ class FakeFM1 {
       this.buf = [];
       this.q.push(reply(0x74, [obj, ok ? 0 : 2]));
     } else if (cmd === 0x75 && this.safe) {
-      const want = Object.keys(this.staged).join() === "0,2,3,4" ? 0b11101 : -1;   // every object of the list
+      const list = [...Array(this.nobj).keys()].filter((k) => k !== 1);   // every object of the list
+      const want = Object.keys(this.staged).join() === list.join() ? list.reduce((m, k) => m | (1 << k), 0) : -1;
       this.q.push(reply(0x75, [b[0] === want ? 0xFF : 2]));
       if (b[0] === want)                       // (the answer later: when the player presses)
         this.q.push(() => {
@@ -103,6 +108,14 @@ const res = await ndRestore(safe, back, () => {}, () => { asked = true; untouche
 check("THE SAFE RESTORE: all staged, nothing changed when the FM-1 asks", asked && untouched);
 check("... SEL: every object switched to (one the backup hasn't, emptied), the FM-1 restarting itself", res === "restored" &&
       same(safe.store[0], objs[0]) && same(safe.store[3], objs[3]) && safe.store[4].length === 0 && safe.restarted);
+const pre = new FakeFM1(empty(), true, true, "sel", 5);
+check("... onto a 0.3 build from before banks D-F: their empty objects left out, the rest restored",
+      (await ndRestore(pre, back)) === "restored" && same(pre.store[0], objs[0]) && !(5 in pre.store));
+const withD = { ...back, 5: fill(50, 9) };
+const pre2 = new FakeFM1(empty(), true, true, "sel", 5);
+let refusedD = false;
+try { await ndRestore(pre2, withD); } catch (e) { refusedD = e.code === "lost"; }
+check("... one holding bank D onto it: refused, nothing changed", refusedD && pre2.store[0].length === 0);
 const home = new FakeFM1(empty(), true, true, "home");
 check("... HOME: cancelled, nothing changed", (await ndRestore(home, back)) === "cancelled" && home.store[0].length === 0 &&
       !home.restarted);

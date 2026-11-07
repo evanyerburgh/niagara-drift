@@ -575,6 +575,7 @@ void dr_gesture(int g, int amt) { post(C_GEST, g, amt); }
 volatile float dr_level[DR_NGROUPS];
 volatile float dr_fade;
 volatile float dr_duck_level = 1.0f;
+volatile float dr_tail;
 static float duck = 1.0f, duck_to = 1.0f;     /* the dip around a save while playing (ui.c) */
 volatile float dr_pitch[DR_NGROUPS];
 
@@ -2536,8 +2537,10 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
             for (j = 0; j < k; j++)
                 pk = fm_maxf(pk, fm_maxf(fm_fabsf(mixl[j]), fm_fabsf(mixr[j])));
             fx_quiet = pk < 1e-6f ? fx_quiet + 1u : 0u;
+            dr_tail = pk;
         } else {                                 /* resting: the delay goes straight to its knobs */
             fx_rest();
+            dr_tail = 0.0f;
         }
         {                                        /* FEEDBACK: this block's sound, for the drones 256 samples on */
             float pk = 0.0f;

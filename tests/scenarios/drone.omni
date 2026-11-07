@@ -17,10 +17,10 @@ expect par74 0
 # depth; 108, 109 each drone's sub wave; 110 the Tuning.
 # Pages: 0 Drones 1 1 Drones 2 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO sends 7 Mods 8 Partner 9 Pitch moves
 # 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
-# a new FM-1 plays the Presets; these scenes go in bank A (SEL + D5)
+# a new FM-1 plays the Presets; these scenes go in bank A (SEL + G4)
 expect bank 3
 press SEL
-tapkey w12
+tapkey w8
 release SEL
 expect bank 0
 wav drone.wav
@@ -489,11 +489,10 @@ expect par49 1
 midi 91 3C 64
 wait 20
 expect par21 6000
-# SAVE while playing: the output dips out (20 ms), the write, back (30 ms); two writes: the project and bank C, which
-# a new FM-1 fills with P9-P12 (v0.3)
+# SAVE while playing: the output dips out (20 ms), the write, back (30 ms); one write: the project
 tap SAVE
 wait 150
-expect store_writes 2
+expect store_writes 1
 expect dirty 0
 # no autosave while the drone plays (a knob moved and back: unsaved again)
 spin K1 1
@@ -501,17 +500,21 @@ spin K1 -1
 expect dirty 1
 wait 5000
 expect dirty 1
-expect store_writes 2
-# PLAY again: out over the fade (Fade is 32 now: 2.0 s), then the autosave
+expect store_writes 1
+# PLAY again: out over the fade (Fade is 32 now: 2.0 s), then the autosave, once the effects' tails are no longer
+# heard (a save's erase cut into them popped, Evan 2026-11-07), or 15 s after the last touch, with the dip
 tap PLAY
 expect playing 0
 wait 2500
 expect fade 0
 wait 4500
+expect dirty 1
+expect store_writes 1
+wait 9000
 expect dirty 0
 # the knob came back where it was: the flash has this sound already; written once, for the tip seen since the save
 # (FX's first time, v0.3: the tips' seen flags go with the next save)
-expect store_writes 3
+expect store_writes 2
 wavstop
 # everything comes back after a reboot
 reboot
@@ -529,7 +532,7 @@ press SAVE
 tapkey w0
 release SAVE
 expect scenes 1
-expect store_writes 4
+expect store_writes 3
 expect view 0
 # the sound is scene 1 (its key blinks), until a knob is turned
 expect scene_at 0
@@ -591,10 +594,10 @@ expect scene_at -1
 tapkey w0
 wait 1500
 expect par7 650
-# banks (v0.2): SEL + a top white key (D5 .. G5) picks the bank; the 12 scene keys play it
+# banks: SEL + one of the eight gesture keys (G4 .. G5: A B C D E F, the Presets' two) picks the bank; keys 1-8 play it
 expect bank 0
 press SEL
-tapkey w13
+tapkey w9
 release SEL
 expect bank 1
 expect bscenes 0
@@ -610,7 +613,7 @@ expect bank 1
 # the Presets: eight on keys 1-8 (v0.3: 9-12 are gestures), fixed: none can be saved over (and picking the bank
 # doesn't play G5's gesture)
 press SEL
-tapkey w15
+tapkey w14
 release SEL
 expect bank 3
 expect par93 0
@@ -620,13 +623,13 @@ tapkey w7
 release SAVE
 wait 300
 expect bscenes 255
-# P12 (Clean): one oscillator, drone II out on its own; SEL + PLAY brings it in, and out again (playing). Since v0.3
-# P9-P12 start in bank C (C1-C4)
+# P12 (Clean): one oscillator, drone II out on its own; SEL + PLAY brings it in, and out again (playing). P9-P12 are
+# the Presets' second bank (SEL + G5), keys 1-4
 tap PLAY
 wait 1600
 expect playing 1
 press SEL
-tapkey w14
+tapkey w15
 release SEL
 tapkey w3
 wait 2500
@@ -638,9 +641,9 @@ release SEL
 wait 2500
 expect par72 0
 expect level1 >3
-# back to the Presets (P12 was C4)
+# back to the Presets (P12 was their second bank's key 4)
 press SEL
-tapkey w15
+tapkey w14
 release SEL
 press SEL
 tap PLAY
@@ -668,14 +671,14 @@ expect par21 5700
 tapkey b3
 # back to A; bank B's scene survives a reboot
 press SEL
-tapkey w12
+tapkey w8
 release SEL
 expect bank 0
 expect scenes 1
 reboot
 wait 300
 press SEL
-tapkey w13
+tapkey w9
 release SEL
 expect bscenes 4
 # a black key during a scene change is the hand's: the scene leaves it alone (2026-10-25: the Sub key showed its next

@@ -128,8 +128,11 @@ void plat_midi_out(uint32_t pkt)
 
 /* flash: one buffer per object, kept across a simulated reboot */
 static uint8_t store[OBJ_NOBJ][PLAT_STORE_MAX];
-static int store_len[OBJ_NOBJ] = {-1, -1, -1, -1, -1};
+static int store_len[OBJ_NOBJ] = {-1, -1, -1, -1, -1, -1, -1, -1};   /* -1: never written */
+_Static_assert(OBJ_NOBJ == 8, "store_len: one -1 an object");
 static uint32_t store_writes;
+static int save_cut, save_cut_due;   /* "savecut 1": each save cuts the next audio block to silence, as the FM-1's erase
+                                      * does (main.c audio_silence: the DMA buffer zeroed for a block, ~5.8 ms) */
 int plat_store_load(uint32_t obj, void *dst, uint32_t max)
 {
     int n;
@@ -148,6 +151,8 @@ int plat_store_save(uint32_t obj, const void *src, uint32_t len)
     memcpy(store[obj], src, len);
     store_len[obj] = (int)len;
     store_writes++;
+    if (save_cut)
+        save_cut_due = 1;
     return 0;
 }
 
@@ -328,6 +333,10 @@ static void run_ms(uint32_t ms)
         while (audio_due_ms <= (double)now_ms) {      /* 256-frame blocks, as the device renders them */
             double t0 = now_ns(), dt;
             dr_render(blk, 256, master);
+            if (save_cut_due) {                       /* the erase's cut (savecut 1) */
+                memset(blk, 0, sizeof(int32_t) * 2u * 256u);
+                save_cut_due = 0;
+            }
 #ifdef OM_WEB
             web_audio(blk, 256);
 #endif
@@ -609,6 +618,8 @@ int main(int argc, char **argv)
                 dr_set(p, v);
             }
             run_ms(1);
+        } else if (!strcmp(cmd, "savecut")) {      /* savecut 1: a save cuts an audio block, as on the FM-1 */
+            save_cut = atoi(a);
         } else if (!strcmp(cmd, "phones"))         /* phones 1: headphones in (the Speaker cut out) */
             phones = atoi(a);
         else if (!strcmp(cmd, "master"))
