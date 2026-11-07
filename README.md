@@ -352,11 +352,12 @@ pink specks are as many as Color says.
 
 - **The sends** and **speed mod** are centered: the middle is none. Each send is named for what it moves: Pitch, or
   X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 4 / 9. Under each value, how far it swings
-  in what you hear ("±12c", "±3.6 oct"), with the Movement. The picture shows LFO I and II, the drones' four sends
-  (in the knobs' order), and a line from each LFO that reaches one (gray: at 0, or only from an LFO that's off); the
-  delay's send is on Mods, with its knob; the waves bent by Speed mod, as on Mods; under them the rate and the
-  Movement; under the sends the Swell lock (D#4, held to switch): free, on Swell (the LFO starts over each Swell bar)
-  or waits Swell (locked, the Swell stopped).
+  in what you hear ("±12c", "±3.6 oct"), with the Movement. The picture is the wiring, each drone's two sends as a
+  sentence with its keys: "[F#3] LFO II → [G#3] x-wave" (F#3 picks the LFO, G#3 what it moves), "[A#3] LFO I+II →
+  [C#4] reso"; a send at 0 (or fed only by an LFO that's off) is gray. Above them the two LFOs, I over II, each a
+  cycle with its dot (bent by Speed mod, as on Mods), the rate, and the Swell lock (D#4, held to switch): free, or on
+  Swell (the LFO starts over each Swell bar; dim while the Swell is stopped, waiting for it). "mvmt 0%" in the rate's
+  place: ALGORITHM's Movement is at 0, so nothing moves. The delay's send is on Mods, with its knob.
 - **Mods**, the LFO moving other things, and cross-mod's amount:
   - **Speed mod** ("Speed" on the knob): the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
   - **Source**: which LFO does that (I, II or both).
@@ -376,13 +377,16 @@ pink specks are as many as Color says.
 
 #### Swell · ARP
 
-<img src="docs/img/page-swell.png" width="244" alt="The Swell page: the swell's shape over a bar">
+<img src="docs/img/page-swell.png" width="244" alt="The Swell page: a bar of the Swell's two breaths as strands meeting at a dot">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Swell | rate (on a MIDI clock: division) | depth | shape | swing |
 
-- Tap ARP for this page; tap it again here to start or stop the Swell. The picture shows a bar of it, and a dot where it is.
+- Tap ARP for this page; tap it again here to start or stop the Swell (the header says **on**, or **off · tap ARP**).
+  The picture shows two bars of it, four breaths, the level falling down the picture in dB (the dip is the Depth), as
+  five strands that meet at a dot where the Swell is now: wide when it's slow, nearly one line when it's fast. **Shape**
+  shows its number with its kind under it (gate, pulse, even, ramp).
 - **The Swell** runs from a 33-second breath to a buzz (the starting sound has it on: a slow breath, 40 deep).
 - **Depth** is how far it dips, in dB (down to −30; all the way, silence). **Shape** runs both ways from the
   middle, **even** (a smooth breath): to the right it becomes a **ramp**, swelling slowly and falling away quickly,
@@ -395,16 +399,22 @@ pink specks are as many as Color says.
 
 #### Delay and Reverb · FX
 
-<img src="docs/img/page-effects.png" width="732" alt="The Delay page with KNOB 4's card in two halves, the same page with SEL held and the delay type turning, and the Reverb page with its tail">
+<img src="docs/img/page-effects.png" width="732" alt="The Delay page with its echoes as half-rings and the type above Mix, the same page with SEL held and the type turning, and the Reverb page with its tail as rings">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 | SEL + KNOB 4 |
 |---|---|---|---|---|---|
-| Delay | drive | time | repeats | delay mix | delay type |
-| Reverb | length | damp | reverb type | reverb mix | into reverb |
+| Delay | drive | time | repeat | mix | delay type |
+| Reverb | length | damp | reverb type | mix | into reverb |
 
-- **KNOB 4 has two jobs** on these pages, and its card shows both: the mix above, and below it the choice you make
-  before playing, marked **+ SEL**. Hold SEL and turn KNOB 4 to change that choice; its half of the card lights and
-  the mix dims. Let go of SEL and KNOB 4 is the mix again.
+- **KNOB 4 has two jobs** on these pages: the **Mix**, and the choice you make before playing, shown above it on the
+  line ("SEL Tape", "SEL Both"). Hold SEL and turn KNOB 4 to change that choice: its column becomes **Type** or
+  **Into**, and the line shows the mix it goes back to. Let go of SEL and KNOB 4 is the mix again.
+- **The pictures** put time on an axis that opens out near the start, so short and long times both read. **Delay**:
+  the sound is the white ring at the left, and each echo a half-ring at its time (2 s at the right), as big as it's
+  still loud, the left channel's opening up in blue and the right's down in aqua, dimmer as they age; Drive thickens
+  the lines, and "runaway" shows in red in the header. **Reverb**: the tail as rings (40 s at the right), each as tall
+  as the tail is then, as wide as the room, darker with Damp; at Inf they all hold and "freeze" shows in blue. At the
+  left, what goes into it (echoes, drones), lit when the reverb hears it.
 
 - **Drive** distorts the drones and their echoes together, after the delay and before the reverb, as the Lyra-8's
   distortion does: ghost notes, beating and crackle on the repeats. The first fifth of its turn blends a little in;

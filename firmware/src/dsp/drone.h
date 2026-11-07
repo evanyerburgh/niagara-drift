@@ -278,6 +278,7 @@ float dr_lfo_wave(int tap, int shape, float ph);   /* a tap's shape (1..10; 0 of
                                                     * random, ph 0..1 the last cycle, 1..2 this one */
 float dr_lfo_rmod_k(float rm, int src, int w1, int w2);  /* rate mod's speed scale (the screen's picture) */
 float dr_pulse_wave(float ph);                 /* the pulse's gain at ph (0..2) as set now, 0..1 */
+float dr_pulse_hz(int v);                      /* breaths a second at Rate v, or now (-1: the Rate, or the clock's) */
 /* Age and Character at full (Evan, 2026-11-02: "stronger"; the pictures on Life read them too) */
 #define AGE_CUT -250                    /* Age: the cutoff, of its 1000, about 2.5 octaves darker (was -70) */
 #define AGE_NZ 20                       /* its hiss (was 15) */

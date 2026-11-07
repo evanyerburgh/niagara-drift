@@ -575,3 +575,25 @@ at the end. The current state is in the [README](../README.md) and the code.
   SEL and PLAY boxed). Nothing jumps: a line that comes and goes keeps its place, gray when idle (LFO sends'
   Movement and Swell lock). No sliders on LFO sends or Mods, nor cross-mod's amount bar: the knobs' values say it.
   A setting shown at the page's top with its key (Partner, the sub's octave, the filter) gets no banner there.
+- 2026-11-03: Swell, Delay and Reverb in the new look. The Swell: a bar of its two breaths in dB, six strands meeting
+  at the dot (the fan 0.09 / (1 + 2.2 Hz) of a bar), nine coral pills a meter; Shape as its number with its kind
+  under it (gate 100, pulse, even 0, ramp), since the picture shows the shape. Delay and Reverb on log time axes
+  (Delay 42 + 60 ln(1 + t / 0.1 s), 2 s; Reverb 84 + 37.7 ln(1 + t / 1 s), 40 s): echoes as half-rings
+  48 sqrt(wet fb^k) tall, L blue up and R aqua down; the tail as rings as tall as it is then, drained by Damp;
+  runaway red and freeze blue in the header. KNOB 4's second job as the SEL tag above Mix (both pages say "Mix").
+  A value too wide at 16 px steps down to 13 ("Cathedral").
+- 2026-11-04: LFO sends is the wiring as sentences (Evan's board): each drone's two sends "[F#3] LFO II → [G#3]
+  x-wave", "[A#3] LFO I+II → [C#4] reso", the keys where they sit, a send at 0 gray; under them the LFOs small and live,
+  the rate, the Swell lock; "movement 0%" when Movement grays every route. The same keys on both LFO pages; no banner
+  for a key whose change the page shows (the routes on LFO sends, the delay's LFO and cross-mod on Mods). The key
+  order stays (D#4 the reset between the drones).
+- 2026-11-07: the Swell's strands 2 px, five of them (were six of 1 px: thinner and rougher than every other page's);
+  the fan as before, meeting at the dot. The picture two bars across at every speed (four breaths, 54 px each; was
+  one bar): the rhythm reads as a rhythm; the dot crosses both, the screen counting which bar it's in; the fan half
+  as wide a breath, so its widest spread stays.
+- 2026-11-07: Delay's and Reverb's rings 2 px, as every page (were 1 px); Drive thickens the Delay's from there (3 px
+  from Drive 34, 4 at 100).
+- 2026-11-07: LFO sends: the LFOs above the routes, I over II (on one row the longest names ran into the rate), their
+  waves in one column, 13 px tall and 54 long (were 9 and 24); the rate right of LFO I, the lock right of LFO II;
+  locked with the Swell stopped, "on Swell" dimmed (was "waits Swell", too wide beside the waves); "mvmt 0%" in the
+  rate's place when Movement is 0 (the rate isn't heard then).
