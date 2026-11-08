@@ -196,8 +196,8 @@ extern const char *const DR_LFO_W2_NAME[DR_LFO_NSHAPES];
                                                 * drone is a pulse of clicks; was 27 Hz) */
 #define DR_PITCH_NOTE 2068                     /* 27 Hz (A0), the DS-2's bottom: under it the screen shows Hz */
 #define DR_PITCH_HI 9135                       /* 1.6 kHz */
-#define DR_NREV 4
-extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall" */
+#define DR_NREV 5
+extern const char *const DR_REV_NAME[DR_NREV];          /* "Room", "Hall", "Cathedral", "Chorus hall", "Shimmer" */
 #define DR_DLY_TMAX 163                                   /* the delay's longest Time: 1455 ms */
 #define DR_NDIV 8
 extern const char *const DR_DIV_NAME[DR_NDIV];          /* "32 bars" .. "1/4" */

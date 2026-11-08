@@ -2207,7 +2207,7 @@ static float filt_db(int g, float cut, float f)
 /* the reverb's tail, as measured (to -60 dB after a burst, QA batch 3; doubling the -30 dB time had made
  * the long ones short, and the Chorus hall no longer than the Hall) and its pre-delay: an envelope over 5 s,
  * as high as h */
-static const float RV_PRE_S[DR_NREV] = {0.004f, 0.018f, 0.042f, 0.024f};   /* drone_fx.c's pre-delays */
+static const float RV_PRE_S[DR_NREV] = {0.004f, 0.018f, 0.042f, 0.024f, 0.030f};   /* drone_fx.c's pre-delays */
 static float rev_secs(int v) { return v >= 100 ? 0.0f : 0.3f * fm_exp2f((float)v * 0.070607f); }   /* 0: Inf */
 
 /* where an echo is drawn, off its time: Grain's jitter (its own sound shakes the time), Self's drift later (its

@@ -199,7 +199,55 @@ static inline float dly_read(const int16_t *b, float d)   /* d full-rate samples
 #define DLY_DMAX (2.0f * (float)DLY_N - 16.0f)   /* the farthest back it reads, full-rate samples */
 
 /* ------------------------------------------------------------ reverb --- */
-enum { RV_ROOM, RV_HALL, RV_CATHEDRAL, RV_CHORUS_HALL, RV_NTYPES };
+/* SHIMMER (v0.3, Evan's pick of three, 2026-11-09: "the flicker"): the reverb's wet, low-passed, an octave up, fed back
+ * into its input, so each pass climbs an octave. The shift: two pairs of reads of a short line, each pair sweeping at
+ * about twice the write's speed and crossfaded with sin^2 windows (46 ms windows of 1024 at 22.05 kHz); one pair 7
+ * cents sharp of the octave, the other 7 flat, so the halo shimmers in place. In a smaller space than the Cathedral,
+ * fed back harder, so it builds at once (the first test, in a large hall at 0.45, was "too slow to be shimmering") */
+#define SH_GAIN 0.62f                            /* the octave fed back */
+#define SH_LP_K 0.55f                            /* the low pass before the shift: ~2.9 kHz at 22.05 kHz, two poles */
+#define SH_DET 14.0f                             /* the two pairs' gap, cents */
+#define SH_N 2048u
+#define SH_W 1024.0f
+static float sh_buf[SH_N];                       /* main RAM, 8 KB */
+static struct { uint32_t w; float ph, ph2, lp1, lp2, prev, amt; } sh;
+static inline float sh_read(float d)             /* d samples back, linear */
+{
+    float p = (float)sh.w - 2.0f - d, f;
+    uint32_t k;
+    if (p < 0.0f)
+        p += (float)SH_N;
+    k = (uint32_t)p;
+    f = p - (float)k;
+    return sh_buf[k & (SH_N - 1u)] * (1.0f - f) + sh_buf[(k + 1u) & (SH_N - 1u)] * f;
+}
+static inline float sh_pair(float *ph, float step)
+{
+    float d1, d2, s1, s2;
+    *ph -= step;                                 /* the read gains ~a sample a tick on the write: twice the speed */
+    if (*ph < 0.0f)
+        *ph += SH_W;
+    d1 = *ph;
+    d2 = d1 + SH_W * 0.5f;
+    if (d2 >= SH_W)
+        d2 -= SH_W;
+    s1 = fm_sin_turns(d1 * (0.5f / SH_W));
+    s2 = fm_sin_turns(d2 * (0.5f / SH_W));
+    return sh_read(d1) * s1 * s1 + sh_read(d2) * s2 * s2;
+}
+static inline float sh_tick(float x)
+{
+    /* each pair's step past the write: 2 * 2^(+-c/1200) - 1, to first order */
+    const float up = 2.0f * (1.0f + SH_DET * 0.5f * 0.000577623f) - 1.0f, dn = 2.0f * (1.0f - SH_DET * 0.5f * 0.000577623f) - 1.0f;
+    float y;
+    sh.lp1 += (x - sh.lp1) * SH_LP_K;
+    sh.lp2 += (sh.lp1 - sh.lp2) * SH_LP_K;
+    sh_buf[sh.w] = fm_flush(sh.lp2);
+    y = 0.5f * (sh_pair(&sh.ph, up) + sh_pair(&sh.ph2, dn));
+    sh.w = (sh.w + 1u) & (SH_N - 1u);
+    return y;
+}
+enum { RV_ROOM, RV_HALL, RV_CATHEDRAL, RV_CHORUS_HALL, RV_SHIMMER, RV_NTYPES };
 typedef struct {
     float size, pre_ms, mod, lowcut, width;   /* the lines' lengths x; pre-delay; the swing, samples at 22.05 kHz;
                                                * the input's low cut, Hz; 0 mono .. 1 */
@@ -210,6 +258,8 @@ static const rv_type_t RV_TYPE[RV_NTYPES] = {
     {0.75f, 18.0f, 5.0f, 90.0f, 0.9f, 0.93f},    /* HALL */
     {1.00f, 42.0f, 7.0f, 60.0f, 0.85f, 1.00f},   /* CATHEDRAL: the largest, the furthest */
     {0.85f, 24.0f, 18.0f, 90.0f, 1.0f, 1.45f},   /* CHORUS HALL: a hall whose lines swing wide (they cancel a little) */
+    {0.60f, 30.0f, 6.0f, 70.0f, 0.95f, 1.00f},   /* SHIMMER: a hall whose wet, an octave up, feeds back into it
+                                                 * (sh_tick): each pass climbs an octave */
 };
 #define RV_FS (DR_SR * 0.5f)
 /* the eight lines at size 1, samples at 22.05 kHz (57 .. 125 ms; primes, ~1.12 from one to the next:
@@ -707,10 +757,18 @@ static void fx_run(float *l, float *r, uint32_t n)
     }
     /* REVERB at the half rate: the send down, the network, the wet up */
     rv_block(n / 2u, (float)n / DR_SR);
+    {   /* Shimmer's feedback eases in and out over ~0.3 s; none and not the type: the shift isn't run */
+        const float aim = par[P_REV_TYPE] == RV_SHIMMER ? SH_GAIN : 0.0f;
+        const float st = (float)n / (0.3f * DR_SR) * SH_GAIN;
+        sh.amt = sh.amt < aim ? fm_minf(sh.amt + st, aim) : fm_maxf(sh.amt - st, aim);
+    }
     for (j = 0; j + 1u < n; j += 2u) {
         float a = sl[j], b = sl[j + 1u], x, ol, or_;
         x = (hb_ap(&rv.dn, 1, HB_A1, hb_ap(&rv.dn, 0, HB_A0, b)) + hb_ap(&rv.dn, 3, HB_A3, hb_ap(&rv.dn, 2, HB_A2, a))) * 0.5f;
+        if (sh.amt > 0.0f)
+            x += sh.amt * sh_tick(sh.prev);
         rv_tick(x, &ol, &or_);
+        sh.prev = (ol + or_) * 0.5f;
         sl[j] = hb_ap(&rv.up[0], 1, HB_A1, hb_ap(&rv.up[0], 0, HB_A0, ol));
         sl[j + 1u] = hb_ap(&rv.up[0], 3, HB_A3, hb_ap(&rv.up[0], 2, HB_A2, ol));
         sr[j] = hb_ap(&rv.up[1], 1, HB_A1, hb_ap(&rv.up[1], 0, HB_A0, or_));

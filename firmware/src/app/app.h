@@ -56,7 +56,7 @@
 #define BANK_PRESETS2 7
 #define BANK_D 4                         /* D, E, F: 4, 5, 6 (their own flash objects, 8 scenes each) */
 #define BANK_IS_PRESETS(b) ((b) == BANK_PRESETS || (b) == BANK_PRESETS2)
-#define PRESET_LOCKED 11                 /* P12, the clean sound */
+#define PRESET_LOCKED 15                 /* P16, the bare sound */
 
 typedef struct {
     uint32_t magic, format;

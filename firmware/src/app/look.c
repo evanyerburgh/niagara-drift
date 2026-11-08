@@ -2072,7 +2072,7 @@ static void lk_pic_delay(void)
  * the reverb hears it */
 static void lk_pic_reverb(void)
 {
-    static const float WIDE[DR_NREV] = {0.16f, 0.24f, 0.324f, 0.27f};   /* Room, Hall, Cathedral, Chorus hall */
+    static const float WIDE[DR_NREV] = {0.16f, 0.24f, 0.324f, 0.27f, 0.30f};   /* Room, Hall, Cathedral, Chorus hall, Shimmer */
     const int ty = (unsigned)proj.par[P_REV_TYPE] < DR_NREV ? proj.par[P_REV_TYPE] : 2, into = proj.par[P_DLY_ROUTE];
     const float len = rev_secs(proj.par[P_REV_LEN]), mix = (float)proj.par[P_REV_MIX] * 0.01f;
     const float damp = (float)proj.par[P_REV_DAMP] * 0.01f, r0 = 6.0f + 20.0f * mix;
