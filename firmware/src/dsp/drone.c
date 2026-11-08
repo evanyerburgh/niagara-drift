@@ -36,10 +36,12 @@ static const char *const INTERVAL_NAME[DR_NINTERVALS] = {"-Oct", "-5th", "-5th j
  * than one every two seconds, ~16 dB of slow loudness swell, ~1.6 octaves of brightness): each voice's LFO taps
  * start routed (I or II), the filters breathing deep and against each other (+85 drone I, -85 drone II) on a
  * slow LFO (a cycle in ~25 s; Wave II a random glide), the Swell on as a slow breath (one in ~35 s, 12 dB),
- * some delay with a gentle wobble, a little more reverb; the oscillators' depths start at 0 */
+ * some delay with a gentle wobble, a little more reverb; the oscillators' depths start at 0. The cutoffs 1 kHz and
+ * 1.2 kHz (Evan, 2026-11-08; 2.3 and 2.0 before, where half of each sweep went above what a D3 drone lets you hear),
+ * the levels 84 and 68 for the same loudness */
 static const dr_param_t PARAMS[DR_NPARAMS] = {
-    VOICE_PARAMS(5000, 67, DR_IV_UNISON, 30, 700, 75, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
-    VOICE_PARAMS(5700, 33, DR_IV_UNISON + 9, 15, 680, 61, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
+    VOICE_PARAMS(5000, 67, DR_IV_UNISON, 30, 575, 84, DR_LFO_I, DR_LFO_I, 85),     /* I: D3, saw, partner in unison */
+    VOICE_PARAMS(5700, 33, DR_IV_UNISON + 9, 15, 600, 68, DR_LFO_II, DR_LFO_II, -85),  /* II: A3, triangle, partner an octave up */
     {"Cross-mod", 0, DR_XMOD_OUT, 0}, {"X-mod amt", 0, 100, 40}, {"Hard sync", 0, 1, 0}, {"Pitch link", 0, 1, 0},
     {"Link ofs", -2400, 2400, 700}, {"LFO rate", 0, 152, 74}, {"Wave I", 0, DR_LFO_NSHAPES - 1, 1},
     {"Wave II", 0, DR_LFO_NSHAPES - 1, 8}, {"Pitch glide", 0, 100, 7}, {"Fade", 0, 100, 29}, {"Drift", 0, 100, 30},

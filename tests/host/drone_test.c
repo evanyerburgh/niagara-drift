@@ -30,6 +30,10 @@ static void classic(void)
     dr_set(DR_GP(1, GP_FLFO_DEPTH), -25);
     dr_set(DR_GP(0, GP_RESO), 350);
     dr_set(DR_GP(1, GP_RESO), 350);
+    dr_set(DR_GP(0, GP_CUTOFF), 700);               /* the cutoffs and levels before 2026-11-08 */
+    dr_set(DR_GP(1, GP_CUTOFF), 680);
+    dr_set(DR_GP(0, GP_LEVEL), 75);
+    dr_set(DR_GP(1, GP_LEVEL), 61);
     dr_set(P_LFO_RATE, 98);
     dr_set(P_LFO_W2, 1);
     dr_set(P_DLY_REPEATS, 35);

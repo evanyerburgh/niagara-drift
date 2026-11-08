@@ -693,4 +693,5 @@ at the end. The current state is in the [README](../README.md) and the code.
   end when it would run past it. Depth 100 is now the whole range (it was reached at 50 on Reso and ~70 on X-Wave; past
   that the knob did nothing more); saved sounds are converted to the range they reached (format 44). The cutoff's
   sweep stays centered on its knob, as on most synths, its edges unchanged: the fix there is the sounds' own cutoffs
-  (the starting sound's, with the Presets).
+  (the starting sound's: drone I's cutoff 70 to 57.5, 2.3 kHz to 1 kHz, drone II's 68 to 60, 1.2 kHz, the levels 75 to
+  84 and 61 to 68 for the same loudness; its sweep's dull stretches halved, 12 s a minute to 6).

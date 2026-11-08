@@ -674,7 +674,9 @@ int main(int argc, char **argv)
                 {DR_GP(0, GP_RESO), 350}, {DR_GP(1, GP_RESO), 350}, {P_LFO_RATE, 98}, {P_LFO_W2, 1},
                 {P_DLY_REPEATS, 35}, {P_DLY_MIX, 0}, {P_REV_MIX, 25}, {P_DLY_LFO_DEPTH, 0}, {P_PULSE, 0},
                 {P_PULSE_RATE, 45}, {P_PULSE_DEPTH, 48},
-                {P_GLIDE, 0}, {P_FADE, 25}, {P_MORPH, 21}, {P_SCENE_T, 48}};   /* the times before 2026-11-07 */
+                {P_GLIDE, 0}, {P_FADE, 25}, {P_MORPH, 21}, {P_SCENE_T, 48},   /* the times before 2026-11-07 */
+                {DR_GP(0, GP_CUTOFF), 700}, {DR_GP(1, GP_CUTOFF), 680}, {DR_GP(0, GP_LEVEL), 75},
+                {DR_GP(1, GP_LEVEL), 61}};   /* the cutoffs and levels before 2026-11-08 */
             uint32_t i;
             for (i = 0; i < sizeof OLD / sizeof OLD[0]; i++) {  /* only these (the engine's queue holds 64) */
                 proj.par[OLD[i][0]] = OLD[i][1];
