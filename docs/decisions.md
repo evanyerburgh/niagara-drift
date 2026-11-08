@@ -682,7 +682,8 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-11-08 (Evan, ledger 3a): **intervals in each Tuning's own terms**, as composers and tuning files write them:
   on the equal Tunings by steps over the division ("11\19", as Ableton's tuning site and the xenharmonic writers do),
   on the others by ratio ("3/2", "7/4"; each Tuning's ratios in flash beside its cents, `dr_tun_name`). Drones 1's
-  interval, a partner's and Shift's; 12-tone keeps its familiar names, and a note off the Tuning's notes or a ratio
-  past 7 characters falls back to them. Pitch values stay notes and cents. Swara names for Shruti and harmonic numbers
+  interval, a partner's and Shift's, between the two notes' nearest on the Tuning (Evan on the FM-1: exactly on them
+  was too rare); 12-tone keeps its familiar names, and a note over 25 cents off or a ratio past 7 characters falls
+  back to them. Pitch values stay notes and cents. Swara names for Shruti and harmonic numbers
   were considered and left out (simpler; a Shruti naming would need an Indian musician's check). The screen fonts
   without the drawn arrow carry a real backslash (it was a blank slot).

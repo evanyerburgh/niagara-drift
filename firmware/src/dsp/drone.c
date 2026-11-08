@@ -214,8 +214,9 @@ static void itoa_s(int v, char *b)
 /* AN INTERVAL IN THE TUNING'S OWN TERMS (ledger 3a, Evan 2026-11-08: "follow how composers notate it"): on the equal
  * ones its steps over the division, as Ableton's tuning files and the xenharmonic writers do ("11\19", 19-tone's
  * fifth); on the others its ratio, from each Tuning's own (TUN_R, the same order as the cents tables; from the 1/1,
- * or from A for the ones built on it: an interval's ratio is the same). 0 when it has no such name: 12-tone (its
- * names are the familiar ones), unison, a note off the Tuning's notes, a ratio too long to fit ("1323/1024") */
+ * or from A for the ones built on it: an interval's ratio is the same), between the two notes' nearest. 0 when it has
+ * no such name: 12-tone (its names are the familiar ones), unison, a note over 25 cents off the Tuning's notes, a
+ * ratio too long to fit ("1323/1024") */
 typedef struct { uint16_t n, d; } dr_ratio_t;
 static const dr_ratio_t TUN_R_JUST[12] = {{1, 1}, {16, 15}, {9, 8}, {6, 5}, {5, 4}, {4, 3}, {45, 32}, {3, 2}, {8, 5},
                                           {5, 3}, {9, 5}, {15, 8}};
@@ -244,6 +245,7 @@ static uint32_t gcd_u(uint32_t a, uint32_t b)
     }
     return a;
 }
+#define TUN_NAME_OFF(d) ((d) > 25 || (d) < -25)   /* more than this many cents off its nearest note: no name */
 int dr_tun_name(int t, int p1, int a, int b, char *out)   /* the interval from a to b (cents), its size alone */
 {
     const int r = DR_TUN_MOVES(t) ? p1 : 900;
@@ -253,8 +255,11 @@ int dr_tun_name(int t, int p1, int a, int b, char *out)   /* the interval from a
         return 0;
     ka = dr_grid_k(t, a, r);
     kb = dr_grid_k(t, b, r);
-    if (dr_grid_at(t, ka, r) != a || dr_grid_at(t, kb, r) != b || ka == kb)
-        return 0;                                /* off the Tuning's notes (SEL's fine tuning, Pitch lock) */
+    if (TUN_NAME_OFF(dr_grid_at(t, ka, r) - a) || TUN_NAME_OFF(dr_grid_at(t, kb, r) - b) || ka == kb)
+        return 0;                                /* far off the Tuning's notes (Pitch lock keeping a 12-tone pitch on a
+                                                  * sparse one): the familiar name; a few cents off (a drone left on D3,
+                                                  * 5c from 19-tone's D; SEL's fine tuning) named by its nearest notes
+                                                  * (Evan on the FM-1, 2026-11-08: exactly on them was too rare, "m6") */
     if (kb < ka) {
         k = ka;
         ka = kb;

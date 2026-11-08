@@ -510,9 +510,10 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
   - <a id="intervals-on-a-tuning"></a>**Intervals on a Tuning are named in its own terms**, as composers and tuning
     files write them: on the equal ones by steps over the division ("11\19" is 19-tone's fifth, "31\53" 53-tone's),
     on the others by ratio ("3/2", "7/4", "11/9"). Drones 1's interval, a partner's and Shift's read this way, so every
-    click of a pitch knob changes the name. On 12-tone they keep their familiar names ("5th"), and a note off the
-    Tuning's notes (SEL's fine tuning, Pitch lock) or a ratio too long to fit ("1323/1024") gets the nearest familiar
-    name. The pitches themselves still read as notes and cents ("C#3 +42").
+    click of a pitch knob changes the name. A drone a few cents off the Tuning's notes (left on D3, or SEL's fine
+    tuning) is named by its nearest note. On 12-tone they keep their familiar names ("5th"), and a note more than 25
+    cents off the Tuning's notes (Pitch lock keeping a 12-tone pitch on Harmonics) or a ratio too long to fit
+    ("1323/1024") gets the nearest familiar name. The pitches themselves still read as notes and cents ("C#3 +42").
   - **So do Partner and Shift.** A partner's interval is the Tuning's, over its own drone; Shift's knob steps from
     note to note of the Tuning over drone I, and each drone moves as many of the Tuning's notes from its own. A Shift
     set off the notes (with SEL, or a sound from before) moves its cents exactly.
