@@ -703,18 +703,19 @@ static void lk_pic_drones1(void)
             m = fm_maxf(m, fm_fabsf(dr_scope[g][i]));
         lk_peak[g] = m > lk_peak[g] ? m : lk_peak[g] + (m - lk_peak[g]) * 0.03f;
         k = (float)half / fm_maxf(lk_peak[g], 0.05f);
-        if (plat_ms() < ui.touch_t[g ? 3 : 1] + 300u) {   /* its Reso turning, and 1.5 s after: the filter curve
-                                                         * as on Drones, the peak growing (Evan, 2026-11-08: the
-                                                         * waves hardly show the resonance) */
-            lk_curve(g, g ? 130 : 10, top + 2, LK_PIC_H - 6);
-            continue;
-        }
         for (j = 0; j < LK_STRANDS - 1; j++)
             for (i = 0; i < DR_SCOPE_N; i++)
                 lk_hist[g][j][i] = lk_hist[g][j + 1][i];
         for (i = 0; i < DR_SCOPE_N; i++) {     /* smoothed as draw_scope's (raw captures jump) */
             sc_disp[g][i] += (dr_scope[g][i] - sc_disp[g][i]) * 0.45f;
             lk_hist[g][LK_STRANDS - 1][i] = (int8_t)fm_clampf(sc_disp[g][i] * k, (float)-half, (float)half);
+        }
+        if (plat_ms() < ui.touch_t[g ? 3 : 1] + 300u) {   /* its Reso turning, and 1.5 s after: the filter curve
+                                                         * as on Drones, the peak growing (Evan, 2026-11-08: the
+                                                         * waves hardly show the resonance); the waves' history
+                                                         * kept going, so they come back as they are now */
+            lk_curve(g, g ? 130 : 10, top + 2, LK_PIC_H - 6);
+            continue;
         }
         {   /* scaled to its own loudness, but as quiet as it is heard near silence: smaller and dimmer, then a
              * thin gray line */
@@ -2129,12 +2130,11 @@ static void lk_pic(void)
         int c;
         for (c = 1; c < 4; c += 2) {
             char t[16];
-            const int ps = sel_job(ui.view, c), own = knob_own(c), held = (int)(ui.btn >> B_SEL & 1u);
+            const int ps = sel_job(ui.view, c), held = (int)(ui.btn >> B_SEL & 1u);
             if (held)                          /* SEL held: the job it returns to, by name ("time", "type") */
                 scopy(t, c == 1 ? "time" : "type");
             else
                 dr_param_text(ps, proj.par[ps], t);
-            (void)own;
             lk_sel_tag(c, t, held);
         }
     }
