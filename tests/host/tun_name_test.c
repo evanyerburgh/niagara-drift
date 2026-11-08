@@ -26,7 +26,8 @@ int main(void)
     check(DR_TUN_53, 0, A3 - 702, A3, "31\\53");
     check(DR_TUN_24, 0, A3 - 350, A3, "7\\24");               /* a neutral third */
     check(DR_TUN_19, 0, D3, A3, "11\\19");                   /* D3 5c off 19-tone's D: by its nearest note */
-    check(DR_TUN_19, 0, A3 - 665, A3, 0);                     /* 30c off: the familiar name */
+    check(DR_TUN_19, 0, A3 - 682, A3, 0);                     /* the gap 13c from 11\\19: the familiar name */
+    check(DR_TUN_19, 0, A3 - 704, A3, "11\\19");             /* 9c: still its name */
     check(DR_TUN_JUST, D3, D3, D3 + 702, "3/2");              /* Just on drone I */
     check(DR_TUN_JUST, D3, D3, D3 + 1902, "3/1");             /* an octave and a fifth */
     check(DR_TUN_JUST, D3, D3, D3, 0);                        /* unison */
