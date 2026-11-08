@@ -681,11 +681,18 @@ int main(void)
         memset(&bx, 0, sizeof bx);
         bx.magic = BANK_MAGIC;
         bx.format = 43u;
-        bx.used = 1u;
+        bx.used = 3u;
         for (k = 0; k < DR_NPARAMS; k++)
-            bx.scene[0][k] = dr_param_info(k)->def;
+            bx.scene[0][k] = bx.scene[1][k] = dr_param_info(k)->def;
         bx.scene[0][DR_GP(0, GP_FLFO_DEST)] = DR_TO_RESO;   /* Reso 250, depth 20: reached 5..45 % */
         bx.scene[0][DR_GP(0, GP_FLFO_DEPTH)] = 20;
+        bx.scene[1][P_MOVE] = 0;                            /* Movement 0 (reached nothing): as at 50 (#84's review) */
+        bx.scene[1][DR_GP(0, GP_OLFO_DEST)] = DR_TO_XWAVE;  /* ... saw, 40: 57, as above */
+        bx.scene[1][DR_GP(0, GP_OLFO_DEPTH)] = 40;
+        bx.scene[1][DR_GP(1, GP_FLFO)] = DR_LFO_BOTH;       /* ... both LFOs (twice the swing), -30, Reso 500: reached */
+        bx.scene[1][DR_GP(1, GP_FLFO_DEST)] = DR_TO_RESO;   /* 0..100 %, so -50 */
+        bx.scene[1][DR_GP(1, GP_FLFO_DEPTH)] = -30;
+        bx.scene[1][DR_GP(1, GP_RESO)] = 500;
         memcpy(store[BANKX_OBJ[0]], &bx, sizeof bx);
         store_n[BANKX_OBJ[0]] = (int)sizeof bx;
         check("a format-43 project loads", project_load() == 0 && proj.format == PROJ_FORMAT);
@@ -697,6 +704,10 @@ int main(void)
         check("... resonance 100 (held at both ends) is 100, D1's 20 is 40; the cutoff's -85 kept",
               proj.par[DR_GP(0, GP_FLFO_DEPTH)] == 100 && scene_get(BANK_D, 0)[DR_GP(0, GP_FLFO_DEPTH)] == 40 &&
                   proj.par[DR_GP(1, GP_FLFO_DEPTH)] == -85);
+        printf("    D2 (Movement 0): X-Wave 40 -> %d, Reso -30 on both LFOs -> %d\n", scene_get(BANK_D, 1)[DR_GP(0, GP_OLFO_DEPTH)],
+               scene_get(BANK_D, 1)[DR_GP(1, GP_FLFO_DEPTH)]);
+        check("... Movement 0 converted as at 50 (X-Wave 40 is 57), a negative send on both LFOs keeps its sign (-30 is -50)",
+              scene_get(BANK_D, 1)[DR_GP(0, GP_OLFO_DEPTH)] == 57 && scene_get(BANK_D, 1)[DR_GP(1, GP_FLFO_DEPTH)] == -50);
         check("... and saved as 44, D too", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 44u &&
                                               ((const bank8_t *)store[BANKX_OBJ[0]])->format == 44u);
     }

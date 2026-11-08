@@ -233,11 +233,12 @@ int scene_put(int bank, int n)
  * setting's ends (b the knob, 0..1), as the depth that reaches the same range now (drone.c: lfo_fit, half the scale) */
 static int16_t fit_depth(const int16_t *v, int g, int tap, int dp, float b, int sq)
 {
-    const float mv = (float)v[P_MOVE] * 0.02f, n = v[DR_GP(g, tap)] == DR_LFO_BOTH ? 2.0f : 1.0f;
+    /* Movement at 0 reached nothing: converted as at 50, so raising it later reaches what it would have (#84's review) */
+    const float mv = v[P_MOVE] > 0 ? (float)v[P_MOVE] * 0.02f : 1.0f, n = v[DR_GP(g, tap)] == DR_LFO_BOTH ? 2.0f : 1.0f;
     const int d = v[DR_GP(g, dp)];
     const float a = (float)(d < 0 ? -d : d) * 0.01f, s = (sq ? a * a : a) * mv * n;
     float w, x;
-    if (d == 0 || mv <= 0.0f || v[DR_GP(g, tap)] == DR_LFO_OFF)
+    if (d == 0 || v[DR_GP(g, tap)] == DR_LFO_OFF)
         return (int16_t)d;
     w = 0.5f * (fm_minf(b + s, 1.0f) - fm_maxf(b - s, 0.0f));   /* the half-width it reached */
     x = w / (0.5f * mv * n);

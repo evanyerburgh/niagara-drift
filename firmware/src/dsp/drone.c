@@ -1901,10 +1901,9 @@ static inline float route_n(const grp_t *v, int i)
  * end for part of the cycle (Evan, 2026-11-08: a sweep should be heard all the way round). A divide a control tick */
 static inline float lfo_fit(float b, float o, float s)
 {
-    if (s <= 0.0f)
-        return fm_clampf(b, 0.0f, 1.0f);
-    const float w = fm_minf(s, 0.5f), c = fm_clampf(b, w, 1.0f - w);
-    return fm_clampf(c + o * (w / s), 0.0f, 1.0f);
+    if (s <= 0.5f)                               /* it fits the range: centered, or slid, unscaled (no divide) */
+        return fm_clampf(fm_clampf(b, s, 1.0f - s) + o, 0.0f, 1.0f);
+    return fm_clampf(0.5f + o * (0.5f / s), 0.0f, 1.0f);   /* wider than the range: fills it */
 }
 static inline float route_at(const grp_t *v, int i, uint32_t t)
 {
