@@ -2016,6 +2016,8 @@ static void input(void)
     for (i = 0; i < 4; i++)
         if ((e = plat_enc(EN_K1 + (int)i)) != 0) {
             knob_turn((int)i, e);
+            if (ui.btn >> B_SEL & 1u)
+                ui.btn_used |= 1u << B_SEL;            /* SEL + a knob: SEL used (no map after it) */
             ui.scene_at = -1;                          /* the sound is no longer the scene's */
             ui.morph = -1;                             /* a hand on a knob: the morph stops where it is */
             ui.visit = -1;                             /* ... and a visit held becomes a stay (no way back) */
@@ -2204,6 +2206,9 @@ static int keymap_on(void)
         white |= 1u << WHITE_K[i];
     if (page_jobs(ui.view) && ui.sel_turned && ui.km_key < 0)
         return 0;
+    if ((ui.btn_used >> B_SEL & 1u) && ui.km_key < 0)
+        return 0;                                      /* SEL already used in this hold (SEL + PLAY, a bank, a knob):
+                                                        * no map until it's let go (Evan, 2026-11-08) */
     return (ui.btn >> B_SEL & 1u) && (plat_ms() - ui.sel_t >= wait || ui.km_key >= 0) && !lit(0) && !lit(1) &&
            !lit(2) && !lit(3) && !(ui.keys & white) && ui.press < 0;
 }

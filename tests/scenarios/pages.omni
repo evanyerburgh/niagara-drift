@@ -169,3 +169,19 @@ shot keymap.png
 spin K2 1
 expect keymap 0
 release SEL
+# SEL used for something else in a hold (SEL + PLAY, a bank): no map after it, until SEL is let go (Evan, 2026-11-08)
+press SEL
+tap PLAY
+wait 1000
+expect keymap 0
+tap PLAY
+wait 1000
+expect keymap 0
+release SEL
+press SEL
+key w14 down
+wait 100
+key w14 up
+wait 1000
+expect keymap 0
+release SEL
