@@ -306,6 +306,11 @@ static void param_set(int p, int v)
         return;
     proj.par[p] = (int16_t)v;
     dr_set(p, v);
+    if (p == P_TUNING)                                 /* a new Tuning, by the knob or with a sound: SEL's fine tuning
+                                                        * let go, the knobs land on its own notes (Evan, 2026-11-07: an
+                                                        * offset set against one Tuning's notes means nothing on
+                                                        * another's) */
+        memset(proj.tun_off, 0, sizeof proj.tun_off);
     mark_dirty();
 }
 
@@ -514,10 +519,6 @@ static void knob_turn(int i, int32_t e)
         int n = in->hi - in->lo + 1, v = (proj.par[p] - in->lo + (e > 0 ? 1 : -1)) % n;
         param_set(p, in->lo + (v < 0 ? v + n : v));
         loop_note(p, proj.par[p], 0);
-        if (p == P_TUNING)                             /* a new Tuning: SEL's fine tuning let go, the knobs land on
-                                                        * its own notes (Evan, 2026-11-07: an offset set against one
-                                                        * Tuning's notes means nothing on another's) */
-            memset(proj.tun_off, 0, sizeof proj.tun_off);
     } else {
         param_set(p, proj.par[p] + accel(EN_K1 + i, e, dr_param_info(p)->hi - dr_param_info(p)->lo));
         loop_note(p, proj.par[p], 0);
@@ -985,18 +986,21 @@ static void loop_run(void)                     /* every millisecond: recording's
 }
 
 /* ------------------------------------------------------------- scenes --- */
-static int scene_step(int p)                           /* a value that steps (a switch, a list): it flips */
+static int scene_step(int p)                           /* a value that steps (a switch, a list): it flips; the
+                                                        * Tuning's eleven too (never through the ones between) */
 {
     const dr_param_t *in = dr_param_info(p);
-    return in->hi - in->lo <= 9;
+    return in->hi - in->lo <= 9 || p == P_TUNING;
 }
 
 /* settings of the room, not the sound: a scene doesn't carry them (the speaker and the stereo spread, which
- * depend on speaker or headphones; the tuning to the band; the pitch lock; how long things take) */
+ * depend on speaker or headphones; the tuning to the band; the pitch lock; how long things take). The Tuning is
+ * a sound's (v0.3, ledger 3, Evan 2026-11-08): a scene or Preset brings its own, a Preset that names none 12-tone,
+ * as it was made, with Pitch lock on too (it keeps the drones' pitch, not their grid) */
 static int scene_room(int p)
 {
     return p == P_FADE || p == P_TUNE || p == P_SPEAKER || p == P_WIDTH || p == P_PLOCK || p == P_MORPH ||
-           p == P_SCENE_T || p == P_PRESS_SENS || p == P_SCENE_BARS || p == P_TUNING || p == P_CLK_SYNC;
+           p == P_SCENE_T || p == P_PRESS_SENS || p == P_SCENE_BARS || p == P_CLK_SYNC;
 }
 
 /* a scene's name: its bank's letter and its number ("B5"; the Presets "P2", their second bank "P9" ..) */

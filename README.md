@@ -152,7 +152,7 @@ updated from 0.2, copies of P9–P12 are also in the first empty keys of C, B or
 
 | | |
 |---|---|
-| **White key** 1–8 (F3–F4): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Tuning, Sync, Pitch lock, Fade, Morph and Scene time stay as they are |
+| **White key** 1–8 (F3–F4): **tap** | morph to the scene stored there in the current bank, over the Scene time, and stay (turn a knob to stop part way). A tap is anything you let go under half a second, however hard, as with the gesture keys. A scene keeps the sound, not the room: Pressure, Stereo, Tune, Sync, Pitch lock, Fade, Morph and Scene time stay as they are. The Tuning is the sound's: it comes with the scene (see Tuning) |
 | **Hold and press** a scene key | a **crossfade**: the harder you press, the further the sound moves from where it was into that scene (a light rest does nothing). It glides there no faster than the Scene time, so pressing hard at once glides in as a tap does, and pressing slowly follows your finger. The key gets brighter as you go in; the screen says how far ("A5 40%"). **Let go** and it glides back to where you were (the header: "→ A5"). **Tap SEL** while holding and the blend stays right there ("A5 40% KEPT"), however you press after; let go when you like. It's a sound of its own between the two (SEL + SAVE takes you back to where you were before it) |
 | **Press all the way** (and hold a moment) | the scene is **taken**: the key flashes, and letting go keeps it |
 | **SEL + SAVE** | **undo**: back to the sound before your last scene tap or blend, gliding over the Scene time (a knob turned since goes back too; the room's settings, such as Stereo or the Scene time, stay). Again, and it goes forward to where you were. Keep SEL down until you've let go of SAVE |
@@ -468,7 +468,7 @@ pink specks are as many as Color says.
 | Setup 1 | fade | morph | scene time | sync |
 | Setup 2 | tuning | tune | stereo | pressure |
 
-Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't change it.
+Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't change it, except the Tuning, which a sound carries.
 
 - Each knob gives most of its turn to slow times, a second about a quarter of the way.
 - **Fade** is how long PLAY takes (up to 60 s; 1.5 s to start); **Morph** is how long a black key or a new LFO
@@ -510,6 +510,10 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
   - **So do Partner and Shift.** A partner's interval is the Tuning's, over its own drone; Shift's knob steps from
     note to note of the Tuning over drone I, and each drone moves as many of the Tuning's notes from its own. A Shift
     set off the notes (with SEL, or a sound from before) moves its cents exactly.
+  - **A sound carries its Tuning.** A scene stored on LMY brings LMY back when you play it, even with Pitch lock on
+    (the lock keeps the drones' pitch, not the notes around them). A Preset plays on 12-tone, as it was made, unless
+    it has a Tuning of its own. The Tuning changes half way through the scene's glide, and lets go of SEL's fine
+    tuning, as turning the knob does.
   - It only decides where a turn goes: a sound or scene plays its pitches as they were saved, until you turn the knob
     (the first click goes to the Tuning's next note).
 

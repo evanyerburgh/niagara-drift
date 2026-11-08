@@ -151,8 +151,8 @@ enum {
                                           * 0..100 (0: not latched; v0.3) */
     P_SUBW_0, P_SUBW_1,                  /* each drone's sub wave (DR_SUBW_NAME): Square (as before), Sine, Triangle, Saw,
                                           * each as loud (RMS) as the square (v0.3, Evan 2026-10-28) */
-    P_TUNING,                       /* where a pitch knob lands when it stops (DR_TUNING_NAME, the UI's; a room setting,
-                                     * v0.3, Evan 2026-10-30): 0 12-tone .. 8 the 22 shrutis */
+    P_TUNING,                       /* where a pitch knob lands when it stops (DR_TUNING_NAME, the UI's; v0.3, Evan
+                                     * 2026-10-30; a sound's since 2026-11-08, ledger 3): 0 12-tone .. the 22 shrutis */
     P_CLK_SYNC,                     /* follow a MIDI clock (1, as since v0.3's step 3) or not (0: the clock ignored, its
                                      * tempo forgotten); a room setting (v0.3, Evan 2026-11-01, ledger item 5) */
     DR_NPARAMS

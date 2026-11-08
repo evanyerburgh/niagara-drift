@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): a sound carries its Tuning (ledger 3, Evan 2026-11-08). Drone I on
+# D3, drone II on A3, Wander (par78) on its minor pentatonic, a little Pitch glide; stored in A1 on LMY (par110 7),
+# then the Tuning set back to 12-tone (0) and Wander heard there; A1 tapped (Scene time 1.1 s, par71 24): LMY comes
+# back with it, half way through the glide; then P1 Niagara, which names no Tuning: 12-tone again. The Setup 2 page
+# after A1. Not a test of its own (no expectations; tests/scenarios/tuning.omni has them).
+notips
+set 74 0
+set 51 0
+set 71 24
+set 0 5000
+set 21 5700
+set 50 25
+set 81 0
+set 78 85
+press SEL
+tapkey w8
+release SEL
+tap PLAY
+wait 1500
+set 110 7
+press SAVE
+tapkey w0
+release SAVE
+wait 300
+set 110 0
+wav sound-tuning.wav
+wait 8000
+tapkey w0
+wait 8000
+tap GLO
+tap GLO
+wait 300
+shot sound-tuning-setup.png
+tap HOME
+press SEL
+tapkey w14
+release SEL
+tapkey w0
+wait 6000
+wavstop
