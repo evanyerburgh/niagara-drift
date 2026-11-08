@@ -11,7 +11,9 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x314E5244u           /* "DRN1" */
-#define PROJ_FORMAT 43u                  /* 43: the LFO rate 0..152, every second from 100 s to 10 s (41's and 42's
+#define PROJ_FORMAT 44u                  /* 44: the LFO's depth on X-Wave and the resonance, 100 their whole range
+                                          * (43's read, converted to the same range);
+                                          * 43: the LFO rate 0..152, every second from 100 s to 10 s (41's and 42's
                                           * read, converted);
                                           * 42: the LFO rate to 100 s, a power curve (a test build of #78);
                                           * 41: Tune in Hz, Sync (112 values; 39-40's widened, Tune converted);

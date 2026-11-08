@@ -371,7 +371,9 @@ pink specks are as many as Color says.
 
 - **The sends** and **speed mod** are centered: the middle is none. Each send is named for what it moves: Pitch, or
   X-Wave with black key 2 / 7 on the LFO pages; Cutoff, or Reso with key 4 / 9. Under each value, how far it swings
-  in what you hear ("±12c", "±3.6 oct"), with the Movement. The picture is the wiring, each drone's two sends as a
+  in what you hear ("±12c", "±3.6 oct"), with the Movement. On X-Wave and resonance, 100 sweeps the whole range
+  (sine to square, none to full resonance); near an end the sweep turns there instead of stopping, so it keeps
+  moving all the way round. The picture is the wiring, each drone's two sends as a
   sentence with its keys: "[F#3] LFO II → [G#3] x-wave" (F#3 picks the LFO, G#3 what it moves), "[A#3] LFO I+II →
   [C#4] reso"; a send at 0 (or fed only by an LFO that's off) is gray. Above them the two LFOs, I over II, each a
   cycle with its dot (bent by Speed mod, as on Mods), the rate, and the Swell lock (D#4, held to switch): free, or on

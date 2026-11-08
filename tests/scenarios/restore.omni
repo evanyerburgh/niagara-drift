@@ -4,6 +4,11 @@
 # panel does nothing else (a knob turned is dropped, HOME doesn't change the page). The flash's side, cut anywhere:
 # tests/storage_test.c
 notips
+# the starting sound's cutoffs and levels before 2026-11-08 (the expectations below were made on them)
+set 7 700
+set 28 680
+set 11 75
+set 32 61
 tap PLAY
 wait 1500
 expect view 0

@@ -3,6 +3,8 @@
 # glides there no faster than the whole way in a Scene time (here 1.1 s: Setup 1 KNOB 3 at 24), after the
 # first 250 ms (a tap so far)
 set 71 24
+# drone I's cutoff at 700 (the starting sound's before 2026-11-08)
+set 7 700
 # Pitch lock off (on at start since 2026-10-19): these move the pitch
 set 74 0
 # bank A (a new FM-1 starts on the Presets, which are fixed)

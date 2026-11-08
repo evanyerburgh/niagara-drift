@@ -40,7 +40,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      I_(GP_RESO), 450, II_(GP_RESO), 450, I_(GP_DRIVE), 70, II_(GP_DRIVE), 60, P_CHAR, 27, P_FEEDBACK, 30,
      P_LFO_RATE, 61, P_REV_TYPE, 1, P_REV_LEN, 75, P_REV_DAMP, 80, P_REV_MIX, 40, I_(GP_NOISE), 8, I_(GP_LEVEL), 89,
      II_(GP_LEVEL), 89, P_DLY_TYPE, 1, P_DLY_TIME, 85, P_DLY_REPEATS, 45, P_DLY_MIX, 15, I_(GP_FLFO_DEST), DR_TO_RESO,
-     I_(GP_FLFO_DEPTH), 55, II_(GP_FLFO_DEST), DR_TO_RESO, II_(GP_FLFO_DEPTH), -55, -1},
+     I_(GP_FLFO_DEPTH), 100, II_(GP_FLFO_DEST), DR_TO_RESO, II_(GP_FLFO_DEPTH), -100, -1},
     /* P3 EERIE: a tritone apart, near-sines, drone II through a ringing band-pass with a breath of white noise,
      * its partner a just minor third; drone II wanders a whole-tone scale; the LFO's doubled curve, more Movement; the longest clean echoes, a chorus hall.
      * Drone II's pitch wavers a little (the oscillator LFO), the LFO's own wave bending its rate: uneven */
@@ -63,7 +63,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      II_(GP_CUTOFF), 950, I_(GP_RESO), 50, II_(GP_RESO), 50, P_PULSE, 0, P_MOVE, 35, P_REV_TYPE, 2, P_REV_LEN, 92,
      P_REV_DAMP, 20, P_REV_MIX, 65, P_DLY_TIME, 80, P_DLY_MIX, 25, P_DLY_REPEATS, 60, I_(GP_LEVEL), 49,
      II_(GP_LEVEL), 46, P_DLY_TYPE, 1, I_(GP_OLFO_DEST), DR_TO_XWAVE, I_(GP_OLFO_DEPTH), 65, II_(GP_OLFO), DR_LFO_II,
-     II_(GP_OLFO_DEST), DR_TO_XWAVE, II_(GP_OLFO_DEPTH), 65, -1},
+     II_(GP_OLFO_DEST), DR_TO_XWAVE, II_(GP_OLFO_DEPTH), 75, -1},
     /* P6 TANPURA: Sa and Pa: drone I on D3 with its high Sa (the partner an octave up), drone II on the Pa below
      * (A2), bright buzzing strings (the jawari: character, drive, an open resonant filter), plucked: the Swell about
      * once a second, swung; a hall. The LFO slow and gentle */
@@ -93,7 +93,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     {I_(GP_PITCH), 3800, II_(GP_PITCH), 3900, P_FEEDBACK, 85, P_CHAR, 21, II_(GP_MODE), DR_BP, I_(GP_CUTOFF), 740,
      II_(GP_CUTOFF), 780, I_(GP_RESO), 600, II_(GP_RESO), 600, I_(GP_DRIVE), 75, II_(GP_DRIVE), 75, P_DLY_TIME, 20,
      P_DLY_REPEATS, 45, P_DLY_MIX, 40, P_REV_TYPE, 0, P_REV_LEN, 40, P_REV_MIX, 50, P_MOVE, 40, I_(GP_LEVEL), 89,
-     II_(GP_LEVEL), 89, P_LFO_W1, DR_LFO_RANDOM, P_LFO_RATE, 90, I_(GP_FLFO_DEST), DR_TO_RESO, I_(GP_FLFO_DEPTH), 50,
+     II_(GP_LEVEL), 89, P_LFO_W1, DR_LFO_RANDOM, P_LFO_RATE, 90, I_(GP_FLFO_DEST), DR_TO_RESO, I_(GP_FLFO_DEPTH), 100,
      -1},
     /* P10 CATHEDRAL: a major sixth apart (D3, B3), soft waves, drone I's sub a third's subharmonic below (49 Hz), a long dark
      * reverb, almost a freeze.
@@ -229,6 +229,25 @@ int scene_put(int bank, int n)
     return 0;
 }
 
+/* format 43 to 44: an LFO depth on X-WAVE (sq: squared) or the resonance (linear), whose swing was cut off at the
+ * setting's ends (b the knob, 0..1), as the depth that reaches the same range now (drone.c: lfo_fit, half the scale) */
+static int16_t fit_depth(const int16_t *v, int g, int tap, int dp, float b, int sq)
+{
+    /* Movement at 0 reached nothing: converted as at 50, so raising it later reaches what it would have (#84's review) */
+    const float mv = v[P_MOVE] > 0 ? (float)v[P_MOVE] * 0.02f : 1.0f, n = v[DR_GP(g, tap)] == DR_LFO_BOTH ? 2.0f : 1.0f;
+    const int d = v[DR_GP(g, dp)];
+    const float a = (float)(d < 0 ? -d : d) * 0.01f, s = (sq ? a * a : a) * mv * n;
+    float w, x;
+    if (d == 0 || v[DR_GP(g, tap)] == DR_LFO_OFF)
+        return (int16_t)d;
+    w = 0.5f * (fm_minf(b + s, 1.0f) - fm_maxf(b - s, 0.0f));   /* the half-width it reached */
+    x = w / (0.5f * mv * n);
+    if (sq)
+        x = fm_sqrtf(x);
+    x = fm_minf(x * 100.0f + 0.5f, 100.0f);
+    return (int16_t)(d < 0 ? -(int)x : (int)x);
+}
+
 /* one scene (or the sound) from an older format to this one */
 static void convert(int16_t *v, uint32_t from)
 {
@@ -319,6 +338,15 @@ static void convert(int16_t *v, uint32_t from)
                     n = t >= 10.0f ? 100.0f - t : 90.0f + fm_log2f(hz * 10.0f) * (1.0f / 0.152438f);
         v[P_LFO_RATE] = (int16_t)fm_clampf(n + 0.5f, 0.0f, 152.0f);
     }
+    if (from <= 43u)                            /* the LFO on X-WAVE and the resonance turns at their ends now, and
+                                                 * its depth 100 is their whole range (Evan, 2026-11-08): each sound
+                                                 * keeps the range it reached */
+        for (g = 0; g < DR_NGROUPS; g++) {
+            if (v[DR_GP(g, GP_OLFO_DEST)] == DR_TO_XWAVE)
+                v[DR_GP(g, GP_OLFO_DEPTH)] = fit_depth(v, g, GP_OLFO, GP_OLFO_DEPTH, v[DR_GP(g, GP_WAVE)] * 0.01f, 1);
+            if (v[DR_GP(g, GP_FLFO_DEST)] == DR_TO_RESO)
+                v[DR_GP(g, GP_FLFO_DEPTH)] = fit_depth(v, g, GP_FLFO, GP_FLFO_DEPTH, v[DR_GP(g, GP_RESO)] * 0.001f, 0);
+        }
 }
 
 static int in_range(const int16_t *v)
@@ -551,7 +579,8 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
     bank_fmt[b - 1] = ld.b.format;
     if (ld.b.format == PROJ_FORMAT) {
         *k = ld.b;
-    } else if (ld.b.format == 41u || ld.b.format == 42u) {   /* 41, 42: as now, the LFO rate on an old scale */
+    } else if (ld.b.format >= 41u && ld.b.format <= 43u) {   /* 41-43: as now, the LFO rate on an old scale (41,
+                                                                * 42) or the X-WAVE and resonance depths (43) */
         *k = ld.b;
         for (i = 0; i < NSCENES; i++)
             convert(k->scene[i], ld.b.format);
@@ -625,9 +654,9 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
             k->used &= (uint16_t)~(1u << i);
 }
 
-/* D, E or F (j 0..2) from its object: new in format 43, so only this format is read yet (a later format converts it
- * here, as bank_load does B and C) */
-_Static_assert(PROJ_FORMAT == 43, "bankx_load reads D-F only in format 43: add their conversion from 43 (as bank_load "
+/* D, E or F (j 0..2) from its object: new in format 43, read in 43 (converted) and 44 (a later format converts it
+ * here too, as bank_load does B and C) */
+_Static_assert(PROJ_FORMAT == 44, "bankx_load reads D-F only in formats 43 and 44: add their conversion (as bank_load "
                                   "does B and C) before raising PROJ_FORMAT, or everyone's D, E and F are dropped");
 static void bankx_load(int j)
 {
@@ -636,9 +665,15 @@ static void bankx_load(int j)
     bankx_blank(k);
     memset(ld.raw, 0, sizeof ld.raw);
     if (plat_store_load(BANKX_OBJ[j], ld.raw, sizeof ld.raw) < (int)sizeof *k || ld.x.magic != BANK_MAGIC ||
-        ld.x.format != PROJ_FORMAT)
+        (ld.x.format != PROJ_FORMAT && ld.x.format != 43u))
         return;
     *k = ld.x;
+    if (k->format != PROJ_FORMAT) {            /* 43: the X-WAVE and resonance depths */
+        for (i = 0; i < NPLAY; i++)
+            convert(k->scene[i], k->format);
+        k->format = PROJ_FORMAT;
+        bank_dirty |= (uint8_t)(1u << (j + 4));     /* (bits 4-6: D-F) */
+    }
     k->used &= (uint16_t)((1u << NPLAY) - 1u);
     for (i = 0; i < NPLAY; i++)
         if ((k->used >> i & 1u) && !in_range(k->scene[i]))
@@ -654,7 +689,7 @@ static const int16_t *old_scene(int n, uint32_t *from)   /* scene n of the bank 
 {
     uint32_t f = ld.b.format;
     *from = f;
-    if (f == PROJ_FORMAT || f == 41u || f == 42u) return ld.b.scene[n];
+    if (f == PROJ_FORMAT || (f >= 41u && f <= 43u)) return ld.b.scene[n];
     if (f == 39u || f == 40u) return ld.b40.scene[n];
     if (f == 37u || f == 38u) return ld.b38.scene[n];
     if (f == 36u) return ld.b36.scene[n];
@@ -779,7 +814,8 @@ int project_load(void)
     }
     if (from == PROJ_FORMAT) {
         proj = ld.p;
-    } else if (from == 41u || from == 42u) {   /* 41, 42: as now, the LFO rate on an old scale */
+    } else if (from >= 41u && from <= 43u) {   /* 41-43: as now, the LFO rate on an old scale (41, 42) or the
+                                                * X-WAVE and resonance depths (43) */
         proj = ld.p;
         convert(proj.par, from);
         for (i = 0; i < NSCENES; i++)
