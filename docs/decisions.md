@@ -687,3 +687,10 @@ at the end. The current state is in the [README](../README.md) and the code.
   its familiar names, and a gap further off or a ratio past 7 characters falls back to them. Pitch values stay notes and cents. Swara names for Shruti and harmonic numbers
   were considered and left out (simpler; a Shruti naming would need an Indian musician's check). The screen fonts
   without the drawn arrow carry a real backslash (it was a blank slot).
+- 2026-11-08: the LFO on **X-Wave and the resonance turns at their ends** (Evan: a sweep should be heard all the way
+  round). Its swing was cut off there, so at depth 100 X-Wave sat on the square or the sine 27 s of every minute and the
+  resonance held its full whistle 5 s; now the sweep stays centered on the knob while it fits and slides away from an
+  end when it would run past it. Depth 100 is now the whole range (it was reached at 50 on Reso and ~70 on X-Wave; past
+  that the knob did nothing more); saved sounds are converted to the range they reached (format 44). The cutoff's
+  sweep stays centered on its knob, as on most synths, its edges unchanged: the fix there is the sounds' own cutoffs
+  (the starting sound's, with the Presets).
