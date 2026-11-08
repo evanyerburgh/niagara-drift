@@ -15,8 +15,9 @@ expect par74 0
 # 44 hard sync, 45 pitch link, 46 link offset, 47 LFO rate, 48 Wave I, 49 Wave II, 50 Glide, 51 Fade, 55 Pulse,
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
 # depth; 108, 109 each drone's sub wave; 110 the Tuning.
-# Pages: 0 Drones 1 1 Drones 2 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO sends 7 Mods 8 Partner 9 Pitch moves
-# 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
+# Pages: 0 Drones 1 Pitch 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO sends 7 Mods 8 Partner 9 Pitch moves
+# 10 Setup 1 11 Setup 2 12 Swell 13 Space 14 Details. "page V" goes to page V at once, in no time: since v0.3 moved
+# the knobs, the script turns each on its new page and comes back, its timing (and its sound) as before.
 # a new FM-1 plays the Presets; these scenes go in bank A (SEL + G4)
 expect bank 3
 press SEL
@@ -45,16 +46,22 @@ expect peak_db_min -20
 shot playing.png
 # the Drones page: KNOB 1 drone I's pitch (a detent is the Tuning's next step: a semitone; SEL held, a cent),
 # KNOB 2 its cutoff, KNOB 3-4 drone II's
+page 1
 spin K1 2
+page 0
 expect par0 5200
 press SEL
+page 1
 spin K1 -83
+page 0
 release SEL
 expect par0 5117
 expect view 0
 spin K2 -5
 expect par7 650
+page 1
 spin K3 1
+page 0
 expect par21 5800
 spin K4 10
 expect par28 780
@@ -62,22 +69,31 @@ wait 600
 expect pitch0 5117
 # a slow turn (clicks 500 ms apart) glides on between clicks, not in stairs: each click glides over the
 # time since the one before, so 300 ms after the last it's still on its way (a 250 ms limit had it there)
+page 1
 turn K1 2 500
+page 0
+page 1
 turn K1 1 10
+page 0
 wait 300
 expect pitch0 >5300
 expect pitch0 <5417
 wait 300
 expect pitch0 5417
 # three semitones up, the +17 cents SEL gave it kept (5417); back down, and it stays
+page 1
 spin K1 -3
+page 0
 expect par0 5117
 wait 900
 expect par0 5117
-# HOME again: Drones 2, each drone's level and resonance (KNOB 1-2 drone I, 3-4 drone II)
+# HOME again: Pitch, each drone's pitch and resonance (KNOB 1-2 drone I, 3-4 drone II); since v0.3 the levels are on
+# Drones (page 0) with the cutoffs
 tap HOME
 expect view 1
+page 0
 spin K3 -20
+page 1
 expect par32 41
 spin K4 10
 expect par29 450
@@ -86,7 +102,9 @@ expect par29 350
 # a slow turn is a step a detent
 set 11 0
 wait 500
+page 0
 turn K1 5 300
+page 1
 expect par11 5
 wait 500
 set 11 75
@@ -291,10 +309,17 @@ tapkey b1
 expect par6 1
 tapkey b1
 expect par6 2
-# PITCH LOCK (the global pair's first key, key 4): the pitch knobs do nothing until it's off again
+# PITCH LOCK (the global pair's first key, key 4): it keeps the drones' pitch through scenes; the pitch knobs still
+# tune (v0.3, Evan, 2026-11-08: pitch moved off the main page)
 tapkey b3
 expect par74 1
+page 1
 spin K1 5
+wait 1200
+expect par0 >5117
+spin K1 -5
+wait 1200
+page 0
 expect par0 5117
 tapkey b3
 expect par74 0
@@ -321,9 +346,13 @@ shot switches.png
 tapkey b8
 expect par45 1
 expect par46 683
+page 1
 spin K3 -1
+page 0
 expect par46 600
+page 1
 spin K1 -1
+page 0
 expect par0 5017
 wait 400
 expect pitch1 5617
@@ -390,41 +419,58 @@ expect par7 650
 # FX: Delay: drive, time, repeats, mix (SEL + KNOB 4: the delay's type); again: Reverb: length, damp, type, mix (SEL +
 # KNOB 4: what goes into it) (v0.3; the delay LFO depth is on Mods)
 tap FX
+page 13
 expect view 13
+page 14
 spin K1 20
+page 13
 expect par98 20
+page 14
 spin K1 -20
+page 13
 expect par98 0
+page 14
 spin K2 -10
+page 13
 expect par60 40
-spin K3 15
+spin K1 15
 expect par61 50
-spin K4 30
+spin K2 30
 expect par62 30
 wait 100
 shot fx.png
 tap FX
+page 14
 expect view 14
-spin K1 10
+page 13
+spin K3 10
+page 14
 expect par95 70
-spin K2 -10
+spin K3 -10
 expect par96 30
-spin K3 1
+spin K4 1
 expect par64 3
-spin K3 -1
+spin K4 -1
 expect par64 2
+page 13
 spin K4 10
+page 14
 expect par63 35
 wait 100
 shot fx2.png
-spin K3 -1
+spin K4 -1
 expect par64 1
 # SEL + KNOB 4 on Delay: the delay's type (its Mix stays)
 tap FX
+page 13
 expect view 13
 press SEL
-spin K4 -1
-spin K4 -1
+page 14
+spin K2 -1
+page 13
+page 14
+spin K2 -1
+page 13
 expect par94 1
 expect par62 30
 release SEL
@@ -457,26 +503,33 @@ expect par97 50
 tap GLO
 expect view 10
 # a page button opens the page last shown there: Reverb, then home, then FX held (a peek) shows Reverb; HOME is
-# always Drones 1
+# always Drones
 tap HOME
 expect view 0
 tap FX
+page 13
 tap FX
+page 14
 expect view 14
 tap HOME
 expect view 0
 press FX
+page 14
 wait 500
 expect view 14
 release FX
+page 0
 expect view 0
 tap HOME
 expect view 1
 tap FX
+page 14
 tap HOME
 expect view 0
 tap FX
+page 14
 tap FX
+page 13
 expect view 13
 tap HOME
 # SELECT: the LFO rate; PRESETS: nothing yet (the macro to come), the waves stay
@@ -495,8 +548,12 @@ wait 150
 expect store_writes 1
 expect dirty 0
 # no autosave while the drone plays (a knob moved and back: unsaved again)
+page 1
 spin K1 1
+page 0
+page 1
 spin K1 -1
+page 0
 expect dirty 1
 wait 5000
 expect dirty 1
@@ -536,7 +593,9 @@ expect store_writes 3
 expect view 0
 # the sound is scene 1 (its key blinks), until a knob is turned
 expect scene_at 0
+page 1
 spin K1 10
+page 0
 expect scene_at -1
 expect par0 6017
 spin K2 20
@@ -662,7 +721,6 @@ tapkey w0
 wait 6000
 expect par0 5000
 tapkey b3
-spin K1 10
 tapkey w1
 wait 6000
 expect par0 5000
@@ -700,20 +758,30 @@ set 71 24
 # the types go round both ways: the delay's (SEL + KNOB 4 on Delay) from Wide (1) to Clean, Self, Clean, Wide; the
 # reverb's (KNOB 3 on Reverb) from the hall (1) to the room, the chorus hall, the room, the hall
 tap FX
+page 13
 expect view 13
 press SEL
 expect par94 1
-spin K4 -1
+page 14
+spin K2 -1
+page 13
 expect par94 0
-spin K4 -1
+page 14
+spin K2 -1
+page 13
 expect par94 5
-spin K4 1
+page 14
+spin K2 1
+page 13
 expect par94 0
-spin K4 1
+page 14
+spin K2 1
+page 13
 expect par94 1
 release SEL
-# on these two pages SEL's key map waits 1.5 s, not 0.4 (a quick SEL + KNOB 4 never meets it), and once KNOB 4's
-# SEL job has turned it stays away until SEL is let go (Evan, 2026-10-28)
+# on a page with a SEL job (Details since v0.3) SEL's key map waits 1.5 s, not 0.4 (a quick SEL + knob never meets
+# it), and once a SEL job has turned it stays away until SEL is let go (Evan, 2026-10-28)
+page 14
 press SEL
 wait 600
 expect keymap 0
@@ -721,20 +789,22 @@ wait 1000
 expect keymap 1
 release SEL
 press SEL
-spin K4 1
+spin K2 1
 wait 3000
 expect keymap 0
-spin K4 -1
+spin K2 -1
 release SEL
+page 13
 expect par94 1
 tap FX
+page 14
 expect view 14
 expect par64 1
-spin K3 -1
-spin K3 -1
+spin K4 -1
+spin K4 -1
 expect par64 3
-spin K3 1
-spin K3 1
+spin K4 1
+spin K4 1
 expect par64 1
 # ... and what goes into the reverb (SEL + KNOB 4 on Reverb): both, then back round to the drones alone, then both
 # again; its Mix stays, and without SEL KNOB 4 is the Mix again
@@ -747,10 +817,14 @@ spin K4 1
 expect par99 0
 release SEL
 expect par63 40
+page 13
 spin K4 1
+page 14
 expect par63 41
 expect par99 0
+page 13
 spin K4 -1
+page 14
 tap HOME
 # Wander's scale (Pitch moves, KNOB 4) goes round too: before the first (minor pentatonic) comes just intonation
 tap SEQ

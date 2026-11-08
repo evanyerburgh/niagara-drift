@@ -597,6 +597,9 @@ int main(int argc, char **argv)
                 enc_acc[e] += s;
                 run_ms(gap);
             }
+        } else if (!strcmp(cmd, "page")) {          /* page V: page V at once, in no time (the pages moved in v0.3:
+                                                    * the scripts kept their timing, sample for sample) */
+            set_view(atoi(a));
         } else if (!strcmp(cmd, "spin")) {
             int e = find_name(ENC_N, NE, a);
             if (e < 0) {

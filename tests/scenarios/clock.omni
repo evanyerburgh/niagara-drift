@@ -71,18 +71,23 @@ wait 4000
 expect lfoerr <30
 # THE DELAY: its time a note value (Dly note, 102): a quarter note at 100 BPM is 600 ms (dlyt: tenths of a ms)
 tap FX
+page 13
 expect view 13
 expect par102 5
 wait 2000
 expect dlyt >5950
 expect dlyt <6050
 # ... a half note: 1.2 s; a bar (2.4 s) is longer than the line: halved, 1.2 s
+page 14
 spin K2 3
+page 13
 expect par102 8
 wait 2000
 expect dlyt >11900
 expect dlyt <12100
+page 14
 spin K2 2
+page 13
 expect par102 10
 wait 2000
 expect dlyt >11900

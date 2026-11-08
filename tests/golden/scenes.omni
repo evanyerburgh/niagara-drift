@@ -25,8 +25,12 @@ press SAVE
 tapkey w0
 release SAVE
 spin K2 -40
+page 1
 spin K1 5
+page 0
+page 1
 spin K3 -3
+page 0
 press SAVE
 tapkey w1
 release SAVE

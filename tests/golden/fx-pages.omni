@@ -7,19 +7,25 @@ notips
 tap PLAY
 wait 2000
 tap FX
+page 13
 wait 2000
 shot delay-rest.png
 press SEL
-spin K4 1
+page 14
+spin K2 1
+page 13
 wait 300
 shot delay-sel.png
-spin K4 -1
+page 14
+spin K2 -1
+page 13
 release SEL
 wait 2000
-spin K4 5
+spin K2 5
 wait 300
 shot delay-mix.png
 tap FX
+page 14
 wait 2000
 shot reverb-rest.png
 press SEL

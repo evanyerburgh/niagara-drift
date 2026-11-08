@@ -67,7 +67,7 @@ typedef struct {
                                           * (the player's, not a scene's; was the macro PRESETS played, format <= 25) */
     uint8_t gkey_old[4];                 /* unused since 29 (what each gesture key played, 27-28) */
     uint8_t seen[2];                     /* the one-time tips shown (bit TIP_*; v0.3): the player's, not a scene's */
-#define SEEN1_MOVED 0x07u                /* seen[1]: the tips on 0.3's moved knobs (TIP_KN_*, 8-10): a new FM-1
+#define SEEN1_MOVED 0x37u                /* seen[1]: the tips on 0.3's moved knobs (TIP_KN_*, 8-10, 12-13): a new FM-1
                                           * never had them where 0.2 did, so they start seen */
     int8_t tun_off[3];                   /* each pitch knob's offset off the Tuning's grid, cents (SEL's fine tuning; drone
                                           * I, drone II, the link offset; v0.3): the player's, not a scene's */

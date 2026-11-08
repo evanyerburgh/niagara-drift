@@ -12,9 +12,10 @@
  *   PLAY           the drone fades in / out      MASTER   volume      SAVE   saves
  * One button away (tap: the knobs stay on its page, pressed again its second page; hold: they switch
  * only while it's held, and the page you were on comes back when it's let go):
- *   HOME Drones 1, Drones 2 (Level, Reso) · ENV Life (Feedback, Drift, Character, Age), Tone (Noise, Colour: white
+ *   HOME Drones (Level, Cutoff), Pitch (Pitch, Reso) · ENV Life (Feedback, Drift, Character, Age), Tone (Noise, Colour: white
  *   .. pink) · EDIT Osc (X-Wave, PW), Sub · Drive (Osc/Sub, Drive) · LFO LFO sends (each drone's two sends), Mods
- *   (Speed mod, Source, Delay mod, Cross-mod) · SEQ Partner, Pitch moves · GLO Setup 1 (Fade, Morph, Scene time),
+ *   (Speed mod, Source, Delay mod, Cross-mod) · SEQ Partner, Pitch moves · FX Space (Repeats, Mix, Length, Mix),
+ *   Details (Drive, Time, Damp, Type) · GLO Setup 1 (Fade, Morph, Scene time),
  *   Setup 2 (Tuning, Tune, Stereo, Pressure) (global). The top bar shows a dot for each of a
  *   button's pages.
  *   OCT- / OCT+    the LFO's Wave I / Wave II (LFO I and II on screen): a tap is the next shape, round and
@@ -48,8 +49,8 @@
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
 enum { V_PLAY, V_PLAY2, V_LIFE, V_TONE, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_MOVES, V_SETUP, V_SETUP2,
        V_PULSE, V_FX, V_FX2, NVIEWS };
-static const char *const VIEW_NAME[NVIEWS] = {"Drones 1", "Drones 2", "Life", "Tone", "Osc", "Sub · Drive", "LFO sends",
-                                              "Mods", "Partner", "Pitch moves", "Setup 1", "Setup 2", "Swell", "Delay", "Reverb"};
+static const char *const VIEW_NAME[NVIEWS] = {"Drones", "Pitch", "Life", "Tone", "Osc", "Sub · Drive", "LFO sends",
+                                              "Mods", "Partner", "Pitch moves", "Setup 1", "Setup 2", "Swell", "Space", "Details"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
  * nothing (g NONE) */
 #define G 2
@@ -58,8 +59,10 @@ typedef struct {
     uint8_t g, p;
 } knob_t;
 static const knob_t VIEW_KNOB[NVIEWS][4] = {
-    {{0, GP_PITCH}, {0, GP_CUTOFF}, {1, GP_PITCH}, {1, GP_CUTOFF}},
-    {{0, GP_LEVEL}, {0, GP_RESO}, {1, GP_LEVEL}, {1, GP_RESO}},
+    /* HOME (v0.3, Evan, 2026-11-08: what drone players move most, each drone's level and cutoff, on the page HOME
+     * opens; the pitch, set once and left, and the resonance behind it) */
+    {{0, GP_LEVEL}, {0, GP_CUTOFF}, {1, GP_LEVEL}, {1, GP_CUTOFF}},
+    {{0, GP_PITCH}, {0, GP_RESO}, {1, GP_PITCH}, {1, GP_RESO}},
     {{G, P_FEEDBACK}, {G, P_DRIFT}, {G, P_CHAR}, {G, P_AGE}},   /* the one turned most first (Evan, 2026-10-31) */
     {{0, GP_NOISE}, {0, GP_NCOLOR}, {1, GP_NOISE}, {1, GP_NCOLOR}},
     {{0, GP_WAVE}, {0, GP_WIDTH}, {1, GP_WAVE}, {1, GP_WIDTH}},
@@ -72,23 +75,24 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
     {{G, P_FADE}, {G, P_MORPH}, {G, P_SCENE_T}, {G, P_CLK_SYNC}},   /* Sync on KNOB 4 (v0.3) */
     {{G, P_TUNING}, {G, P_TUNE}, {G, P_WIDTH}, {G, P_PRESS_SENS}},   /* Tuning and Tune side by side (2026-11-01) */
     {{G, P_PULSE_RATE}, {G, P_PULSE_DEPTH}, {G, P_PULSE_SHAPE}, {G, P_PULSE_SWING}},
-    /* FX (v0.3): the delay with the drive after it; the reverb, its type on KNOB 3. Each page's KNOB 4 has a second
-     * job with SEL held (SEL_JOB): the delay's type, what goes into the reverb (Evan, 2026-10-28) */
-    {{G, P_DLY_DRIVE}, {G, P_DLY_TIME}, {G, P_DLY_REPEATS}, {G, P_DLY_MIX}},
-    {{G, P_REV_LEN}, {G, P_REV_DAMP}, {G, P_REV_TYPE}, {G, P_REV_MIX}},
+    /* FX (v0.3, Evan, 2026-11-08): Space, the amounts played (the delay's repeats and mix, the reverb's length and
+     * mix), the page FX opens; Details, what's set before (the delay's drive and time, the reverb's damp and type), with
+     * SEL the delay's type over Time and what goes into the reverb over Type (sel_job) */
+    {{G, P_DLY_REPEATS}, {G, P_DLY_MIX}, {G, P_REV_LEN}, {G, P_REV_MIX}},
+    {{G, P_DLY_DRIVE}, {G, P_DLY_TIME}, {G, P_REV_DAMP}, {G, P_REV_TYPE}},
 };
 /* A KNOB's SECOND JOB with SEL held, on the pages that have one (its card shows both, the second "+ SEL"): the
  * choices set before playing, so a player who never finds them loses nothing. FX's KNOB 4: the delay's type, what goes
  * into the reverb; Sub · Drive's Osc mix knobs: each drone's sub wave (Evan, 2026-10-28) */
 static int sel_job(int v, int i)
 {
-    if (i == 3)
-        return v == V_FX ? P_DLY_TYPE : v == V_FX2 ? P_DLY_ROUTE : -1;
+    if (v == V_FX2 && (i == 1 || i == 3))      /* Details: the delay's type by its Time, Into by the reverb's Type */
+        return i == 1 ? P_DLY_TYPE : P_DLY_ROUTE;
     if (v == V_SOURCE && (i == 0 || i == 2))
         return i ? P_SUBW_1 : P_SUBW_0;
     return -1;
 }
-static int page_jobs(int v) { return sel_job(v, 0) >= 0 || sel_job(v, 3) >= 0; }
+static int page_jobs(int v) { return sel_job(v, 0) >= 0 || sel_job(v, 1) >= 0 || sel_job(v, 3) >= 0; }
 static const char *sel_job_name(int p) { return p == P_DLY_ROUTE ? "Into" : p == P_DLY_TYPE ? "Type" : "Wave"; }
 /* the page buttons: each shows its first page, pressed again the next */
 static const struct {
@@ -237,13 +241,14 @@ static void mark_dirty(void) { ui.dirty = 1; ui.chg_t = plat_ms(); }
 /* ONE-TIME TIPS (v0.3): the first time a player does a thing, a line on what's next to it, once (the project keeps
  * what's been seen, the player's, as the Gesture time is). A tip waits for the screen: after any message */
 enum { TIP_BLEND, TIP_NAMES, TIP_GEST, TIP_FX, TIP_INTO, TIP_XMOD, TIP_CLOCK, TIP_UNDO, TIP_KN_LIFE, TIP_KN_MODS,
-       TIP_KN_SETUP2, TIP_KEEP, NTIPS };
+       TIP_KN_SETUP2, TIP_KEEP, TIP_KN_DRONES, TIP_KN_SPACE, NTIPS };
 static const char *const TIP_TEXT[NTIPS] = {   /* one line, the banner's width (~23) */
-    "PRESS HARDER: BLEND", "HOLD [SEL]: KEY NAMES", "HOLD: IN · TAP: LATCH", "TAP [FX]: REVERB",
+    "PRESS HARDER: BLEND", "HOLD [SEL]: KEY NAMES", "HOLD: IN · TAP: LATCH", "TAP [FX]: TIME, TYPES",
     "[SEL]+KNOB 4: INTO REV", "[F#5]: PITCH, SNARL", "SWELL KNOB 1: DIVISION", "[SEL] + [SAVE]: UNDO",
     /* the knobs 0.3 moved (Evan, 2026-11-01), the first time a player from 0.2 opens their page (SEEN1_MOVED) */
     "FEEDBACK NOW KNOB 1", "X-MOD NOW KNOB 4", "TUNE NOW KNOB 2",
-    "TAP [SEL]: KEEP IT"};                     /* SEL glowing while a blend or a gesture can be kept */
+    "TAP [SEL]: KEEP IT",                      /* SEL glowing while a blend or a gesture can be kept */
+    "PITCH: TAP [HOME] AGAIN", "DRIVE, TIME: TAP [FX]"};   /* the pages 0.3 rearranged (2026-11-08), as the knobs */
 /* (a button or key in [ ]: the new look draws it in a box, the spec's rule 19; the old screen drops the brackets) */
 #define TIP_MS 3500u
 static int tip_seen(int t) { return proj.seen[t >> 3] >> (t & 7) & 1u; }
@@ -389,10 +394,6 @@ static void pitch_turn(int g, int p, int role, int32_t s)
 {
     uint32_t now = plat_ms(), dt = now - ui.enc_t[role], a = (uint32_t)(s < 0 ? -s : s), slide;
     int cents, ti = tun_i(p);
-    if (proj.par[P_PLOCK]) {                           /* locked against a bumped knob */
-        say_c("PITCH LOCKED", "unlock [C#4]", K_GOLD);
-        return;
-    }
     ui.enc_t[role] = now;
     if (a > 1)
         dt /= a;                                       /* several detents since the last look */
@@ -653,7 +654,7 @@ static void sw_flip(sw_t w)
     default: return;
     }
     if ((w.s == S_PARTNER && ui.view == V_PARTNER) || (w.s == S_SUBOCT && ui.view == V_SOURCE) ||
-        (w.s == S_HP && ui.view == V_PLAY2) || (w.s == S_XMOD && ui.view == V_LFO2) ||
+        (w.s == S_HP && ui.view == V_PLAY) || (w.s == S_XMOD && ui.view == V_LFO2) ||
         (ui.view == V_LFO && (w.s == S_OTAP || w.s == S_ODEST || w.s == S_FTAP || w.s == S_FDEST)) ||
         (w.s == S_DTAP && ui.view == V_LFO2))
         return;                                /* the page shows it and its key: no banner (Evan, 2026-11-02; the LFO
@@ -697,8 +698,12 @@ static void set_view(int v)
     ui.view = (uint8_t)v;
     for (i = 0; i < 4; i++)
         ui.touch_t[i] = 0;
-    if (v == V_FX)
+    if (v == V_PLAY)
+        tip(TIP_KN_DRONES);
+    else if (v == V_FX) {
+        tip(TIP_KN_SPACE);
         tip(TIP_FX);
+    }
     else if (v == V_FX2)
         tip(TIP_INTO);
     else if (v == V_LIFE)
@@ -722,7 +727,8 @@ static int page_btn(int b)                             /* the index in PAGE_BTN,
 }
 
 /* a page button pressed: the page of its last shown at once (the review: Reverb, Life, Moves couldn't be peeked;
- * HOME always Drones 1, home), unless already on its pages (then the next on a tap) */
+ * HOME always Drones and FX always Space, the pages played: v0.3), unless already on its pages (then the next on a
+ * tap) */
 static void page_down(int b)
 {
     int i = page_btn(b);
@@ -732,7 +738,7 @@ static void page_down(int b)
     ui.hold_from = ui.view;
     ui.hold_cycle = (uint8_t)on_pages(i);
     if (!ui.hold_cycle)
-        set_view(PAGE_BTN[i].first + (b == B_HOME ? 0 : ui.page_last[i]));
+        set_view(PAGE_BTN[i].first + (b == B_HOME || b == B_FX ? 0 : ui.page_last[i]));   /* HOME and FX: the page played */
 }
 /* let go: after a hold (or a knob turned while held), back where it was; after a tap, stay (or step on) */
 static void page_up(int b)
@@ -2010,6 +2016,8 @@ static void input(void)
     for (i = 0; i < 4; i++)
         if ((e = plat_enc(EN_K1 + (int)i)) != 0) {
             knob_turn((int)i, e);
+            if (ui.btn >> B_SEL & 1u)
+                ui.btn_used |= 1u << B_SEL;            /* SEL + a knob: SEL used (no map after it) */
             ui.scene_at = -1;                          /* the sound is no longer the scene's */
             ui.morph = -1;                             /* a hand on a knob: the morph stops where it is */
             ui.visit = -1;                             /* ... and a visit held becomes a stay (no way back) */
@@ -2198,6 +2206,9 @@ static int keymap_on(void)
         white |= 1u << WHITE_K[i];
     if (page_jobs(ui.view) && ui.sel_turned && ui.km_key < 0)
         return 0;
+    if ((ui.btn_used >> B_SEL & 1u) && ui.km_key < 0)
+        return 0;                                      /* SEL already used in this hold (SEL + PLAY, a bank, a knob):
+                                                        * no map until it's let go (Evan, 2026-11-08) */
     return (ui.btn >> B_SEL & 1u) && (plat_ms() - ui.sel_t >= wait || ui.km_key >= 0) && !lit(0) && !lit(1) &&
            !lit(2) && !lit(3) && !(ui.keys & white) && ui.press < 0;
 }
@@ -2268,7 +2279,11 @@ static void boxed_blink(uint8_t *b, uint8_t *k)
                {"LFO", B_LFO}, {"SEQ", B_SEQ}, {"GLO", B_GLO}, {"FX", B_FX}, {"ARP", B_ARP}, {"REC", B_REC},
                {"OCT-", B_OCTDN}, {"OCT+", B_OCTUP}, {"OCT", B_OCTDN}};
     const uint8_t lv = plat_ms() % 300u < 150u ? 255 : 0;
-    int m, last = -1;
+    int m, last = -1, g;
+    for (g = 0; g < DR_NGROUPS; g++)           /* Partner's Detune turning with its partner off: the partner's key
+                                                * blinks with the page's "needs [F#3]" (Evan, 2026-11-08) */
+        if (ui.view == V_PARTNER && plat_ms() < ui.touch_t[g ? 3 : 1] && !proj.par[DR_GP(g, GP_PARTNER)])
+            k[key_of_note(g ? "F#4" : "F#3")] = lv;
     if (plat_ms() >= ui.msg_until)
         return;
     for (m = 0; m < 2; m++) {

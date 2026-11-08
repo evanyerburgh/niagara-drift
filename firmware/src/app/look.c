@@ -84,7 +84,7 @@ static int32_t lk_ktext(int32_t x, int32_t y, const felucca_font_t *f, const cha
 static int32_t lk_ktext_w(const felucca_font_t *f, const char *s);
 
 /* ------------------------------------------------------------ header --- */
-/* a page's name in capitals, its number dropped when the header shows its "1/2" ("Drones 1": DRONES) */
+/* a page's name in capitals, its number dropped when the header shows its "1/2" ("Setup 1": SETUP) */
 static void lk_page_name(int v, char *name)
 {
     int i, b;
@@ -576,7 +576,7 @@ static int32_t lk_ktext_w(const felucca_font_t *f, const char *s) { return lk_kt
  * 2026-11-02: clear of the meters; its value and meter gray too) */
 static void lk_why_tag(int col, const char *why)
 {
-    const int32_t w = text_w(&LK_F_SMALL, why), ty = LK_PIC_H - (int32_t)LK_F_SMALL.h - 1, cx = 8 + 56 * col + 28;
+    const int32_t w = lk_ktext_w(&LK_F_SMALL, why), ty = LK_PIC_H - (int32_t)LK_F_SMALL.h - 1, cx = 8 + 56 * col + 28;
     const int32_t lo = col < 2 ? 8 : 122, hi = col < 2 ? 118 : 232;
     int32_t x = cx - w / 2;
     if (x + w > hi)
@@ -584,7 +584,7 @@ static void lk_why_tag(int col, const char *why)
     if (x < lo)
         x = lo;
     cv_rect(x - 3, ty, w + 6, LK_PIC_H - ty, LK_BG);
-    cv_text(x, ty, &LK_F_SMALL, why, LK_LABEL);
+    lk_ktext(x, ty, &LK_F_SMALL, why, LK_LABEL);   /* a key in [ ] boxed: "needs [F#3]" */
 }
 
 /* an up or down arrow, 2 px, its foot on the baseline (the fonts have none) */
@@ -619,8 +619,8 @@ static void lk_plot(int32_t x0, const int16_t *y, int n, uint16_t c)
 /* a still shape as a bundle of six strands (the Figma boards' look): the light one in front, each deeper one further
  * back by (dx, dy), with a gap between them so it reads as strands, not a band (Evan, 2026-11-02: "the Figma looks
  * great"). The shapes on Osc and Sub · Drive don't move with the music, so the spread is fixed */
-#define LK_BDX 0                             /* Osc and Drones 2: each strand straight down, 4 px (Evan, 2026-11-02:
-                                              * Osc as Drones 2; it was 2 px right too) */
+#define LK_BDX 0                             /* Osc and Drones: each strand straight down, 4 px (Evan, 2026-11-02:
+                                              * Osc as Drones; it was 2 px right too) */
 #define LK_BDY 4
 #define LK_SDX 0                             /* Sub · Drive's lanes are small: 3 px down */
 #define LK_SDY 3
@@ -645,7 +645,7 @@ static void lk_bundle(int32_t x0, const int16_t *y, int n, int g, int dx, int dy
     lk_bundle_n(x0, y, n, g, dx, dy, 6, 1.0f);
 }
 
-/* ------------------------------------------------- Drones 1's picture --- */
+/* --------------------------------- Pitch's picture (Drones 1's until v0.3) --- */
 /* the note of the Tuning nearest v (cents): where Partner and Shift count from (dr_tun_over, dr_shift_semi) */
 static int lk_tun_note(int t, int v)
 {
@@ -672,7 +672,7 @@ static void lk_interval(char *t, int c)
 
 /* each drone's last six pictures, drawn as its strands, 2 px: still, they lie on one line; moving (Drift, detune,
  * an LFO on pitch or X-Wave), they fan out. Each wave scaled to its own loudness (fast up, slow down) so a quiet
- * drone isn't flat (Drones 2 shows the levels); between the names' line and the values row */
+ * drone isn't flat (Drones shows the levels); between the names' line and the values row */
 #define LK_STRANDS 6
 static int8_t lk_hist[DR_NGROUPS][LK_STRANDS][DR_SCOPE_N];
 static float lk_peak[DR_NGROUPS];
@@ -688,6 +688,9 @@ static int lk_heard(int g, float *bright, float *close)
     *close = fm_minf(1.0f, lf / 0.3f);
     return lf > 0.0f;
 }
+
+static float lk_cut_hist[DR_NGROUPS][LK_STRANDS];
+static void lk_curve(int g, int32_t x0, int32_t top, int32_t bot);
 
 static void lk_pic_drones1(void)
 {
@@ -706,6 +709,13 @@ static void lk_pic_drones1(void)
         for (i = 0; i < DR_SCOPE_N; i++) {     /* smoothed as draw_scope's (raw captures jump) */
             sc_disp[g][i] += (dr_scope[g][i] - sc_disp[g][i]) * 0.45f;
             lk_hist[g][LK_STRANDS - 1][i] = (int8_t)fm_clampf(sc_disp[g][i] * k, (float)-half, (float)half);
+        }
+        if (plat_ms() < ui.touch_t[g ? 3 : 1] + 300u) {   /* its Reso turning, and 1.5 s after: the filter curve
+                                                         * as on Drones, the peak growing (Evan, 2026-11-08: the
+                                                         * waves hardly show the resonance); the waves' history
+                                                         * kept going, so they come back as they are now */
+            lk_curve(g, g ? 130 : 10, top + 2, LK_PIC_H - 6);
+            continue;
         }
         {   /* scaled to its own loudness, but as quiet as it is heard near silence: smaller and dimmer, then a
              * thin gray line */
@@ -742,7 +752,7 @@ static void lk_pic_drones1(void)
     for (i = 0; i < 4; i += 2)                 /* a pitch knob turning: its fine tuning, SEL's job, and how far
                                                 * it has the knob off the Tuning's notes ("fine +3"; Evan,
                                                 * 2026-11-07: on the other Tunings the note's own cents hid it) */
-        if (lit(i) && !proj.par[P_PLOCK]) {
+        if (lit(i)) {
             const int p = knob_param(i), off = p >= 0 ? proj.tun_off[tun_i(p)] : 0;
             char t[12], *q = scopy(t, "fine ");
             if (off)
@@ -752,59 +762,78 @@ static void lk_pic_drones1(void)
         }
 }
 
-/* ------------------------------------------------- Drones 2's picture --- */
+/* -------------------------------- Drones' picture (Drones 2's until v0.3) --- */
 /* each drone's filter curve (its resonance's peak growing) as six strands, the last six pictures' cutoffs (an LFO or
  * Drift on it fans them), in place at any level, closing up and dimming toward silence (Evan, 2026-11-02); its
  * level in dB under it */
-static float lk_cut_hist[DR_NGROUPS][LK_STRANDS];
+
+/* one drone's filter curve, five strands of the last pictures' cutoffs, closing up and dimming toward silence; silent,
+ * one thin gray line where it was (Drones, and Pitch while a Reso knob turns) */
+static void lk_curve(int g, int32_t x0, int32_t top, int32_t bot)
+{
+    const int32_t h = bot - top;
+    float br, cl;
+    int j, i;
+    for (j = 0; j < LK_STRANDS - 1; j++)
+        lk_cut_hist[g][j] = lk_cut_hist[g][j + 1];
+    lk_cut_hist[g][LK_STRANDS - 1] = dr_cut[g];
+    if (!lk_heard(g, &br, &cl)) {              /* silent: the curve as one thin gray line, where it was */
+        int32_t py = 0, yy;
+        for (i = 0; i <= 50; i++) {
+            const float d = filt_db(g, lk_cut_hist[g][LK_STRANDS - 1], 100.0f * (float)i / 50.0f);
+            yy = bot - LK_BDY - (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f * (float)(h - 5 * LK_BDY));
+            if (i)
+                cv_line(x0 + 2 * (i - 1), py, x0 + 2 * i, yy, LK_UNLIT);
+            py = yy;
+        }
+        return;
+    }
+    for (j = 1; j < LK_STRANDS; j++) {         /* five (Evan, 2026-11-02: one fewer, the same ramp), closing up and
+                                                * dimming near silence: the oldest first, deep; the newest last, light */
+        int16_t y[51];
+        const int32_t oy = (int32_t)((float)(LK_BDY * j) * cl + (float)LK_BDY * (1.0f - cl) + 0.5f);
+        for (i = 0; i <= 50; i++) {
+            const float d = filt_db(g, lk_cut_hist[g][j], 100.0f * (float)i / 50.0f);
+            y[i] = (int16_t)(bot - oy - (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f *
+                                                  (float)(h - 5 * LK_BDY)));   /* in place at any level (Evan,
+                                                                                 * 2026-11-02: it sank as it got quiet) */
+        }
+        lk_plot(x0, y, 51, lk_mix(0x07060Bu, lk_ramp888(g, (float)(j - 1) / (float)(LK_STRANDS - 2)), br));
+    }
+}
+
+static int lk_drone_pitch(int g)               /* a drone's pitch knob as set (drone II with the link: I's plus the gap) */
+{
+    const int c1 = proj.par[DR_GP(0, GP_PITCH)];
+    return g == 0 ? c1 : proj.par[P_PLINK] ? c1 + proj.par[P_PLINK_OFF] : proj.par[DR_GP(1, GP_PITCH)];
+}
 
 static void lk_pic_drones2(void)
 {
-    const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 4, bot = LK_PIC_H - (int32_t)LK_F_SMALL.h - 6, h = bot - top;
-    int g, j, i;
+    const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 4, bot = LK_PIC_H - (int32_t)LK_F_SMALL.h - 6;
+    int g;
     lk_halves();
     for (g = 0; g < DR_NGROUPS; g++) {         /* the filter's mode beside the drone's name, and its key (Evan,
-                                                * 2026-11-02: the curve shows it, the key says where), as Sub · Drive */
+                                                * 2026-11-02: the curve shows it, the key says where), as Sub · Drive;
+                                                * at the half's right its note, small, read-only (Evan, 2026-11-08: so
+                                                * the main page says where the drones are) */
         static const char *const MODE[3] = {"LP", "BP", "HP"};
         const int32_t base = 2 + LK_B(LK_F_DRONE), x1 = (g ? 130 : 10) + text_w(&LK_F_DRONE, g ? "II" : "I") + 6;
         const int m = gpar(g, GP_MODE);
+        char t[16], *q;
         lk_key(cv_text(x1, base - LK_B(LK_F_SMALL), &LK_F_SMALL, MODE[(unsigned)m < 3u ? m : 0], LK_DRONE[g]) + 5, base,
                LK_BKEY[g ? 7 : 2]);
+        dr_param_text(DR_GP(g, GP_PITCH), lk_drone_pitch(g), t);
+        for (q = t; *q && *q != ' '; q++)      /* the note; its cents are the Pitch page's */
+            ;
+        *q = 0;
+        cv_text((g ? 230 : 112) - text_w(&LK_F_SMALL, t), base - LK_B(LK_F_SMALL), &LK_F_SMALL, t, LK_DRONE[g]);
     }
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 130 : 10;
         const float l = dr_level[g], db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
         char t[12];
-        for (j = 0; j < LK_STRANDS - 1; j++)
-            lk_cut_hist[g][j] = lk_cut_hist[g][j + 1];
-        lk_cut_hist[g][LK_STRANDS - 1] = dr_cut[g];
-        {
-            float br, cl;
-            if (!lk_heard(g, &br, &cl)) {      /* silent: the curve as one thin gray line, where it was */
-                int32_t py = 0, yy;
-                for (i = 0; i <= 50; i++) {
-                    const float d = filt_db(g, lk_cut_hist[g][LK_STRANDS - 1], 100.0f * (float)i / 50.0f);
-                    yy = bot - LK_BDY - (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f * (float)(h - 5 * LK_BDY));
-                    if (i)
-                        cv_line(x0 + 2 * (i - 1), py, x0 + 2 * i, yy, LK_UNLIT);
-                    py = yy;
-                }
-            } else
-                for (j = 1; j < LK_STRANDS; j++) {   /* five (Evan, 2026-11-02: one fewer, the same ramp), closing
-                                                      * up and dimming near silence: the oldest first, deep; the
-                                                      * newest last, light */
-                    int16_t y[51];
-                    const int32_t oy = (int32_t)((float)(LK_BDY * j) * cl + (float)LK_BDY * (1.0f - cl) + 0.5f);
-                    for (i = 0; i <= 50; i++) {
-                        const float d = filt_db(g, lk_cut_hist[g][j], 100.0f * (float)i / 50.0f);
-                        y[i] = (int16_t)(bot - oy - (int32_t)((fm_clampf(d, -36.0f, 18.0f) + 36.0f) / 54.0f *
-                                                              (float)(h - 5 * LK_BDY)));   /* in place at any level
-                                                                                             * (Evan, 2026-11-02: it
-                                                                                             * sank as it got quiet) */
-                    }
-                    lk_plot(x0, y, 51, lk_mix(0x07060Bu, lk_ramp888(g, (float)(j - 1) / (float)(LK_STRANDS - 2)), br));
-                }
-        }
+        lk_curve(g, x0, top, bot);
         if (db > -60.0f) {                     /* "-10 dB" */
             char *q = t;
             *q++ = '-';
@@ -1272,8 +1301,10 @@ static void lk_pic_partner(void)
                 py = y;
             }
         }
-        if (!on) {
-            scopy(t, "partner off");
+        if (!on) {                             /* off: what Detune needs, where its beats would be (Evan, 2026-11-08);
+                                                * Detune's value gray */
+            lk_ktext(x0, LK_PIC_H - (int32_t)LK_F_SMALL.h - 1, &LK_F_SMALL, g ? "needs [F#4]" : "needs [F#3]", LK_LABEL);
+            continue;
         } else if (fm_fabsf(beat) < 0.05f) {
             scopy(t, "still");
         } else {
@@ -1720,7 +1751,7 @@ static void lk_pic_setup1(void)
  * a tick a note (dr_tun_c), Tune turning it away from the fixed notch at the top (440), A named on its tick; the
  * Tuning's 1/1 named on its (LMY on C, Harrison and Partch on G, Harmonics on A; Just and Shruti on drone I, the ring
  * turned to put it at the top); inside, its notes and its 1/1. No drones or interval: the page sets the tuning (Evan,
- * 2026-11-07; Drones 1 shows the interval). Stereo: the two drones' waves upright, L and R as far apart as it
+ * 2026-11-07; Pitch shows the interval). Stereo: the two drones' waves upright, L and R as far apart as it
  * puts them. Pressure: what a press gives, light .. firm, and the key pressed now on it */
 #define LK_RING RGB(119, 114, 138)
 static void lk_circle(int32_t cx, int32_t cy, int32_t r, uint16_t c)   /* 1 px, the midpoint way */
@@ -1767,7 +1798,7 @@ static void lk_pic_setup2(void)
     const int32_t cx = 56, cy = 66, R = 38;     /* the ring, its ticks out to R + 9, A off them: centered in the left of
                                                 * the picture, clear of the header;
                                                 * the picture's height, the interval gone (Evan, 2026-11-07: this page
-                                                * sets the tuning; the drones' interval is on Drones 1) */
+                                                * sets the tuning; the drones' interval is on Pitch) */
     int g, i, k;
     char tx[24];
     {   /* the ring, its notes, A, the 1/1 */
@@ -1879,7 +1910,7 @@ static void lk_pic_setup2(void)
  * where the Swell is now. Off: one gray line, still, no dot (the spec, 2026-10-31; the board, ARP 262:4) */
 #define LK_SW_N 109                            /* 2 px a point: x 12 .. 228, two bars (54 px a breath) */
 #define LK_SW_S 5                              /* strands, 2 px as on every page (Evan, 2026-11-07: they were 1 px,
-                                                * thinner and rougher than the rest; five, as Drones 2) */
+                                                * thinner and rougher than the rest; five, as Drones) */
 static int16_t lk_swell_y(float ph, int32_t top, int32_t h)
 {
     const float g = fm_maxf(dr_pulse_wave(ph), 1e-4f), db = fm_log2f(g) * 6.0206f;
@@ -1976,14 +2007,19 @@ static void lk_ring_tilt(int32_t cx, int32_t cy, float rx, float ry, int tilt, u
     }
 }
 
-/* ------------------------------------------------------ the Delay's picture --- */
-/* the echoes as ripples out from the sound (a full ring, white) on a time axis that opens out near it (x 42 +
- * 60 ln(1 + t / 0.1 s): 2 s at x 224, so short and long times both read); each repeat a half-ring as big as it's still
- * loud (48 sqrt(wet fb^k), a quarter as wide), the left channel's opening up in the FX blue and the right's down in aqua,
+/* ------------------------------------------------ Space's and Details' picture --- */
+/* FX's two pages share one picture in two halves, DELAY in the FX blue and REVERB in the rings' pale cyan (Evan,
+ * 2026-11-08), each the old full page's drawing in its half: the Delay's and the Reverb's as before (the spec,
+ * 2026-10-31; the boards FX 266:4, 268:2), their axes and widths halved */
+#define LK_REV_C RGB(201, 246, 255)          /* REVERB's name: the rings' newest */
+
+/* the echoes as ripples out from the sound (a full ring, white) on a time axis that opens out near it (x 24 +
+ * 29 ln(1 + t / 0.1 s): 2 s at x 112, so short and long times both read); each repeat a half-ring as big as it's still
+ * loud (40 sqrt(wet fb^k), an eighth as wide), the left channel's opening up in the FX blue and the right's down in aqua,
  * each dimmer as it ages, drawn while over -26 dB; Drive thickens the lines. Wide: the right at 0.75 of the time;
  * Ping-pong: odd repeats left, even right; Grain jittered, Self stretching (as the engine). Past Repeats 85 they stop
- * shrinking: runaway, in the header (the spec, 2026-10-31; the board, FX 266:4) */
-static float lk_dly_x(float ms) { return 42.0f + 60.0f * fm_logf(1.0f + ms * 0.01f); }
+ * shrinking: runaway, in the header */
+static float lk_dly_x(float ms) { return 24.0f + 29.0f * fm_logf(1.0f + ms * 0.01f); }
 static void lk_pic_delay(void)
 {
     const int ty = (unsigned)proj.par[P_DLY_TYPE] < DR_NDLY ? proj.par[P_DLY_TYPE] : DR_DLY_TAPE;
@@ -1993,70 +2029,73 @@ static void lk_pic_delay(void)
     const float wet = mix > 0.0f ? 0.25f + 0.75f * mix : 0.0f;
     const int w = (int)(2.0f + (float)proj.par[P_DLY_DRIVE] * 0.015f + 0.5f);   /* 2 px as every page, 3 from Drive 34,
                                                                                   * 4 at 100 (Evan, 2026-11-07) */
-    const int32_t mid = 61;
+    const int32_t mid = 68;
     static const uint32_t C[2][2] = {{0xB4D9FFu, 0x1F6BFFu}, {0xB8FFF0u, 0x3CBFAFu}};   /* new, old: L blue, R aqua */
     int side, k;
-    char sw[8];
-    cv_text(8, 18, &LK_F_SMALL, "L", LK_LABEL);
-    cv_text(8, 89, &LK_F_SMALL, "R", LK_LABEL);
-    lk_ring(42, mid, 12.0f, 48.0f, 0, w, LK_INK);   /* the sound */
+    cv_text(4, 26, &LK_F_SMALL, "L", LK_LABEL);
+    cv_text(4, 92, &LK_F_SMALL, "R", LK_LABEL);
+    lk_ring(24, mid, 6.0f, 40.0f, 0, w, LK_INK);   /* the sound */
     for (side = 0; side < 2; side++) {
         float a = 1.0f;
         const float step = ms * (side && ty == 1 ? 0.75f : 1.0f);
         for (k = 1; k < 40; k++) {
             const int heard = ty != 2 || (k & 1) != side;   /* ping-pong: odd repeats on the left, even on the right */
             const float t = step * (float)k;
-            const float x = lk_dly_x(t) + (float)echo_shift(ty, k);
+            const float x = lk_dly_x(t) + 0.5f * (float)echo_shift(ty, k);
             float hgt, age;
             a *= fb;
-            hgt = 48.0f * fm_sqrtf(wet * a);
-            if (x > 224.0f || wet * a < 0.0025f)   /* off the axis, or under -26 dB */
+            hgt = 40.0f * fm_sqrtf(wet * a);
+            if (x > 112.0f || wet * a < 0.0025f)   /* off the axis, or under -26 dB */
                 break;
             if (!heard)
                 continue;
             age = fm_minf((float)(k - 1) * 0.1f, 1.0f);
-            lk_ring((int32_t)(x + 0.5f), side ? mid + 1 : mid, hgt * 0.25f, hgt, side ? 2 : 1, w,
+            lk_ring((int32_t)(x + 0.5f), side ? mid + 1 : mid, hgt * 0.125f, hgt, side ? 2 : 1, w,
                     lk_mix(0x07060Bu, lk_mix888(C[side][0], C[side][1], age), 1.0f - 0.4f * age));
         }
     }
-    scopy(sw, "2 s");                          /* over the echoes */
-    cv_rect(227 - text_w(&LK_F_SMALL, sw), 80, text_w(&LK_F_SMALL, sw) + 4, (int32_t)LK_F_SMALL.h - 2, LK_BG);
-    cv_text(229 - text_w(&LK_F_SMALL, sw), 79, &LK_F_SMALL, sw, LK_LABEL);
+    cv_rect(113 - text_w(&LK_F_SMALL, "2 s"), 87, text_w(&LK_F_SMALL, "2 s") + 4, (int32_t)LK_F_SMALL.h - 2, LK_BG);
+    cv_text(115 - text_w(&LK_F_SMALL, "2 s"), 86, &LK_F_SMALL, "2 s", LK_LABEL);
 }
 
-/* ----------------------------------------------------- the Reverb's picture --- */
-/* the tail as rings on a time axis that opens out near the start (x 91 + 35.8 ln(1 + t / 1 s): 40 s at the right; the
- * first ring clear of the Into words at Mix 100 in a Cathedral, the widest), so
- * every Length from 0.3 s to 40 s draws differently: a ring at 0 and then each 1.75 times later, each as tall as the
- * tail is then (its dB falling in a line to -60 at the Length), none once it has died away, the first as tall as the mix
- * (12 + 46 mix px); as wide as the room (Room narrow, Cathedral wide); new ones pale, older ones the FX blue, drained
- * toward gray by Damp; 2 px, as every page (Evan, 2026-11-07). Inf: all one height, "freeze" in the header. At the left what goes in (Into), lit when the
- * reverb hears it (the spec, 2026-10-31, round 2; the board, FX 268:2) */
+/* the tail as rings on a time axis that opens out near the start (x 136 + 25.5 ln(1 + t / 1 s): 40 s at the half's
+ * right), above what goes in: a ring at 0 and then each 1.75 times later, each as tall as the tail
+ * is then (its dB falling in a line to -60 at the Length), none once it has died away, the first as tall as the mix
+ * (6 + 20 mix px); as wide as the room (Room narrow, Cathedral wide); new ones pale, older ones the FX blue, drained
+ * toward gray by Damp; 2 px. Inf: all one height, "freeze" in the header. At the left what goes in (Into), lit when
+ * the reverb hears it */
 static void lk_pic_reverb(void)
 {
     static const float WIDE[DR_NREV] = {0.16f, 0.24f, 0.324f, 0.27f};   /* Room, Hall, Cathedral, Chorus hall */
     const int ty = (unsigned)proj.par[P_REV_TYPE] < DR_NREV ? proj.par[P_REV_TYPE] : 2, into = proj.par[P_DLY_ROUTE];
     const float len = rev_secs(proj.par[P_REV_LEN]), mix = (float)proj.par[P_REV_MIX] * 0.01f;
-    const float damp = (float)proj.par[P_REV_DAMP] * 0.01f, r0 = 12.0f + 46.0f * mix;
-    const int32_t mid = 62;
+    const float damp = (float)proj.par[P_REV_DAMP] * 0.01f, r0 = 6.0f + 20.0f * mix;
+    const int32_t mid = 46;
     float t = 0.0f;
     int k;
-    char tx[8];
     for (k = 0; k < 9; k++, t = k == 1 ? 0.42f : t * 1.75f) {
-        const float x = 91.0f + 35.8f * fm_logf(1.0f + t), a = len <= 0.0f ? 1.0f : 1.0f - t / len;
+        const float x = 136.0f + 25.5f * fm_logf(1.0f + t), a = len <= 0.0f ? 1.0f : 1.0f - t / len;
         const float ry = r0 * a, age = (float)k / 6.0f;
         uint32_t c;
-        if (x > 222.0f || ry < 2.0f)           /* off the axis, or died away */
+        if (x > 231.0f || ry < 2.0f)           /* off the axis, or died away */
             break;
         c = lk_mix888(lk_mix888(0xC9F6FFu, 0x507FCEu, fm_minf(age, 1.0f)), 0x3A3646u, fm_minf(damp * age, 0.85f));
-        lk_ring_tilt((int32_t)(x + 0.5f), mid, 6.0f + WIDE[ty] * ry, ry, ty == 3 ? (k & 1 ? -1 : 1) : 0,
+        lk_ring_tilt((int32_t)(x + 0.5f), mid, 3.0f + 0.5f * WIDE[ty] * ry, ry, ty == 3 ? (k & 1 ? -1 : 1) : 0,
                      mix > 0.0f ? lk_mix(0x07060Bu, c, 1.0f) : LK_UNLIT);
     }
-    cv_text(12, 38, &LK_F_SMALL, "echoes", mix > 0.0f && into != 2 ? LK_INK : LK_LABEL);   /* Into: Both, Echoes, */
-    cv_text(12, 50, &LK_F_SMALL, "drones", mix > 0.0f && into != 1 ? LK_INK : LK_LABEL);   /* Drones */
-    scopy(tx, "40 s");                         /* over the rings */
-    cv_rect(227 - text_w(&LK_F_SMALL, tx), 80, text_w(&LK_F_SMALL, tx) + 4, (int32_t)LK_F_SMALL.h - 2, LK_BG);
-    cv_text(229 - text_w(&LK_F_SMALL, tx), 79, &LK_F_SMALL, tx, LK_LABEL);
+    cv_text(126, 78, &FONT_XS, "echoes", mix > 0.0f && into != 2 ? LK_INK : LK_LABEL);   /* Into: Both, Echoes, Drones; */
+    cv_text(126, 90, &FONT_XS, "drones", mix > 0.0f && into != 1 ? LK_INK : LK_LABEL);   /* at 15 in half a page (Evan) */
+    cv_rect(229 - text_w(&LK_F_SMALL, "40 s"), 87, text_w(&LK_F_SMALL, "40 s") + 4, (int32_t)LK_F_SMALL.h - 2, LK_BG);
+    cv_text(231 - text_w(&LK_F_SMALL, "40 s"), 86, &LK_F_SMALL, "40 s", LK_LABEL);
+}
+
+static void lk_pic_space(void)
+{
+    lk_pic_delay();
+    lk_pic_reverb();
+    cv_rect(120, 4, 1, LK_PIC_H - 8, LK_RULE);   /* DELAY | REVERB */
+    cv_text(10, 2, &LK_F_SMALL, "DELAY", LK_FX);
+    cv_text(130, 2, &LK_F_SMALL, "REVERB", LK_REV_C);
 }
 
 static void lk_pic(void)
@@ -2070,7 +2109,7 @@ static void lk_pic(void)
     ui.sig[1] = h;
     cv_begin(240, LK_PIC_H, LK_BG);
     switch (ui.view) {
-    case V_PLAY2: lk_pic_drones2(); break;
+    case V_PLAY2: lk_pic_drones1(); break;
     case V_LIFE: lk_pic_life(); break;
     case V_TONE: lk_pic_tone(); break;
     case V_OSC: lk_pic_osc(); break;
@@ -2082,20 +2121,22 @@ static void lk_pic(void)
     case V_PULSE: lk_pic_swell(); break;
     case V_SETUP: lk_pic_setup1(); break;
     case V_SETUP2: lk_pic_setup2(); break;
-    case V_FX: lk_pic_delay(); break;
-    case V_FX2: lk_pic_reverb(); break;
-    default: lk_pic_drones1(); break;
+    case V_FX:
+    case V_FX2: lk_pic_space(); break;
+    default: lk_pic_drones2(); break;
     }
-    if ((ui.view == V_FX || ui.view == V_FX2) && !msg) {   /* KNOB 4's second job, on the rule above Mix */
-        char t[16];
-        const int ps = sel_job(ui.view, 3), held = (int)(ui.btn >> B_SEL & 1u);
-        if (held) {                            /* SEL held: the job it returns to, "mix 45" */
-            char *q = scopy(t, "mix ");
-            itoa_u((uint32_t)proj.par[knob_own(3)], q);
-        } else {
-            dr_param_text(ps, proj.par[ps], t);
+    if (ui.view == V_FX2 && !msg) {            /* Details' second jobs, on the rule above Time and Type: the delay's
+                                                * type, what goes into the reverb; SEL held, the value they return to */
+        int c;
+        for (c = 1; c < 4; c += 2) {
+            char t[16];
+            const int ps = sel_job(ui.view, c), held = (int)(ui.btn >> B_SEL & 1u);
+            if (held)                          /* SEL held: the job it returns to, by name ("time", "type") */
+                scopy(t, c == 1 ? "time" : "type");
+            else
+                dr_param_text(ps, proj.par[ps], t);
+            lk_sel_tag(c, t, held);
         }
-        lk_sel_tag(3, t, held);
     }
     if (msg)
         lk_banner();
@@ -2303,6 +2344,8 @@ static const char *lk_unheard(int p)
 {
     if (p < P_XMOD && p % GP_N == GP_WIDTH && gpar(p / GP_N, GP_WAVE) < 70)
         return "needs sqr";
+    if (p < P_XMOD && p % GP_N == GP_DETUNE && !gpar(p / GP_N, GP_PARTNER))   /* its partner off (Evan, 2026-11-08) */
+        return p / GP_N ? "needs [F#4]" : "needs [F#3]";
     return 0;
 }
 
@@ -2545,8 +2588,6 @@ static void lk_values(void)
         int32_t wb, ws, y;
         if (p < 0)
             continue;
-        if (is_pitch && proj.par[P_PLOCK])
-            on = 0;                            /* PITCH LOCK: the knob does nothing, so it doesn't light */
         v = proj.par[p];
         if (is_pitch && (p == P_PLINK_OFF ? sh[1] != sh[0] : sh[g] != 0)) {
             v += p == P_PLINK_OFF ? sh[1] - sh[0] : sh[g];   /* Shift moving it: the pitch as heard, lit */

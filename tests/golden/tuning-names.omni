@@ -2,7 +2,7 @@
 # the same-samples check (tools/same_samples.py): intervals in each Tuning's own terms (ledger 3a, Evan 2026-11-08):
 # steps on the equal ones ("12\19"), ratios on the rest ("3/2"). Drone I near D3, drone II near A3, each landed on
 # the Tuning's notes (a click up and back); partners +5th and +M3 (par3, par24); Shift (par80) so many notes up.
-# On 19-tone (par110 2), Harmonics (6), Harrison (8): Drones 1, Partner, Pitch moves. Not a test of its own.
+# On 19-tone (par110 2), Harmonics (6), Harrison (8): Pitch, Partner, Pitch moves. Not a test of its own.
 notips
 set 74 0
 set 51 0
@@ -13,13 +13,21 @@ wait 1500
 set 0 5000
 set 21 5700
 set 110 2
+page 1
 spin K1 1
+page 0
 wait 700
+page 1
 spin K1 -1
+page 0
 wait 700
+page 1
 spin K3 1
+page 0
 wait 700
+page 1
 spin K3 -1
+page 0
 wait 1500
 shot names-19-drones1.png
 tap SEQ
@@ -36,13 +44,21 @@ set 0 5000
 set 21 5700
 set 110 6
 tap HOME
+page 1
 spin K1 1
+page 0
 wait 700
+page 1
 spin K1 -1
+page 0
 wait 700
+page 1
 spin K3 1
+page 0
 wait 700
+page 1
 spin K3 -1
+page 0
 wait 1500
 shot names-harm-drones1.png
 tap SEQ
@@ -59,13 +75,21 @@ set 0 5000
 set 21 5700
 set 110 8
 tap HOME
+page 1
 spin K1 1
+page 0
 wait 700
+page 1
 spin K1 -1
+page 0
 wait 700
+page 1
 spin K3 1
+page 0
 wait 700
+page 1
 spin K3 -1
+page 0
 wait 1500
 shot names-harrison-drones1.png
 tap SEQ

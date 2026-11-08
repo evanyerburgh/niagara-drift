@@ -47,7 +47,7 @@ LEGEND, MUTED_KEY = (166, 166, 173), (85, 85, 91)
 KNOBS = [(105, 100, 24, "MASTER", "Volume", PALE), (215, 100, 24, "SELECT", "LFO rate", LILAC),
          (105, 210, 24, "PRESETS", "Gesture time", PALE), (215, 210, 24, "ALGORITHM", "Movement", LILAC)] + \
         [(610 + i * 104, 100, 22, "KNOB%d" % (i + 1), None, None) for i in range(4)]
-ROW1 = [("FX", "Delay"), ("SEL", "Fine"), ("ENV", "Life"), ("LFO", "Sends"), ("EDIT", "Osc"), ("GLO", "Setup")]
+ROW1 = [("FX", "Space"), ("SEL", "Fine"), ("ENV", "Life"), ("LFO", "Sends"), ("EDIT", "Osc"), ("GLO", "Setup")]
 ROW2 = [("HOME", "Drones"), ("SAVE", "Store"), ("ARP", "Swell"), ("SEQ", "Partner"), ("PLAY", "On/off"), ("REC", "Loop")]
 BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14]
 BLACK = [(["Partner"], AMBER), (["Sub"], AMBER), (["Filter"], AMBER), (["Pitch", "lock"], None), (["LFO", "reset"], None),
