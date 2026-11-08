@@ -581,7 +581,7 @@ page where a knob has a second job with SEL (Sub · Drive, Delay, Reverb) it wai
 once you've turned that job, until you let go, so SEL + a knob never flashes the map.
 **Touch a black key while SEL is held** and the screen names it, its group and its setting ("I · G#3", "SUB -1
 OCT"), without switching it: let go of SEL to play it. The map steps aside while you turn a knob or hold a white
-key.
+key, and once SEL has done something else in a hold (SEL + PLAY, a bank, a knob) it waits until you let go.
 
 <img src="docs/img/page-keys.png" width="244" alt="The black keys' map while SEL is held: the keyboard with its black keys lit as on the panel and their groups named, and the key touched named with its setting">
 
