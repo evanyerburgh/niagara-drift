@@ -232,6 +232,8 @@ extern const char *const DR_TUNING_NAME[DR_NTUNING];
                                                 * do or Sa), not on A: pure from wherever drone I is */
 int dr_tun_n(int t);                           /* the Tuning t's notes an octave */
 int dr_tun_c(int t, int i);                    /* ... its note i, cents over its root */
+int dr_tun_name(int t, int p1, int a, int b, char *out);   /* the interval a to b (cents) on Tuning t (drone I on p1) in
+                                               * its own terms: "11\19", "7/4"; 0: none (12-tone, unison, off its notes) */
 int dr_grid_k(int t, int v, int root);         /* the index of the note nearest v (cents), the grid on root */
 int dr_grid_at(int t, int k, int root);        /* ... the note k, cents (0 the root, n its octave) */
 extern const char *const DR_ROUTE_NAME[DR_NROUTE];      /* "Both", "Echoes", "Drones" */

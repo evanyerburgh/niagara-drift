@@ -87,6 +87,8 @@ def font_path(name):
 
 ARROW = {"S", "Q17"}                                  # the fonts that show the arrow (look.c: the banner, LK_F_MSG, and
 #   the header's "-> P3", LK_F_TAG); the others leave its slot a space (the arrow in all 14 was 3.1 KB of flash)
+BSLASH = {"N1", "N2", "U1", "U2", "U3", "XS", "T18"}     # the fonts that draw an interval (the values, Drones 1's
+#   line): a real backslash for an equal Tuning's steps, "11\\19" (ledger 3a); the rest leave its slot a space
 
 
 def render(ttf, px, scale, pixel, first, last, fname=""):
@@ -105,9 +107,10 @@ def render(ttf, px, scale, pixel, first, last, fname=""):
     for c in range(first, last + 1):
         ch = {0x60: "\u00b7", 0x5E: "\u00b1", 0x7E: "\u00d7"}.get(c, chr(c))
         arrow = c == 0x5C and fname in ARROW
-        if c == 0x5C and not arrow:
-            ch = " "   # spare slots (gfx.c): the backtick's holds
-        #   a middle dot ("·"), the caret's "±", the tilde's "×" (nothing on screen uses those three)
+        if c == 0x5C and not arrow and fname not in BSLASH:
+            ch = " "
+        # spare slots (gfx.c): the backtick's holds a middle dot ("·"), the caret's "±", the tilde's "×" (nothing on
+        #   screen uses those three); the backslash's, an arrow (ARROW), a backslash (BSLASH) or a space
         adv = int(round(font.getlength(ch, features=feats)))
         bw = adv + 2 * PAD
         if arrow:                                      # the backslash's slot: a right arrow, drawn (Barlow has
