@@ -627,6 +627,8 @@ static void bank_load(int b)                   /* B (1) or C (2): from its objec
 
 /* D, E or F (j 0..2) from its object: new in format 43, so only this format is read yet (a later format converts it
  * here, as bank_load does B and C) */
+_Static_assert(PROJ_FORMAT == 43, "bankx_load reads D-F only in format 43: add their conversion from 43 (as bank_load "
+                                  "does B and C) before raising PROJ_FORMAT, or everyone's D, E and F are dropped");
 static void bankx_load(int j)
 {
     bank8_t *k = &bank_x[j];

@@ -298,6 +298,12 @@ static char *scopy(char *d, const char *s)          /* copies, returns the end *
 }
 
 /* ------------------------------------------------------------ values --- */
+/* SEL's fine tuning set on one Tuning, kept while a scene's blend takes the sound to another, so a blend that comes
+ * back (a crossfade let go under half way, SEL + SAVE's undo) brings it back too; -1: none (the knob or SEL moved since)
+ * (the review of #82) */
+static int tun_keep_t = -1;
+static int8_t tun_keep[3];
+
 static void param_set(int p, int v)
 {
     const dr_param_t *i = dr_param_info(p);
@@ -306,6 +312,11 @@ static void param_set(int p, int v)
         return;
     proj.par[p] = (int16_t)v;
     dr_set(p, v);
+    if (p == P_TUNING)                                 /* a new Tuning, by the knob or with a sound: SEL's fine tuning
+                                                        * let go, the knobs land on its own notes (Evan, 2026-11-07: an
+                                                        * offset set against one Tuning's notes means nothing on
+                                                        * another's) */
+        memset(proj.tun_off, 0, sizeof proj.tun_off);
     mark_dirty();
 }
 
@@ -394,6 +405,7 @@ static void pitch_turn(int g, int p, int role, int32_t s)
         cents = (int)s;
         v -= grid_near(p, v);
         proj.tun_off[ti] = (int8_t)(v < -127 ? -127 : v > 127 ? 127 : v);
+        tun_keep_t = -1;                               /* a new offset of the hand's: none kept to come back */
     } else {
         float sp = 1000.0f / (float)(dt ? dt : 1u), x = fm_clampf((sp - 10.0f) * (1.0f / 60.0f), 0.0f, 1.0f);
         const dr_param_t *in = dr_param_info(p);
@@ -514,10 +526,8 @@ static void knob_turn(int i, int32_t e)
         int n = in->hi - in->lo + 1, v = (proj.par[p] - in->lo + (e > 0 ? 1 : -1)) % n;
         param_set(p, in->lo + (v < 0 ? v + n : v));
         loop_note(p, proj.par[p], 0);
-        if (p == P_TUNING)                             /* a new Tuning: SEL's fine tuning let go, the knobs land on
-                                                        * its own notes (Evan, 2026-11-07: an offset set against one
-                                                        * Tuning's notes means nothing on another's) */
-            memset(proj.tun_off, 0, sizeof proj.tun_off);
+        if (p == P_TUNING)
+            tun_keep_t = -1;                           /* the hand chose it: nothing kept comes back */
     } else {
         param_set(p, proj.par[p] + accel(EN_K1 + i, e, dr_param_info(p)->hi - dr_param_info(p)->lo));
         loop_note(p, proj.par[p], 0);
@@ -985,18 +995,21 @@ static void loop_run(void)                     /* every millisecond: recording's
 }
 
 /* ------------------------------------------------------------- scenes --- */
-static int scene_step(int p)                           /* a value that steps (a switch, a list): it flips */
+static int scene_step(int p)                           /* a value that steps (a switch, a list): it flips; the
+                                                        * Tuning's eleven too (never through the ones between) */
 {
     const dr_param_t *in = dr_param_info(p);
-    return in->hi - in->lo <= 9;
+    return in->hi - in->lo <= 9 || p == P_TUNING;
 }
 
 /* settings of the room, not the sound: a scene doesn't carry them (the speaker and the stereo spread, which
- * depend on speaker or headphones; the tuning to the band; the pitch lock; how long things take) */
+ * depend on speaker or headphones; the tuning to the band; the pitch lock; how long things take). The Tuning is
+ * a sound's (v0.3, ledger 3, Evan 2026-11-08): a scene or Preset brings its own, a Preset that names none 12-tone,
+ * as it was made, with Pitch lock on too (it keeps the drones' pitch, not their grid) */
 static int scene_room(int p)
 {
     return p == P_FADE || p == P_TUNE || p == P_SPEAKER || p == P_WIDTH || p == P_PLOCK || p == P_MORPH ||
-           p == P_SCENE_T || p == P_PRESS_SENS || p == P_SCENE_BARS || p == P_TUNING || p == P_CLK_SYNC;
+           p == P_SCENE_T || p == P_PRESS_SENS || p == P_SCENE_BARS || p == P_CLK_SYNC;
 }
 
 /* a scene's name: its bank's letter and its number ("B5"; the Presets "P2", their second bank "P9" ..) */
@@ -1203,6 +1216,20 @@ static void sound_blend(const int16_t *from, const int16_t *to, float x)
             dr_slide(k / GP_N, 20);                    /* a frame's step of pitch, slid */
         else if (k == P_PLINK_OFF)
             dr_slide(1, 20);
+        if (k == P_TUNING) {                           /* SEL's fine tuning: kept for its Tuning, back with it */
+            const int back = v == tun_keep_t, was = proj.par[P_TUNING];
+            int8_t off[3];
+            memcpy(off, proj.tun_off, sizeof off);
+            param_set(k, v);                           /* (lets it go) */
+            if (back)
+                memcpy(proj.tun_off, tun_keep, sizeof tun_keep);
+            if (off[0] | off[1] | off[2]) {
+                tun_keep_t = was;
+                memcpy(tun_keep, off, sizeof tun_keep);
+            } else if (back)
+                tun_keep_t = -1;
+            continue;
+        }
         param_set(k, v);
     }
 }

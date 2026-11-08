@@ -136,3 +136,73 @@ set 45 1
 set 46 700
 spin K3 1
 expect par46 800
+# A SOUND CARRIES ITS TUNING (ledger 3, Evan 2026-11-08): a scene stored on 19-tone brings 19-tone back, and lets go
+# of SEL's fine tuning as it does; a Preset that names none is 12-tone, as it was made, Pitch lock on or off; the
+# Tuning flips half way through the scene's glide, never through the ones between
+set 45 0
+set 71 24
+tap GLO
+tap GLO
+set 110 2
+expect par110 2
+tap HOME
+press SEL
+tapkey w8
+release SEL
+press SAVE
+tapkey w0
+release SAVE
+wait 300
+set 110 7
+press SEL
+spin K1 3
+release SEL
+expect tunoff0 >0
+tapkey w0
+wait 300
+expect par110 7
+wait 1200
+expect par110 2
+expect tunoff0 0
+# the Presets (SEL + F5), Pitch lock on: P1 Niagara names no Tuning, so 12-tone
+set 74 1
+press SEL
+tapkey w14
+release SEL
+tapkey w0
+wait 1500
+expect par110 0
+# SEL's fine tuning comes back with its Tuning when a blend does (the review of #82): drone I on D3 (on 12-tone's
+# notes) +3; A1 (19-tone) pressed in past half way lets it go; let go, the sound goes back: 12-tone and +3 return;
+# tapped, then SEL + SAVE (undo): the same
+set 74 0
+press SEL
+tapkey w8
+release SEL
+set 0 5000
+wait 300
+press SEL
+spin K1 3
+release SEL
+expect par110 0
+expect tunoff0 3
+key w0 down
+pressure w0 127
+wait 1800
+expect par110 2
+expect tunoff0 0
+pressure w0 0
+key w0 up
+wait 1800
+expect par110 0
+expect tunoff0 3
+tapkey w0
+wait 1500
+expect par110 2
+expect tunoff0 0
+press SEL
+tap SAVE
+release SEL
+wait 1500
+expect par110 0
+expect tunoff0 3

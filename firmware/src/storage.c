@@ -20,8 +20,9 @@
 /* flash map, OMNI (plat.h OBJ_*): the project at 0xFC000 (Felucca's FL_GLOB), the panel calibration at
  * 0xDC000 (Felucca's user-preset area), scene banks B and C at 0x97000 and 0x99000 and the Presets saved over at
  * 0x9B000, D, E and F (v0.3) at 0x9D000, 0xDE000 and 0x9F000 / 0xFE000 (Felucca's main store,
- * above the app area our loader writes, 0x4000..0x93000). Nothing above 0xDFFFF: 0xE0000.. is the update loader's
- * staging area. The magic is X0X's, so a project is told apart by its own magic (project.c). */
+ * above the app area our loader writes, 0x4000..0x93000). 0xE0000..0xE5000 is the update loader's staging area: no
+ * object there (the project at 0xFC000 and F's second copy at 0xFE000 are above it, where the update loader never
+ * writes: it stops at 0xFC000). The magic is X0X's, so a project is told apart by its own magic (project.c). */
 typedef struct {
     uint32_t magic;
     uint16_t type, slot;

@@ -475,6 +475,9 @@ static int expect(const char *what, const char *val)
         got = (int)(clk.starts * 100u + clk.conts * 10u + clk.stops);
     else if (!strcmp(what, "wander"))             /* Wander's move of drone II now, |cents| */
         got = (int)(fm_fabsf(dr_wander()) * 100.0f + 0.5f);
+    else if (!strncmp(what, "tunoff", 6))         /* tunoffN: SEL's fine tuning N (0 drone I, 1 II, 2 the link offset),
+                                                   * cents */
+        got = proj.tun_off[atoi(what + 6) % 3];
     else if (!strncmp(what, "mtime", 5))          /* Macro time (PRESETS), 0..100 */
         got = proj.mtime;
     else if (!strncmp(what, "par", 3))            /* parN: parameter N (drone.h) */

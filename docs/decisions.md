@@ -670,3 +670,12 @@ at the end. The current state is in the [README](../README.md) and the code.
   keep a blend or a gesture, with a one-time tip "TAP [SEL]: KEEP IT". SEL held, the map on screen: D5-G5 light as
   the banks (the one playing lit, the rest dim). A key or button a message names in a box blinks quickly (150 / 150
   ms) while it shows. The key map draws the same four looks; the emulator shows dim keys too.
+- 2026-11-08 (Evan, ledger 3): **a sound carries its Tuning.** The Tuning is no longer a room setting: a scene
+  brings back the Tuning it was stored on, even with Pitch lock on (the lock keeps the drones' pitch, not their
+  grid); a Preset that names no Tuning plays on 12-tone, as it was made. It flips half way through a scene's glide
+  (as a switch does; it has 11 choices, so it was listed apart), and any new Tuning, by the knob or with a sound, lets
+  go of SEL's fine tuning (`param_set`). The knob stays on Setup 2. No new save format: scenes always stored the
+  Tuning, it was only skipped when they played.
+- 2026-11-08 (Evan): a scene key pressed part way and let go: the header keeps naming that scene ("→ A3") and its gold
+  line runs back down from where the press got to as the sound returns (it had filled a new line to "→ back", which
+  looked as if the change went on). An undo's glide still fills its line.
