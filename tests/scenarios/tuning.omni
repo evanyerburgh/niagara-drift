@@ -9,18 +9,26 @@ wait 500
 expect par110 0
 expect par0 5000
 # four detents: four semitones, at once (F#3)
+page 1
 spin K1 4
+page 0
 expect par0 5400
 wait 900
 expect par0 5400
 # SEL fine-tunes, 1 cent a detent, and that stays: +3 over every semitone it steps to after
 press SEL
+page 1
 spin K1 3
+page 0
 release SEL
 expect par0 5403
+page 1
 spin K1 2
+page 0
 expect par0 5603
+page 1
 spin K1 -1
+page 0
 expect par0 5503
 # the grid goes round both ways: quarter tones (1)
 tap GLO
@@ -33,7 +41,9 @@ expect par110 1
 # ... a detent is a quarter tone, and the new Tuning let SEL's +3 go (Evan, 2026-11-07): from 5503 to the next
 # quarter tone, 5550
 tap HOME
+page 1
 spin K1 1
+page 0
 expect par0 5550
 # just intonation (5, Ptolemy's, movable: built on drone I, Evan 2026-10-30): drone I's knob picks the tonic in
 # semitones, from 5550 (off the semitones) down four: 5500 5400 5300 5200
@@ -44,14 +54,20 @@ spin K1 1
 spin K1 1
 expect par110 5
 tap HOME
+page 1
 spin K1 -4
+page 0
 expect par0 5200
 # ... and drone II's (par21, 5700: 500 over drone I) steps through the just intervals over it: up to 45/32 (5790),
 # down to 4/3, 5/4 (5698, 5586)
 expect par21 5700
+page 1
 spin K3 1
+page 0
 expect par21 5790
+page 1
 spin K3 -2
+page 0
 expect par21 5586
 # 53-tone (4): 1200/53 = 22.6 cents a step, from A (900): 5200 is 4300 over A, under step 190 (4302); two up, 190
 # and 191: 5225
@@ -59,7 +75,9 @@ tap GLO
 spin K1 -1
 expect par110 4
 tap HOME
+page 1
 spin K1 2
+page 0
 expect par0 5225
 # the Tunings in order (40: simplest to richest): 5 Just, 6 Harmonics, 7 LMY, 8 Harrison, 9 Shruti, 10 Partch
 # LMY (7): La Monte Young's Well-Tuned Piano, as Ableton's file places it (A 440 one of its notes): uneven steps,
@@ -71,17 +89,29 @@ spin K1 1
 expect par110 7
 tap HOME
 set 0 6402
+page 1
 spin K1 1
+page 0
 expect par0 6429
+page 1
 spin K1 1
+page 0
 expect par0 6465
+page 1
 spin K1 1
+page 0
 expect par0 6669
+page 1
 spin K1 -1
+page 0
 expect par0 6465
+page 1
 spin K1 -1
+page 0
 expect par0 6429
+page 1
 spin K1 -1
+page 0
 expect par0 6402
 wait 900
 expect par0 6402
@@ -90,7 +120,9 @@ tap GLO
 spin K1 -1
 expect par110 6
 tap HOME
+page 1
 spin K1 1
+page 0
 expect par0 6541
 # the shrutis (9, movable as Just: Sa on drone I): drone I's knob in semitones, 6541 up: 6600; drone II's (5586,
 # 1014 under drone I: 186 over Sa an octave down, by 10/9's 182) up to 9/8: 5604
@@ -100,9 +132,13 @@ spin K1 1
 spin K1 1
 expect par110 9
 tap HOME
+page 1
 spin K1 1
+page 0
 expect par0 6600
+page 1
 spin K3 1
+page 0
 expect par21 5604
 # Lou Harrison's (8, his National Steel guitar's, A 440 one of its notes): 6600 (900 over A3, over 5/3's 884) up:
 # 996 (16/9): 6696;
@@ -111,9 +147,13 @@ tap GLO
 spin K1 -1
 expect par110 8
 tap HOME
+page 1
 spin K1 1
+page 0
 expect par0 6696
+page 1
 spin K1 -2
+page 0
 expect par0 6465
 # Harry Partch's 43 (10), from A: 6465 (765 over A3, 14/9) up: 792, 814 (128/81, 8/5): 6514
 tap GLO
@@ -121,7 +161,9 @@ spin K1 1
 spin K1 1
 expect par110 10
 tap HOME
+page 1
 spin K1 2
+page 0
 expect par0 6514
 tap GLO
 spin K1 1
@@ -134,7 +176,9 @@ tap HOME
 # (700) up one: 800
 set 45 1
 set 46 700
+page 1
 spin K3 1
+page 0
 expect par46 800
 # A SOUND CARRIES ITS TUNING (ledger 3, Evan 2026-11-08): a scene stored on 19-tone brings 19-tone back, and lets go
 # of SEL's fine tuning as it does; a Preset that names none is 12-tone, as it was made, Pitch lock on or off; the
@@ -155,7 +199,9 @@ release SAVE
 wait 300
 set 110 7
 press SEL
+page 1
 spin K1 3
+page 0
 release SEL
 expect tunoff0 >0
 tapkey w0
@@ -182,7 +228,9 @@ release SEL
 set 0 5000
 wait 300
 press SEL
+page 1
 spin K1 3
+page 0
 release SEL
 expect par110 0
 expect tunoff0 3

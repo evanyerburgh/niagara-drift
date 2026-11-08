@@ -695,3 +695,12 @@ at the end. The current state is in the [README](../README.md) and the code.
   sweep stays centered on its knob, as on most synths, its edges unchanged: the fix there is the sounds' own cutoffs
   (the starting sound's: drone I's cutoff 70 to 57.5, 2.3 kHz to 1 kHz, drone II's 68 to 60, 1.2 kHz, the levels 75 to
   84 and 61 to 68 for the same loudness; its sweep's dull stretches halved, 12 s a minute to 6).
+- 2026-11-08: **the pages played open first** (research on what drone players move by hand, a standalone playability
+  review and a playable test, ledger 20): HOME opens **Drones** (I level, I cutoff, II level, II cutoff; Drones 2's
+  picture, each drone's note small at its half's right) and **Pitch** is behind it (pitch and resonance; Drones 1's
+  waves; a drone's half shows its filter curve while its Reso turns and 1.5 s after). FX always opens **Space** (delay
+  repeats and mix, reverb length and mix, two halves DELAY and REVERB; a Mix turning named in full in the readout,
+  "DELAY MIX 25"), **Details** behind it (drive, time, damp, reverb type; SEL + KNOB 2 the delay's type, SEL + KNOB 4
+  Into). Pitch lock keeps the drones' pitch through scenes and Presets only: the pitch knobs always tune. Partner's
+  Detune with its partner off is gray, "needs [F#3]" / "[F#4]", the key blinking while it turns. A 30-minute set took
+  ~24 page taps against ~42 (the review's estimate). The other pages stay where they are.

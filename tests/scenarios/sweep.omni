@@ -13,17 +13,25 @@ spin K2 20
 wav sweep.wav
 tap PLAY
 wait 1500
+page 1
 turn K1 12 150
+page 0
 wait 600
 expect par0 6200
+page 1
 turn K1 -12 50
+page 0
 wait 600
 expect par0 >4800
 expect par0 <5001
+page 1
 turn K1 15 15
+page 0
 wait 600
 press SEL
+page 1
 turn K1 -20 100
+page 0
 release SEL
 wait 800
 tap PLAY

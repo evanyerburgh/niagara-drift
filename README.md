@@ -16,8 +16,8 @@ note. It's inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the S
 teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO pages they set the
 LFO's routing, and cross-mod lets drone I move drone II's filter, or the drones and their sound bend each other's pitch); white keys 1–8 hold scenes, in
 eight banks you pick with SEL and the gesture keys; keys 9–12 and the top four are gestures. The page buttons' pages, each tap the next: HOME
-Drones 1, 2 · ENV Life, Tone · EDIT Osc, Sub · Drive · SEQ Partner, Pitch moves · LFO LFO sends, Mods · ARP Swell ·
-FX Delay, Reverb · GLO Setup 1, 2.*
+Drones, Pitch · ENV Life, Tone · EDIT Osc, Sub · Drive · SEQ Partner, Pitch moves · LFO LFO sends, Mods · ARP Swell ·
+FX Space, Details · GLO Setup 1, 2.*
 
 **Status: 0.2.** It runs on the FM-1 (tested on one unit so far) and in the browser:
 [try it](https://evanyerburgh.github.io/niagara-drift/) without an FM-1, the same code with sound.
@@ -113,7 +113,7 @@ still works. Installing firmware is at your own risk.
 2. **Tap the white keys 1–8**: a new FM-1 starts on the Presets, a sound on each key ([The Presets](#the-presets)).
 3. **Hold a gesture key** and let go: a top key (Weight, Shift, Clean, Wash), or keys 9–12 (Tick, Chord, Snarl,
    Stutter), pressed harder for more ([The gestures](#the-gestures)).
-4. **Tune each drone**: black key 4 turns Pitch lock off, then KNOB 1 and KNOB 3 on the Drones page.
+4. **Tune each drone**: HOME twice opens the Pitch page, KNOB 1 and KNOB 3.
 5. **Change the sound**: the page buttons (ENV, EDIT, LFO, …) and KNOB 1–4 ([Pages](#pages)).
 6. **Save your sound**: SEL + G4 picks bank A, then hold SAVE and tap a white key.
 7. **PLAY** again: the drones fade out.
@@ -165,7 +165,9 @@ Updating from 0.2: keys 9–12 used to hold scenes. On the first start of 0.3, e
 first empty key 1–8 of its own bank, then of another; one with no room left stays stored, unplayed (the installer
 backs everything up first). The screen says how many moved. The banks moved too: SEL with any of the eight gesture keys picks one, A, B and C now on G4,
 A4 and B4, the Presets on F5. Three knobs moved too: Feedback is KNOB 1 on Life,
-Cross-mod KNOB 4 on Mods, Tune KNOB 2 on Setup 2; each page says so once, the first time you open it.
+Cross-mod KNOB 4 on Mods, Tune KNOB 2 on Setup 2. HOME opens Drones, the drones' levels and cutoffs (the pitches are on
+Pitch, HOME again), and FX opens Space, the delay's and the reverb's amounts (the drive, time, damp and types on
+Details, FX again). Each page says so once, the first time you open it.
 
 ### The gestures
 
@@ -226,9 +228,9 @@ knob you're turning.
 ### Pages
 
 Tap a page button and the knobs stay on that page. Hold it to peek: turn a knob, let go, and you're
-back (the header says PEEK, and where letting go takes you: "let go: DRONES"). Tap it again for its next page (FX has
-three); "1/2" by the page's name shows which of its pages you're on. A page button opens the page you last used there
-(HOME always opens Drones 1), so after visiting Reverb, holding FX peeks at Reverb.
+back (the header says PEEK, and where letting go takes you: "let go: DRONES"). Tap it again for its next page; "1/2"
+by the page's name shows which of its pages you're on. HOME and FX always open the page you play from (Drones,
+Space); the other buttons open the page you last used there, so after visiting Pitch moves, holding SEQ peeks at it.
 
 The header, left to right: the page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT. At the
 right, the sound: its bank and key ("A5"; a Preset's name too, "P3 EERIE", where there's room), "changed" once you've
@@ -238,23 +240,26 @@ PLAY's fade fills the line too. When it's full, the sound's name goes first, the
 Each page's screen shows a picture of what its knobs do, and the four values below it. Every knob
 glides: a slow turn is a smooth sweep, never steps; turn faster to go further. The levels follow your ear: halfway is about a quarter as loud.
 
-#### Drones · HOME
+#### Drones and Pitch · HOME
 
-<img src="docs/img/page-play.png" width="488" alt="The Drones 1 and Drones 2 pages: each drone's waveform; each drone's level and filter curve">
+<img src="docs/img/page-play.png" width="488" alt="The Drones page: each drone's filter curve with its level in dB, its filter and key, and its note; the Pitch page: each drone's waveform and the interval between them">
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Drones 1 | I pitch | I cutoff | II pitch | II cutoff |
-| Drones 2 | I level | I resonance | II level | II resonance |
+| Drones | I level | I cutoff | II level | II cutoff |
+| Pitch | I pitch | I resonance | II pitch | II resonance |
 
-- **Drones 2** draws each drone's filter curve, its level in dB under it; as a drone goes quiet its strands close up
-  and dim, and a silent one is the curve in thin gray. Beside each drone's name, its filter (LP, BP, HP) and the black
-  key that changes it (A#3 for drone I, A#4 for drone II). The resonance's last dot is red: there the filter rings on
-  its own.
+- **Drones** is the page HOME opens: each drone's level and cutoff, what you move most while you play (bring one drone
+  forward, push the other back, open or close it). It draws each drone's filter curve, the level you hear in dB under
+  it; as a drone goes quiet its strands close up and dim, and a silent one is the curve in thin gray. Beside each
+  drone's name, its filter (LP, BP, HP) and the black key that changes it (A#3 for drone I, A#4 for drone II), and at
+  the right its note.
 
-- **The picture** (Drones 1) draws each drone's wave as a few strands: they lie on one line while the drone is still
-  and fan out as Drift, detune or an LFO moves it. Each wave fills its half (Drones 2 shows the levels), until it's
-  nearly silent: then it shrinks and dims to a thin gray line. Beside **II**, its interval from drone I, to the nearest semitone, and an arrow: up or down ("5th ↑").
+- **Pitch** (HOME again) draws each drone's wave as a few strands: they lie on one line while the drone is still and
+  fan out as Drift, detune or an LFO moves it. Each wave fills its half, until it's nearly silent: then it shrinks and
+  dims to a thin gray line. Beside **II**, its interval from drone I, to the nearest semitone, and an arrow: up or
+  down ("5th ↑"). While a **resonance** knob turns, that drone's half shows its filter curve instead, the peak growing,
+  for a moment after you let go. The resonance's last dot is red: there the filter rings on its own.
 
 - **Pitch** goes from 1.6 kHz down to 2 Hz. Under 27 Hz (where the screen shows Hz, not a note) a drone stops being a
   tone and becomes a pulse of clicks, a click a cycle: rhythm, and through a drive they ping against the other drone.
@@ -355,6 +360,8 @@ pink specks are as many as Color says.
   each drone with its partner as a knot (a Lissajous figure): the interval sets its shape, and the beating rolls it,
   as fast as it beats ("beats 2.0/s"); a just interval with no detune stands still. Beside each drone's name, whether
   its partner is on and the black key that switches it (F#3 for drone I, F#4 for drone II).
+  With a partner off, its Detune is gray and the picture says what it needs ("needs [F#3]"); while you turn it, the
+  key blinks.
 - Each **interval** comes twice: tempered, then **just** ("+5th just"), a pure ratio (a fifth is exactly 3/2) that
   doesn't beat; detune still adds beating on purpose. Octaves and unison are both at once. On a Tuning other than
   12-tone and Quarter, both are the Tuning's own interval (a 19-tone fifth is 695 cents), and the value names it in
@@ -383,7 +390,7 @@ pink specks are as many as Color says.
   - **Speed mod** ("Speed" on the knob): the LFO speeds up and slows down on one of its own waves (up to 3 octaves either way).
   - **Source**: which LFO does that (I, II or both).
   - **Delay mod** ("Delay" on the knob): how far the LFO wobbles the delay's time (up to ±25%; negative the other way), on the wave black
-    key 10 picks on the LFO pages. You hear it only with some delay mix (FX, the Delay page).
+    key 10 picks on the LFO pages. You hear it only with some delay mix (FX, the Space page).
   - **Cross-mod** ("X-mod" on the knob): how deep cross-mod goes (black key 11): how much drone I's sound moves drone II's filter; how
     far each drone's sound bends the other's pitch (**cross-FM**: a little roughens and thickens the two, a lot
     tangles them into one restless, metallic sound); or, with **Snarl**, how far the finished sound, echoes and all,
@@ -418,24 +425,27 @@ pink specks are as many as Color says.
   lasts, from 32 bars down to a quarter note, and the picture shows it with the tempo ("8 bars · 120"). A locked LFO
   (black key 5, held) restarts on the Swell's bars, so it follows the clock too.
 
-#### Delay and Reverb · FX
+#### Space and Details · FX
 
-<img src="docs/img/page-effects.png" width="732" alt="The Delay page with its echoes as half-rings and the type above Mix, the same page with SEL held and the type turning, and the Reverb page with its tail as rings">
+<img src="docs/img/page-effects.png" width="732" alt="The Space page with the delay's echoes as half-rings on its left half and the reverb's tail as rings on its right half; the Details page with SEL held and the delay's type turning; the Details page with the two SEL choices shown above Time and Type">
 
-| Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 | SEL + KNOB 4 |
-|---|---|---|---|---|---|
-| Delay | drive | time | repeat | mix | delay type |
-| Reverb | length | damp | reverb type | mix | into reverb |
+| Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
+|---|---|---|---|---|
+| Space | delay repeats | delay mix | reverb length | reverb mix |
+| Details | delay drive · SEL: — | delay time · SEL: delay type | reverb damp | reverb type · SEL: into reverb |
 
-- **KNOB 4 has two jobs** on these pages: the **Mix**, and the choice you make before playing, shown above it on the
-  line ("SEL Tape", "SEL Both"). Hold SEL and turn KNOB 4 to change that choice: its column becomes **Type** or
-  **Into**, and the line shows the mix it goes back to. Let go of SEL and KNOB 4 is the mix again.
-- **The pictures** put time on an axis that opens out near the start, so short and long times both read. **Delay**:
-  the sound is the white ring at the left, and each echo a half-ring at its time (2 s at the right), as big as it's
-  still loud, the left channel's opening up in blue and the right's down in aqua, dimmer as they age; Drive thickens
-  the lines, and "runaway" shows in red in the header. **Reverb**: the tail as rings (40 s at the right), each as tall
-  as the tail is then, as wide as the room, darker with Damp; at Inf they all hold and "freeze" shows in blue. At the
-  left, what goes into it (echoes, drones), lit when the reverb hears it.
+- **Space** is the page FX opens, always: the amounts you play, the delay on the left half (DELAY) and the reverb on the
+  right (REVERB). While a Mix turns, the bottom of the screen names it in full ("DELAY MIX 25").
+- **Details** (FX again) holds what you set before playing: the delay's drive and time, the reverb's damp and type.
+  **Two knobs have a second job** there, shown above them on the line ("SEL Tape", "SEL Both"): hold SEL and turn
+  KNOB 2 for the delay's type, KNOB 4 for what goes into the reverb. Their columns become **Type** and **Into** while
+  SEL is held; let go and they're Time and Type again.
+- **The pictures**, on both pages, put time on an axis that opens out near the start, so short and long times both
+  read. **Delay**: the sound is the white ring at the left, and each echo a half-ring at its time (2 s at the right of
+  its half), as big as it's still loud, the left channel's opening up in blue and the right's down in aqua, dimmer as
+  they age; Drive thickens the lines, and "runaway" shows in red in the header. **Reverb**: the tail as rings (40 s at
+  the right), each as tall as the tail is then, as wide as the room, darker with Damp; at Inf they all hold and
+  "freeze" shows in blue. Under them, what goes into it (echoes, drones), lit when the reverb hears it.
 
 - **Drive** distorts the drones and their echoes together, after the delay and before the reverb, as the Lyra-8's
   distortion does: ghost notes, beating and crackle on the repeats. The first fifth of its turn blends a little in;
@@ -452,7 +462,7 @@ pink specks are as many as Color says.
   away into self-oscillation ("runaway" on the screen), held by a soft clip.
 - **Reverb types**: **Room**, **Hall**, **Cathedral** (the largest), **Chorus hall** (a hall that shimmers).
   They differ in size, distance and movement; changing type crossfades, and the knob goes round both ways.
-- **Into reverb** (Reverb, SEL + KNOB 4) is what the reverb hears: **Both** (the drones and their echoes, as the effects
+- **Into reverb** (Details, SEL + KNOB 4) is what the reverb hears: **Both** (the drones and their echoes, as the effects
   are chained), **Echoes** (only the echoes wash out; the drones stay dry and up front), or **Drones** (the reverb
   beside the delay: the drones wash, the echoes stay dry and distinct on top). Like every knob of choices, it goes
   round.
@@ -498,7 +508,7 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
     Tune turning the ring away from the small mark at the top (440). Inside, how many notes and, on the pure ones,
     where their 1/1 is (LMY on C, Harrison and Partch on G, Harmonics on A, Just and Shruti on drone I), its tick the
     long white one. The
-    interval between the drones is on Drones 1. Beside it Stereo, the drones' two waves as far apart as it puts them, and Pressure, what a press gives from light
+    interval between the drones is on Pitch. Beside it Stereo, the drones' two waves as far apart as it puts them, and Pressure, what a press gives from light
     to firm, with the key you're pressing on it ("[C4] 62%").
   - **Just and Shruti move with drone I**, as just intonation does (a movable do; drone I is do, or Sa): drone I's
     knob picks the tonic in semitones, and drone II's knob, Pitch link, Wander and Chord are pure over it, wherever it
@@ -511,7 +521,7 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
     310 cents). On Harmonics, Wander moves between all the harmonics, whatever the scale.
   - <a id="intervals-on-a-tuning"></a>**Intervals on a Tuning are named in its own terms**, as composers and tuning
     files write them: on the equal ones by steps over the division ("11\19" is 19-tone's fifth, "31\53" 53-tone's),
-    on the others by ratio ("3/2", "7/4", "11/9"). Drones 1's interval, a partner's and Shift's read this way, so every
+    on the others by ratio ("3/2", "7/4", "11/9"). Pitch's interval, a partner's and Shift's read this way, so every
     click of a pitch knob changes the name. The name is the interval between the drones' nearest notes of the
     Tuning, shown when the gap you hear is within 10 cents of it (a drone left on D3, or SEL's fine tuning); further off,
     or on 12-tone, or a ratio too long to fit ("1323/1024"), it's the familiar name ("5th"). The pitches themselves still read as notes and cents ("C#3 +42").
@@ -561,7 +571,7 @@ send's wave and target) glows dimly on its first choice, is lit on the second an
 means off. They follow the page: on the LFO pages they set the LFO's routing. Normally they're grouped by meaning:
 drone I (keys 1–3), the two global keys (4–5), drone II (6–8), the links (9–11).
 
-When the screen names a key or button in a box ("unlock [C#4]", "turn on [SEL] + [PLAY]"), its light blinks quickly
+When the screen names a key or button in a box ("needs [F#3]", "turn on [SEL] + [PLAY]"), its light blinks quickly
 while the message shows, so you can find it.
 
 **Hold SEL** for a moment and the screen draws the black keys as they sit on the keyboard, lit as on the panel,
@@ -580,7 +590,7 @@ key.
 | 1 | I partner | which LFO moves I's pitch (I, II, both) |
 | 2 | I sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | I's pitch send moves X-Wave instead |
 | 3 | I filter: LP, BP, HP | which LFO moves I's cutoff (I, II, both) |
-| 4 | pitch lock (the pitch knobs do nothing, and scenes leave the pitches where they are; on when you first start: turn a pitch knob and the screen says "PITCH LOCKED  unlock C#4") | I's cutoff send moves resonance instead |
+| 4 | pitch lock: scenes and Presets leave the drones' pitches where they are (on when you first start; the pitch knobs still tune) | I's cutoff send moves resonance instead |
 | 5 | LFO reset | LFO reset |
 | 6 | II partner | which LFO moves II's pitch (I, II, both) |
 | 7 | II sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | II's pitch send moves X-Wave instead |
@@ -613,7 +623,7 @@ beats it locks ("120 BPM · SWELL ON CLOCK"), and then:
 |---|---|
 | **The Swell** (KNOB 1 on its page) | a breath a **Division**: 32 bars .. 1/4 |
 | **The LFO** (SELECT) | a cycle a division: 32 bars .. 1/16 ("LFO CYCLE") |
-| **The delay** (Time, Delay page) | a **note value**: 1/16, 1/8T, 1/8, 1/4T, 1/8D, 1/4, 1/2T, 1/4D, 1/2, 1/2D, 1 bar (halved when longer than the delay holds) |
+| **The delay** (Time, Details page) | a **note value**: 1/16, 1/8T, 1/8, 1/4T, 1/8D, 1/4, 1/2T, 1/4D, 1/2, 1/2D, 1 bar (halved when longer than the delay holds) |
 | **Wander** | its notes land on the beat (on the bar, when they're slow), still at random |
 | **Scene time** (Setup 1) | in **bars**: 1 .. 16; a scene change ends on a bar line |
 

@@ -87,7 +87,7 @@ def font_path(name):
 
 ARROW = {"S", "Q17"}                                  # the fonts that show the arrow (look.c: the banner, LK_F_MSG, and
 #   the header's "-> P3", LK_F_TAG); the others leave its slot a space (the arrow in all 14 was 3.1 KB of flash)
-BSLASH = {"N1", "N2", "U1", "U2", "U3", "XS", "T18"}     # the fonts that draw an interval (the values, Drones 1's
+BSLASH = {"N1", "N2", "U1", "U2", "U3", "XS", "T18"}     # the fonts that draw an interval (the values, Pitch's
 #   line): a real backslash for an equal Tuning's steps, "11\\19" (ledger 3a); the rest leave its slot a space
 
 

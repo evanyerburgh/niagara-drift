@@ -1,16 +1,18 @@
 # the page pictures (screenshots to look at): every page, with values that show something.
-# Pages: 0 Drones 1 1 Drones 2 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO sends 7 Mods 8 Partner 9 Pitch moves
-# 10 Setup 1 11 Setup 2 12 Swell 13 Delay 14 Reverb.
+# Pages: 0 Drones 1 Pitch 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO sends 7 Mods 8 Partner 9 Pitch moves
+# 10 Setup 1 11 Setup 2 12 Swell 13 Space 14 Details ("page V": page V at once, in no time).
 # the one-time tips (v0.3) aren't in the manual's pictures
 notips
 tap PLAY
 wait 1500
 shot play.png
-# Drones 2: drone I resonant, drone II quieter
+# Pitch: drone I resonant, drone II quieter (its level on Drones)
 tap HOME
 expect view 1
 spin K2 50
+page 0
 spin K3 -30
+page 1
 wait 300
 shot play2.png
 # Life: some character and feedback, a little Age
@@ -122,32 +124,35 @@ release ARP
 # Delay: Wide (SEL + KNOB 4, its second job), its echoes left and right, a little drive after it
 tap FX
 expect view 13
+# Space: the delay set to Ping-pong first (SEL + KNOB 2 on Details), then the repeats, both mixes and the reverb's
+# length; the readout names a Mix while it turns, so the picture waits for it to go
+page 14
 press SEL
-spin K4 -1
-spin K4 -1
+spin K2 -1
+spin K2 -1
 expect par94 1
 release SEL
+page 13
 wait 1500
-spin K1 15
-spin K3 20
-spin K4 20
-wait 300
+spin K1 20
+spin K2 20
+spin K3 10
+spin K4 10
+wait 1800
 shot fx.png
-# ... SEL held, KNOB 4 turned: its lower half lit, the delay's type (Wide to Ping-pong and back)
+# Details, SEL held, KNOB 2 turned: the delay's type over Time (Wide to Ping-pong and back)
+tap FX
+expect view 14
+spin K1 15
 wait 1500
 press SEL
-spin K4 1
-spin K4 -1
+spin K2 1
+spin K2 -1
 expect par94 1
 wait 300
 shot fx-sel.png
 release SEL
-# Reverb: the cathedral's tail, a little longer
-tap FX
-expect view 14
-spin K1 10
-spin K4 10
-wait 300
+wait 1500
 shot fx2.png
 # SEL held: the black keys' map (the normal layer), drone I's Sub key touched
 tap HOME

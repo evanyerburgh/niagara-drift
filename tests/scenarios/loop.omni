@@ -44,7 +44,9 @@ expect par7 700
 tap REC
 expect loop 1
 wait 200
+page 1
 turn K1 10 200
+page 0
 wait 500
 expect par0 >5500
 # loop: back to the start (5000), gliding: 0.1 s in, still most of the way up

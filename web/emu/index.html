@@ -343,7 +343,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <li><span class="dir">Start the drones</span><span class="ctls"><span class="cap">Switch on</span> <span class="cap">PLAY</span></span></li>
       <li><span class="dir">Try the presets</span><span class="ctls"><span class="how">tap</span> <span class="cap white">white keys 1–8</span></span></li>
       <li><span class="dir">Try a gesture</span><span class="ctls"><span class="how">hold</span> <span class="cap white">Weight</span> <span class="cap white">Snarl</span> <span class="how">…, let go</span></span></li>
-      <li><span class="dir">Tune each drone</span><span class="ctls"><span class="cap">Pitch lock</span> <span class="how">off, then</span> <span class="cap knob d1">KNOB 1</span> <span class="cap knob d2">KNOB 3</span></span></li>
+      <li><span class="dir">Tune each drone</span><span class="ctls"><span class="cap">HOME</span> <span class="how">twice, then</span> <span class="cap knob d1">KNOB 1</span> <span class="cap knob d2">KNOB 3</span></span></li>
       <li><span class="dir">Change the sound</span><span class="ctls"><span class="cap">ENV</span> <span class="cap">EDIT</span> <span class="cap">LFO</span> …</span></li>
       <li><span class="dir">Save your sound</span><span class="ctls"><span class="cap">SEL</span> + <span class="cap white">Tick</span> <span class="how">(bank A), then hold</span> <span class="cap">SAVE</span> <span class="how">and tap a</span> <span class="cap white">white key</span></span></li>
       <li><span class="dir">Stop the drones</span><span class="ctls"><span class="cap">PLAY</span></span></li>
@@ -403,8 +403,8 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">HOME</div>
         <div class="pstack">
-        <div class="g-page"><i>Drones 1</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Pitch<small>a note of the Tuning a click</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Cutoff</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Pitch<small>a note of the Tuning a click</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Cutoff</span></div>
-        <div class="g-page"><i>Drones 2</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Level</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Reso</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Level</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Reso</span></div>
+        <div class="g-page"><i>Drones</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Level</span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Cutoff</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Level</span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Cutoff</span></div>
+        <div class="g-page"><i>Pitch</i><span class="k d1"><span class="sr">Knob 1, drone I: </span>Pitch<small>a note of the Tuning a click</small></span><span class="k d1"><span class="sr">Knob 2, drone I: </span>Reso</span><span class="k d2"><span class="sr">Knob 3, drone II: </span>Pitch<small>a note of the Tuning a click</small></span><span class="k d2"><span class="sr">Knob 4, drone II: </span>Reso</span></div>
         <p class="pnote combos"><span>Start or stop drone II alone: <span class="cap">SEL</span> + <span class="cap">PLAY</span></span></p>
         </div>
       </div>
@@ -449,7 +449,7 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <h4>Normal</h4>
       <div class="krow">
       <div class="g-grp d1" data-label="Drone I"><span><span class="sr">Key 1: </span>Partner<small>on · off</small></span><span><span class="sr">Key 2: </span>Sub<small>−1 −2 ⅓ ⅕ −3 −4</small></span><span><span class="sr">Key 3: </span>Filter<small>LP BP HP</small></span></div>
-      <div class="g-grp both"><span><span class="sr">Key 4: </span>Pitch lock<small>on at start</small></span><span><span class="sr">Key 5: </span>LFO reset<small>hold: lock</small></span></div>
+      <div class="g-grp both"><span><span class="sr">Key 4: </span>Pitch lock<small>scenes keep the pitch</small></span><span><span class="sr">Key 5: </span>LFO reset<small>hold: lock</small></span></div>
       <div class="g-grp d2" data-label="Drone II"><span><span class="sr">Key 6: </span>Partner<small>on · off</small></span><span><span class="sr">Key 7: </span>Sub<small>−1 −2 ⅓ ⅕ −3 −4</small></span><span><span class="sr">Key 8: </span>Filter<small>LP BP HP</small></span></div>
       <div class="g-grp both"><span><span class="sr">Key 9: </span>Pitch link<small>II follows I</small></span><span><span class="sr">Key 10: </span>Hard sync</span></div>
       <div class="g-grp both"><span><span class="sr">Key 11: </span>Cross-mod<small>off · cutoff · pitch · snarl</small></span></div>
@@ -536,8 +536,8 @@ kbd { font: 500 .85em var(--mono); background: var(--card); border: 1px solid va
       <div class="pblock">
         <div class="g-btn">FX</div>
         <div class="pstack">
-        <div class="g-page"><i>Delay</i><span class="k both"><span class="sr">Knob 1: </span>Drive<small>after the delay</small></span><span class="k both"><span class="sr">Knob 2: </span>Time<small>70 ms – 1.46 s · on a clock: notes</small></span><span class="k both"><span class="sr">Knob 3: </span>Repeats</span><span class="k both"><span class="sr">Knob 4: </span>Dly mix<small>+ SEL: type · clean · wide · ping-pong · tape · grain · self</small></span></div>
-        <div class="g-page"><i>Reverb</i><span class="k both"><span class="sr">Knob 1: </span>Length<small>to Inf: a freeze</small></span><span class="k both"><span class="sr">Knob 2: </span>Damp</span><span class="k both"><span class="sr">Knob 3: </span>Type<small>room · hall · cathedral · chorus</small></span><span class="k both"><span class="sr">Knob 4: </span>Rev mix<small>+ SEL: into · both · echoes · drones</small></span></div>
+        <div class="g-page"><i>Space</i><span class="k both"><span class="sr">Knob 1: </span>Repeats<small>the delay's</small></span><span class="k both"><span class="sr">Knob 2: </span>Dly mix</span><span class="k both"><span class="sr">Knob 3: </span>Length<small>the reverb's · to Inf: a freeze</small></span><span class="k both"><span class="sr">Knob 4: </span>Rev mix</span></div>
+        <div class="g-page"><i>Details</i><span class="k both"><span class="sr">Knob 1: </span>Drive<small>after the delay</small></span><span class="k both"><span class="sr">Knob 2: </span>Time<small>70 ms – 1.46 s · on a clock: notes · + SEL: type · clean · wide · ping-pong · tape · grain · self</small></span><span class="k both"><span class="sr">Knob 3: </span>Damp</span><span class="k both"><span class="sr">Knob 4: </span>Type<small>room · hall · cathedral · chorus · + SEL: into · both · echoes · drones</small></span></div>
         </div>
       </div>
     </div>
@@ -677,7 +677,7 @@ el("rect", { x: 58, y: 262, width: 210, height: 58, rx: 14, fill: TRAY });
 button(72, 272, 82, 38, "OCT-", "LFO I", LILAC); button(170, 272, 82, 38, "OCT+", "LFO II", LILAC);
 el("rect", { x: 300, y: 44, width: 236, height: 236, rx: 26, fill: "#0a0a0b" });
 el("rect", { x: 568, y: 160, width: 400, height: 140, rx: 18, fill: TRAY });
-const ROW1 = [["FX", "Delay"], ["SEL", "Fine"], ["ENV", "Life"], ["LFO", "Sends"], ["EDIT", "Osc"], ["GLO", "Setup"]],
+const ROW1 = [["FX", "Space"], ["SEL", "Fine"], ["ENV", "Life"], ["LFO", "Sends"], ["EDIT", "Osc"], ["GLO", "Setup"]],
       ROW2 = [["HOME", "Drones"], ["SAVE", "Store"], ["ARP", "Swell"], ["SEQ", "Partner"], ["PLAY", "On/off"], ["REC", "Loop"]];
 for (let i = 0; i < 6; i++) {
   button(582 + i * 63, 174, 54, 48, ...ROW1[i]);
@@ -742,10 +742,10 @@ function hit(c, cls) {
   c.hit = d;
 }
 // what each control does, on hover (the Buttons list below says the same)
-const TIP = { FX: "Delay: drive, time, repeats, mix; SEL + KNOB 4: the delay type (again: Reverb: length to Inf, damp, type, mix; SEL + KNOB 4: what goes into it)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
+const TIP = { FX: "Space: the delay's repeats and mix, the reverb's length (to Inf) and mix (again: Details: drive, time, damp, reverb type; SEL + KNOB 2: the delay type; SEL + KNOB 4: what goes into the reverb)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a top white key: a bank (A, B, C, Presets); with PLAY: drone II alone",
   ENV: "Life: feedback, drift, character, age (again: Tone: noise and its color, white to pink); hold to peek", LFO: "LFO sends: each drone's pitch and cutoff sends; the keys pick the routing (again: Mods: speed mod, source, delay mod, cross-mod)",
   EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, with SEL the sub's wave; drive); hold to peek", GLO: "Setup 1: fade, morph, scene time, sync (again: Setup 2: tuning, tune, stereo width, pressure)",
-  HOME: "Drones 1: pitch, cutoff (again: Drones 2: levels, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in banks A to F)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
+  HOME: "Drones: levels, cutoffs (again: Pitch: pitches, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in banks A to F)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
   PLAY: "Drones in / out (with SEL: drone II alone)", REC: "Motion loop: tap to record knob moves, gestures and scenes, again to loop, again to stop", "OCT-": "LFO I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "Gesture time: how long every gesture takes, left slower, right faster", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
@@ -754,7 +754,7 @@ for (const [n, c] of [...Object.entries(buttons), ...Object.entries(knobs)]) if 
 const BLACK_TIP = [["drone I's partner on / off", "which LFO moves drone I's pitch: I, II, both"],
   ["drone I's sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct (these two click under a low drone)", "drone I's pitch send moves X-Wave instead"],
   ["drone I's filter: LP, BP, HP", "which LFO moves drone I's cutoff: I, II, both"],
-  ["pitch lock: the pitch knobs do nothing, and scenes keep your pitch (on at start)", "drone I's cutoff send moves resonance instead"],
+  ["pitch lock: scenes and Presets keep the drones' pitch (on at start); the pitch knobs still tune", "drone I's cutoff send moves resonance instead"],
   ["LFO reset (hold: lock the LFO to the Swell)", "LFO reset (hold: lock the LFO to the Swell)"],
   ["drone II's partner on / off", "which LFO moves drone II's pitch: I, II, both"],
   ["drone II's sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct (these two click under a low drone)", "drone II's pitch send moves X-Wave instead"],
@@ -864,6 +864,7 @@ for (const k of Object.values(knobs)) {
     drag = { y: e.clientY, acc: 0 };
   });
   k.hit.addEventListener("pointermove", (e) => {
+    if (drag && !(e.buttons & 1)) drag = null;   // a press whose release never reached us: a hover never turns a knob
     if (!drag) return;
     drag.acc += drag.y - e.clientY;
     drag.y = e.clientY;
@@ -874,6 +875,7 @@ for (const k of Object.values(knobs)) {
   const end = () => { drag = null; };
   k.hit.addEventListener("pointerup", end);
   k.hit.addEventListener("pointercancel", end);
+  k.hit.addEventListener("lostpointercapture", end);
   k.hit.addEventListener("wheel", (e) => {
     e.preventDefault();
     const dy = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
