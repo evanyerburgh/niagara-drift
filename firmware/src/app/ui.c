@@ -1931,6 +1931,8 @@ static void input(void)
             continue;
         }
         if ((ch & keys) >> BLACK_K[i] & 1u) {
+            if (ui.view == V_LFO || ui.view == V_LFO2)
+                ui.page_t = plat_ms();                 /* the LFO pages' routing keys: the page in use */
             sw_toggle(w);                              /* LFO reset: at once, on the press */
             if (w.s != S_LFORESET)
                 ui.scene_at = -1;
@@ -2046,8 +2048,10 @@ static void input(void)
             ui.touch_t[i] = plat_ms() + 1200u;
             ui.act_t = plat_ms();
         }
-    if (page_return && ui.view != V_PLAY && !ui.kept && ui.hold_btn < 0 && !(ui.btn >> B_SEL & 1u) &&
-        plat_ms() - ui.page_t >= PAGE_RETURN_MS)
+    if (ui.hold_btn >= 0 || (ui.btn >> B_SEL & 1u))
+        ui.page_t = plat_ms();                         /* a peek or SEL held (the key map): the wait starts again
+                                                        * when it's let go (#86's review) */
+    else if (page_return && ui.view != V_PLAY && !ui.kept && plat_ms() - ui.page_t >= PAGE_RETURN_MS)
         set_view(V_PLAY);                              /* auto-return: back to Drones */
 }
 

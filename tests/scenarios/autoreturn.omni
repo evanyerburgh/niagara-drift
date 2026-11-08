@@ -35,3 +35,13 @@ wait 9000
 expect view 13
 tap HOME
 expect view 0
+# SEL held past 8 s on a page (the key map), then let go: the wait starts again then (#86's review)
+tap ENV
+expect view 2
+press SEL
+wait 9000
+release SEL
+wait 1000
+expect view 2
+wait 8000
+expect view 0
