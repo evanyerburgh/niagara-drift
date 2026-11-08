@@ -511,9 +511,10 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
     note to note of the Tuning over drone I, and each drone moves as many of the Tuning's notes from its own. A Shift
     set off the notes (with SEL, or a sound from before) moves its cents exactly.
   - **A sound carries its Tuning.** A scene stored on LMY brings LMY back when you play it, even with Pitch lock on
-    (the lock keeps the drones' pitch, not the notes around them). A Preset plays on 12-tone, as it was made, unless
+    (the lock keeps the drones' own pitch; the notes around them change: a partner's interval, Shift's steps, Wander's
+    and Chord's notes become the new Tuning's). A Preset plays on 12-tone, as it was made, unless
     it has a Tuning of its own. The Tuning changes half way through the scene's glide, and lets go of SEL's fine
-    tuning, as turning the knob does.
+    tuning, as turning the knob does; a glide that goes back (undo, a scene key let go) brings that fine tuning back.
   - It only decides where a turn goes: a sound or scene plays its pitches as they were saved, until you turn the knob
     (the first click goes to the Tuning's next note).
 
