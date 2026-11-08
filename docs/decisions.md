@@ -676,3 +676,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   (as a switch does; it has 11 choices, so it was listed apart), and any new Tuning, by the knob or with a sound, lets
   go of SEL's fine tuning (`param_set`). The knob stays on Setup 2. No new save format: scenes always stored the
   Tuning, it was only skipped when they played.
+- 2026-11-08 (Evan): a scene key pressed part way and let go: the header keeps naming that scene ("→ A3") and its gold
+  line runs back down from where the press got to as the sound returns (it had filled a new line to "→ back", which
+  looked as if the change went on). An undo's glide still fills its line.

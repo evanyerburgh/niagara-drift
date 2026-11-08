@@ -148,7 +148,8 @@ static int32_t lk_badge_w(int pct, const char *s)
 #define LK_GLIDE_MIN 1500u
 static struct {
     uint32_t t0, ms, real;
-    int8_t on, to;
+    float x0;                                  /* a blend let go: how far in it was (its line empties from there) */
+    int8_t on, to, back;
     uint8_t bank;
 } lk_gl;
 static int lk_glide(uint32_t now, float *line, int *bank)
@@ -166,13 +167,22 @@ static int lk_glide(uint32_t now, float *line, int *bank)
         lk_gl.ms = ui.morph_ms > LK_GLIDE_MIN ? ui.morph_ms : LK_GLIDE_MIN;
         lk_gl.to = (int8_t)(ui.morph == VISIT_BACK ? (ui.scene_at >= 0 ? ui.scene_at : -2) : ui.morph);
         lk_gl.bank = proj.bank;
+        /* a scene key let go part way: the sound goes back, so the line it filled empties, still naming that scene
+         * (Evan, 2026-11-08: filling a new line to "→ A5" looked as if the change went on) */
+        lk_gl.back = (int8_t)(ui.morph == VISIT_BACK && ui.visit <= -2 && -2 - ui.visit < NPLAY);
+        if (lk_gl.back) {
+            lk_gl.to = (int8_t)(-2 - ui.visit);
+            lk_gl.x0 = ui.press_x;
+        }
     }
     if (lk_gl.on) {
         const uint32_t el = now - lk_gl.t0;
-        if (ui.morph < 0 && (el < lk_gl.real || el >= lk_gl.ms || (lk_gl.to >= 0 && ui.scene_at != lk_gl.to)))
+        if (ui.morph < 0 && (el < lk_gl.real || el >= lk_gl.ms ||
+                             (lk_gl.to >= 0 && !lk_gl.back && ui.scene_at != lk_gl.to)))
             lk_gl.on = 0;                      /* stopped by a hand, or shown long enough */
         else {
-            *line = el >= lk_gl.ms ? 1.0f : (float)el / (float)lk_gl.ms;
+            const float f = el >= lk_gl.ms ? 1.0f : (float)el / (float)lk_gl.ms;
+            *line = lk_gl.back ? lk_gl.x0 * (1.0f - f) : f;
             *bank = lk_gl.bank;
             return lk_gl.to;
         }
