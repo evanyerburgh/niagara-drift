@@ -2129,15 +2129,25 @@ static float wave_at(int w, float pw, float ph)
     }
 }
 /* the X-WAVE at x (0..100): a wave, or two blended (within 2 of a wave: that wave, as the engine) */
-static float xwave_at(int x, float pw, float ph)
+static float xwave_atf(float x, float pw, float ph)   /* x: X-WAVE in knob units, 0..100 (a fraction while it moves) */
 {
-    int s = x * 3, wi = (s + 2) / 100;
-    float wf = (float)(s - 100 * wi) * 0.01f, a;
+    const float s = x * 3.0f;
+    int wi = (int)((s + 2.0f) / 100.0f);       /* (a divide: exact on whole knob values, as the int one was) */
+    float wf = (s - 100.0f * (float)wi) * 0.01f, a;
     if (wi >= 3 || wf <= 0.02f)
         return wave_at(wi > 3 ? 3 : wi, pw, ph);
     a = wave_at(wi, pw, ph);
     return a + (wave_at(wi + 1, pw, ph) - a) * wf;
 }
+/* X-WAVE and the resonance as heard while the drones play (an LFO or Wander moving them: Evan, 2026-11-08, the
+ * pictures show what moves; the knob's number stays the knob's), else the knob */
+static float live_par(int g, int p, float now)
+{
+    const float k = (float)gpar(g, p);
+    return dr_fade > 0.0f && fm_fabsf(now - k) >= 0.5f ? now : k;
+}
+static float xw_now(int g) { return live_par(g, GP_WAVE, dr_xw[g]); }
+static float reso_now(int g) { return live_par(g, GP_RESO, dr_reso[g]); }
 static float pw_of(int g) { return 0.5f - 0.45f * (float)gpar(g, GP_WIDTH) * 0.01f; }
 
 
@@ -2146,7 +2156,7 @@ static float pw_of(int g) { return 0.5f - 0.45f * (float)gpar(g, GP_WIDTH) * 0.0
 static float filt_db(int g, float cut, float f)
 {
     int mode = gpar(g, GP_MODE);
-    float r = (float)gpar(g, GP_RESO) * 0.001f, k = fm_maxf(2.0f - 2.1f * r, 0.06f), rin = 1.0f - 0.6f * r * r;
+    float r = reso_now(g) * 0.001f, k = fm_maxf(2.0f - 2.1f * r, 0.06f), rin = 1.0f - 0.6f * r * r;
     float rr = fm_exp2f((f - cut) * 0.0981378f), r2 = rr * rr, d = (1.0f - r2) * (1.0f - r2) + k * k * r2, m2;
     if (mode == DR_LP) {                       /* as the engine: rin of the filter + (1 - rin) of a one-pole an
                                                 * octave under the cutoff (the bass makeup), summed as complex */

@@ -283,6 +283,8 @@ extern volatile float dr_pulse;                /* the pulse's gain now, 0..1 (1:
 extern volatile float dr_lfo_ph;               /* the LFO's phase now, 0..1 (cycles) */
 extern volatile float dr_dly_ms;              /* the delay's time now, with its LFO, ms (the host's probe) */
 extern volatile float dr_cut[DR_NGROUPS];      /* each drone's cutoff now, gliding, with its LFO (knob units 0..100) */
+extern volatile float dr_xw[DR_NGROUPS];       /* ... its X-WAVE now, with its LFO and Wander (knob units 0..100), and */
+extern volatile float dr_reso[DR_NGROUPS];     /* its resonance (0..1000); both updated while the drones play */
 extern volatile float dr_fb;                   /* FEEDBACK's share of the sound now, 0..1 (v0.3; was the loop's level) */
 extern volatile float dr_snarl;                /* SNARL's bend now (how far it moves the drones' speed), 0..1 */
 extern volatile float dr_pulse_ph;             /* the pulse's phase now, 0..2 (its two beats) */

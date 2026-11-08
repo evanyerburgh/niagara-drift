@@ -834,13 +834,13 @@ static void lk_pic_osc(void)
     lk_halves();
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 130 : 10;
-        const int x = gpar(g, GP_WAVE);
+        const float x = xw_now(g);             /* as heard: an LFO on X-Wave changes the shape (Evan, 2026-11-08) */
         const float pw = pw_of(g);
         int16_t y[51];
         for (i = 0; i <= 50; i++) {
             float ph = 2.0f * (float)i / 50.0f;
             ph -= (float)(int)ph;
-            y[i] = (int16_t)(top + half - 5 * LK_BDY / 2 - (int32_t)(xwave_at(x, pw, ph) * (float)half * 0.4f));
+            y[i] = (int16_t)(top + half - 5 * LK_BDY / 2 - (int32_t)(xwave_atf(x, pw, ph) * (float)half * 0.4f));
         }
         lk_bundle(x0, y, 51 - 5 * LK_BDX / 2, g, LK_BDX, LK_BDY);
     }
@@ -903,7 +903,8 @@ static void lk_pic_source(void)
         const int32_t x0 = g ? 130 : 10;
         const float mix = (float)gpar(g, GP_MIX) * 0.01f, drv = 0.5f * fm_exp2f((float)gpar(g, GP_DRIVE) * 0.05f);
         const float share[2] = {fm_sqrtf(1.0f - mix), fm_sqrtf(mix)}, td = fm_tanhf(drv);
-        const int x = gpar(g, GP_WAVE), sw = proj.par[g ? P_SUBW_1 : P_SUBW_0];
+        const float x = xw_now(g);             /* the osc lane as heard (an LFO on X-Wave); the sub's own wave */
+        const int sw = proj.par[g ? P_SUBW_1 : P_SUBW_0];
         const float pw = pw_of(g);
         for (k = 0; k < 2; k++) {              /* osc above, sub below */
             const int32_t yc = top + lane * k + lane / 2;
@@ -915,7 +916,7 @@ static void lk_pic_source(void)
                 for (i = 0; i <= 36; i++) {
                     float ph = 2.0f * (float)i / 36.0f, v;
                     ph -= (float)(int)ph;
-                    v = share[k] * (k ? lk_sub_at(sw, ph) : xwave_at(x, pw, ph));
+                    v = share[k] * (k ? lk_sub_at(sw, ph) : xwave_atf(x, pw, ph));
                     y[i] = (int16_t)(yc - (int32_t)(fm_tanhf(drv * v) / td * (float)amp));
                 }
                 if (v0 < 0.005f)

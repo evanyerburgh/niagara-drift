@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# The pictures follow an LFO on X-Wave and the resonance (2026-11-08, #84): Osc's and Sub · Drive's osc lane draw
+# the wave as heard, Drones 2's curves the resonance as heard; the numbers stay the knobs'. The LFO at 26 s, each
+# drone's send at 100; shots across part of a cycle.
+notips
+tap PLAY
+set 47 74
+set 55 0
+set 52 0
+set 17 0
+set 38 0
+set 15 1
+set 14 100
+set 36 1
+set 35 100
+wait 2000
+tap EDIT
+expect view 4
+wait 3250
+shot osc-a.png
+wait 6500
+shot osc-b.png
+tap EDIT
+expect view 5
+wait 3250
+shot sub-a.png
+set 17 100
+set 38 100
+set 18 1
+set 39 1
+tap HOME
+expect view 0
+tap HOME
+expect view 1
+wait 3250
+shot reso-a.png
+wait 6500
+shot reso-b.png

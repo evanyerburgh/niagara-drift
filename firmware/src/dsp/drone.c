@@ -854,6 +854,7 @@ volatile float dr_lfo[2];
 volatile float dr_pulse = 1.0f;
 volatile float dr_lfo_ph, dr_pulse_ph;
 volatile float dr_cut[DR_NGROUPS];
+volatile float dr_xw[DR_NGROUPS], dr_reso[DR_NGROUPS];
 volatile float dr_fb, dr_snarl;
 volatile float dr_scope[DR_NGROUPS][DR_SCOPE_N];
 static float sc_buf[DR_NGROUPS][DR_SCOPE_N];
@@ -2130,6 +2131,7 @@ static void render_group(int g, uint32_t n)
         fl = route_at(v, 1, j0 / CR);
         fmod = (1.0f - v->dw[1]) * fl * famt * 5.0f;
         r = lfo_fit(r0, v->dw[1] * fl * ramt, v->dw[1] * fm_fabsf(ramt) * route_n(v, 1));
+        dr_reso[g] = r * 1000.0f;                /* as it sounds, with the LFO (the screen) */
         k = 2.0f - 2.1f * r;
         rin = 1.0f - 0.6f * r * r;
         /* band-pass and high-pass get half of that input loss back (~1/sqrt(rin): +4 dB at 100), as the low-pass
@@ -2140,6 +2142,7 @@ static void render_group(int g, uint32_t n)
         pmod = (1.0f - v->dw[0]) * 24.0f * om;
         xw = fm_clampf(lfo_fit(xw0, 0.5f * v->dw[0] * om, v->dw[0] * fm_fabsf(xwamt) * route_n(v, 0)) + dw * 0.12f * v->wn[1],
                        0.0f, 1.0f) * 3.0f;
+        dr_xw[g] = xw * (100.0f / 3.0f);          /* as it sounds, with the LFO and Wander (the screen) */
         wi = (int)(xw + 0.025f);                 /* within 0.02 of a wave (2 of the knob's 300ths): that */
         wf = xw - (float)wi;                     /* wave alone, as dr_param_text names it (33 is the */
         if (wf < 0.025f)                         /* triangle, 67 the saw; and one wave costs half two) */
