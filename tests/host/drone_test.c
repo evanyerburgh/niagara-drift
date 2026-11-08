@@ -555,7 +555,7 @@ int main(void)
              * the saw's 8th harmonic (880 Hz), right at the cutoff (55: ~840 Hz); depth 0: steady; depth 25
              * heard (linear on the resonance: squared, it swung the peak ~1.4 dB) */
             static float w[4410];
-            static const int RD[3] = {0, 100, 25};
+            static const int RD[3] = {0, 100, 50};   /* 50: a quarter of the range each way (25 before format 44) */
             float rmn[3], rmx[3];
             int r;
             dr_set(DR_GP(0, GP_FLFO_DEST), DR_TO_RESO);
@@ -574,11 +574,11 @@ int main(void)
                     rmx[r] = fmaxf(rmx[r], h);
                 }
             }
-            printf("    filter LFO on the resonance: 880 Hz at %.4f .. %.4f (depth 0: %.4f .. %.4f; 25: %.4f .. %.4f)\n",
+            printf("    filter LFO on the resonance: 880 Hz at %.4f .. %.4f (depth 0: %.4f .. %.4f; 50: %.4f .. %.4f)\n",
                    (double)rmn[1], (double)rmx[1], (double)rmn[0], (double)rmx[0], (double)rmn[2], (double)rmx[2]);
             check("the filter LFO can move the resonance (the peak swings x2; steady at depth 0)",
                   rmx[1] > 2.0f * rmn[1] && rmx[0] < 1.1f * rmn[0] && finite_ok);
-            check("the resonance LFO heard at depth 25 (the peak swings 3 dB or more)", rmx[2] > 1.41f * rmn[2]);
+            check("the resonance LFO heard at depth 50 (the peak swings 3 dB or more)", rmx[2] > 1.41f * rmn[2]);
             dr_set(DR_GP(0, GP_FLFO_DEST), DR_TO_CUTOFF);
             dr_set(DR_GP(0, GP_RESO), 250);
         }

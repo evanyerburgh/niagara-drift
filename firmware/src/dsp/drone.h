@@ -54,10 +54,10 @@ enum {
     GP_LEVEL,       /* the drone's level */
     GP_PARTNER,     /* the partner oscillator on (1) / off (0): a switch */
     GP_OLFO,        /* the oscillator's LFO tap: DR_LFO_OFF, _I, _II, _BOTH (a switch) */
-    GP_OLFO_DEPTH,  /* -100..100: up to +-24 semitones (pitch) or the whole X-WAVE range; 0 none */
+    GP_OLFO_DEPTH,  /* -100..100: up to +-24 semitones (pitch) or the whole X-WAVE range at 100; 0 none */
     GP_OLFO_DEST,   /* what the oscillator's LFO moves: DR_TO_PITCH, DR_TO_XWAVE (a switch) */
     GP_FLFO,        /* the filter's LFO tap: DR_LFO_OFF, _I, _II, _BOTH (a switch) */
-    GP_FLFO_DEPTH,  /* -100..100: up to +-5 octaves of cutoff, or the whole resonance range; 0 none */
+    GP_FLFO_DEPTH,  /* -100..100: up to +-5 octaves of cutoff, or the whole resonance range at 100; 0 none */
     GP_FLFO_DEST,   /* what the filter's LFO moves: DR_TO_CUTOFF, DR_TO_RESO (a switch) */
     GP_NOISE,       /* NOISE, 0..100: its level, added to the oscillators (they stay as they are); 100 is level
                      * with a saw, 50 about -7 dB, 25 -12 */

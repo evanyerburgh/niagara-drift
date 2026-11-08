@@ -1887,6 +1887,22 @@ static void morph_tick(int g, float step)        /* one control tick of the swit
     v->dw[0] = toward(v->dw[0], p[GP_OLFO_DEST] == DR_TO_XWAVE ? 1.0f : 0.0f, step);
     v->dw[1] = toward(v->dw[1], p[GP_FLFO_DEST] == DR_TO_RESO ? 1.0f : 0.0f, step);
 }
+/* a route's widest swing in its waves: twice for BOTH (I + II summed), during a switch's crossfade too */
+static inline float route_n(const grp_t *v, int i)
+{
+    return v->rt[i] == DR_LFO_BOTH || v->rp[i] == DR_LFO_BOTH ? 2.0f : 1.0f;
+}
+/* An LFO on a setting with hard ends (X-WAVE, the resonance: 0..1): b the knob, o the LFO's move now, s its widest.
+ * Centered on the knob while the swing fits; where it would run past an end it slides away from it (the knob near
+ * an end: the sweep reaches the end and turns there), and a swing wider than the range fills it: never held at an
+ * end for part of the cycle (Evan, 2026-11-08: a sweep should be heard all the way round). A divide a control tick */
+static inline float lfo_fit(float b, float o, float s)
+{
+    if (s <= 0.0f)
+        return fm_clampf(b, 0.0f, 1.0f);
+    const float w = fm_minf(s, 0.5f), c = fm_clampf(b, w, 1.0f - w);
+    return fm_clampf(c + o * (w / s), 0.0f, 1.0f);
+}
 static inline float route_at(const grp_t *v, int i, uint32_t t)
 {
     float b = lfo_at(v->rt[i], t);
@@ -1913,8 +1929,9 @@ static void render_group(int g, uint32_t n)
     const float mv = pfs[P_MOVE] * 0.02f;
     const float oamt = depth_amtf(pv[GP_OLFO_DEPTH]) * mv, famt = depth_amtf(pv[GP_FLFO_DEPTH]) * mv;
     /* to the resonance the depth is linear (squared, as for the cutoff's 5 octaves, 50 swung the peak ~5 dB and
-     * 25 was barely heard): 50 swings it half its range */
-    const float ramt = pv[GP_FLFO_DEPTH] * 0.01f * mv;
+     * 25 was barely heard): 100 sweeps its whole range, 50 half (format 44; 50 was the whole range, past it held at
+     * the ends); X-WAVE's (squared, as pitch's) the same: xwamt */
+    const float ramt = pv[GP_FLFO_DEPTH] * 0.005f * mv, xwamt = 0.5f * oamt;
     const float mstep = (float)CR / (morph_s() * DR_SR);    /* a switch's move a control tick */
     /* CHARACTER (clean .. vintage): softer edges (a one-pole, its corner 8 kHz .. 500 Hz in even steps, so the
      * middle of the knob is heard: in a straight line it was ~6.4 kHz at 50, now ~3 kHz), a little x^2 (a bent
@@ -2112,7 +2129,7 @@ static void render_group(int g, uint32_t n)
         om = route_at(v, 0, j0 / CR) * oamt;
         fl = route_at(v, 1, j0 / CR);
         fmod = (1.0f - v->dw[1]) * fl * famt * 5.0f;
-        r = fm_clampf(r0 + v->dw[1] * fl * ramt, 0.0f, 1.0f);
+        r = lfo_fit(r0, v->dw[1] * fl * ramt, v->dw[1] * fm_fabsf(ramt) * route_n(v, 1));
         k = 2.0f - 2.1f * r;
         rin = 1.0f - 0.6f * r * r;
         /* band-pass and high-pass get half of that input loss back (~1/sqrt(rin): +4 dB at 100), as the low-pass
@@ -2121,7 +2138,8 @@ static void render_group(int g, uint32_t n)
         wh = v->wm[DR_HP] * wb;
         wb *= v->wm[DR_BP];
         pmod = (1.0f - v->dw[0]) * 24.0f * om;
-        xw = fm_clampf(xw0 + v->dw[0] * om + dw * 0.12f * v->wn[1], 0.0f, 1.0f) * 3.0f;
+        xw = fm_clampf(lfo_fit(xw0, 0.5f * v->dw[0] * om, v->dw[0] * fm_fabsf(xwamt) * route_n(v, 0)) + dw * 0.12f * v->wn[1],
+                       0.0f, 1.0f) * 3.0f;
         wi = (int)(xw + 0.025f);                 /* within 0.02 of a wave (2 of the knob's 300ths): that */
         wf = xw - (float)wi;                     /* wave alone, as dr_param_text names it (33 is the */
         if (wf < 0.025f)                         /* triangle, 67 the saw; and one wave costs half two) */
