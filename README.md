@@ -231,6 +231,9 @@ Tap a page button and the knobs stay on that page. Hold it to peek: turn a knob,
 back (the header says PEEK, and where letting go takes you: "let go: DRONES"). Tap it again for its next page; "1/2"
 by the page's name shows which of its pages you're on. HOME and FX always open the page you play from (Drones,
 Space); the other buttons open the page you last used there, so after visiting Pitch moves, holding SEQ peeks at it.
+**A page left alone goes back to Drones**, the page you play from: 8 seconds after you opened it or last turned one of
+its knobs (playing keys and gestures doesn't count). To stay on a page, hold **SEL** and tap its button: "kept" shows in
+the header until you go to another page.
 
 The header, left to right: the page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT. At the
 right, the sound: its bank and key ("A5"; a Preset's name too, "P3 EERIE", where there's room), "changed" once you've

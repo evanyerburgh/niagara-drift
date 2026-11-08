@@ -1,0 +1,37 @@
+# Auto-return (v0.3, Evan, 2026-11-08): a page left alone goes back to Drones 8 s after it was opened or a knob
+# last turned on it; SEL + a page's button keeps it ("kept" in the header) until another page. The other
+# scenarios have it off (their pages stay put); "autoreturn" turns it on, as on the FM-1.
+notips
+autoreturn
+tap PLAY
+wait 500
+tap FX
+expect view 13
+wait 7000
+expect view 13
+spin K2 1
+wait 7500
+expect view 13
+wait 1000
+expect view 0
+tap ENV
+expect view 2
+press SEL
+tap ENV
+release SEL
+expect view 2
+wait 1000
+wait 10000
+expect view 2
+tap FX
+expect view 13
+wait 8200
+expect view 0
+press SEL
+tap FX
+release SEL
+expect view 13
+wait 9000
+expect view 13
+tap HOME
+expect view 0

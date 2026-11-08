@@ -703,3 +703,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   Into). Pitch lock keeps the drones' pitch through scenes and Presets only: the pitch knobs always tune. Partner's
   Detune with its partner off is gray, "needs [F#3]" / "[F#4]", the key blinking while it turns. A 30-minute set took
   ~24 page taps against ~42 (the review's estimate). The other pages stay where they are.
+- 2026-11-08: **auto-return** (Evan's idea, ledger 21): a page left alone goes back to Drones, the page played, 8 s
+  after it was opened or a knob last turned on it (keys and gestures don't count; not while a page button is held or
+  SEL is). Hold SEL and tap a page's button to keep it ("kept" in the header) until another page. The return is a
+  plain switch. The host's scenarios have it off unless they say `autoreturn`.
