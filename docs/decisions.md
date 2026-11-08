@@ -679,3 +679,11 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-11-08 (Evan): a scene key pressed part way and let go: the header keeps naming that scene ("→ A3") and its gold
   line runs back down from where the press got to as the sound returns (it had filled a new line to "→ back", which
   looked as if the change went on). An undo's glide still fills its line.
+- 2026-11-08 (Evan, ledger 3a): **intervals in each Tuning's own terms**, as composers and tuning files write them:
+  on the equal Tunings by steps over the division ("11\19", as Ableton's tuning site and the xenharmonic writers do),
+  on the others by ratio ("3/2", "7/4"; each Tuning's ratios in flash beside its cents, `dr_tun_name`). Drones 1's
+  interval, a partner's and Shift's, between the two notes' nearest on the Tuning when the gap heard is within 10 cents of
+  theirs (Evan: exactly on the notes was too rare, and a name the drones aren't playing would mislead); 12-tone keeps
+  its familiar names, and a gap further off or a ratio past 7 characters falls back to them. Pitch values stay notes and cents. Swara names for Shruti and harmonic numbers
+  were considered and left out (simpler; a Shruti naming would need an Indian musician's check). The screen fonts
+  without the drawn arrow carry a real backslash (it was a blank slot).

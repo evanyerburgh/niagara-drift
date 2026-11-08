@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# The sound and the screen against main, on every push to a PR and again when its labels change ("changes-sound",
+# "changes-screen"); apart from tests.yml so a label's run shows nothing skipped (ledger 13h, 2026-11-08).
+name: Same samples
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  same-samples:
+    # The sound and the screen against main: every fixed render (tests/golden), every scenario and the engine's own
+    # scenes, played by this branch and by main on the same machine, compared sample by sample and pixel by pixel.
+    # A PR that means to change the sound carries the label "changes-sound": the differences are listed, not failed.
+    # One that means to change only the screen carries "changes-screen": screenshots may differ, the sound may not.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install numpy Pillow
+      - name: Same samples as main
+        env:
+          CC: cc -D_DEFAULT_SOURCE -Wl,--no-as-needed -lm
+        run: |
+          git worktree add -q --detach ../base origin/${{ github.base_ref }}
+          python3 tools/same_samples.py ../base . ${{ contains(github.event.pull_request.labels.*.name, 'changes-sound') && '--allow-change' || '' }} ${{ contains(github.event.pull_request.labels.*.name, 'changes-screen') && '--allow-screen' || '' }}

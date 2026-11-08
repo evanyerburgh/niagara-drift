@@ -646,8 +646,15 @@ static void lk_bundle(int32_t x0, const int16_t *y, int n, int g, int dx, int dy
 }
 
 /* ------------------------------------------------- Drones 1's picture --- */
-/* drone II's interval from drone I, by the nearest semitone: "5th", "m10", "2 8ve 4th" (12-tone names: the Tunings'
- * ratios come with Setup 2's PR). No cents (Pitch's value shows them); which way is an arrow (Evan, 2026-11-01) */
+/* the note of the Tuning nearest v (cents): where Partner and Shift count from (dr_tun_over, dr_shift_semi) */
+static int lk_tun_note(int t, int v)
+{
+    const int r = DR_TUN_MOVES(t) ? proj.par[DR_GP(0, GP_PITCH)] : 900;
+    return dr_grid_at(t, dr_grid_k(t, v, r), r);
+}
+/* drone II's interval from drone I, by the nearest semitone: "5th", "m10", "2 8ve 4th"; on another Tuning in its own
+ * terms when both are on its notes (dr_tun_name: "11\19", "7/4"; ledger 3a). No cents (Pitch's value shows them);
+ * which way is an arrow (Evan, 2026-11-01) */
 static void lk_interval(char *t, int c)
 {
     static const char *const N[12] = {"unison", "m2", "M2", "m3", "M3", "4th", "tritone", "5th", "m6", "M6", "m7", "M7"};
@@ -725,7 +732,8 @@ static void lk_pic_drones1(void)
                   c2 = proj.par[P_PLINK] ? c1 + proj.par[P_PLINK_OFF] : proj.par[DR_GP(1, GP_PITCH)];
         const int32_t x1 = 130 + text_w(&LK_F_DRONE, "II") + 6, iy = 2 + LK_B(LK_F_DRONE) - LK_B(LK_F_SMALL);
         int32_t ax;
-        lk_interval(t, c2 - c1);
+        if (!dr_tun_name(proj.par[P_TUNING], c1, c1, c2, t))
+            lk_interval(t, c2 - c1);
         cv_text(130, 2, &LK_F_DRONE, "II", LK_DRONE[1]);
         ax = cv_text(x1, iy, &LK_F_SMALL, t, LK_DRONE[1]);
         if (c2 != c1)
@@ -2343,7 +2351,16 @@ static int lk_line2(int p, int v, char *t, char *t2)
         for (q = t; *q && *q != ' '; q++)
             ;
         if (lk_tuned()) {
+            /* in the Tuning's own terms (ledger 3a): what it plays, from the drone's note ("+7/4", "-11\19") */
+            const int tn = proj.par[P_TUNING], g = p / GP_N, a = lk_tun_note(tn, proj.par[DR_GP(g, GP_PITCH)]);
+            const float se = dr_partner_semi(g, v);
+            const int b = a + (int)(se * 100.0f + (se < 0.0f ? -0.5f : 0.5f));
+            char n[12];
             *q = 0;
+            if (dr_tun_name(tn, proj.par[DR_GP(0, GP_PITCH)], a, b, n)) {
+                t[0] = b < a ? '-' : '+';
+                scopy(t + 1, n);
+            }
             return 0;
         }
         if (*q) {
@@ -2362,10 +2379,13 @@ static int lk_line2(int p, int v, char *t, char *t2)
         q = t;
         *q++ = ct < 0 ? '-' : '+';
         if (dr_shift_on(proj.par[P_TUNING], proj.par[DR_GP(0, GP_PITCH)], ct)) {
-            /* on a note of the Tuning: its interval by name (Evan, 2026-11-07), the nearest 12-tone one: on 19-tone
-             * "+5th" is 19-tone's fifth */
+            /* on a note of the Tuning: its interval by name (Evan, 2026-11-07); on another Tuning in its own terms
+             * (ledger 3a: "+11\19", "+3/2"), else the nearest 12-tone name */
             static const char *const N[8] = {"", "m2", "M2", "m3", "M3", "4th", "tritone", "5th"};
-            const int n = (a + 50) / 100;
+            const int n = (a + 50) / 100, tn = proj.par[P_TUNING], p1 = proj.par[DR_GP(0, GP_PITCH)],
+                      g1 = lk_tun_note(tn, p1);
+            if (dr_tun_name(tn, p1, g1, g1 + ct, q))
+                return 0;
             scopy(q, N[n < 8 ? n : 7]);
             if (!n)                            /* under a quarter tone: its cents */
                 goto cents;

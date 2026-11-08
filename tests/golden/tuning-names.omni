@@ -1,0 +1,79 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): intervals in each Tuning's own terms (ledger 3a, Evan 2026-11-08):
+# steps on the equal ones ("12\19"), ratios on the rest ("3/2"). Drone I near D3, drone II near A3, each landed on
+# the Tuning's notes (a click up and back); partners +5th and +M3 (par3, par24); Shift (par80) so many notes up.
+# On 19-tone (par110 2), Harmonics (6), Harrison (8): Drones 1, Partner, Pitch moves. Not a test of its own.
+notips
+set 74 0
+set 51 0
+set 3 12
+set 24 8
+tap PLAY
+wait 1500
+set 0 5000
+set 21 5700
+set 110 2
+spin K1 1
+wait 700
+spin K1 -1
+wait 700
+spin K3 1
+wait 700
+spin K3 -1
+wait 1500
+shot names-19-drones1.png
+tap SEQ
+wait 800
+shot names-19-partner.png
+tap SEQ
+wait 300
+set 80 700
+spin K1 11
+wait 1200
+shot names-19-moves.png
+tap SEQ
+set 0 5000
+set 21 5700
+set 110 6
+tap HOME
+spin K1 1
+wait 700
+spin K1 -1
+wait 700
+spin K3 1
+wait 700
+spin K3 -1
+wait 1500
+shot names-harm-drones1.png
+tap SEQ
+wait 800
+shot names-harm-partner.png
+tap SEQ
+wait 300
+set 80 700
+spin K1 4
+wait 1200
+shot names-harm-moves.png
+tap SEQ
+set 0 5000
+set 21 5700
+set 110 8
+tap HOME
+spin K1 1
+wait 700
+spin K1 -1
+wait 700
+spin K3 1
+wait 700
+spin K3 -1
+wait 1500
+shot names-harrison-drones1.png
+tap SEQ
+wait 800
+shot names-harrison-partner.png
+tap SEQ
+wait 300
+set 80 700
+spin K1 7
+wait 1200
+shot names-harrison-moves.png

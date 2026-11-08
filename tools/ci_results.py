@@ -4,9 +4,9 @@
 
     tools/ci_results.py REPO PR SHA       (GH_TOKEN set; needs the gh CLI)
 
-Waits for every run of the Tests workflow on SHA to finish (the PR's opening and its label each start one), then
-prints, as markdown: the PR's labels, each job's latest result (a job a later run skipped keeps its earlier result:
-host and cost don't run again for a label), and the same-samples check's own summary (what differs, file by file).
+Waits for every run of the Tests and Same samples workflows on SHA to finish (a label starts another of Same
+samples), then prints, as markdown: the PR's labels, each job's latest result (a job a later run skipped keeps its
+earlier result), and the same-samples check's own summary (what differs, file by file).
 Waits at most 25 minutes; whatever hasn't finished by then is reported as still running.
 """
 import json
@@ -21,10 +21,15 @@ def gh(*args):
     return subprocess.run(["gh", *args], capture_output=True, text=True, check=True).stdout
 
 
+WORKFLOWS = ("Tests", "Same samples")
+
+
 def runs(repo, sha):
-    out = gh("run", "list", "--repo", repo, "--workflow", "Tests", "--commit", sha, "--limit", "20",
-             "--json", "databaseId,status,conclusion,event,createdAt")
-    return sorted(json.loads(out), key=lambda r: r["createdAt"])
+    rs = []
+    for w in WORKFLOWS:
+        rs += json.loads(gh("run", "list", "--repo", repo, "--workflow", w, "--commit", sha, "--limit", "20",
+                            "--json", "databaseId,status,conclusion,event,createdAt"))
+    return sorted(rs, key=lambda r: r["createdAt"])
 
 
 def same_samples_text(repo, job_id):
@@ -53,7 +58,7 @@ def main():
     labels = [l["name"] for l in json.loads(gh("pr", "view", pr, "--repo", repo, "--json", "labels"))["labels"]]
     out = [f"Labels on the PR: {', '.join(labels) if labels else 'none'}", ""]
     if not rs:
-        out.append("No run of the Tests workflow was found for this commit.")
+        out.append("No run of the Tests or Same samples workflows was found for this commit.")
         print("\n".join(out))
         return
     jobs = {}                                         # job name -> (its run, the job), the latest that ran
@@ -69,8 +74,8 @@ def main():
     if "same-samples" in jobs and jobs["same-samples"][1].get("status") == "completed":
         try:
             text = same_samples_text(repo, jobs["same-samples"][1]["databaseId"])
-        except subprocess.CalledProcessError:
-            text = ""
+        except subprocess.CalledProcessError as e:   # say why, so the next review shows it (it had read nothing)
+            text = "(its log couldn't be read: " + (e.stderr or "").strip()[:300] + ")"
         out += ["", "Same samples, as it reported:", "", text or "(its summary couldn't be read from the log)"]
     print("\n".join(out))
 

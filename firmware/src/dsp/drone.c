@@ -211,6 +211,93 @@ static void itoa_s(int v, char *b)
     *b = 0;
 }
 
+/* AN INTERVAL IN THE TUNING'S OWN TERMS (ledger 3a, Evan 2026-11-08: "follow how composers notate it"): on the equal
+ * ones its steps over the division, as Ableton's tuning files and the xenharmonic writers do ("11\19", 19-tone's
+ * fifth); on the others its ratio, from each Tuning's own (TUN_R, the same order as the cents tables; from the 1/1,
+ * or from A for the ones built on it: an interval's ratio is the same), between the two notes' nearest. 0 when it has
+ * no such name: 12-tone (its names are the familiar ones), unison, a gap more than 10 cents from that interval, a
+ * ratio too long to fit ("1323/1024") */
+typedef struct { uint16_t n, d; } dr_ratio_t;
+static const dr_ratio_t TUN_R_JUST[12] = {{1, 1}, {16, 15}, {9, 8}, {6, 5}, {5, 4}, {4, 3}, {45, 32}, {3, 2}, {8, 5},
+                                          {5, 3}, {9, 5}, {15, 8}};
+static const dr_ratio_t TUN_R_HARM[8] = {{1, 1}, {9, 8}, {5, 4}, {11, 8}, {3, 2}, {13, 8}, {7, 4}, {15, 8}};
+static const dr_ratio_t TUN_R_LMY[12] = {{1, 1}, {64, 63}, {28, 27}, {7, 6}, {32, 27}, {4, 3}, {256, 189}, {3, 2},
+                                         {32, 21}, {14, 9}, {7, 4}, {16, 9}};
+static const dr_ratio_t TUN_R_HARRISON[12] = {{1, 1}, {28, 27}, {10, 9}, {7, 6}, {11, 9}, {4, 3}, {112, 81}, {3, 2},
+                                              {14, 9}, {5, 3}, {16, 9}, {11, 6}};
+static const dr_ratio_t TUN_R_SHRUTI[22] = {{1, 1}, {256, 243}, {16, 15}, {10, 9}, {9, 8}, {32, 27}, {6, 5}, {5, 4},
+                                            {81, 64}, {4, 3}, {27, 20}, {45, 32}, {64, 45}, {3, 2}, {128, 81}, {8, 5},
+                                            {5, 3}, {27, 16}, {16, 9}, {9, 5}, {15, 8}, {243, 128}};
+static const dr_ratio_t TUN_R_PARTCH[43] = {
+    {1, 1}, {64, 63}, {28, 27}, {256, 243}, {16, 15}, {88, 81}, {10, 9}, {112, 99}, {8, 7}, {7, 6}, {32, 27},
+    {6, 5}, {11, 9}, {56, 45}, {80, 63}, {128, 99}, {320, 243}, {4, 3}, {256, 189}, {112, 81}, {88, 63}, {64, 45},
+    {16, 11}, {40, 27}, {3, 2}, {32, 21}, {14, 9}, {128, 81}, {8, 5}, {160, 99}, {44, 27}, {5, 3}, {320, 189},
+    {512, 297}, {1280, 729}, {16, 9}, {9, 5}, {11, 6}, {28, 15}, {256, 135}, {64, 33}, {88, 45}, {160, 81}};   /* from A
+                                                  * (his 9/8 over G): Partch's 43 */
+static const dr_ratio_t *const TUN_R[DR_NTUNING - DR_TUN_JUST] = {TUN_R_JUST, TUN_R_HARM, TUN_R_LMY, TUN_R_HARRISON,
+                                                                   TUN_R_SHRUTI, TUN_R_PARTCH};
+static uint32_t gcd_u(uint32_t a, uint32_t b)
+{
+    while (b) {
+        const uint32_t r = a % b;
+        a = b;
+        b = r;
+    }
+    return a;
+}
+#define TUN_NAME_OFF(d) ((d) > 10 || (d) < -10)   /* the gap this many cents from the named interval: no name (under
+                                                  * half the smallest step, 53-tone's 11.3c: never the wrong step) */
+int dr_tun_name(int t, int p1, int a, int b, char *out)   /* the interval from a to b (cents), its size alone */
+{
+    const int r = DR_TUN_MOVES(t) ? p1 : 900;
+    int ka, kb, k;
+    t = tun_ok(t);
+    if (t == DR_TUN_12 || a == b)
+        return 0;
+    ka = dr_grid_k(t, a, r);
+    kb = dr_grid_k(t, b, r);
+    {   /* named by the two notes' nearest on the Tuning, when the gap heard is within 10 cents of theirs (Evan on the
+         * FM-1, 2026-11-08: exactly on the notes was too rare, a drone left on D3 read "m6"; and a name for an
+         * interval the drones aren't playing would mislead): else the familiar name */
+        const int named = dr_grid_at(t, kb, r) - dr_grid_at(t, ka, r), heard = b > a ? b - a : a - b;
+        if (ka == kb || TUN_NAME_OFF((named < 0 ? -named : named) - heard))
+            return 0;
+    }
+    if (kb < ka) {
+        k = ka;
+        ka = kb;
+        kb = k;
+    }
+    if (t < DR_TUN_JUST) {                       /* "11\19" */
+        char *q = out;
+        itoa_s(kb - ka, q);
+        while (*q)
+            q++;
+        *q++ = '\\';
+        itoa_s(TUN_EDO[t], q);
+        return 1;
+    }
+    {
+        const int n = TUN_N[t - DR_TUN_JUST], oa = ka >= 0 ? ka / n : -((n - 1 - ka) / n), ob = kb >= 0 ? kb / n :
+                                                                                         -((n - 1 - kb) / n);
+        const dr_ratio_t *R = TUN_R[t - DR_TUN_JUST], ra = R[ka - oa * n], rb = R[kb - ob * n];
+        uint32_t num = (uint32_t)rb.n * ra.d, den = (uint32_t)rb.d * ra.n, g;
+        for (k = ob - oa; k > 0; k--)            /* (b at or above a: its octaves over a's) */
+            num *= 2u;
+        g = gcd_u(num, den);
+        num /= g;
+        den /= g;
+        if (num > 9999u || den > 999u || (num > 999u && den > 99u))
+            return 0;                            /* more than 7 characters: it won't fit, the familiar name instead */
+        itoa_s((int)num, out);
+        while (*out)
+            out++;
+        *out++ = '/';
+        itoa_s((int)den, out);
+        return 1;
+    }
+}
+
 /* the LFO's rate in Hz, 0..152: a cycle in 100 s, then every second down to 10 s (Evan on the FM-1, 2026-11-07: each
  * second on the dial), then on in steps of the same size (10 s to 9 s, x 700^(1/62), ~11 %) to 70 Hz: 1 / (100 - v)
  * to v 90, 0.1 * 700^((v - 90) / 62) after */
