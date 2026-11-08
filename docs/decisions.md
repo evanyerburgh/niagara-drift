@@ -699,8 +699,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   review and a playable test, ledger 20): HOME opens **Drones** (I level, I cutoff, II level, II cutoff; Drones 2's
   picture, each drone's note small at its half's right) and **Pitch** is behind it (pitch and resonance; Drones 1's
   waves; a drone's half shows its filter curve while its Reso turns and 1.5 s after). FX always opens **Space** (delay
-  repeats and mix, reverb length and mix, two halves DELAY and REVERB; a Mix turning named in full in the readout,
-  "DELAY MIX 25"), **Details** behind it (drive, time, damp, reverb type; SEL + KNOB 2 the delay's type, SEL + KNOB 4
+  repeats and mix, reverb length and mix, two halves DELAY and REVERB, each Mix named by its half), **Details** behind it (drive, time, damp, reverb type; SEL + KNOB 2 the delay's type, SEL + KNOB 4
   Into). Pitch lock keeps the drones' pitch through scenes and Presets only: the pitch knobs always tune. Partner's
   Detune with its partner off is gray, "needs [F#3]" / "[F#4]", the key blinking while it turns. A 30-minute set took
   ~24 page taps against ~42 (the review's estimate). The other pages stay where they are.

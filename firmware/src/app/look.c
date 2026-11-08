@@ -2082,8 +2082,8 @@ static void lk_pic_reverb(void)
         lk_ring_tilt((int32_t)(x + 0.5f), mid, 3.0f + 0.5f * WIDE[ty] * ry, ry, ty == 3 ? (k & 1 ? -1 : 1) : 0,
                      mix > 0.0f ? lk_mix(0x07060Bu, c, 1.0f) : LK_UNLIT);
     }
-    cv_text(126, 74, &LK_F_SMALL, "echoes", mix > 0.0f && into != 2 ? LK_INK : LK_LABEL);   /* Into: Both, Echoes, */
-    cv_text(126, 86, &LK_F_SMALL, "drones", mix > 0.0f && into != 1 ? LK_INK : LK_LABEL);   /* Drones */
+    cv_text(126, 78, &FONT_XS, "echoes", mix > 0.0f && into != 2 ? LK_INK : LK_LABEL);   /* Into: Both, Echoes, Drones; */
+    cv_text(126, 90, &FONT_XS, "drones", mix > 0.0f && into != 1 ? LK_INK : LK_LABEL);   /* at 15 in half a page (Evan) */
     cv_rect(229 - text_w(&LK_F_SMALL, "40 s"), 87, text_w(&LK_F_SMALL, "40 s") + 4, (int32_t)LK_F_SMALL.h - 2, LK_BG);
     cv_text(231 - text_w(&LK_F_SMALL, "40 s"), 86, &LK_F_SMALL, "40 s", LK_LABEL);
 }
@@ -2530,15 +2530,14 @@ static int lk_readout(void)
         h = hash(h, (uint32_t)*q);
     for (q = ui.glab[1]; *q; q++)
         h = hash(h, (uint32_t)*q << 8);
-    h = hash(h, ui.glab_col);
     if (h == ui.sig[2])
         return 1;
     ui.sig[2] = h;
     cv_begin(240, LK_VAL_H, LK_BG);
     cv_rect(8, 0, 224, 1, LK_RULE);
-    cv_round(9, 4, 222, 81, 5, ui.glab_col ? ui.glab_col : LK_VIOLET);   /* the LFO's violet; Space's Mix, its half's */
+    cv_round(9, 4, 222, 81, 5, LK_VIOLET);
     cv_round(10, 5, 220, 79, 4, LK_BG);
-    text_c(120, 9, &FONT_T20, ui.glab[0], ui.glab_col ? ui.glab_col : LK_VIOLET);
+    text_c(120, 9, &FONT_T20, ui.glab[0], LK_VIOLET);
     fb = text_w(&FONT_N1, ui.glab[1]) <= 210 ? &FONT_N1 : &FONT_N2;
     text_c(120, 9 + (int32_t)FONT_T20.h + (62 - (int32_t)FONT_T20.h - (int32_t)fb->h) / 2, fb, ui.glab[1], LK_WHITE);
     cv_blit(0, LK_VAL_Y);

@@ -435,7 +435,7 @@ pink specks are as many as Color says.
 | Details | delay drive · SEL: — | delay time · SEL: delay type | reverb damp | reverb type · SEL: into reverb |
 
 - **Space** is the page FX opens, always: the amounts you play, the delay on the left half (DELAY) and the reverb on the
-  right (REVERB). While a Mix turns, the bottom of the screen names it in full ("DELAY MIX 25").
+  right (REVERB).
 - **Details** (FX again) holds what you set before playing: the delay's drive and time, the reverb's damp and type.
   **Two knobs have a second job** there, shown above them on the line ("SEL Tape", "SEL Both"): hold SEL and turn
   KNOB 2 for the delay's type, KNOB 4 for what goes into the reverb. Their columns become **Type** and **Into** while

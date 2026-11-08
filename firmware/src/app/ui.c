@@ -169,7 +169,6 @@ static struct {
     uint16_t msg_col;                  /* the banner's colour */
     uint8_t msg_tip;                   /* the message is a one-time tip (drawn apart from a message in the new look) */
     char glab[2][16];                  /* SELECT / ALGORITHM / PRESETS turned: their name and value (top bar) */
-    uint16_t glab_col;                 /* the readout's color: 0 the LFO's violet; Space's Mix knobs their half's */
     uint32_t glab_until;
     uint32_t touch_t[4];               /* each knob: lit until then (each its own timer: two hands) */
     uint8_t sel_lit;                   /* bit i: knob i last turned with SEL held, on a page where that's a second job */
@@ -536,13 +535,6 @@ static void knob_turn(int i, int32_t e)
     }
     if (ui.view == V_LFO || ui.view == V_LFO2)
         depth_hint(p);
-    if (p == P_DLY_MIX || p == P_REV_MIX) {            /* Space's two Mix knobs: the readout names which (Evan,
-                                                        * 2026-11-08: "DELAY MIX 25"), in its half's color */
-        scopy(ui.glab[0], p == P_DLY_MIX ? "DELAY MIX" : "REVERB MIX");
-        dr_param_text(p, proj.par[p], ui.glab[1]);
-        ui.glab_col = p == P_DLY_MIX ? RGB(120, 173, 255) : RGB(201, 246, 255);
-        ui.glab_until = plat_ms() + 1500u;
-    }
 }
 
 /* ------------------------------------------------------------ switches --- */
@@ -791,7 +783,6 @@ static void wave_step(int w, int dir)
     if (ui.view == V_LFO)                      /* LFO sends draws both waves, named: no need to say it (Evan) */
         return;
     dr_param_text(p, v, t);
-    ui.glab_col = 0;
     scopy(ui.glab[0], w ? "LFO II" : "LFO I");
     scopy(ui.glab[1], t);
     ui.glab_until = plat_ms() + 1500u;
@@ -1712,7 +1703,6 @@ static void mtime_turn(int32_t e)                      /* PRESETS: Gesture time,
     proj.mtime = (uint8_t)(v < 0 ? 0 : v > 100 ? 100 : v);
     mark_dirty();
     t = fm_exp2f((float)DR_GEST_TIME[DR_G_WEIGHT] * 0.0490689f) * mtime_k();
-    ui.glab_col = 0;
     scopy(ui.glab[0], "GESTURE TIME");
     q = ui.glab[1];
     if (t < 9.95f)
@@ -1776,7 +1766,6 @@ static void global_turn(int role, int p, const char *name, int32_t e)
     dr_param_text(p, proj.par[p], t);
     {   /* not on the page: a label in the top bar */
         uint32_t i;
-        ui.glab_col = 0;
         for (i = 0; i < 15u && name[i]; i++)
             ui.glab[0][i] = name[i];
         ui.glab[0][i] = 0;
