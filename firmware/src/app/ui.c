@@ -2758,7 +2758,7 @@ static void sp_scene(int bank, int n)
     }
 }
 
-/* what a black key does now, said after its key: "A#3 steps it to band-pass", "F#3 turns it off" (Evan, 2026-11-10: a
+/* what a black key does now, said after its key: "A#3 for band-pass", "F#3 for off" (Evan, 2026-11-10: a
  * key's name alone didn't say what it does). The next press's result, as sw_flip makes it */
 static const char *const SP_SUB[7] = {"", "1 octave down", "2 octaves down", "one third", "one fifth", "3 octaves down",
                                       "4 octaves down"};
@@ -2772,18 +2772,18 @@ static void sp_does(int k)
     const int on = sw_get(w);
     sp_value(LK_BKEY[k]);
     switch (w.s) {
-    case S_PARTNER: case S_PLOCK: case S_PLINK: case S_SYNC: sp_cat(on ? " turns it off" : " turns it on"); break;
-    case S_SUBOCT: sp_cat(" steps it to "); sp_cat(SP_SUB[p[GP_SUBOCT] % 6 + 1]); break;
-    case S_HP: sp_cat(" steps it to "); sp_cat(MODE[(p[GP_MODE] + 1) % 3]); break;
+    case S_PARTNER: case S_PLOCK: case S_PLINK: case S_SYNC: sp_cat(on ? " for off" : " for on"); break;
+    case S_SUBOCT: sp_cat(" for "); sp_cat(SP_SUB[p[GP_SUBOCT] % 6 + 1]); break;
+    case S_HP: sp_cat(" for "); sp_cat(MODE[(p[GP_MODE] + 1) % 3]); break;
     case S_OTAP: case S_FTAP: case S_DTAP: {
         const int v = w.s == S_OTAP ? p[GP_OLFO] : w.s == S_FTAP ? p[GP_FLFO] : proj.par[P_DLY_LFO];
-        sp_cat(" changes it to ");
+        sp_cat(" for ");
         sp_cat(WAVES[v == DR_LFO_I ? DR_LFO_II : v == DR_LFO_II ? DR_LFO_BOTH : DR_LFO_I]);
         break;
     }
-    case S_ODEST: sp_cat(on ? " switches it to pitch" : " switches it to x-wave"); break;
-    case S_FDEST: sp_cat(on ? " switches it to cutoff" : " switches it to reso"); break;
-    case S_XMOD: sp_cat(" steps it to "); sp_cat(XM[(proj.par[P_XMOD] + 1) % (DR_XMOD_OUT + 1)]); break;
+    case S_ODEST: sp_cat(on ? " for pitch" : " for x-wave"); break;
+    case S_FDEST: sp_cat(on ? " for cutoff" : " for reso"); break;
+    case S_XMOD: sp_cat(" for "); sp_cat(XM[(proj.par[P_XMOD] + 1) % (DR_XMOD_OUT + 1)]); break;
     case S_LFORESET: sp_cat(" restarts the LFO"); break;
     default: break;
     }
@@ -2871,10 +2871,11 @@ static void sp_screen(int all)
             sp_cat(k.g ? ". Drone 2: " : ". Drone 1: ");
         else
             sp_cat(i ? ", " : ": ");
-        sp_short = ui.view == V_LFO;           /* (LFO sends: the values alone, their keys after) */
+        sp_short = ui.view == V_LFO;           /* (LFO sends: the values alone; their depth as a knob turns) */
         sp_knob(i);
         sp_short = 0;
-        if (k.g < G && (i == 3 || VIEW_KNOB[ui.view][i + 1].g != k.g)) {   /* the drone's key hints after its knobs */
+        if (all && k.g < G && (i == 3 || VIEW_KNOB[ui.view][i + 1].g != k.g)) {   /* WHERE: the drone's key hints after
+                                                * its knobs (a page opening says its knobs only: Evan, 2026-11-10) */
             const uint32_t n0 = sp_n;
             sp_cat(", ");
             if (!sp_hints(k.g)) {
@@ -2884,7 +2885,7 @@ static void sp_screen(int all)
         }
     }
     sp_cat(".");
-    {
+    if (all) {
         const uint32_t n0 = sp_n;
         sp_cat(" ");
         if (sp_hints(G))
@@ -3101,8 +3102,14 @@ static void speak(void)
                 sp_value(LK_BKEY[ui.km_key]);
                 sp_cat(": ");
                 sp_setting(ui.km_key);
-                sp_cat(". ");
-                sp_does(ui.km_key);
+                sp_cat(". Press ");
+                {
+                    const uint32_t n0 = sp_n;
+                    sp_does(ui.km_key);      /* (its key again: left out) */
+                    for (; sp_buf[n0] && sp_buf[n0] != ' '; )
+                        memmove(sp_buf + n0, sp_buf + n0 + 1, sp_n-- - n0);
+                    memmove(sp_buf + n0, sp_buf + n0 + 1, sp_n-- - n0);
+                }
             }
             ann_later(sp_buf, ANN_NOW, 120u, now);
         }

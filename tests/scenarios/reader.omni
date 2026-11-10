@@ -5,7 +5,7 @@ notips
 wait 300
 listen
 wait 100
-said Drones_page._Drone_1:_Level_84,_Cutoff_57.5,_low-pass_filter,_A#3_steps_it_to_band-pass
+said Drones_page._Drone_1:_Level_84,_Cutoff_57.5,_low-pass_filter,_A#3_for_band-pass
 tap PLAY
 wait 300
 said Play
@@ -15,7 +15,7 @@ said Drone_1_Cutoff
 # A#3 switches drone I's filter: its hint is said, with what the key does next (the page shows it, no banner)
 tapkey b2
 wait 100
-said Drone_1_band-pass_filter,_A#3_steps_it_to_high-pass
+said Drone_1_band-pass_filter,_A#3_for_high-pass
 tap HOME
 wait 500
 said Pitch_page._Drone_1:_Pitch_D3
@@ -39,7 +39,7 @@ wait 600
 said Keys,_SEL_held
 key b2 down
 wait 300
-said A#3:_drone_1_Filter,_band-pass._A#3_steps_it_to_high-pass
+said A#3:_drone_1_Filter,_band-pass._Press_for_high-pass
 key b2 up
 release SEL
 wait 300
