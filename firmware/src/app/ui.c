@@ -1210,8 +1210,10 @@ static void sound_blend(const int16_t *from, const int16_t *to, float x)
             continue;                                  /* on a MIDI clock the Swell's on / off and its division stay as
                                                         * they are (Evan, 2026-10-26: a scene switched it off mid-song) */
         if (proj.par[P_PLOCK] && (k == DR_GP(0, GP_PITCH) || k == DR_GP(1, GP_PITCH) || k == P_PLINK_OFF ||
-                                  k == P_WANDER || k == P_GL_0 + DR_G_SHIFT))
-            continue;                                  /* pitch lock: the drones keep their pitch (2026-10-17) */
+                                  k == P_GL_0 + DR_G_SHIFT))
+            continue;                                  /* pitch lock: the drones keep their pitch (2026-10-17); Wander
+                                                        * comes with the scene (Evan, 2026-11-08: a scene saved with
+                                                        * Wander left it running through every scene after it) */
         if (scene_step(k))
             v = x >= 0.5f ? to[k] : from[k];
         else

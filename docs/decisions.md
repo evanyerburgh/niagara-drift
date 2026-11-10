@@ -708,3 +708,6 @@ at the end. The current state is in the [README](../README.md) and the code.
   SEL is). Hold SEL and tap a page's button to keep it ("kept" in the header) until another page. The return is a
   plain switch. The host's scenarios have it off unless they say `autoreturn`. **Taken out 2026-11-10** (Evan, on the
   FM-1: "kind of annoying"), SEL + a page's button with it: a page stays until the player leaves it.
+- 2026-11-10: **Wander comes with a scene**, Pitch lock on or off (Evan, 2026-11-08 and 11-10): the lock keeps the
+  drones' pitch, Pitch link's interval and Shift only. Before, with the lock on, Wander counted as pitch, so a scene
+  saved with Wander left it running through every scene after it.

@@ -590,7 +590,7 @@ key, and once SEL has done something else in a hold (SEL + PLAY, a bank, a knob)
 | 1 | I partner | which LFO moves I's pitch (I, II, both) |
 | 2 | I sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | I's pitch send moves X-Wave instead |
 | 3 | I filter: LP, BP, HP | which LFO moves I's cutoff (I, II, both) |
-| 4 | pitch lock: scenes and Presets leave the drones' pitches where they are (on when you first start; the pitch knobs still tune) | I's cutoff send moves resonance instead |
+| 4 | pitch lock: scenes and Presets leave the drones' pitches where they are (on when you first start; the pitch knobs still tune); Wander comes with the scene | I's cutoff send moves resonance instead |
 | 5 | LFO reset | LFO reset |
 | 6 | II partner | which LFO moves II's pitch (I, II, both) |
 | 7 | II sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | II's pitch send moves X-Wave instead |
