@@ -2561,7 +2561,11 @@ void ui_frame(void)
                     for (q = ui.msg_next; *q; q++)
                         ;
                     scopy(q, " KEPT, UNPLAYED");
-                }
+                } else if (proj_note_presets)
+                    scopy(ui.msg_next, "0.2 PRESETS [SEL]+[E5]");
+                ui.msg_until = plat_ms() + 3500u;
+            } else if (proj_note_presets) {      /* from 0.2: its dropped Presets are in bank F (SEL + E5) */
+                say_c("0.2 PRESETS [SEL]+[E5]", 0, K_GOLD);
                 ui.msg_until = plat_ms() + 3500u;
             }
         } else {

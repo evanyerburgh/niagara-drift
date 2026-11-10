@@ -153,18 +153,78 @@ const char *preset_name(int n)             /* a Preset's name */
 {
     return n >= 0 && n < NPRESETS ? PRESET_NAME[n] : 0;
 }
+/* 0.2'S PRESETS THAT 0.3 DROPS (Evan, 2026-11-10): for a player updating from 0.2, into bank F (F1-F6; F is new in
+ * 0.3, so empty), as they sound on 0.3's engine (main's lists before the new sixteen: #84's cutoffs, #78's LFO scale).
+ * Niagara, Abyss, Tape and Howl live on as 0.3's Presets; Heaven is Sibyl, moving more; Clean is Bare. Nobody
+ * else gets them */
+#define OLD02_N 64
+static const int16_t OLD02_CHANGES[][OLD02_N + 1] = {
+    /* F1 EERIE (0.2's P3): a tritone apart, near-sines, drone II through a ringing band-pass with a breath of white
+     * noise, its partner a just minor third; drone II wanders a whole-tone scale; the LFO's doubled curve, more
+     * Movement; the longest clean echoes, a chorus hall. Drone II's pitch wavers a little (the oscillator LFO), the
+     * LFO's own wave bending its rate: uneven */
+    {I_(GP_PITCH), 5000, II_(GP_PITCH), 5600, I_(GP_LEVEL), 95, II_(GP_LEVEL), 76, I_(GP_WAVE), 20, II_(GP_WAVE), 33, I_(GP_INTERVAL), 1,
+     II_(GP_INTERVAL), 7, I_(GP_DETUNE), 35, II_(GP_DETUNE), 8, II_(GP_MODE), DR_BP, II_(GP_CUTOFF), 640,
+     II_(GP_RESO), 720, I_(GP_CUTOFF), 600, II_(GP_NOISE), 12, II_(GP_NCOLOR), 0, P_WANDER, 25, P_WSCALE, 3,
+     P_GLIDE, 45, P_LFO_W1, 6, P_MOVE, 70, P_PULSE, 0, P_REV_TYPE, 3, P_REV_MIX, 55, P_DLY_TYPE, 0, P_DLY_TIME, 100,
+     P_DLY_REPEATS, 70, P_DLY_MIX, 30, II_(GP_OLFO), DR_LFO_II, II_(GP_OLFO_DEPTH), 12, P_LFO_RMOD, 40,
+     P_LFO_RMOD_SRC, DR_LFO_I, -1},
+    /* F2 GLASS (0.2's P4): high sines a fifth apart (D5, A5), drone I's partner an octave up, beating a little, a long
+     * bright cathedral */
+    {I_(GP_PITCH), 7400, II_(GP_PITCH), 8100, I_(GP_WAVE), 0, II_(GP_WAVE), 0, I_(GP_INTERVAL), 14, I_(GP_DETUNE), 20,
+     II_(GP_DETUNE), 25, I_(GP_CUTOFF), 900, II_(GP_CUTOFF), 900, I_(GP_RESO), 100, II_(GP_RESO), 100, I_(GP_MIX), 0,
+     II_(GP_MIX), 0, P_PULSE, 0, P_REV_LEN, 85, P_REV_MIX, 60, P_REV_DAMP, 15, P_DLY_TIME, 70, P_DLY_MIX, 30,
+     P_DLY_REPEATS, 60, I_(GP_LEVEL), 46, II_(GP_LEVEL), 42, -1},
+    /* F3 TANPURA (0.2's P6): Sa and Pa: drone I on D3 with its high Sa (the partner an octave up), drone II on the Pa
+     * below (A2), bright buzzing strings (the jawari: character, drive, an open resonant filter), plucked: the Swell
+     * about once a second, swung; a hall. The LFO slow and gentle */
+    {II_(GP_PITCH), 4500, I_(GP_WAVE), 67, II_(GP_WAVE), 67, I_(GP_INTERVAL), 14, II_(GP_INTERVAL), 14,
+     I_(GP_DETUNE), 6, II_(GP_DETUNE), 6, I_(GP_MIX), 0, II_(GP_MIX), 0, I_(GP_CUTOFF), 820, II_(GP_CUTOFF), 780,
+     I_(GP_RESO), 320, II_(GP_RESO), 320, I_(GP_DRIVE), 40, II_(GP_DRIVE), 40, P_CHAR, 27, P_PULSE_RATE, 50,
+     P_PULSE_DEPTH, 45, P_PULSE_SHAPE, -40, P_PULSE_SWING, 15, P_MOVE, 30, P_REV_TYPE, 1, P_REV_LEN, 55,
+     P_REV_MIX, 30, P_DLY_MIX, 10, I_(GP_LEVEL), 73, II_(GP_LEVEL), 68, -1},
+    /* F4 WHISTLE (0.2's P8): the filters' resonance at its edge, so they sing as sines of their own: drone I's at D5
+     * and drone II's at A5, over soft low drones (D2, A2) that feed them; the filter LFO drifts the whistles a little;
+     * long clean echoes in a cathedral; no Swell */
+    {I_(GP_PITCH), 3800, II_(GP_PITCH), 4500, I_(GP_WAVE), 20, II_(GP_WAVE), 20, I_(GP_CUTOFF), 497,
+     II_(GP_CUTOFF), 556, I_(GP_RESO), 960, II_(GP_RESO), 960, I_(GP_DRIVE), 10, II_(GP_DRIVE), 10, I_(GP_MIX), 0,
+     II_(GP_MIX), 0, I_(GP_FLFO_DEPTH), 12, II_(GP_FLFO_DEPTH), -12, P_PULSE, 0, P_MOVE, 40, P_DLY_TYPE, 0,
+     P_DLY_TIME, 90, P_DLY_REPEATS, 55, P_DLY_MIX, 25, P_REV_TYPE, 2, P_REV_LEN, 80, P_REV_MIX, 50, I_(GP_LEVEL), 54, II_(GP_LEVEL), 51, -1},
+    /* F5 CATHEDRAL (0.2's P10): a major sixth apart (D3, B3), soft waves, drone I's sub a third's subharmonic below
+     * (49 Hz), a long dark reverb, almost a freeze. Almost no LFO: still and huge */
+    {I_(GP_PITCH), 5000, II_(GP_PITCH), 5900, I_(GP_WAVE), 20, II_(GP_WAVE), 20, I_(GP_MIX), 35, I_(GP_SUBOCT), 3,
+     I_(GP_CUTOFF), 650, II_(GP_CUTOFF), 650, P_PULSE, 0, P_REV_TYPE, 2, P_REV_LEN, 98, P_REV_MIX, 75, P_REV_DAMP, 55,
+     P_DLY_MIX, 10, I_(GP_LEVEL), 50, II_(GP_LEVEL), 47, I_(GP_FLFO_DEPTH), 15, II_(GP_FLFO_DEPTH), -15, P_MOVE, 25, -1},
+    /* F6 METAL (0.2's P11): cross-mod and hard sync, an inharmonic gap (a tritone and a bit), squares, drone I high-
+     * passed, resonant, in a small room. The oscillator LFOs on X-Wave and a quicker filter sweep: a moving, metallic
+     * shimmer */
+    {I_(GP_PITCH), 3800, II_(GP_PITCH), 5730, P_XMOD, 1, P_XMOD_AMT, 60, P_SYNC, 1, I_(GP_WAVE), 100,
+     II_(GP_WAVE), 100, I_(GP_WIDTH), 50, I_(GP_MODE), DR_HP, I_(GP_CUTOFF), 520, II_(GP_CUTOFF), 750,
+     I_(GP_RESO), 650, II_(GP_RESO), 400, I_(GP_DRIVE), 55, II_(GP_DRIVE), 55, P_REV_TYPE, 0, P_REV_MIX, 25,
+     I_(GP_LEVEL), 73, II_(GP_LEVEL), 73, P_DLY_TYPE, 0, P_DLY_TIME, 10, P_DLY_REPEATS, 30, P_DLY_MIX, 25,
+     I_(GP_OLFO_DEST), DR_TO_XWAVE, I_(GP_OLFO_DEPTH), 45, II_(GP_OLFO), DR_LFO_II, II_(GP_OLFO_DEST), DR_TO_XWAVE,
+     II_(GP_OLFO_DEPTH), 45, P_LFO_RATE, 110, I_(GP_FLFO_DEPTH), 50, II_(GP_FLFO_DEPTH), -50, -1},
+};
+#define NOLD02 ((int)(sizeof OLD02_CHANGES / sizeof OLD02_CHANGES[0]))
+_Static_assert(NOLD02 == 6 && NOLD02 <= NPLAY, "0.2's six dropped Presets fit bank F");
+
 _Static_assert(NPRESETS == 2 * NPLAY && PRESET_LOCKED < NPRESETS, "a Preset for every key of the two banks, the bare one locked");
 static int16_t preset[DR_NPARAMS];         /* one Preset, built when it's asked for (all twelve were 2.4 KB of RAM) */
 static int preset_n = -1;                  /* ... which */
 
-static const int16_t *preset_get(int n)
+static void changes_build(int16_t *d, const int16_t *c, int max)   /* the defaults, then a list of changes */
 {
     int k;
+    for (k = 0; k < DR_NPARAMS; k++)
+        d[k] = dr_param_info(k)->def;
+    for (k = 0; k < max && c[k] >= 0; k += 2)
+        d[c[k]] = c[k + 1];
+}
+
+static const int16_t *preset_get(int n)
+{
     if (n != preset_n) {
-        for (k = 0; k < DR_NPARAMS; k++)
-            preset[k] = dr_param_info(k)->def;
-        for (k = 0; k < PRESET_N && PRESET_CHANGES[n][k] >= 0; k += 2)
-            preset[PRESET_CHANGES[n][k]] = PRESET_CHANGES[n][k + 1];
+        changes_build(preset, PRESET_CHANGES[n], PRESET_N);
         preset_n = n;
     }
     return preset;
@@ -771,8 +831,8 @@ static void presets_move(void)
 
 /* KEYS 9-12 BECOME GESTURES (format 36, Evan 2026-10-28): a bank plays keys 1-8. On the first start, a scene of
  * the player's on keys 9-12 moves to the first empty key 1-8 of its own bank, then of another (A, B, C); one with no
- * room stays stored there, unplayed, not lost. Then P9-P12 (the Presets no longer on keys) are copied into the first
- * empty keys 1-8 of C, then B, then A, never over a scene. proj_note says what happened, for the screen */
+ * room stays stored there, unplayed, not lost. Then 0.2's Presets that 0.3 dropped go into bank F (OLD02_CHANGES).
+ * proj_note says what happened, for the screen */
 int proj_note_moved, proj_note_stored, proj_note_presets;
 static uint16_t *bank_used(int b) { return b ? &bank_bc[b - 1].used : &proj.scene_used; }
 static int16_t *bank_scene(int b, int n) { return b ? bank_bc[b - 1].scene[n] : proj.scene[n]; }
@@ -787,7 +847,6 @@ static int free_key(int b)                     /* the first empty key 1-8 of ban
 static void keys_to_gestures(void)
 {
     static const int8_t ORDER[3][3] = {{0, 1, 2}, {1, 0, 2}, {2, 1, 0}};   /* its own bank first */
-    static const int8_t P_INTO[3] = {2, 1, 0};                            /* C, B, A */
     /* a first save cut short: B or C already written in this format (the banks go first), the project not. Those
      * moves and copies are on the flash already: only A's own scenes move again, within A, so nothing doubles */
     const int again = bank_fmt[0] >= 36u || bank_fmt[1] >= 36u;
@@ -809,16 +868,14 @@ static void keys_to_gestures(void)
             if (k == (again ? 1 : 3))
                 proj_note_stored++;
         }
-    for (n = again ? NPRESETS : NPLAY; n < NPRESETS; n++)
-        for (k = 0; k < 3; k++) {
-            d = P_INTO[k];
-            if ((i = free_key(d)) >= 0) {
-                memcpy(bank_scene(d, i), preset_get(n), sizeof(int16_t) * DR_NPARAMS);
-                *bank_used(d) |= (uint16_t)(1u << i);
-                proj_note_presets++;
-                break;
-            }
-        }
+    if (!bank_x[2].used) {                     /* 0.2's dropped Presets into F (a first save cut short may have
+                                                * written it already: then it's loaded, not empty) */
+        for (n = 0; n < NOLD02; n++)
+            changes_build(bank_x[2].scene[n], OLD02_CHANGES[n], OLD02_N);
+        bank_x[2].used = (uint16_t)((1u << NOLD02) - 1u);
+        bank_dirty |= 1u << 6;
+        proj_note_presets = NOLD02;
+    }
     for (b = 1; b < 3; b++)
         bank_dirty |= (uint8_t)(1u << b);
 }

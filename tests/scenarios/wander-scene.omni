@@ -1,4 +1,4 @@
-# Wander comes with a scene, Pitch lock on too (Evan, 2026-11-08 / 11-10): P3 Seance has Wander, P1 Niagara none;
+# Wander comes with a scene, Pitch lock on too (Evan, 2026-11-08 / 11-10): P6 Seance has Wander, P1 Niagara none;
 # par71 Scene time (0: 0.1 s), par74 Pitch lock, par78 Wander; 'wander' is drone II's move by it (cents)
 notips
 set 71 0
@@ -7,7 +7,7 @@ press SEL
 tapkey w14
 release SEL
 tap PLAY
-tapkey w2
+tapkey w5
 wait 3000
 expect par74 1
 expect par78 >0
