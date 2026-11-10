@@ -20,6 +20,14 @@
  *   leds                         print the lit buttons and keys
  *   expect WHAT VALUE            check state: exit 1 on mismatch; VALUE "<N" / ">N" is a bound
  *   reboot                       re-run boot from the simulated flash (persistence test)
+ *   listen                       a screen reader starts listening (HELLO, again every 2 s): each SAY is printed
+ *                                ("said: ..."; "said!:" cuts off what was being said)
+ *   where                        the reader asks for everything on the screen
+ *   said TEXT                    some SAY since the last "said" (or "listen") has TEXT in it (_ for a space): else a
+ *                                failure
+ *   speakdump                    every page, knob value and message as the reader gets them (fm1-reader's audit)
+ * OMNI_SAID_LOG=FILE: a reader listens from boot, quietly, and every SAY is appended to FILE (the audit).
+ * (The screen reader's hookup is FoMni's host's, Charles Vestal.)
  */
 #define OM_HOST 1
 #include <stdio.h>
@@ -162,6 +170,43 @@ uint32_t plat_xruns(void) { return 0; }
 
 /* -------------------------------------------------------------- app --- */
 #include "../firmware/src/app/app.h"
+#define ANN_NAME "Niagara Drift " OM_VERSION
+#include "ann_words.h"                                  /* the words file's link (tools/gen_words.py) */
+#include "../firmware/src/announce.c"
+/* what the reader is told: every SAY to stdout with "said:" (listen), and kept for the "said" check */
+static char said_last[ANN_MAX + 1], said_log[16384];   /* said_log: every SAY since the last "said" check */
+static uint32_t said_len;
+static int said_print = 1, sim_listen;
+static FILE *said_log_f;                                /* OMNI_SAID_LOG=FILE: every SAY, for fm1-reader's audit */
+#ifdef OM_WEB
+static void web_said(const uint8_t *p, uint32_t n);
+#endif
+static int ann_wire_send(const uint8_t *p, uint32_t n)
+{
+#ifdef OM_WEB
+    web_said(p, n);
+#endif
+    if (n >= 7u && p[4] == ANN_SAY) {
+        uint32_t i, k = 0;
+        for (i = 6; i + 1u < n && k < ANN_MAX; i++)
+            said_last[k++] = (char)p[i];
+        said_last[k] = 0;
+        if (said_len + k + 2u < sizeof said_log) {
+            memcpy(said_log + said_len, said_last, k);
+            said_len += k;
+            said_log[said_len++] = '\n';
+            said_log[said_len] = 0;
+        }
+#ifndef OM_WEB
+        if (said_print)
+            printf("said%s: %s\n", (p[5] & ANN_NOW) ? "!" : "", said_last);
+        if (said_log_f)
+            fprintf(said_log_f, "%s\t%s\n", (p[5] & ANN_KEEP) ? "WARN" : "MSG", said_last);
+#endif
+    }
+    return 0;
+}
+static const uint8_t ANN_HELLO_F[] = {ANN_H0, ANN_H1, ANN_H2, ANN_HELLO, ANN_VER};
 #include "../firmware/src/app/project.c"
 #include "../firmware/src/app/ui.c"
 
@@ -323,6 +368,8 @@ static void run_ms(uint32_t ms)
     uint32_t i, k;
     for (i = 0; i < ms; i++) {
         now_ms++;
+        if (sim_listen && now_ms % 2000u == 0)          /* the reader's HELLO, as it sends it */
+            ann_frame(ANN_HELLO_F, sizeof ANN_HELLO_F, now_ms);
         while (clk_bpm > 0.0 && clk_next_us <= (double)now_ms * 1000.0) {   /* the "clock" command's pulses */
             double j = clk_jit > 0.0 ? clk_jit * 1000.0 * jit_rand() : 0.0;
             min_t[mi_w % MQ] = (uint32_t)(clk_next_us + j);
@@ -536,7 +583,14 @@ int main(int argc, char **argv)
     }
     snprintf(out, sizeof out, "%s/midi_out.txt", dir);
     midi_log = fopen(out, "w");
+    if (getenv("OMNI_SAID_LOG")) {                       /* a reader listens from the start, quietly: the log only */
+        said_log_f = fopen(getenv("OMNI_SAID_LOG"), "a");
+        sim_listen = 1;
+        said_print = 0;
+    }
     boot();
+    if (sim_listen)
+        ann_frame(ANN_HELLO_F, sizeof ANN_HELLO_F, now_ms);
     while (fgets(line, sizeof line, sc)) {
         char cmd[32] = {0}, a[256] = {0}, b[64] = {0}, c[64] = {0};
         lineno++;
@@ -669,6 +723,27 @@ int main(int argc, char **argv)
             printf("\n");
         } else if (!strcmp(cmd, "expect"))
             fails += expect(a, b);
+        else if (!strcmp(cmd, "listen")) {          /* a screen reader starts listening */
+            sim_listen = 1;
+            said_len = 0;
+            said_log[0] = 0;
+            ann_frame(ANN_HELLO_F, sizeof ANN_HELLO_F, now_ms);
+        } else if (!strcmp(cmd, "where")) {
+            static const uint8_t WHERE[] = {ANN_H0, ANN_H1, ANN_H2, ANN_WHERE};
+            ann_frame(WHERE, sizeof WHERE, now_ms);
+        } else if (!strcmp(cmd, "said")) {          /* TEXT in some SAY since the last check ("_" a space) */
+            char *q;
+            for (q = a; *q; q++)
+                if (*q == '_')
+                    *q = ' ';
+            if (!strstr(said_log, a)) {
+                printf("FAIL line %d: nothing said with \"%s\" (said:\n%s)\n", lineno, a, said_log);
+                fails++;
+            }
+            said_len = 0;
+            said_log[0] = 0;
+        } else if (!strcmp(cmd, "speakdump"))
+            speak_dump();
         else if (!strcmp(cmd, "notips"))            /* every one-time tip seen (the manual's pictures) */
             memset(proj.seen, 0xFF, sizeof proj.seen);
         else if (!strcmp(cmd, "classic")) {         /* the starting sound before 2026-10-17, for the scenarios made on

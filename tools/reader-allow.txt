@@ -1,0 +1,8 @@
+# Words the screen reader's audit (fm1-reader tools/audit.mjs) should take as meant: names and words of their own
+Harrison
+Partch
+Shruti
+Dreamhouse
+Ashram
+Sibyl
+Seance

@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the screen reader (Charles Vestal's fm1-reader, announce.c; issue #87): a reader listens, and the screen, each page,
+# a knob turning, a key hint changing, a banner, PLAY and stop, a Preset tapped and the SEL key map are said
+notips
+wait 300
+listen
+wait 100
+said Drones_page._Drone_1:_Level_84,_Cutoff_57.5,_low-pass_filter,_A#3_for_band-pass
+tap PLAY
+wait 300
+said Play
+turn K2 3
+wait 400
+said Drone_1_Cutoff
+# A#3 switches drone I's filter: its hint is said, with what the key does next (the page shows it, no banner)
+tapkey b2
+wait 100
+said Drone_1_band-pass_filter,_A#3_for_high-pass
+tap HOME
+wait 500
+said Pitch_page._Drone_1:_Pitch_D3
+# a banner, in words: hard sync (D#5)
+tapkey b9
+wait 100
+said HARD_SYNC_ON
+# the Presets, P2 from its key
+press SEL
+tapkey w14
+release SEL
+wait 100
+said BANK_PRESETS_1-8
+wait 100
+tapkey w1
+wait 300
+said to_Preset_2_EMBERS
+# SEL held: the key map, then a key touched
+press SEL
+wait 600
+said Keys,_SEL_held
+key b2 down
+wait 300
+said A#3:_drone_1_Filter,_band-pass._Press_for_high-pass
+key b2 up
+release SEL
+wait 300
+# the reader asks for everything
+where
+wait 100
+said Playing,_on_its_way_to_Preset_2_EMBERS
+wait 9000
+where
+wait 100
+said Playing,_Preset_2_EMBERS
+tap PLAY
+wait 100
+said Stop

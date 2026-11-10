@@ -658,6 +658,21 @@ builds the same page from your checkout, serves it at http://localhost:8765 and 
 | Black keys 1–11 | click | 1 … 0, − |
 | Scenes 1–8 · gestures 9–12 · gestures 13–16 | click | Q … I · A … F · G … K |
 
+### Hearing the screen
+
+Niagara Drift can say what its screen shows, for players who are blind or can't see the screen. Plug the FM-1 into a
+computer, open the [FM-1 Screen Reader](https://charlesvestal.github.io/fm1-reader/) in Chrome or Edge, and click
+Connect: it speaks in its own voice, or hands the words to your screen reader (VoiceOver, NVDA, JAWS, TalkBack).
+
+- A page, as it opens: its name and its knobs ("Drones page. Drone 1: Level 84, Cutoff 57.5 …").
+- A knob, as it settles: "Drone 1 Cutoff 60.5". A key, when pressed: what it set and what the next press does
+  ("Drone 1 band-pass filter, A sharp 3 for high-pass"). The messages across the top, PLAY and stop, a scene or
+  Preset on its way ("to Preset 2 Embers"), a gesture coming in.
+- Hold **SEL** and touch a black key: what it does, without switching it.
+- Ask the reader for everything on the screen: the page with its keys, whether it's playing, and the sound.
+
+The reader and its voice are Charles Vestal's.
+
 ## Problems and ideas
 
 It's tested on one FM-1 so far. If something goes wrong, sounds wrong or could be better, please
@@ -697,8 +712,11 @@ Niagara Drift is the next link in a chain of FM-1 firmwares:
   reverb, written anew here; the idea of crossfading between scenes, and of a backup before installing.
 - [fm1-base](https://github.com/charlesvestal/fm1-base) by Charles Vestal: the safe restore's flash core (staging,
   the journal, the commit and its finish at power-on), as it is there (MPL-2.0).
+- The [FM-1 Screen Reader](https://github.com/charlesvestal/fm1-reader) by Charles Vestal: the screen's words over
+  USB and the page that speaks them (its firmware side from fm1-base, MPL-2.0); thanks to João Durães (WoodJack) for
+  asking for it.
 
-GPL-3.0-only (one file from fm1-base keeps its MPL-2.0); see [LICENSING.md](LICENSING.md).
+GPL-3.0-only (the files from fm1-base keep their MPL-2.0); see [LICENSING.md](LICENSING.md).
 
 Niagara Drift isn't affiliated with or endorsed by M-VAVE, Hügelton Instruments or the makers of any
 instrument that inspired it.

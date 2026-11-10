@@ -728,3 +728,10 @@ at the end. The current state is in the [README](../README.md) and the code.
   reverb with the drones cut to 0.4. It washes in over 8 s and out over 6 ("it should wash in and out"). Still a
   reverb type, played with Length and Mix. Cistern keeps its loudness (within 1 dB), 2-7 dB less bright at 1-4 kHz.
   A reverb type's crossfade is 200 ms (50 jumped up to 6 dB leaving the Cathedral).
+- 2026-11-10: **the screen reader** (issue #87, João Durães; Charles Vestal's fm1-reader, its firmware side from fm1-base,
+  MPL-2.0): the screen as text over USB SysEx, words in full from `firmware/words.tsv` (published with the site). A page
+  says its name and knobs as it opens (about 20 words); its key hints, each with what the next press does ("A#3 for
+  band-pass"), come when the reader asks for everything, a key is pressed, or SEL is held and a key touched (Evan: the
+  keys' names alone didn't say what they do; then fewer words a page). Drones as "drone 1, 2"; scenes "scene A 5" (A5
+  is a note); flats, cents, minutes and intervals in words by the firmware. 1.3 KB RAM, 7.1 KB flash. A Helper / Pro
+  setting that turns the help on and off is its own piece, later.

@@ -503,6 +503,12 @@ static void fm1_main(void)
                 enter_uboot("UBOOT");
             }
         }
+        {   /* a screen reader's SysEx (announce.c), before the updater and the backup look */
+            const uint8_t *p;
+            uint32_t n;
+            if (ota_frame_get(&p, &n) && ann_frame(p, n, fm1_ms))
+                ota_frame_done();
+        }
         dbg_service();                              /* M-UPGRADE handshake, the load (other SysEx is dropped) */
         rx_run();
         if (usb.ota_req) {
