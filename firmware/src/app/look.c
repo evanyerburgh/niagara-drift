@@ -198,9 +198,10 @@ static int lk_glide(uint32_t now, float *line, int *bank)
 /* left to right the page's name, its "1/2" (or PEEK), what's running (REC or LOOP, SWELL, a gesture, II OUT); at the
  * right PLAY's state, then the sound: its key, and a Preset's name only with room for both ("changed" once a hand has
  * moved it); on its way to a scene, where to, in gold ("→ P3 EERIE"); peeking, where letting go goes ("let go:
- * DRONES"). A glide or a fade fills a gold line under it. When it's full, what gives way, in order: the name, PLAY's
- * state to its short form ("PLAY", as before), the "1/2", "changed", SWELL, the key (Evan, 2026-11-01), then a latched
- * gesture's word, PLAY's state; the page's name never */
+ * DRONES"). A glide or a fade fills a gold line under it. When it's full, what gives way, in order: PLAY's state to its
+ * short form ("PLAY", as before), the "1/2", "changed", SWELL, the Preset's name (Evan, 2026-11-10: the name stays, so
+ * the player sees which Preset is playing), the key (Evan, 2026-11-01), then a latched gesture's word, PLAY's state;
+ * the page's name never */
 static void lk_bar(void)
 {
     const uint32_t now = plat_ms();
@@ -340,30 +341,30 @@ static void lk_bar(void)
         chg = 0;
         key[0] = 0;
     }
-    for (drop = 0; drop < 9; drop++) {         /* 0 all; 1 no name; 2 PLAY's state short; 3 no 1/2; 4 no "changed";
-                                                * 5 no SWELL; 6 no key (or "→ P3"); 7 a latched gesture by its fill,
+    for (drop = 0; drop < 9; drop++) {         /* 0 all; 1 PLAY's state short; 2 no 1/2; 3 no "changed";
+                                                * 4 no SWELL; 5 no name; 6 no key (or "→ P3"); 7 a latched gesture by its fill,
                                                 * alone ("CHORD"); 8 no PLAY's state (a peek keeps where
                                                 * it goes) */
-        const char *st = !state || (drop >= 8 && !peek) ? 0 : drop >= 2 ? st_short : state;
+        const char *st = !state || (drop >= 8 && !peek) ? 0 : drop >= 1 ? st_short : state;
         int32_t x = 8 + text_w(&LK_F_PAGE, name), rx = 232, gap = 0;
         if (drop == 7 && gb >= 0 && gest_pct < 0)
             gname[glen] = 0;
         if (peek)
             x += 6 + text_w(&LK_F_SEL, "PEEK") + 6;
-        else if (half[0] && drop < 3)
+        else if (half[0] && drop < 2)
             x += 4 + text_w(&LK_F_HALF, half);
         for (i = 0; i < nb; i++)
-            if (!(i == swell && drop >= 5))
+            if (!(i == swell && drop >= 4))
                 x += 12 + lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
         if (st) {
             rx -= lk_ktext_w(&LK_F_TAG, st);
             gap = 10;
         }
-        if (sound && drop < 1) {
+        if (sound && drop < 5) {
             rx -= gap + text_w(&LK_F_SOUND, sound);
             gap = 6;
         }
-        if (chg && drop < 4) {
+        if (chg && drop < 3) {
             rx -= gap + text_w(&LK_F_TAG, chg);
             gap = 6;
         }
@@ -372,18 +373,18 @@ static void lk_bar(void)
         if (rx >= x + 12)
             break;
     }
-    show_half = drop < 3;
-    show_chg = drop < 4;
-    show_name = drop < 1;
+    show_half = drop < 2;
+    show_chg = drop < 3;
+    show_name = drop < 5;
     if (state)
-        state = drop >= 8 && !peek ? 0 : drop >= 2 ? st_short : state;
+        state = drop >= 8 && !peek ? 0 : drop >= 1 ? st_short : state;
     {                                          /* what gave way comes back where it fits again (SWELL gone, the
                                                 * "1/2" has room): "changed", then the "1/2", then the sound's name */
         int32_t x = 8 + text_w(&LK_F_PAGE, name) + (peek ? 12 + text_w(&LK_F_SEL, "PEEK") : 0), rx = 232, gap = 0;
         for (i = 0; i < nb; i++)
-            if (!(i == swell && drop >= 5))
+            if (!(i == swell && drop >= 4))
                 x += 12 + lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
-        if (half[0] && !peek && drop < 3)
+        if (half[0] && !peek && drop < 2)
             x += 4 + text_w(&LK_F_HALF, half);
         if (state) {
             rx -= lk_ktext_w(&LK_F_TAG, state);
@@ -447,7 +448,7 @@ static void lk_bar(void)
         }
         for (i = 0; i < nb; i++) {             /* the badges, as many as fit (still too many: the last go) */
             const int32_t w = lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
-            if (i == swell && drop >= 5)
+            if (i == swell && drop >= 4)
                 continue;
             if (x + 12 + w > rx - 12)
                 break;
