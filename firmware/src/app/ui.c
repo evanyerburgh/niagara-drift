@@ -2762,7 +2762,7 @@ static void sp_scene(int bank, int n)
  * key's name alone didn't say what it does). The next press's result, as sw_flip makes it */
 static const char *const SP_SUB[7] = {"", "1 octave down", "2 octaves down", "one third", "one fifth", "3 octaves down",
                                       "4 octaves down"};
-static void sp_does(int k)
+static void sp_does_k(int k, int key)
 {
     static const char *const MODE[3] = {"low-pass", "band-pass", "high-pass"};
     static const char *const WAVES[4] = {"no LFO", "LFO I", "LFO II", "LFO I+II"};
@@ -2770,7 +2770,8 @@ static void sp_does(int k)
     const sw_t w = sw_layer()[k];
     const int16_t *p = &proj.par[DR_GP(w.g, 0)];
     const int on = sw_get(w);
-    sp_value(LK_BKEY[k]);
+    if (key)
+        sp_value(LK_BKEY[k]);
     switch (w.s) {
     case S_PARTNER: case S_PLOCK: case S_PLINK: case S_SYNC: sp_cat(on ? " for off" : " for on"); break;
     case S_SUBOCT: sp_cat(" for "); sp_cat(SP_SUB[p[GP_SUBOCT] % 6 + 1]); break;
@@ -2788,6 +2789,7 @@ static void sp_does(int k)
     default: break;
     }
 }
+static void sp_does(int k) { sp_does_k(k, 1); }
 /* a black key's setting and its state now: "drone 1 filter, band-pass" (the key map) */
 static void sp_setting(int k)
 {
@@ -3102,14 +3104,8 @@ static void speak(void)
                 sp_value(LK_BKEY[ui.km_key]);
                 sp_cat(": ");
                 sp_setting(ui.km_key);
-                sp_cat(". Press ");
-                {
-                    const uint32_t n0 = sp_n;
-                    sp_does(ui.km_key);      /* (its key again: left out) */
-                    for (; sp_buf[n0] && sp_buf[n0] != ' '; )
-                        memmove(sp_buf + n0, sp_buf + n0 + 1, sp_n-- - n0);
-                    memmove(sp_buf + n0, sp_buf + n0 + 1, sp_n-- - n0);
-                }
+                sp_cat(". Press");
+                sp_does_k(ui.km_key, 0);     /* " for high-pass" (its key not again) */
             }
             ann_later(sp_buf, ANN_NOW, 120u, now);
         }
