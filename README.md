@@ -493,7 +493,8 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
   delay, Wander and the Scene time run on their own knobs again. Under it, what the clock is doing: "no clock",
   "120 BPM", "keeps 120" (stopped or unplugged, at the last tempo) or "free time" (off).
 - **Tune** is A's pitch in Hz, from 427 to 453 (440 to start): 1 Hz a click, 0.1 with SEL held ("432Hz").
-  **Stereo** spreads the drones from mono to drone I left, drone II right.
+  **Stereo** spreads the drones from mono to drone I left, drone II right; a drone playing alone (drone II out) sits in
+  the middle.
 - **The speaker** gets a low cut (about 120 Hz) for the deep bass it can't play, so it doesn't waste its loudness
   there. It's automatic: plug in headphones and the cut goes out, unplug and it comes back.
 - **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as

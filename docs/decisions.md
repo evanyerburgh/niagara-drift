@@ -711,3 +711,5 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-11-10: **Wander comes with a scene**, Pitch lock on or off (Evan, 2026-11-08 and 11-10): the lock keeps the
   drones' pitch, Pitch link's interval and Shift only. Before, with the lock on, Wander counted as pitch, so a scene
   saved with Wander left it running through every scene after it.
+- 2026-11-10: **a drone alone sits in the middle** (Evan: Bare "is more on the left"): Stereo's spread scales with the
+  other drone's fade, so with drone II out (II OUT, Bare) drone I glides to the center, and back out as II comes in.
