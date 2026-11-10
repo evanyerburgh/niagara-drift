@@ -198,9 +198,10 @@ static int lk_glide(uint32_t now, float *line, int *bank)
 /* left to right the page's name, its "1/2" (or PEEK), what's running (REC or LOOP, SWELL, a gesture, II OUT); at the
  * right PLAY's state, then the sound: its key, and a Preset's name only with room for both ("changed" once a hand has
  * moved it); on its way to a scene, where to, in gold ("→ P3 EERIE"); peeking, where letting go goes ("let go:
- * DRONES"). A glide or a fade fills a gold line under it. When it's full, what gives way, in order: the name, PLAY's
- * state to its short form ("PLAY", as before), the "1/2", "changed", SWELL, the key (Evan, 2026-11-01), then a latched
- * gesture's word, PLAY's state; the page's name never */
+ * DRONES"). A glide or a fade fills a gold line under it. When it's full, what gives way, in order: PLAY's state to its
+ * short form ("PLAY", as before), the "1/2", "changed", SWELL, the Preset's name (Evan, 2026-11-10: the name stays, so
+ * the player sees which Preset is playing), the key (Evan, 2026-11-01), then a latched gesture's word, PLAY's state;
+ * the page's name never */
 static void lk_bar(void)
 {
     const uint32_t now = plat_ms();
@@ -228,8 +229,7 @@ static void lk_bar(void)
              (uint32_t)fade_q() | (uint32_t)(glide + 2) << 8 | (uint32_t)(uint8_t)lk_at << 16 |
                  (uint32_t)proj.bank << 24 | (uint32_t)(ui.view == V_PULSE && dr_ext_spb > 0.0f) << 28 |
                  (uint32_t)((ui.view == V_FX || ui.view == V_FX2) && proj.par[P_DLY_REPEATS] > 85) << 29 |
-                 (uint32_t)((ui.view == V_FX || ui.view == V_FX2) && proj.par[P_REV_LEN] >= 100) << 30 |
-                 (uint32_t)ui.kept << 31);
+                 (uint32_t)((ui.view == V_FX || ui.view == V_FX2) && proj.par[P_REV_LEN] >= 100) << 30);
     h = hash(hash(h, (uint32_t)(gest + 1) | (uint32_t)ui.hold_from << 8 |
                          (uint32_t)(line < 0.0f ? 0xFFFu : (uint32_t)(line * 224.0f)) << 12),
              (uint32_t)(gest_pct + 1));
@@ -286,10 +286,6 @@ static void lk_bar(void)
         badge[nb] = "runaway";
         bcol[nb++] = LK_RED;
     }
-    if (ui.kept && nb < 6) {                   /* SEL + its button: no auto-return (Evan, 2026-11-08) */
-        badge[nb] = "kept";
-        bcol[nb++] = LK_LABEL;
-    }
     if (proj.par[P_II_OUT] && nb < 6) {
         badge[nb] = "II OUT";
         bcol[nb++] = LK_DRONE[1];
@@ -340,30 +336,30 @@ static void lk_bar(void)
         chg = 0;
         key[0] = 0;
     }
-    for (drop = 0; drop < 9; drop++) {         /* 0 all; 1 no name; 2 PLAY's state short; 3 no 1/2; 4 no "changed";
-                                                * 5 no SWELL; 6 no key (or "→ P3"); 7 a latched gesture by its fill,
+    for (drop = 0; drop < 9; drop++) {         /* 0 all; 1 PLAY's state short; 2 no 1/2; 3 no "changed";
+                                                * 4 no SWELL; 5 no name; 6 no key (or "→ P3"); 7 a latched gesture by its fill,
                                                 * alone ("CHORD"); 8 no PLAY's state (a peek keeps where
                                                 * it goes) */
-        const char *st = !state || (drop >= 8 && !peek) ? 0 : drop >= 2 ? st_short : state;
+        const char *st = !state || (drop >= 8 && !peek) ? 0 : drop >= 1 ? st_short : state;
         int32_t x = 8 + text_w(&LK_F_PAGE, name), rx = 232, gap = 0;
         if (drop == 7 && gb >= 0 && gest_pct < 0)
             gname[glen] = 0;
         if (peek)
             x += 6 + text_w(&LK_F_SEL, "PEEK") + 6;
-        else if (half[0] && drop < 3)
+        else if (half[0] && drop < 2)
             x += 4 + text_w(&LK_F_HALF, half);
         for (i = 0; i < nb; i++)
-            if (!(i == swell && drop >= 5))
+            if (!(i == swell && drop >= 4))
                 x += 12 + lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
         if (st) {
             rx -= lk_ktext_w(&LK_F_TAG, st);
             gap = 10;
         }
-        if (sound && drop < 1) {
+        if (sound && drop < 5) {
             rx -= gap + text_w(&LK_F_SOUND, sound);
             gap = 6;
         }
-        if (chg && drop < 4) {
+        if (chg && drop < 3) {
             rx -= gap + text_w(&LK_F_TAG, chg);
             gap = 6;
         }
@@ -372,18 +368,18 @@ static void lk_bar(void)
         if (rx >= x + 12)
             break;
     }
-    show_half = drop < 3;
-    show_chg = drop < 4;
-    show_name = drop < 1;
+    show_half = drop < 2;
+    show_chg = drop < 3;
+    show_name = drop < 5;
     if (state)
-        state = drop >= 8 && !peek ? 0 : drop >= 2 ? st_short : state;
+        state = drop >= 8 && !peek ? 0 : drop >= 1 ? st_short : state;
     {                                          /* what gave way comes back where it fits again (SWELL gone, the
                                                 * "1/2" has room): "changed", then the "1/2", then the sound's name */
         int32_t x = 8 + text_w(&LK_F_PAGE, name) + (peek ? 12 + text_w(&LK_F_SEL, "PEEK") : 0), rx = 232, gap = 0;
         for (i = 0; i < nb; i++)
-            if (!(i == swell && drop >= 5))
+            if (!(i == swell && drop >= 4))
                 x += 12 + lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
-        if (half[0] && !peek && drop < 3)
+        if (half[0] && !peek && drop < 2)
             x += 4 + text_w(&LK_F_HALF, half);
         if (state) {
             rx -= lk_ktext_w(&LK_F_TAG, state);
@@ -447,7 +443,7 @@ static void lk_bar(void)
         }
         for (i = 0; i < nb; i++) {             /* the badges, as many as fit (still too many: the last go) */
             const int32_t w = lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
-            if (i == swell && drop >= 5)
+            if (i == swell && drop >= 4)
                 continue;
             if (x + 12 + w > rx - 12)
                 break;
@@ -683,12 +679,20 @@ static void lk_interval(char *t, int c)
 static int8_t lk_hist[DR_NGROUPS][LK_STRANDS][DR_SCOPE_N];
 static float lk_peak[DR_NGROUPS];
 
-/* how a drone's strands follow the level heard (dr_level, so a gesture's or a scene's level moves count), as Sub ·
- * Drive's lanes do (Evan, 2026-11-02): over -48..0 dB, dimming toward silence with most of the change near it,
- * closing up below about -34 dB; silent (under -48 dB): one thin gray line. Returns 0 when silent */
+/* a drone's level as heard: dr_level (so a gesture's or a scene's level moves count) through PLAY's fade, since the
+ * engine stops measuring when it stops (the level stayed where it was: Evan, 2026-11-10, Drones' curves stayed lit
+ * after a stop) */
+static float lk_level(int g)
+{
+    return dr_level[g] * dr_fade;
+}
+
+/* how a drone's strands follow the level heard (lk_level), as Sub · Drive's lanes do (Evan, 2026-11-02): over
+ * -48..0 dB, dimming toward silence with most of the change near it, closing up below about -34 dB; silent (under
+ * -48 dB) or stopped: one thin gray line, as at power-up. Returns 0 when silent */
 static int lk_heard(int g, float *bright, float *close)
 {
-    const float l = dr_level[g], db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
+    const float l = lk_level(g), db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
     const float lf = fm_clampf((db + 48.0f) / 48.0f, 0.0f, 1.0f), d = 1.0f - lf;
     *bright = 0.35f + 0.65f * (1.0f - d * d * d);
     *close = fm_minf(1.0f, lf / 0.3f);
@@ -701,20 +705,27 @@ static void lk_curve(int g, int32_t x0, int32_t top, int32_t bot);
 static void lk_pic_drones1(void)
 {
     const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 2, bot = LK_PIC_H - 2, mid = (top + bot) / 2, half = (bot - top) / 2;
+    static uint32_t drawn;
+    const uint32_t now = plat_ms();
+    const int back = now - drawn > 200u;     /* back after a while away: every strand from now (as lk_curve) */
     int g, j, i;
+    drawn = now;
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 128 : 8;
         float m = 0.0f, k;
         for (i = 0; i < DR_SCOPE_N; i++)
             m = fm_maxf(m, fm_fabsf(dr_scope[g][i]));
-        lk_peak[g] = m > lk_peak[g] ? m : lk_peak[g] + (m - lk_peak[g]) * 0.03f;
+        lk_peak[g] = m > lk_peak[g] || back ? m : lk_peak[g] + (m - lk_peak[g]) * 0.03f;
         k = (float)half / fm_maxf(lk_peak[g], 0.05f);
         for (j = 0; j < LK_STRANDS - 1; j++)
             for (i = 0; i < DR_SCOPE_N; i++)
                 lk_hist[g][j][i] = lk_hist[g][j + 1][i];
         for (i = 0; i < DR_SCOPE_N; i++) {     /* smoothed as draw_scope's (raw captures jump) */
-            sc_disp[g][i] += (dr_scope[g][i] - sc_disp[g][i]) * 0.45f;
+            sc_disp[g][i] += back ? dr_scope[g][i] - sc_disp[g][i] : (dr_scope[g][i] - sc_disp[g][i]) * 0.45f;
             lk_hist[g][LK_STRANDS - 1][i] = (int8_t)fm_clampf(sc_disp[g][i] * k, (float)-half, (float)half);
+            if (back)
+                for (j = 0; j < LK_STRANDS - 1; j++)
+                    lk_hist[g][j][i] = lk_hist[g][LK_STRANDS - 1][i];
         }
         if (plat_ms() < ui.touch_t[g ? 3 : 1] + 300u) {   /* its Reso turning, and 1.5 s after: the filter curve
                                                          * as on Drones, the peak growing (Evan, 2026-11-08: the
@@ -778,11 +789,16 @@ static void lk_pic_drones1(void)
 static void lk_curve(int g, int32_t x0, int32_t top, int32_t bot)
 {
     const int32_t h = bot - top;
+    static uint32_t drawn[DR_NGROUPS];
+    const uint32_t now = plat_ms();
     float br, cl;
     int j, i;
-    for (j = 0; j < LK_STRANDS - 1; j++)
-        lk_cut_hist[g][j] = lk_cut_hist[g][j + 1];
+    for (j = 0; j < LK_STRANDS - 1; j++)        /* back after a while away (another page): all its strands from now,
+                                                 * or they'd come in from where it was last drawn, a frame each (Evan,
+                                                 * 2026-11-10: tracers) */
+        lk_cut_hist[g][j] = now - drawn[g] > 200u ? dr_cut[g] : lk_cut_hist[g][j + 1];
     lk_cut_hist[g][LK_STRANDS - 1] = dr_cut[g];
+    drawn[g] = now;
     if (!lk_heard(g, &br, &cl)) {              /* silent: the curve as one thin gray line, where it was */
         int32_t py = 0, yy;
         for (i = 0; i <= 50; i++) {
@@ -827,17 +843,21 @@ static void lk_pic_drones2(void)
         const int32_t base = 2 + LK_B(LK_F_DRONE), x1 = (g ? 130 : 10) + text_w(&LK_F_DRONE, g ? "II" : "I") + 6;
         const int m = gpar(g, GP_MODE);
         char t[16], *q;
-        lk_key(cv_text(x1, base - LK_B(LK_F_SMALL), &LK_F_SMALL, MODE[(unsigned)m < 3u ? m : 0], LK_DRONE[g]) + 5, base,
-               LK_BKEY[g ? 7 : 2]);
+        const int32_t ke = lk_key(cv_text(x1, base - LK_B(LK_F_SMALL), &LK_F_SMALL, MODE[(unsigned)m < 3u ? m : 0],
+                                          LK_DRONE[g]) + 5, base, LK_BKEY[g ? 7 : 2]);
+        const felucca_font_t *f;
         dr_param_text(DR_GP(g, GP_PITCH), lk_drone_pitch(g), t);
         for (q = t; *q && *q != ' '; q++)      /* the note; its cents are the Pitch page's */
             ;
         *q = 0;
-        cv_text((g ? 230 : 112) - text_w(&LK_F_SMALL, t), base - LK_B(LK_F_SMALL), &LK_F_SMALL, t, LK_DRONE[g]);
+        f = (g ? 230 : 112) - text_w(&LK_F_SMALL, t) >= ke + 4 ? &LK_F_SMALL : &FONT_U2;   /* too wide for the key
+                                                * box beside it ("F#5", "2.7Hz"): the units' size (Evan's rule) */
+        cv_text((g ? 230 : 112) - text_w(f, t), base - (f == &FONT_U2 ? LK_B(FONT_U2) : LK_B(LK_F_SMALL)), f, t,
+                LK_DRONE[g]);
     }
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 130 : 10;
-        const float l = dr_level[g], db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
+        const float l = lk_level(g), db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
         char t[12];
         lk_curve(g, x0, top, bot);
         if (db > -60.0f) {                     /* "-10 dB" */
@@ -2072,7 +2092,7 @@ static void lk_pic_delay(void)
  * the reverb hears it */
 static void lk_pic_reverb(void)
 {
-    static const float WIDE[DR_NREV] = {0.16f, 0.24f, 0.324f, 0.27f};   /* Room, Hall, Cathedral, Chorus hall */
+    static const float WIDE[DR_NREV] = {0.16f, 0.24f, 0.324f, 0.27f, 0.30f};   /* Room, Hall, Cathedral, Chorus hall, Shimmer */
     const int ty = (unsigned)proj.par[P_REV_TYPE] < DR_NREV ? proj.par[P_REV_TYPE] : 2, into = proj.par[P_DLY_ROUTE];
     const float len = rev_secs(proj.par[P_REV_LEN]), mix = (float)proj.par[P_REV_MIX] * 0.01f;
     const float damp = (float)proj.par[P_REV_DAMP] * 0.01f, r0 = 6.0f + 20.0f * mix;

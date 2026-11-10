@@ -537,7 +537,6 @@ int main(int argc, char **argv)
     snprintf(out, sizeof out, "%s/midi_out.txt", dir);
     midi_log = fopen(out, "w");
     boot();
-    page_return = 0;                               /* the scenarios: pages stay put unless they ask */
     while (fgets(line, sizeof line, sc)) {
         char cmd[32] = {0}, a[256] = {0}, b[64] = {0}, c[64] = {0};
         lineno++;
@@ -598,9 +597,6 @@ int main(int argc, char **argv)
                 enc_acc[e] += s;
                 run_ms(gap);
             }
-        } else if (!strcmp(cmd, "autoreturn")) {    /* autoreturn: pages go back to Drones as on the FM-1 (off in
-                                                    * the scenarios unless asked, so their pages stay put) */
-            page_return = 1;
         } else if (!strcmp(cmd, "page")) {          /* page V: page V at once, in no time (the pages moved in v0.3:
                                                     * the scripts kept their timing, sample for sample) */
             set_view(atoi(a));

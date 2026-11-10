@@ -158,8 +158,6 @@ static struct {
                                         * autosave, N scene N */
     uint32_t save_t;                   /* ... asked then */
     uint8_t page_last[8];              /* each page button's page last shown (0: its first): opened again there */
-    uint32_t page_t;                   /* a page other than Drones: opened or a knob turned on it then (auto-return) */
-    uint8_t kept;                      /* the page kept (SEL + its button): no auto-return until another page */
     uint32_t sel_t;                    /* when SEL went down (held 0.4 s: the black keys' map) */
     int8_t km_key;                     /* the black key touched while SEL is held (named, not switched), or -1 */
     uint8_t jack;                      /* the headphone jack as last read (1: in), and since when */
@@ -694,17 +692,9 @@ static void sw_toggle(sw_t w)
 
 /* ------------------------------------------------------------ buttons --- */
 static int on_pages(int i) { return ui.view >= PAGE_BTN[i].first && ui.view < PAGE_BTN[i].first + PAGE_BTN[i].n; }
-/* AUTO-RETURN (v0.3, Evan, 2026-11-08): a page left alone goes back to Drones, the page played: 8 s after it was
- * opened or a knob last turned on it, unless kept (SEL + its button) or a page button is held (a peek). The host's
- * scenarios have it off unless they ask ("autoreturn"), so their pages stay as they were written */
-#define PAGE_RETURN_MS 8000u
-static uint8_t page_return = 1;
 static void set_view(int v)
 {
     uint32_t i;
-    if (v != ui.view)
-        ui.kept = 0;                           /* another page: kept no more */
-    ui.page_t = plat_ms();
     ui.view = (uint8_t)v;
     for (i = 0; i < 4; i++)
         ui.touch_t[i] = 0;
@@ -742,14 +732,6 @@ static int page_btn(int b)                             /* the index in PAGE_BTN,
 static void page_down(int b)
 {
     int i = page_btn(b);
-    if (ui.btn >> B_SEL & 1u) {                       /* SEL + a page button: that page, kept (no auto-return) */
-        if (!on_pages(i))
-            set_view(PAGE_BTN[i].first + (b == B_HOME || b == B_FX ? 0 : ui.page_last[i]));
-        ui.kept = ui.view != V_PLAY;
-        ui.btn_used |= 1u << B_SEL;
-        ui.hold_btn = -1;                              /* its let-go does nothing: no step, no peek */
-        return;
-    }
     ui.hold_btn = (int8_t)b;
     ui.hold_t = plat_ms();
     ui.hold_turned = 0;
@@ -1228,8 +1210,10 @@ static void sound_blend(const int16_t *from, const int16_t *to, float x)
             continue;                                  /* on a MIDI clock the Swell's on / off and its division stay as
                                                         * they are (Evan, 2026-10-26: a scene switched it off mid-song) */
         if (proj.par[P_PLOCK] && (k == DR_GP(0, GP_PITCH) || k == DR_GP(1, GP_PITCH) || k == P_PLINK_OFF ||
-                                  k == P_WANDER || k == P_GL_0 + DR_G_SHIFT))
-            continue;                                  /* pitch lock: the drones keep their pitch (2026-10-17) */
+                                  k == P_GL_0 + DR_G_SHIFT))
+            continue;                                  /* pitch lock: the drones keep their pitch (2026-10-17); Wander
+                                                        * comes with the scene (Evan, 2026-11-08: a scene saved with
+                                                        * Wander left it running through every scene after it) */
         if (scene_step(k))
             v = x >= 0.5f ? to[k] : from[k];
         else
@@ -1931,8 +1915,6 @@ static void input(void)
             continue;
         }
         if ((ch & keys) >> BLACK_K[i] & 1u) {
-            if (ui.view == V_LFO || ui.view == V_LFO2)
-                ui.page_t = plat_ms();                 /* the LFO pages' routing keys: the page in use */
             sw_toggle(w);                              /* LFO reset: at once, on the press */
             if (w.s != S_LFORESET)
                 ui.scene_at = -1;
@@ -2036,7 +2018,6 @@ static void input(void)
     for (i = 0; i < 4; i++)
         if ((e = plat_enc(EN_K1 + (int)i)) != 0) {
             knob_turn((int)i, e);
-            ui.page_t = plat_ms();                     /* a knob turned: the page is in use */
             if (ui.btn >> B_SEL & 1u)
                 ui.btn_used |= 1u << B_SEL;            /* SEL + a knob: SEL used (no map after it) */
             ui.scene_at = -1;                          /* the sound is no longer the scene's */
@@ -2048,11 +2029,6 @@ static void input(void)
             ui.touch_t[i] = plat_ms() + 1200u;
             ui.act_t = plat_ms();
         }
-    if (ui.hold_btn >= 0 || (ui.btn >> B_SEL & 1u))
-        ui.page_t = plat_ms();                         /* a peek or SEL held (the key map): the wait starts again
-                                                        * when it's let go (#86's review) */
-    else if (page_return && ui.view != V_PLAY && !ui.kept && plat_ms() - ui.page_t >= PAGE_RETURN_MS)
-        set_view(V_PLAY);                              /* auto-return: back to Drones */
 }
 
 /* ------------------------------------------------------------- screen --- */
@@ -2207,7 +2183,7 @@ static float filt_db(int g, float cut, float f)
 /* the reverb's tail, as measured (to -60 dB after a burst, QA batch 3; doubling the -30 dB time had made
  * the long ones short, and the Chorus hall no longer than the Hall) and its pre-delay: an envelope over 5 s,
  * as high as h */
-static const float RV_PRE_S[DR_NREV] = {0.004f, 0.018f, 0.042f, 0.024f};   /* drone_fx.c's pre-delays */
+static const float RV_PRE_S[DR_NREV] = {0.004f, 0.018f, 0.042f, 0.024f, 0.030f};   /* drone_fx.c's pre-delays */
 static float rev_secs(int v) { return v >= 100 ? 0.0f : 0.3f * fm_exp2f((float)v * 0.070607f); }   /* 0: Inf */
 
 /* where an echo is drawn, off its time: Grain's jitter (its own sound shakes the time), Self's drift later (its
@@ -2585,7 +2561,11 @@ void ui_frame(void)
                     for (q = ui.msg_next; *q; q++)
                         ;
                     scopy(q, " KEPT, UNPLAYED");
-                }
+                } else if (proj_note_presets)
+                    scopy(ui.msg_next, "0.2 PRESETS [SEL]+[E5]");
+                ui.msg_until = plat_ms() + 3500u;
+            } else if (proj_note_presets) {      /* from 0.2: its dropped Presets are in bank F (SEL + E5) */
+                say_c("0.2 PRESETS [SEL]+[E5]", 0, K_GOLD);
                 ui.msg_until = plat_ms() + 3500u;
             }
         } else {

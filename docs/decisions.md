@@ -706,4 +706,18 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-11-08: **auto-return** (Evan's idea, ledger 21): a page left alone goes back to Drones, the page played, 8 s
   after it was opened or a knob last turned on it (keys and gestures don't count; not while a page button is held or
   SEL is). Hold SEL and tap a page's button to keep it ("kept" in the header) until another page. The return is a
-  plain switch. The host's scenarios have it off unless they say `autoreturn`.
+  plain switch. The host's scenarios have it off unless they say `autoreturn`. **Taken out 2026-11-10** (Evan, on the
+  FM-1: "kind of annoying"), SEL + a page's button with it: a page stays until the player leaves it.
+- 2026-11-10: **Wander comes with a scene**, Pitch lock on or off (Evan, 2026-11-08 and 11-10): the lock keeps the
+  drones' pitch, Pitch link's interval and Shift only. Before, with the lock on, Wander counted as pitch, so a scene
+  saved with Wander left it running through every scene after it.
+- 2026-11-10: **a drone alone sits in the middle** (Evan: Bare "is more on the left"): Stereo's spread scales with the
+  other drone's fade, so with drone II out (II OUT, Bare) drone I glides to the center, and back out as II comes in.
+- 2026-11-10: **the 16 Presets** (Evan, after eight audition rounds and six test builds on the FM-1): two banks of eight,
+  each mixing moods, nothing too strange at P2: P1 Niagara, Embers, Vespers, Dreamhouse, Abyss, Seance, Sonar, Sibyl |
+  P9 Howl, Cistern, Piston, Ashram, Telegraph, Tape, Falling, Bare (locked, drone II out, level 80). Each moves over a
+  minute; names from each sound's own world. Leveled to P1's loud moments (12 within 0.1 dB; Abyss, Vespers -2.5;
+  Ashram -5.7 on the speaker measure, its bass). Howl's random LFO at 100 (was 90), so its grind comes back every
+  10-15 s however it's started. Shimmer (the flicker: two octave-up head pairs 14 cents apart) is reverb type 5, on
+  Cistern; to be tuned later. Updating from 0.2: its dropped Presets (Eerie, Glass, Tanpura, Whistle, Cathedral,
+  Metal) go into bank F, nothing else copied (Heaven is Sibyl, Clean is Bare).

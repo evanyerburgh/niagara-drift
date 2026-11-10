@@ -24,9 +24,9 @@ FX Space, Details · GLO Setup 1, 2.*
 
 ## What it does
 
-- **Presets** to start from, each a different side of the instrument: Niagara, Abyss, Eerie, Glass, Heaven,
-  Tanpura, Tape and Whistle on keys 1–8 of the Presets bank, and Howl, Cathedral, Metal and Clean on keys 1–4 of
-  the second.
+- **16 Presets** to start from, each a different side of the instrument and each moving over a minute: Niagara,
+  Embers, Vespers, Dreamhouse, Abyss, Seance, Sonar and Sibyl on keys 1–8 of the Presets bank; Howl, Cistern, Piston,
+  Ashram, Telegraph, Tape, Falling and Bare on keys 1–8 of the second.
 - **Eight gestures**, each several settings moving together on top of your sound: **Weight**, **Shift**, **Clean** and
   **Wash** on the top keys, in while you hold and out as slowly as you held; **Tick**, **Chord**, **Snarl** and
   **Stutter** on keys 9–12, as deep as you press. Tap any of them in to stay.
@@ -47,8 +47,8 @@ FX Space, Details · GLO Setup 1, 2.*
 - **The Swell**: both drones breathing in time, from a slow soft swell to a hard rhythmic gate, with swing.
 - **Effects**: a stereo delay of six types (Clean, Wide, Ping-pong, Tape, and the Lyra-8-like Grain and Self, whose
   own echoes move their time; the LFO can warble it too), a drive
-  after it (the drones and their echoes distorted together, as on the Lyra-8), into a reverb of four (Room, Hall,
-  Cathedral, Chorus hall) whose length goes to Inf, a freeze.
+  after it (the drones and their echoes distorted together, as on the Lyra-8), into a reverb of five (Room, Hall,
+  Cathedral, Chorus hall, Shimmer) whose length goes to Inf, a freeze.
 - **Feedback** (the finished sound fed back into the drones) and **Character** (clean to vintage).
 - **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
 - **Morph**: buttons and keys never jump: the sound moves to a new setting over a time you set.
@@ -124,29 +124,34 @@ a gesture, open the effects…) the screen shows a one-line tip about what's nex
 
 ### The Presets
 
-Twelve sounds to start from, each showing a part of what Niagara Drift does: P1–P8 on keys 1–8 of the Presets bank
-(SEL + F5), P9–P12 on keys 1–4 of the second (SEL + G5). Most
-have drone I on D, so moving between them keeps the root and changes the interval and the sound. With **Pitch lock**
-on (as a new FM-1 starts) they keep the pitch you're on, so you hear the textures first; turn it off (black key 4)
-and each plays at its own pitches, as described below. They're levelled to sound alike in loudness with the lock on,
-and within about 3 dB at their own pitches. The screen names the one you pick ("SCENE P3 EERIE"). They're fixed: to keep a sound you
-made from one, pick one of your banks, A to F (SEL + G4 to E5), and store it there (SAVE + a key). (On an FM-1
-updated from 0.2, copies of P9–P12 are also in the first empty keys of C, B or A, yours to change.)
+Sixteen sounds to start from, each showing a part of what Niagara Drift does, and each changing over a minute's
+listen: P1–P8 on keys 1–8 of the Presets bank (SEL + F5), P9–P16 on keys 1–8 of the second (SEL + G5). Most have
+drone I on D, so moving between them keeps the root and changes the interval and the sound. With **Pitch lock** on (as
+a new FM-1 starts) they keep the pitch you're on, so you hear the textures first; turn it off (black key 4) and each
+plays at its own pitches, as described below (and on its own Tuning, where it has one). Their loud moments are
+leveled to P1's, most within a dB, Abyss and Vespers about 2.5 dB quieter, Ashram more on the speaker (its warmth is
+bass the speaker can't play); Bare is quieter on purpose. The header names the one
+you pick ("P3 VESPERS"). They're fixed: to keep a sound you made from one, pick one of your banks, A to F (SEL + G4
+to E5), and store it there (SAVE + a key).
 
 | Key | Preset | What it shows |
 |---|---|---|
-| P1 | **Niagara** | the starting sound: D and A a fifth apart, breathing slowly, like a calm Lyra-8 |
-| P2 | **Abyss** | dark: D over B a minor third below, a saw and a narrow square, a subharmonic sub, closed resonant filters, character and feedback, a dark hall; the resonance swells and rings |
-| P3 | **Eerie** | D and G♯, a tritone: near-sines, drone II through a ringing band-pass with a breath of white noise, wandering a whole-tone scale, its pitch wavering; long clean echoes, a chorus hall |
-| P4 | **Glass** | high sines a fifth apart (D5, A5), drone I's partner an octave up, beating a little, a long bright reverb |
-| P5 | **Heaven** | D and F♯ a tenth apart, sines with just thirds and fifths blooming toward triangles, a long light cathedral |
-| P6 | **Tanpura** | Sa and Pa: D with its high octave over the A below, bright buzzing strings, plucked about once a second |
-| P7 | **Tape** | worn: D and F, a wide square and a saw, Age and lots of Character, tape wow, a tape delay, hiss |
-| P8 | **Whistle** | the filters at the edge of resonance sing as sines of their own (D5, A5) over soft low drones; long clean echoes |
-| P9 | **Howl** | low, D and E♭ a semitone apart so they grind, the feedback high, drone II band-passed; flares at random |
-| P10 | **Cathedral** | D and B a sixth apart, soft waves, a sub below, a long dark reverb, almost a freeze; nearly still |
-| P11 | **Metal** | cross-mod and hard sync, squares an inharmonic gap apart, drone I high-passed, shimmering; a clean slapback |
-| P12 | **Clean** (locked) | one oscillator, everything else off: a plain saw to build from. Drone II is out: SEL + PLAY brings it in |
+| P1 | **Niagara** | the starting sound: D and A a fifth apart, breathing slowly |
+| P2 | **Embers** | D and a pure third above, triangles blooming toward saws and back, the two drones in turn, a chorus hall |
+| P3 | **Vespers** | saws through band-passes near a sung "ah", the waves turning slowly, a gentle Swell, a bright cathedral |
+| P4 | **Dreamhouse** | on the Harmonics Tuning: A1 and its 7th harmonic, sines with pure fifths, the resonance swelling, a little feedback |
+| P5 | **Abyss** | dark: D over B a minor third below, a saw and a narrow square, a subharmonic sub, closed resonant filters, character and feedback, a dark hall; the resonance swells and rings |
+| P6 | **Seance** | on Harrison's Tuning: a hollow bass (D with a fifth under it) under a high band-passed voice with a breath of noise; drone I moving drone II's filter, long swinging echoes, a chorus hall; the high voice wanders, rarely |
+| P7 | **Sonar** | drone I slowed to 2.7 Hz, a click each cycle pinging through the delay, drone II's resonant filter singing as it sweeps |
+| P8 | **Sibyl** | a voice: D4 and F♯5, sines with just thirds and fifths, each wave turning into an "ah", a gentle Swell, a bright cathedral |
+| P9 | **Howl** | low, D and E♭ a semitone apart so they grind, the feedback high, drone II band-passed; a random LFO flares the filters every few seconds |
+| P10 | **Cistern** | reeds in a cistern: a fifth apart, drone I rounder with a sine sub, a bellows Swell, a tape delay a second long, the Shimmer reverb |
+| P11 | **Piston** | the low D stepping a whole tone up and back about once a second, driving drone II's filter; a slow Swell |
+| P12 | **Ashram** | a warm organ on E♭ on the Shruti Tuning: a filtered pulse over a sine sub, a second voice about 24 cents sharp, the bass wandering in Dorian, a chorus hall |
+| P13 | **Telegraph** | a stepped figure on drone II's pitch and filter over a low D; every 20 seconds or so the whole figure moves to a new note |
+| P14 | **Tape** | worn: D and F, a wide square and a saw, Age and lots of Character, tape wow, a tape delay, hiss |
+| P15 | **Falling** | on the LMY Tuning: sines on E4 and G3, the filters opening slowly, a falling, gliding top, feedback, the bass wandering slowly |
+| P16 | **Bare** (locked) | one oscillator, everything else off: a plain saw to build from. Drone II is out: SEL + PLAY brings it in |
 
 ### White keys: scenes
 
@@ -163,7 +168,9 @@ updated from 0.2, copies of P9–P12 are also in the first empty keys of C, B or
 
 Updating from 0.2: keys 9–12 used to hold scenes. On the first start of 0.3, each scene you had there moves to the
 first empty key 1–8 of its own bank, then of another; one with no room left stays stored, unplayed (the installer
-backs everything up first). The screen says how many moved. The banks moved too: SEL with any of the eight gesture keys picks one, A, B and C now on G4,
+backs everything up first). The screen says how many moved. 0.2's Presets that 0.3 doesn't keep (Eerie, Glass,
+Tanpura, Whistle, Cathedral and Metal) are in bank F, keys 1–6 (SEL + E5), yours to change ("0.2 PRESETS" on the
+screen); Heaven lives on as Sibyl, Clean as Bare. The banks moved too: SEL with any of the eight gesture keys picks one, A, B and C now on G4,
 A4 and B4, the Presets on F5. Three knobs moved too: Feedback is KNOB 1 on Life,
 Cross-mod KNOB 4 on Mods, Tune KNOB 2 on Setup 2. HOME opens Drones, the drones' levels and cutoffs (the pitches are on
 Pitch, HOME again), and FX opens Space, the delay's and the reverb's amounts (the drive, time, damp and types on
@@ -231,15 +238,12 @@ Tap a page button and the knobs stay on that page. Hold it to peek: turn a knob,
 back (the header says PEEK, and where letting go takes you: "let go: DRONES"). Tap it again for its next page; "1/2"
 by the page's name shows which of its pages you're on. HOME and FX always open the page you play from (Drones,
 Space); the other buttons open the page you last used there, so after visiting Pitch moves, holding SEQ peeks at it.
-**A page left alone goes back to Drones**, the page you play from: 8 seconds after you opened it or last turned one of
-its knobs (playing keys and gestures doesn't count). To stay on a page, hold **SEL** and tap its button: "kept" shows in
-the header until you go to another page.
 
 The header, left to right: the page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT. At the
-right, the sound: its bank and key ("A5"; a Preset's name too, "P3 EERIE", where there's room), "changed" once you've
+right, the sound: its bank and key ("A5"; a Preset's name too, "P3 SEANCE"), "changed" once you've
 moved it from there; stopped, what PLAY does. On its way to a scene it says where, in gold ("→ P3 EERIE", "→ A5" as a
 blend glides back), a gold line filling under the header as it goes, for at least 1.5 s however short the Scene time;
-PLAY's fade fills the line too. When it's full, the sound's name goes first, the page's name never.
+PLAY's fade fills the line too. When it's full, the "1/2" and SWELL give way before a Preset's name; the page's name never does.
 Each page's screen shows a picture of what its knobs do, and the four values below it. Every knob
 glides: a slow turn is a smooth sweep, never steps; turn faster to go further. The levels follow your ear: halfway is about a quarter as loud.
 
@@ -463,7 +467,8 @@ pink specks are as many as Color says.
 - **Time** is 70 ms to 1.46 s, and turning it bends the echoes' pitch, as tape does. The echoes keep what's under
   about 9 kHz. **Repeats** past about 85 runs
   away into self-oscillation ("runaway" on the screen), held by a soft clip.
-- **Reverb types**: **Room**, **Hall**, **Cathedral** (the largest), **Chorus hall** (a hall that shimmers).
+- **Reverb types**: **Room**, **Hall**, **Cathedral** (the largest), **Chorus hall** (a hall that shimmers),
+  **Shimmer** (its tail an octave up, in two halos a few cents apart that flicker: a bright glow over the drones).
   They differ in size, distance and movement; changing type crossfades, and the knob goes round both ways.
 - **Into reverb** (Details, SEL + KNOB 4) is what the reverb hears: **Both** (the drones and their echoes, as the effects
   are chained), **Echoes** (only the echoes wash out; the drones stay dry and up front), or **Drones** (the reverb
@@ -496,7 +501,8 @@ Everything on GLO belongs to the FM-1 and the room, not to a sound: scenes don't
   delay, Wander and the Scene time run on their own knobs again. Under it, what the clock is doing: "no clock",
   "120 BPM", "keeps 120" (stopped or unplugged, at the last tempo) or "free time" (off).
 - **Tune** is A's pitch in Hz, from 427 to 453 (440 to start): 1 Hz a click, 0.1 with SEL held ("432Hz").
-  **Stereo** spreads the drones from mono to drone I left, drone II right.
+  **Stereo** spreads the drones from mono to drone I left, drone II right; a drone playing alone (drone II out) sits in
+  the middle.
 - **The speaker** gets a low cut (about 120 Hz) for the deep bass it can't play, so it doesn't waste its loudness
   there. It's automatic: plug in headphones and the cut goes out, unplug and it comes back.
 - **Pressure** is how hard you have to press the scene keys: up for a light touch, down for a firm one (50 as
@@ -593,7 +599,7 @@ key, and once SEL has done something else in a hold (SEL + PLAY, a bank, a knob)
 | 1 | I partner | which LFO moves I's pitch (I, II, both) |
 | 2 | I sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | I's pitch send moves X-Wave instead |
 | 3 | I filter: LP, BP, HP | which LFO moves I's cutoff (I, II, both) |
-| 4 | pitch lock: scenes and Presets leave the drones' pitches where they are (on when you first start; the pitch knobs still tune) | I's cutoff send moves resonance instead |
+| 4 | pitch lock: scenes and Presets leave the drones' pitches where they are (on when you first start; the pitch knobs still tune); Wander comes with the scene | I's cutoff send moves resonance instead |
 | 5 | LFO reset | LFO reset |
 | 6 | II partner | which LFO moves II's pitch (I, II, both) |
 | 7 | II sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct | II's pitch send moves X-Wave instead |

@@ -682,15 +682,15 @@ tapkey w7
 release SAVE
 wait 300
 expect bscenes 255
-# P12 (Clean): one oscillator, drone II out on its own; SEL + PLAY brings it in, and out again (playing). P9-P12 are
-# the Presets' second bank (SEL + G5), keys 1-4
+# P16 (Bare): one oscillator, drone II out on its own; SEL + PLAY brings it in, and out again (playing). P9-P16 are
+# the Presets' second bank (SEL + G5), keys 1-8
 tap PLAY
 wait 1600
 expect playing 1
 press SEL
 tapkey w15
 release SEL
-tapkey w3
+tapkey w7
 wait 2500
 expect par72 1
 expect level1 <2
@@ -700,7 +700,7 @@ release SEL
 wait 2500
 expect par72 0
 expect level1 >3
-# back to the Presets (P12 was their second bank's key 4)
+# back to the Presets (P16 was their second bank's key 8)
 press SEL
 tapkey w14
 release SEL
@@ -712,7 +712,7 @@ expect par72 1
 tap PLAY
 wait 1600
 expect playing 0
-tapkey w1
+tapkey w4
 wait 6000
 expect par0 5000
 expect par21 4700
@@ -721,10 +721,10 @@ tapkey w0
 wait 6000
 expect par0 5000
 tapkey b3
-tapkey w1
+tapkey w4
 wait 6000
 expect par0 5000
-# (P2 puts drone II on B2, 4700: locked, it stays on P1's A3)
+# (P5 Abyss puts drone II on B2, 4700: locked, it stays on P1's A3)
 expect par21 5700
 tapkey b3
 # back to A; bank B's scene survives a reboot
@@ -756,7 +756,7 @@ wait 12000
 expect par6 4
 set 71 24
 # the types go round both ways: the delay's (SEL + KNOB 4 on Delay) from Wide (1) to Clean, Self, Clean, Wide; the
-# reverb's (KNOB 3 on Reverb) from the hall (1) to the room, the chorus hall, the room, the hall
+# reverb's (KNOB 3 on Reverb) from the hall (1) to the room, Shimmer (the last, v0.3), the room, the hall
 tap FX
 page 13
 expect view 13
@@ -802,7 +802,7 @@ expect view 14
 expect par64 1
 spin K4 -1
 spin K4 -1
-expect par64 3
+expect par64 4
 spin K4 1
 spin K4 1
 expect par64 1

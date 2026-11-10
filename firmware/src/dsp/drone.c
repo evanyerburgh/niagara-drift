@@ -64,7 +64,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Tuning", 0, DR_NTUNING - 1, DR_TUN_12},
     {"Sync", 0, 1, 1},
 };
-const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall"};
+const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall", "Shimmer"};
 const char *const DR_DIV_NAME[DR_NDIV] = {"32 bars", "16 bars", "8 bars", "4 bars", "2 bars", "1 bar", "1/2", "1/4"};
 static const float DIV_BEATS[DR_NDIV] = {128.0f, 64.0f, 32.0f, 16.0f, 8.0f, 4.0f, 2.0f, 1.0f};   /* a breath, beats */
 const char *const DR_LDIV_NAME[DR_NLDIV] = {"32 bars", "16 bars", "8 bars", "4 bars", "2 bars", "1 bar", "1/2", "1/4",
@@ -1978,8 +1978,9 @@ static void render_group(int g, uint32_t n)
     const float r0 = pv[GP_RESO] * 0.001f;
     float k = 2.0f - 2.1f * r0, rin = 1.0f - 0.6f * r0 * r0;    /* per tick, when the LFO moves the resonance */
     const float lvl = pv[GP_LEVEL] * pv[GP_LEVEL] * 0.0001f * 0.6f * age_mk;   /* an audio taper: squared (50 is -12 dB) */
-    /* drone I left, drone II right, as far apart as Width says (as it glides: read raw, each detent clicked) */
-    const float width = pfs[P_WIDTH] * 0.01f, pan = g ? 0.5f + 0.5f * width : 0.5f - 0.5f * width;
+    /* drone I left, drone II right, as far apart as Width says (as it glides: read raw, each detent clicked); a drone
+     * alone (the other out, II OUT) moves to the middle as the other fades (Evan, 2026-11-10: Bare sat on the left) */
+    const float width = pfs[P_WIDTH] * 0.01f * grp[1 - g].gf, pan = g ? 0.5f + 0.5f * width : 0.5f - 0.5f * width;
     const float gl1 = fm_sqrtf(1.0f - pan) * 1.41421356f, gr1 = fm_sqrtf(pan) * 1.41421356f;
     float pdl, pdr, gl, gr;
     if (v->pl == 0.0f && v->pr == 0.0f) {        /* the first block: where it's set (both never 0 otherwise) */
