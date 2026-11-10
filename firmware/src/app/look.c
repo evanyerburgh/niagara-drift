@@ -705,20 +705,27 @@ static void lk_curve(int g, int32_t x0, int32_t top, int32_t bot);
 static void lk_pic_drones1(void)
 {
     const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 2, bot = LK_PIC_H - 2, mid = (top + bot) / 2, half = (bot - top) / 2;
+    static uint32_t drawn;
+    const uint32_t now = plat_ms();
+    const int back = now - drawn > 200u;     /* back after a while away: every strand from now (as lk_curve) */
     int g, j, i;
+    drawn = now;
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 128 : 8;
         float m = 0.0f, k;
         for (i = 0; i < DR_SCOPE_N; i++)
             m = fm_maxf(m, fm_fabsf(dr_scope[g][i]));
-        lk_peak[g] = m > lk_peak[g] ? m : lk_peak[g] + (m - lk_peak[g]) * 0.03f;
+        lk_peak[g] = m > lk_peak[g] || back ? m : lk_peak[g] + (m - lk_peak[g]) * 0.03f;
         k = (float)half / fm_maxf(lk_peak[g], 0.05f);
         for (j = 0; j < LK_STRANDS - 1; j++)
             for (i = 0; i < DR_SCOPE_N; i++)
                 lk_hist[g][j][i] = lk_hist[g][j + 1][i];
         for (i = 0; i < DR_SCOPE_N; i++) {     /* smoothed as draw_scope's (raw captures jump) */
-            sc_disp[g][i] += (dr_scope[g][i] - sc_disp[g][i]) * 0.45f;
+            sc_disp[g][i] += back ? dr_scope[g][i] - sc_disp[g][i] : (dr_scope[g][i] - sc_disp[g][i]) * 0.45f;
             lk_hist[g][LK_STRANDS - 1][i] = (int8_t)fm_clampf(sc_disp[g][i] * k, (float)-half, (float)half);
+            if (back)
+                for (j = 0; j < LK_STRANDS - 1; j++)
+                    lk_hist[g][j][i] = lk_hist[g][LK_STRANDS - 1][i];
         }
         if (plat_ms() < ui.touch_t[g ? 3 : 1] + 300u) {   /* its Reso turning, and 1.5 s after: the filter curve
                                                          * as on Drones, the peak growing (Evan, 2026-11-08: the
@@ -782,11 +789,16 @@ static void lk_pic_drones1(void)
 static void lk_curve(int g, int32_t x0, int32_t top, int32_t bot)
 {
     const int32_t h = bot - top;
+    static uint32_t drawn[DR_NGROUPS];
+    const uint32_t now = plat_ms();
     float br, cl;
     int j, i;
-    for (j = 0; j < LK_STRANDS - 1; j++)
-        lk_cut_hist[g][j] = lk_cut_hist[g][j + 1];
+    for (j = 0; j < LK_STRANDS - 1; j++)        /* back after a while away (another page): all its strands from now,
+                                                 * or they'd come in from where it was last drawn, a frame each (Evan,
+                                                 * 2026-11-10: tracers) */
+        lk_cut_hist[g][j] = now - drawn[g] > 200u ? dr_cut[g] : lk_cut_hist[g][j + 1];
     lk_cut_hist[g][LK_STRANDS - 1] = dr_cut[g];
+    drawn[g] = now;
     if (!lk_heard(g, &br, &cl)) {              /* silent: the curve as one thin gray line, where it was */
         int32_t py = 0, yy;
         for (i = 0; i <= 50; i++) {
