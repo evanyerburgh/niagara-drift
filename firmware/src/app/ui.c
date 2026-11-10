@@ -220,6 +220,7 @@ static struct {
 /* a message: a banner across the top of the picture for a moment (the knobs keep the bottom) */
 static void say_c(const char *a, const char *b, uint16_t col);
 static void say(const char *a, const char *b) { say_c(a, b, 0); }
+static void sp_msg(const char *a, const char *b);
 static void say_c(const char *a, const char *b, uint16_t col)
 {
     ui.msg_col = col;
@@ -233,6 +234,7 @@ static void say_c(const char *a, const char *b, uint16_t col)
     ui.msg[1][i] = 0;
     ui.msg_until = plat_ms() + 1300u;
     ui.msg_next[0] = 0;                                /* a second part waiting belonged to the last one */
+    sp_msg(a, b);                                      /* and to a screen reader (below) */
 }
 void ui_say(const char *a, const char *b) { say(a, b); }
 
@@ -2535,6 +2537,653 @@ static void draw_splash(uint32_t t0)
 
 #include "look.c"                             /* 0.3's new look: every page, the header, the key map */
 
+/* ------------------------------------------------------ screen reader --- */
+/* The screen as text for a screen reader on the computer (announce.c, Charles Vestal's fm1-reader; issue #87): a page
+ * once it settles, with its knobs; a knob's value as it turns; the banners as they show; PLAY and stop; the sound
+ * a scene or a Preset takes it to; a gesture coming in. WHERE (the reader asks, or it has just started listening) is
+ * everything on the screen. The words are the screen's own, said in full by the words file (firmware/words.tsv,
+ * published with the site). Nothing is built while no reader listens. */
+static struct {
+    uint32_t ctx;                              /* the page, hashed: a change is said */
+    int16_t val[4];                            /* the four knobs' values said last */
+    int16_t at;                                /* the sound (lk_at) said last */
+    int8_t gest, playing, km, morph;
+    uint8_t started, said, map;
+    uint32_t hint[3];                          /* each drone's key hints and the page's, hashed: a key press is said */
+    char glab[2][16];
+} sp;
+
+static int sp_eq(const char *a, const char *b)  /* the same text (the device's libc has no strcmp) */
+{
+    while (*a && *a == *b) {
+        a++;
+        b++;
+    }
+    return *a == *b;
+}
+static uint32_t sp_hint_sig(int g);
+static char sp_buf[ANN_MAX + 1];
+static uint32_t sp_n;
+
+static void sp_cat(const char *s)              /* the screen's text as plain ASCII: "[SEL]" a word, "·" a comma */
+{
+    const uint8_t *u = (const uint8_t *)s;
+    while (*u && sp_n < ANN_MAX) {
+        const char *w = 0;
+        if (*u == '[' || *u == ']') {
+            u++;
+            continue;
+        }
+        if (u[0] == 0xC2 && u[1] == 0xB7) {         /* · */
+            while (sp_n && sp_buf[sp_n - 1] == ' ')
+                sp_n--;
+            w = ",";
+            u += 2;
+        } else if (u[0] == 0xE2 && u[1] == 0x86) {  /* → ↑ ↓ */
+            w = u[2] == 0x92 ? "to" : u[2] == 0x91 ? "up" : u[2] == 0x93 ? "down" : "";
+            u += 3;
+        } else if (*u >= 0x80) {
+            u++;
+            continue;
+        }
+        if (w) {
+            while (*w && sp_n < ANN_MAX)
+                sp_buf[sp_n++] = *w++;
+            continue;
+        }
+        sp_buf[sp_n++] = (char)*u++;
+    }
+    sp_buf[sp_n] = 0;
+}
+static void sp_start(void) { sp_n = 0; sp_buf[0] = 0; }
+
+/* a value as words can take it, a word at a time: a number and its unit apart ("2.1 Hz", "-12 dB"; "5th", "8ves" kept);
+ * minutes ("1m30": "1 minutes 30"); a note's flat or sharp in words ("E flat 2": the words file ignores capitals, so it
+ * can't tell "Bb" from "BB"); an interval's minor or major ("m3" from "M3", the same) and its way ("+5th": "5th up") */
+static void sp_word(const char *s, uint32_t len)
+{
+    static const char *const ORD[] = {"", "", "second", "third", "fourth", "fifth", "sixth", "seventh", "octave",
+                                      "ninth", "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth"};
+    char o[40];
+    uint32_t n = 0, i = 0;
+    uint32_t dg = 1;                                   /* an interval: a sign, then a word or an ordinal ("+5th") */
+    while (dg < len && s[dg] >= '0' && s[dg] <= '9')
+        dg++;
+    const char sign = len > 1u && (s[0] == '+' || s[0] == '-') && s[1] != '.' &&
+                      (dg == 1u || (len - dg == 2u && ((s[dg] == 't' && s[dg + 1] == 'h') || (s[dg] == 's' && s[dg + 1] == 't') ||
+                                                      (s[dg] == 'n' && s[dg + 1] == 'd') || (s[dg] == 'r' && s[dg + 1] == 'd'))))
+                          ? s[0] : 0;
+    if (sign)
+        i = 1;
+    {   /* a step of an equal Tuning, "+11\\19": "11 steps of 19 up" (the xenharmonic writers' notation) */
+        const char sg = s[0] == '+' || s[0] == '-' ? s[0] : 0;
+        uint32_t j = i = sg ? 1u : 0u;
+        while (j < len && s[j] >= '0' && s[j] <= '9')
+            j++;
+        if (j > i && j + 1u < len && s[j] == '\\') {
+            memcpy(o, s + i, j - i);
+            o[j - i] = 0;
+            sp_cat(o);
+            sp_cat(j - i == 1u && s[i] == '1' ? " step of " : " steps of ");
+            memcpy(o, s + j + 1, len - j - 1u);
+            o[len - j - 1u] = 0;
+            sp_cat(o);
+            if (sg)
+                sp_cat(sg == '+' ? " up" : " down");
+            return;
+        }
+        i = sign ? 1u : 0u;
+    }
+    if (i + 1u < len && (s[i] == 'm' || s[i] == 'M') && s[i + 1] >= '1' && s[i + 1] <= '9') {   /* m3, M7, m10 */
+        int k = s[i + 1] - '0';
+        if (i + 2u < len && s[i + 2] >= '0' && s[i + 2] <= '9')
+            k = k * 10 + (s[i + 2] - '0');
+        sp_cat(s[i] == 'm' ? "minor " : "major ");
+        sp_cat(k > 0 && k < 15 ? ORD[k] : "");
+    } else if (len >= 4u && s[1] == 'm' && s[0] >= '0' && s[0] <= '9' && s[2] >= '0' && s[2] <= '9') {   /* 1m30 */
+        o[0] = s[0];
+        o[1] = 0;
+        sp_cat(o);
+        sp_cat(s[0] == '1' ? " minute" : " minutes");
+        if (s[2] != '0' || s[3] != '0') {
+            o[0] = ' ';
+            o[1] = s[2] == '0' ? s[3] : s[2];
+            o[2] = s[2] == '0' ? 0 : s[3];
+            o[3] = 0;
+            sp_cat(o);
+        }
+    } else {
+        for (; i < len && n < sizeof o - 9u; i++) {
+            const char c = s[i], d = i + 1u < len ? s[i + 1] : 0, e = i + 2u < len ? s[i + 2] : 0;
+            o[n++] = c;
+            if (c >= 'A' && c <= 'G' && d == 'b' && (e == '-' || (e >= '0' && e <= '9'))) {   /* (the reader says sharps) */
+                const char *w = " flat ";
+                while (*w)
+                    o[n++] = *w++;
+                i++;
+            } else if (c >= '0' && c <= '9' && ((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z'))) {
+                const char *r = s + i + 1;   /* an ordinal or "8ve(s)" stays whole */
+                const uint32_t rl = len - i - 1u;
+                if (!((rl == 2u && ((r[0] == 't' && r[1] == 'h') || (r[0] == 'n' && r[1] == 'd') || (r[0] == 'r' && r[1] == 'd') ||
+                                    (r[0] == 'v' && r[1] == 'e'))) ||
+                      (rl == 3u && ((r[0] == 'v' && r[1] == 'e' && r[2] == 's') || (r[0] == 't' && r[1] == 'h' && r[2] == 's')))))
+                    o[n++] = ' ';
+                if (rl == 1u && r[0] == 'c') {    /* cents: in words here ("3 C#4" is a note's C to the reader) */
+                    const char *w = "cents";
+                    while (*w)
+                        o[n++] = *w++;
+                    break;
+                }
+            }
+        }
+        o[n] = 0;
+        sp_cat(o);
+    }
+    if (sign)
+        sp_cat(sign == '+' ? " up" : " down");
+}
+static void sp_value(const char *s)
+{
+    while (*s) {
+        uint32_t k = 0;
+        while (s[k] && s[k] != ' ')
+            k++;
+        if (k)
+            sp_word(s, k);
+        s += k;
+        if (*s) {
+            sp_cat(" ");
+            s++;
+        }
+    }
+}
+
+/* a knob's name in full (the cards abbreviate to fit: the words file says the rest) */
+static const char *sp_name(int p, int second)
+{
+    if (second)
+        return p == P_SUBW_0 || p == P_SUBW_1 ? "Sub wave" : p == P_DLY_TYPE ? "Delay type" : "Into reverb";
+    if (p < P_XMOD && (p % GP_N == GP_OLFO_DEPTH || p % GP_N == GP_FLFO_DEPTH))
+        return card_name(p);                   /* LFO sends: named for what they move */
+    switch (p) {
+    case P_PLINK_OFF: return "Link offset";
+    case P_SHIFT_MOVE: return "Shift";
+    case P_SCENE_T: case P_SCENE_BARS: return "Scene time";
+    case P_REV_TYPE: return "Reverb type";
+    case P_DLY_TIME: case P_DLY_NOTE: return "Delay time";
+    case P_DLY_DRIVE: return "Delay drive";
+    case P_PULSE_DIV: return "Rate";
+    default: return dr_param_info(p)->name;
+    }
+}
+
+/* knob i on the page shown: "Cutoff 57.5", "Interval +5th just" (its value and the word under it) */
+static int sp_short;                           /* a page's sentence on LFO sends: the values without their second
+                                                * line (said as a knob turns), so it fits one message with its keys */
+static void sp_knob(int i)
+{
+    const int p = knob_param(i), second = (ui.btn >> B_SEL & 1u) && sel_job(ui.view, i) >= 0;
+    char t[16], t2[16];
+    if (p < 0)
+        return;
+    sp_cat(sp_name(p, second));
+    sp_cat(" ");
+    lk_text(p, proj.par[p], t);
+    if (!second && lk_line2(p, proj.par[p], t, t2) && t2[0] && !sp_short) {
+        sp_value(t);
+        sp_cat(" ");
+        sp_value(t2);
+    } else {
+        sp_value(t);
+    }
+}
+
+/* a scene's name as said: "Preset 3 Vespers", "scene B 5" (the screen's "P3", "B5"; "A5" is a note too) */
+static void sp_scene(int bank, int n)
+{
+    char t[4];
+    sp_cat(BANK_IS_PRESETS(bank) ? "Preset " : "scene ");
+    if (!BANK_IS_PRESETS(bank)) {
+        t[0] = BANK_L[(unsigned)bank < NBANKS ? bank : 0];
+        t[1] = ' ';
+        t[2] = 0;
+        sp_cat(t);
+    }
+    itoa_u((uint32_t)n + 1u + (bank == BANK_PRESETS2 ? NPLAY : 0u), t);
+    sp_cat(t);
+    if (BANK_IS_PRESETS(bank)) {
+        sp_cat(" ");
+        sp_cat(preset_name(n + (bank == BANK_PRESETS2 ? NPLAY : 0)));
+    }
+}
+
+/* a page's key hints, as its picture draws them beside each drone (g 0, 1) or for the page (g 2): "LP filter, key
+ * A#3" (Evan, 2026-11-10: in the page, after the knobs). Returns 0 when the page has none there */
+static int sp_hints(int g)
+{
+    static const char *const MODE[3] = {"LP", "BP", "HP"};
+    char t[16];
+    const int v = ui.view;
+    if (g < G && v == V_PLAY) {
+        sp_cat(MODE[(unsigned)gpar(g, GP_MODE) < 3u ? gpar(g, GP_MODE) : 0]);
+        sp_cat(" filter, key ");
+        sp_value(LK_BKEY[g ? 7 : 2]);
+    } else if (g < G && v == V_SOURCE) {
+        dr_param_text(DR_GP(g, GP_SUBOCT), gpar(g, GP_SUBOCT), t);
+        sp_cat("sub ");
+        sp_value(t);
+        sp_cat(", key ");
+        sp_value(LK_BKEY[g ? 6 : 1]);
+    } else if (g < G && v == V_PARTNER) {
+        sp_cat(gpar(g, GP_PARTNER) ? "partner on, key " : "partner off, key ");
+        sp_value(LK_BKEY[g ? 5 : 0]);
+    } else if (g < G && v == V_LFO) {
+        int d;
+        for (d = 0; d < 2; d++) {              /* "LFO I to pitch, keys F#3 and G#3" */
+            const int route = gpar(g, d ? GP_FLFO : GP_OLFO);
+            if (d)
+                sp_cat(", ");
+            sp_cat(route == DR_LFO_BOTH ? "LFO I+II" : route == DR_LFO_II ? "LFO II" : route ? "LFO I" : "no LFO");
+            sp_cat(" to ");
+            sp_cat(d ? (gpar(g, GP_FLFO_DEST) == DR_TO_RESO ? "reso" : "cutoff")
+                     : (gpar(g, GP_OLFO_DEST) == DR_TO_XWAVE ? "x-wave" : "pitch"));
+            sp_cat(" on ");
+            sp_value(LK_BKEY[g * 5 + (d ? 2 : 0)]);
+            sp_cat(", ");
+            sp_value(LK_BKEY[g * 5 + (d ? 3 : 1)]);
+        }
+    } else if (g == G && v == V_LFO2) {
+        static const char *const DOES[4] = {"off", "drone 1 moves drone 2's cutoff", "the drones bend each other",
+                                            "Snarl"};
+        const int xm = proj.par[P_XMOD];
+        sp_cat("Cross-mod ");
+        sp_cat(DOES[(unsigned)xm < 4u ? xm : 0]);
+        sp_cat(", key ");
+        sp_value(LK_BKEY[10]);
+    } else if (g == G && v == V_MOVES) {
+        sp_cat("Shift's key E5");
+    } else {
+        return 0;
+    }
+    return 1;
+}
+
+/* the page: its name, then its knobs, drone by drone; all: PLAY's state, the sound, what's running */
+static void sp_screen(int all)
+{
+    int i;
+    sp_start();
+    sp_cat(ui.view == V_SOURCE ? "Sub and Drive" : VIEW_NAME[ui.view]);   /* (the screen's "·") */
+    sp_cat(" page");
+    for (i = 0; i < 4; i++) {
+        const knob_t k = VIEW_KNOB[ui.view][i];
+        if (knob_param(i) < 0)
+            continue;
+        if (ui.view == V_LFO) {                /* LFO sends: each send with its LFO and keys ("Pitch 0 from LFO I,
+                                                * keys F#3 G#3"): its target is the knob's name */
+            const int d = (i & 1), route = gpar(k.g, d ? GP_FLFO : GP_OLFO);
+            sp_cat(i == 0 ? ". Drone 1: " : i == 2 ? ". Drone 2: " : "; ");
+            sp_short = 1;
+            sp_knob(i);
+            sp_short = 0;
+            sp_cat(route == DR_LFO_BOTH ? " from LFO I+II" : route == DR_LFO_II ? " from LFO II" : route ? " from LFO I"
+                                                                                                : ", no LFO");
+            sp_cat(", keys ");
+            sp_value(LK_BKEY[k.g * 5 + (d ? 2 : 0)]);
+            sp_cat(" ");
+            sp_value(LK_BKEY[k.g * 5 + (d ? 3 : 1)]);
+            continue;
+        }
+        if (k.g < G && (i == 0 || VIEW_KNOB[ui.view][i - 1].g != k.g))
+            sp_cat(k.g ? ". Drone 2: " : ". Drone 1: ");
+        else
+            sp_cat(i ? ", " : ": ");
+        sp_short = ui.view == V_LFO;
+        sp_knob(i);
+        sp_short = 0;
+        if (k.g < G && (i == 3 || VIEW_KNOB[ui.view][i + 1].g != k.g)) {   /* the drone's key hints after its knobs */
+            const uint32_t n0 = sp_n;
+            sp_cat(", ");
+            if (!sp_hints(k.g)) {
+                sp_n = n0;
+                sp_buf[sp_n] = 0;
+            }
+        }
+    }
+    sp_cat(".");
+    {
+        const uint32_t n0 = sp_n;
+        sp_cat(" ");
+        if (sp_hints(G))
+            sp_cat(".");
+        else {
+            sp_n = n0;
+            sp_buf[sp_n] = 0;
+        }
+    }
+    if (!all)
+        return;
+    sp_cat(ui.playing ? " Playing" : " Stopped");
+    lk_sound_at();
+    if (lk_at >= 0) {
+        sp_cat(", ");
+        sp_scene(lk_at >> 4, lk_at & 15);
+        if (lk_chg)
+            sp_cat(", changed");
+    } else if (ui.morph >= 0 && ui.morph < NPLAY) {
+        sp_cat(", on its way to ");
+        sp_scene(proj.bank, ui.morph);
+    }
+    sp_cat(".");
+    if (proj.par[P_PULSE])
+        sp_cat(" Swell on.");
+    i = lk_gesture();
+    if (i >= 0) {
+        sp_cat(" ");
+        sp_cat(GESTURE[i]);
+        sp_cat(proj.par[gl_par(i)] ? " latched." : " on.");
+    }
+    if (proj.par[P_II_OUT])
+        sp_cat(" Drone 2 out.");
+    if (ui.loop != L_IDLE)
+        sp_cat(ui.loop == L_REC ? " Recording a loop." : " Loop playing.");
+}
+
+/* a banner's word as said: the drones' numerals as numbers ("II" 2), its arrows in words, a scene's key apart */
+static void sp_msg_word(const char *s, uint32_t k, int first)
+{
+    char w[24];
+    if (k >= sizeof w)
+        k = sizeof w - 1u;
+    memcpy(w, s, k);
+    w[k] = 0;
+    if (sp_eq(w, "I") || sp_eq(w, "II"))
+        sp_cat(first ? (k == 1u ? "Drone 1" : "Drone 2") : k == 1u ? "1" : "2");
+    else if (sp_eq(w, "I+II"))
+        sp_cat("1 and 2");
+    else if (sp_eq(w, ">") || sp_eq(w, "\\"))
+        sp_cat("to");
+    else if (sp_eq(w, "<>"))
+        sp_cat("and");
+    else if (k == 2u && w[0] >= 'A' && w[0] <= 'F' && w[1] >= '1' && w[1] <= '8') {   /* a scene's key: "A1" */
+        char t[4] = {w[0], ' ', w[1], 0};
+        sp_cat(first ? "scene " : "");
+        sp_cat(t);
+    } else
+        sp_word(w, k);
+}
+/* a banner: its two lines as one sentence. One that repeats its first line (a pressure blend's "A1 41%") is a readout:
+ * said once it settles */
+static void sp_msg(const char *a, const char *b)
+{
+    static char last[24];
+    static uint32_t last_t;
+    const uint32_t now = plat_ms();
+    const char *l;
+    int i, first = 1, run;
+    if (!ann_on() || !a || !*a)
+        return;
+    run = sp_eq(last, a) && now - last_t < 1500u && b && *b;
+    for (i = 0; i < 23 && a[i]; i++)
+        last[i] = a[i];
+    last[i] = 0;
+    last_t = now;
+    sp_start();
+    for (i = 0; i < 2; i++) {
+        l = i ? b : a;
+        if (!l || !*l)
+            continue;
+        if (i)
+            sp_cat(" ");
+        while (*l) {
+            uint32_t k = 0;
+            while (l[k] && l[k] != ' ')
+                k++;
+            if (k)
+                sp_msg_word(l, k, first);
+            first = 0;
+            l += k;
+            while (*l == ' ')
+                l++;
+            if (*l)
+                sp_cat(" ");
+        }
+    }
+    if (run)
+        ann_later(sp_buf, ANN_NOW, 200u, now);
+    else
+        ann_say(sp_buf, 0, ANN_NOW);
+    sp.said = 1;
+}
+
+static uint32_t sp_hint_sig(int g)            /* the hint's text, hashed (built aside: sp_buf is kept) */
+{
+    char keep[ANN_MAX + 1];
+    const uint32_t kn = sp_n;
+    uint32_t h = 2166136261u, i;
+    memcpy(keep, sp_buf, kn + 1u);
+    sp_start();
+    if (sp_hints(g))
+        for (i = 0; i < sp_n; i++)
+            h = hash(h, (uint8_t)sp_buf[i]);
+    memcpy(sp_buf, keep, kn + 1u);
+    sp_n = kn;
+    return h;
+}
+static uint32_t sp_ctx_sig(void)
+{
+    return hash(hash(2166136261u, ui.view),
+                (uint32_t)(page_jobs(ui.view) && (ui.btn >> B_SEL & 1u)) | (uint32_t)proj.par[P_PLINK] << 1);
+}
+static void sp_snap(void)
+{
+    int i;
+    for (i = 0; i < 4; i++) {
+        const int p = knob_param(i);
+        sp.val[i] = (int16_t)(p < 0 ? 0 : proj.par[p]);
+    }
+    sp.playing = (int8_t)ui.playing;
+    sp.at = ui.morph >= 0 && ui.morph < NPLAY ? (int16_t)(proj.bank << 4 | ui.morph) : lk_at;   /* (its end: said) */
+    sp.morph = ui.morph;
+    sp.gest = (int8_t)lk_gesture();
+    memcpy(sp.glab, ui.glab, sizeof sp.glab);
+    for (i = 0; i < 3; i++)
+        sp.hint[i] = sp_hint_sig(i);
+}
+
+static void speak(void)
+{
+    const uint32_t now = plat_ms();
+    uint32_t c;
+    int where = ann_where(), i, changed = -1, g;
+    if (!ann_on()) {
+        sp.started = 0;
+        sp.said = 0;
+        return;
+    }
+    lk_sound_at();
+    if (!sp.started || where) {                       /* everything on the screen */
+        sp.started = 1;
+        sp.ctx = sp_ctx_sig();
+        sp_snap();
+        sp_screen(1);
+        ann_say(sp_buf, 0, ANN_NOW);
+        sp.said = 0;
+        return;
+    }
+    if (sp.said) {                                    /* a banner said what a key did (and what it changed) */
+        sp.said = 0;
+        sp_snap();
+        return;
+    }
+    if (keymap_on() != sp.map || (sp.map && ui.km_key != sp.km)) {   /* SEL held: the key map, a key touched */
+        sp.map = (uint8_t)keymap_on();
+        sp.km = ui.km_key;
+        if (sp.map) {
+            sp_start();
+            if (ui.km_key < 0)
+                sp_cat("Keys, SEL held: touch a black key to hear what it does");
+            else {
+                const char *name, *st;
+                sw_text(sw_layer()[ui.km_key], &name, &st);
+                sp_value(LK_BKEY[ui.km_key]);
+                sp_cat(", ");
+                {
+                    const char *gn = lk_kgroup(ui.km_key)->name;
+                    sp_cat(gn[0] == 'I' && !gn[1] ? "drone 1" : gn[0] == 'I' && gn[1] == 'I' ? "drone 2" : gn);
+                }
+                sp_cat(": ");
+                sp_cat(name);
+                sp_cat(" ");
+                sp_value(st);
+            }
+            ann_later(sp_buf, ANN_NOW, 120u, now);
+        }
+        return;
+    }
+    if (ui.playing != (uint8_t)sp.playing) {
+        sp.playing = (int8_t)ui.playing;
+        ann_say(ui.playing ? "Play" : "Stop", 0, ANN_NOW);
+    }
+    c = sp_ctx_sig();
+    if (c != sp.ctx) {                                /* a new page (or SEL's second jobs): said when it settles */
+        sp.ctx = c;
+        sp_snap();
+        sp_screen(0);
+        ann_later(sp_buf, ANN_NOW, 200u, now);
+        return;
+    }
+    for (i = 0; i < 3; i++) {                         /* a key changed what a page's hint shows (no banner said it) */
+        const uint32_t h = sp_hint_sig(i);
+        if (h != sp.hint[i]) {
+            sp.hint[i] = h;
+            sp_start();
+            if (i < G)
+                sp_cat(i ? "Drone 2 " : "Drone 1 ");
+            sp_hints(i);
+            ann_say(sp_buf, 0, ANN_NOW);
+            return;
+        }
+    }
+    for (i = 0; i < 4; i++) {                         /* a knob turning */
+        const int p = knob_param(i), v = p < 0 ? 0 : proj.par[p];
+        if (v != sp.val[i]) {
+            sp.val[i] = (int16_t)v;
+            if (changed < 0 && lit(i))                /* a hand on it (not a scene gliding it) */
+                changed = i;
+        }
+    }
+    if (changed >= 0) {
+        sp_start();
+        if (VIEW_KNOB[ui.view][changed].g < G)
+            sp_cat(VIEW_KNOB[ui.view][changed].g ? "Drone 2 " : "Drone 1 ");
+        sp_knob(changed);
+        ann_later(sp_buf, ANN_NOW, 120u, now);
+        return;
+    }
+    if (ui.glab[0][0] && now < ui.glab_until && memcmp(sp.glab, ui.glab, sizeof sp.glab)) {   /* the top bar's readout */
+        memcpy(sp.glab, ui.glab, sizeof sp.glab);
+        sp_start();
+        sp_cat(ui.glab[0]);
+        sp_cat(" ");
+        sp_cat(ui.glab[1]);
+        ann_later(sp_buf, ANN_NOW, 120u, now);
+        return;
+    }
+    if (ui.morph != sp.morph) {                       /* on its way to a scene or a Preset (the header's "→ P3") */
+        sp.morph = ui.morph;
+        if (ui.morph >= 0 && ui.morph < NPLAY) {
+            sp_start();
+            sp_cat("to ");
+            sp_scene(proj.bank, ui.morph);
+            ann_say(sp_buf, 0, ANN_NOW);
+            sp.at = (int16_t)(proj.bank << 4 | ui.morph);   /* (arriving says nothing more) */
+            return;
+        }
+    }
+    if (lk_at != sp.at && ui.morph < 0) {             /* a scene or a Preset taken: the sound's name */
+        sp.at = lk_at;
+        if (lk_at >= 0) {
+            sp_start();
+            sp_scene(lk_at >> 4, lk_at & 15);
+            ann_say(sp_buf, 0, 0);
+        }
+    }
+    g = lk_gesture();
+    if (g != sp.gest) {                               /* a gesture coming in (its % is the header's to show) */
+        sp.gest = (int8_t)g;
+        if (g >= 0) {
+            sp_start();
+            sp_cat(GESTURE[g]);
+            sp_cat(proj.par[gl_par(g)] ? " latched" : "");
+            ann_say(sp_buf, 0, ANN_NOW);
+        }
+    }
+}
+
+#ifdef OM_HOST
+/* every page, knob value and screen as a screen reader gets them (the "speakdump" command): KIND <tab> the text sent
+ * (fm1-reader's tools/audit.mjs puts it in words with web/words/ and checks it). Each knob from its lowest value to its
+ * highest; with SEL held, the second jobs; WHERE stopped and playing, on a Preset and a scene of bank A */
+static void sp_print(const char *kind, const char *t) { printf("%s\t%s\n", kind, t); }
+static void speak_dump(void)
+{
+    const uint8_t keep_view = ui.view, keep_play = ui.playing;
+    const uint32_t keep_btn = ui.btn;
+    const int16_t keep_at = lk_at;
+    project_t keep = proj;
+    int v, s, i, x, lo, hi, step;
+    for (v = 0; v < NVIEWS; v++)
+        for (s = 0; s < 2; s++) {
+            ui.view = (uint8_t)v;
+            ui.btn = s ? keep_btn | 1u << B_SEL : keep_btn & ~(1u << B_SEL);
+            if (s && !page_jobs(v))
+                continue;
+            sp_screen(0);
+            sp_print("SCREEN", sp_buf);
+            for (i = 0; i < 4; i++) {
+                const int p = knob_param(i);
+                if (p < 0 || (s && sel_job(v, i) < 0))
+                    continue;
+                lo = dr_param_info(p)->lo;
+                hi = dr_param_info(p)->hi;
+                step = hi - lo > 2000 ? 7 : 1;          /* the pitches: a note in every few cents is enough */
+                for (x = lo; x <= hi; x += step) {
+                    proj.par[p] = (int16_t)x;
+                    sp_start();
+                    sp_knob(i);
+                    sp_print("KNOB", sp_buf);
+                }
+                proj = keep;
+            }
+        }
+    ui.btn = keep_btn;
+    for (x = 0; x < 4; x++) {                         /* WHERE: stopped and playing, a Preset and a scene of A */
+        ui.view = V_PLAY;
+        ui.playing = (uint8_t)(x & 1);
+        lk_at = (int16_t)(x < 2 ? BANK_PRESETS << 4 | 2 : 0 << 4 | 4);
+        proj.par[P_PULSE] = (int16_t)(x & 1);
+        sp_screen(1);
+        sp_print("WHERE", sp_buf);
+    }
+    for (x = 0; x < 2 * NPLAY; x++) {                 /* each Preset's name, and bank B's scenes, as a tap says them */
+        sp_start();
+        sp_scene(x < NPLAY ? BANK_PRESETS : BANK_PRESETS2, x % NPLAY);
+        sp_print("SOUND", sp_buf);
+        sp_start();
+        sp_scene(1, x % NPLAY);
+        sp_print("SOUND", sp_buf);
+    }
+    for (x = 0; x < DR_NGTYPE; x++) {
+        sp_print("GESTURE", GESTURE[x]);
+    }
+    proj = keep;
+    lk_at = keep_at;
+    ui.view = keep_view;
+    ui.playing = keep_play;
+}
+#endif
+
 void ui_frame(void)
 {
     input();
@@ -2577,6 +3226,8 @@ void ui_frame(void)
     }
     lk_frame();
     leds();
+    speak();
+    ann_tick(plat_ms());
     ui.frame++;
 }
 
