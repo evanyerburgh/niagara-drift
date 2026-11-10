@@ -823,13 +823,17 @@ static void lk_pic_drones2(void)
         const int32_t base = 2 + LK_B(LK_F_DRONE), x1 = (g ? 130 : 10) + text_w(&LK_F_DRONE, g ? "II" : "I") + 6;
         const int m = gpar(g, GP_MODE);
         char t[16], *q;
-        lk_key(cv_text(x1, base - LK_B(LK_F_SMALL), &LK_F_SMALL, MODE[(unsigned)m < 3u ? m : 0], LK_DRONE[g]) + 5, base,
-               LK_BKEY[g ? 7 : 2]);
+        const int32_t ke = lk_key(cv_text(x1, base - LK_B(LK_F_SMALL), &LK_F_SMALL, MODE[(unsigned)m < 3u ? m : 0],
+                                          LK_DRONE[g]) + 5, base, LK_BKEY[g ? 7 : 2]);
+        const felucca_font_t *f;
         dr_param_text(DR_GP(g, GP_PITCH), lk_drone_pitch(g), t);
         for (q = t; *q && *q != ' '; q++)      /* the note; its cents are the Pitch page's */
             ;
         *q = 0;
-        cv_text((g ? 230 : 112) - text_w(&LK_F_SMALL, t), base - LK_B(LK_F_SMALL), &LK_F_SMALL, t, LK_DRONE[g]);
+        f = (g ? 230 : 112) - text_w(&LK_F_SMALL, t) >= ke + 4 ? &LK_F_SMALL : &FONT_U2;   /* too wide for the key
+                                                * box beside it ("F#5", "2.7Hz"): the units' size (Evan's rule) */
+        cv_text((g ? 230 : 112) - text_w(f, t), base - (f == &FONT_U2 ? LK_B(FONT_U2) : LK_B(LK_F_SMALL)), f, t,
+                LK_DRONE[g]);
     }
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 130 : 10;
