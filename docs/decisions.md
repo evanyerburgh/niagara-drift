@@ -721,3 +721,10 @@ at the end. The current state is in the [README](../README.md) and the code.
   10-15 s however it's started. Shimmer (the flicker: two octave-up head pairs 14 cents apart) is reverb type 5, on
   Cistern; to be tuned later. Updating from 0.2: its dropped Presets (Eerie, Glass, Tanpura, Whistle, Cathedral,
   Metal) go into bank F, nothing else copied (Heaven is Sibyl, Clean is Bare).
+- 2026-11-10: **Shimmer, the simple way** (Evan, from four rounds of renders: "L"; the first was "dissonant ... a
+  little menacing"): the octave is shifted once, before the reverb, and nothing feeds back (Sound On Sound's recipe;
+  the Big Sky's Input mode), into the Hall's own room, so a switch from Hall changes only the halo. The octave in two
+  voices 14 cents apart (20 was out of tune, 8 too tame; in tune together, fed back, it rang away), 1.6 into the
+  reverb with the drones cut to 0.4. It washes in over 8 s and out over 6 ("it should wash in and out"). Still a
+  reverb type, played with Length and Mix. Cistern keeps its loudness (within 1 dB), 2-7 dB less bright at 1-4 kHz.
+  A reverb type's crossfade is 200 ms (50 jumped up to 6 dB leaving the Cathedral).

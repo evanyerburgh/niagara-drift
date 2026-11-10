@@ -733,6 +733,8 @@ tapkey w8
 release SEL
 expect bank 0
 expect scenes 1
+# (the autosave first: it waits for the tails to fade, and comes at most every 30 s)
+wait 32000
 reboot
 wait 300
 press SEL

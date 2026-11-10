@@ -34,7 +34,7 @@
  * gives every line the same decay time (LENGTH: 0.3 .. 40 s, 100 "Inf": a freeze; at Inf the damping is out of
  * the loop, so what's in it stays). Out: four lines a side with alternating signs. FOUR TYPES set the size,
  * pre-delay, swing, low cut and width: Room, Hall, Cathedral, Chorus hall (a wide swing). A new type moves its
- * lines (and the pre-delay) to their new lengths at once, each read at both for 50 ms and crossfaded: no fade, no
+ * lines (and the pre-delay) to their new lengths at once, each read at both for 200 ms and crossfaded: no fade, no
  * clearing, no pitch bend (v0.3; they glided, and the tail bent by up to 7 semitones, going round as it did). Stopped, an Inf tail fades over about twice the Fade time. */
 
 #ifdef OM_HOST
@@ -199,18 +199,24 @@ static inline float dly_read(const int16_t *b, float d)   /* d full-rate samples
 #define DLY_DMAX (2.0f * (float)DLY_N - 16.0f)   /* the farthest back it reads, full-rate samples */
 
 /* ------------------------------------------------------------ reverb --- */
-/* SHIMMER (v0.3, Evan's pick of three, 2026-11-09: "the flicker"): the reverb's wet, low-passed, an octave up, fed back
- * into its input, so each pass climbs an octave. The shift: two pairs of reads of a short line, each pair sweeping at
- * about twice the write's speed and crossfaded with sin^2 windows (46 ms windows of 1024 at 22.05 kHz); one pair 7
- * cents sharp of the octave, the other 7 flat, so the halo shimmers in place. In a smaller space than the Cathedral,
- * fed back harder, so it builds at once (the first test, in a large hall at 0.45, was "too slow to be shimmering") */
-#define SH_GAIN 0.62f                            /* the octave fed back */
+/* SHIMMER (v0.3; Evan's pick, 2026-11-10, "L"): the reverb's input, low-passed, an octave up, mixed with the input
+ * (the octave 1.6, the drones cut to 0.4: mostly halo) into a hall: one clean octave over whatever is playing, any
+ * note or chord, that rings as long as the reverb's Length. Nothing feeds back (the first Shimmer fed the octave back
+ * into the reverb, each pass climbing another: "dissonant ... a little menacing"). The shift: two pairs of reads of a
+ * short line, each pair sweeping at about twice the write's speed and crossfaded with sin^2 windows (46 ms windows
+ * of 1024 at 22.05 kHz); one pair 7 cents sharp of the octave, the other 7 flat, so each harmonic of the halo swells
+ * and fades on its own, the highest fastest: the sparkle (20 cents apart was out of tune; 8, too tame). It washes
+ * in over 8 s and out over 6 ("it should wash in and out") */
+#define SH_GAIN 1.6f                             /* the octave into the reverb (the two pairs, part cancelling) */
+#define SH_DRY 0.6f                              /* how much of the drones it takes out of the reverb's input */
+#define SH_IN_S 8.0f                             /* the wash in, s */
+#define SH_OUT_S 6.0f                            /* and out */
 #define SH_LP_K 0.55f                            /* the low pass before the shift: ~2.9 kHz at 22.05 kHz, two poles */
 #define SH_DET 14.0f                             /* the two pairs' gap, cents */
 #define SH_N 2048u
 #define SH_W 1024.0f
 static float sh_buf[SH_N];                       /* main RAM, 8 KB */
-static struct { uint32_t w; float ph, ph2, lp1, lp2, prev, amt; } sh;
+static struct { uint32_t w; float ph, ph2, lp1, lp2, amt; } sh;   /* amt: the wash, 0 .. 1 */
 static inline float sh_read(float d)             /* d samples back, linear */
 {
     float p = (float)sh.w - 2.0f - d, f;
@@ -258,15 +264,16 @@ static const rv_type_t RV_TYPE[RV_NTYPES] = {
     {0.75f, 18.0f, 5.0f, 90.0f, 0.9f, 0.93f},    /* HALL */
     {1.00f, 42.0f, 7.0f, 60.0f, 0.85f, 1.00f},   /* CATHEDRAL: the largest, the furthest */
     {0.85f, 24.0f, 18.0f, 90.0f, 1.0f, 1.45f},   /* CHORUS HALL: a hall whose lines swing wide (they cancel a little) */
-    {0.60f, 30.0f, 6.0f, 70.0f, 0.95f, 1.00f},   /* SHIMMER: a hall whose wet, an octave up, feeds back into it
-                                                 * (sh_tick): each pass climbs an octave */
+    {0.75f, 18.0f, 5.0f, 90.0f, 0.9f, 0.93f},    /* SHIMMER: the Hall, its input an octave up (sh_tick), so a switch
+                                                 * between them changes only the halo */
 };
 #define RV_FS (DR_SR * 0.5f)
 /* the eight lines at size 1, samples at 22.05 kHz (57 .. 125 ms; primes, ~1.12 from one to the next:
  * ChoralRoot's), each in its own stretch of one array with room for the swing and the interpolator */
 static const uint16_t RV_LEN[8] = {1259, 1433, 1607, 1801, 2003, 2221, 2477, 2767};
 #define RV_GUARD 24u
-#define RV_XSTEP (1.0f / (0.05f * RV_FS))   /* a new type's crossfade: 50 ms */
+#define RV_XSTEP (1.0f / (0.2f * RV_FS))    /* a new type's crossfade: 200 ms (50 jumped up to 6 dB leaving the
+                                             * Cathedral, v0.3) */
 #define RV_CAP (1259u + 1433u + 1607u + 1801u + 2003u + 2221u + 2477u + 2767u + 8u * RV_GUARD)
 static float rv_mem[RV_CAP] DR_POOL;
 #define RV_PRE_N 2048u                   /* the pre-delay: 92 ms at 22.05 kHz */
@@ -413,7 +420,7 @@ static void rv_clear(void)
 }
 
 /* this block's ramps, nt ticks: a new type's lengths (the lines', the pre-delay's) at once, crossfaded from the old
- * over 50 ms (a turn through several: one after the other); the odd four swing (their slow sines worked out at the
+ * over 200 ms (a turn through several: one after the other); the odd four swing (their slow sines worked out at the
  * block's ends) */
 static void rv_block(uint32_t nt, float dt)
 {
@@ -757,11 +764,10 @@ static void fx_run(float *l, float *r, uint32_t n)
     }
     /* REVERB at the half rate: the send down, the network, the wet up */
     rv_block(n / 2u, (float)n / DR_SR);
-    {   /* Shimmer's feedback eases in and out over ~0.3 s; none and not the type: the shift isn't run */
-        const float aim = par[P_REV_TYPE] == RV_SHIMMER ? SH_GAIN : 0.0f;
-        const float st = (float)n / (0.3f * DR_SR) * SH_GAIN;
+    {   /* Shimmer washes in over 8 s and out over 6; none and not the type: the shift isn't run */
         const float was = sh.amt;
-        sh.amt = sh.amt < aim ? fm_minf(sh.amt + st, aim) : fm_maxf(sh.amt - st, aim);
+        sh.amt = par[P_REV_TYPE] == RV_SHIMMER ? fm_minf(sh.amt + (float)n * (1.0f / (SH_IN_S * DR_SR)), 1.0f)
+                                               : fm_maxf(sh.amt - (float)n * (1.0f / (SH_OUT_S * DR_SR)), 0.0f);
         if (was > 0.0f && sh.amt <= 0.0f) {      /* out: its line emptied, so a later Shimmer starts clean, not
                                                   * with the last one's audio */
             uint32_t q;
@@ -774,9 +780,8 @@ static void fx_run(float *l, float *r, uint32_t n)
         float a = sl[j], b = sl[j + 1u], x, ol, or_;
         x = (hb_ap(&rv.dn, 1, HB_A1, hb_ap(&rv.dn, 0, HB_A0, b)) + hb_ap(&rv.dn, 3, HB_A3, hb_ap(&rv.dn, 2, HB_A2, a))) * 0.5f;
         if (sh.amt > 0.0f)
-            x += sh.amt * sh_tick(sh.prev);
+            x = x * (1.0f - SH_DRY * sh.amt) + SH_GAIN * sh.amt * sh_tick(x);
         rv_tick(x, &ol, &or_);
-        sh.prev = (ol + or_) * 0.5f;
         sl[j] = hb_ap(&rv.up[0], 1, HB_A1, hb_ap(&rv.up[0], 0, HB_A0, ol));
         sl[j + 1u] = hb_ap(&rv.up[0], 3, HB_A3, hb_ap(&rv.up[0], 2, HB_A2, ol));
         sr[j] = hb_ap(&rv.up[1], 1, HB_A1, hb_ap(&rv.up[1], 0, HB_A0, or_));
