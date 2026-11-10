@@ -238,7 +238,7 @@ static inline float sh_pair(float *ph, float step)
 static inline float sh_tick(float x)
 {
     /* each pair's step past the write: 2 * 2^(+-c/1200) - 1, to first order */
-    const float up = 2.0f * (1.0f + SH_DET * 0.5f * 0.000577623f) - 1.0f, dn = 2.0f * (1.0f - SH_DET * 0.5f * 0.000577623f) - 1.0f;
+    static const float up = 2.0f * (1.0f + SH_DET * 0.5f * 0.000577623f) - 1.0f, dn = 2.0f * (1.0f - SH_DET * 0.5f * 0.000577623f) - 1.0f;
     float y;
     sh.lp1 += (x - sh.lp1) * SH_LP_K;
     sh.lp2 += (sh.lp1 - sh.lp2) * SH_LP_K;
@@ -760,7 +760,15 @@ static void fx_run(float *l, float *r, uint32_t n)
     {   /* Shimmer's feedback eases in and out over ~0.3 s; none and not the type: the shift isn't run */
         const float aim = par[P_REV_TYPE] == RV_SHIMMER ? SH_GAIN : 0.0f;
         const float st = (float)n / (0.3f * DR_SR) * SH_GAIN;
+        const float was = sh.amt;
         sh.amt = sh.amt < aim ? fm_minf(sh.amt + st, aim) : fm_maxf(sh.amt - st, aim);
+        if (was > 0.0f && sh.amt <= 0.0f) {      /* out: its line emptied, so a later Shimmer starts clean, not
+                                                  * with the last one's audio */
+            uint32_t q;
+            for (q = 0; q < SH_N; q++)
+                sh_buf[q] = 0.0f;
+            sh.lp1 = sh.lp2 = 0.0f;
+        }
     }
     for (j = 0; j + 1u < n; j += 2u) {
         float a = sl[j], b = sl[j + 1u], x, ol, or_;

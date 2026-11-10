@@ -127,6 +127,7 @@ static const char *const names[] = {
     "worst case: + feedback, character, drift, macros, drive",
     "the same, Cross-mod on pitch (cross-FM)",
     "the same, Cross-mod on the output (Snarl)",
+    "the same, the reverb Shimmer (v0.3)",
 };
 #define NCASES ((int)(sizeof names / sizeof names[0]))
 
@@ -141,6 +142,7 @@ static void setup(int c)
     case 5: drone(1, 2, 2); break;
     case 6: drone(1, 2, 2); dr_set(P_XMOD, DR_XMOD_FM); break;   /* cross-FM (v0.3) */
     case 7: drone(1, 2, 2); dr_set(P_XMOD, DR_XMOD_OUT); break;  /* Snarl (v0.3) */
+    case 8: drone(1, 2, 2); dr_set(P_REV_TYPE, 4); break;         /* Shimmer: the octave in the reverb's loop */
     }
 }
 

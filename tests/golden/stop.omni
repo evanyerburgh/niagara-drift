@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): the Drones pages after PLAY stops them. Drones 1's curves dim with
+# the fade and settle on one thin gray line, as at power-up (Evan, 2026-11-10: they had stayed lit); Drones 2's
+# waves the same. Then Shimmer switched off and on again: it starts clean, not with its last audio. Not a test of
+# its own (no expectations).
+notips
+wav stop.wav
+wait 300
+shot powerup.png
+tap PLAY
+wait 2500
+shot playing.png
+tap PLAY
+wait 400
+shot fading.png
+wait 3000
+shot stopped.png
+page 1
+wait 300
+shot stopped-2.png
+page 0
+set 64 4
+set 63 80
+tap PLAY
+wait 6000
+set 64 0
+wait 1000
+set 64 4
+wait 3000

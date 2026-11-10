@@ -679,12 +679,20 @@ static void lk_interval(char *t, int c)
 static int8_t lk_hist[DR_NGROUPS][LK_STRANDS][DR_SCOPE_N];
 static float lk_peak[DR_NGROUPS];
 
-/* how a drone's strands follow the level heard (dr_level, so a gesture's or a scene's level moves count), as Sub ·
- * Drive's lanes do (Evan, 2026-11-02): over -48..0 dB, dimming toward silence with most of the change near it,
- * closing up below about -34 dB; silent (under -48 dB): one thin gray line. Returns 0 when silent */
+/* a drone's level as heard: dr_level (so a gesture's or a scene's level moves count) through PLAY's fade, since the
+ * engine stops measuring when it stops (the level stayed where it was: Evan, 2026-11-10, Drones' curves stayed lit
+ * after a stop) */
+static float lk_level(int g)
+{
+    return dr_level[g] * dr_fade;
+}
+
+/* how a drone's strands follow the level heard (lk_level), as Sub · Drive's lanes do (Evan, 2026-11-02): over
+ * -48..0 dB, dimming toward silence with most of the change near it, closing up below about -34 dB; silent (under
+ * -48 dB) or stopped: one thin gray line, as at power-up. Returns 0 when silent */
 static int lk_heard(int g, float *bright, float *close)
 {
-    const float l = dr_level[g], db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
+    const float l = lk_level(g), db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
     const float lf = fm_clampf((db + 48.0f) / 48.0f, 0.0f, 1.0f), d = 1.0f - lf;
     *bright = 0.35f + 0.65f * (1.0f - d * d * d);
     *close = fm_minf(1.0f, lf / 0.3f);
@@ -837,7 +845,7 @@ static void lk_pic_drones2(void)
     }
     for (g = 0; g < DR_NGROUPS; g++) {
         const int32_t x0 = g ? 130 : 10;
-        const float l = dr_level[g], db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
+        const float l = lk_level(g), db = l > 1e-4f ? 6.0206f * fm_log2f(l) : -99.0f;
         char t[12];
         lk_curve(g, x0, top, bot);
         if (db > -60.0f) {                     /* "-10 dB" */
