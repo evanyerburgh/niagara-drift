@@ -713,3 +713,11 @@ at the end. The current state is in the [README](../README.md) and the code.
   saved with Wander left it running through every scene after it.
 - 2026-11-10: **a drone alone sits in the middle** (Evan: Bare "is more on the left"): Stereo's spread scales with the
   other drone's fade, so with drone II out (II OUT, Bare) drone I glides to the center, and back out as II comes in.
+- 2026-11-10: **the 16 Presets** (Evan, after eight audition rounds and six test builds on the FM-1): two banks of eight,
+  each mixing moods, nothing too strange at P2: P1 Niagara, Embers, Vespers, Dreamhouse, Abyss, Seance, Sonar, Sibyl |
+  P9 Howl, Cistern, Piston, Ashram, Telegraph, Tape, Falling, Bare (locked, drone II out, level 80). Each moves over a
+  minute; names from each sound's own world. Leveled to P1's loud moments (12 within 0.1 dB; Abyss, Vespers -2.5;
+  Ashram -5.7 on the speaker measure, its bass). Howl's random LFO at 100 (was 90), so its grind comes back every
+  10-15 s however it's started. Shimmer (the flicker: two octave-up head pairs 14 cents apart) is reverb type 5, on
+  Cistern; to be tuned later. Updating from 0.2: its dropped Presets (Eerie, Glass, Tanpura, Whistle, Cathedral,
+  Metal) go into bank F, nothing else copied (Heaven is Sibyl, Clean is Bare).
