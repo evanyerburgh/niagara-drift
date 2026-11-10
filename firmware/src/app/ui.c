@@ -2562,13 +2562,14 @@ static int sp_eq(const char *a, const char *b)  /* the same text (the device's l
     return *a == *b;
 }
 static uint32_t sp_hint_sig(int g);
-static char sp_buf[ANN_MAX + 1];
+#define SP_MAX (2u * ANN_MAX)                 /* a page is built whole, then sent in one or two messages */
+static char sp_buf[SP_MAX + 1], sp_rest[ANN_MAX + 1];   /* (sp_rest: a long page's second half, said after) */
 static uint32_t sp_n;
 
 static void sp_cat(const char *s)              /* the screen's text as plain ASCII: "[SEL]" a word, "·" a comma */
 {
     const uint8_t *u = (const uint8_t *)s;
-    while (*u && sp_n < ANN_MAX) {
+    while (*u && sp_n < SP_MAX) {
         const char *w = 0;
         if (*u == '[' || *u == ']') {
             u++;
@@ -2587,7 +2588,7 @@ static void sp_cat(const char *s)              /* the screen's text as plain ASC
             continue;
         }
         if (w) {
-            while (*w && sp_n < ANN_MAX)
+            while (*w && sp_n < SP_MAX)
                 sp_buf[sp_n++] = *w++;
             continue;
         }
@@ -2757,40 +2758,87 @@ static void sp_scene(int bank, int n)
     }
 }
 
+/* what a black key does now, said after its key: "A#3 steps it to band-pass", "F#3 turns it off" (Evan, 2026-11-10: a
+ * key's name alone didn't say what it does). The next press's result, as sw_flip makes it */
+static const char *const SP_SUB[7] = {"", "1 octave down", "2 octaves down", "one third", "one fifth", "3 octaves down",
+                                      "4 octaves down"};
+static void sp_does(int k)
+{
+    static const char *const MODE[3] = {"low-pass", "band-pass", "high-pass"};
+    static const char *const WAVES[4] = {"no LFO", "LFO I", "LFO II", "LFO I+II"};
+    static const char *const XM[4] = {"off", "cutoff", "pitch", "Snarl"};
+    const sw_t w = sw_layer()[k];
+    const int16_t *p = &proj.par[DR_GP(w.g, 0)];
+    const int on = sw_get(w);
+    sp_value(LK_BKEY[k]);
+    switch (w.s) {
+    case S_PARTNER: case S_PLOCK: case S_PLINK: case S_SYNC: sp_cat(on ? " turns it off" : " turns it on"); break;
+    case S_SUBOCT: sp_cat(" steps it to "); sp_cat(SP_SUB[p[GP_SUBOCT] % 6 + 1]); break;
+    case S_HP: sp_cat(" steps it to "); sp_cat(MODE[(p[GP_MODE] + 1) % 3]); break;
+    case S_OTAP: case S_FTAP: case S_DTAP: {
+        const int v = w.s == S_OTAP ? p[GP_OLFO] : w.s == S_FTAP ? p[GP_FLFO] : proj.par[P_DLY_LFO];
+        sp_cat(" changes it to ");
+        sp_cat(WAVES[v == DR_LFO_I ? DR_LFO_II : v == DR_LFO_II ? DR_LFO_BOTH : DR_LFO_I]);
+        break;
+    }
+    case S_ODEST: sp_cat(on ? " switches it to pitch" : " switches it to x-wave"); break;
+    case S_FDEST: sp_cat(on ? " switches it to cutoff" : " switches it to reso"); break;
+    case S_XMOD: sp_cat(" steps it to "); sp_cat(XM[(proj.par[P_XMOD] + 1) % (DR_XMOD_OUT + 1)]); break;
+    case S_LFORESET: sp_cat(" restarts the LFO"); break;
+    default: break;
+    }
+}
+/* a black key's setting and its state now: "drone 1 filter, band-pass" (the key map) */
+static void sp_setting(int k)
+{
+    static const char *const MODE[3] = {"low-pass", "band-pass", "high-pass"};
+    const sw_t w = sw_layer()[k];
+    const char *name, *st;
+    sw_text(w, &name, &st);
+    if (w.s == S_PARTNER || w.s == S_SUBOCT || w.s == S_HP || w.s == S_OTAP || w.s == S_ODEST || w.s == S_FTAP ||
+        w.s == S_FDEST)
+        sp_cat(w.g ? "drone 2 " : "drone 1 ");
+    sp_cat(name);
+    sp_cat(", ");
+    if (w.s == S_HP)
+        sp_cat(MODE[(unsigned)proj.par[DR_GP(w.g, GP_MODE)] < 3u ? proj.par[DR_GP(w.g, GP_MODE)] : 0]);
+    else if (w.s == S_SUBOCT)
+        sp_cat(SP_SUB[(unsigned)proj.par[DR_GP(w.g, GP_SUBOCT)] < 7u ? proj.par[DR_GP(w.g, GP_SUBOCT)] : 1]);
+    else
+        sp_value(st);
+}
+
 /* a page's key hints, as its picture draws them beside each drone (g 0, 1) or for the page (g 2): "LP filter, key
  * A#3" (Evan, 2026-11-10: in the page, after the knobs). Returns 0 when the page has none there */
 static int sp_hints(int g)
 {
-    static const char *const MODE[3] = {"LP", "BP", "HP"};
-    char t[16];
+    static const char *const MODE[3] = {"low-pass", "band-pass", "high-pass"};
     const int v = ui.view;
     if (g < G && v == V_PLAY) {
         sp_cat(MODE[(unsigned)gpar(g, GP_MODE) < 3u ? gpar(g, GP_MODE) : 0]);
-        sp_cat(" filter, key ");
-        sp_value(LK_BKEY[g ? 7 : 2]);
+        sp_cat(" filter, ");
+        sp_does(g ? 7 : 2);
     } else if (g < G && v == V_SOURCE) {
-        dr_param_text(DR_GP(g, GP_SUBOCT), gpar(g, GP_SUBOCT), t);
         sp_cat("sub ");
-        sp_value(t);
-        sp_cat(", key ");
-        sp_value(LK_BKEY[g ? 6 : 1]);
+        sp_cat(SP_SUB[(unsigned)gpar(g, GP_SUBOCT) < 7u ? gpar(g, GP_SUBOCT) : 1]);
+        sp_cat(", ");
+        sp_does(g ? 6 : 1);
     } else if (g < G && v == V_PARTNER) {
-        sp_cat(gpar(g, GP_PARTNER) ? "partner on, key " : "partner off, key ");
-        sp_value(LK_BKEY[g ? 5 : 0]);
+        sp_cat(gpar(g, GP_PARTNER) ? "partner on, " : "partner off, ");
+        sp_does(g ? 5 : 0);
     } else if (g < G && v == V_LFO) {
         int d;
-        for (d = 0; d < 2; d++) {              /* "LFO I to pitch, keys F#3 and G#3" */
+        for (d = 0; d < 2; d++) {              /* "pitch from LFO I, F#3 changes it to LFO II, G#3 switches it to x-wave" */
             const int route = gpar(g, d ? GP_FLFO : GP_OLFO);
             if (d)
-                sp_cat(", ");
-            sp_cat(route == DR_LFO_BOTH ? "LFO I+II" : route == DR_LFO_II ? "LFO II" : route ? "LFO I" : "no LFO");
-            sp_cat(" to ");
+                sp_cat("; ");
             sp_cat(d ? (gpar(g, GP_FLFO_DEST) == DR_TO_RESO ? "reso" : "cutoff")
                      : (gpar(g, GP_OLFO_DEST) == DR_TO_XWAVE ? "x-wave" : "pitch"));
-            sp_cat(" on ");
-            sp_value(LK_BKEY[g * 5 + (d ? 2 : 0)]);
+            sp_cat(route == DR_LFO_BOTH ? " from LFO I+II, " : route == DR_LFO_II ? " from LFO II, " : route ? " from LFO I, "
+                                                                                                        : ", no LFO, ");
+            sp_does(g * 5 + (d ? 2 : 0));
             sp_cat(", ");
-            sp_value(LK_BKEY[g * 5 + (d ? 3 : 1)]);
+            sp_does(g * 5 + (d ? 3 : 1));
         }
     } else if (g == G && v == V_LFO2) {
         static const char *const DOES[4] = {"off", "drone 1 moves drone 2's cutoff", "the drones bend each other",
@@ -2798,10 +2846,10 @@ static int sp_hints(int g)
         const int xm = proj.par[P_XMOD];
         sp_cat("Cross-mod ");
         sp_cat(DOES[(unsigned)xm < 4u ? xm : 0]);
-        sp_cat(", key ");
-        sp_value(LK_BKEY[10]);
+        sp_cat(", ");
+        sp_does(10);
     } else if (g == G && v == V_MOVES) {
-        sp_cat("Shift's key E5");
+        sp_cat("E5 plays Shift");
     } else {
         return 0;
     }
@@ -2819,26 +2867,11 @@ static void sp_screen(int all)
         const knob_t k = VIEW_KNOB[ui.view][i];
         if (knob_param(i) < 0)
             continue;
-        if (ui.view == V_LFO) {                /* LFO sends: each send with its LFO and keys ("Pitch 0 from LFO I,
-                                                * keys F#3 G#3"): its target is the knob's name */
-            const int d = (i & 1), route = gpar(k.g, d ? GP_FLFO : GP_OLFO);
-            sp_cat(i == 0 ? ". Drone 1: " : i == 2 ? ". Drone 2: " : "; ");
-            sp_short = 1;
-            sp_knob(i);
-            sp_short = 0;
-            sp_cat(route == DR_LFO_BOTH ? " from LFO I+II" : route == DR_LFO_II ? " from LFO II" : route ? " from LFO I"
-                                                                                                : ", no LFO");
-            sp_cat(", keys ");
-            sp_value(LK_BKEY[k.g * 5 + (d ? 2 : 0)]);
-            sp_cat(" ");
-            sp_value(LK_BKEY[k.g * 5 + (d ? 3 : 1)]);
-            continue;
-        }
         if (k.g < G && (i == 0 || VIEW_KNOB[ui.view][i - 1].g != k.g))
             sp_cat(k.g ? ". Drone 2: " : ". Drone 1: ");
         else
             sp_cat(i ? ", " : ": ");
-        sp_short = ui.view == V_LFO;
+        sp_short = ui.view == V_LFO;           /* (LFO sends: the values alone, their keys after) */
         sp_knob(i);
         sp_short = 0;
         if (k.g < G && (i == 3 || VIEW_KNOB[ui.view][i + 1].g != k.g)) {   /* the drone's key hints after its knobs */
@@ -2956,6 +2989,43 @@ static void sp_msg(const char *a, const char *b)
     sp.said = 1;
 }
 
+/* the text built, said: in one message, or a long page in two (at ". Drone 2", or the last sentence that fits), the
+ * second said once the first has gone (now: at once; later: once the page settles, as ann_later) */
+static void sp_split(void)                     /* sp_buf to its first message, sp_rest the second (or none) */
+{
+    uint32_t cut = sp_n, i;
+    sp_rest[0] = 0;
+    if (sp_n > ANN_MAX) {
+        for (i = 0, cut = 0; i + 9u < sp_n && i < ANN_MAX; i++)
+            if (sp_buf[i] == '.' && sp_buf[i + 1] == ' ') {
+                cut = i + 1u;
+                if (sp_buf[i + 2] == 'D' && sp_buf[i + 8] == '2')   /* ". Drone 2" */
+                    break;
+            }
+        if (!cut)
+            cut = ANN_MAX;
+        for (i = cut; sp_buf[i] == ' '; i++)
+            ;
+        memcpy(sp_rest, sp_buf + i, sp_n - i > ANN_MAX ? ANN_MAX : sp_n - i);
+        sp_rest[sp_n - i > ANN_MAX ? ANN_MAX : sp_n - i] = 0;
+        sp_buf[cut] = 0;
+        sp_n = cut;
+    }
+}
+static void sp_send(int later)
+{
+    const uint32_t now = plat_ms();
+    sp_split();
+    if (later)
+        ann_later(sp_buf, ANN_NOW, 200u, now);
+    else {
+        ann_say(sp_buf, 0, ANN_NOW);
+        if (sp_rest[0]) {
+            ann_say(sp_rest, 0, 0);
+            sp_rest[0] = 0;
+        }
+    }
+}
 static uint32_t sp_hint_sig(int g)            /* the hint's text, hashed (built aside: sp_buf is kept) */
 {
     char keep[ANN_MAX + 1];
@@ -3002,12 +3072,16 @@ static void speak(void)
         return;
     }
     lk_sound_at();
+    if (sp_rest[0] && !ann.later_set) {              /* a long page's second half, once its first has been said */
+        ann_say(sp_rest, 0, 0);
+        sp_rest[0] = 0;
+    }
     if (!sp.started || where) {                       /* everything on the screen */
         sp.started = 1;
         sp.ctx = sp_ctx_sig();
         sp_snap();
         sp_screen(1);
-        ann_say(sp_buf, 0, ANN_NOW);
+        sp_send(0);
         sp.said = 0;
         return;
     }
@@ -3023,19 +3097,12 @@ static void speak(void)
             sp_start();
             if (ui.km_key < 0)
                 sp_cat("Keys, SEL held: touch a black key to hear what it does");
-            else {
-                const char *name, *st;
-                sw_text(sw_layer()[ui.km_key], &name, &st);
+            else {                                    /* "A#3: drone 1 filter, band-pass. A#3 steps it to high-pass" */
                 sp_value(LK_BKEY[ui.km_key]);
-                sp_cat(", ");
-                {
-                    const char *gn = lk_kgroup(ui.km_key)->name;
-                    sp_cat(gn[0] == 'I' && !gn[1] ? "drone 1" : gn[0] == 'I' && gn[1] == 'I' ? "drone 2" : gn);
-                }
                 sp_cat(": ");
-                sp_cat(name);
-                sp_cat(" ");
-                sp_value(st);
+                sp_setting(ui.km_key);
+                sp_cat(". ");
+                sp_does(ui.km_key);
             }
             ann_later(sp_buf, ANN_NOW, 120u, now);
         }
@@ -3050,7 +3117,7 @@ static void speak(void)
         sp.ctx = c;
         sp_snap();
         sp_screen(0);
-        ann_later(sp_buf, ANN_NOW, 200u, now);
+        sp_send(1);
         return;
     }
     for (i = 0; i < 3; i++) {                         /* a key changed what a page's hint shows (no banner said it) */
@@ -3074,6 +3141,7 @@ static void speak(void)
         }
     }
     if (changed >= 0) {
+        sp_rest[0] = 0;                               /* (a page's second half: a hand moved on) */
         sp_start();
         if (VIEW_KNOB[ui.view][changed].g < G)
             sp_cat(VIEW_KNOB[ui.view][changed].g ? "Drone 2 " : "Drone 1 ");
@@ -3140,7 +3208,10 @@ static void speak_dump(void)
             if (s && !page_jobs(v))
                 continue;
             sp_screen(0);
+            sp_split();
             sp_print("SCREEN", sp_buf);
+            if (sp_rest[0])
+                sp_print("SCREEN", sp_rest);
             for (i = 0; i < 4; i++) {
                 const int p = knob_param(i);
                 if (p < 0 || (s && sel_job(v, i) < 0))
@@ -3164,7 +3235,10 @@ static void speak_dump(void)
         lk_at = (int16_t)(x < 2 ? BANK_PRESETS << 4 | 2 : 0 << 4 | 4);
         proj.par[P_PULSE] = (int16_t)(x & 1);
         sp_screen(1);
+        sp_split();
         sp_print("WHERE", sp_buf);
+        if (sp_rest[0])
+            sp_print("WHERE", sp_rest);
     }
     for (x = 0; x < 2 * NPLAY; x++) {                 /* each Preset's name, and bank B's scenes, as a tap says them */
         sp_start();
