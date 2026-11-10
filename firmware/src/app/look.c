@@ -229,8 +229,7 @@ static void lk_bar(void)
              (uint32_t)fade_q() | (uint32_t)(glide + 2) << 8 | (uint32_t)(uint8_t)lk_at << 16 |
                  (uint32_t)proj.bank << 24 | (uint32_t)(ui.view == V_PULSE && dr_ext_spb > 0.0f) << 28 |
                  (uint32_t)((ui.view == V_FX || ui.view == V_FX2) && proj.par[P_DLY_REPEATS] > 85) << 29 |
-                 (uint32_t)((ui.view == V_FX || ui.view == V_FX2) && proj.par[P_REV_LEN] >= 100) << 30 |
-                 (uint32_t)ui.kept << 31);
+                 (uint32_t)((ui.view == V_FX || ui.view == V_FX2) && proj.par[P_REV_LEN] >= 100) << 30);
     h = hash(hash(h, (uint32_t)(gest + 1) | (uint32_t)ui.hold_from << 8 |
                          (uint32_t)(line < 0.0f ? 0xFFFu : (uint32_t)(line * 224.0f)) << 12),
              (uint32_t)(gest_pct + 1));
@@ -286,10 +285,6 @@ static void lk_bar(void)
     if ((ui.view == V_FX || ui.view == V_FX2) && proj.par[P_DLY_REPEATS] > 85) {   /* the echoes stop shrinking */
         badge[nb] = "runaway";
         bcol[nb++] = LK_RED;
-    }
-    if (ui.kept && nb < 6) {                   /* SEL + its button: no auto-return (Evan, 2026-11-08) */
-        badge[nb] = "kept";
-        bcol[nb++] = LK_LABEL;
     }
     if (proj.par[P_II_OUT] && nb < 6) {
         badge[nb] = "II OUT";

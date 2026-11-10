@@ -706,4 +706,5 @@ at the end. The current state is in the [README](../README.md) and the code.
 - 2026-11-08: **auto-return** (Evan's idea, ledger 21): a page left alone goes back to Drones, the page played, 8 s
   after it was opened or a knob last turned on it (keys and gestures don't count; not while a page button is held or
   SEL is). Hold SEL and tap a page's button to keep it ("kept" in the header) until another page. The return is a
-  plain switch. The host's scenarios have it off unless they say `autoreturn`.
+  plain switch. The host's scenarios have it off unless they say `autoreturn`. **Taken out 2026-11-10** (Evan, on the
+  FM-1: "kind of annoying"), SEL + a page's button with it: a page stays until the player leaves it.

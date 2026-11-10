@@ -231,15 +231,12 @@ Tap a page button and the knobs stay on that page. Hold it to peek: turn a knob,
 back (the header says PEEK, and where letting go takes you: "let go: DRONES"). Tap it again for its next page; "1/2"
 by the page's name shows which of its pages you're on. HOME and FX always open the page you play from (Drones,
 Space); the other buttons open the page you last used there, so after visiting Pitch moves, holding SEQ peeks at it.
-**A page left alone goes back to Drones**, the page you play from: 8 seconds after you opened it or last turned one of
-its knobs (playing keys and gestures doesn't count). To stay on a page, hold **SEL** and tap its button: "kept" shows in
-the header until you go to another page.
 
 The header, left to right: the page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT. At the
-right, the sound: its bank and key ("A5"; a Preset's name too, "P3 EERIE", where there's room), "changed" once you've
+right, the sound: its bank and key ("A5"; a Preset's name too, "P3 SEANCE"), "changed" once you've
 moved it from there; stopped, what PLAY does. On its way to a scene it says where, in gold ("→ P3 EERIE", "→ A5" as a
 blend glides back), a gold line filling under the header as it goes, for at least 1.5 s however short the Scene time;
-PLAY's fade fills the line too. When it's full, the sound's name goes first, the page's name never.
+PLAY's fade fills the line too. When it's full, the "1/2" and SWELL give way before a Preset's name; the page's name never does.
 Each page's screen shows a picture of what its knobs do, and the four values below it. Every knob
 glides: a slow turn is a smooth sweep, never steps; turn faster to go further. The levels follow your ear: halfway is about a quarter as loud.
 
