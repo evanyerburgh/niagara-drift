@@ -78,14 +78,7 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      II_(GP_PITCH), 4500, II_(GP_WAVE), 67, II_(GP_CUTOFF), 620, II_(GP_RESO), 850, II_(GP_LEVEL), 88,
      P_LFO_RATE, 94, P_PULSE, 0, P_DLY_TIME, 45, P_DLY_MIX, 40, P_REV_TYPE, 1, P_DLY_TYPE, 0, P_REV_LEN, 55,
      P_DLY_DRIVE, 25, -1},
-    /* P8 HOWL: D2 and Eb2 grinding, Feedback 85, a random LFO on the filters, quick enough
-     * that the grind comes back however Howl is started (Evan, 2026-11-10; 0.2's P9) */
-    {I_(GP_PITCH), 3800, I_(GP_CUTOFF), 740, I_(GP_RESO), 600, I_(GP_DRIVE), 75, I_(GP_LEVEL), 92,
-     I_(GP_FLFO_DEPTH), 100, I_(GP_FLFO_DEST), 1, II_(GP_PITCH), 3900, II_(GP_CUTOFF), 780, II_(GP_RESO), 600,
-     II_(GP_MODE), 1, II_(GP_DRIVE), 75, II_(GP_LEVEL), 92, P_LFO_RATE, 100, P_LFO_W1, 8, P_DLY_TIME, 20,
-     P_DLY_REPEATS, 45, P_DLY_MIX, 40, P_REV_MIX, 50, P_REV_TYPE, 0, P_MOVE, 40, P_FEEDBACK, 85, P_CHAR, 21,
-     P_REV_LEN, 40, -1},
-    /* P9 SIBYL: a voice: D4 and F#5, sines, the LFO morphing each wave (the "ah"), a gentle Swell, a bright Cathedral
+    /* P8 SIBYL: a voice: D4 and F#5, sines, the LFO morphing each wave (the "ah"), a gentle Swell, a bright Cathedral
      * (0.2's Heaven, moving more) */
     {I_(GP_PITCH), 6200, I_(GP_WAVE), 0, I_(GP_INTERVAL), 9, I_(GP_DETUNE), 15, I_(GP_MIX), 0, I_(GP_CUTOFF), 950,
      I_(GP_RESO), 50, I_(GP_LEVEL), 65, I_(GP_OLFO_DEPTH), 65, I_(GP_OLFO_DEST), 1, II_(GP_PITCH), 7800,
@@ -93,6 +86,13 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      II_(GP_RESO), 50, II_(GP_LEVEL), 61, II_(GP_OLFO_DEPTH), 75, II_(GP_OLFO_DEST), 1, P_DRIFT, 40, P_PULSE_RATE, 8,
      P_PULSE_DEPTH, 30, P_PULSE_SHAPE, 0, P_DLY_TIME, 80, P_DLY_REPEATS, 60, P_REV_MIX, 65, P_MOVE, 55,
      P_DLY_TYPE, 1, P_REV_LEN, 92, P_REV_DAMP, 20, -1},
+    /* P9 HOWL: D2 and Eb2 grinding, Feedback 85, a random LFO on the filters, quick enough
+     * that the grind comes back however Howl is started (Evan, 2026-11-10; 0.2's P9) */
+    {I_(GP_PITCH), 3800, I_(GP_CUTOFF), 740, I_(GP_RESO), 600, I_(GP_DRIVE), 75, I_(GP_LEVEL), 92,
+     I_(GP_FLFO_DEPTH), 100, I_(GP_FLFO_DEST), 1, II_(GP_PITCH), 3900, II_(GP_CUTOFF), 780, II_(GP_RESO), 600,
+     II_(GP_MODE), 1, II_(GP_DRIVE), 75, II_(GP_LEVEL), 92, P_LFO_RATE, 100, P_LFO_W1, 8, P_DLY_TIME, 20,
+     P_DLY_REPEATS, 45, P_DLY_MIX, 40, P_REV_MIX, 50, P_REV_TYPE, 0, P_MOVE, 40, P_FEEDBACK, 85, P_CHAR, 21,
+     P_REV_LEN, 40, -1},
     /* P10 CISTERN: reeds (Deep Listening's cistern): saw-square drones, drone I rounder with a sine sub, a bellows
      * Swell, a Tape delay a second long, the Shimmer reverb */
     {I_(GP_WAVE), 45, I_(GP_WIDTH), 0, I_(GP_MIX), 35, I_(GP_CUTOFF), 600, I_(GP_RESO), 150, I_(GP_DRIVE), 10,
@@ -146,8 +146,8 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      P_DLY_MIX, 0, P_REV_MIX, 0, P_DLY_LFO_DEPTH, 0, P_II_OUT, 1, P_MOVE, 0, -1},
 };
 #define NPRESETS ((int)(sizeof PRESET_CHANGES / sizeof PRESET_CHANGES[0]))
-static const char *const PRESET_NAME[] = {"NIAGARA", "EMBERS", "VESPERS", "DREAMHOUSE", "ABYSS", "SEANCE", "SONAR", "HOWL",
-                                          "SIBYL", "CISTERN", "PISTON", "ASHRAM", "TELEGRAPH", "TAPE", "FALLING", "BARE"};
+static const char *const PRESET_NAME[] = {"NIAGARA", "EMBERS", "VESPERS", "DREAMHOUSE", "ABYSS", "SEANCE", "SONAR", "SIBYL",
+                                          "HOWL", "CISTERN", "PISTON", "ASHRAM", "TELEGRAPH", "TAPE", "FALLING", "BARE"};
 _Static_assert(sizeof PRESET_NAME / sizeof PRESET_NAME[0] == NPRESETS, "a name for each Preset");
 const char *preset_name(int n)             /* a Preset's name */
 {
