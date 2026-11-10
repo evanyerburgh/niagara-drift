@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): the reverb's types switched under a steady sound (the LFO's sends
+# and the Swell off), mix 50. Hall, then Shimmer: its octave washes in over 8 s and out over 6, and only the halo
+# changes, the room is the Hall's (Evan, 2026-11-10: "it should wash in and out"). Then Cathedral to the Hall: a
+# type's crossfade is 200 ms (at 50 the level jumped up to 6 dB leaving the Cathedral). Not a test of its own (no
+# expectations).
+notips
+phones 1
+set 55 0
+set 14 0
+set 17 0
+set 35 0
+set 38 0
+tap PLAY
+set 63 50
+set 64 1
+wav reverb-types.wav
+wait 6000
+set 64 4
+wait 14000
+set 64 1
+wait 9000
+set 64 2
+wait 5000
+set 64 1
+wait 4000

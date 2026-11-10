@@ -468,7 +468,8 @@ pink specks are as many as Color says.
   about 9 kHz. **Repeats** past about 85 runs
   away into self-oscillation ("runaway" on the screen), held by a soft clip.
 - **Reverb types**: **Room**, **Hall**, **Cathedral** (the largest), **Chorus hall** (a hall that shimmers),
-  **Shimmer** (its tail an octave up, in two halos a few cents apart that flicker: a bright glow over the drones).
+  **Shimmer** (the Hall with an octave above whatever is playing, in two voices a few cents apart, so its harmonics
+  sparkle; it washes in over about 8 seconds and out over 6, and Length and Mix play it like any reverb).
   They differ in size, distance and movement; changing type crossfades, and the knob goes round both ways.
 - **Into reverb** (Details, SEL + KNOB 4) is what the reverb hears: **Both** (the drones and their echoes, as the effects
   are chained), **Echoes** (only the echoes wash out; the drones stay dry and up front), or **Drones** (the reverb
