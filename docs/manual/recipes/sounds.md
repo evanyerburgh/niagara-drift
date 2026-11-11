@@ -212,7 +212,8 @@ two filters in turn.
    Swell's speed.
 4. Hold black key 5, [[D#4]], half a second: the LFO restarts on each of the Swell's breaths ("on Swell").
 
-> **Good to know.** The Swell's speed sets the rhythm: the locked LFO restarts on each of its breaths. Hold [[D#4]]
+> **Good to know.** Echoes blur the rhythm: if your sound has them, turn the delay's Mix down first ([[FX]],
+> KNOB 2). The Swell's speed sets the rhythm: the locked LFO restarts on each of its breaths. Hold [[D#4]]
 > again to free the LFO. (With a MIDI clock, the Swell and the locked LFO follow its beat too.)
 
 ![LFO sends, LFO I Square on both cutoffs, on Swell](../media/swell-0.png "Square on both cutoffs, on Swell")
@@ -220,10 +221,9 @@ two filters in turn.
 
 **Listen** (`swell`)
 
-- 0:00 P8 Sibyl as it starts
-- 0:01 the Swell quicker: the drones breathe about once a second
-- 0:07 LFO I to Square on both cutoffs: the filters jump in turn
-- 0:16 the LFO locked to the Swell: each jump lands on its breath
+- 0:00 P8 Sibyl, its delay off and its Swell quick: the drones breathe about once a second
+- 0:01 LFO I to Square on both cutoffs: the filters jump in turn
+- 0:11 the LFO locked to the Swell: each jump lands on its breath
 
 ### LFO chasing itself {#chase}
 

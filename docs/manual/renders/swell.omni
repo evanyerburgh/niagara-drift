@@ -7,14 +7,16 @@ set 74 0
 set 71 0
 tapkey w7
 tap PLAY
-wait 3000
-wav swell.wav
-# @ P8 Sibyl as it starts as it starts
-wait 1500
+wait 2500
+tap FX
+turn K2 -100 10
+wait 500
 tap ARP
-# @ the Swell quicker (Swell, KNOB 1): the drones breathe about once a second
 turn K1 45 60
-wait 3000
+wait 1500
+wav swell.wav
+# @ P8 Sibyl, its delay off and its Swell quick: the drones breathe about once a second
+wait 1500
 tap LFO
 # @ LFO I to Square on both cutoffs (key 8 twice: LFO I on drone II's too), about as fast: the filters jump in turn
 tap OCT-
