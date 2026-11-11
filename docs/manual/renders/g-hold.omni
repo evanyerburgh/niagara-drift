@@ -9,19 +9,13 @@ tapkey w0
 tap PLAY
 wait 2500
 wav g-hold.wav
-# @ P1 Niagara as it starts
+# @ P1 Niagara
 wait 1500
-# @ hold Wash (G5) 4 seconds: the delay, then the reverb grows longer and darker, the dry dipping
+# @ Wash held 4 s: the reverb grows
 key w15 down
 wait 4000
 shot g-hold-0.png
-# @ let go: it leaves over as long as it was held, the dry back first, the tails last
+# @ let go: it fades over 4 s
 key w15 up
 wait 5000
-# @ hold Weight (D5) 2 seconds: a fuller, warmer bass; let go and it leaves in 2
-key w12 down
-wait 2000
-shot g-hold-1.png
-key w12 up
-wait 3500
 wavstop

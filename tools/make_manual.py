@@ -286,7 +286,7 @@ def recipe_html(rid, title, body):
             f'<button class="share" data-id="{rid}" data-title="{html.escape(title)}" aria-label="Share {html.escape(title)}">Share</button></div>'
             f'<div class="recipe-body"><div>{f"<p class=lead>{lead}</p>" if lead else ""}<ol class="moves">{moves}</ol>'
             f'{f"<div class=good><b>Good to know</b>{good}</div>" if good else ""}</div>'
-            f'<div><div class="screens">{figs}</div>{snd}</div></div></section>')
+            f'<div class="screens">{figs}</div>{snd}</div></section>')
 
 
 def onpage(groups, base, label):

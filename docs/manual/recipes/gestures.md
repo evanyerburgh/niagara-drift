@@ -11,20 +11,18 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 
 ### Bloom into the reverb, fade out slowly {#hold}
 
-*Wash: the longer you hold, the slower it fades*
+*The longer you hold, the slower it fades*
 
 1. Hold **Wash**, [[G5]], until the reverb has bloomed.
 2. Let go: it fades out as slowly as you held it in.
 
 ![Drones, Wash at 100%](../media/g-hold-0.png "WASH 100%")
-![Drones, Weight at 72%](../media/g-hold-1.png "WEIGHT 72%")
 
 **Listen** (`g-hold`)
 
-- 0:00 P1 Niagara as it starts
-- 0:01 Wash held 4 seconds: the delay, then the reverb grows longer and darker, the dry dipping
-- 0:05 let go: it leaves over as long as it was held, the dry back first, the tails last
-- 0:10 Weight held 2 seconds: a fuller, warmer bass; let go and it leaves in 2
+- 0:00 P1 Niagara
+- 0:01 Wash held 4 s: the reverb grows
+- 0:05 let go: it fades over 4 s
 
 ### Swell into a chord and back {#press}
 
@@ -40,28 +38,29 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 
 **Listen** (`g-press`)
 
-- 0:00 P3 Vespers as it starts
-- 0:01 Chord pressed lightly: the partners start to move toward a chord
-- 0:04 pressed harder: further in, a full, beatless chord
-- 0:08 eased off: it comes back toward where it was
-- 0:11 let go: it goes
+- 0:00 P3 Vespers
+- 0:01 Chord pressed lightly: the drones start to move
+- 0:04 harder: a full chord
+- 0:08 eased off: back toward the start
+- 0:11 let go
 
 ### Leave a gesture on while you play {#keep}
 
-*A tap latches it; SEL keeps it part way*
+*A tap latches it; SEL latches it at a level*
 
 1. Tap a gesture key: it comes all the way in and stays. Tap again to let it go.
-2. Or hold one and tap [[SEL]] part way: it stays there.
+2. Or hold a gesture key (or press it harder) until the screen shows a level you like, and tap [[SEL]] while still
+   holding it: it latches at that level. Let go when you like.
 
-![Drones, Clean latched](../media/g-keep-0.png "CLEAN latched")
-![Drones, Wash kept part way](../media/g-keep-1.png "Wash kept part way")
+![Drones, Chord latched](../media/g-keep-0.png "Tapped: CHORD latched")
+![Drones, Chord pressed to 55%](../media/g-keep-1.png "CHORD 55%: tap SEL here")
 
 **Listen** (`g-keep`)
 
-- 0:00 P2 Embers as it starts
-- 0:01 Clean tapped: it comes all the way in on its own and stays: the grit, the movement, then the effects leave
-- 0:06 tapped again: it goes, the effects back first
-- 0:10 Wash held, SEL tapped part way: it stays where it had got to
+- 0:00 P2 Embers
+- 0:01 Chord tapped: all the way in, latched
+- 0:05 tapped again: it goes
+- 0:09 pressed to 55%, SEL tapped: latched there
 
 ### Build a climax {#stack}
 
@@ -74,10 +73,10 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 
 **Listen** (`g-stack`)
 
-- 0:00 P6 Seance as it starts
-- 0:01 Snarl pressed in: a growl under the sound
-- 0:05 Wash held on top: the growl washes into the reverb, a climax
-- 0:10 both let go: each leaves in its own order
+- 0:00 P6 Seance
+- 0:01 Snarl pressed: a growl
+- 0:05 Wash held on top: the climax
+- 0:10 both let go
 
 ### Transform the sound over half a minute {#minute}
 
@@ -90,8 +89,8 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 
 **Listen** (`g-minute`)
 
-- 0:00 P12 Ashram, Gesture time slow
-- 0:01 Weight tapped: it comes in on its own, slowly, no key held
+- 0:00 P12 Ashram, Gesture time 33 s
+- 0:01 Weight tapped: it comes in on its own
 
 ### Hit it fast, let it fade slowly {#speed}
 
@@ -105,5 +104,6 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 **Listen** (`g-speed`)
 
 - 0:00 P13 Telegraph, Gesture time fast
-- 0:01 Wash held 2 seconds: in fast
-- 0:03 let go, then PRESETS turned slow: the release stretches out, the reverb lingering
+- 0:01 Wash held 2 s: in fast
+- 0:03 let go, PRESETS turned left: a slow fade
+

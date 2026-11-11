@@ -1,30 +1,67 @@
 ---
 title: Scenes and saving
 intro: Keep a sound, move between sounds, and get back to where you were
+description: Recipes for Niagara Drift's 48 scenes: make a Preset your own, blend between two sounds by pressure, undo a scene change.
+image: s-blend-0.png
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-### Save your sound {#save .coming}
+The 8 white keys are scenes: 6 banks of 8 (A to F) to fill with your own sounds, and the Presets.
 
-*SAVE, then a white key*
+### Make a Preset your own {#save}
 
-### Blend into a scene and keep it {#blend .coming}
+*Pick a bank, change it, SAVE and a white key*
 
-*Press harder, tap SEL to stay there*
+1. Tap a Preset, then pick bank A: hold [[SEL]] and tap [[G4]] (B to F are [[A4]] to [[E5]]).
+2. Change it as you like.
+3. Hold [[SAVE]] and tap a white key: it's stored there. Tap that key later to glide back to it.
 
-### Go back {#back .coming}
+> **Good to know.** The Presets can't be saved over: your sounds go in A to F.
 
-*SEL + SAVE: to the sound before the last scene*
+![Space, saved to A1](../media/s-save-0.png "Saved: the header says A1")
+![Drones, back on A1](../media/s-save-1.png "A1 tapped: back to the saved sound")
 
-### Take a scene all the way {#take .coming}
+**Listen** (`s-save`)
 
-*Press all the way and hold a moment*
+- 0:00 P10 Cistern, bank A picked
+- 0:01 changed: brighter, a longer reverb
+- 0:05 saved on A1
+- 0:07 changed again: darker
+- 0:11 A1 tapped: back to the saved sound
 
-### Your 6 banks {#banks .coming}
+### Blend between two sounds and keep the mix {#blend}
 
-*SEL + a gesture key picks one*
+*Press a scene key harder, tap SEL*
 
-### Make a Preset yours {#yours .coming}
+1. Hold another scene's key and press slowly harder: the sound moves toward it, as far as you press.
+2. Tap [[SEL]] while still holding: the blend stays there ("A2 67% KEPT"). Let go when you like.
 
-*Start from one, save it in a bank*
+> **Good to know.** Let go without SEL and it glides back. Press all the way and hold a moment, and the scene is taken
+> ("TAKEN").
+
+![Osc, the blend kept at 67%](../media/s-blend-0.png "A2 67% KEPT")
+![Osc, after letting go](../media/s-blend-1.png "Let go: the blend stays")
+
+**Listen** (`s-blend`)
+
+- 0:00 A1: P2 Embers (a darker version on A2)
+- 0:01 A2 pressed slowly harder
+- 0:05 SEL tapped, then let go: the blend stays
+
+### Undo a scene change {#back}
+
+*SEL + SAVE*
+
+1. Hold [[SEL]] and tap [[SAVE]]: back to the sound before your last scene tap or blend.
+2. Again: forward to where you were.
+
+![Drones, on P5 Abyss](../media/s-back-0.png "P5 tapped")
+![Drones, back on P1 Niagara](../media/s-back-1.png "SEL + SAVE: back to P1")
+
+**Listen** (`s-back`)
+
+- 0:00 P1 Niagara
+- 0:01 P5 Abyss tapped
+- 0:05 SEL + SAVE: back to Niagara
+- 0:09 again: forward to Abyss

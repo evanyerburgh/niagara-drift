@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P13, headphones, Pitch lock off.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+set 51 55
+press SEL
+tapkey w15
+release SEL
+tapkey w4
+tap GLO
+expect view 10
+wait 1600
+wav t-fade.wav
+# @ P13 Telegraph stopped, Fade at 10 s (Setup 1, KNOB 1); PLAY tapped: it comes in over 10 seconds
+tap PLAY
+wait 5000
+shot t-fade-0.png
+wait 7000
+# @ SEL + PLAY: drone II alone fades out, over the same 10 seconds
+press SEL
+tap PLAY
+release SEL
+wait 5000
+shot t-fade-1.png
+wait 6000
+wavstop

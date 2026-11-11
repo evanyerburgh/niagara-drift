@@ -9,20 +9,25 @@ tapkey w1
 tap PLAY
 wait 2500
 wav g-keep.wav
-# @ P2 Embers as it starts
+# @ P2 Embers
 wait 1500
-# @ tap Clean (F5): it comes all the way in on its own and stays: the grit, the movement, then the effects leave
-tapkey w14
-wait 5000
-shot g-keep-0.png
-# @ tap again: it goes, the effects back first
-tapkey w14
+# @ Chord tapped: all the way in, latched
+tapkey w9
 wait 4000
-# @ hold Wash and tap SEL part way: it stays where it had got to
-key w15 down
+shot g-keep-0.png
+# @ tapped again: it goes
+tapkey w9
+wait 3500
+# @ pressed to 55%, SEL tapped: latched there
+pressure w9 0
+key w9 down
+pressure w9 40
+wait 1200
+pressure w9 75
 wait 1800
 tap SEL
-key w15 up
-wait 4000
+wait 300
 shot g-keep-1.png
+key w9 up
+wait 3500
 wavstop
