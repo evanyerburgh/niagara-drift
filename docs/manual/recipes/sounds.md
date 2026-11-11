@@ -259,24 +259,23 @@ easiest to hear on a vibrato.
 When the delay's time moves, its echoes bend in pitch, as tape does when it speeds up and slows down. Let an LFO move
 it, and every echo warbles.
 
-1. Press [[LFO]], and tap black key 10, [[D#5]], to pick which LFO moves the delay's time (I, II or both).
-2. Press [[LFO]] again for **Mods**, and turn KNOB 3, Delay, up: the delay's time wobbles by up to a quarter, and the
-   echoes bend with it.
-3. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) up: each echo bends again as it comes round.
-4. Press [[FX]] again for **Details**, and turn Time (KNOB 2) up: the bends get deeper and slower.
+1. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: clear echoes to bend.
+2. Press [[LFO]] twice for **Mods**, and turn KNOB 3, Delay, up: the LFO wobbles the delay's time by up to a quarter,
+   and every echo bends with it.
+3. Press [[FX]] twice for **Details**, and turn Time (KNOB 2) up: deeper, slower bends.
 
-> **Good to know.** Turning Time by hand bends the echoes too. A slow LFO warbles; a fast one makes a vibrato on the
-> echoes alone. Movement (ALGORITHM) scales the warble with the other LFO sends.
+> **Good to know.** On the LFO pages, black key 10, [[D#5]], picks which LFO moves the delay's time: LFO I's
+> regular waves warble evenly, LFO II's random glide makes them wander, as here. Turning Time by hand bends the
+> echoes too. Movement (ALGORITHM) scales the warble with the other LFO sends.
 
-![Mods, Delay +80, LFO I](../media/warble-0.png "Delay +80")
-![Details, Time 730 ms](../media/warble-1.png "Time 730 ms")
+![Mods, Delay +80](../media/warble-0.png "Delay +80")
+![Details, Time 410 ms](../media/warble-1.png "Time 410 ms")
 
 **Listen** (`warble`)
 
-- 0:00 P6 Seance as it starts
-- 0:01 the LFO on the delay's time, Delay up: the echoes wobble and bend
-- 0:09 more repeats: each echo bends again as it comes round
-- 0:13 a longer Time: deeper, slower bends
+- 0:00 P8 Sibyl with its echoes up: clear repeats of the two voices
+- 0:01 Delay up: the LFO wobbles the delay's time, and every echo bends in pitch
+- 0:09 a longer Time: deeper, slower bends
 
 ### Crackling echoes {#crackle}
 
