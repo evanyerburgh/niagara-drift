@@ -109,7 +109,7 @@ Gestures stack: each moves its own settings on top of the others. Snarl's growl 
 **PRESETS** is Gesture time: turn it left and every gesture takes longer, up to 12 times its own time. For a gesture
 that takes a minute, don't hold the key: tap it, and it comes in on its own.
 
-1. Turn **PRESETS** left: the screen shows the time ("GESTURE TIME", Weight's).
+1. Turn **PRESETS** left: all the way, Weight takes about 33 s, and Tick, Chord, Snarl and Stutter over a minute.
 2. Tap a gesture key, here **Weight**, [[D5]]: it comes in slowly, with no key held.
 3. Tap it again when you want it gone: it leaves as slowly.
 

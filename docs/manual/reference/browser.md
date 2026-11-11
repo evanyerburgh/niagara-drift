@@ -17,3 +17,6 @@ builds the same page from your checkout, serves it at http://localhost:8765 and 
 | HOME · EDIT · LFO I · LFO II (OCT− · OCT+) | | Esc · V · Z · X |
 | Black keys 1–11 | click | 1 … 0, − |
 | Scenes 1–8 · gestures 9–12 · gestures 13–16 | click | Q … I · A … F · G … K |
+
+The mouse doesn't sense pressure, so on keys 9–12 a held click climbs at the gesture's own time (Gesture time,
+PRESETS); let go and it falls; click again and it climbs again. On the FM-1 those keys follow how hard you press.
