@@ -169,7 +169,8 @@ def table_html(rows):
     head, body = cells[0], [r for r in cells[1:] if not all(re.fullmatch(r":?-+:?", c) for c in r)]
     th = "".join(f"<th>{inline(c)}</th>" for c in head)
     tb = "".join("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in r) + "</tr>" for r in body)
-    return f'<div class="tablewrap"><table><thead><tr>{th}</tr></thead><tbody>{tb}</tbody></table></div>'
+    head_html = f"<thead><tr>{th}</tr></thead>" if any(head) else ""     # a blank header row (| | |) left out
+    return f'<div class="tablewrap"><table>{head_html}<tbody>{tb}</tbody></table></div>'
 
 
 def render(bl, h_shift=0):

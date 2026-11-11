@@ -7,42 +7,24 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 
 ## What it does
 
-- **16 Presets** to start from, each a different side of the instrument and each moving over a minute: Niagara,
-  Embers, Vespers, Dreamhouse, Abyss, Seance, Sonar and Sibyl on keys 1–8 of the Presets bank; Howl, Cistern, Piston,
-  Ashram, Telegraph, Tape, Falling and Bare on keys 1–8 of the second.
-- **Eight gestures**, each several settings moving together on top of your sound: **Weight**, **Shift**, **Clean** and
-  **Wash** on the top keys, in while you hold and out as slowly as you held; **Tick**, **Chord**, **Snarl** and
-  **Stutter** on keys 9–12, as deep as you press. Tap any of them in to stay.
-- **Scenes**: 8 on the white keys in each of six banks (48 of yours), plus the Presets' two, recalled gliding over the
-  Scene time, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob moves, gestures and scenes.
-- **It moves on its own**: the LFO, the Swell, **Drift**, **Wander** (drone II's slow random melody on a scale) and
-  **Age** (tape wear) keep it breathing without a hand on it.
-- **Two drones**, each a main oscillator that blends sine → triangle → saw → square (X-WAVE), a
-  partner oscillator at an interval (tempered or just) with detune, a sub one to four octaves down
-  (the lowest two click under a low drone) or a subharmonic (⅓, ⅕ of the pitch), and a white or pink noise, into its own self-oscillating
-  filter (low-, band- or high-pass) with drive. Pitch is free between notes, from 2 Hz to 1.6 kHz.
-- **Tunings**: the pitch knobs move through the notes of a Tuning, and the screen names the intervals in its own
-  terms: 12-tone, quarter tones, 19-, 31- and 53-tone equal temperament, just intonation, the harmonics, La Monte
-  Young's Well-Tuned Piano, Lou Harrison's, the 22 shrutis of Indian music, or Harry Partch's 43 notes. A sound
-  carries its Tuning.
-- **Links** between them: pitch link, hard sync, and cross-mod: drone I's sound moving drone II's cutoff, or each
-  drone's sound bending the other's pitch (cross-FM).
-- **The Ultra LFO**: one rate, two waves of ten shapes each (one of them truly
-  random, two stepped, AND and OR), routed to each drone's pitch or X-WAVE and cutoff or resonance, alone or summed. It can
-  move its own rate and lock to the Swell.
-- **Movement** (ALGORITHM): all the LFO's depths down or up together, from still to double.
-- **The Swell**: both drones breathing in time, from a slow soft swell to a hard rhythmic gate, with swing.
-- **Effects**: a stereo delay of six types (Clean, Wide, Ping-pong, Tape, and Grain and Self, whose
-  own echoes move their time; the LFO can warble it too), a drive
-  after it (the drones and their echoes distorted together), into a reverb of five (Room, Hall,
-  Cathedral, Chorus hall, Shimmer) whose length goes to Inf, a freeze.
-- **Feedback** (the finished sound fed back into the drones) and **Character** (clean to vintage).
-- **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
-- **Morph**: buttons and keys never jump: the sound moves to a new setting over a time you set.
+<ul class="cards">
+<li><b>Two drones</b><span>Each a wave from sine to square, a partner at an interval, a sub and noise, into its own self-oscillating filter and drive</span></li>
+<li><b>16 Presets</b><span>Each a different side of the instrument, each moving over a minute</span></li>
+<li><b>Tunings</b><span>12-tone to Partch's 43 notes, La Monte Young's, Harrison's, the shrutis; intervals named in each one's terms</span></li>
+<li><b>Eight gestures</b><span>Several settings moving at once on top of your sound: held, pressed harder, or tapped to stay</span></li>
+<li><b>Scenes</b><span>48 of yours in six banks, gliding in, or crossfaded by pressing a key harder</span></li>
+<li><b>Motion loop</b><span>Records your knob moves, gestures and scenes, and plays them back</span></li>
+<li><b>The Ultra LFO</b><span>Two waves of ten shapes on each drone's pitch, wave, cutoff or resonance, and the delay</span></li>
+<li><b>Movement</b><span>Every LFO depth at once, from still to double, on one knob</span></li>
+<li><b>The Swell</b><span>Both drones breathing in time, from a soft swell to a hard gate</span></li>
+<li><b>Cross-mod</b><span>The drones moving each other's filter or pitch, or the finished sound bending both</span></li>
+<li><b>Effects</b><span>Six delays, a drive after them, five reverbs from a room to a freeze</span></li>
+<li><b>Feedback and Character</b><span>The finished sound fed back into the drones; the oscillators from clean to vintage</span></li>
+<li><b>Moves on its own</b><span>Drift, Wander (a slow melody on a scale) and Age (tape wear) keep it alive</span></li>
+<li><b>Never jumps</b><span>Buttons, keys and scenes glide to their new settings over times you set</span></li>
+</ul>
 
 ## Videos
-
-Niagara Drift as others have played it.
 
 <div class="videos">
 <figure class="video"><iframe src="https://www.youtube-nocookie.com/embed/6mRatAf7f-k" title="2 x FM-1 AMBIENT TECHNO LIVE PERFORMANCE | Niagara Drift and Groove OS, by Grzegorz Bojanek" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen"></iframe>
@@ -55,33 +37,30 @@ Niagara Drift as others have played it.
 
 ## Technical details
 
-- **Audio:** 44.1 kHz, stereo, rendered in 32-bit floating point and sent to the FM-1's converter at 24 bits; a block
-  every 5.8 ms. Past about four-fifths of MASTER it drives into a soft overdrive at about the same loudness.
-- **Keys:** the white keys sense pressure: scenes crossfade, and keys 9–12 play their gestures, as hard as you press.
-- **MIDI**, over USB or the TRS jack: notes on channels 1 and 2 tune the two drones; a MIDI clock puts the Swell, the
-  LFO, the delay, Wander and the scenes in time (see [MIDI](reference/midi.md)).
-- **Your sounds:** six banks of eight scenes, plus the sixteen Presets; the installers back them up before they install,
-  and a restore is safe even if the power goes off halfway (see [Help](help.md)).
-- **The screen, out loud:** with the [FM-1 Screen Reader](reference/screen-reader.md), it says what its screen shows.
-- **In the browser:** the emulator on the front page is the firmware's own code, compiled for the browser, running at
-  44.1 kHz with sound; SAVE there keeps your sound in that browser. Running FM-1 firmware in a browser was
-  [Groove OS](https://www.groove-os.com/)'s idea.
-- **Open source:** GPL-3.0; the code, the host simulator and the tests are on
-  [GitHub](https://github.com/evanyerburgh/niagara-drift).
+| | |
+|---|---|
+| **Audio** | 44.1 kHz stereo; 32-bit floating point inside, 24-bit out; a block every 5.8 ms |
+| **Keys** | the white keys sense pressure (scene crossfades, keys 9–12's gestures) |
+| **MIDI** | over USB or TRS: notes on channels 1 and 2 tune the drones; a clock syncs the Swell, LFO, delay, Wander and scenes ([MIDI](reference/midi.md)) |
+| **Your sounds** | six banks of eight scenes, plus 16 Presets; backed up before every install, restored safely ([Help](help.md)) |
+| **The screen, out loud** | the [FM-1 Screen Reader](reference/screen-reader.md) says what the screen shows |
+| **In the browser** | the emulator is the firmware's own code, compiled for the browser, at 44.1 kHz; SAVE keeps your sound in that browser |
+| **License** | GPL-3.0, source on [GitHub](https://github.com/evanyerburgh/niagara-drift) |
 
 ## Where it came from
 
-Niagara Drift is named for *Day of Niagara* (the Theatre of Eternal Music, 1965) and La Monte Young's *Drift Studies*.
-It began from ideas in the Stylophone CPM DS-2, the Moog Subharmonicon and the Soma Lyra-8, and has grown into an
-instrument of its own.
+Named for *Day of Niagara* (the Theatre of Eternal Music, 1965) and La Monte Young's *Drift Studies*. It began from ideas
+in the Stylophone CPM DS-2, the Moog Subharmonicon and the Soma Lyra-8, and has grown into an instrument of its own.
 
-It's built on [FoMni](https://github.com/charlesvestal/fm1-fomni) and [X0X](https://github.com/charlesvestal/fm1-x0x)
-by Charles Vestal, and on [Felucca](https://github.com/hugelton/Felucca)'s FM-1 platform by Leo Kuroshita (Hügelton
-Instruments), all GPL-3.0. Key pressure is read as in [MONK-1](https://github.com/charlesvestal/fm1-monk) by Charles
-Vestal; the delay and reverb follow [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1)'s design by Quixotic7,
-whose idea the scene crossfade was; the safe restore's flash core and the screen reader come from Charles Vestal's
-[fm1-base](https://github.com/charlesvestal/fm1-base) (MPL-2.0). The full list is in
-[LICENSING.md](../../LICENSING.md). The site is set in Inter Tight, IBM Plex Mono and Barlow Semi Condensed (SIL OFL).
+| From | By | What it gave |
+|---|---|---|
+| [FoMni](https://github.com/charlesvestal/fm1-fomni) and [X0X](https://github.com/charlesvestal/fm1-x0x) | Charles Vestal | the code it started from, the host simulator, the browser emulator |
+| [Felucca](https://github.com/hugelton/Felucca) | Leo Kuroshita, Hügelton Instruments | the FM-1 platform: hardware layer, USB, update loader, storage, installer |
+| [MONK-1](https://github.com/charlesvestal/fm1-monk) | Charles Vestal | reading the keys' pressure |
+| [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) | Quixotic7 | the delay and reverb's design; the scene crossfade and backup-before-install ideas |
+| [fm1-base](https://github.com/charlesvestal/fm1-base) | Charles Vestal | the safe restore's flash core and the screen reader (MPL-2.0) |
+| [Groove OS](https://www.groove-os.com/) | | the idea of running FM-1 firmware in a browser |
 
-Niagara Drift is made by Evan Yerburgh. It isn't made or endorsed by M-VAVE, Hügelton Instruments or the makers of
-any instrument it began from.
+Made by Evan Yerburgh; not made or endorsed by M-VAVE, Hügelton Instruments or the makers of any instrument it began
+from. Licenses in [LICENSING.md](../../LICENSING.md). The site is set in Inter Tight, IBM Plex Mono and Barlow Semi
+Condensed (SIL OFL).
