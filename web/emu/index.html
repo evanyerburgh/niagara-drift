@@ -144,6 +144,7 @@ body.drawn .g-card, body.drawn .doors a, body.drawn .try-row a, body.drawn .foot
 .keys-link { margin-left: .6rem; font: 500 .6em var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--pale);
              background: var(--black); padding: .3em .8em; border-radius: 999px; text-decoration: none; white-space: nowrap; }
 a.keys-link:hover, a.keys-link:focus-visible { text-decoration: underline; }
+.bar #reset { margin-left: auto; }   /* the reset apart, at the right: it forgets your sounds */
 .bar .keys-link { margin-left: 0; font-size: .85rem; padding: .45em 1em; }   /* just under the emulator */
 html { scroll-behavior: smooth; } @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 .keys-card { scroll-margin-top: 2rem; }   /* no computer keyboard on a phone */
@@ -368,9 +369,9 @@ header nav { z-index: 6; }
 </div>
 
 <div class="bar">
-  <span class="state"><span id="status">Off. Sound starts when you switch it on.</span> <span class="cpu" id="cpu"></span></span>
-  <button id="reset" type="button" aria-label="Factory reset" title="Factory reset: forget your sound and scenes, and start again from the factory settings">Reset</button>
+  <span class="state"><span id="status">Off</span> <span class="cpu" id="cpu"></span></span>
   <a class="keys-link" href="#keys">Computer keys ↓</a>
+  <button id="reset" type="button" aria-label="Factory reset" title="Factory reset: forget your sound and scenes, and start again from the factory settings">Reset</button>
 </div>
 <!--ACTIONS-->
 
@@ -837,7 +838,7 @@ async function switchOn() {
     await ready;
     await ac.resume();
     document.getElementById("start").hidden = true;
-    status.textContent = ac.sampleRate === 44100 ? "On." : `On (the browser runs audio at ${ac.sampleRate} Hz).`;
+    status.textContent = ac.sampleRate === 44100 ? "On" : `On (the browser runs audio at ${ac.sampleRate} Hz)`;
     syncButtons(); syncKeys();
   } catch (err) {
     go.disabled = false;
