@@ -39,7 +39,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 ### Connect
 
 <ul class="cards">
-<li><img class="ic" src="../../web/manual/icons/metronome.svg" alt=""><b>MIDI</b><span>A clock over USB or TRS puts the Swell, the LFO, the delay, Wander and the scenes in time; notes tune the drones</span></li>
+<li><img class="ic" src="../../web/manual/icons/metronome.svg" alt=""><b>MIDI in</b><span>Follows a MIDI clock over USB or TRS: the Swell, the LFO, the delay, Wander and the scenes keep its time; notes on channels 1 and 2 tune the drones</span></li>
 <li><img class="ic" src="../../web/manual/icons/ear.svg" alt=""><b>Hear the screen</b><span>With the FM-1 Screen Reader, it says what its screen shows, for players who can't see it</span></li>
 <li><img class="ic" src="../../web/manual/icons/browser.svg" alt=""><b>Play it in a browser</b><span>The emulator on the front page is the firmware itself, with sound; no FM-1 needed</span></li>
 <li><img class="ic" src="../../web/manual/icons/download-simple.svg" alt=""><b>Install from a browser</b><span>Install, update, back up and go back to M-VAVE's firmware from Chrome or Edge</span></li>
