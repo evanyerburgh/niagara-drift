@@ -1,34 +1,80 @@
 ---
 title: Performing
-intro: Play it live: what to move, and what to hold
+intro: Play it live: change chords unheard, loop your hands, reach another page, play in time
+description: Recipes for playing Niagara Drift live: retune a drone in silence, loop your knob moves, peek at another page, follow a MIDI clock.
+image: p-retune-1.png
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-### Trade places {#trade .coming}
+### Change chords without a slide {#retune}
 
-*One drone opens and comes forward as the other closes and recedes*
+*Drone II out, a new note, back in*
 
-### Ride the Movement {#movement .coming}
+1. Hold [[SEL]] and tap [[PLAY]]: drone II fades out.
+2. Press [[HOME]] for **Pitch**, and turn KNOB 3 to a new note.
+3. [[SEL]] + [[PLAY]] again: it fades back in on the new chord.
 
-*Every LFO from still to double on one knob*
+> **Good to know.** How fast it fades is **Fade** (Setup 1, KNOB 1).
 
-### Play the beating {#beating .coming}
+![Pitch, drone II out, retuned to Bb4](../media/p-retune-0.png "II OUT, retuned")
+![Pitch, drone II back in a minor sixth above](../media/p-retune-1.png "Back in: a minor sixth")
 
-*Partner's detune live: from a slow breath to a shimmer*
+**Listen** (`p-retune`)
 
-### Retune in the silence {#retune .coming}
+- 0:00 P8 Sibyl, Fade 3 s
+- 0:01 SEL + PLAY: drone II fades out
+- 0:05 retuned in the silence
+- 0:07 SEL + PLAY: back in on a minor chord
 
-*Drone II out, to a new note, back in on a new chord*
+### Loop your moves {#loop}
 
-### Loop your moves {#loop .coming}
+*REC, move, REC*
 
-*REC records knobs, gestures and scenes*
+1. Tap [[REC]] and play: knobs, gestures, scenes.
+2. Tap [[REC]] again: what you did plays back, round and round. Play on top.
+3. Tap [[REC]] once more to stop.
 
-### Peek at a page {#peek .coming}
+![Drones, recording](../media/p-loop-0.png "REC 0:02")
+![Drones, looping](../media/p-loop-1.png "LOOP")
+
+**Listen** (`p-loop`)
+
+- 0:00 P14 Tape
+- 0:01 REC: drone I's cutoff down and back up
+- 0:06 REC again: the move loops
+
+### Reach another page and come back {#peek}
 
 *Hold its button, turn, let go*
 
-### Play to a MIDI clock {#clock .coming}
+1. Hold a page's button, here [[FX]] for **Space**.
+2. Turn a knob there.
+3. Let go: you're back where you were, the change kept.
 
-*The Swell and the LFO in time*
+![Space, peeked at](../media/p-peek-0.png "PEEK: let go goes back to DRONES")
+![Drones, back](../media/p-peek-1.png "Back on Drones")
+
+**Listen** (`p-peek`)
+
+- 0:00 P11 Piston, on Drones
+- 0:01 FX held: the reverb turned up
+- 0:06 FX let go: back on Drones, the reverb kept
+
+### Play in time with a MIDI clock {#clock}
+
+*Send a clock: the Swell, the LFO, the delay and Wander follow it*
+
+1. Send a MIDI clock from a DAW or a drum machine, over USB or the TRS jack.
+2. Press [[ARP]] for the **Swell**, and turn KNOB 1, **Division**, to a note value: it breathes in time.
+
+> **Good to know.** **Sync** (Setup 1, KNOB 4) on follows a clock, off ignores it. More in
+> [MIDI](../reference/midi.md).
+
+![Swell, 1/4 at 80 BPM](../media/p-clock-0.png "1/4 at 80 BPM")
+![Swell, 1/4 at 140 BPM](../media/p-clock-1.png "1/4 at 140 BPM")
+
+**Listen** (`p-clock`)
+
+- 0:00 P10 Cistern, a clock at 80 BPM: a breath a beat
+- 0:05 the clock at 140 BPM: faster

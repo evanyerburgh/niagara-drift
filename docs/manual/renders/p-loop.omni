@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P14, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w5
+tap PLAY
+wait 3000
+expect view 0
+wav p-loop.wav
+# @ P14 Tape
+wait 1000
+# @ REC tapped: drone I's cutoff turned down and back up
+tap REC
+wait 300
+turn K2 -25 80
+wait 400
+shot p-loop-0.png
+turn K2 25 80
+wait 500
+# @ REC tapped again: the move plays back, round and round
+tap REC
+wait 2500
+shot p-loop-1.png
+wait 7000
+wavstop

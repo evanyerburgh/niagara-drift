@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P11, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w2
+tap PLAY
+wait 3000
+expect view 0
+wav p-peek.wav
+# @ P11 Piston, on Drones
+wait 1500
+# @ FX held: the reverb's mix turned up on Space
+press FX
+wait 400
+expect view 13
+turn K4 30 80
+wait 300
+shot p-peek-0.png
+wait 1500
+# @ FX let go: back on Drones, the reverb kept
+release FX
+wait 600
+expect view 0
+shot p-peek-1.png
+wait 4000
+wavstop
