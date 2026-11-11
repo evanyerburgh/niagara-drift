@@ -1,7 +1,7 @@
 ---
 title: Sounds
 intro: Explore Niagara Drift and find the sounds you want to make
-description: Recipes for sounds on Niagara Drift: ticks, pulses, tangled drones, stepped figures, warbling echoes, a frozen chord.
+description: Recipes for sounds on Niagara Drift: ticks, a singing filter, hard sync, metallic cross-FM bells, stepped figures, warbling echoes, a frozen chord.
 image: ticks-1.png
 ---
 
@@ -66,57 +66,106 @@ and the ring swells and fades on its own.
 - 0:01 both resonances up: the filters ring on the drones' notes
 - 0:10 the filter LFOs moved to resonance: the ring swells and fades
 
-### Tangled drones {#tangle}
-
-*Each drone bending the other's pitch*
-
-Each drone's sound bends the other's pitch (cross-FM): a little roughens and thickens the two, a lot tangles them into
-one restless, metallic sound.
-
-1. Tap black key 11, [[F#5]], until it winks: **bend each other** (twice from off).
-2. Press [[LFO]] twice for the **Mods** page, where the screen says so.
-3. Turn KNOB 4, X-mod, up: around 40 it roughens, by 85 it tangles.
-4. Turn drone II's pitch (Pitch page, KNOB 3): every interval tangles differently.
-
-> **Good to know.** Key 11 goes round four settings: off (dark); drone I moving drone II's cutoff (lit), a filter
-> that follows the other drone, as in **Seance** (P6); bend each other (winking); and **Snarl** (winking), the
-> finished sound, echoes and all, bending both: a growl that drags the delay's repeats with it. X-mod sets how far
-> each goes. **Movement** (ALGORITHM) doesn't scale it: it's sound, not the LFO. The **Snarl** gesture ([[B4]])
-> brings Snarl in by pressure.
-
-![Mods, cross-mod bend each other, X-mod 40](../media/tangle-0.png "bend each other, 40")
-![Mods, X-mod 85](../media/tangle-1.png "X-mod 85")
-
-**Listen** (`tangle`)
-
-- 0:00 P2 Embers as it starts: triangles blooming toward saws
-- 0:01 key 11 twice: cross-FM at the amount already set: the drones roughen
-- 0:06 X-mod up: they tangle into one restless, metallic sound
-- 0:13 X-mod back down: they come apart
-
 ### Hard sync sweep {#sync}
 
-*Drone II locked to drone I, its pitch swept by the LFO*
+*Drone II locked to drone I, its pitch swept: a sweep of tone, not of note*
 
 With hard sync, drone II restarts its wave on every cycle of drone I: moving drone II's pitch then changes its tone,
-not its note, a tearing, vocal sweep.
+not its note, a tearing, vocal sweep. It needs drone II above drone I, and its filter open, to be heard.
 
 1. Tap black key 10, [[D#5]]: **hard sync**, drone II locked to drone I.
-2. Press [[LFO]] for **LFO sends**, and turn KNOB 3, drone II's pitch send, up: the LFO sweeps drone II's pitch, and
-   you hear it as a sweep of tone.
-3. Turn SELECT to set how fast it sweeps, and drone II's pitch (Pitch page) to set where the sweep sits.
+2. Press [[HOME]] for **Pitch**, and turn KNOB 3 to put drone II above drone I (here an octave up).
+3. Press [[HOME]] for **Drones**: turn KNOB 4, drone II's cutoff, well up, and bring drone II forward (KNOB 3 up,
+   KNOB 1 down).
+4. Press [[LFO]] for **LFO sends**, and turn KNOB 3, drone II's pitch send, up: the LFO sweeps it. SELECT sets how
+   fast.
 
-> **Good to know.** It's strongest with drone II above drone I and a saw or square in its wave (Osc page). With Pitch
-> link on ([[C#5]]) drone II follows drone I's notes as you tune.
+> **Good to know.** It's strongest with a saw or square in drone II's wave (Osc page). With Pitch link on ([[C#5]])
+> drone II follows drone I's notes as you tune.
 
-![LFO sends, drone II's pitch send +50](../media/sync-0.png "drone II's pitch send +50")
-![Pitch, drone II's synced wave](../media/sync-1.png "the synced wave")
+![Drones, drone II an octave up, open and forward](../media/sync-0.png "drone II up, open, forward")
+![LFO sends, drone II's pitch send up](../media/sync-1.png "the LFO on drone II's pitch")
 
 **Listen** (`sync`)
 
-- 0:00 P5 Abyss as it starts
-- 0:01 hard sync on: a harder, buzzier edge
-- 0:05 drone II's pitch send up: its pitch sweeps under the sync, a tearing, vocal sweep
+- 0:00 P5 Abyss as it starts: dark, closed filters
+- 0:01 hard sync on, drone II up and opened: a hard, buzzy edge
+- 0:08 the LFO sweeps drone II's pitch: a tearing, vocal sweep of tone
+
+## Cross-mod
+
+### Metallic bells {#bells}
+
+*Cross-FM: each drone bending the other's pitch, high and pure, into bells*
+
+Each drone's sound bends the other's pitch, FM synthesis between the two. On pure, high tones a tritone apart it rings
+into a metallic, bell-like sound; turned higher it clangs and runs wild.
+
+1. Press [[EDIT]] for **Osc**, and turn KNOB 1 and KNOB 3, the X-Waves, all the way down: **sine**.
+2. Press [[HOME]] twice for **Pitch**, and turn both drones high, a tritone apart (here C#6 and G6: the top of their
+   range is about 1.6 kHz).
+3. Tap black key 11, [[F#5]], until it winks: **bend each other** (twice from off).
+4. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up: about 70 rings, 85 clangs.
+
+> **Good to know.** Simple intervals (an octave, a fifth) lock into harmonies instead of bells; awkward ones (a
+> tritone, a seventh) ring metallic. Lower down, on rich waves, cross-FM only thickens and roughens. If the Swell is
+> on, switch it off ([[ARP]], then [[ARP]] again on its page) so the bells ring steadily.
+
+![Mods, bend each other, X-mod 70](../media/bells-0.png "bend each other, 70")
+![Mods, X-mod 85](../media/bells-1.png "X-mod 85")
+
+**Listen** (`bells`)
+
+- 0:00 two pure sines, high, a tritone apart
+- 0:01 bend each other, X-mod up: they ring into one metallic, bell-like tone
+- 0:09 X-mod higher: the bells clang and run wild
+
+### One drone shaping the other {#xfilter}
+
+*Drone I's sound moving drone II's filter*
+
+At key 11's first setting, drone I's sound moves drone II's filter, as fast as drone I sounds: drone II growls,
+buzzes and takes on drone I's pitch as a grain.
+
+1. Tap black key 11, [[F#5]], once: it lights, **I moves II's cutoff**.
+2. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up: the growl deepens.
+3. Press [[HOME]] for **Pitch**, and move drone I's pitch (KNOB 1): the growl changes its grain.
+
+> **Good to know.** It's strongest with drone II's filter resonant and band-pass ([[A#4]]), as in **Vespers** (P3)
+> here. **Seance** (P6) uses it gently.
+
+![Mods, I moves II's cutoff](../media/xfilter-0.png "I moves II's cutoff")
+![Pitch, drone I moved](../media/xfilter-1.png "drone I moved")
+
+**Listen** (`xfilter`)
+
+- 0:00 P3 Vespers as it starts: saws through band-pass filters
+- 0:01 key 11 once: drone I's sound moves drone II's filter: drone II growls and shimmers
+- 0:04 X-mod up: the growl deepens into a buzzing, vocal edge
+- 0:12 drone I's pitch moved: the growl changes its grain
+
+### Snarl {#snarl}
+
+*The finished sound, echoes and all, bending both drones*
+
+At key 11's last setting, the finished sound, the delay's echoes included, bends both drones' pitch: a growl that
+drags the echoes with it.
+
+1. Tap black key 11, [[F#5]], three times from off: **Snarl** (it winks).
+2. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up: 40 a growl, 85 a snarl.
+3. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) up: the snarl bends the echoes too.
+
+> **Good to know.** The **Snarl** gesture ([[B4]]) brings it in by pressure, with the drive and Feedback on top, and
+> leaves without a trace. **Clean** ([[F5]]) takes it out while you hold it.
+
+![Mods, Snarl](../media/snarl-0.png "Snarl")
+![Mods, X-mod 85](../media/snarl-1.png "X-mod 85")
+
+**Listen** (`snarl`)
+
+- 0:00 P13 Telegraph as it starts: a stepped figure over a low D, through a delay
+- 0:01 key 11 three times: Snarl, the finished sound bending both drones
+- 0:04 X-mod up: the snarl grows, dragging the echoes with it
 
 ## Movement and rhythm
 

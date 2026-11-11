@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P13, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w4
+tap PLAY
+wait 2500
+wav snarl.wav
+# @ P13 Telegraph as it starts: a stepped figure over a low D, through a delay
+wait 1500
+# @ key 11 three times: Snarl, the finished sound, echoes and all, bending both drones
+tapkey b10
+tapkey b10
+tapkey b10
+tap LFO
+tap LFO
+wait 2500
+shot snarl-0.png
+# @ X-mod up: the snarl grows, dragging the echoes with it
+turn K4 45 80
+wait 7000
+shot snarl-1.png
+wavstop

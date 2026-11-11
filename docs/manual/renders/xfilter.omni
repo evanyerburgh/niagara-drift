@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P3, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w2
+tap PLAY
+wait 2500
+wav xfilter.wav
+# @ P3 Vespers as it starts: saws through band-pass filters
+wait 1500
+# @ key 11 once: drone I's sound moves drone II's filter, at audio rate: drone II growls and shimmers
+tapkey b10
+tap LFO
+tap LFO
+wait 2500
+shot xfilter-0.png
+# @ X-mod up: the growl deepens into a buzzing, vocal edge
+turn K4 45 80
+wait 5000
+# @ drone I's pitch moved (Pitch): the growl changes its grain
+tap HOME
+turn K1 5 300
+wait 4000
+shot xfilter-1.png
+wavstop
