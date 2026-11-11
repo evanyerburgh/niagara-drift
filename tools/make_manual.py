@@ -50,7 +50,8 @@ MENU = [("", "Play it", "the emulator: the firmware itself, in your browser"),
         ("manual/recipes/", "Recipes", "how to get a sound or a move"),
         ("manual/reference/", "Reference", "every page, knob and key"),
         ("manual/reference/shortcuts/", "Shortcuts", "every combination, hold and tap"),
-        ("manual/help/", "Help", "installing, going back, problems")]
+        ("manual/help/", "Help", "installing, going back, problems"),
+        ("manual/about/", "About", "what it does, the details, where it came from")]
 
 
 def menu_html(up, current):
@@ -313,7 +314,8 @@ def page_html(rel, meta, body, current, side=""):
 </div></div>
 <main id="main" tabindex="-1" class="page{' side' if side else ''}">{side}<div class="prose">{body}</div></main>
 <p class="foot">Niagara Drift · free, open-source firmware (GPL-3.0) for the M-VAVE FM-1. Sound examples are rendered from the
-firmware's own code on a computer, with headphones' settings, not recorded from an FM-1. <a href="{REPO}">Source on GitHub</a></p>
+firmware's own code on a computer, with headphones' settings, not recorded from an FM-1. <a href="{mup}about/">About</a> ·
+<a href="{REPO}">Source on GitHub</a></p>
 <script src="{mup}manual.js"></script>
 </body></html>"""
 
@@ -339,7 +341,7 @@ def build(out):
         rel = page_rel(md)
         meta, text = front(md.read_text(encoding="utf-8"))
         kind = rel.split("/")[0] if rel else ""
-        current = {"start": "Start here", "recipes": "Recipes", "help": "Help"}.get(kind, "Reference" if kind == "reference" else "")
+        current = {"recipes": "Recipes", "help": "Help", "about": "About"}.get(kind, "Reference" if kind == "reference" else "")
         if rel == "reference/shortcuts":
             current = "Shortcuts"
         side = ""
