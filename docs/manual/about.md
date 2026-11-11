@@ -10,7 +10,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 ### Sound
 
 <ul class="cards">
-<li><b>Two drones</b><span>Each a wave from sine to square, a partner (a second oscillator) at an interval, a sub and noise, into its own self-oscillating filter and drive</span></li>
+<li><b>2 drones</b><span>Each a wave from sine to square, a partner (a second oscillator) at an interval, a sub and noise, into its own self-oscillating filter and drive</span></li>
 <li><b>Tunings</b><span>12-tone to Partch's 43 notes, La Monte Young's, Harrison's, the shrutis; intervals named in each one's terms</span></li>
 <li><b>Cross-mod</b><span>FM between the drones: each bending the other's pitch, or the finished sound bending both (Snarl); or drone I moving drone II's filter</span></li>
 <li><b>Feedback and Character</b><span>The finished sound fed back into the drones; the oscillators from clean to vintage</span></li>
@@ -30,7 +30,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 
 <ul class="cards">
 <li><b>16 Presets</b><span>Each a different side of the instrument, each moving over a minute</span></li>
-<li><b>Eight gestures</b><span>Macros: several settings at once on top of your sound, each in its own order; held, pressed harder, or tapped to stay</span></li>
+<li><b>8 gestures</b><span>Macros: several settings at once on top of your sound, each in its own order; held, pressed harder, or tapped to stay</span></li>
 <li><b>Save 48 sounds</b><span>Six banks of eight scenes, yours to fill; each glides in, or crossfades as you press its key harder</span></li>
 <li><b>Motion loop</b><span>Records your knob moves, gestures and scenes, and plays them back</span></li>
 <li><b>Never jumps</b><span>Everything glides (morphs): buttons, keys and scenes move to new settings over times you set</span></li>

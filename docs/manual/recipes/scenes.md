@@ -21,7 +21,7 @@ intro: Keep a sound, move between sounds, and get back to where you were
 
 *Press all the way and hold a moment*
 
-### Your six banks {#banks .coming}
+### Your 6 banks {#banks .coming}
 
 *SEL + a gesture key picks one*
 

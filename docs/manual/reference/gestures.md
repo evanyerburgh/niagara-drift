@@ -16,7 +16,7 @@ without a trace when they've left. Your own settings stay as they are underneath
 The header shows the last one you played and how far in it is ("WASH 40%"), or "latched". Scenes remember which are
 latched.
 
-## Eight gestures
+## 8 gestures
 
 ### Weight · [[D5]], held
 
