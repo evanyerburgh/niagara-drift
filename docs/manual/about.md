@@ -36,6 +36,15 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 <li><img class="ic" src="../../web/manual/icons/path.svg" alt=""><b>Never jumps</b><span>Everything glides (morphs): buttons, keys and scenes move to new settings over times you set</span></li>
 </ul>
 
+### Connect
+
+<ul class="cards">
+<li><img class="ic" src="../../web/manual/icons/metronome.svg" alt=""><b>MIDI</b><span>A clock over USB or TRS puts the Swell, the LFO, the delay, Wander and the scenes in time; notes tune the drones</span></li>
+<li><img class="ic" src="../../web/manual/icons/ear.svg" alt=""><b>Hear the screen</b><span>With the FM-1 Screen Reader, it says what its screen shows, for players who can't see it</span></li>
+<li><img class="ic" src="../../web/manual/icons/browser.svg" alt=""><b>Play it in a browser</b><span>The emulator on the front page is the firmware itself, with sound; no FM-1 needed</span></li>
+<li><img class="ic" src="../../web/manual/icons/download-simple.svg" alt=""><b>Install from a browser</b><span>Install, update, back up and go back to M-VAVE's firmware from Chrome or Edge</span></li>
+</ul>
+
 ## Videos
 
 <div class="videos">
@@ -55,15 +64,13 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 | **Oscillators** | virtual analog, 4 shapes blended continuously (sine, triangle, saw, square) with pulse width; saw and pulse band-limited (polyBLEP); hard sync; cross-FM |
 | **Partner** | a second oscillator on each drone: an octave or a fifth or fourth below, unison, a third, fourth or fifth above, an octave, or an octave and a fifth; each tempered or just (pure, beatless); detune up to 30 cents for slow beating |
 | **Sub and noise** | a sub of 4 waves (square, sine, triangle, saw), 1–4 octaves down or the subharmonics ⅓ and ⅕; under a low drone the lowest become ticks and pulses ([recipe](recipes/sounds.md#ticks)); noise from white to pink |
+| **Filter** | a state-variable filter (zero-delay feedback, after Andrew Simper): low-, band- or high-pass, resonant to self-oscillation; an antialiased drive |
 | **LFO** | 2 waves of 10 shapes each (20 in all: triangles, squares, saws, exponentials, patterns, random, AND and OR steps), one cycle in 100 s to 70 Hz, on pitch, wave, cutoff, resonance and the delay |
 | **Tuning** | A from 427 to 453 Hz (440 to start, 432 for those who like it), 1 Hz a click or 0.1 with SEL; 12-tone, quarter tones, 19-, 31- and 53-tone, just, the harmonics, LMY, Harrison, the shrutis, Partch |
 | **Detuning** | each drone a cent at a time off its Tuning's notes (SEL + a pitch knob), kept as you move between notes; each partner up to 30 cents, for beating; Drift lets the detune wander |
-| **Filter** | a state-variable filter (zero-delay feedback, after Andrew Simper): low-, band- or high-pass, resonant to self-oscillation; an antialiased drive |
-| **Pressure-sensitive keys** | the white keys: scenes crossfade, and keys 9–12's gestures come in, as hard as you press; how light a touch is a setting |
-| **MIDI** | over USB or TRS: notes on channels 1 and 2 tune the drones; a clock syncs the Swell, LFO, delay, Wander and scenes ([MIDI](reference/midi.md)) |
-| **Your sounds** | six banks of eight scenes, plus 16 Presets; backed up before every install, restored safely ([Help](help.md)) |
-| **The screen, out loud** | the [FM-1 Screen Reader](reference/screen-reader.md) says what the screen shows |
-| **In the browser** | the emulator is the firmware's own code, compiled for the browser, at 44.1 kHz; SAVE keeps your sound in that browser |
+| **Pressure sensing** | each white key's pressure, read as it's held; scenes crossfade and keys 9–12's gestures follow it; the touch is a setting (Setup 2) |
+| **MIDI** | in, over USB and TRS: notes on channels 1 and 2 tune the drones; the clock (24 pulses a beat) and Start, with Sync on or off ([MIDI](reference/midi.md)) |
+| **Storage** | 6 banks of 8 scenes and 16 Presets in the FM-1's flash; backups to a file before every install; a restore that a power cut can't break ([Help](help.md)) |
 | **License** | GPL-3.0, source on [GitHub](https://github.com/evanyerburgh/niagara-drift) |
 
 ## Where it came from
@@ -77,7 +84,8 @@ in the Stylophone CPM DS-2, the Moog Subharmonicon and the Soma Lyra-8, and has 
 | [Felucca](https://github.com/hugelton/Felucca) | Leo Kuroshita, Hügelton Instruments | the FM-1 platform: hardware layer, USB, update loader, storage, installer |
 | [MONK-1](https://github.com/charlesvestal/fm1-monk) | Charles Vestal | reading the keys' pressure |
 | [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) | Quixotic7 | the delay and reverb's design; the scene crossfade and backup-before-install ideas |
-| [fm1-base](https://github.com/charlesvestal/fm1-base) | Charles Vestal | the safe restore's flash core and the screen reader (MPL-2.0) |
+| [fm1-base](https://github.com/charlesvestal/fm1-base) | Charles Vestal | the safe restore's flash core (MPL-2.0) |
+| [FM-1 Screen Reader](https://github.com/charlesvestal/fm1-reader) | Charles Vestal | the screen's words over USB and the page that speaks them (its firmware side from fm1-base, MPL-2.0); thanks to João Durães (WoodJack) for asking for it |
 | [Groove OS](https://www.groove-os.com/) | | the idea of running FM-1 firmware in a browser |
 
 Made by Evan Yerburgh; not made or endorsed by M-VAVE, Hügelton Instruments or the makers of any instrument it began
