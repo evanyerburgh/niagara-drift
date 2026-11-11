@@ -284,7 +284,7 @@ def recipe_html(rid, title, body):
                f'src="../../media/{name}.mp4" aria-label="{html.escape(title)}: a sound example"></audio><ol>{li}</ol></div>')
     return (f'<section class="recipe" id="{rid}"><div class="recipe-head"><h3>{inline(title)}</h3>'
             f'</div>'
-            f'<div class="recipe-body{"" if snd else " quiet"}"><div>{f"<p class=lead>{lead}</p>" if lead else ""}<ol class="moves">{moves}</ol>'
+            f'<div class="recipe-body"><div class="how">{f"<p class=lead>{lead}</p>" if lead else ""}<ol class="moves">{moves}</ol>'
             f'{f"<div class=good><b>Good to know</b>{good}</div>" if good else ""}</div>'
             f'<div class="screens">{figs}</div>{snd}</div></section>')
 
