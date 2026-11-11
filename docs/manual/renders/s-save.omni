@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P10, headphones, Pitch lock off, Scene time about 2 s.
+notips
+phones 1
+set 74 0
+set 71 27
+press SEL
+tapkey w15
+release SEL
+tapkey w1
+tap PLAY
+wait 2500
+press SEL
+tapkey w8
+release SEL
+expect bank 0
+wait 1500
+turn K4 25 60
+tap FX
+turn K3 15 60
+wait 1500
+press SAVE
+tapkey w0
+release SAVE
+wait 1500
+shot s-save-0.png
+tap HOME
+turn K4 -40 40
+wait 2500
+tapkey w0
+wait 4000
+shot s-save-1.png

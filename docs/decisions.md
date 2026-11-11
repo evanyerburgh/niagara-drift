@@ -735,3 +735,17 @@ at the end. The current state is in the [README](../README.md) and the code.
   keys' names alone didn't say what they do; then fewer words a page). Drones as "drone 1, 2"; scenes "scene A 5" (A5
   is a note); flats, cents, minutes and intervals in words by the firmware. 1.3 KB RAM, 7.1 KB flash. A Helper / Pro
   setting that turns the help on and off is its own piece, later.
+- 2026-11-11: **the manual as pages of the site** (Evan, from a prototype played in the browser): Markdown in
+  `docs/manual` (it reads on GitHub too), made into `/manual/` by `tools/make_manual.py`; the README keeps what it is,
+  installing and links. Five ways in: Start here (from a Preset, or from Bare built up), Recipes, Reference (the
+  README's pages as they were, then rewritten short page by page, as the gestures already are), Shortcuts (not
+  "hidden moves": nothing is hidden), Help. Every page: Install, Source (GitHub's mark), a menu icon for the rest, a home
+  icon; a banner whose two bands run corner to corner and turn the words pale where they cross. Recipes are for what
+  one knob doesn't do (a key and a knob, or two or three pages), in five kinds, a page each with every recipe listed
+  at its top: Sounds, Gestures, Scenes and saving, Time and transitions, Performing. Each: what you hear, the moves,
+  Good to know, two screens and a sound, its own link and Share. The sounds are host renders from scripts in
+  `docs/manual/renders`, each recipe from a different Preset, leveled to -14 LUFS by perceived loudness (ITU BS.1770, so a bass-heavy clip isn't
+  left sounding quiet; peaks under -1 dBFS); the
+  screens are committed, the sounds made at release (40 recipes would add ~25 MB to git). The front page: the poster
+  as a short hero, the emulator, the manual's doors and four recipes to try. Words: nothing that sounds like bad
+  design (hidden, buried), no closing period on a banner's line, no Lyra-8 in the new words (the credit line keeps it).

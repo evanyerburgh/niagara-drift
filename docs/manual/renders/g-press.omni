@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P3, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w2
+tap PLAY
+wait 2500
+wav g-press.wav
+# @ P3 Vespers as it starts
+wait 1500
+# @ Chord (A4), pressed lightly: the partners start to move toward a chord
+key w9 down
+pressure w9 40
+wait 3000
+# @ pressed harder: further in, a full, beatless chord
+pressure w9 110
+wait 4000
+shot g-press-0.png
+# @ eased off: it comes back toward where it was
+pressure w9 30
+wait 3000
+# @ let go: it goes
+key w9 up
+wait 3500
+wavstop

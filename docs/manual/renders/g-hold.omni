@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P1, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w0
+tap PLAY
+wait 2500
+wav g-hold.wav
+# @ P1 Niagara
+wait 1500
+# @ Wash held 4 s: the reverb grows
+key w15 down
+wait 4000
+shot g-hold-0.png
+# @ let go: it fades over 4 s
+key w15 up
+wait 5000
+wavstop

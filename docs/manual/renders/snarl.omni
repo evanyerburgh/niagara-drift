@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P2, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w1
+tap PLAY
+wait 2500
+tap FX
+turn K1 20 60
+turn K2 25 60
+wait 500
+wav snarl.wav
+# @ P2 Embers, more echoes: steady triangles blooming toward saws
+wait 1500
+# @ key 11 three times: Snarl, the finished sound, echoes and all, starting to bend both drones
+tapkey b10
+tapkey b10
+tapkey b10
+tap LFO
+tap LFO
+wait 3000
+shot snarl-0.png
+# @ X-mod up: the snarl grows, the pitch dragged and torn, the echoes bending with it
+turn K4 45 80
+wait 8000
+shot snarl-1.png
+wavstop

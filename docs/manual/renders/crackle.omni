@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P11, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w2
+tap PLAY
+wait 3000
+wav crackle.wav
+# @ P11 Piston as it starts as it starts
+wait 1500
+tap FX
+# @ Repeat up (Space): the echoes pile up
+turn K1 30 60
+tap FX
+# @ hold SEL, turn KNOB 2 (Details): the delay to Self, its time stretching as the echoes get louder
+press SEL
+turn K2 3 60
+release SEL
+expect par94 5
+wait 4500
+shot crackle-0.png
+# @ Drive up: the drones and their echoes distorted together, ghost notes and crackle
+turn K1 45 60
+wait 4500
+shot crackle-1.png
+wavstop

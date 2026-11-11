@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P15, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w6
+tap PLAY
+wait 2500
+tap FX
+expect view 13
+turn K1 15 40
+turn K2 25 40
+wait 1500
+wav shimmer.wav
+# @ P15 Falling, sines in the middle (G3 and E4), with its echoes up
+wait 1500
+tap FX
+expect view 14
+# @ the reverb's Type to Shimmer, Into Echoes (with SEL): over 8 seconds the echoes rise an octave into a halo
+turn K4 2 300
+press SEL
+turn K4 1 300
+release SEL
+expect par64 4
+expect par99 1
+tap FX
+turn K4 25 40
+wait 9000
+shot shimmer-0.png
+tap FX
+wait 400
+shot shimmer-1.png
+wait 3000
+wavstop

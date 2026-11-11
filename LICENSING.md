@@ -26,6 +26,7 @@ your recipients its complete corresponding source under the same licence.
 | --- | --- | --- |
 | Barlow Semi Condensed (The Barlow Project Authors), the UI face | SIL OFL 1.1 | `assets/fonts/BarlowSemiCondensed-*.ttf`, `assets/fonts/Barlow-OFL.txt` |
 | Inter Tight (The Inter Project Authors), IBM Plex Mono (IBM Corp., Reserved Font Name "Plex") and Barlow Semi Condensed, the emulator page's faces, as served by Google Fonts (latin subset, unmodified) | SIL OFL 1.1 | `web/emu/fonts/*.woff2`, with `InterTight-OFL.txt`, `IBMPlexMono-OFL.txt`, `Barlow-OFL.txt` beside them |
+| [Phosphor Icons](https://github.com/phosphor-icons/core) 2.1.1, light weight (Phosphor Icons), 18 icons on the site's pages, unmodified | MIT | `web/manual/icons/*.svg`, with `LICENSE` beside them |
 | JieLi AC79 SDK: `uboot.boot`, `cfg_tool.bin`, `eq_cfg_hw.bin` are read from your SDK checkout at build time and placed in the package; no SDK files are in this tree | Apache-2.0 | <https://gitee.com/Jieli-Tech/fw-AC79_AIoT_SDK> |
 
 ## Trademarks

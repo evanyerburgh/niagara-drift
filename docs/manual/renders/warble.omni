@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P8, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w7
+tap PLAY
+wait 2500
+tap FX
+expect view 13
+turn K1 15 40
+turn K2 35 40
+tap ARP
+turn K1 45 60
+wait 1500
+wav warble.wav
+# @ P8 Sibyl with its echoes up and its Swell quick: the drones dip about once a second, the echoes ring in the gaps
+wait 1500
+tap LFO
+tap LFO
+expect view 7
+# @ Delay all the way up (Mods): the LFO wobbles the delay's time by a quarter, and every echo bends in the gaps
+turn K3 80 30
+wait 6000
+shot warble-0.png
+tap FX
+tap FX
+expect view 14
+# @ a longer Time (Details): deeper, slower bends
+turn K2 15 60
+wait 6000
+shot warble-1.png
+wavstop

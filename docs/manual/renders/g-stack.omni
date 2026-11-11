@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P6, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w5
+tap PLAY
+wait 2500
+wav g-stack.wav
+# @ P6 Seance as it starts
+wait 1500
+# @ Snarl (B4) pressed in: a growl under the sound
+key w10 down
+pressure w10 100
+wait 4000
+# @ Wash (G5) held on top: the growl washes into the reverb, a climax
+key w15 down
+wait 5000
+shot g-stack-0.png
+# @ let go of both: Wash leaves slowly, Snarl at once
+key w10 up
+key w15 up
+wait 5000
+wavstop

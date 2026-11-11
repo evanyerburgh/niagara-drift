@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P2, headphones, Pitch lock off, Scene time about 2 s.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 27
+tapkey w1
+tap PLAY
+wait 2500
+press SEL
+tapkey w8
+release SEL
+press SAVE
+tapkey w0
+release SAVE
+turn K2 -25 30
+turn K4 -25 30
+tap EDIT
+turn K1 -40 30
+turn K3 -40 30
+press SAVE
+tapkey w1
+release SAVE
+tapkey w0
+pressure w0 0
+pressure w1 0
+wait 4000
+wav s-blend.wav
+# @ A1, P2 Embers saved as it is (a second, darker sound saved on A2)
+wait 1500
+# @ A2 pressed slowly harder: the sound moves toward it, as far as you press
+key w1 down
+pressure w1 30
+wait 1200
+pressure w1 60
+wait 1200
+pressure w1 80
+wait 1500
+# @ SEL tapped: the blend stays where it is ("KEPT"), whatever the key does now
+tap SEL
+expect scene_at -1
+wait 600
+shot s-blend-0.png
+key w1 up
+wait 4000
+shot s-blend-1.png
+wavstop

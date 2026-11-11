@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P2, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w1
+tap PLAY
+wait 2500
+wav g-keep.wav
+# @ P2 Embers
+wait 1500
+# @ Chord tapped: all the way in, latched
+tapkey w9
+wait 4000
+shot g-keep-0.png
+# @ tapped again: it goes
+tapkey w9
+wait 3500
+# @ pressed to 55%, SEL tapped: latched there
+pressure w9 0
+key w9 down
+pressure w9 40
+wait 1200
+pressure w9 75
+wait 1800
+tap SEL
+wait 300
+shot g-keep-1.png
+key w9 up
+wait 3500
+wavstop

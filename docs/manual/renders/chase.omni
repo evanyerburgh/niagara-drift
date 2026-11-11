@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P7, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w6
+tap PLAY
+wait 3000
+tap LFO
+tapkey b5
+tapkey b5
+turn K3 25 40
+turn SELECT 8 60
+wait 500
+wav chase.wav
+# @ P7 Sonar with a vibrato on drone II (LFO sends, its pitch send up): a slow, steady wobble
+wait 3000
+shot chase-0.png
+tap LFO
+# @ Speed mod to the top (Mods, KNOB 1), driven by LFO I's triangle: the wobble rushes, then drags, over and over
+turn K1 100 25
+turn K2 -1 300
+wait 9000
+shot chase-1.png
+# @ Speed back to 0: the wobble steady again
+turn K1 -100 10
+wait 3000
+wavstop

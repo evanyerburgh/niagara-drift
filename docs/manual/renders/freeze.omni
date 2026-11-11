@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P10, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w1
+tap PLAY
+wait 3000
+wav freeze.wav
+# @ P10 Cistern as it starts as it starts
+wait 1500
+tap FX
+# @ reverb Mix up, then Length to the top (Inf): the chord freezes and holds
+turn K4 20 60
+turn K3 40 40
+wait 4500
+shot freeze-0.png
+tap HOME
+tap HOME
+# @ new notes for both drones (Pitch): they play over the frozen chord
+turn K1 -5 60
+turn K3 3 60
+wait 4500
+shot freeze-1.png
+wavstop

@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P4, headphones, Pitch lock off, Scene time 0. The bright
+# figure is set up before the recording (its moves take ~10 s); the clip starts on it stepping.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w3
+tap PLAY
+wait 2500
+tap EDIT
+expect view 4
+turn K3 67 40
+tap HOME
+expect view 0
+turn K4 45 60
+turn K3 15 60
+turn K1 -25 60
+tap LFO
+tap OCT+
+tap OCT+
+turn K3 40 60
+turn SELECT 55 50
+wait 1500
+shot figure-0.png
+wav figure.wav
+# @ the figure stepping: drone II bright, round four notes on LFO II's OR 5
+wait 2000
+tap SEQ
+tap SEQ
+# @ Wander up (Pitch moves): every few seconds the whole figure moves to a new note
+turn K3 60 40
+wait 13000
+shot figure-1.png
+wavstop

@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P3, headphones, Pitch lock off.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+set 70 0
+tapkey w2
+tap PLAY
+wait 2500
+tap GLO
+expect view 10
+expect par9 1
+wav t-morph.wav
+# @ P3 Vespers; Morph at its fastest (Setup 1, KNOB 2 all the way left)
+wait 1500
+# @ drone I's filter key (A#3): band-pass to high-pass at once, thin and bright
+tapkey b2
+expect par9 2
+wait 2500
+# @ Morph turned to 8 s; the key again: high-pass to low-pass, the body coming back slowly
+set 70 59
+wait 300
+shot t-morph-0.png
+tapkey b2
+expect par9 0
+wait 8500
+# @ and again: low-pass to band-pass, the low end thinning as slowly
+tapkey b2
+expect par9 1
+wait 8500
+wavstop

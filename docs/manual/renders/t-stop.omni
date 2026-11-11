@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P1, headphones, Pitch lock off.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 40
+tapkey w0
+tap PLAY
+wait 2500
+expect view 0
+wav t-stop.wav
+# @ P1 Niagara; Scene time 8 s; P5 Abyss tapped: a slow glide starts
+wait 1000
+tapkey w4
+wait 3500
+# @ a knob turned part way: the glide stops where it is, a sound between the two
+turn K2 1 60
+wait 600
+shot t-stop-0.png
+wait 6000
+wavstop

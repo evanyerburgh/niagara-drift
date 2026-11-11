@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P15, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w6
+tap PLAY
+wait 3000
+tap HOME
+expect view 1
+turn K2 40 60
+turn K4 40 60
+tap HOME
+expect view 0
+turn K2 40 60
+turn K4 40 60
+wait 1500
+wav sing.wav
+# @ P15 Falling, both resonances up (Pitch) and both cutoffs opened (Drones): the filters ring on the drones' notes
+wait 1500
+tap LFO
+# @ keys 4 and 9 on the LFO pages move the filter LFOs to resonance: the ring swells and fades
+tapkey b3
+tapkey b8
+turn K2 40 60
+turn K4 -40 60
+wait 6000
+shot sing-0.png
+tap HOME
+wait 400
+shot sing-1.png
+wait 18000
+wavstop

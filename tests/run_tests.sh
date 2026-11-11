@@ -72,6 +72,12 @@ run host-build sh host/build_host.sh
 if command -v emcc >/dev/null 2>&1; then
     run emu sh -c "sh web/emu/build.sh >/dev/null && node tests/host/emu_test.mjs build/emu/omni.wasm"
 fi
+run manual python3 tools/make_manual.py --check
+for s in docs/manual/renders/*.omni; do       # the recipes' renders still play through (keys and pages moved?)
+    n=$(basename "$s" .omni)
+    mkdir -p "build/recipes/$n"
+    run "recipe-$n" build/host/omni_host "$s" "build/recipes/$n"
+done
 for s in tests/scenarios/*.omni; do
     n=$(basename "$s" .omni)
     mkdir -p "build/scenarios/$n"

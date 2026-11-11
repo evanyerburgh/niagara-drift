@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P1, headphones, Pitch lock off, Scene time 0. The two high
+# sines are set up before the recording (the moves take ~8 s); the clip starts on them.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w0
+tap PLAY
+wait 2500
+tap EDIT
+turn K1 -40 60
+turn K3 -40 60
+tap HOME
+tap HOME
+turn K1 35 60
+turn K3 36 60
+tap ARP
+tap ARP
+tap HOME
+turn K2 30 60
+turn K4 30 60
+wait 1500
+wav bells.wav
+# @ two pure sines, high, a tritone apart (C#6 and G6, near the top of their range), the Swell off
+wait 1500
+# @ key 11 twice, bend each other, X-mod up: they ring into one metallic, bell-like tone
+tapkey b10
+tapkey b10
+tap LFO
+tap LFO
+turn K4 30 80
+wait 5000
+shot bells-0.png
+# @ X-mod higher: the bells clang and run wild
+turn K4 15 80
+wait 7000
+shot bells-1.png
+wavstop

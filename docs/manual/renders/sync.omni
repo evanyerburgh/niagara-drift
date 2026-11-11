@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P5, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w4
+tap PLAY
+wait 2500
+tap LFO
+turn K2 -100 10
+turn K4 100 10
+tap HOME
+turn K4 30 60
+turn K3 20 60
+turn K1 -20 60
+tap HOME
+wait 500
+wav sync.wav
+# @ P5 Abyss, drone II opened and brought forward (its resonance LFO off)
+wait 1500
+# @ hard sync on: drone II locked to drone I, a harder, buzzier edge
+tapkey b9
+wait 2000
+shot sync-0.png
+# @ drone II's pitch turned slowly up two octaves: under the sync its tone tears upward, a vocal, laser-like sweep
+turn K3 24 250
+wait 500
+shot sync-1.png
+# @ and back down: the sweep falls
+turn K3 -24 250
+# @ up again, faster
+turn K3 24 120
+wait 1500
+wavstop
