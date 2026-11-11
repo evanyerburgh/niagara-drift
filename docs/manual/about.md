@@ -31,7 +31,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 <ul class="cards">
 <li><b>16 Presets</b><span>Each a different side of the instrument, each moving over a minute</span></li>
 <li><b>Eight gestures</b><span>Several settings moving at once on top of your sound: held, pressed harder, or tapped to stay</span></li>
-<li><b>Scenes</b><span>48 of yours in six banks, gliding in, or crossfaded by pressing a key harder</span></li>
+<li><b>48 scenes</b><span>Save your sounds in six banks of eight; each glides in, or crossfades as you press its key harder</span></li>
 <li><b>Motion loop</b><span>Records your knob moves, gestures and scenes, and plays them back</span></li>
 <li><b>Never jumps</b><span>Buttons, keys and scenes glide to their new settings over times you set</span></li>
 </ul>
