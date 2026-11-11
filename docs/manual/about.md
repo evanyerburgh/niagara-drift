@@ -7,20 +7,32 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 
 ## What it does
 
+### The sound
+
 <ul class="cards">
 <li><b>Two drones</b><span>Each a wave from sine to square, a partner at an interval, a sub and noise, into its own self-oscillating filter and drive</span></li>
-<li><b>16 Presets</b><span>Each a different side of the instrument, each moving over a minute</span></li>
 <li><b>Tunings</b><span>12-tone to Partch's 43 notes, La Monte Young's, Harrison's, the shrutis; intervals named in each one's terms</span></li>
-<li><b>Eight gestures</b><span>Several settings moving at once on top of your sound: held, pressed harder, or tapped to stay</span></li>
-<li><b>Scenes</b><span>48 of yours in six banks, gliding in, or crossfaded by pressing a key harder</span></li>
-<li><b>Motion loop</b><span>Records your knob moves, gestures and scenes, and plays them back</span></li>
+<li><b>Cross-mod</b><span>The drones moving each other's filter or pitch, or the finished sound bending both</span></li>
+<li><b>Feedback and Character</b><span>The finished sound fed back into the drones; the oscillators from clean to vintage</span></li>
+<li><b>Effects</b><span>Six delays, a drive after them, five reverbs from a room to a freeze</span></li>
+</ul>
+
+### Movement
+
+<ul class="cards">
 <li><b>The Ultra LFO</b><span>Two waves of ten shapes on each drone's pitch, wave, cutoff or resonance, and the delay</span></li>
 <li><b>Movement</b><span>Every LFO depth at once, from still to double, on one knob</span></li>
 <li><b>The Swell</b><span>Both drones breathing in time, from a soft swell to a hard gate</span></li>
-<li><b>Cross-mod</b><span>The drones moving each other's filter or pitch, or the finished sound bending both</span></li>
-<li><b>Effects</b><span>Six delays, a drive after them, five reverbs from a room to a freeze</span></li>
-<li><b>Feedback and Character</b><span>The finished sound fed back into the drones; the oscillators from clean to vintage</span></li>
 <li><b>Moves on its own</b><span>Drift, Wander (a slow melody on a scale) and Age (tape wear) keep it alive</span></li>
+</ul>
+
+### Playing
+
+<ul class="cards">
+<li><b>16 Presets</b><span>Each a different side of the instrument, each moving over a minute</span></li>
+<li><b>Eight gestures</b><span>Several settings moving at once on top of your sound: held, pressed harder, or tapped to stay</span></li>
+<li><b>Scenes</b><span>48 of yours in six banks, gliding in, or crossfaded by pressing a key harder</span></li>
+<li><b>Motion loop</b><span>Records your knob moves, gestures and scenes, and plays them back</span></li>
 <li><b>Never jumps</b><span>Buttons, keys and scenes glide to their new settings over times you set</span></li>
 </ul>
 
