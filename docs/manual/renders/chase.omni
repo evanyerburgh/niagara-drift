@@ -10,15 +10,15 @@ tap PLAY
 wait 3000
 wav chase.wav
 # @ P7 Sonar as it starts as it starts
-wait 3000
+wait 1500
 tap LFO
 tap LFO
 # @ Speed mod up (Mods): the LFO speeds up and slows down on its own wave, the sweep rushing and dragging
-turn K1 60 80
-wait 10000
+turn K1 60 60
+wait 4500
 shot chase-0.png
 # @ Source to both LFOs: the push and pull gets lopsided
-turn K2 1 300
-wait 9000
+turn K2 1 60
+wait 4500
 shot chase-1.png
 wavstop

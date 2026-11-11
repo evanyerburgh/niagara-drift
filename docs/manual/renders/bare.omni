@@ -13,9 +13,9 @@ tap PLAY
 wait 3000
 wav bare.wav
 # @ P16 Bare: one plain saw, drone I
-wait 3000
+wait 1500
 # @ drone I's cutoff down (Drones, KNOB 2): the saw darkens
-turn K2 -15 120
+turn K2 -15 60
 wait 2000
 # @ SEL + PLAY: drone II comes in, a fifth above
 press SEL
@@ -25,9 +25,9 @@ wait 4000
 shot bare-0.png
 tap HOME
 # @ drone II tuned (Pitch, KNOB 3): a minor sixth, then back to the fifth
-turn K3 1 300
+turn K3 1 60
 wait 2500
-turn K3 -1 300
+turn K3 -1 60
 wait 1500
 tap EDIT
 tap EDIT
@@ -38,11 +38,11 @@ tap LFO
 # @ a cutoff send (LFO sends, KNOB 2), then Movement up from 0%: the filter starts to breathe
 turn K2 40 50
 turn ALGO 40 50
-wait 6000
+wait 4500
 shot bare-1.png
 tap FX
 # @ echoes and reverb (Space, KNOB 2 and 4)
 turn K2 30 50
 turn K4 30 50
-wait 6000
+wait 4500
 wavstop

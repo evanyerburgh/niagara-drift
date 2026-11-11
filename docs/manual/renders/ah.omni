@@ -10,7 +10,7 @@ tap PLAY
 wait 3000
 wav ah.wav
 # @ P1 Niagara as it starts as it starts
-wait 3000
+wait 1500
 # @ the filter keys to band-pass: the drones thin to a nasal "ah"
 tapkey b2
 tapkey b7
@@ -20,9 +20,9 @@ tap LFO
 tapkey b1
 tapkey b6
 # @ the sends up: each wave turns slowly, the vowel opening and closing
-turn K1 40 80
-turn K3 -40 80
-wait 9000
+turn K1 40 60
+turn K3 -40 60
+wait 4500
 shot ah-0.png
 tap HOME
 wait 400

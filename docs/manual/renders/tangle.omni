@@ -10,7 +10,7 @@ tap PLAY
 wait 3000
 wav tangle.wav
 # @ P2 Embers as it starts: triangles blooming toward saws
-wait 3000
+wait 1500
 # @ key 11 twice: cross-FM at the amount already set: the drones roughen
 tapkey b10
 tapkey b10
@@ -20,10 +20,10 @@ tap LFO
 wait 400
 shot tangle-0.png
 # @ X-mod up: they tangle into one restless, metallic sound
-turn K4 45 150
-wait 7000
+turn K4 45 60
+wait 4500
 shot tangle-1.png
 # @ X-mod back down: they come apart
-turn K4 -60 80
+turn K4 -60 60
 wait 4000
 wavstop

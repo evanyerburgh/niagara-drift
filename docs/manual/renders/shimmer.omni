@@ -13,21 +13,21 @@ tap PLAY
 wait 3000
 wav shimmer.wav
 # @ P12 Ashram as it starts as it starts
-wait 3000
+wait 1500
 tap FX
 # @ more echoes (Space)
 turn K1 25 60
 turn K2 30 60
 tap FX
 # @ the reverb's Type to Shimmer, and with SEL, Into to Echoes (Details): only the echoes rise an octave into the halo
-turn K4 1 300
+turn K4 1 60
 press SEL
-turn K4 1 300
+turn K4 1 60
 release SEL
 wait 3000
 tap FX
 turn K4 30 60
-wait 10000
+wait 4500
 shot shimmer-0.png
 tap FX
 wait 400

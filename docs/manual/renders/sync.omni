@@ -10,14 +10,14 @@ tap PLAY
 wait 3000
 wav sync.wav
 # @ P5 Abyss as it starts as it starts
-wait 3000
+wait 1500
 # @ key 10: hard sync, drone II locked to drone I: a harder, buzzier edge
 tapkey b9
 wait 4000
 tap LFO
 # @ drone II's pitch send up: its pitch sweeps under the sync, a tearing, vocal sweep
-turn K3 50 80
-wait 9000
+turn K3 50 60
+wait 4500
 shot sync-0.png
 tap HOME
 tap HOME

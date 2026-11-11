@@ -31,12 +31,12 @@ drone, its interval, the sub, the LFO, the space.
 **Listen** (`bare`)
 
 - 0:00 P16 Bare: one plain saw, drone I
-- 0:03 drone I's cutoff down: the saw darkens
-- 0:06 drone II comes in, a fifth above
-- 0:10 drone II tuned: a minor sixth, then back to the fifth
-- 0:15 the sub blended in
-- 0:20 a cutoff send, then Movement up from 0%: the filter starts to breathe
-- 0:30 echoes and reverb
+- 0:01 drone I's cutoff down: the saw darkens
+- 0:04 drone II comes in, a fifth above
+- 0:08 drone II tuned: a minor sixth, then back to the fifth
+- 0:12 the sub blended in
+- 0:17 a cutoff send, then Movement up from 0%: the filter starts to breathe
+- 0:26 echoes and reverb
 
 ### Trade places {#trade .coming}
 

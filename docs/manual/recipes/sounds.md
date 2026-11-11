@@ -14,55 +14,32 @@ Each sound example starts from a different Preset.
 
 ### Ticks and clicks {#ticks}
 
-*A sub under 20 Hz turns into a pulse*
+*A sub so low it breaks into a few clicks a second*
 
-Take a drone's sub below 20 Hz and it stops being a tone: it becomes a slow, steady tick under the other drone, a
-pulse to play against.
+Take drone I down to its lowest notes and its sub four octaves under that, and the sub stops being a tone: it becomes
+a slow tick, a few clicks a second under drone II, a pulse to play against.
 
-1. Press [[EDIT]] twice for the **Sub · Drive** page.
-2. Tap [[G#3]], drone I's sub, until the screen says **−3 oct**, or **−4 oct** for slower ticks. It goes round −1,
-   −2, ⅓, ⅕, −3, −4.
-3. Turn KNOB 1, Osc/Sb, toward the sub, to about 60.
-4. Turn KNOB 2, Drive, up for a bite.
+1. Press [[HOME]] for **Pitch**, and turn KNOB 1 down to drone I's lowest notes: **A0** (27.5 Hz), about 29 clicks
+   from where most Presets start.
+2. Press [[EDIT]] twice for **Sub · Drive**, and tap [[G#3]], drone I's sub, until the screen says **−4 oct**. It
+   goes round −1, −2, ⅓, ⅕, −3, −4.
+3. Turn KNOB 1, Osc/Sb, all the way to the sub: **100**.
+4. Turn KNOB 2, Drive, up for a harder click.
 
-> **Good to know.** Only −3 and −4 oct go below 20 Hz, and only under a low drone: the lower drone I, the slower the
-> ticks ([[G#4]] and KNOB 3 do the same for drone II). The FM-1's speaker can't play the low part: listen on
-> headphones. The **Tick** gesture ([[G4]]) goes further, into a click or two a second, faster as you press harder.
+> **Good to know.** The ticks come at drone I's pitch ÷ 16, two to a cycle (each edge of the sub's square): lower
+> drone I, slower ticks. Higher, or at −3 oct, they blur into a flutter. The clicks reach the speaker, though the hum
+> under them doesn't. The **Tick** gesture ([[G4]]) does this on its own, faster as you press harder. Or take drone I
+> itself under 20 Hz (Pitch, KNOB 1): a click each cycle, as in **Sonar** (P7).
 
-![Sub · Drive, drone I's sub at -3 oct, Osc/Sb 60](../media/ticks-0.png "−3 oct, Osc/Sb 60")
-![Sub · Drive, drone I's sub at -4 oct](../media/ticks-1.png "−4 oct: half as fast")
+![Sub · Drive, drone I's sub at -4 oct, Osc/Sb 100](../media/ticks-0.png "−4 oct, all sub")
+![Sub · Drive, Drive 50](../media/ticks-1.png "Drive 50")
 
 **Listen** (`ticks`)
 
 - 0:00 P14 Tape as it starts: worn, a hum under it
-- 0:03 the sub falls to −3 oct and comes up in the mix: the hum breaks into ticks
-- 0:13 −4 oct: the ticks slow to half
-- 0:19 Drive up: each tick gets a hard edge
-
-### A drone as a pulse {#pulse}
-
-*Its pitch under 27 Hz: a click each cycle against the other drone*
-
-Turn one drone's pitch down far enough and it stops being a note: under about 27 Hz it's a stream of clicks, one a
-cycle, a rhythm under the other drone that you tune with the knob, pinging through the delay.
-
-1. Press [[HOME]] until the page says **Pitch** (from Drones, once).
-2. Turn KNOB 1, drone I's pitch, down, a note a click, until the screen shows Hz instead of a note: here, 13 Hz.
-   Slower still for single clicks: it goes down to 2 Hz.
-3. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: the clicks ping through the delay.
-
-> **Good to know.** The speaker can't play the low part, but the clicks come through it. Through Drive (Details,
-> KNOB 1) they ping against the other drone. **Sonar** (P7) is built this way: drone I at 2.7 Hz.
-
-![Pitch, drone I at 13 Hz](../media/pulse-0.png "drone I at 13 Hz")
-![Space, Repeat 75 and Mix 50](../media/pulse-1.png "Repeat 75, Mix 50")
-
-**Listen** (`pulse`)
-
-- 0:00 P3 Vespers as it starts: two voices singing "ah"
-- 0:03 drone I's pitch turned down, a note a click: it sinks, then starts to flutter
-- 0:10 under 20 Hz it's a pulse: each cycle a click, under drone II's "ah"
-- 0:15 more echoes: the clicks ping through the delay
+- 0:01 drone I turned down to its lowest notes, A0: a low buzz
+- 0:04 the sub at −4 oct, all the way in: the buzz breaks into ticks, about 3 a second
+- 0:13 Drive up: each tick gets a harder edge
 
 ### A sung "ah" {#ah}
 
@@ -85,8 +62,8 @@ A band-pass filter near a vowel makes a drone sound sung; the LFO turning its wa
 **Listen** (`ah`)
 
 - 0:00 P1 Niagara as it starts
-- 0:03 the filters to band-pass: the drones thin to a nasal "ah"
-- 0:06 the sends on X-Wave, up: each wave turns slowly, the vowel opening and closing
+- 0:01 the filters to band-pass: the drones thin to a nasal "ah"
+- 0:04 the sends on X-Wave, up: each wave turns slowly, the vowel opening and closing
 
 ### A singing filter {#sing}
 
@@ -110,8 +87,8 @@ and the ring swells and fades on its own.
 **Listen** (`sing`)
 
 - 0:00 P15 Falling as it starts
-- 0:03 both resonances up: the filters ring on the drones' notes
-- 0:13 the filter LFOs moved to resonance: the ring swells and fades
+- 0:01 both resonances up: the filters ring on the drones' notes
+- 0:10 the filter LFOs moved to resonance: the ring swells and fades
 
 ### Tangled drones {#tangle}
 
@@ -137,9 +114,9 @@ one restless, metallic sound.
 **Listen** (`tangle`)
 
 - 0:00 P2 Embers as it starts: triangles blooming toward saws
-- 0:03 key 11 twice: cross-FM at the amount already set: the drones roughen
-- 0:07 X-mod up: they tangle into one restless, metallic sound
-- 0:21 X-mod back down: they come apart
+- 0:01 key 11 twice: cross-FM at the amount already set: the drones roughen
+- 0:06 X-mod up: they tangle into one restless, metallic sound
+- 0:13 X-mod back down: they come apart
 
 ### Hard sync sweep {#sync}
 
@@ -162,8 +139,8 @@ not its note, a tearing, vocal sweep.
 **Listen** (`sync`)
 
 - 0:00 P5 Abyss as it starts
-- 0:03 hard sync on: a harder, buzzier edge
-- 0:07 drone II's pitch send up: its pitch sweeps under the sync, a tearing, vocal sweep
+- 0:01 hard sync on: a harder, buzzier edge
+- 0:05 drone II's pitch send up: its pitch sweeps under the sync, a tearing, vocal sweep
 
 ## Movement and rhythm
 
@@ -189,9 +166,9 @@ four notes, a figure that repeats. Wander then moves the whole figure to a new n
 **Listen** (`figure`)
 
 - 0:00 P4 Dreamhouse as it starts: a low A and its seventh harmonic
-- 0:04 drone II's pitch send up: the high voice steps round a figure of four notes
-- 0:13 the LFO's rate up: the figure quickens
-- 0:25 Wander up: every so often the whole figure moves to a new note
+- 0:02 drone II's pitch send up: the high voice steps round a figure of four notes
+- 0:09 the LFO's rate up: the figure quickens
+- 0:17 Wander up: every so often the whole figure moves to a new note
 
 ### A filter rhythm in time with the Swell {#swell}
 
@@ -217,9 +194,9 @@ two filters in turn.
 **Listen** (`swell`)
 
 - 0:00 P8 Sibyl as it starts
-- 0:03 the Swell quicker: the drones breathe about once a second
-- 0:08 LFO I to Square on both cutoffs: the filters jump in turn
-- 0:18 the LFO locked to the Swell: each jump lands on its breath
+- 0:01 the Swell quicker: the drones breathe about once a second
+- 0:07 LFO I to Square on both cutoffs: the filters jump in turn
+- 0:16 the LFO locked to the Swell: each jump lands on its breath
 
 ### LFO chasing itself {#chase}
 
@@ -240,8 +217,8 @@ Speed mod lets an LFO speed up and slow down on one of its own waves, so every s
 **Listen** (`chase`)
 
 - 0:00 P7 Sonar as it starts
-- 0:03 Speed mod up: the LFO speeds up and slows down on its own wave, the sweep rushing and dragging
-- 0:17 Source to both LFOs: the push and pull gets lopsided
+- 0:01 Speed mod up: the LFO speeds up and slows down on its own wave, the sweep rushing and dragging
+- 0:09 Source to both LFOs: the push and pull gets lopsided
 
 ## Echoes and space
 
@@ -267,9 +244,9 @@ it, and every echo warbles.
 **Listen** (`warble`)
 
 - 0:00 P6 Seance as it starts
-- 0:03 the LFO on the delay's time, Delay up: the echoes wobble and bend
-- 0:16 more repeats: each echo bends again as it comes round
-- 0:19 a longer Time: deeper, slower bends
+- 0:01 the LFO on the delay's time, Delay up: the echoes wobble and bend
+- 0:09 more repeats: each echo bends again as it comes round
+- 0:13 a longer Time: deeper, slower bends
 
 ### Crackling echoes {#crackle}
 
@@ -292,9 +269,9 @@ distorts the drones and their echoes together: ghost notes and crackle.
 **Listen** (`crackle`)
 
 - 0:00 P11 Piston as it starts
-- 0:03 Repeat up: the echoes pile up
-- 0:04 the delay to Self: its time stretching as the echoes get louder
-- 0:10 Drive up: the drones and their echoes distorted together, ghost notes and crackle
+- 0:01 Repeat up: the echoes pile up
+- 0:03 the delay to Self: its time stretching as the echoes get louder
+- 0:08 Drive up: the drones and their echoes distorted together, ghost notes and crackle
 
 ### Freeze a chord, play over it {#freeze}
 
@@ -317,8 +294,8 @@ play over the frozen chord.
 **Listen** (`freeze`)
 
 - 0:00 P10 Cistern as it starts
-- 0:03 reverb Mix up, then Length to the top: the chord freezes and holds
-- 0:11 new notes for both drones: they play over the frozen chord
+- 0:01 reverb Mix up, then Length to the top: the chord freezes and holds
+- 0:08 new notes for both drones: they play over the frozen chord
 
 ### Shimmer on the echoes {#shimmer}
 
@@ -341,5 +318,5 @@ drones stay dry while each echo rises into the halo.
 **Listen** (`shimmer`)
 
 - 0:00 P12 Ashram as it starts
-- 0:03 more echoes
-- 0:06 the reverb to Shimmer, Into Echoes: only the echoes rise an octave into the halo
+- 0:01 more echoes
+- 0:04 the reverb to Shimmer, Into Echoes: only the echoes rise an octave into the halo

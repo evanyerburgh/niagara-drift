@@ -13,20 +13,20 @@ tap PLAY
 wait 3000
 wav sing.wav
 # @ P15 Falling as it starts as it starts
-wait 3000
+wait 1500
 tap HOME
 tap HOME
 # @ both resonances up (Pitch): the filters ring on the drones' notes
-turn K2 40 80
-turn K4 40 80
+turn K2 40 60
+turn K4 40 60
 wait 4000
 tap LFO
 # @ keys 4 and 9 on the LFO pages move the filter LFOs to resonance: the ring swells and fades
 tapkey b3
 tapkey b8
-turn K2 40 80
-turn K4 -40 80
-wait 10000
+turn K2 40 60
+turn K4 -40 60
+wait 4500
 shot sing-0.png
 tap HOME
 wait 400

@@ -10,7 +10,7 @@ tap PLAY
 wait 3000
 wav swell.wav
 # @ P8 Sibyl as it starts as it starts
-wait 3000
+wait 1500
 tap ARP
 # @ the Swell quicker (Swell, KNOB 1): the drones breathe about once a second
 turn K1 45 60
@@ -28,7 +28,7 @@ wait 4000
 key b4 down
 wait 700
 key b4 up
-wait 9000
+wait 4500
 shot swell-0.png
 tap ARP
 wait 400

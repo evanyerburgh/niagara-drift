@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# A recipe's render (tools/make_manual.py --renders), headphones, Pitch lock off, Scene time 0.
+# A recipe's render (tools/make_manual.py --renders): from P14, headphones, Pitch lock off, Scene time 0.
 # "# @" marks the listening times (tools/make_manual.py --times).
 notips
 phones 1
@@ -13,23 +13,25 @@ tap PLAY
 wait 3000
 wav ticks.wav
 # @ P14 Tape as it starts: worn, a hum under it
-wait 3000
-tap EDIT
-tap EDIT
+wait 1500
+tap HOME
+# @ drone I turned down to its lowest notes, A0: a low buzz
+turn K1 -29 60
 wait 300
+tap EDIT
+tap EDIT
 tapkey b1
 tapkey b1
 tapkey b1
 tapkey b1
-# @ the sub falls to −3 oct and comes up in the mix: the hum breaks into ticks
-turn K1 30 120
-wait 6000
+tapkey b1
+# @ the sub at -4 oct, Osc/Sb all the way to it: the buzz breaks into ticks, about 3 a second
+turn K1 85 15
+wait 300
 shot ticks-0.png
-# @ −4 oct: the ticks slow to half
-tapkey b1
-wait 6000
-shot ticks-1.png
-# @ Drive up: each tick gets a hard edge
-turn K2 25 120
+wait 8000
+# @ Drive up: each tick gets a harder edge
+turn K2 30 40
 wait 5000
+shot ticks-1.png
 wavstop

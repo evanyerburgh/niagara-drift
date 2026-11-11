@@ -13,19 +13,19 @@ tap PLAY
 wait 3000
 wav crackle.wav
 # @ P11 Piston as it starts as it starts
-wait 3000
+wait 1500
 tap FX
 # @ Repeat up (Space): the echoes pile up
 turn K1 30 60
 tap FX
 # @ hold SEL, turn KNOB 2 (Details): the delay to Self, its time stretching as the echoes get louder
 press SEL
-turn K2 2 300
+turn K2 2 60
 release SEL
-wait 5000
+wait 4500
 shot crackle-0.png
 # @ Drive up: the drones and their echoes distorted together, ghost notes and crackle
-turn K1 45 80
-wait 9000
+turn K1 45 60
+wait 4500
 shot crackle-1.png
 wavstop
