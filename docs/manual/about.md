@@ -57,6 +57,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 | **Sub and noise** | a sub of 4 waves (square, sine, triangle, saw), 1–4 octaves down or the subharmonics ⅓ and ⅕; under a low drone the lowest become ticks and pulses ([recipe](recipes/sounds.md#ticks)); noise from white to pink |
 | **LFO** | 2 waves of 10 shapes each (20 in all: triangles, squares, saws, exponentials, patterns, random, AND and OR steps), one cycle in 100 s to 70 Hz, on pitch, wave, cutoff, resonance and the delay |
 | **Tuning** | A from 427 to 453 Hz (440 to start, 432 for those who like it), 1 Hz a click or 0.1 with SEL; 12-tone, quarter tones, 19-, 31- and 53-tone, just, the harmonics, LMY, Harrison, the shrutis, Partch |
+| **Detuning** | each drone a cent at a time off its Tuning's notes (SEL + a pitch knob), kept as you move between notes; each partner up to 30 cents, for beating; Drift lets the detune wander |
 | **Filter** | a state-variable filter (zero-delay feedback, after Andrew Simper): low-, band- or high-pass, resonant to self-oscillation; an antialiased drive |
 | **Pressure-sensitive keys** | the white keys: scenes crossfade, and keys 9–12's gestures come in, as hard as you press; how light a touch is a setting |
 | **MIDI** | over USB or TRS: notes on channels 1 and 2 tune the drones; a clock syncs the Swell, LFO, delay, Wander and scenes ([MIDI](reference/midi.md)) |
