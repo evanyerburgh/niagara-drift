@@ -68,7 +68,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 | **LFO** | 2 waves of 10 shapes each (20 in all: triangles, squares, saws, exponentials, patterns, random, AND and OR steps), one cycle in 100 s to 70 Hz, on pitch, wave, cutoff, resonance and the delay |
 | **Tuning** | A from 427 to 453 Hz (440 to start, 432 for those who like it), 1 Hz a click or 0.1 with SEL; 12-tone, quarter tones, 19-, 31- and 53-tone, just, the harmonics, LMY, Harrison, the shrutis, Partch |
 | **Detuning** | each drone a cent at a time off its Tuning's notes (SEL + a pitch knob), kept as you move between notes; each partner up to 30 cents, for beating; Drift lets the detune wander |
-| **Pressure sensing** | each white key's pressure, read as it's held; scenes crossfade and keys 9–12's gestures follow it; the touch is a setting (Setup 2) |
+| **Polyphonic aftertouch** | each white key's own pressure, read as it's held; scenes crossfade and keys 9–12's gestures follow it; the touch is a setting (Setup 2); used inside, not sent out over MIDI |
 | **MIDI** | in, over USB and TRS: notes on channels 1 and 2 tune the drones; the clock (24 pulses a beat) and Start, with Sync on or off ([MIDI](reference/midi.md)) |
 | **Storage** | 6 banks of 8 scenes and 16 Presets in the FM-1's flash; backups to a file before every install; a restore that a power cut can't break ([Help](help.md)) |
 | **License** | GPL-3.0, source on [GitHub](https://github.com/evanyerburgh/niagara-drift) |
