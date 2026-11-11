@@ -12,14 +12,14 @@ intro: Play it live: what to move, and what to hold
 Start from one plain oscillator with everything off, as on an analog synth, and build a sound up yourself: the second
 drone, its interval, the sub, the LFO, the space.
 
-1. [[SEL]] + [[G5]], then white key 8: **P16 Bare**, and [[PLAY]]. One saw, drone I, through an open filter. Wait for
-   the gold line under the header to fill: Bare glides in over the Scene time.
-2. On **Drones**, where you start: KNOB 2, drone I's cutoff, down until the saw darkens.
-3. [[SEL]] + [[PLAY]]: drone II comes in, a fifth above. [[HOME]] for **Pitch**: KNOB 3 tunes it, and the screen
-   names the interval.
-4. [[EDIT]] twice: **Sub · Drive**. KNOB 1 blends drone I toward its sub, an octave down.
-5. [[LFO]]: **LFO sends**. KNOB 2, drone I's cutoff send, up; then [[ALGORITHM]], Movement, up from 0%: the filter
-   starts to breathe. [[FX]]: KNOB 2 brings in the echoes, KNOB 4 the reverb.
+1. Press [[SEL]] + [[G5]], tap white key 8 (**P16 Bare**), then [[PLAY]]: one saw, drone I, through an open filter.
+   Wait for the gold line under the header to fill: Bare glides in over the Scene time.
+2. Turn KNOB 2 on **Drones**, where you start: drone I's cutoff, down until the saw darkens.
+3. Press [[SEL]] + [[PLAY]]: drone II comes in, a fifth above. Press [[HOME]] for **Pitch**, and turn KNOB 3 to tune
+   it; the screen names the interval.
+4. Press [[EDIT]] twice for **Sub · Drive**, and turn KNOB 1 to blend drone I toward its sub, an octave down.
+5. Press [[LFO]] for **LFO sends**, and turn KNOB 2, drone I's cutoff send, up; then turn [[ALGORITHM]], Movement, up
+   from 0%: the filter starts to breathe. Press [[FX]], and turn KNOB 2 for the echoes, KNOB 4 for the reverb.
 
 > **Good to know.** On Bare, Movement starts at 0%, so no LFO send is heard until it comes up. Drift and Character
 > ([[ENV]], KNOB 2 and 3) take the drones from still and clean toward alive and worn. Keep what you make: [[SEL]] +
