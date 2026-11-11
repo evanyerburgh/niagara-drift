@@ -36,5 +36,5 @@ intro: LFO: where the LFO goes, and what else it moves
     looping straight back into the clock, and a line from the delay's wave to the delay's time; under it, cross-mod as it is now ("I moves II's cutoff", "bend each other",
     "Snarl" or off) and its key, F#5.
   - Movement (ALGORITHM) scales the delay's wobble too, as it does the LFO sends; not Speed mod or Cross-mod (see
-    [The LFO](lfo.md)).
-- The LFO's rate and waves are on the top-left knobs; see [The LFO](lfo.md) below.
+    [LFO](lfo.md)).
+- The LFO's rate and waves are on the top-left knobs; see [LFO](lfo.md).

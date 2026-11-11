@@ -1,5 +1,5 @@
 ---
-title: The LFO
+title: LFO
 intro: One clock, two waves, and Movement
 ---
 
@@ -29,4 +29,4 @@ and slowly, so Movement is heard at once; set an osc depth to hear it move the p
 | | the LFO's rate, its shapes, and where the waves go (the black keys on the LFO pages) |
  Turning a
 depth that can't be heard says why on the screen (Movement at 0%, or its wave off).
-**PRESETS** is **Gesture time**: how fast every gesture moves (see [The gestures](gestures.md)).
+**PRESETS** is **Gesture time**: how fast every gesture moves (see [Gestures](gestures.md)).

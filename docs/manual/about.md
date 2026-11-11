@@ -7,12 +7,12 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 
 ## What it does
 
-### The sound
+### Sound
 
 <ul class="cards">
 <li><b>Two drones</b><span>Each a wave from sine to square, a partner at an interval, a sub and noise, into its own self-oscillating filter and drive</span></li>
 <li><b>Tunings</b><span>12-tone to Partch's 43 notes, La Monte Young's, Harrison's, the shrutis; intervals named in each one's terms</span></li>
-<li><b>Cross-mod</b><span>The drones moving each other's filter or pitch, or the finished sound bending both</span></li>
+<li><b>Cross-mod</b><span>FM between the drones: each bending the other's pitch, or the finished sound bending both (Snarl); or drone I moving drone II's filter</span></li>
 <li><b>Feedback and Character</b><span>The finished sound fed back into the drones; the oscillators from clean to vintage</span></li>
 <li><b>Effects</b><span>Six delays, a drive after them, five reverbs from a room to a freeze</span></li>
 </ul>
@@ -20,9 +20,9 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 ### Movement
 
 <ul class="cards">
-<li><b>The Ultra LFO</b><span>Two waves of ten shapes on each drone's pitch, wave, cutoff or resonance, and the delay</span></li>
+<li><b>Ultra LFO</b><span>Two waves of ten shapes on each drone's pitch, wave, cutoff or resonance, and the delay</span></li>
 <li><b>Movement</b><span>Every LFO depth at once, from still to double, on one knob</span></li>
-<li><b>The Swell</b><span>Both drones breathing in time, from a soft swell to a hard gate</span></li>
+<li><b>Swell</b><span>Both drones breathing in time, from a soft swell to a hard gate</span></li>
 <li><b>Moves on its own</b><span>Drift, Wander (a slow melody on a scale) and Age (tape wear) keep it alive</span></li>
 </ul>
 

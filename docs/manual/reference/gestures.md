@@ -1,5 +1,5 @@
 ---
-title: The gestures
+title: Gestures
 intro: What each gesture does, and how to play them
 ---
 
@@ -16,7 +16,7 @@ without a trace when they've left. Your own settings stay as they are underneath
 The header shows the last one you played and how far in it is ("WASH 40%"), or "latched". Scenes remember which are
 latched.
 
-## The eight
+## Eight gestures
 
 ### Weight · [[D5]], held
 

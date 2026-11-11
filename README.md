@@ -74,7 +74,7 @@ kept, unless that version's notes in the [changelog](CHANGELOG.md) say otherwise
 **Backing up, going back to M-VAVE's firmware, and when an install doesn't take:** see
 [Help](docs/manual/help.md). Installing firmware is at your own risk.
 
-## The manual
+## Manual
 
 - [Start here](https://evanyerburgh.github.io/niagara-drift/#start-here): two ways in, from a Preset or from a bare saw,
   on the site's front page

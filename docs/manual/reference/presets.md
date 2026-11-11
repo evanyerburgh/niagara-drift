@@ -1,5 +1,5 @@
 ---
-title: The Presets
+title: Presets
 intro: Sixteen sounds to start from, each changing over a minute
 ---
 

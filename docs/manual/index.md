@@ -1,5 +1,5 @@
 ---
-title: The manual
+title: Manual
 intro: Four ways in, by what you want to do
 description: The Niagara Drift manual: start here, recipes, reference, shortcuts, help.
 ---

@@ -1,5 +1,5 @@
 ---
-title: The controls
+title: Controls
 intro: The buttons and the pages, the header and the knobs
 ---
 

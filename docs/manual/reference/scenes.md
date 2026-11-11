@@ -13,8 +13,8 @@ intro: The white keys: your sounds, gliding or crossfaded in by pressure
 | **SEL + SAVE** | **undo**: back to the sound before your last scene tap or blend, gliding over the Scene time (a knob turned since goes back too; the room's settings, such as Stereo or the Scene time, stay). Again, and it goes forward to where you were. Keep SEL down until you've let go of SAVE |
 | **SAVE, then a white key** | hold SAVE first, then tap the key: the sound is stored there (a key pressed first goes to its scene instead; lit keys hold a scene; a scene on its way brightens its key as it glides in; the key of the scene you're on blinks slowly, until you turn a knob or flip a switch; while playing, the sound dips for a moment as it's written). Not into the Presets: they're fixed (store your own in A to F) |
 | **SEL + a gesture key** | picks the bank the 8 scene keys play, in a row: G4 bank **A**, A4 **B**, B4 **C**, C5 **D**, D5 **E**, E5 **F** (yours), F5 the **Presets** P1–P8 and G5 their second bank, P9–P16 (below; a new FM-1 starts on the Presets). The screen names scenes by bank: "B5", "P9" |
-| **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [The gestures](gestures.md)) |
-| **Keys 9–12** (G4–C5) | **gestures** too, by pressure: Tick, Chord, Snarl, Stutter (see [The gestures](gestures.md)) |
+| **Top white key** (D5–G5) alone | a **gesture**: Weight, Shift, Clean, Wash (see [Gestures](gestures.md)) |
+| **Keys 9–12** (G4–C5) | **gestures** too, by pressure: Tick, Chord, Snarl, Stutter (see [Gestures](gestures.md)) |
 
 Updating from 0.2: keys 9–12 used to hold scenes. On the first start of 0.3, each scene you had there moves to the
 first empty key 1–8 of its own bank, then of another; one with no room left stays stored, unplayed (the installer

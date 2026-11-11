@@ -221,7 +221,7 @@ two filters in turn.
 - 0:08 LFO I to Square on both cutoffs: the filters jump in turn
 - 0:18 the LFO locked to the Swell: each jump lands on its breath
 
-### The LFO chasing itself {#chase}
+### LFO chasing itself {#chase}
 
 *Speed mod: the LFO rushing and dragging on its own wave*
 

@@ -1,5 +1,5 @@
 ---
-title: The black keys
+title: Black keys
 intro: Switches, and the LFO's routing on the LFO pages
 ---
 

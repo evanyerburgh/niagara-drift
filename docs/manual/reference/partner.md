@@ -15,7 +15,7 @@ intro: SEQ: each drone's partner; Shift, glide and Wander
 - **Shift's move** is where the Shift gesture takes the drones: from a fifth down through none in the middle to a
   fifth up, a note of the Tuning a detent (on 12-tone a semitone), named by its interval ("+5th", "-4th", "+m3"; on
   another Tuning in that Tuning's own terms: see [Intervals on a Tuning](setup.md#intervals-on-a-tuning)); with SEL held, a cent a detent, off the notes ("+503c"); it
-  lights while Shift (E5) is in. See [The gestures](gestures.md).
+  lights while Shift (E5) is in. See [Gestures](gestures.md).
 - **Wander** gives drone II a slow random melody: it jumps from note to note in no order, the notes of a scale on
   drone I (in any octave, up to an octave from its own pitch), and only now and then comes home. The knob is **how
   often**, at random times within a range: 25–30 s apart at the bottom, 0.5–2 s at the top; the screen shows the
