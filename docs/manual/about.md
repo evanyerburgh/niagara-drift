@@ -12,7 +12,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 <ul class="cards">
 <li><img class="ic" src="../../web/manual/icons/waveform.svg" alt=""><b>2 drones</b><span>Virtual-analog: each a wave from sine to square, a partner (a second oscillator) at an interval, a sub and noise, into its own resonant filter and drive</span></li>
 <li><img class="ic" src="../../web/manual/icons/music-notes-simple.svg" alt=""><b>11 Tunings</b><span>12-tone to Partch's 43 notes, La Monte Young's, Harrison's, the shrutis; intervals named in each one's terms</span></li>
-<li><img class="ic" src="../../web/manual/icons/intersect.svg" alt=""><b>Cross-mod</b><span>FM between the drones: each bending the other's pitch, or the finished sound bending both (Snarl); or drone I moving drone II's filter</span></li>
+<li><img class="ic" src="../../web/manual/icons/intersect.svg" alt=""><b>FM cross-mod</b><span>FM between the drones: each bending the other's pitch, or the finished sound bending both (Snarl); or drone I moving drone II's filter</span></li>
 <li><img class="ic" src="../../web/manual/icons/arrows-clockwise.svg" alt=""><b>Feedback and Character</b><span>The finished sound fed back into the drones; the oscillators from clean to vintage</span></li>
 <li><img class="ic" src="../../web/manual/icons/broadcast.svg" alt=""><b>6 delays, 5 reverbs</b><span>Clean to tape and self-warping echoes, a drive after them, reverbs from a room to a freeze</span></li>
 </ul>
