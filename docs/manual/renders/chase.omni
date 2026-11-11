@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P7, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w6
+tap PLAY
+wait 3000
+wav chase.wav
+# @ P7 Sonar as it starts as it starts
+wait 3000
+tap LFO
+tap LFO
+# @ Speed mod up (Mods): the LFO speeds up and slows down on its own wave, the sweep rushing and dragging
+turn K1 60 80
+wait 10000
+shot chase-0.png
+# @ Source to both LFOs: the push and pull gets lopsided
+turn K2 1 300
+wait 9000
+shot chase-1.png
+wavstop

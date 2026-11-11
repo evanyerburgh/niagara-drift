@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P6, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w5
+tap PLAY
+wait 3000
+wav warble.wav
+# @ P6 Seance as it starts as it starts
+wait 3000
+tap LFO
+# @ key 10 on the LFO pages picks which LFO moves the delay's time
+tapkey b9
+tap LFO
+# @ Delay up (Mods): the echoes' time wobbles, and their pitch bends with it
+turn K3 60 80
+wait 8000
+shot warble-0.png
+tap FX
+# @ more repeats (Space): each echo bends again as it comes round
+turn K1 15 60
+wait 3000
+tap FX
+# @ a longer Time (Details): deeper, slower bends
+turn K2 15 80
+wait 8000
+shot warble-1.png
+wavstop

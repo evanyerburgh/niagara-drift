@@ -14,4 +14,6 @@ emcc -O2 -ffp-contract=off -std=gnu99 -Wall -Wno-unused-function -Wno-unused-par
     -o build/emu/omni.wasm web/emu/omni_web.c firmware/src/dsp/drone.c
 cp web/emu/index.html web/emu/worklet.js web/emu/og.png build/emu/
 mkdir -p build/emu/fonts && cp web/emu/fonts/* build/emu/fonts/
+python3 tools/make_manual.py build/emu       # the manual's pages, build/emu/manual (its sounds once rendered:
+                                              # tools/make_manual.py --renders)
 echo "emu: build/emu ($(wc -c < build/emu/omni.wasm) B wasm)"

@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P5, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w4
+tap PLAY
+wait 3000
+wav sync.wav
+# @ P5 Abyss as it starts as it starts
+wait 3000
+# @ key 10: hard sync, drone II locked to drone I: a harder, buzzier edge
+tapkey b9
+wait 4000
+tap LFO
+# @ drone II's pitch send up: its pitch sweeps under the sync, a tearing, vocal sweep
+turn K3 50 80
+wait 9000
+shot sync-0.png
+tap HOME
+tap HOME
+wait 400
+shot sync-1.png
+wait 3000
+wavstop

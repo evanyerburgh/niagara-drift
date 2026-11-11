@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders), headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w5
+tap PLAY
+wait 3000
+wav ticks.wav
+# @ P14 Tape as it starts: worn, a hum under it
+wait 3000
+tap EDIT
+tap EDIT
+wait 300
+tapkey b1
+tapkey b1
+tapkey b1
+tapkey b1
+# @ the sub falls to −3 oct and comes up in the mix: the hum breaks into ticks
+turn K1 30 120
+wait 6000
+shot ticks-0.png
+# @ −4 oct: the ticks slow to half
+tapkey b1
+wait 6000
+shot ticks-1.png
+# @ Drive up: each tick gets a hard edge
+turn K2 25 120
+wait 5000
+wavstop

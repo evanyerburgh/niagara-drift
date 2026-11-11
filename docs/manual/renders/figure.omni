@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders), headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w3
+tap PLAY
+wait 3000
+wav figure.wav
+# @ P4 Dreamhouse as it starts: a low A and its seventh harmonic
+wait 3000
+tap LFO
+tap OCT+
+tap OCT+
+wait 1000
+shot figure-0.png
+# @ drone II's pitch send up: the high voice steps round a figure of four notes
+turn K3 40 100
+wait 5000
+# @ the LFO's rate up (SELECT): the figure quickens
+turn SELECT 55 70
+wait 8000
+shot figure-1.png
+tap SEQ
+tap SEQ
+# @ Wander up (Pitch moves): every so often the whole figure moves to a new note
+turn K3 40 60
+wait 14000
+shot figure-2.png
+wavstop

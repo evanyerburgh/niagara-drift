@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P12, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w3
+tap PLAY
+wait 3000
+wav shimmer.wav
+# @ P12 Ashram as it starts as it starts
+wait 3000
+tap FX
+# @ more echoes (Space)
+turn K1 25 60
+turn K2 30 60
+tap FX
+# @ the reverb's Type to Shimmer, and with SEL, Into to Echoes (Details): only the echoes rise an octave into the halo
+turn K4 1 300
+press SEL
+turn K4 1 300
+release SEL
+wait 3000
+tap FX
+turn K4 30 60
+wait 10000
+shot shimmer-0.png
+tap FX
+wait 400
+shot shimmer-1.png
+wait 2000
+wavstop
