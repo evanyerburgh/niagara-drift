@@ -136,3 +136,8 @@ figcaption { font-size: .85rem; color: var(--muted); margin-top: .35rem; line-he
 .listen li button { all: unset; cursor: pointer; font: 500 .85rem var(--mono); color: var(--pale); text-decoration: underline; }
 .listen li button:focus-visible { outline: 3px solid var(--pale); outline-offset: 2px; }
 .foot { border-top: 1px solid var(--rule); max-width: 1080px; margin: 0 auto; padding: 20px 16px 40px; font-size: .88rem; color: var(--muted); }
+
+/* videos (the About page): YouTube's no-cookie player, 16:9, a caption with its link */
+.videos { display: grid; gap: 22px; margin: 1rem 0 1.4rem; }
+.video iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 12px; background: var(--card); display: block; }
+.video figcaption { margin-top: .4rem; }

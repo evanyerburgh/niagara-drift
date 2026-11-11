@@ -40,6 +40,19 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 - **Drift**: the drones are never quite still; pitch, cutoff, timbre, level and detune slowly wander.
 - **Morph**: buttons and keys never jump: the sound moves to a new setting over a time you set.
 
+## Videos
+
+Niagara Drift as others have played it.
+
+<div class="videos">
+<figure class="video"><iframe src="https://www.youtube-nocookie.com/embed/6mRatAf7f-k" title="2 x FM-1 AMBIENT TECHNO LIVE PERFORMANCE | Niagara Drift and Groove OS, by Grzegorz Bojanek" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen"></iframe>
+<figcaption><a href="https://www.youtube.com/watch?v=6mRatAf7f-k">2 x FM-1 AMBIENT TECHNO LIVE PERFORMANCE | Niagara Drift and Groove OS</a> · Grzegorz Bojanek</figcaption></figure>
+<figure class="video"><iframe src="https://www.youtube-nocookie.com/embed/bVre9eF2Rm4" title="無数の窓口 - collective unconscious - [soundtrack][5.1ch専用][FM-1 Niagara], by Mirrorofes" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen"></iframe>
+<figcaption><a href="https://www.youtube.com/watch?v=bVre9eF2Rm4">無数の窓口 - collective unconscious - [soundtrack][5.1ch専用][FM-1 Niagara]</a> · Mirrorofes</figcaption></figure>
+<figure class="video"><iframe src="https://www.youtube-nocookie.com/embed/ZzUiysz0RY0" title="M-VAVE FM-1 カスタムファームウェアにびっくり「Niagara Drift」の世界！, by 電気老人" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen"></iframe>
+<figcaption><a href="https://www.youtube.com/watch?v=ZzUiysz0RY0">M-VAVE FM-1 カスタムファームウェアにびっくり「Niagara Drift」の世界！</a> · 電気老人</figcaption></figure>
+</div>
+
 ## Technical details
 
 - **Audio:** 44.1 kHz, stereo, rendered in 32-bit floating point and sent to the FM-1's converter at 24 bits; a block
