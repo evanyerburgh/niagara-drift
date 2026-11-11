@@ -49,6 +49,24 @@
 })();
 document.addEventListener("click", (e) => document.querySelectorAll("details.menubtn[open]").forEach((d) => { if (!d.contains(e.target)) d.open = false; }));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll("details.menubtn[open]").forEach((d) => d.open = false); });
+// two screens stacked taller than the recipe beside them: side by side instead, when that's shorter (wide pages only)
+function pairs() {
+  document.querySelectorAll(".recipe-body").forEach((b) => {
+    b.classList.remove("pair");
+    if (innerWidth <= 820 || b.querySelectorAll(".screens figure").length !== 2) return;
+    const tall = () => Math.max(b.querySelector(".screens").offsetHeight,
+      b.querySelector(".how").offsetHeight + (b.querySelector(".listen") ? b.querySelector(".listen").offsetHeight + 24 : 0));
+    const stacked = tall();
+    b.classList.add("pair");
+    if (tall() >= stacked) b.classList.remove("pair");
+  });
+}
+addEventListener("load", () => {   // then back to the linked recipe, which the layout's change moved
+  pairs();
+  const t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  if (t) t.scrollIntoView({ behavior: "instant" });
+});
+addEventListener("resize", pairs);
 document.querySelectorAll(".listen").forEach((l) => {
   const a = l.querySelector("audio");
   l.querySelectorAll("button[data-t]").forEach((b) => b.addEventListener("click", () => { a.currentTime = +b.dataset.t; a.play(); }));

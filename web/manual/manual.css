@@ -113,13 +113,17 @@ main:focus { outline: none; }
 .recipe { border-top: 1px solid #ffffff4d; padding: 40px 0; scroll-margin-top: 12px; }
 .recipe-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; }
 .prose .recipe-head h3 { font-size: 1.9rem; margin: 0; letter-spacing: -.015em; }
-/* two columns: the steps with the sound under them, the screens on the right */
-.recipe-body { display: grid; grid-template-columns: minmax(0, 1fr) 400px; grid-template-rows: auto 1fr;
+/* two columns: the steps with the sound under them, the screens on the right at the screen's own size (240 px: two
+ * stacked about as tall as an average recipe, so they don't make it longer) */
+.recipe-body { display: grid; grid-template-columns: minmax(0, 1fr) 240px; grid-template-rows: auto 1fr;
                grid-template-areas: "how shots" "listen shots"; gap: 24px 48px; margin-top: 10px; align-items: start; }
 .recipe-body .how { grid-area: how; }
 .recipe-body .screens { grid-area: shots; }
 .recipe-body .listen { grid-area: listen; max-width: 480px; }
-@media (max-width: 820px) { .recipe-body { grid-template-columns: minmax(0, 1fr) 300px; gap: 24px 28px; } }
+.recipe-body.pair { grid-template-columns: minmax(0, 1fr) 494px; }   /* two screens side by side, where stacked they'd be
+                                                                    * taller than the recipe (manual.js) */
+.recipe-body.pair .screens { grid-template-columns: 240px 240px; }
+@media (max-width: 820px) { .recipe-body { gap: 24px 28px; } }
 @media (max-width: 640px) { .recipe-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: none;
                                            grid-template-areas: "how" "shots" "listen"; } }
 .prose .moves { counter-reset: m; list-style: none; padding: 0; margin: .4rem 0 0; }
