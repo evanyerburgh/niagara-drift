@@ -151,11 +151,11 @@ buzzes and takes on drone I's pitch as a grain.
 *The finished sound, echoes and all, bending both drones*
 
 At key 11's last setting, the finished sound, the delay's echoes included, bends both drones' pitch: a growl that
-drags the echoes with it.
+drags and tears the pitch, and the echoes with it. It's clearest on a steady sound with plenty of echoes.
 
-1. Tap black key 11, [[F#5]], three times from off: **Snarl** (it winks).
-2. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up: 40 a growl, 85 a snarl.
-3. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) up: the snarl bends the echoes too.
+1. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: more echoes for Snarl to drag.
+2. Tap black key 11, [[F#5]], three times from off: **Snarl** (it winks).
+3. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up: 40 a growl, 85 a snarl.
 
 > **Good to know.** The **Snarl** gesture ([[B4]]) brings it in by pressure, with the drive and Feedback on top, and
 > leaves without a trace. **Clean** ([[F5]]) takes it out while you hold it.
@@ -165,9 +165,9 @@ drags the echoes with it.
 
 **Listen** (`snarl`)
 
-- 0:00 P13 Telegraph as it starts: a stepped figure over a low D, through a delay
-- 0:01 key 11 three times: Snarl, the finished sound bending both drones
-- 0:04 X-mod up: the snarl grows, dragging the echoes with it
+- 0:00 P2 Embers with more echoes: steady triangles blooming toward saws
+- 0:01 Snarl on: the finished sound starts to bend both drones
+- 0:04 X-mod up: the snarl grows, the pitch dragged and torn, the echoes bending with it
 
 ## Movement and rhythm
 
