@@ -22,14 +22,6 @@ The 8 white keys are scenes: 6 banks of 8 (A to F) to fill with your own sounds,
 ![Space, saved to A1](../media/s-save-0.png "Saved: the header says A1")
 ![Drones, back on A1](../media/s-save-1.png "A1 tapped: back to the saved sound")
 
-**Listen** (`s-save`)
-
-- 0:00 P10 Cistern, bank A picked
-- 0:01 changed: brighter, a longer reverb
-- 0:05 saved on A1
-- 0:07 changed again: darker
-- 0:11 A1 tapped: back to the saved sound
-
 ### Blend between two sounds and keep the mix {#blend}
 
 *Press a scene key harder, tap SEL*
@@ -58,10 +50,3 @@ The 8 white keys are scenes: 6 banks of 8 (A to F) to fill with your own sounds,
 
 ![Drones, on P5 Abyss](../media/s-back-0.png "P5 tapped")
 ![Drones, back on P1 Niagara](../media/s-back-1.png "SEL + SAVE: back to P1")
-
-**Listen** (`s-back`)
-
-- 0:00 P1 Niagara
-- 0:01 P5 Abyss tapped
-- 0:05 SEL + SAVE: back to Niagara
-- 0:09 again: forward to Abyss

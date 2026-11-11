@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # A recipe's render (tools/make_manual.py --renders): from P10, headphones, Pitch lock off, Scene time about 2 s.
-# "# @" marks the listening times (tools/make_manual.py --times).
 notips
 phones 1
 set 74 0
@@ -15,26 +14,19 @@ press SEL
 tapkey w8
 release SEL
 expect bank 0
-wav s-save.wav
-# @ P10 Cistern as it starts; bank A picked (SEL + G4)
 wait 1500
-# @ made your own: drone II's filter opened, the reverb longer
 turn K4 25 60
 tap FX
 turn K3 15 60
 wait 1500
-# @ saved: hold SAVE, tap white key 1 (the header says A1)
 press SAVE
 tapkey w0
 release SAVE
 wait 1500
 shot s-save-0.png
-# @ changed again: drone II's filter closed
 tap HOME
 turn K4 -40 40
 wait 2500
-# @ white key 1 tapped: back to the saved sound, gliding over the Scene time
 tapkey w0
 wait 4000
 shot s-save-1.png
-wavstop

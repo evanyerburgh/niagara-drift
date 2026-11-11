@@ -283,8 +283,8 @@ def recipe_html(rid, title, body):
         snd = (f'<div class="listen"><h4 id="{rid}-listen">Listen</h4><audio controls preload="none" '
                f'src="../../media/{name}.mp4" aria-label="{html.escape(title)}: a sound example"></audio><ol>{li}</ol></div>')
     return (f'<section class="recipe" id="{rid}"><div class="recipe-head"><h3>{inline(title)}</h3>'
-            f'<button class="share" data-id="{rid}" data-title="{html.escape(title)}" aria-label="Share {html.escape(title)}">Share</button></div>'
-            f'<div class="recipe-body"><div>{f"<p class=lead>{lead}</p>" if lead else ""}<ol class="moves">{moves}</ol>'
+            f'</div>'
+            f'<div class="recipe-body{"" if snd else " quiet"}"><div>{f"<p class=lead>{lead}</p>" if lead else ""}<ol class="moves">{moves}</ol>'
             f'{f"<div class=good><b>Good to know</b>{good}</div>" if good else ""}</div>'
             f'<div class="screens">{figs}</div>{snd}</div></section>')
 
@@ -518,6 +518,9 @@ def renders(only=None):
         for png in sorted(o.glob("*.png")):
             Image.open(png).resize((480, 480), Image.NEAREST).save(MAN / "media" / png.name)
         wav = o / f"{s.stem}.wav"
+        if not wav.exists():                           # screens only: nothing to hear in this one
+            print(f"render: {s.stem}: {len(list(o.glob('*.png')))} screens, no sound")
+            continue
         level(wav, o / "level.wav")
         mp4 = AUDIO / f"{s.stem}.mp4"
         if shutil.which("afconvert"):

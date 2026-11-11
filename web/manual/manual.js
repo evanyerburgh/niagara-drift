@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // The manual's pages (tools/make_manual.py): the banner's two bands drifting from its top left to its bottom right
 // (violet, and one that darkens), the words pale where they cross, as the front page's name is (reduced motion: still);
-// the menu closing on a click elsewhere or Escape; a recipe's Share and its listening times.
+// the menu closing on a click elsewhere or Escape; a recipe's listening times.
 "use strict";
 (() => {
   const top = document.querySelector(".top"), inner = top && top.querySelector(".top-in");
@@ -49,13 +49,6 @@
 })();
 document.addEventListener("click", (e) => document.querySelectorAll("details.menubtn[open]").forEach((d) => { if (!d.contains(e.target)) d.open = false; }));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll("details.menubtn[open]").forEach((d) => d.open = false); });
-document.querySelectorAll(".share").forEach((b) => b.addEventListener("click", async () => {
-  const url = location.href.split("#")[0] + "#" + b.dataset.id;
-  try {
-    if (navigator.share) await navigator.share({ title: b.dataset.title + " · Niagara Drift", url });
-    else { await navigator.clipboard.writeText(url); b.textContent = "Link copied"; setTimeout(() => (b.textContent = "Share"), 1600); }
-  } catch (e) { /* the share sheet closed */ }
-}));
 document.querySelectorAll(".listen").forEach((l) => {
   const a = l.querySelector("audio");
   l.querySelectorAll("button[data-t]").forEach((b) => b.addEventListener("click", () => { a.currentTime = +b.dataset.t; a.play(); }));
