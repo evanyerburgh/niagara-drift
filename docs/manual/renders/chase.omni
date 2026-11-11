@@ -15,7 +15,7 @@ turn K3 25 40
 turn SELECT 8 60
 wait 500
 wav chase.wav
-# @ P7 Sonar with a vibrato on drone II (LFO sends, its pitch send up): a steady wobble, about 1.5 a second
+# @ P7 Sonar with a vibrato on drone II (LFO sends, its pitch send up): a slow, steady wobble
 wait 3000
 shot chase-0.png
 tap LFO
