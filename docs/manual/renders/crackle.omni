@@ -20,8 +20,9 @@ turn K1 30 60
 tap FX
 # @ hold SEL, turn KNOB 2 (Details): the delay to Self, its time stretching as the echoes get louder
 press SEL
-turn K2 2 60
+turn K2 3 60
 release SEL
+expect par94 5
 wait 4500
 shot crackle-0.png
 # @ Drive up: the drones and their echoes distorted together, ghost notes and crackle

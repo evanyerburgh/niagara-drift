@@ -10,9 +10,10 @@ tapkey w3
 tap PLAY
 wait 2500
 tap EDIT
+expect view 4
 turn K3 67 40
 tap HOME
-tap HOME
+expect view 0
 turn K4 25 60
 turn K1 -15 60
 tap LFO

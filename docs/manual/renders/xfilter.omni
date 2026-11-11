@@ -22,6 +22,8 @@ turn K4 45 80
 wait 5000
 # @ drone I's pitch moved (Pitch): the growl changes its grain
 tap HOME
+tap HOME
+expect view 1
 turn K1 5 300
 wait 4000
 shot xfilter-1.png

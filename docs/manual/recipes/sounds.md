@@ -50,21 +50,22 @@ and the ring swells and fades on its own.
 
 1. Press [[HOME]] for **Pitch**, and turn KNOB 2 and KNOB 4, the resonances, up: the filters ring. Their last dot is
    red: there they ring on their own.
-2. Press [[LFO]] for **LFO sends**, and tap [[C#4]] and [[C#5]]: on the LFO pages they switch each drone's cutoff
+2. Press [[HOME]] again for **Drones**, and turn the cutoffs (KNOB 2 and KNOB 4) up: the ring brighter.
+3. Press [[LFO]] for **LFO sends**, and tap [[C#4]] and [[C#5]]: on the LFO pages they switch each drone's cutoff
    send to **resonance**.
-3. Turn KNOB 2 and KNOB 4, the resonance sends, up: the ring swells and fades as the LFO goes round.
+4. Turn KNOB 2 and KNOB 4, the resonance sends, up: the ring swells and fades as the LFO goes round.
 
 > **Good to know.** **Abyss** (P5) swells its resonances this way. With the drones a fifth or an octave apart the two
 > rings meet; a semitone apart, they beat. Weight ([[D5]]) lets the resonance give way while you hold it.
 
 ![LFO sends, both cutoff sends on resonance](../media/sing-0.png "the sends on resonance")
-![Drones, the filters ringing](../media/sing-1.png "the filters ringing")
+![Drones, the filters ringing](../media/sing-1.png "the filters open, ringing")
 
 **Listen** (`sing`)
 
-- 0:00 P15 Falling as it starts
-- 0:01 both resonances up: the filters ring on the drones' notes
-- 0:10 the filter LFOs moved to resonance: the ring swells and fades
+- 0:00 P15 Falling, both resonances up and both cutoffs opened: the filters ring on the drones' notes
+- 0:01 the filter LFOs moved to resonance: the ring swells and fades, slowly, again and again
+
 
 ### Hard sync sweep {#sync}
 
@@ -83,8 +84,8 @@ not its note, a tearing, vocal, laser-like sweep.
 > only a few semitones, so the sweep is gentler. Here Abyss's own resonance LFO was turned off first (LFO sends,
 > KNOB 2 and 4 to 0), so its slow ringing doesn't cover the sweep.
 
-![Drones, hard sync, drone II open and forward](../media/sync-0.png "hard sync, drone II open")
-![Pitch, drone II two octaves up](../media/sync-1.png "drone II two octaves up")
+![Pitch, hard sync, drone II on B2](../media/sync-0.png "hard sync on, drone II on B2")
+![Pitch, drone II two octaves up on B4](../media/sync-1.png "two octaves up: B4")
 
 **Listen** (`sync`)
 
@@ -131,13 +132,13 @@ buzzes and takes on drone I's pitch as a grain.
 
 1. Tap black key 11, [[F#5]], once: it lights, **I moves II's cutoff**.
 2. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up: the growl deepens.
-3. Press [[HOME]] for **Pitch**, and move drone I's pitch (KNOB 1): the growl changes its grain.
+3. Press [[HOME]] twice for **Pitch**, and move drone I's pitch (KNOB 1): the growl changes its grain.
 
 > **Good to know.** It's strongest with drone II's filter resonant and band-pass ([[A#4]]), as in **Vespers** (P3)
 > here. **Seance** (P6) uses it gently.
 
 ![Mods, I moves II's cutoff](../media/xfilter-0.png "I moves II's cutoff")
-![Pitch, drone I moved](../media/xfilter-1.png "drone I moved")
+![Pitch, drone I moved to G3](../media/xfilter-1.png "drone I moved to G3")
 
 **Listen** (`xfilter`)
 
