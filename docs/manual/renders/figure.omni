@@ -14,8 +14,9 @@ expect view 4
 turn K3 67 40
 tap HOME
 expect view 0
-turn K4 25 60
-turn K1 -15 60
+turn K4 45 60
+turn K3 15 60
+turn K1 -25 60
 tap LFO
 tap OCT+
 tap OCT+

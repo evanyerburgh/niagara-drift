@@ -744,7 +744,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   one knob doesn't do (a key and a knob, or two or three pages), in five kinds, a page each with every recipe listed
   at its top: Sounds, Gestures, Scenes and saving, Time and transitions, Performing. Each: what you hear, the moves,
   Good to know, two screens and a sound, its own link and Share. The sounds are host renders from scripts in
-  `docs/manual/renders`, each recipe from a different Preset, leveled to -13.5 dB RMS (peaks under -1 dBFS); the
+  `docs/manual/renders`, each recipe from a different Preset, leveled to -14 LUFS by perceived loudness (ITU BS.1770, so a bass-heavy clip isn't
+  left sounding quiet; peaks under -1 dBFS); the
   screens are committed, the sounds made at release (40 recipes would add ~25 MB to git). The front page: the poster
   as a short hero, the emulator, the manual's doors and four recipes to try. Words: nothing that sounds like bad
   design (hidden, buried), no closing period on a banner's line, no Lyra-8 in the new words (the credit line keeps it).

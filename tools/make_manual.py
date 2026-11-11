@@ -32,7 +32,7 @@ MAN = SRC / "docs" / "manual"
 WEB = SRC / "web" / "manual"                       # the pages' style and the banner's bands
 AUDIO = SRC / "build" / "manual-audio"
 REPO = "https://github.com/evanyerburgh/niagara-drift"
-LEVEL_DB = -13.5                                   # every recipe's sound at this loudness (RMS), peaks under -1 dBFS
+LEVEL_LUFS = -14.0                                 # every recipe's sound at this perceived loudness (BS.1770), peaks under -1 dBFS
 
 GH = ('<svg class="gh" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 '
       '12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.'
@@ -516,16 +516,44 @@ def renders(only=None):
         print(f"render: {s.stem}: {len(list(o.glob('*.png')))} screens, {mp4.stat().st_size // 1024} KB")
 
 
+def _biquad(x, b0, b1, b2, a1, a2):
+    y, x1, x2, y1, y2 = [0.0] * len(x), 0.0, 0.0, 0.0, 0.0
+    for i, v in enumerate(x):
+        o = b0 * v + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2
+        x2, x1, y2, y1 = x1, v, y1, o
+        y[i] = o
+    return y
+
+
+def loudness(chans, sr):
+    """Perceived loudness, LUFS (ITU BS.1770: the K-weighting's two stages, the channels' mean squares summed; one
+    block, no gating: the clips are short and steady). The deep bass counts less, as the ear hears it."""
+    k = math.tan(math.pi * 1681.97 / sr)                  # stage 1: a +4 dB shelf above ~1.7 kHz
+    vh, vb, q = 10 ** (4.0 / 20), 10 ** (4.0 / 40), 1 / math.sqrt(2)
+    a0 = 1 + k / q + k * k
+    s1 = ((vh + vb * k / q + k * k) / a0, 2 * (k * k - vh) / a0, (vh - vb * k / q + k * k) / a0,
+          2 * (k * k - 1) / a0, (1 - k / q + k * k) / a0)
+    k = math.tan(math.pi * 38.13 / sr)                    # stage 2: a high-pass at ~38 Hz
+    a0 = 1 + k / 0.5 + k * k
+    s2 = (1.0, -2.0, 1.0, 2 * (k * k - 1) / a0, (1 - k / 0.5 + k * k) / a0)
+    total = 0.0
+    for c in chans:
+        y = _biquad(_biquad(c, *s1), *s2)
+        total += sum(v * v for v in y) / len(y)
+    return -0.691 + 10 * math.log10(max(total, 1e-12))
+
+
 def level(src, dst):
-    """The WAV at LEVEL_DB RMS, raised only as far as its peaks stay under -1 dBFS."""
+    """The WAV at LEVEL_LUFS perceived loudness, raised only as far as its peaks stay under -1 dBFS."""
     with wave.open(str(src)) as w:
         p, a = w.getparams(), array("h", w.readframes(w.getnframes()))
+    n = p.nchannels
+    chans = [[v / 32768 for v in a[c::n]] for c in range(n)]
     pk = max(1, max(abs(x) for x in a)) / 32768
-    rms = max(1e-9, math.sqrt(sum(x * x for x in a) / len(a)) / 32768)
-    g = min(10 ** ((LEVEL_DB - 20 * math.log10(rms)) / 20), 10 ** ((-1 - 20 * math.log10(pk)) / 20))
+    g = min(10 ** ((LEVEL_LUFS - loudness(chans, p.framerate)) / 20), 10 ** ((-1 - 20 * math.log10(pk)) / 20))
     with wave.open(str(dst), "wb") as w:
         w.setparams(p)
-        w.writeframes(array("h", (int(round(x * g)) for x in a)).tobytes())
+        w.writeframes(array("h", (int(round(max(-32768, min(32767, x * g)))) for x in a)).tobytes())
 
 
 def render_times(path):

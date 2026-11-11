@@ -180,7 +180,8 @@ LFO II's **OR** shape adds two square waves, one five times as fast as the other
 four notes, a figure that repeats. Wander then moves the whole figure to a new note now and then.
 
 1. Make drone II bright, so the figure stands out: press [[EDIT]] for **Osc** and turn KNOB 3, its wave, to a
-   **saw**; then on **Drones** ([[HOME]]) turn KNOB 4, its cutoff, up, and KNOB 1, drone I's level, a little down.
+   **saw**; then on **Drones** ([[HOME]]) turn KNOB 4, its cutoff, all the way up, KNOB 3, its level, up, and KNOB 1,
+   drone I's level, down.
 2. Press [[LFO]] for **LFO sends**, and tap [[OCT+]], LFO II's wave, until the screen says **OR 5**.
 3. Turn KNOB 3, drone II's pitch send, up: 40 is about ±4 semitones.
 4. Turn SELECT, the LFO's rate, up for a quicker figure.
