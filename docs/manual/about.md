@@ -10,7 +10,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 ### Sound
 
 <ul class="cards">
-<li><b>Two drones</b><span>Each a wave from sine to square, a partner at an interval, a sub and noise, into its own self-oscillating filter and drive</span></li>
+<li><b>Two drones</b><span>Each a wave from sine to square, a partner (a second oscillator) at an interval, a sub and noise, into its own self-oscillating filter and drive</span></li>
 <li><b>Tunings</b><span>12-tone to Partch's 43 notes, La Monte Young's, Harrison's, the shrutis; intervals named in each one's terms</span></li>
 <li><b>Cross-mod</b><span>FM between the drones: each bending the other's pitch, or the finished sound bending both (Snarl); or drone I moving drone II's filter</span></li>
 <li><b>Feedback and Character</b><span>The finished sound fed back into the drones; the oscillators from clean to vintage</span></li>
@@ -21,19 +21,19 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 
 <ul class="cards">
 <li><b>Ultra LFO</b><span>Two waves of ten shapes on each drone's pitch, wave, cutoff or resonance, and the delay</span></li>
-<li><b>Movement</b><span>Every LFO depth at once, from still to double, on one knob</span></li>
-<li><b>Swell</b><span>Both drones breathing in time, from a soft swell to a hard gate</span></li>
-<li><b>Moves on its own</b><span>Drift, Wander (a slow melody on a scale) and Age (tape wear) keep it alive</span></li>
+<li><b>Movement</b><span>One knob for every LFO's depth at once, from still to double</span></li>
+<li><b>Swell</b><span>A tremolo on both drones, in time: from a soft swell to a hard gate</span></li>
+<li><b>Moves on its own</b><span>Drift (slow random modulation), Wander (a random melody on a scale) and Age (tape wear)</span></li>
 </ul>
 
 ### Playing
 
 <ul class="cards">
 <li><b>16 Presets</b><span>Each a different side of the instrument, each moving over a minute</span></li>
-<li><b>Eight gestures</b><span>Several settings moving at once on top of your sound: held, pressed harder, or tapped to stay</span></li>
+<li><b>Eight gestures</b><span>Macros: several settings at once on top of your sound, each in its own order; held, pressed harder, or tapped to stay</span></li>
 <li><b>Save 48 sounds</b><span>Six banks of eight scenes, yours to fill; each glides in, or crossfades as you press its key harder</span></li>
 <li><b>Motion loop</b><span>Records your knob moves, gestures and scenes, and plays them back</span></li>
-<li><b>Never jumps</b><span>Buttons, keys and scenes glide to their new settings over times you set</span></li>
+<li><b>Never jumps</b><span>Everything glides (morphs): buttons, keys and scenes move to new settings over times you set</span></li>
 </ul>
 
 ## Videos
