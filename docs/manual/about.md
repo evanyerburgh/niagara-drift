@@ -52,8 +52,9 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 | | |
 |---|---|
 | **Audio** | 44.1 kHz stereo; 32-bit floating point inside, 24-bit out; a block every 5.8 ms |
-| **Oscillators** | virtual analog, 4 shapes blended continuously (sine, triangle, saw, square) with pulse width; saw and pulse band-limited (polyBLEP); a partner oscillator; hard sync; cross-FM |
-| **Sub and noise** | a sub of 4 waves (square, sine, triangle, saw), 1–4 octaves down or the subharmonics ⅓ and ⅕; noise from white to pink |
+| **Oscillators** | virtual analog, 4 shapes blended continuously (sine, triangle, saw, square) with pulse width; saw and pulse band-limited (polyBLEP); hard sync; cross-FM |
+| **Partner** | a second oscillator on each drone: an octave or a fifth or fourth below, unison, a third, fourth or fifth above, an octave, or an octave and a fifth; each tempered or just (pure, beatless); detune up to 30 cents for slow beating |
+| **Sub and noise** | a sub of 4 waves (square, sine, triangle, saw), 1–4 octaves down or the subharmonics ⅓ and ⅕; under a low drone the lowest become ticks and pulses ([recipe](recipes/sounds.md#ticks)); noise from white to pink |
 | **LFO** | 2 waves of 10 shapes each (20 in all: triangles, squares, saws, exponentials, patterns, random, AND and OR steps), one cycle in 100 s to 70 Hz, on pitch, wave, cutoff, resonance and the delay |
 | **Filter** | a state-variable filter (zero-delay feedback, after Andrew Simper): low-, band- or high-pass, resonant to self-oscillation; an antialiased drive |
 | **Keys** | the white keys sense pressure (scene crossfades, keys 9–12's gestures) |
