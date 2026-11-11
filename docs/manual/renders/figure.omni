@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# A recipe's render (tools/make_manual.py --renders), headphones, Pitch lock off, Scene time 0.
+# A recipe's render (tools/make_manual.py --renders): from P4, headphones, Pitch lock off, Scene time 0. The bright
+# figure is set up before the recording (its moves take ~10 s); the clip starts on it stepping.
 # "# @" marks the listening times (tools/make_manual.py --times).
 notips
 phones 1
@@ -7,34 +8,27 @@ set 74 0
 set 71 0
 tapkey w3
 tap PLAY
-wait 3000
-wav figure.wav
-# @ P4 Dreamhouse as it starts: a low A and its seventh harmonic
-wait 1500
-# @ drone II brighter and forward: its wave to a saw (Osc, KNOB 3), its filter opened, drone I a little back (Drones)
+wait 2500
 tap EDIT
-turn K3 67 20
+turn K3 67 40
 tap HOME
 tap HOME
-turn K4 25 40
-turn K1 -15 40
-wait 800
+turn K4 25 60
+turn K1 -15 60
 tap LFO
 tap OCT+
 tap OCT+
-wait 1000
+turn K3 40 60
+turn SELECT 55 50
+wait 1500
 shot figure-0.png
-# @ drone II's pitch send up: the high voice steps round a figure of four notes
-turn K3 40 60
-wait 4500
-# @ the LFO's rate up (SELECT): the figure quickens
-turn SELECT 55 60
-wait 4500
+wav figure.wav
+# @ the figure stepping: drone II bright, round four notes on LFO II's OR 5
+wait 2000
+tap SEQ
+tap SEQ
+# @ Wander up (Pitch moves): every few seconds the whole figure moves to a new note
+turn K3 60 40
+wait 13000
 shot figure-1.png
-tap SEQ
-tap SEQ
-# @ Wander up (Pitch moves): every so often the whole figure moves to a new note
-turn K3 40 60
-wait 4500
-shot figure-2.png
 wavstop

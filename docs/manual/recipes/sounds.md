@@ -189,16 +189,13 @@ four notes, a figure that repeats. Wander then moves the whole figure to a new n
 > **Good to know.** LFO I's OR ([[OCT−]]) is three times as fast: another figure. **AND** (AND 3 on LFO I, AND 5 on
 > LFO II) steps between two notes instead, as in **Piston** (P11). **Telegraph** (P13) is built this way, on LFO I's OR 3.
 
-![LFO sends, LFO II on OR 5](../media/figure-0.png "OR 5 on LFO II")
-![LFO sends, drone II's pitch send +40, 0.49 Hz](../media/figure-1.png "pitch send +40, 0.49 Hz")
+![LFO sends, LFO II on OR 5, drone II's pitch send +40](../media/figure-0.png "OR 5 on drone II's pitch")
+![Pitch moves, Wander 2.4-6 s](../media/figure-1.png "Wander moving the figure")
 
 **Listen** (`figure`)
 
-- 0:00 P4 Dreamhouse as it starts: a low A and its seventh harmonic
-- 0:01 drone II brighter and forward: its wave to a saw, its filter opened
-- 0:06 drone II's pitch send up: the high voice steps round a figure of four notes
-- 0:13 the LFO's rate up: the figure quickens
-- 0:21 Wander up: every so often the whole figure moves to a new note
+- 0:00 the figure stepping: drone II bright, round four notes on LFO II's OR 5
+- 0:02 Wander up: every few seconds the whole figure moves to a new note
 
 ### A filter rhythm in time with the Swell {#swell}
 
