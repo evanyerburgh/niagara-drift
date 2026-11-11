@@ -9,7 +9,7 @@
 
 Niagara Drift is open-source firmware that turns the M-VAVE
 FM-1 into a drone synthesizer: two always-on drones you tune, shape and move rather than play note by
-note. It's inspired by the Stylophone CPM DS-2, the Moog Subharmonicon and the Soma Lyra-8.
+note.
 
 ![The FM-1 with what every control does in Niagara Drift written on it](docs/img/panel.png)
 
@@ -131,6 +131,8 @@ Niagara Drift is the next link in a chain of FM-1 firmwares:
 - The [FM-1 Screen Reader](https://github.com/charlesvestal/fm1-reader) by Charles Vestal: the screen's words over
   USB and the page that speaks them (its firmware side from fm1-base, MPL-2.0); thanks to João Durães (WoodJack) for
   asking for it.
+
+It began from ideas in the Stylophone CPM DS-2, the Moog Subharmonicon and the Soma Lyra-8.
 
 GPL-3.0-only (the files from fm1-base keep their MPL-2.0); see [LICENSING.md](LICENSING.md).
 
