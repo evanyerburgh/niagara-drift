@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P13, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w4
+tap PLAY
+wait 2500
+turn PRESET 30 30
+wav g-speed.wav
+# @ P13 Telegraph, Gesture time fast
+wait 1500
+# @ hold Wash (G5) 2 seconds: in fast
+key w15 down
+wait 2000
+key w15 up
+# @ let go, then turn PRESETS slow: the release stretches out, the reverb lingering
+turn PRESET -60 10
+wait 9000
+shot g-speed-0.png
+wavstop

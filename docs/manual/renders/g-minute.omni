@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P12, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w3
+tap PLAY
+wait 2500
+turn PRESET -40 30
+wav g-minute.wav
+# @ P12 Ashram, Gesture time slow
+wait 1500
+# @ tap Weight (D5): it comes in on its own, slowly, no key held
+tapkey w12
+wait 12000
+shot g-minute-0.png
+wait 6000
+wavstop

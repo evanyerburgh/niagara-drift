@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P1, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w0
+tap PLAY
+wait 2500
+wav g-hold.wav
+# @ P1 Niagara as it starts
+wait 1500
+# @ hold Wash (G5) 4 seconds: the delay, then the reverb grows longer and darker, the dry dipping
+key w15 down
+wait 4000
+shot g-hold-0.png
+# @ let go: it leaves over as long as it was held, the dry back first, the tails last
+key w15 up
+wait 5000
+# @ hold Weight (D5) 2 seconds: a fuller, warmer bass; let go and it leaves in 2
+key w12 down
+wait 2000
+shot g-hold-1.png
+key w12 up
+wait 3500
+wavstop

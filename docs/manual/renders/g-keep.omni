@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's render (tools/make_manual.py --renders): from P2, headphones, Pitch lock off, Scene time 0.
+# "# @" marks the listening times (tools/make_manual.py --times).
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w1
+tap PLAY
+wait 2500
+wav g-keep.wav
+# @ P2 Embers as it starts
+wait 1500
+# @ tap Clean (F5): it comes all the way in on its own and stays: the grit, the movement, then the effects leave
+tapkey w14
+wait 5000
+shot g-keep-0.png
+# @ tap again: it goes, the effects back first
+tapkey w14
+wait 4000
+# @ hold Wash and tap SEL part way: it stays where it had got to
+key w15 down
+wait 1800
+tap SEL
+key w15 up
+wait 4000
+shot g-keep-1.png
+wavstop
