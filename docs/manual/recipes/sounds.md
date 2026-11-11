@@ -178,10 +178,12 @@ drags and tears the pitch, and the echoes with it. It's clearest on a steady sou
 LFO II's **OR** shape adds two square waves, one five times as fast as the other: on a drone's pitch it steps round
 four notes, a figure that repeats. Wander then moves the whole figure to a new note now and then.
 
-1. Press [[LFO]] for **LFO sends**, and tap [[OCT+]], LFO II's wave, until the screen says **OR 5**.
-2. Turn KNOB 3, drone II's pitch send, up: 40 is about ±4 semitones.
-3. Turn SELECT, the LFO's rate, up for a quicker figure.
-4. Press [[SEQ]] twice for **Pitch moves**, and turn KNOB 3, Wander, up: every so often the figure starts on another
+1. Make drone II bright, so the figure stands out: press [[EDIT]] for **Osc** and turn KNOB 3, its wave, to a
+   **saw**; then on **Drones** ([[HOME]]) turn KNOB 4, its cutoff, up, and KNOB 1, drone I's level, a little down.
+2. Press [[LFO]] for **LFO sends**, and tap [[OCT+]], LFO II's wave, until the screen says **OR 5**.
+3. Turn KNOB 3, drone II's pitch send, up: 40 is about ±4 semitones.
+4. Turn SELECT, the LFO's rate, up for a quicker figure.
+5. Press [[SEQ]] twice for **Pitch moves**, and turn KNOB 3, Wander, up: every so often the figure starts on another
    note.
 
 > **Good to know.** LFO I's OR ([[OCT−]]) is three times as fast: another figure. **AND** (AND 3 on LFO I, AND 5 on
@@ -193,9 +195,38 @@ four notes, a figure that repeats. Wander then moves the whole figure to a new n
 **Listen** (`figure`)
 
 - 0:00 P4 Dreamhouse as it starts: a low A and its seventh harmonic
-- 0:02 drone II's pitch send up: the high voice steps round a figure of four notes
-- 0:09 the LFO's rate up: the figure quickens
-- 0:17 Wander up: every so often the whole figure moves to a new note
+- 0:01 drone II brighter and forward: its wave to a saw, its filter opened
+- 0:06 drone II's pitch send up: the high voice steps round a figure of four notes
+- 0:13 the LFO's rate up: the figure quickens
+- 0:21 Wander up: every so often the whole figure moves to a new note
+
+### A filter rhythm in time with the Swell {#swell}
+
+*A square LFO on both cutoffs, locked to the Swell's breath*
+
+The Swell makes both drones breathe; lock the LFO to it and a square wave on the filters jumps on the same beat, the
+two filters in turn.
+
+1. Press [[ARP]] for the **Swell** page (tap it again if the Swell is off), and turn KNOB 1 for about a breath a
+   second.
+2. Press [[LFO]] for **LFO sends**. Tap [[OCT−]] until LFO I is **Square**, and tap key 8, [[A#4]], until LFO I moves
+   drone II's cutoff too.
+3. Turn KNOB 2 and KNOB 4, the cutoff sends, one up and one down: the filters jump in turn. Turn SELECT to about the
+   Swell's speed.
+4. Hold black key 5, [[D#4]], half a second: the LFO restarts on each of the Swell's breaths ("on Swell").
+
+> **Good to know.** The Swell's speed sets the rhythm: the locked LFO restarts on each of its breaths. Hold [[D#4]]
+> again to free the LFO. (With a MIDI clock, the Swell and the locked LFO follow its beat too.)
+
+![LFO sends, LFO I Square on both cutoffs, on Swell](../media/swell-0.png "Square on both cutoffs, on Swell")
+![Swell, rate 1.2 s](../media/swell-1.png "the Swell at 1.2 s")
+
+**Listen** (`swell`)
+
+- 0:00 P8 Sibyl as it starts
+- 0:01 the Swell quicker: the drones breathe about once a second
+- 0:07 LFO I to Square on both cutoffs: the filters jump in turn
+- 0:16 the LFO locked to the Swell: each jump lands on its breath
 
 ### LFO chasing itself {#chase}
 

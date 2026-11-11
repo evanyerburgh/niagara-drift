@@ -11,6 +11,14 @@ wait 3000
 wav figure.wav
 # @ P4 Dreamhouse as it starts: a low A and its seventh harmonic
 wait 1500
+# @ drone II brighter and forward: its wave to a saw (Osc, KNOB 3), its filter opened, drone I a little back (Drones)
+tap EDIT
+turn K3 67 20
+tap HOME
+tap HOME
+turn K4 25 40
+turn K1 -15 40
+wait 800
 tap LFO
 tap OCT+
 tap OCT+
