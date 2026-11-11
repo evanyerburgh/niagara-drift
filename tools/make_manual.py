@@ -54,7 +54,7 @@ def icon(name, cls="ic"):
 MENU_ICON = {"Play it": "play", "Start here": "flag", "Recipes": "cooking-pot", "Reference": "book-open",
              "Shortcuts": "keyboard", "Help": "lifebuoy", "About": "info"}
 TAB_ICON = {"sounds": "waveform", "gestures": "hand-pointing", "scenes": "floppy-disk", "time": "timer",
-            "performing": "faders"}
+            "performing": "faders", "bare": "plant"}
 MENU = [("", "Play it", "the emulator: the firmware itself, in your browser"),
         ("#start-here", "Start here", "the first steps, beside the emulator"),
         ("manual/recipes/", "Recipes", "how to get a sound or a move"),
@@ -303,7 +303,7 @@ def onpage(groups, base, label):
 
 # ---- pages -------------------------------------------------------------------------------------------------------
 
-RECIPE_KINDS = ["sounds", "gestures", "scenes", "time", "performing"]
+RECIPE_KINDS = ["sounds", "gestures", "scenes", "time", "performing", "bare"]   # bare: the tutorial, one walk-through
 
 
 def page_html(rel, meta, body, current, side=""):
@@ -361,8 +361,11 @@ def build(out):
         if rel.startswith("recipes/") and rel.split("/")[1] in RECIPE_KINDS:
             groups, recipes = recipe_page(text)
             first = text.split("\n## ", 1)[0].split("\n### ", 1)[0]     # the words before the first group or recipe
-            body = (tabs(rel.split("/")[1]) + render(blocks(first)) + onpage(groups, "", meta.get("title", ""))
-                    + "".join(recipes))
+            if len(recipes) == 1:                      # one walk-through (the tutorial): the page's title is its heading
+                body = tabs(rel.split("/")[1]) + render(blocks(first)) + re.sub(r'<div class="recipe-head">.*?</div>', "", recipes[0], flags=re.S)
+            else:
+                body = (tabs(rel.split("/")[1]) + render(blocks(first)) + onpage(groups, "", meta.get("title", ""))
+                        + "".join(recipes))
             meta.setdefault("kicker", "Recipes")
         elif rel == "recipes":
             body = tabs(None, "") + render(blocks(text), 0) + all_recipes()
@@ -386,7 +389,7 @@ def tabs(cur, base="../"):
     out = '<nav class="tabs" aria-label="Recipe kinds">'
     for k in RECIPE_KINDS:
         meta, _ = front((MAN / "recipes" / f"{k}.md").read_text(encoding="utf-8"))
-        out += f'<a href="{base}{k}/"{" aria-current=\"page\"" if k == cur else ""}>{icon(TAB_ICON[k], "ti")}{meta["title"]}</a>'
+        out += f'<a href="{base}{k}/"{" aria-current=\"page\"" if k == cur else ""}>{icon(TAB_ICON[k], "ti")}{meta.get("tab", meta["title"])}</a>'
     return out + "</nav>"
 
 
