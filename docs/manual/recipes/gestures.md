@@ -9,12 +9,12 @@ image: g-stack-0.png
 
 Gestures are macros: one key moves several settings at once. **PRESETS** sets how fast.
 
-### Hold one in, let it go {#hold}
+### Bloom into the reverb, fade out slowly {#hold}
 
-*Out as slowly as you held*
+*Wash: the longer you hold, the slower it fades*
 
-1. Hold **Wash**, [[G5]], a few seconds.
-2. Let go: it leaves as slowly as you held it.
+1. Hold **Wash**, [[G5]], until the reverb has bloomed.
+2. Let go: it fades out as slowly as you held it in.
 
 ![Drones, Wash at 100%](../media/g-hold-0.png "WASH 100%")
 ![Drones, Weight at 72%](../media/g-hold-1.png "WEIGHT 72%")
@@ -26,12 +26,12 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 - 0:05 let go: it leaves over as long as it was held, the dry back first, the tails last
 - 0:10 Weight held 2 seconds: a fuller, warmer bass; let go and it leaves in 2
 
-### Press harder for more {#press}
+### Swell into a chord and back {#press}
 
-*Keys 9–12 follow your finger*
+*Chord: as far as you press*
 
-1. Press **Chord**, [[A4]], lightly, then harder: further in.
-2. Ease off, and it comes back.
+1. Press **Chord**, [[A4]], slowly harder: the drones move into a chord.
+2. Ease off: they come back.
 
 > **Good to know.** Chord builds its chord from Wander's scale, on the **Pitch moves** page ([[SEQ]] twice, KNOB 4):
 > change the scale and the chord changes.
@@ -46,12 +46,12 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 - 0:08 eased off: it comes back toward where it was
 - 0:11 let go: it goes
 
-### Keep one {#keep}
+### Leave a gesture on while you play {#keep}
 
-*A tap, or SEL while holding*
+*A tap latches it; SEL keeps it part way*
 
 1. Tap a gesture key: it comes all the way in and stays. Tap again to let it go.
-2. Or hold one and tap [[SEL]]: it stays where it is.
+2. Or hold one and tap [[SEL]] part way: it stays there.
 
 ![Drones, Clean latched](../media/g-keep-0.png "CLEAN latched")
 ![Drones, Wash kept part way](../media/g-keep-1.png "Wash kept part way")
@@ -63,12 +63,12 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 - 0:06 tapped again: it goes, the effects back first
 - 0:10 Wash held, SEL tapped part way: it stays where it had got to
 
-### Stack them for a climax {#stack}
+### Build a climax {#stack}
 
 *Snarl under Wash*
 
-1. Press **Snarl**, [[B4]].
-2. Hold **Wash**, [[G5]], too.
+1. Press **Snarl**, [[B4]], firmly.
+2. Hold **Wash**, [[G5]], on top. Let go of both to come down.
 
 ![Drones, Wash over Snarl](../media/g-stack-0.png "Wash over Snarl")
 
@@ -79,9 +79,9 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 - 0:05 Wash held on top: the growl washes into the reverb, a climax
 - 0:10 both let go: each leaves in its own order
 
-### Make one last a minute {#minute}
+### Transform the sound over half a minute {#minute}
 
-*Gesture time slow, then a tap*
+*A slow Gesture time and a tap*
 
 1. Turn **PRESETS** all the way left: **GESTURE TIME 33 s**.
 2. Tap a gesture key: it comes in on its own.
@@ -93,12 +93,12 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 - 0:00 P12 Ashram, Gesture time slow
 - 0:01 Weight tapped: it comes in on its own, slowly, no key held
 
-### In fast, out slow, or the other way round {#speed}
+### Hit it fast, let it fade slowly {#speed}
 
 *Turn PRESETS after letting go*
 
 1. Hold a gesture on a fast Gesture time, and let go.
-2. Turn **PRESETS** left: it leaves slowly. (Or slow in, then fast out.)
+2. Turn **PRESETS** left: it fades slowly. (Or slow in, then fast out.)
 
 ![Drones, Wash leaving slowly at 12%](../media/g-speed-0.png "WASH 12%, leaving slowly")
 
