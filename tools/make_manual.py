@@ -45,8 +45,18 @@ HOME = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2 12 3.5l9 7
         'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.6 9.6V20h4.6v-5.6h3.6V20h4.6V9.6" '
         'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>')
 # the menu, the same on every page: what each holds, for the menu's second line
+def icon(name, cls="ic"):
+    """A Phosphor icon (light, MIT, web/manual/icons) as inline SVG in the text's color, hidden from screen readers."""
+    s = (WEB / "icons" / f"{name}.svg").read_text(encoding="utf-8").strip()
+    return s.replace("<svg ", f'<svg class="{cls}" aria-hidden="true" focusable="false" ', 1)
+
+
+MENU_ICON = {"Play it": "play", "Start here": "flag", "Recipes": "cooking-pot", "Reference": "book-open",
+             "Shortcuts": "keyboard", "Help": "lifebuoy", "About": "info"}
+TAB_ICON = {"sounds": "waveform", "gestures": "hand-pointing", "scenes": "floppy-disk", "time": "timer",
+            "performing": "faders"}
 MENU = [("", "Play it", "the emulator: the firmware itself, in your browser"),
-        ("#start-here", "Start here", "on the front page, beside the emulator"),
+        ("#start-here", "Start here", "the first steps, beside the emulator"),
         ("manual/recipes/", "Recipes", "how to get a sound or a move"),
         ("manual/reference/", "Reference", "every page, knob and key"),
         ("manual/reference/shortcuts/", "Shortcuts", "every combination, hold and tap"),
@@ -56,7 +66,8 @@ MENU = [("", "Play it", "the emulator: the firmware itself, in your browser"),
 
 def menu_html(up, current):
     """Install, Source and the menu (the front page has the same, web/emu/index.html)."""
-    items = "".join(f'<a href="{up}{h}"{" aria-current=\"page\"" if n == current else ""}>{n}<small>{s}</small></a>'
+    items = "".join(f'<a href="{up}{h}"{" aria-current=\"page\"" if n == current else ""}>{icon(MENU_ICON[n], "mi")}'
+                    f'<span>{n}<small>{s}</small></span></a>'
                     for h, n, s in MENU)
     return (f'<a href="{up}install/">Install</a><a href="{REPO}" aria-label="Source on GitHub">Source{GH}</a>'
             f'<details class="menubtn"><summary aria-label="Menu" title="Menu">Menu</summary><div class="panel">{items}</div></details>')
@@ -374,7 +385,7 @@ def tabs(cur, base="../"):
     out = '<nav class="tabs" aria-label="Recipe kinds">'
     for k in RECIPE_KINDS:
         meta, _ = front((MAN / "recipes" / f"{k}.md").read_text(encoding="utf-8"))
-        out += f'<a href="{base}{k}/"{" aria-current=\"page\"" if k == cur else ""}>{meta["title"]}</a>'
+        out += f'<a href="{base}{k}/"{" aria-current=\"page\"" if k == cur else ""}>{icon(TAB_ICON[k], "ti")}{meta["title"]}</a>'
     return out + "</nav>"
 
 
@@ -391,7 +402,7 @@ def all_recipes():
 
 def reference_side(rel):
     """The reference's pages at the side, in the order of docs/manual/reference/index.md's list."""
-    order = re.findall(r"\]\(([\w-]+)\.md\)", (MAN / "reference" / "index.md").read_text(encoding="utf-8"))
+    order = re.findall(r'(?:\]\(|href=")([\w-]+)\.md[)"]', (MAN / "reference" / "index.md").read_text(encoding="utf-8"))
     here = rel.split("/")[1] if "/" in rel else ""
     li = ""
     for n in order:
