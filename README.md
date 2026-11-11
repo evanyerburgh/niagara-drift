@@ -76,7 +76,8 @@ kept, unless that version's notes in the [changelog](CHANGELOG.md) say otherwise
 
 ## The manual
 
-- [Start here](docs/manual/start.md): two ways in, from a Preset or from a bare saw
+- [Start here](https://evanyerburgh.github.io/niagara-drift/#start-here): two ways in, from a Preset or from a bare saw,
+  on the site's front page
 - [Recipes](docs/manual/recipes/index.md): how to get a sound or a move, across the pages
 - [Reference](docs/manual/reference/index.md): every page, knob and key
 - [Shortcuts](docs/manual/reference/shortcuts.md): every key combination, hold and tap

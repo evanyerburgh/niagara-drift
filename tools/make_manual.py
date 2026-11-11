@@ -46,7 +46,7 @@ HOME = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2 12 3.5l9 7
         'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>')
 # the menu, the same on every page: what each holds, for the menu's second line
 MENU = [("", "Play it", "the emulator: the firmware itself, in your browser"),
-        ("manual/start/", "Start here", "two ways in"),
+        ("#start-here", "Start here", "on the front page, beside the emulator"),
         ("manual/recipes/", "Recipes", "how to get a sound or a move"),
         ("manual/reference/", "Reference", "every page, knob and key"),
         ("manual/reference/shortcuts/", "Shortcuts", "every combination, hold and tap"),
