@@ -10,7 +10,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 ### Sound
 
 <ul class="cards">
-<li><b>2 drones</b><span>Each a wave from sine to square, a partner (a second oscillator) at an interval, a sub and noise, into its own self-oscillating filter and drive</span></li>
+<li><b>2 drones</b><span>Virtual-analog: each a wave from sine to square, a partner (a second oscillator) at an interval, a sub and noise, into its own resonant filter and drive</span></li>
 <li><b>Tunings</b><span>12-tone to Partch's 43 notes, La Monte Young's, Harrison's, the shrutis; intervals named in each one's terms</span></li>
 <li><b>Cross-mod</b><span>FM between the drones: each bending the other's pitch, or the finished sound bending both (Snarl); or drone I moving drone II's filter</span></li>
 <li><b>Feedback and Character</b><span>The finished sound fed back into the drones; the oscillators from clean to vintage</span></li>
@@ -52,6 +52,8 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 | | |
 |---|---|
 | **Audio** | 44.1 kHz stereo; 32-bit floating point inside, 24-bit out; a block every 5.8 ms |
+| **Oscillators** | virtual analog: saw and pulse band-limited (polyBLEP), sine, triangle, blended continuously; hard sync; cross-FM |
+| **Filter** | a state-variable filter (zero-delay feedback, after Andrew Simper): low-, band- or high-pass, resonant to self-oscillation; an antialiased drive |
 | **Keys** | the white keys sense pressure (scene crossfades, keys 9–12's gestures) |
 | **MIDI** | over USB or TRS: notes on channels 1 and 2 tune the drones; a clock syncs the Swell, LFO, delay, Wander and scenes ([MIDI](reference/midi.md)) |
 | **Your sounds** | six banks of eight scenes, plus 16 Presets; backed up before every install, restored safely ([Help](help.md)) |
