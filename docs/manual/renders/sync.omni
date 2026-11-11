@@ -8,24 +8,29 @@ set 71 0
 tapkey w4
 tap PLAY
 wait 2500
-wav sync.wav
-# @ P5 Abyss as it starts: dark, closed filters
-wait 1500
-# @ hard sync on, drone II up above drone I, its filter opened and brought forward: a hard, buzzy edge
-tapkey b9
-tap HOME
-turn K3 15 60
+tap LFO
+turn K2 -100 10
+turn K4 100 10
 tap HOME
 turn K4 30 60
 turn K3 20 60
 turn K1 -20 60
+tap HOME
+wait 500
+wav sync.wav
+# @ P5 Abyss, drone II opened and brought forward (its resonance LFO off)
 wait 1500
+# @ hard sync on: drone II locked to drone I, a harder, buzzier edge
+tapkey b9
+wait 2000
 shot sync-0.png
-tap LFO
-# @ the LFO sweeps drone II's pitch: under the sync it's heard as a tearing, vocal sweep of tone
-turn K3 70 30
-turn SELECT 25 60
+# @ drone II's pitch turned slowly up two octaves: under the sync its tone tears upward, a vocal, laser-like sweep
+turn K3 24 250
 wait 500
 shot sync-1.png
-wait 12000
+# @ and back down: the sweep falls
+turn K3 -24 250
+# @ up again, faster
+turn K3 24 120
+wait 1500
 wavstop

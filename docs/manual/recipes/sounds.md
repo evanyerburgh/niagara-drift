@@ -68,29 +68,31 @@ and the ring swells and fades on its own.
 
 ### Hard sync sweep {#sync}
 
-*Drone II locked to drone I, its pitch swept: a sweep of tone, not of note*
+*Drone II locked to drone I, its pitch swept by hand: a sweep of tone, not of note*
 
-With hard sync, drone II restarts its wave on every cycle of drone I: moving drone II's pitch then changes its tone,
-not its note, a tearing, vocal sweep. It needs drone II above drone I, and its filter open, to be heard.
+With hard sync, drone II restarts its wave on every cycle of drone I: turning drone II's pitch then changes its tone,
+not its note, a tearing, vocal, laser-like sweep.
 
-1. Tap black key 10, [[D#5]]: **hard sync**, drone II locked to drone I.
-2. Press [[HOME]] for **Pitch**, and turn KNOB 3 to put drone II above drone I (here an octave up).
-3. Press [[HOME]] for **Drones**: turn KNOB 4, drone II's cutoff, well up, and bring drone II forward (KNOB 3 up,
+1. Press [[HOME]] for **Drones**: turn KNOB 4, drone II's cutoff, well up, and bring drone II forward (KNOB 3 up,
    KNOB 1 down).
-4. Press [[LFO]] for **LFO sends**, and turn KNOB 3, drone II's pitch send, up: the LFO sweeps it. SELECT sets how
-   fast.
+2. Tap black key 10, [[D#5]]: **hard sync**, drone II locked to drone I.
+3. Press [[HOME]] for **Pitch**, and turn KNOB 3, drone II's pitch, slowly up two octaves and back: the tone sweeps.
 
-> **Good to know.** It's strongest with a saw or square in drone II's wave (Osc page). With Pitch link on ([[C#5]])
-> drone II follows drone I's notes as you tune.
+> **Good to know.** It's strongest with drone II above drone I and a saw or square in its wave (Osc page). To keep
+> it moving without a hand, send the LFO to drone II's pitch (LFO sends, KNOB 3) with a deep send: the LFO moves
+> only a few semitones, so the sweep is gentler. Here Abyss's own resonance LFO was turned off first (LFO sends,
+> KNOB 2 and 4 to 0), so its slow ringing doesn't cover the sweep.
 
-![Drones, drone II an octave up, open and forward](../media/sync-0.png "drone II up, open, forward")
-![LFO sends, drone II's pitch send up](../media/sync-1.png "the LFO on drone II's pitch")
+![Drones, hard sync, drone II open and forward](../media/sync-0.png "hard sync, drone II open")
+![Pitch, drone II two octaves up](../media/sync-1.png "drone II two octaves up")
 
 **Listen** (`sync`)
 
-- 0:00 P5 Abyss as it starts: dark, closed filters
-- 0:01 hard sync on, drone II up and opened: a hard, buzzy edge
-- 0:08 the LFO sweeps drone II's pitch: a tearing, vocal sweep of tone
+- 0:00 P5 Abyss, drone II opened and brought forward
+- 0:01 hard sync on: a harder, buzzier edge
+- 0:03 drone II's pitch turned slowly up two octaves: its tone tears upward, a vocal, laser-like sweep
+- 0:10 and back down: the sweep falls
+- 0:16 up again, faster
 
 ## Cross-mod
 
@@ -194,34 +196,6 @@ four notes, a figure that repeats. Wander then moves the whole figure to a new n
 - 0:02 drone II's pitch send up: the high voice steps round a figure of four notes
 - 0:09 the LFO's rate up: the figure quickens
 - 0:17 Wander up: every so often the whole figure moves to a new note
-
-### A filter rhythm in time with the Swell {#swell}
-
-*A square LFO on both cutoffs, locked to the Swell's breath*
-
-The Swell makes both drones breathe; lock the LFO to it and a square wave on the filters jumps on the same beat, the
-two filters in turn.
-
-1. Press [[ARP]] for the **Swell** page (tap it again if the Swell is off), and turn KNOB 1 for about a breath a
-   second.
-2. Press [[LFO]] for **LFO sends**. Tap [[OCT−]] until LFO I is **Square**, and tap key 8, [[A#4]], until LFO I moves
-   drone II's cutoff too.
-3. Turn KNOB 2 and KNOB 4, the cutoff sends, one up and one down: the filters jump in turn. Turn SELECT to about the
-   Swell's speed.
-4. Hold black key 5, [[D#4]], half a second: the LFO restarts on each of the Swell's breaths ("on Swell").
-
-> **Good to know.** On a MIDI clock the Swell keeps its time in bars and beats, and the locked LFO with it (see
-> [MIDI](../reference/midi.md)). Hold [[D#4]] again to free the LFO.
-
-![LFO sends, LFO I Square on both cutoffs, on Swell](../media/swell-0.png "Square on both cutoffs, on Swell")
-![Swell, rate 1.2 s](../media/swell-1.png "the Swell at 1.2 s")
-
-**Listen** (`swell`)
-
-- 0:00 P8 Sibyl as it starts
-- 0:01 the Swell quicker: the drones breathe about once a second
-- 0:07 LFO I to Square on both cutoffs: the filters jump in turn
-- 0:16 the LFO locked to the Swell: each jump lands on its breath
 
 ### LFO chasing itself {#chase}
 
