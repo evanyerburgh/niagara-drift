@@ -359,7 +359,7 @@ def build(out):
             if kind == "reference":
                 side = reference_side(rel)
                 meta.setdefault("kicker", "Reference")
-        page = page_html(rel, meta, rewrite_links(body, md), current, side)
+        page = page_html(rel, meta, icons(rewrite_links(body, md)), current, side)
         p = dst / rel / "index.html" if rel else dst / "index.html"
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(page, encoding="utf-8")
@@ -405,6 +405,15 @@ def page_rel(md):
     """docs/manual/X/index.md and X.md are both the page manual/X/ ("" for the manual's first page)."""
     rel = md.relative_to(MAN).with_suffix("").as_posix()
     return "" if rel == "index" else rel[:-6] if rel.endswith("/index") else rel
+
+
+def icons(body):
+    """<img class="ic" src="…/icons/NAME.svg" alt=""> (it shows on GitHub too) as the icon's own SVG, in the text's color
+    (Phosphor's light weight, MIT, web/manual/icons)."""
+    def svg(m):
+        s = (WEB / "icons" / f"{m.group(1)}.svg").read_text(encoding="utf-8").strip()
+        return s.replace("<svg ", '<svg class="ic" aria-hidden="true" focusable="false" ', 1)
+    return re.sub(r'<img class="ic" src="[^"]*icons/([\w-]+)\.svg" alt="">', svg, body)
 
 
 def rewrite_links(body, md):

@@ -148,3 +148,8 @@ figcaption { font-size: .85rem; color: var(--muted); margin-top: .35rem; line-he
 .cards b { display: block; color: var(--pale); font-size: 1.05rem; margin-bottom: .2rem; }
 .cards span { display: block; color: var(--muted); font-size: .92rem; line-height: 1.4; }
 .prose .cards { padding-left: 0; }
+
+/* icons (Phosphor, light, MIT): in the text's color, above a card's title */
+.ic { width: 1.6rem; height: 1.6rem; display: block; margin-bottom: .45rem; color: var(--pale); }
+.cards .ic { width: 28px; height: 28px; }
+.doors .ic { width: 30px; height: 30px; }
