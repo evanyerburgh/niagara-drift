@@ -8,17 +8,23 @@ set 71 0
 tapkey w6
 tap PLAY
 wait 3000
+tap LFO
+tapkey b5
+tapkey b5
+turn K3 25 40
+turn SELECT 8 60
+wait 500
 wav chase.wav
-# @ P7 Sonar as it starts as it starts
-wait 1500
-tap LFO
-tap LFO
-# @ Speed mod up (Mods): the LFO speeds up and slows down on its own wave, the sweep rushing and dragging
-turn K1 60 60
-wait 4500
+# @ P7 Sonar with a vibrato on drone II (LFO sends, its pitch send up): a steady wobble, about 1.5 a second
+wait 3000
 shot chase-0.png
-# @ Source to both LFOs: the push and pull gets lopsided
-turn K2 1 60
-wait 4500
+tap LFO
+# @ Speed mod to the top (Mods, KNOB 1), driven by LFO I's triangle: the wobble rushes, then drags, over and over
+turn K1 100 25
+turn K2 -1 300
+wait 9000
 shot chase-1.png
+# @ Speed back to 0: the wobble steady again
+turn K1 -100 10
+wait 3000
 wavstop

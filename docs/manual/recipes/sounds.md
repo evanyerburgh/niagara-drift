@@ -232,23 +232,26 @@ two filters in turn.
 
 *Speed mod: the LFO rushing and dragging on its own wave*
 
-Speed mod lets an LFO speed up and slow down on one of its own waves, so every sweep rushes, then drags.
+Speed mod lets the LFO speed up and slow down on one of its own waves, so every wobble rushes, then drags. It's
+easiest to hear on a vibrato.
 
-1. Press [[LFO]] twice for the **Mods** page.
-2. Turn KNOB 1, Speed, up: the LFO speeds up and slows down by up to three octaves.
-3. Turn KNOB 2, Source, to pick which wave does it: LFO I, LFO II or both.
+1. Press [[LFO]] for **LFO sends**. Tap key 6, [[F#4]], until LFO I moves drone II's pitch, and turn KNOB 3, its pitch
+   send, up: a slow vibrato.
+2. Press [[LFO]] again for **Mods**, and turn KNOB 1, Speed, all the way up: the LFO speeds up and slows down by up to
+   three octaves.
+3. Turn KNOB 2, Source, to **LFO I**: a regular rush and drag (LFO II's random glide makes it uneven).
 
 > **Good to know.** Speed mod moves the rate of everything the LFO moves at once: the filters, the pitches, the
-> delay. **Sonar** (P7) with it sweeps unevenly.
+> delay. Speed at 0 steadies it again.
 
-![Mods, Speed +60, Source LFO II](../media/chase-0.png "Speed +60")
-![Mods, Source LFO I and II](../media/chase-1.png "Source: both")
+![LFO sends, LFO I on drone II's pitch](../media/chase-0.png "a vibrato on drone II")
+![Mods, Speed +100, Source LFO I](../media/chase-1.png "Speed +100, LFO I")
 
 **Listen** (`chase`)
 
-- 0:00 P7 Sonar as it starts
-- 0:01 Speed mod up: the LFO speeds up and slows down on its own wave, the sweep rushing and dragging
-- 0:09 Source to both LFOs: the push and pull gets lopsided
+- 0:00 P7 Sonar with a vibrato on drone II: a slow, steady wobble
+- 0:03 Speed mod to the top, driven by LFO I's triangle: the wobble rushes, then drags, over and over
+- 0:14 Speed back to 0: the wobble steady again
 
 ## Echoes and space
 
