@@ -9,20 +9,25 @@ tapkey w7
 tap PLAY
 wait 2500
 tap FX
+expect view 13
 turn K1 15 40
 turn K2 35 40
-wait 500
+tap ARP
+turn K1 45 60
+wait 1500
 wav warble.wav
-# @ P8 Sibyl with its echoes up (Space): clear repeats of the two voices
+# @ P8 Sibyl with its echoes up and its Swell quick: the drones dip about once a second, the echoes ring in the gaps
 wait 1500
 tap LFO
 tap LFO
-# @ Delay up (Mods): the LFO wobbles the delay's time, and every echo bends in pitch
-turn K3 60 40
-wait 5000
+expect view 7
+# @ Delay all the way up (Mods): the LFO wobbles the delay's time by a quarter, and every echo bends in the gaps
+turn K3 80 30
+wait 6000
 shot warble-0.png
 tap FX
 tap FX
+expect view 14
 # @ a longer Time (Details): deeper, slower bends
 turn K2 15 60
 wait 6000

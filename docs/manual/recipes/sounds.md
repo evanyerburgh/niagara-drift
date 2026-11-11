@@ -259,25 +259,27 @@ easiest to hear on a vibrato.
 *The LFO moving the delay's time: echoes bending in pitch*
 
 When the delay's time moves, its echoes bend in pitch, as tape does when it speeds up and slows down. Let an LFO move
-it, and every echo warbles.
+it, and every echo warbles; let the Swell dip the drones, and the bending echoes ring on their own in the gaps.
 
 1. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: clear echoes to bend.
-2. Press [[LFO]] twice for **Mods**, and turn KNOB 3, Delay, up: the LFO wobbles the delay's time by up to a quarter,
-   and every echo bends with it.
-3. Press [[FX]] twice for **Details**, and turn Time (KNOB 2) up: deeper, slower bends.
+2. Press [[ARP]] for the **Swell** (tap it again if it's off), and turn KNOB 1 up for about a breath a second: the
+   echoes sound in the gaps.
+3. Press [[LFO]] twice for **Mods**, and turn KNOB 3, Delay, all the way up: the LFO wobbles the delay's time by a
+   quarter, and every echo bends.
+4. Press [[FX]] twice for **Details**, and turn Time (KNOB 2) up: deeper, slower bends.
 
 > **Good to know.** On the LFO pages, black key 10, [[D#5]], picks which LFO moves the delay's time: LFO I's
 > regular waves warble evenly, LFO II's random glide makes them wander, as here. Turning Time by hand bends the
 > echoes too. Movement (ALGORITHM) scales the warble with the other LFO sends.
 
-![Mods, Delay +80](../media/warble-0.png "Delay +80")
-![Details, Time 410 ms](../media/warble-1.png "Time 410 ms")
+![Mods, Delay +100](../media/warble-0.png "Delay +100: ±28%")
+![Details, a longer Time](../media/warble-1.png "a longer Time")
 
 **Listen** (`warble`)
 
-- 0:00 P8 Sibyl with its echoes up: clear repeats of the two voices
-- 0:01 Delay up: the LFO wobbles the delay's time, and every echo bends in pitch
-- 0:09 a longer Time: deeper, slower bends
+- 0:00 P8 Sibyl with its echoes up and its Swell quick: the drones dip about once a second, the echoes ring in the gaps
+- 0:01 Delay all the way up: every echo bends in pitch, clearest in the gaps
+- 0:10 a longer Time: deeper, slower bends
 
 ### Crackling echoes {#crackle}
 
