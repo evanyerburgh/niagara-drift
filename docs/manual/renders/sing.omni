@@ -26,10 +26,10 @@ tapkey b3
 tapkey b8
 turn K2 40 60
 turn K4 -40 60
-wait 4500
+wait 9000
 shot sing-0.png
 tap HOME
 wait 400
 shot sing-1.png
-wait 2000
+wait 14000
 wavstop

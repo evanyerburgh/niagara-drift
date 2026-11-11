@@ -41,29 +41,34 @@ a slow tick, a few clicks a second under drone II, a pulse to play against.
 - 0:04 the sub at −4 oct, all the way in: the buzz breaks into ticks, about 3 a second
 - 0:13 Drive up: each tick gets a harder edge
 
-### A sung "ah" {#ah}
+### Talking drones {#talk}
 
-*Band-pass filters and the LFO turning the waves: two voices*
+*Two filters as a voice's formants: the drones say "ooo-eee"*
 
-A band-pass filter near a vowel makes a drone sound sung; the LFO turning its wave (X-Wave) opens and closes the vowel.
+A voice's vowels are two resonant peaks, its formants. Put both drones on one note, give each a band-pass filter on
+one formant, and they sound like one voice; swing the second filter and it talks.
 
-1. Tap [[A#3]] and [[A#4]], each drone's filter, to **BP** (band-pass): the drones thin to a nasal "ah".
-2. Press [[LFO]] for **LFO sends**, and tap [[G#3]] and [[G#4]]: on the LFO pages they switch each drone's pitch send
-   to **X-Wave**.
-3. Turn KNOB 1 and KNOB 3, the X-Wave sends, up (or down, to move the other way): each wave turns slowly.
-4. Press [[HOME]] for Drones, and turn the cutoffs to choose the vowel: lower for "oo", higher for "ah".
+1. Press [[HOME]] for **Pitch**. Turn KNOB 3 until drone II is on drone I's note (from Niagara, 7 clicks down to
+   D3), and turn KNOB 2 and KNOB 4, the resonances, up to about 80.
+2. Tap [[A#3]] and [[A#4]] to **BP**: both filters band-pass.
+3. Press [[HOME]] for **Drones**. Turn KNOB 2, drone I's cutoff, to about **39.5** (the first formant, ~300 Hz), and
+   KNOB 4, drone II's, to about **63** (the second, ~1.4 kHz). Match drone II's level (KNOB 3) to drone I's.
+4. Press [[EDIT]] for **Osc**, and turn both X-Waves to **saw**: a rich wave to filter.
+5. Press [[LFO]] for **LFO sends**. Turn KNOB 2, drone I's cutoff send, to 0; tap key 8, [[A#4]], to **LFO I**, and
+   turn KNOB 4, drone II's cutoff send, to about **−35**: drone II's filter swings between "oo" (~870 Hz) and "ee"
+   (~2.3 kHz).
 
-> **Good to know.** **Vespers** (P3) and **Sibyl** (P8) are built this way. A slow LFO (SELECT) sings; a fast one
-> stutters. The filter key goes round: low-pass, band-pass, high-pass.
+> **Good to know.** Drone II's cutoff picks the vowel: about 55 for "oo", 59 for "ah", 70 for "ee" (with drone I
+> near 40, or 53 for "ah"). SELECT sets how fast it talks. Stop the LFO (send at 0) and turn KNOB 4 by hand to speak
+> the vowels yourself.
 
-![LFO sends, both pitch sends on X-Wave, +40 and -40](../media/ah-0.png "the sends on X-Wave")
-![Drones, both filters band-pass](../media/ah-1.png "both filters BP")
+![Osc, both drones on saw](../media/talk-0.png "the vowel set up")
+![LFO sends, drone II's cutoff on LFO I](../media/talk-1.png "LFO I on drone II's filter")
 
-**Listen** (`ah`)
+**Listen** (`talk`)
 
-- 0:00 P1 Niagara as it starts
-- 0:01 the filters to band-pass: the drones thin to a nasal "ah"
-- 0:04 the sends on X-Wave, up: each wave turns slowly, the vowel opening and closing
+- 0:00 both drones on one note, band-pass, on the formants: a dark "oo"
+- 0:02 the LFO swings drone II's filter: the drones talk, "ooo-eee", every 6 or 7 seconds
 
 ### A singing filter {#sing}
 
