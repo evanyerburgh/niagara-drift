@@ -8,7 +8,8 @@ image: g-stack-0.png
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 Gestures are macros: one key moves several settings, each in its own order, on top of your sound, and when it has
-gone your sound is as it was. The top four go by how long you hold them; keys 9–12 by how hard you press.
+gone your sound is as it was. The top four go by how long you hold them; keys 9–12 by how hard you press. **PRESETS**,
+Gesture time, sets how fast all of them move, in and out.
 
 ### Hold one in, let it go {#hold}
 
