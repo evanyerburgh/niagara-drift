@@ -20,7 +20,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 ### Movement
 
 <ul class="cards">
-<li><b>Ultra LFO</b><span>Two waves of ten shapes on each drone's pitch, wave, cutoff or resonance, and the delay</span></li>
+<li><b>Ultra LFO</b><span>2 waves of 10 shapes each, on each drone's pitch, wave, cutoff or resonance, and the delay</span></li>
 <li><b>Movement</b><span>One knob for every LFO's depth at once, from still to double</span></li>
 <li><b>Swell</b><span>A tremolo on both drones, in time: from a soft swell to a hard gate</span></li>
 <li><b>Moves on its own</b><span>Drift (slow random modulation), Wander (a random melody on a scale) and Age (tape wear)</span></li>
@@ -52,7 +52,9 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 | | |
 |---|---|
 | **Audio** | 44.1 kHz stereo; 32-bit floating point inside, 24-bit out; a block every 5.8 ms |
-| **Oscillators** | virtual analog: saw and pulse band-limited (polyBLEP), sine, triangle, blended continuously; hard sync; cross-FM |
+| **Oscillators** | virtual analog, 4 shapes blended continuously (sine, triangle, saw, square) with pulse width; saw and pulse band-limited (polyBLEP); a partner oscillator; hard sync; cross-FM |
+| **Sub and noise** | a sub of 4 waves (square, sine, triangle, saw), 1–4 octaves down or the subharmonics ⅓ and ⅕; noise from white to pink |
+| **LFO** | 2 waves of 10 shapes each (20 in all: triangles, squares, saws, exponentials, patterns, random, AND and OR steps), one cycle in 100 s to 70 Hz, on pitch, wave, cutoff, resonance and the delay |
 | **Filter** | a state-variable filter (zero-delay feedback, after Andrew Simper): low-, band- or high-pass, resonant to self-oscillation; an antialiased drive |
 | **Keys** | the white keys sense pressure (scene crossfades, keys 9–12's gestures) |
 | **MIDI** | over USB or TRS: notes on channels 1 and 2 tune the drones; a clock syncs the Swell, LFO, delay, Wander and scenes ([MIDI](reference/midi.md)) |
