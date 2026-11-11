@@ -55,12 +55,6 @@ image: p-retune-1.png
 ![Space, peeked at](../media/p-peek-0.png "PEEK: let go goes back to DRONES")
 ![Drones, back](../media/p-peek-1.png "Back on Drones")
 
-**Listen** (`p-peek`)
-
-- 0:00 P11 Piston, on Drones
-- 0:01 FX held: the reverb turned up
-- 0:06 FX let go: back on Drones, the reverb kept
-
 ### Play in time with a MIDI clock {#clock}
 
 *Send a clock: the Swell, the LFO, the delay and Wander follow it*
