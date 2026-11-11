@@ -284,8 +284,9 @@ def recipe_html(rid, title, body):
                f'src="../../media/{name}.mp4" aria-label="{html.escape(title)}: a sound example"></audio><ol>{li}</ol></div>')
     return (f'<section class="recipe" id="{rid}"><div class="recipe-head"><h3>{inline(title)}</h3>'
             f'<button class="share" data-id="{rid}" data-title="{html.escape(title)}" aria-label="Share {html.escape(title)}">Share</button></div>'
-            f'<div class="recipe-body"><div><p class="lead">{lead}</p><ol class="moves">{moves}</ol>'
-            f'<div class="good"><b>Good to know</b>{good}</div></div><div><div class="screens">{figs}</div>{snd}</div></div></section>')
+            f'<div class="recipe-body"><div>{f"<p class=lead>{lead}</p>" if lead else ""}<ol class="moves">{moves}</ol>'
+            f'{f"<div class=good><b>Good to know</b>{good}</div>" if good else ""}</div>'
+            f'<div><div class="screens">{figs}</div>{snd}</div></div></section>')
 
 
 def onpage(groups, base, label):
