@@ -70,7 +70,7 @@ BLACK = [(["Partner"], AMBER), (["Sub"], AMBER), (["Filter"], AMBER), (["Pitch",
          (["X-mod"], None)]
 
 
-PARTS = {"buttons": (560, 46, 978, 312), "left": (44, 52, 290, 324), "keys": (30, 334, 970, 616)}   # in panel units
+PARTS = {"buttons": (560, 154, 978, 312), "knobs": (560, 46, 978, 154), "left": (44, 52, 290, 324), "keys": (30, 334, 970, 616)}   # in panel units
 
 
 def panel(play_png):

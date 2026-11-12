@@ -33,11 +33,13 @@ Gesture time: how fast the gestures move.
 
 ### KNOB 1–4
 
+<img src="../../img/panel-knobs.png" width="360" alt="The FM-1's knobs 1 to 4: KNOB 1 and 2 for drone I, KNOB 3 and 4 for drone II">
+
 What the page shows. On the drone pages, KNOB 1–2 are drone I and KNOB 3–4 drone II.
 
 ## Buttons
 
-<img src="../../img/panel-buttons.png" width="420" alt="The FM-1's knobs 1 to 4 for drone I and II, and its twelve buttons, each with the page it opens: FX Space, SEL Fine, ENV Life, LFO Sends, EDIT Osc, GLO Setup, HOME Drones, SAVE Store, ARP Swell, SEQ Partner, PLAY On/off, REC Loop">
+<img src="../../img/panel-buttons.png" width="400" alt="The FM-1's twelve buttons, each with the page it opens: FX Space, SEL Fine, ENV Life, LFO Sends, EDIT Osc, GLO Setup, HOME Drones, SAVE Store, ARP Swell, SEQ Partner, PLAY On/off, REC Loop">
 
 Eight buttons open pages; four do something.
 
