@@ -74,7 +74,7 @@ main:focus { outline: none; }
 .prose img.shot ~ ul > li { overflow: hidden; position: relative; padding-left: 1.3rem; }
 .prose img.shot ~ ul > li::before { content: "•"; position: absolute; left: .35rem; }
 .prose img.shot ~ ol > li { overflow: hidden; }
-.prose h2 { clear: both; }
+.prose h2, .prose h3 { clear: both; }   /* a subhead starts below the picture beside the table above it */
 @media (max-width: 600px) { .prose img.shot { float: none; display: block; margin: 0 0 16px; } }
 .prose img { max-width: 100%; height: auto; image-rendering: pixelated; border-radius: 8px; }
 .prose code { font: 500 .88em var(--mono); background: var(--card); padding: .05em .35em; border-radius: 5px; }
