@@ -42,9 +42,10 @@ def main():
         dst = os.path.join(ROOT, "docs", "img", "black-keys-%s.png" % n)
         black_keys(lfo).save(dst, optimize=True)
         print("keys:", os.path.relpath(dst, ROOT))
-    for n, only in (("filter", (2, 7)),):                   # a page's own keys picked out (Drones: the filters)
+    for n, lfo, only in (("filter", 0, (2, 7)), ("sub", 0, (1, 6)), ("partner", 0, (0, 5)), ("link", 0, (8,)),
+                         ("sends", 1, (0, 1, 2, 3, 5, 6, 7, 8))):   # a page's own keys picked out
         dst = os.path.join(ROOT, "docs", "img", "black-keys-%s.png" % n)
-        black_keys(0, only).save(dst, optimize=True)
+        black_keys(lfo, only).save(dst, optimize=True)
         print("keys:", os.path.relpath(dst, ROOT))
     pm = panel(os.path.join(out, "play.png"))
     dst = os.path.join(ROOT, "docs", "img", "panel.png")

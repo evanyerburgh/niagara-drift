@@ -32,6 +32,12 @@ How far the LFO moves the drone's pitch, or its X-Wave instead ([[G#3]], [[G#4]]
 
 How far the LFO moves the drone's cutoff, or its resonance instead ([[C#4]], [[C#5]] on the LFO pages).
 
+### Which LFO, and what it moves
+
+On the LFO pages, each drone's four black keys pick the LFO for each send and what it moves.
+
+<img src="../../img/black-keys-sends.png" width="560" alt="The black keys on the LFO pages with each drone's four send keys picked out: F#3 to C#4 for drone I, F#4 to C#5 for drone II">
+
 ## Mods
 
 <img class="shot" src="../../img/screen-lfo2.png" width="240" alt="The Mods page: the LFO's clock feeding LFO I and II, the delay's wobble, and cross-mod's mode">
@@ -60,7 +66,7 @@ How deep cross-mod goes, in the mode [[F#5]] picks:
 
 ## Good to know
 
-- **Which LFO** feeds each send is on a black key on the LFO pages ([[F#3]], [[A#3]], [[F#4]], [[A#4]]).
+- **Every black key on the LFO pages:** see [Black keys](black-keys.md#lfo-keys).
 - **Under each send's value,** how far it swings as heard ("±12c", "±3.6 oct"), Movement included.
 - **On X-Wave and resonance,** 100 sweeps the whole range, turning at the ends so it keeps moving.
 - **Movement** (ALGORITHM) scales the sends and Delay mod, not Speed mod or Cross-mod.

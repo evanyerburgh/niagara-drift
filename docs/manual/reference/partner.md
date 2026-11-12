@@ -22,8 +22,13 @@ A second oscillator for each drone, and how the drones' pitches move: Shift, gli
 
 <img class="shot" src="../../img/screen-partner.png" width="240" alt="The Partner page: each drone and its partner as a knot, with the interval and the beating">
 
-Each drone has a partner: a second oscillator an interval above or below it, switched on by a black key ([[F#3]],
-[[F#4]]).
+Each drone has a partner: a second oscillator an interval above or below it.
+
+### On and off
+
+A black key switches each partner: [[F#3]] for drone I, [[F#4]] for drone II.
+
+<img src="../../img/black-keys-partner.png" width="560" alt="The black keys with the two partner keys picked out: F#3 for drone I, F#4 for drone II">
 
 ### Interval
 

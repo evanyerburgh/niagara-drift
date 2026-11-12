@@ -45,6 +45,12 @@ Each drone's note and its filter's resonance.
 
 1.6 kHz down to 2 Hz, a note of the Tuning a click. With [[SEL]] held, a cent a click.
 
+### Pitch link
+
+[[C#5]] links drone II to drone I: drone II's pitch knob then sets the interval between them.
+
+<img src="../../img/black-keys-link.png" width="560" alt="The black keys with the pitch link key picked out: C#5">
+
 ### Resonance
 
 Boosts the filter at its cutoff. The last dot is red: there it rings on its own (self-oscillates).
@@ -55,7 +61,6 @@ Boosts the filter at its cutoff. The last dot is red: there it rings on its own 
 - **Pitch glides** from note to note, so a steady turn is one slide.
 - **A fine offset stays** (with SEL, +3 cents stays +3 from note to note) until you change the Tuning; "fine +3" shows
   it.
-- **Pitch link on** ([[C#5]]): drone II's knob sets the interval between the drones.
 - **The pictures:** on Drones, each filter's curve, its level in dB under it, its note at the right; a silent drone is
   a thin gray curve. On Pitch, each wave as strands that fan out as it moves, and drone II's interval from drone I
   ("5th ↑").
