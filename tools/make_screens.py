@@ -42,6 +42,10 @@ def main():
         dst = os.path.join(ROOT, "docs", "img", "black-keys-%s.png" % n)
         black_keys(lfo).save(dst, optimize=True)
         print("keys:", os.path.relpath(dst, ROOT))
+    for n, only in (("filter", (2, 7)),):                   # a page's own keys picked out (Drones: the filters)
+        dst = os.path.join(ROOT, "docs", "img", "black-keys-%s.png" % n)
+        black_keys(0, only).save(dst, optimize=True)
+        print("keys:", os.path.relpath(dst, ROOT))
     pm = panel(os.path.join(out, "play.png"))
     dst = os.path.join(ROOT, "docs", "img", "panel.png")
     pm.save(dst, optimize=True)
@@ -160,9 +164,10 @@ BLACK_LFO = [["Pitch", "LFO"], ["Pitch to", "X-Wave"], ["Cutoff", "LFO"], ["Cuto
 BLACK_NOTES = ["F#3", "G#3", "A#3", "C#4", "D#4", "F#4", "G#4", "A#4", "C#5", "D#5", "F#5"]
 
 
-def black_keys(lfo):
+def black_keys(lfo, only=None):
     """The eleven black keys alone, named for their jobs: normally (the drones), or on the LFO pages, where the keys that
-    change are named in the LFO's lilac; each key's note under it."""
+    change are named in the LFO's lilac; each key's note under it. only: the keys a page is about, ringed, the rest
+    quiet."""
     S = 2.6
     def P(v): return int(round(v * S))
     w, h = 928, 150
@@ -186,14 +191,20 @@ def black_keys(lfo):
             words, face, ink = BLACK_LFO[k], LILAC, INK
         else:
             face, ink = KEY_B, INK
-        rect(cx - kw / 2, by, kw, bh, kw / 2, face)
+        ring = None
+        if only is not None:
+            if k in only:
+                ring = PALE
+            else:
+                face, ink, col = (70, 70, 76), (120, 120, 126), None
+        rect(cx - kw / 2, by, kw, bh, kw / 2, face, ring, 3 if ring else 0)
         if lfo and BLACK_LFO[k] and k < 9:                     # on the LFO pages keys 1-4 are drone I's, 6-9 drone II's
             col = AMBER if k < 4 else TEAL
         if col:
             rect(cx - 9, by + 9, 18, 5, 2.5, col)
         for j, wd in enumerate(words):
             text(cx, by + 52 + (j - (len(words) - 1) / 2) * 14 + 4.5, wd, 12 if lfo and BLACK_LFO[k] else 12.5, ink)
-        text(cx, by + bh + 26, BLACK_NOTES[k], 13, LEGEND, "SemiBold")
+        text(cx, by + bh + 26, BLACK_NOTES[k], 13, PALE if ring else LEGEND, "SemiBold")
     return img
 
 

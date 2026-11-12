@@ -30,8 +30,10 @@ How loud each drone is. Halfway is about a quarter as loud.
 
 ### Cutoff
 
-Opens or closes each drone's filter. The filter's type (LP, BP, HP: low-, band- or high-pass) is on a black key
-([[A#3]], [[A#4]]).
+Opens or closes each drone's filter. Its type, low-pass (LP), band-pass (BP) or high-pass (HP), is on a black key:
+[[A#3]] for drone I, [[A#4]] for drone II.
+
+<img src="../../img/black-keys-filter.png" width="560" alt="The black keys with the two filter keys picked out: A#3 for drone I, A#4 for drone II">
 
 ## Pitch
 
@@ -47,10 +49,6 @@ Each drone's note and its filter's resonance.
 
 Boosts the filter at its cutoff. The last dot is red: there it rings on its own (self-oscillates).
 
-## MASTER
-
-The volume. Past about four-fifths of its turn it overdrives, at about the same loudness.
-
 ## Good to know
 
 - **Under 27 Hz** a drone becomes a pulse of clicks; the speaker can't play that low, so listen on headphones.
@@ -58,7 +56,6 @@ The volume. Past about four-fifths of its turn it overdrives, at about the same 
 - **A fine offset stays** (with SEL, +3 cents stays +3 from note to note) until you change the Tuning; "fine +3" shows
   it.
 - **Pitch link on** ([[C#5]]): drone II's knob sets the interval between the drones.
-- **Overdriving MASTER** flattens the swells and dips.
 - **The pictures:** on Drones, each filter's curve, its level in dB under it, its note at the right; a silent drone is
   a thin gray curve. On Pitch, each wave as strands that fan out as it moves, and drone II's interval from drone I
   ("5th ↑").

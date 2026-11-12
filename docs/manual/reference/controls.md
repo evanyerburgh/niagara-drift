@@ -17,7 +17,7 @@ Four knobs on the left always do the same; four on the right change with the pag
 
 ### MASTER
 
-The volume.
+The volume. Past about four-fifths of its turn it overdrives: thicker, at about the same loudness.
 
 ### SELECT
 
@@ -91,4 +91,5 @@ The sound: its bank and key ("A5", "P6 SEANCE"), "changed" once you've moved it.
   [the recipe](../recipes/performing.md#loop).
 - **OCT− / OCT+:** tap for the next shape; [[SEL]] + OCT for the one before. Each light pulses with its wave.
 - **On the way to a scene** the header says where, in gold ("→ P3 VESPERS"), a gold line filling under it.
+- **Overdriving MASTER** flattens the drones' swells and dips.
 - **Every knob glides:** a slow turn is a smooth sweep, a fast turn goes further.
