@@ -1,67 +1,72 @@
 ---
 title: Performing
-intro: Play it live: what to move, and what to hold
+intro: Play it live: change chords unheard, loop your hands, reach another page, play in time
+description: Recipes for playing Niagara Drift live: retune a drone in silence, loop your knob moves, peek at another page, follow a MIDI clock.
+image: p-retune-1.png
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-### Build up from Bare {#bare}
+### Change chords without a slide {#retune}
 
-*One drone, everything off, then a control at a time*
+*Drone II out, a new note, back in*
 
-Start from one plain oscillator with everything off, as on an analog synth, and build a sound up yourself: the second
-drone, its interval, the sub, the LFO, the space.
+1. Hold [[SEL]] and tap [[PLAY]]: drone II fades out.
+2. Press [[HOME]] for **Pitch**, and turn KNOB 3 to a new note.
+3. [[SEL]] + [[PLAY]] again: it fades back in on the new chord.
 
-1. Press [[SEL]] + [[G5]], tap white key 8 (**P16 Bare**), then [[PLAY]]: one saw, drone I, through an open filter.
-   Wait for the gold line under the header to fill: Bare glides in over the Scene time.
-2. Turn KNOB 2 on **Drones**, where you start: drone I's cutoff, down until the saw darkens.
-3. Press [[SEL]] + [[PLAY]]: drone II comes in, a fifth above. Press [[HOME]] for **Pitch**, and turn KNOB 3 to tune
-   it; the screen names the interval.
-4. Press [[EDIT]] twice for **Sub · Drive**, and turn KNOB 1 to blend drone I toward its sub, an octave down.
-5. Press [[LFO]] for **LFO sends**, and turn KNOB 2, drone I's cutoff send, up; then turn [[ALGORITHM]], Movement, up
-   from 0%: the filter starts to breathe. Press [[FX]], and turn KNOB 2 for the echoes, KNOB 4 for the reverb.
+> **Good to know.** How fast it fades is **Fade** (Setup 1, KNOB 1).
 
-> **Good to know.** On Bare, Movement starts at 0%, so no LFO send is heard until it comes up. Drift and Character
-> ([[ENV]], KNOB 2 and 3) take the drones from still and clean toward alive and worn. Keep what you make: [[SEL]] +
-> [[G4]] (bank A), hold [[SAVE]] and tap a white key.
+![Pitch, drone II out, retuned to Bb4](../media/p-retune-0.png "II OUT, retuned")
+![Pitch, drone II back in a minor sixth above](../media/p-retune-1.png "Back in: a minor sixth")
 
-![Drones, drone II in](../media/bare-0.png "drone II in, a fifth above")
-![LFO sends, drone I's cutoff send +40](../media/bare-1.png "a cutoff send, Movement up")
+**Listen** (`p-retune`)
 
-**Listen** (`bare`)
+- 0:00 P8 Sibyl, Fade 3 s
+- 0:01 SEL + PLAY: drone II fades out
+- 0:05 retuned in the silence
+- 0:07 SEL + PLAY: back in on a minor chord
 
-- 0:00 P16 Bare: one plain saw, drone I
-- 0:01 drone I's cutoff down: the saw darkens
-- 0:04 drone II comes in, a fifth above
-- 0:08 drone II tuned: a minor sixth, then back to the fifth
-- 0:12 the sub blended in
-- 0:17 a cutoff send, then Movement up from 0%: the filter starts to breathe
-- 0:26 echoes and reverb
+### Loop your moves {#loop}
 
-### Trade places {#trade .coming}
+*REC, move, REC*
 
-*One drone opens and comes forward as the other closes and recedes*
+1. Tap [[REC]] and play: knobs, gestures, scenes.
+2. Tap [[REC]] again: what you did plays back, round and round. Play on top.
+3. Tap [[REC]] once more to stop.
 
-### Ride the Movement {#movement .coming}
+![Drones, recording](../media/p-loop-0.png "REC 0:02")
+![Drones, looping](../media/p-loop-1.png "LOOP")
 
-*Every LFO from still to double on one knob*
+**Listen** (`p-loop`)
 
-### Play the beating {#beating .coming}
+- 0:00 P14 Tape
+- 0:01 REC: drone I's cutoff down and back up
+- 0:06 REC again: the move loops
 
-*Partner's detune live: from a slow breath to a shimmer*
-
-### Retune in the silence {#retune .coming}
-
-*Drone II out, to a new note, back in on a new chord*
-
-### Loop your moves {#loop .coming}
-
-*REC records knobs, gestures and scenes*
-
-### Peek at a page {#peek .coming}
+### Reach another page and come back {#peek}
 
 *Hold its button, turn, let go*
 
-### Play to a MIDI clock {#clock .coming}
+1. Hold a page's button, here [[FX]] for **Space**: the header says PEEK.
+2. Turn a knob there.
+3. Let go: you're back where you were, the change kept.
 
-*The Swell and the LFO in time*
+
+### Play in time with a MIDI clock {#clock}
+
+*Send a clock: the Swell, the LFO, the delay and Wander follow it*
+
+1. Send a MIDI clock from a DAW or a drum machine, over USB or the TRS jack.
+2. Press [[ARP]] for the **Swell**, and turn KNOB 1, **Division**, to a note value: it breathes in time.
+
+> **Good to know.** **Sync** (Setup 1, KNOB 4) on follows a clock, off ignores it. More in
+> [MIDI](../reference/midi.md).
+
+![Swell, 1/4 at 80 BPM](../media/p-clock-0.png "1/4 at 80 BPM")
+![Swell, 1/4 at 140 BPM](../media/p-clock-1.png "1/4 at 140 BPM")
+
+**Listen** (`p-clock`)
+
+- 0:00 P10 Cistern, a clock at 80 BPM: a breath a beat
+- 0:05 the clock at 140 BPM: faster

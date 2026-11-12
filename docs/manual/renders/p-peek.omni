@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# A recipe's steps, checked (tools/make_manual.py --renders; nothing to see or hear: the expects are the point): from P11, headphones, Pitch lock off, Scene time 0.
+notips
+phones 1
+set 74 0
+set 71 0
+press SEL
+tapkey w15
+release SEL
+tapkey w2
+tap PLAY
+wait 3000
+expect view 0
+wait 1500
+press FX
+wait 400
+expect view 13
+turn K4 30 80
+wait 300
+wait 1500
+release FX
+wait 600
+expect view 0
+wait 4000
