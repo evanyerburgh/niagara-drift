@@ -5,28 +5,12 @@ intro: 16 sounds to start from, each changing over a minute
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## Playing them
+## Presets
 
-Most have drone I on D, so moving between them keeps the root and changes the rest.
+16 sounds built into Niagara Drift, each showing a different side of it and changing over a minute. They sit in two
+banks of eight on white keys 1–8.
 
-### Pitch lock ([[C#4]])
-
-On, as a new FM-1 starts: they keep the pitch you're on, so you hear each sound's texture. Off: each plays its own
-notes and Tuning.
-
-### They're fixed
-
-To keep your changes, save them in one of your banks, A to F ([recipe](../recipes/scenes.md#save)).
-
-### Levels
-
-Their loud moments match P1's; Bare is quieter on purpose.
-
-### The header
-
-Names the one you pick ("P3 VESPERS").
-
-## P1–P8
+### P1–P8
 
 Hold [[SEL]] and tap [[F5]] for this bank, then tap white keys 1–8.
 
@@ -43,7 +27,7 @@ Hold [[SEL]] and tap [[F5]] for this bank, then tap white keys 1–8.
 | P7 | **Sonar** | drone I slowed to 2.7 Hz, a click each cycle pinging through the delay, drone II's resonant filter singing as it sweeps |
 | P8 | **Sibyl** | a voice: D4 and F♯5, sines with just thirds and fifths, each wave turning into an "ah", a gentle Swell, a bright cathedral |
 
-## P9–P16
+### P9–P16
 
 Hold [[SEL]] and tap [[G5]] for this bank, then tap white keys 1–8.
 
@@ -59,3 +43,12 @@ Hold [[SEL]] and tap [[G5]] for this bank, then tap white keys 1–8.
 | P14 | **Tape** | worn: D and F, a wide square and a saw, Age and lots of Character, tape wow, a tape delay, hiss |
 | P15 | **Falling** | on the LMY Tuning: sines on E4 and G3, the filters opening slowly, a falling, gliding top, feedback, the bass wandering slowly |
 | P16 | **Bare** (locked) | one oscillator, everything else off: a plain saw to build from. Drone II is out: SEL + PLAY brings it in |
+
+## Good to know
+
+- **Pitch lock** ([[C#4]]) is on when a new FM-1 starts: the Presets keep the pitch you're on. Turn it off to hear
+  each at its own notes and Tuning.
+- **They're fixed:** to keep your changes, save them in a bank of your own, A to F
+  ([recipe](../recipes/scenes.md#save)).
+- **Most are rooted on D,** so moving between them keeps the root.
+- **Their loudest moments match P1's;** Bare is quieter on purpose.
