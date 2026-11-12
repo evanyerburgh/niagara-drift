@@ -5,16 +5,32 @@ intro: What each gesture does, and how to play them
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-Eight keys are gestures: several settings moving together on top of your sound, each in its own order, and gone
-without a trace when they've left. Your own settings stay as they are underneath.
+## Playing them
 
-- **The top four, by holding:** in while you hold, out over as long as you held (hold 2 s, it leaves in 2 s).
-- **Keys 9–12, by pressure:** as far in as you press; ease off and they come back; let go and they go.
-- **A tap keeps one:** a press under half a second takes it all the way and keeps it; tap again and it goes.
-- **SEL while holding:** it stays where it has got to. Its key glows dimly, and lights as it comes in.
+<img src="../../img/panel-keys.png" width="720" alt="The FM-1's keys: keys 9 to 12 are the pressure gestures Tick, Chord, Snarl and Stutter; keys 13 to 16 the held gestures Weight, Shift, Clean and Wash">
 
-The header shows the last one you played and how far in it is ("WASH 40%"), or "latched". Scenes remember which are
-latched.
+Macros: one key moves several settings together, on top of your sound, each in its own order. Your settings stay as
+they are underneath.
+
+### Keys 13–16: hold
+
+In while you hold, out over as long as you held.
+
+### Keys 9–12: press
+
+As far in as you press; ease off and they come back.
+
+### Tap to latch
+
+A tap takes one all the way in and keeps it; tap again and it goes.
+
+### Latch at a level
+
+Tap [[SEL]] while holding: it stays at the level it has reached.
+
+### The header
+
+The last one played and how far in ("WASH 40%"), or "latched". Scenes remember which are latched.
 
 ## 8 gestures
 
@@ -59,22 +75,29 @@ The Swell chops the drone, quick from the first touch, then deeper and harder in
 
 ## How long they take
 
-**PRESETS** is Gesture time: every gesture slower to the left (up to 12 times), faster to the right (up to 4 times).
-The middle is each one's own time: Weight 2.8 s, Shift 3.9 s, Clean and Wash 3.3 s, Tick, Chord, Snarl and Stutter
-6.5 s. The screen shows Weight's time ("GESTURE TIME 2.8 s").
+### Gesture time (PRESETS)
 
-For a long one, don't hold the key: tap it, and it comes in on its own. Gesture time acts on a gesture already moving,
-so it can change on the way: turn it fast, play a gesture in quickly, let go, then turn it slow, and the gesture
-leaves slowly; or the other way round, let it creep in, let go, and turn it fast so it drops away. A latched gesture
-changes speed the same way: tap it in on a slow time, tap again when it has come in as far as you want, and turn the
-knob to set how it leaves.
+Left, slower (up to 12 times); right, faster (up to 4 times). The middle is each gesture's own time: Weight 2.8 s,
+Shift 3.9 s, Clean and Wash 3.3 s, the pressure gestures 6.5 s. The screen shows Weight's ("GESTURE TIME 2.8 s").
+
+### Changing speed on the way
+
+Gesture time acts on a gesture already moving: in fast, let go, turn it slow, and it leaves slowly; or the other way.
+
+### A long one
+
+Don't hold the key: tap it, and it comes in on its own.
 
 ## While a gesture is in
 
-- **The LFOs step aside:** the LFO that moves the same thing eases off (the filter LFO for Weight's cutoff, the
-  oscillator LFO for Shift's pitch), so a high Movement doesn't wobble what the gesture is doing. Wash also eases the
-  filter LFOs to a third, so their sweeps don't pile up in the reverb. They come back as the gesture goes.
-- **Partners on the panel:** each key of 9–12 is the partner of the top key four to its right: Tick the low end (as
-  Weight), Chord pitch (as Shift), Snarl dirt (which Clean takes out), Stutter time (as Wash).
+### The LFOs step aside
+
+The LFO that moves the same thing eases off, so Movement doesn't wobble what the gesture is doing. They come back as
+it goes.
+
+### Partners on the panel
+
+Each key of 9–12 pairs with the top key four to its right: Tick the low end (as Weight), Chord pitch (as Shift), Snarl
+dirt (which Clean takes out), Stutter time (as Wash).
 
 Recipes: [Gestures](../recipes/gestures.md) · [Ticks and clicks](../recipes/sounds.md#ticks)
