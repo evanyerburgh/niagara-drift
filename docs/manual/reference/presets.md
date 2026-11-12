@@ -1,25 +1,25 @@
 ---
 title: Presets
-intro: Sixteen sounds to start from, each changing over a minute
+intro: 16 sounds to start from, each changing over a minute
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-Sixteen sounds to start from, each showing a part of what Niagara Drift does, and each changing over a minute's
-listen: P1–P8 on keys 1–8 of the Presets bank (SEL + F5), P9–P16 on keys 1–8 of the second (SEL + G5). Most have
-drone I on D, so moving between them keeps the root and changes the interval and the sound. With **Pitch lock** on (as
-a new FM-1 starts) they keep the pitch you're on, so you hear the textures first; turn it off (black key 4) and each
-plays at its own pitches, as described below (and on its own Tuning, where it has one). Their loud moments are
-leveled to P1's, most within a dB, Abyss and Vespers about 2.5 dB quieter, Ashram more on the speaker (its warmth is
-bass the speaker can't play); Bare is quieter on purpose. The header names the one
-you pick ("P3 VESPERS"). They're fixed: to keep a sound you made from one, pick one of your banks, A to F (SEL + G4
-to E5), and store it there (SAVE + a key).
+Most have drone I on D, so moving between them keeps the root and changes the rest.
+
+- **Where:** P1–P8 on white keys 1–8 of the Presets bank ([[SEL]] + [[F5]]), P9–P16 on the second ([[SEL]] + [[G5]]).
+  The header names the one you pick ("P3 VESPERS").
+- **Pitch lock** ([[C#4]]): on, as a new FM-1 starts, they keep the pitch you're on, so you hear each sound's texture;
+  off, each plays its own notes and Tuning.
+- **They're fixed:** to keep your changes, save them in one of your banks, A to F
+  ([recipe](../recipes/scenes.md#save)).
+- **Levels:** their loud moments match P1's; Bare is quieter on purpose.
 
 | Key | Preset | What it shows |
 |---|---|---|
 | P1 | **Niagara** | the starting sound: D and A a fifth apart, breathing slowly |
 | P2 | **Embers** | D and a pure third above, triangles blooming toward saws and back, the two drones in turn, a chorus hall |
-| P3 | **Vespers** | saws through band-passes near a sung "ah", the waves turning slowly, a gentle Swell, a bright cathedral |
+| P3 | **Vespers** | saws through band-passes near a sung "ah", the waves turning slowly, a gentle Swell (tremolo), a bright cathedral |
 | P4 | **Dreamhouse** | on the Harmonics Tuning: A1 and its 7th harmonic, sines with pure fifths, the resonance swelling, a little feedback |
 | P5 | **Abyss** | dark: D over B a minor third below, a saw and a narrow square, a subharmonic sub, closed resonant filters, character and feedback, a dark hall; the resonance swells and rings |
 | P6 | **Seance** | on Harrison's Tuning: a hollow bass (D with a fifth under it) under a high band-passed voice with a breath of noise; drone I moving drone II's filter, long swinging echoes, a chorus hall; the high voice wanders, rarely |

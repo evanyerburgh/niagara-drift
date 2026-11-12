@@ -12,14 +12,18 @@ intro: EDIT: each drone's wave, its sub and its drive
 | Osc | I X-Wave | I Width (pulse width) | II X-Wave | II Width |
 | Sub · Drive | I osc/sub (+ SEL: sub wave) | I drive | II osc/sub (+ SEL: sub wave) | II drive |
 
-- **X-Wave** blends sine → triangle → saw → square; **Width** is the square's pulse width. The sine and the triangle are a
-  little louder than the saw, so they still carry on a small speaker, and the square a little quieter, level with the
-  saw there. Without a square in the wave, Width does nothing: its value and meter go gray, "needs sqr" above it.
-- **Osc/Sub** crossfades the oscillators with the sub (the knob reads "Osc/Sb"); **drive** pushes each drone into its filter.
-  The picture shows each drone's two lanes, **osc** and **sub**, each as loud as its share of the crossfade, shaped by
-  the drive. Beside each drone's name, its sub's octave ("-1 oct") and the black key that steps it (G#3 for drone I, G#4
-  for drone II).
-- **The sub's wave**: hold SEL and turn a drone's Osc/Sub knob: **Square** (as it starts), **Sine** (pure weight, the
-  deepest on headphones, the least for a small speaker), **Triangle**, **Saw** (the brightest). Each is as loud as the
-  square, and a change glides through, as the sub's octave does. Above each Osc/Sub knob the screen names it ("SEL
-  Square"); with SEL held the column shows the sub's wave instead ("Sub wave").
+## Osc
+
+- **X-Wave** blends sine → triangle → saw → square. The sine and triangle are a little louder, so they carry on a
+  small speaker.
+- **Width** is the square's pulse width. With no square in the wave it does nothing: it goes gray, "needs sqr" above it.
+
+## Sub · Drive
+
+- **Osc/Sub** (the knob reads "Osc/Sb") crossfades the oscillator with the sub, an octave or more below.
+- **Drive** pushes each drone into its filter.
+- **The picture:** each drone's two lanes, **osc** and **sub**, as loud as their share, shaped by the drive.
+- **Beside each name:** the sub's octave ("-1 oct") and the black key that steps it ([[G#3]], [[G#4]]).
+- **The sub's wave:** hold [[SEL]] and turn Osc/Sub: **Square** (to start), **Sine** (the deepest on headphones, the
+  least on a small speaker), **Triangle**, **Saw** (the brightest). All as loud as the square; a change glides. The
+  screen names it above the knob ("SEL Square").
