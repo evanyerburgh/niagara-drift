@@ -5,8 +5,6 @@ intro: EDIT: each drone's wave, its sub and its drive
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-<img src="../../img/page-osc.png" width="488" alt="The Osc and Sub · Drive pages: each drone's waveform on the sine to square scale, and its pulse width; each drone's sound through its drive">
-
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Osc | I X-Wave | I Width (pulse width) | II X-Wave | II Width |
@@ -14,11 +12,15 @@ intro: EDIT: each drone's wave, its sub and its drive
 
 ## Osc
 
+<img class="shot" src="../../img/screen-osc.png" width="240" alt="The Osc page: each drone's waveform on the sine to square scale, and its pulse width">
+
 - **X-Wave** blends sine → triangle → saw → square. The sine and triangle are a little louder, so they carry on a
   small speaker.
 - **Width** is the square's pulse width. With no square in the wave it does nothing: it goes gray, "needs sqr" above it.
 
 ## Sub · Drive
+
+<img class="shot" src="../../img/screen-source.png" width="240" alt="The Sub · Drive page: each drone's osc and sub lanes, shaped by the drive, and its sub's octave">
 
 - **Osc/Sub** (the knob reads "Osc/Sb") crossfades the oscillator with the sub, an octave or more below.
 - **Drive** pushes each drone into its filter.

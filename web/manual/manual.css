@@ -67,6 +67,15 @@ main:focus { outline: none; }
 .prose ul, .prose ol { padding-left: 1.3rem; }
 .prose .onpage, .prose .doors { padding-left: 0; }
 .prose li { margin: .25rem 0; }
+/* a page's screen at the start of its section, the words beside it and then under it (as a flag's stars beside its
+ * stripes); each list item beside it is narrowed whole, so its bullet stays clear of the picture */
+.prose img.shot { float: left; width: 240px; margin: .35rem 32px 16px 0; border-radius: 8px; }
+.prose img.shot ~ ul { list-style: none; padding-left: 0; }
+.prose img.shot ~ ul > li { overflow: hidden; position: relative; padding-left: 1.3rem; }
+.prose img.shot ~ ul > li::before { content: "•"; position: absolute; left: .35rem; }
+.prose img.shot ~ ol > li { overflow: hidden; }
+.prose h2 { clear: both; }
+@media (max-width: 600px) { .prose img.shot { float: none; display: block; margin: 0 0 16px; } }
 .prose img { max-width: 100%; height: auto; image-rendering: pixelated; border-radius: 8px; }
 .prose code { font: 500 .88em var(--mono); background: var(--card); padding: .05em .35em; border-radius: 5px; }
 .tablewrap { overflow-x: auto; margin: 1rem 0 1.4rem; }

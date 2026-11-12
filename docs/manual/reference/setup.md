@@ -5,8 +5,6 @@ intro: GLO: the room's settings and the Tuning
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-<img src="../../img/page-setup.png" width="488" alt="The Setup 1 and 2 pages: the fade, morph and scene times and Sync; the Tuning's ring, Tune in Hz, the stereo width and the keys' pressure">
-
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Setup 1 | fade | morph | scene time | sync |
@@ -16,6 +14,8 @@ Everything on [[GLO]] belongs to the FM-1 and the room, not to a sound: scenes d
 which a sound carries.
 
 ## Setup 1
+
+<img class="shot" src="../../img/screen-setup.png" width="240" alt="The Setup 1 page: the fade, morph and scene times, and Sync">
 
 Each time knob gives most of its turn to slow times, a second about a quarter of the way.
 
@@ -28,6 +28,8 @@ Each time knob gives most of its turn to slow times, a second about a quarter of
 - **The picture:** a row for each time, its knob's whole range across it, the change ending where the knob is.
 
 ## Setup 2
+
+<img class="shot" src="../../img/screen-setup2.png" width="240" alt="The Setup 2 page: the Tuning's ring, Tune in Hz, the stereo width and the keys' pressure">
 
 - **Tuning:** the notes the pitch knobs move through (below).
 - **Tune:** A's pitch, 427 to 453 Hz (440 to start); 1 Hz a click, 0.1 with [[SEL]] ("432Hz").

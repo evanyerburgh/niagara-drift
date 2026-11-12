@@ -5,14 +5,14 @@ intro: ENV: Feedback, Drift, Character, Age; each drone's noise
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-<img src="../../img/page-tone.png" width="488" alt="The Life and Tone pages: a drawing above each of Life's knobs (feedback rings, a flame, a hand-drawn wave, a worn wave); each drone's noise as snow, through its filter">
-
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Life | feedback | drift | character | age |
 | Tone | I noise | I color | II noise | II color |
 
 ## Life
+
+<img class="shot" src="../../img/screen-life.png" width="240" alt="The Life page: feedback rings, a flame, a hand-drawn wave and a worn wave above the four knobs">
 
 - **Feedback** sends the finished sound (after the delay and reverb) back into the drones: a resonant, thickening
   color, as strong on a quiet sound as a loud one. Past about 70 it sings on its own and takes over, at about the same
@@ -28,6 +28,8 @@ intro: ENV: Feedback, Drift, Character, Age; each drone's noise
   and out as slowly. Character is the oscillators' own wear; Age is the tape's. *Picture:* drone I's saw, worn.
 
 ## Tone
+
+<img class="shot" src="../../img/screen-tone.png" width="240" alt="The Tone page: each drone's noise as snow, cut off by its filter">
 
 - **Noise** is the noise's level beside the oscillators, as in a synth's mixer (100 is level with a saw, 50 about −7
   dB, 25 −12). It goes through the drone's filter, so the cutoff, resonance, LFO and Drift shape it.

@@ -5,8 +5,6 @@ intro: LFO: where the LFO goes, and what else it moves
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-<img src="../../img/page-lfo.png" width="488" alt="The LFO sends and Mods pages: the two LFOs and where they go; the speed modulation, the delay modulation and cross-mod">
-
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | LFO sends | I pitch (or X-Wave) | I cutoff (or resonance) | II pitch (or X-Wave) | II cutoff (or resonance) |
@@ -15,6 +13,8 @@ intro: LFO: where the LFO goes, and what else it moves
 The LFO's rate and waves are on the top-left knobs: see [LFO](lfo.md).
 
 ## LFO sends
+
+<img class="shot" src="../../img/screen-lfo.png" width="240" alt="The LFO sends page: the two LFOs, and each drone's sends as sentences with their keys">
 
 How far the LFO moves each drone's pitch and cutoff. The middle of each knob is none.
 
@@ -28,6 +28,8 @@ How far the LFO moves each drone's pitch and cutoff. The middle of each knob is 
   Swell (the LFO starts over each Swell bar). "mvmt 0%" in the rate's place: Movement is at 0, so nothing moves.
 
 ## Mods
+
+<img class="shot" src="../../img/screen-lfo2.png" width="240" alt="The Mods page: the LFO's clock feeding LFO I and II, the delay's wobble, and cross-mod's mode">
 
 - **Speed mod** ("Speed"): the LFO speeds up and slows down on one of its own waves, up to 3 octaves either way.
 - **Source:** which LFO does that (I, II or both).

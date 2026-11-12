@@ -5,14 +5,14 @@ intro: HOME: each drone's level, cutoff, pitch and resonance
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-<img src="../../img/page-play.png" width="488" alt="The Drones page: each drone's filter curve with its level in dB, its filter and key, and its note; the Pitch page: each drone's waveform and the interval between them">
-
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Drones | I level | I cutoff | II level | II cutoff |
 | Pitch | I pitch | I resonance | II pitch | II resonance |
 
 ## Drones
+
+<img class="shot" src="../../img/screen-play.png" width="240" alt="The Drones page: each drone's filter curve with its level in dB, its filter and key, and its note">
 
 The page [[HOME]] opens, and what you move most while playing: bring one drone forward, push the other back, open or
 close it.
@@ -23,6 +23,8 @@ close it.
   [[A#4]]); at the right, its note.
 
 ## Pitch
+
+<img class="shot" src="../../img/screen-play2.png" width="240" alt="The Pitch page: each drone's waveform as strands, and drone II's interval from drone I">
 
 [[HOME]] again.
 

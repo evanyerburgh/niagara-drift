@@ -5,14 +5,14 @@ intro: SEQ: each drone's partner; Shift, glide and Wander
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-<img src="../../img/page-seq.png" width="488" alt="The Partner page; Pitch moves: Shift's move, Wander, drone II's melody, and its scale">
-
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Partner | I interval | I detune | II interval | II detune |
 | Pitch moves | Shift's move | pitch glide | II wander | Wander's scale |
 
 ## Partner
+
+<img class="shot" src="../../img/screen-partner.png" width="240" alt="The Partner page: each drone and its partner as a knot, with the interval and the beating">
 
 Each drone has a partner: a second oscillator an interval above or below it.
 
@@ -26,6 +26,8 @@ Each drone has a partner: a second oscillator an interval above or below it.
   rolls it ("beats 2.0/s"). A just interval with no detune stands still.
 
 ## Pitch moves
+
+<img class="shot" src="../../img/screen-partner2.png" width="240" alt="The Pitch moves page: Shift's move, drone II's last Wander notes, and the scale">
 
 - **Shift's move** is where the Shift gesture ([[E5]]) takes the drones: a fifth down to a fifth up, a note of the
   Tuning a click ("+5th", "-4th", "+m3"). With [[SEL]] held, a cent a click ("+503c"). See

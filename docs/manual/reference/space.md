@@ -5,18 +5,20 @@ intro: FX: the delay, the drive and the reverb
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-<img src="../../img/page-effects.png" width="732" alt="The Space page with the delay's echoes as half-rings on its left half and the reverb's tail as rings on its right half; the Details page with SEL held and the delay's type turning; the Details page with the two SEL choices shown above Time and Type">
-
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Space | delay repeats | delay mix | reverb length | reverb mix |
 | Details | delay drive · SEL: — | delay time · SEL: delay type | reverb damp | reverb type · SEL: into reverb |
+
+<img class="shot" src="../../img/screen-fx.png" width="240" alt="The Space page: the delay's echoes as half-rings on the left, the reverb's tail as rings on the right">
 
 - **Space** is the page [[FX]] opens: the amounts you play, the delay on the left, the reverb on the right.
 - **Details** ([[FX]] again) holds what you set before playing. Hold [[SEL]] and turn KNOB 2 for the delay's type,
   KNOB 4 for what goes into the reverb (shown above them: "SEL Tape", "SEL Both").
 
 ## Delay
+
+<img class="shot" src="../../img/screen-fx-sel.png" width="240" alt="The Details page with SEL held: the delay's type turning">
 
 - **Types**, plain to most alive (a change crossfades; the knob goes round):
   - **Clean:** bright, no wow, so a just-tuned drone stays still.
@@ -33,6 +35,8 @@ intro: FX: the delay, the drive and the reverb
   still loud, left channel up in blue, right down in aqua.
 
 ## Reverb
+
+<img class="shot" src="../../img/screen-fx2.png" width="240" alt="The Details page: drive, time, damp and type, with the two SEL choices above">
 
 - **Types** (a change crossfades; the knob goes round): **Room**, **Hall**, **Cathedral** (the largest), **Chorus
   hall** (a hall that shimmers), **Shimmer** (the Hall with an octave above what's playing, in two voices a few cents

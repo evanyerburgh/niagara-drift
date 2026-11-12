@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-only
 # The README's pictures: runs tests/scenarios/pages.omni in the host simulator (each page with values that
-# show something) and puts each button's page, or its two pages side by side, in docs/img/page-<name>.png;
+# show something) and puts each button's page, or its two pages side by side, in docs/img/page-<name>.png, and each
+# page alone in docs/img/screen-<shot>.png (the manual's Reference, a picture in each page's section);
 # and draws the FM-1 itself (the emulator's geometry, the Drones page on its screen) with what every knob,
 # button and key does in Niagara Drift written on it: docs/img/panel.png.
 #   sh host/build_host.sh && python3 tools/make_screens.py
@@ -28,6 +29,8 @@ def main():
         for i, shot in enumerate(shots):
             scr = Image.open(os.path.join(out, shot + ".png")).convert("RGB").resize((w, w), Image.NEAREST)
             img.paste(scr, (i * (w + GAP), 0))
+            one = os.path.join(ROOT, "docs", "img", "screen-%s.png" % shot)    # each page alone, for the manual's sections
+            scr.save(one, optimize=True)
         dst = os.path.join(ROOT, "docs", "img", "page-%s.png" % name)
         img.save(dst, optimize=True)
         print("screens:", os.path.relpath(dst, ROOT), img.size)

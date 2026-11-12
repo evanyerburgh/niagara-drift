@@ -5,11 +5,11 @@ intro: ARP: both drones breathing in time
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-<img src="../../img/page-swell.png" width="244" alt="The Swell page: two bars of the Swell, four breaths, as strands meeting at a dot">
-
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Swell | rate (on a MIDI clock: division) | depth | shape | swing |
+
+<img class="shot" src="../../img/screen-pulse.png" width="240" alt="The Swell page: two bars of the Swell, four breaths, as strands meeting at a dot">
 
 The Swell is a tremolo on both drones: from a 33-second breath to a buzz.
 

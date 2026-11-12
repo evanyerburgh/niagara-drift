@@ -5,8 +5,6 @@ intro: Switches, and the LFO's routing on the LFO pages
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-<img src="../../img/page-keys.png" width="244" alt="The black keys' map while SEL is held: the keyboard with its black keys lit as on the panel and their groups named, and the key touched named with its setting">
-
 | Key | Normally | On the LFO pages |
 |---|---|---|
 | 1 · F#3 | I partner | which LFO moves I's pitch (I, II, both) |
@@ -43,6 +41,8 @@ Grouped by meaning: drone I (keys 1–3), the two global keys (4–5), drone II 
   lit); hold again to free it.
 
 ## The map
+
+<img class="shot" src="../../img/screen-keymap.png" width="240" alt="The black keys' map while SEL is held: the keys lit as on the panel, their groups named, the key touched named with its setting">
 
 **Hold [[SEL]]** a moment: the screen draws the black keys as on the keyboard, lit as on the panel, their groups
 named, and the gesture keys as the banks they pick. **Touch a black key** while SEL is held and the screen names it
