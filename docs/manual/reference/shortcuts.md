@@ -20,7 +20,7 @@ intro: Every key combination, hold and tap
 | [[SEL]] + KNOB 2 on Details | the delay's type |
 | [[SEL]] + KNOB 4 on Details | what goes into the reverb |
 | tap [[SEL]] while holding a scene key | the blend stays where it is ("A5 40% KEPT") |
-| tap [[SEL]] while holding a gesture | the gesture stays where it has got to |
+| tap [[SEL]] while holding a gesture | it latches at the level it has reached |
 
 ## Holds and taps
 
@@ -34,6 +34,6 @@ intro: Every key combination, hold and tap
 | tap a page button again | its next page ("1/2") |
 | hold [[ARP]] | peek at the Swell page |
 | tap [[ARP]] on the Swell page | the Swell on or off |
-| hold black key 5 half a second | the LFO locked to the Swell (again to free it) |
+| hold [[D#4]] half a second | the LFO locked to the Swell (again to free it) |
 | tap [[REC]] three times | record your moves, loop them, stop |
 | hold [[OCT−]] and [[OCT+]] for 5 seconds | the chip's own update mode, for a stuck install (see [Help](../help.md)) |
