@@ -9,7 +9,7 @@ image: g-stack-0.png
 
 Gestures are macros: one key moves several settings at once. **PRESETS** sets how fast.
 
-### Bloom into the reverb, fade out slowly {#hold}
+### Bloom into reverb, fade out slowly {#hold}
 
 *The longer you hold, the slower it fades*
 
@@ -31,7 +31,7 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 1. Press **Chord**, [[A4]], slowly harder: the drones move into a chord.
 2. Ease off: they come back.
 
-> **Good to know.** Chord builds its chord from Wander's scale, on the **Pitch moves** page ([[SEQ]] twice, KNOB 4):
+> **Good to know.** Chord builds its chord on the **Scale**, on the **Pitch moves** page ([[SEQ]] twice, KNOB 4):
 > change the scale and the chord changes.
 
 ![Drones, Chord at 90%](../media/g-press-0.png "CHORD 90%")
@@ -78,7 +78,7 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 - 0:05 Wash held on top: the climax
 - 0:10 both let go
 
-### Transform the sound over half a minute {#minute}
+### Transform a sound over half a minute {#minute}
 
 *A slow Gesture time and a tap*
 

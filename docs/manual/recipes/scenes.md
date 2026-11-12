@@ -20,7 +20,7 @@ The 8 white keys are scenes: 6 banks of 8 (A to F) to fill with your own sounds,
 > **Good to know.** The Presets can't be saved over: your sounds go in A to F.
 
 
-### Blend between two sounds and keep the mix {#blend}
+### Blend two sounds and keep a mix {#blend}
 
 *Press a scene key harder, tap SEL*
 

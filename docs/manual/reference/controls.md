@@ -5,39 +5,55 @@ intro: The buttons and the pages, the header and the knobs
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-- **Drone pages:** KNOB 1–2 are drone I, KNOB 3–4 drone II (Drones, Tone, Osc, Sub · Drive, Partner, LFO sends; their
-  names underlined amber and teal).
-- **The other pages:** a knob each, for the whole sound.
-- **The screen:** each page's settings as a picture, and the value of the knob you're turning.
+## Controls
 
-## Buttons
-
-| | |
-|---|---|
-| [[PLAY]] | fade the drones in or out. [[SEL]] + [[PLAY]]: drone II alone. Stopped, PLAY breathes slowly and nothing else on the panel moves |
-| [[OCT−]] / [[OCT+]] | **LFO I** / **LFO II**: the next shape, round and round; with [[SEL]], the one before. Each light pulses with its wave |
-| [[SAVE]] | save the sound, at once (it dips out for about 50 ms while playing). Glows dimly while something isn't saved |
-| [[SEL]] (hold) | fine: a pitch knob in single cents, cutoff and resonance in tenths. Glows while it can keep what you're holding (a scene blend, a gesture) |
-| [[ARP]] | the Swell page (Swell: a tremolo on both drones, in time). On the page, a tap switches it on or off, and ARP breathes with it. Hold to peek at it from anywhere |
-| [[REC]] | tap to record your knobs, gestures and scenes; tap to loop them (play on top); tap to stop. Up to 5 minutes, the time shown in the header; REC blinks while recording, fast in its last 20 seconds. Full, it starts looping ("FULL"). Each pass glides back to the start |
-
-## Pages
-
-- **Tap** a page button: the knobs stay on that page. **Tap again** for its next page ("1/2" by the name).
-- **Hold** it to peek: turn a knob, let go, and you're back. The header says PEEK and where letting go takes you
-  ("let go: DRONES").
-- [[HOME]] and [[FX]] open the page you play from (Drones, Space); the other buttons open the page you last used
-  there.
-
-## The header
-
-- **Left:** the page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT.
-- **Right:** the sound: its bank and key ("A5"; a Preset's name too, "P6 SEANCE"), "changed" once you've moved it;
-  stopped, what PLAY does.
-- **On the way to a scene:** where, in gold ("→ P3 VESPERS"; "→ A5" as a blend glides back), with a gold line filling
-  under the header, for at least 1.5 s. PLAY's fade fills the line too.
+The FM-1's knobs and buttons, and the header at the top of the screen.
 
 ## Knobs
 
-Every knob glides: a slow turn is a smooth sweep, a fast turn goes further. Levels follow your ear: halfway is about a
-quarter as loud.
+<img class="shot" src="../../img/panel-left.png" width="200" alt="The FM-1's left knobs: MASTER is Volume, SELECT the LFO rate, PRESETS Gesture time, ALGORITHM Movement; OCT− and OCT+ pick LFO I's and II's waves">
+
+| Knob | What it does |
+|---|---|
+| **MASTER** | the volume. Past about four-fifths it overdrives: thicker, at about the same loudness |
+| **SELECT** | the LFO's rate |
+| **ALGORITHM** | Movement: how much the LFO moves the sound |
+| **PRESETS** | Gesture time: how fast the gestures move |
+| **KNOB 1–4** | what the page shows. On the drone pages, KNOB 1–2 are drone I, KNOB 3–4 drone II |
+
+<img src="../../img/panel-knobs.png" width="360" alt="The FM-1's knobs 1 to 4: KNOB 1 and 2 for drone I, KNOB 3 and 4 for drone II">
+
+## Buttons
+
+<img src="../../img/panel-buttons.png" width="400" alt="The FM-1's twelve buttons, each with the page it opens: FX Space, SEL Fine, ENV Life, LFO Sends, EDIT Osc, GLO Setup, HOME Drones, SAVE Store, ARP Swell, SEQ Partner, PLAY On/off, REC Loop">
+
+| Button | What it does |
+|---|---|
+| [[HOME]] [[FX]] [[ENV]] [[LFO]] [[EDIT]] [[SEQ]] [[GLO]] [[ARP]] | open a page; tap again for its next |
+| [[PLAY]] | fades the drones in or out |
+| [[SAVE]] | saves the sound |
+| [[SEL]] | hold for fine steps, and with other controls for their second job |
+| [[REC]] | records your moves, then loops them |
+| [[OCT−]] [[OCT+]] | LFO I's and LFO II's shape |
+
+## Header
+
+| Side | What it shows |
+|---|---|
+| **Left** | the page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT |
+| **Right** | the sound: its bank and key ("A5", "P6 SEANCE"), "changed" once you've moved it |
+
+## Good to know
+
+- **Hold a page button to peek:** turn a knob, let go, and you're back ("let go: DRONES").
+- **HOME and FX** always open Drones and Space; the other buttons open the page you last used there.
+- **The drone pages:** Drones, Tone, Osc, Sub · Drive, Partner, LFO sends; their knob names underlined amber and teal.
+- **SEL + PLAY** fades drone II alone. Stopped, PLAY breathes slowly, and nothing else on the panel moves.
+- **SAVE** saves at once (the sound dips for about 50 ms while playing), and glows dimly while something isn't saved.
+- **SEL** gives a pitch knob single cents, cutoff and resonance tenths. It glows when it can keep what you're holding.
+- **REC:** tap to record, tap to loop, tap to stop; up to 5 minutes, the time in the header. See
+  [the recipe](../recipes/performing.md#loop).
+- **OCT− / OCT+:** tap for the next shape; [[SEL]] + OCT for the one before. Each light pulses with its wave.
+- **On the way to a scene** the header says where, in gold ("→ P3 VESPERS"), a gold line filling under it.
+- **Overdriving MASTER** flattens the drones' swells and dips.
+- **Every knob glides:** a slow turn is a smooth sweep, a fast turn goes further.

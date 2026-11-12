@@ -123,7 +123,7 @@ into a metallic, bell-like sound; turned higher it clangs and runs wild.
 - 0:01 bend each other, X-mod up: they ring into one metallic, bell-like tone
 - 0:09 X-mod higher: the bells clang and run wild
 
-### One drone shaping the other {#xfilter}
+### Drone I shaping drone II {#xfilter}
 
 *Drone I's sound moving drone II's filter*
 
@@ -199,7 +199,7 @@ four notes, a figure that repeats. Wander then moves the whole figure to a new n
 - 0:00 the figure stepping: drone II bright, round four notes on LFO II's OR 5
 - 0:02 Wander up: every few seconds the whole figure moves to a new note
 
-### A filter rhythm in time with the Swell {#swell}
+### A filter rhythm in time with Swell {#swell}
 
 *A square LFO on both cutoffs, locked to the Swell's breath*
 
@@ -330,7 +330,7 @@ play over the frozen chord.
 - 0:01 reverb Mix up, then Length to the top: the chord freezes and holds
 - 0:08 new notes for both drones: they play over the frozen chord
 
-### Shimmer on the echoes {#shimmer}
+### Shimmer on echoes {#shimmer}
 
 *Only the echoes rise an octave into the halo*
 

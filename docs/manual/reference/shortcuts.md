@@ -5,7 +5,11 @@ intro: Every key combination, hold and tap
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## With SEL
+## Shortcuts
+
+Every combination of keys, and every hold and tap, in one place.
+
+### With SEL
 
 | Do | What it does |
 |---|---|
@@ -22,7 +26,7 @@ intro: Every key combination, hold and tap
 | tap [[SEL]] while holding a scene key | the blend stays where it is ("A5 40% KEPT") |
 | tap [[SEL]] while holding a gesture | it latches at the level it has reached |
 
-## Holds and taps
+### Holds and taps
 
 | Do | What it does |
 |---|---|

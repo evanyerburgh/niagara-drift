@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-only
 # The README's pictures: runs tests/scenarios/pages.omni in the host simulator (each page with values that
-# show something) and puts each button's page, or its two pages side by side, in docs/img/page-<name>.png;
+# show something) and puts each button's page, or its two pages side by side, in docs/img/page-<name>.png, and each
+# page alone in docs/img/screen-<shot>.png (the manual's Reference, a picture in each page's section);
 # and draws the FM-1 itself (the emulator's geometry, the Drones page on its screen) with what every knob,
 # button and key does in Niagara Drift written on it: docs/img/panel.png.
 #   sh host/build_host.sh && python3 tools/make_screens.py
@@ -28,13 +29,32 @@ def main():
         for i, shot in enumerate(shots):
             scr = Image.open(os.path.join(out, shot + ".png")).convert("RGB").resize((w, w), Image.NEAREST)
             img.paste(scr, (i * (w + GAP), 0))
+            one = os.path.join(ROOT, "docs", "img", "screen-%s.png" % shot)    # each page alone, for the manual's sections
+            scr.save(one, optimize=True)
         dst = os.path.join(ROOT, "docs", "img", "page-%s.png" % name)
         img.save(dst, optimize=True)
         print("screens:", os.path.relpath(dst, ROOT), img.size)
+    for n, first, bank in ((1, 1, 14), (2, 9, 15)):           # the Presets' two banks on the keys (the manual's Presets)
+        dst = os.path.join(ROOT, "docs", "img", "keys-presets-%d.png" % n)
+        preset_keys(first, bank).save(dst, optimize=True)
+        print("keys:", os.path.relpath(dst, ROOT))
+    for n, lfo in (("drones", 0), ("lfo", 1)):                # the black keys' two sets of jobs (the manual's Black keys)
+        dst = os.path.join(ROOT, "docs", "img", "black-keys-%s.png" % n)
+        black_keys(lfo).save(dst, optimize=True)
+        print("keys:", os.path.relpath(dst, ROOT))
+    for n, lfo, only in (("filter", 0, (2, 7)), ("sub", 0, (1, 6)), ("partner", 0, (0, 5)), ("link", 0, (8,)),
+                         ("sends", 1, (0, 1, 2, 3, 5, 6, 7, 8))):   # a page's own keys picked out
+        dst = os.path.join(ROOT, "docs", "img", "black-keys-%s.png" % n)
+        black_keys(lfo, only).save(dst, optimize=True)
+        print("keys:", os.path.relpath(dst, ROOT))
     pm = panel(os.path.join(out, "play.png"))
     dst = os.path.join(ROOT, "docs", "img", "panel.png")
     pm.save(dst, optimize=True)
     print("panel:", os.path.relpath(dst, ROOT), pm.size)
+    for part, box in PARTS.items():                            # its sections, for the manual's Reference
+        dst = os.path.join(ROOT, "docs", "img", "panel-%s.png" % part)
+        pm.crop(tuple(int(round(v * 2.6)) for v in box)).save(dst, optimize=True)
+        print("panel:", os.path.relpath(dst, ROOT))
 
 
 # the panel, in the emulator's units (web/emu/index.html: a 1000 x 640 drawing), drawn as the emulator draws it: a black
@@ -53,6 +73,9 @@ BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14]
 BLACK = [(["Partner"], AMBER), (["Sub"], AMBER), (["Filter"], AMBER), (["Pitch", "lock"], None), (["LFO", "reset"], None),
          (["Partner"], TEAL), (["Sub"], TEAL), (["Filter"], TEAL), (["Pitch", "link"], None), (["Hard", "sync"], None),
          (["X-mod"], None)]
+
+
+PARTS = {"buttons": (560, 154, 978, 312), "knobs": (560, 46, 978, 154), "left": (44, 52, 290, 324), "keys": (30, 334, 970, 616)}   # in panel units
 
 
 def panel(play_png):
@@ -121,8 +144,8 @@ def panel(play_png):
         rect(left(i), wy, kw, wh, kw / 2, KEY_W)
         kx = left(i) + kw / 2
         text(kx, wy + wh - 14, str(i + 1) if i < 8 else ("Tick", "Chord", "Snarl", "Stutter", "Weight", "Shift", "Clean", "Wash")[i - 8], 14 if i < 8 else 12.5, INK)
-        if i >= 12:
-            text(kx, wy + 22, ("A", "B", "C", "Presets")[i - 12], 10.5, MUTED_KEY, "SemiBold")
+        if i >= 8:                                             # SEL + each gesture key picks a bank (since #81)
+            text(kx, wy + 22, ("A", "B", "C", "D", "E", "F", "P1–8", "P9–16")[i - 8], 10.5, MUTED_KEY, "SemiBold")
     for k, a in enumerate(BLACK_AFTER):
         cx = x0 + 12 + (a + 1) * pitch
         words, col = BLACK[k]
@@ -132,8 +155,101 @@ def panel(play_png):
         for j, wd in enumerate(words):
             text(cx, by + 52 + (j - (len(words) - 1) / 2) * 14 + 4.5, wd, 12.5, INK)
     bracket(left(0), left(7) + kw, 451, "Presets & scenes · tap: go · SAVE + tap: store", LEGEND, 11.5, 4)
-    bracket(left(8), left(11) + kw, 451, "Gestures · press", LEGEND, 11.5, 4)
-    bracket(left(12), left(15) + kw, 451, "Gestures · with SEL: bank", LEGEND, 11.5, 4)
+    bracket(left(8), left(11) + kw, 451, "Gestures · press · SEL: bank", LEGEND, 11.5, 4)
+    bracket(left(12), left(15) + kw, 451, "Gestures · hold · SEL: bank", LEGEND, 11.5, 4)
+    return img
+
+
+BLACK_LFO = [["Pitch", "LFO"], ["Pitch to", "X-Wave"], ["Cutoff", "LFO"], ["Cutoff", "to reso"], None,   # on the LFO pages
+             ["Pitch", "LFO"], ["Pitch to", "X-Wave"], ["Cutoff", "LFO"], ["Cutoff", "to reso"], ["Delay", "LFO"], None]  # (ui.c SW_LFO)
+BLACK_NOTES = ["F#3", "G#3", "A#3", "C#4", "D#4", "F#4", "G#4", "A#4", "C#5", "D#5", "F#5"]
+
+
+def black_keys(lfo, only=None):
+    """The eleven black keys alone, named for their jobs: normally (the drones), or on the LFO pages, where the keys that
+    change are named in the LFO's lilac; each key's note under it. only: the keys a page is about, ringed, the rest
+    quiet."""
+    S = 2.6
+    def P(v): return int(round(v * S))
+    w, h = 928, 150
+    img = Image.new("RGBA", (P(w), P(h)), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    def f(size, wt="Bold"):
+        return ImageFont.truetype(os.path.join(ROOT, "assets", "fonts", "BarlowSemiCondensed-%s.ttf" % wt), P(size))
+    def rect(x, y, rw, rh, r, fill, outline=None, width=0):
+        d.rounded_rectangle([P(x), P(y), P(x + rw), P(y + rh)], radius=P(r), fill=fill, outline=outline,
+                            width=P(width) if width else 0)
+    def text(x, y, s, size, fill, wt="Bold"):
+        d.text((P(x), P(y)), s, font=f(size, wt), fill=fill, anchor="ms")
+    rect(0, 0, w, h, 18, TRAY)
+    pitch = (w - 24) / 16
+    kw = pitch * .78
+    by, bh = 14, 96
+    for k, a in enumerate(BLACK_AFTER):
+        cx = 12 + (a + 1) * pitch
+        words, col = BLACK[k]
+        if lfo and BLACK_LFO[k]:
+            words, face, ink = BLACK_LFO[k], LILAC, INK
+        else:
+            face, ink = KEY_B, INK
+        ring = None
+        if only is not None:
+            if k in only:
+                ring = PALE
+            else:
+                face, ink, col = (70, 70, 76), (120, 120, 126), None
+        rect(cx - kw / 2, by, kw, bh, kw / 2, face, ring, 3 if ring else 0)
+        if lfo and BLACK_LFO[k] and k < 9:                     # on the LFO pages keys 1-4 are drone I's, 6-9 drone II's
+            col = AMBER if k < 4 else TEAL
+        if col:
+            rect(cx - 9, by + 9, 18, 5, 2.5, col)
+        for j, wd in enumerate(words):
+            text(cx, by + 52 + (j - (len(words) - 1) / 2) * 14 + 4.5, wd, 12 if lfo and BLACK_LFO[k] else 12.5, ink)
+        text(cx, by + bh + 26, BLACK_NOTES[k], 13, PALE if ring else LEGEND, "SemiBold")
+    return img
+
+
+def preset_keys(first, bank):
+    """The keyboard alone, as the panel draws it: white keys 1-8 named P<first>.. and the gesture key that picks their
+    bank lit, "SEL +" on it; the other keys quiet."""
+    S = 2.6
+    def P(v): return int(round(v * S))
+    x0, y0, w, h = 0, 0, 928, 300
+    img = Image.new("RGBA", (P(w), P(h)), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    def f(size, wt="Bold"):
+        return ImageFont.truetype(os.path.join(ROOT, "assets", "fonts", "BarlowSemiCondensed-%s.ttf" % wt), P(size))
+    def rect(x, y, rw, rh, r, fill, outline=None, width=0):
+        d.rounded_rectangle([P(x), P(y), P(x + rw), P(y + rh)], radius=P(r), fill=fill, outline=outline,
+                            width=P(width) if width else 0)
+    def text(x, y, s, size, fill, wt="Bold"):
+        d.text((P(x), P(y)), s, font=f(size, wt), fill=fill, anchor="ms")
+    rect(x0, y0, w, h, 18, TRAY)
+    pitch = (w - 24) / 16
+    kw = pitch * .78
+    top = 30                                                   # room for the captions over the keys
+    wy, wh, by, bh = top + (h - top) * .46, (h - top) * .49, top + (h - top) * .05, (h - top) * .31
+    def left(i): return x0 + 12 + i * pitch + (pitch - kw) / 2
+    QUIET = (120, 120, 126)
+    for i in range(16):
+        kx = left(i) + kw / 2
+        if i < 8:
+            rect(left(i), wy, kw, wh, kw / 2, KEY_W)
+            text(kx, wy + wh - 16, "P%d" % (first + i), 15, INK)
+        elif i == bank:
+            rect(left(i), wy, kw, wh, kw / 2, PALE, LILAC, 3)
+            text(kx, wy + wh - 30, "SEL +", 12, INK, "SemiBold")
+            text(kx, wy + wh - 14, ("F5", "G5")[bank - 14], 15, INK)
+        else:
+            rect(left(i), wy, kw, wh, kw / 2, QUIET)
+    for a in BLACK_AFTER:
+        cx = x0 + 12 + (a + 1) * pitch
+        rect(cx - kw / 2, by, kw, bh, kw / 2, (70, 70, 76))
+    def cap(x1, x2, s, col):
+        m = (x1 + x2) / 2
+        text(m, 22, s, 14, col, "SemiBold")
+    cap(left(0), left(7) + kw, "Presets P%d–P%d · tap: play" % (first, first + 7), LABEL)
+    cap(left(bank) - 40, left(bank) + kw + 40, "bank", LILAC)
     return img
 
 
