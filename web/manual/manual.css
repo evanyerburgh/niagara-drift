@@ -118,6 +118,8 @@ main:focus { outline: none; }
 .recipe-body { display: grid; grid-template-columns: minmax(0, 1fr) 240px; grid-template-rows: auto 1fr;
                grid-template-areas: "how shots" "listen shots"; gap: 24px 48px; margin-top: 10px; align-items: start; }
 .recipe-body .how { grid-area: how; }
+.recipe-body:not(:has(.screens)) { grid-template-columns: minmax(0, 1fr); grid-template-areas: "how" "listen"; }
+.recipe-body:not(:has(.screens)) .how { max-width: 680px; }
 .recipe-body .screens { grid-area: shots; }
 .recipe-body .listen { grid-area: listen; max-width: 480px; }
 .recipe-body.pair { grid-template-columns: minmax(0, 1fr) 494px; }   /* two screens side by side, where stacked they'd be

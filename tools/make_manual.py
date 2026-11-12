@@ -286,7 +286,7 @@ def recipe_html(rid, title, body):
             f'</div>'
             f'<div class="recipe-body"><div class="how">{f"<p class=lead>{lead}</p>" if lead else ""}<ol class="moves">{moves}</ol>'
             f'{f"<div class=good><b>Good to know</b>{good}</div>" if good else ""}</div>'
-            f'<div class="screens">{figs}</div>{snd}</div></section>')
+            + (f'<div class="screens">{figs}</div>' if figs else "") + f'{snd}</div></section>')
 
 
 def onpage(groups, base, label):

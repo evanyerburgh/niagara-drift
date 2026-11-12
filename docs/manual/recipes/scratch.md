@@ -4,7 +4,6 @@ tab: From scratch
 intro: One drone with everything off, then a control at a time
 kicker: Tutorial
 description: A Niagara Drift tutorial: start from one plain drone (P16 Bare) and build a sound up yourself, a control at a time.
-image: bare-1.png
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
@@ -30,6 +29,3 @@ drone, its interval, the sub, the LFO, the space.
 > **Good to know.** Drift and Character
 > ([[ENV]], KNOB 2 and 3) take the drones from still and clean toward alive and worn. Keep what you make: [[SEL]] +
 > [[G4]] (bank A), hold [[SAVE]] and tap a white key.
-
-![Drones, drone II in](../media/bare-0.png "drone II in, a fifth above")
-![LFO sends, drone I's cutoff send +40](../media/bare-1.png "a cutoff send, Movement up")

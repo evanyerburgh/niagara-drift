@@ -48,12 +48,10 @@ image: p-retune-1.png
 
 *Hold its button, turn, let go*
 
-1. Hold a page's button, here [[FX]] for **Space**.
+1. Hold a page's button, here [[FX]] for **Space**: the header says PEEK.
 2. Turn a knob there.
 3. Let go: you're back where you were, the change kept.
 
-![Space, peeked at](../media/p-peek-0.png "PEEK: let go goes back to DRONES")
-![Drones, back](../media/p-peek-1.png "Back on Drones")
 
 ### Play in time with a MIDI clock {#clock}
 

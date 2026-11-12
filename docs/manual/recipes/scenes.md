@@ -15,12 +15,10 @@ The 8 white keys are scenes: 6 banks of 8 (A to F) to fill with your own sounds,
 
 1. Tap a Preset, then pick bank A: hold [[SEL]] and tap [[G4]] (B to F are [[A4]] to [[E5]]).
 2. Change it as you like.
-3. Hold [[SAVE]] and tap a white key: it's stored there. Tap that key later to glide back to it.
+3. Hold [[SAVE]] and tap a white key: it's stored there (the header says A1). Tap that key later to glide back to it.
 
 > **Good to know.** The Presets can't be saved over: your sounds go in A to F.
 
-![Space, saved to A1](../media/s-save-0.png "Saved: the header says A1")
-![Drones, back on A1](../media/s-save-1.png "A1 tapped: back to the saved sound")
 
 ### Blend between two sounds and keep the mix {#blend}
 
@@ -47,6 +45,3 @@ The 8 white keys are scenes: 6 banks of 8 (A to F) to fill with your own sounds,
 
 1. Hold [[SEL]] and tap [[SAVE]]: back to the sound before your last scene tap or blend.
 2. Again: forward to where you were.
-
-![Drones, on P5 Abyss](../media/s-back-0.png "P5 tapped")
-![Drones, back on P1 Niagara](../media/s-back-1.png "SEL + SAVE: back to P1")

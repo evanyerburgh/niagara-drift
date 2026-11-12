@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# A recipe's render (tools/make_manual.py --renders): from P11, headphones, Pitch lock off, Scene time 0.
+# A recipe's steps, checked (tools/make_manual.py --renders; nothing to see or hear: the expects are the point): from P11, headphones, Pitch lock off, Scene time 0.
 notips
 phones 1
 set 74 0
@@ -17,10 +17,8 @@ wait 400
 expect view 13
 turn K4 30 80
 wait 300
-shot p-peek-0.png
 wait 1500
 release FX
 wait 600
 expect view 0
-shot p-peek-1.png
 wait 4000
