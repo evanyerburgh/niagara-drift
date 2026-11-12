@@ -9,57 +9,61 @@ intro: The buttons and the pages, the header and the knobs
 
 <img class="shot" src="../../img/panel-left.png" width="200" alt="The FM-1's left knobs: MASTER is Volume, SELECT the LFO rate, PRESETS Gesture time, ALGORITHM Movement; OCT− and OCT+ pick LFO I's and II's waves">
 
+Four knobs on the left always do the same; four on the right change with the page.
+
+### MASTER
+
+The volume.
+
+### SELECT
+
+The LFO's rate.
+
+### ALGORITHM
+
+Movement: how much the LFO moves the sound.
+
+### PRESETS
+
+Gesture time: how fast the gestures move.
+
 ### KNOB 1–4
 
-On the drone pages (Drones, Tone, Osc, Sub · Drive, Partner, LFO sends), KNOB 1–2 are drone I and KNOB 3–4 drone II.
-On the other pages, a knob each for the whole sound.
-
-### The left knobs
-
-MASTER is the volume, SELECT the LFO's rate, ALGORITHM Movement, PRESETS Gesture time. See [LFO](lfo.md).
-
-### How they turn
-
-A slow turn is a smooth sweep; a fast turn goes further. Levels follow your ear: halfway is about a quarter as loud.
+What the page shows. On the drone pages, KNOB 1–2 are drone I and KNOB 3–4 drone II.
 
 ## The buttons
 
 <img src="../../img/panel-buttons.png" width="420" alt="The FM-1's knobs 1 to 4 for drone I and II, and its twelve buttons, each with the page it opens: FX Space, SEL Fine, ENV Life, LFO Sends, EDIT Osc, GLO Setup, HOME Drones, SAVE Store, ARP Swell, SEQ Partner, PLAY On/off, REC Loop">
 
+Eight buttons open pages; four do something.
+
 ### Page buttons
 
-FX, ENV, LFO, EDIT, GLO, HOME, ARP and SEQ each open a page.
-
-- **Tap:** the knobs stay on that page. **Tap again** for its next page ("1/2").
-- **Hold to peek:** turn a knob, let go, and you're back ("let go: DRONES").
-- [[HOME]] opens Drones and [[FX]] Space; the others open the page you last used there.
+[[HOME]], [[FX]], [[ENV]], [[LFO]], [[EDIT]], [[SEQ]], [[GLO]] and [[ARP]] each open a page. Tap again for its next.
 
 ### PLAY
 
-Fades the drones in or out. [[SEL]] + [[PLAY]]: drone II alone.
+Fades the drones in or out.
 
 ### SAVE
 
-Saves the sound, at once. Glows dimly while something isn't saved.
+Saves the sound.
 
 ### SEL
 
-Hold for fine steps: a pitch knob in cents, cutoff and resonance in tenths. It glows when it can keep what you're
-holding (a scene blend, a gesture).
-
-### ARP
-
-The Swell page (a tremolo on both drones). On the page, a tap starts or stops it.
+Hold for fine steps, and with other controls for their second job.
 
 ### REC
 
-Tap to record your knobs, gestures and scenes, tap to loop them, tap to stop. Up to 5 minutes.
+Records your moves, then loops them.
 
 ### OCT− and OCT+
 
-LFO I's and LFO II's shape: tap for the next; with [[SEL]], the one before.
+LFO I's and LFO II's shape.
 
 ## The header
+
+The top line of the screen.
 
 ### Left
 
@@ -69,6 +73,16 @@ The page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT.
 
 The sound: its bank and key ("A5", "P6 SEANCE"), "changed" once you've moved it.
 
-### On the way
+## Good to know
 
-A scene on its way, in gold ("→ P3 VESPERS"), a gold line filling under the header.
+- **Hold a page button to peek:** turn a knob, let go, and you're back ("let go: DRONES").
+- **HOME and FX** always open Drones and Space; the other buttons open the page you last used there.
+- **The drone pages:** Drones, Tone, Osc, Sub · Drive, Partner, LFO sends; their knob names underlined amber and teal.
+- **SEL + PLAY** fades drone II alone. Stopped, PLAY breathes slowly, and nothing else on the panel moves.
+- **SAVE** saves at once (the sound dips for about 50 ms while playing), and glows dimly while something isn't saved.
+- **SEL** gives a pitch knob single cents, cutoff and resonance tenths. It glows when it can keep what you're holding.
+- **REC:** tap to record, tap to loop, tap to stop; up to 5 minutes, the time in the header. See
+  [the recipe](../recipes/performing.md#loop).
+- **OCT− / OCT+:** tap for the next shape; [[SEL]] + OCT for the one before. Each light pulses with its wave.
+- **On the way to a scene** the header says where, in gold ("→ P3 VESPERS"), a gold line filling under it.
+- **Every knob glides:** a slow turn is a smooth sweep, a fast turn goes further.

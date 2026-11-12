@@ -7,6 +7,8 @@ intro: EDIT: each drone's wave, its sub and its drive
 
 ## The knobs
 
+[[EDIT]] opens Osc; [[EDIT]] again, Sub · Drive. KNOB 1–2 are drone I, KNOB 3–4 drone II.
+
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Osc | I X-Wave | I Width (pulse width) | II X-Wave | II Width |
@@ -16,33 +18,40 @@ intro: EDIT: each drone's wave, its sub and its drive
 
 <img class="shot" src="../../img/screen-osc.png" width="240" alt="The Osc page: each drone's waveform on the sine to square scale, and its pulse width">
 
-[[EDIT]] opens it.
+Each drone's waveform.
 
 ### X-Wave
 
-Blends sine → triangle → saw → square. The sine and triangle are a little louder, so they carry on a small speaker.
+Blends sine → triangle → saw → square.
 
 ### Width
 
-The square's pulse width. With no square in the wave it does nothing: it goes gray, "needs sqr" above it.
+The square's pulse width.
 
 ## Sub · Drive
 
 <img class="shot" src="../../img/screen-source.png" width="240" alt="The Sub · Drive page: each drone's osc and sub lanes, shaped by the drive, and its sub's octave">
 
-[[EDIT]] again. *Picture:* each drone's two lanes, **osc** and **sub**, as loud as their share, shaped by the drive.
+Each drone's sub-oscillator, an octave or more below, and its drive.
 
 ### Osc/Sub
 
-Crossfades the oscillator with the sub, an octave or more below (the knob reads "Osc/Sb"). Beside each drone's name,
-the sub's octave ("-1 oct") and the black key that steps it ([[G#3]], [[G#4]]).
+Crossfades the oscillator with the sub (the knob reads "Osc/Sb").
 
-### The sub's wave
+### Sub wave
 
-Hold [[SEL]] and turn Osc/Sub: **Square** (to start), **Sine** (the deepest on headphones, the least on a small
-speaker), **Triangle**, **Saw** (the brightest). All as loud as the square; a change glides. The screen names it above
-the knob ("SEL Square").
+Hold [[SEL]] and turn Osc/Sub: Square, Sine, Triangle or Saw.
 
 ### Drive
 
-Pushes each drone into its filter.
+Pushes the drone into its filter.
+
+## Good to know
+
+- **The sine and triangle** are a little louder, so they carry on a small speaker.
+- **Width needs a square** in the wave; without one it goes gray, "needs sqr".
+- **The sub's octave** is on a black key ([[G#3]], [[G#4]]), shown beside each drone's name ("-1 oct").
+- **Sub waves:** Sine is the deepest on headphones and the least on a small speaker; Saw the brightest. A change
+  glides.
+- **The pictures:** on Osc, each drone's wave; on Sub · Drive, each drone's osc and sub lanes, as loud as their share,
+  shaped by the drive.

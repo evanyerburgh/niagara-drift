@@ -5,9 +5,12 @@ intro: Switches, and the LFO's routing on the LFO pages
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The keys
+## Black keys
 
 <img src="../../img/panel-keys.png" width="720" alt="The FM-1's keys: the black keys labeled Partner, Sub, Filter for drone I in amber, Pitch lock, LFO reset, Partner, Sub, Filter for drone II in teal, Pitch link, Hard sync, X-mod">
+
+Eleven switches, left to right: drone I's three, two for both drones, drone II's three, then the links. On the LFO pages, most of
+them route the LFO instead.
 
 | Key | Normally | On the LFO pages |
 |---|---|---|
@@ -23,51 +26,26 @@ intro: Switches, and the LFO's routing on the LFO pages
 | 10 · D#5 | hard sync (II to I) | which LFO moves the delay's time (I, II, both) |
 | 11 · F#5 | cross-mod: off, I moves II's cutoff, bend each other, Snarl | the same |
 
-## Lights
-
-### On and off
-
-Dark is off, lit is on. A key of several choices glows dimly on its first, is lit on the second, winks on a third.
-
-### Blinking
-
-A key the screen names in a box ("needs [F#3]") blinks while the message shows.
-
-## Switches
-
-### Filter
-
-Low-pass (dim), band-pass (winking), high-pass (lit).
-
-### Sub
-
-−1 octave (dim), −2 octaves (lit), then the subharmonics ⅓ and ⅕ of the pitch (winking).
-
-### Pitch lock
-
-Keeps the drones' pitches through scenes and Presets; the pitch knobs still tune.
-
-### Pitch link
-
-Drone II follows drone I; KNOB 3 sets the gap ("+7 st").
-
-### LFO reset
-
-Tap to restart the LFO. Hold half a second to lock it to the Swell; hold again to free it.
-
-### On the LFO pages
-
-A wave key picks LFO I (dim), II (lit) or both (winking); a target key, pitch or cutoff (dim), X-Wave or resonance
-(lit). The screen says what moves what ("LFO II → I PITCH").
-
 ## The map
 
 <img class="shot" src="../../img/screen-keymap.png" width="240" alt="The black keys' map while SEL is held: the keys lit as on the panel, their groups named, the key touched named with its setting">
 
 ### Hold SEL
 
-The screen draws the black keys as on the keyboard, lit as on the panel, and the gesture keys as the banks they pick.
+The screen draws the black keys, lit as on the panel.
 
-### Touch a black key
+### Touch a key
 
-While SEL is held, the screen names it and its setting ("SUB -1 OCT") without switching it.
+While SEL is held, the screen names the key and its setting, without switching it.
+
+## Good to know
+
+- **Lights:** dark is off, lit is on. A key of several choices is dim on its first, lit on the second, winking on a
+  third.
+- **Filter:** low-pass (dim), band-pass (winking), high-pass (lit).
+- **Sub:** −1 octave (dim), −2 octaves (lit), then the subharmonics ⅓ and ⅕ (winking).
+- **Pitch lock** keeps the drones' pitches through scenes and Presets; the pitch knobs still tune.
+- **Pitch link:** drone II follows drone I; KNOB 3 sets the gap ("+7 st").
+- **LFO reset:** hold half a second to lock the LFO to the Swell; hold again to free it.
+- **On the LFO pages** the screen says what now moves what ("LFO II → I PITCH").
+- **A key the screen names in a box** ("needs [F#3]") blinks while the message shows.

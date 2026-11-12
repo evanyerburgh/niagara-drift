@@ -7,6 +7,8 @@ intro: HOME: each drone's level, cutoff, pitch and resonance
 
 ## The knobs
 
+[[HOME]] opens Drones; [[HOME]] again, Pitch. KNOB 1–2 are drone I, KNOB 3–4 drone II.
+
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Drones | I level | I cutoff | II level | II cutoff |
@@ -16,48 +18,43 @@ intro: HOME: each drone's level, cutoff, pitch and resonance
 
 <img class="shot" src="../../img/screen-play.png" width="240" alt="The Drones page: each drone's filter curve with its level in dB, its filter and key, and its note">
 
-The page [[HOME]] opens, and what you move most while playing.
+The page you play from: each drone's level and filter cutoff.
 
-### Level and cutoff
+### Level
 
-Bring one drone forward, push the other back, open or close it. Levels follow your ear: halfway is about a quarter as
-loud.
+How loud each drone is. Halfway is about a quarter as loud.
 
-### The picture
+### Cutoff
 
-- Each drone's filter curve, its level in dB under it. A quieter drone's strands close up and dim; a silent one is a
-  thin gray curve.
-- Beside each name, its filter (LP, BP, HP: low-, band- or high-pass) and the black key that changes it ([[A#3]],
-  [[A#4]]); at the right, its note.
+Opens or closes each drone's filter. The filter's type (LP, BP, HP: low-, band- or high-pass) is on a black key
+([[A#3]], [[A#4]]).
 
 ## Pitch
 
 <img class="shot" src="../../img/screen-play2.png" width="240" alt="The Pitch page: each drone's waveform as strands, and drone II's interval from drone I">
 
-[[HOME]] again.
+Each drone's note and its filter's resonance.
 
 ### Pitch
 
-- **Range:** 1.6 kHz down to 2 Hz. Under 27 Hz (the screen shows Hz) a drone becomes a pulse of clicks, a click a
-  cycle. The speaker can't play that low: listen on headphones.
-- **A click is a note of the Tuning** (Setup 2, KNOB 1; semitones to start). It glides from note to note, so a steady
-  turn is one slide; the screen shows where it's going.
-- **[[SEL]] held: a cent a click,** to tune a drone a little sharp or flat. The knob keeps the offset from note to
-  note (+3 cents stays +3) until you change the Tuning. The "fine" tag shows it ("fine +3").
-- **Pitch link on:** drone II's knob turns the gap between the drones, an interval of the Tuning a click.
+1.6 kHz down to 2 Hz, a note of the Tuning a click. With [[SEL]] held, a cent a click.
 
 ### Resonance
 
-While its knob turns, that drone's half shows its filter curve. The last dot is red: there the filter rings on its own
-(self-oscillates).
-
-### The picture
-
-- Each drone's wave as a few strands, on one line while it's still, fanning out as Drift, detune or an LFO moves it.
-  A nearly silent drone shrinks to a thin gray line.
-- Beside II, its interval from drone I, to the nearest semitone, up or down ("5th ↑").
+Boosts the filter at its cutoff. The last dot is red: there it rings on its own (self-oscillates).
 
 ## MASTER
 
-Past about four-fifths of its turn it overdrives at about the same loudness: thicker, but the swells and dips get much
-smaller.
+The volume. Past about four-fifths of its turn it overdrives, at about the same loudness.
+
+## Good to know
+
+- **Under 27 Hz** a drone becomes a pulse of clicks; the speaker can't play that low, so listen on headphones.
+- **Pitch glides** from note to note, so a steady turn is one slide.
+- **A fine offset stays** (with SEL, +3 cents stays +3 from note to note) until you change the Tuning; "fine +3" shows
+  it.
+- **Pitch link on** ([[C#5]]): drone II's knob sets the interval between the drones.
+- **Overdriving MASTER** flattens the swells and dips.
+- **The pictures:** on Drones, each filter's curve, its level in dB under it, its note at the right; a silent drone is
+  a thin gray curve. On Pitch, each wave as strands that fan out as it moves, and drone II's interval from drone I
+  ("5th ↑").
