@@ -5,7 +5,11 @@ intro: ARP: both drones breathing in time
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The knobs
+## Swell
+
+A tremolo on both drones, from a slow breath to a hard gate, on its own or in time with a clock.
+
+## Knobs
 
 [[ARP]] opens the Swell page.
 
@@ -13,11 +17,11 @@ intro: ARP: both drones breathing in time
 |---|---|---|---|---|
 | Swell | rate (on a MIDI clock: division) | depth | shape | swing |
 
-## Swell
+## Controls
 
 <img class="shot" src="../../img/screen-pulse.png" width="240" alt="The Swell page: two bars of the Swell, four breaths, as strands meeting at a dot">
 
-A tremolo on both drones, from a 33-second breath to a buzz. On the page, tap [[ARP]] to start or stop it.
+From a 33-second breath to a buzz. On the page, tap [[ARP]] to start or stop it.
 
 ### Rate
 

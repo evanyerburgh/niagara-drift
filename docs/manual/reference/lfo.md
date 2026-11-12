@@ -5,11 +5,15 @@ intro: One clock, two waves, and Movement
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The controls
+## LFO
+
+One clock with two waves, LFO I and LFO II, and Movement, which sets how much of them you hear.
+
+## Controls
 
 <img class="shot" src="../../img/panel-left.png" width="200" alt="The FM-1's left knobs: SELECT is the LFO rate, ALGORITHM Movement, PRESETS Gesture time; OCT− and OCT+ pick LFO I's and II's waves">
 
-The LFO is one clock with two waves, LFO I and LFO II. Where they go is on the [LFO pages](lfo-pages.md).
+Where the waves go is on the [LFO pages](lfo-pages.md).
 
 ### Rate (SELECT)
 

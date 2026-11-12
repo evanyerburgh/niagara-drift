@@ -5,11 +5,15 @@ intro: The white keys: your sounds, gliding or crossfaded in by pressure
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
+## Scenes and banks
+
+The white keys play your saved sounds, gliding in, or crossfading as you press.
+
 ## Scenes
 
 <img src="../../img/panel-keys.png" width="720" alt="The FM-1's keys: white keys 1 to 8 are scenes; the eight gesture keys above them each pick a bank with SEL (A to F, P1–8, P9–16); the black keys are switches">
 
-White keys 1–8 hold scenes: saved sounds. There are 8 banks of 8: A to F are yours, and two hold the Presets.
+White keys 1–8 hold scenes, in 8 banks of 8: A to F are yours, and two hold the Presets.
 
 ### Tap
 

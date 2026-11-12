@@ -9,7 +9,7 @@ image: g-stack-0.png
 
 Gestures are macros: one key moves several settings at once. **PRESETS** sets how fast.
 
-### Bloom into the reverb, fade out slowly {#hold}
+### Bloom into reverb, fade out slowly {#hold}
 
 *The longer you hold, the slower it fades*
 
@@ -78,7 +78,7 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 - 0:05 Wash held on top: the climax
 - 0:10 both let go
 
-### Transform the sound over half a minute {#minute}
+### Transform a sound over half a minute {#minute}
 
 *A slow Gesture time and a tap*
 

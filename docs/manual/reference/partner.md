@@ -5,7 +5,11 @@ intro: SEQ: each drone's partner; Shift, glide and Wander
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The knobs
+## Partner and Pitch moves
+
+A second oscillator for each drone, and how the drones' pitches move: Shift, glide and Wander.
+
+## Knobs
 
 [[SEQ]] opens Partner; [[SEQ]] again, Pitch moves.
 

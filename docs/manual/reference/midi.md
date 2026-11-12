@@ -5,9 +5,11 @@ intro: Notes, the clock and Sync
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## MIDI in
+## MIDI
 
-Niagara Drift listens to MIDI over USB or the TRS jack: notes tune the drones, and a clock puts it in time.
+Notes tune the drones and a clock puts them in time, over USB or the TRS jack.
+
+## MIDI in
 
 ### Notes
 
@@ -21,7 +23,7 @@ A MIDI clock from a DAW or a drum machine. After about two beats it locks ("120 
 
 Setup 1, KNOB 4: on follows a clock, off ignores it.
 
-## On the clock
+## On a clock
 
 | What | On the clock |
 |---|---|

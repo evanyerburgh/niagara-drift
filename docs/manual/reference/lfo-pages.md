@@ -5,7 +5,11 @@ intro: LFO: where the LFO goes, and what else it moves
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The knobs
+## LFO sends and Mods
+
+Where the LFO goes, and what else it moves.
+
+## Knobs
 
 [[LFO]] opens LFO sends; [[LFO]] again, Mods. The LFO's rate and shapes are on the left knobs: see [LFO](lfo.md).
 

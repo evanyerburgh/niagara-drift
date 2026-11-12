@@ -7,10 +7,10 @@ intro: What each gesture does, and how to play them
 
 ## Gestures
 
-<img src="../../img/panel-keys.png" width="720" alt="The FM-1's keys: keys 9 to 12 are the pressure gestures Tick, Chord, Snarl and Stutter; keys 13 to 16 the held gestures Weight, Shift, Clean and Wash">
-
 Macros: one key moves several settings together, on top of your sound, each in its own order. Keys 13–16 come in as
 you hold them, keys 9–12 as you press harder.
+
+<img src="../../img/panel-keys.png" width="720" alt="The FM-1's keys: keys 9 to 12 are the pressure gestures Tick, Chord, Snarl and Stutter; keys 13 to 16 the held gestures Weight, Shift, Clean and Wash">
 
 ### Weight · [[D5]], hold
 

@@ -5,7 +5,11 @@ intro: FX: the delay, the drive and the reverb
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The knobs
+## Space and Details
+
+The effects: a delay with six types, a drive, and a reverb with five.
+
+## Knobs
 
 [[FX]] opens Space, the amounts you play; [[FX]] again, Details, what you set before playing.
 

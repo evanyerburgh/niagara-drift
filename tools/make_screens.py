@@ -38,6 +38,10 @@ def main():
         dst = os.path.join(ROOT, "docs", "img", "keys-presets-%d.png" % n)
         preset_keys(first, bank).save(dst, optimize=True)
         print("keys:", os.path.relpath(dst, ROOT))
+    for n, lfo in (("drones", 0), ("lfo", 1)):                # the black keys' two sets of jobs (the manual's Black keys)
+        dst = os.path.join(ROOT, "docs", "img", "black-keys-%s.png" % n)
+        black_keys(lfo).save(dst, optimize=True)
+        print("keys:", os.path.relpath(dst, ROOT))
     pm = panel(os.path.join(out, "play.png"))
     dst = os.path.join(ROOT, "docs", "img", "panel.png")
     pm.save(dst, optimize=True)
@@ -148,6 +152,48 @@ def panel(play_png):
     bracket(left(0), left(7) + kw, 451, "Presets & scenes · tap: go · SAVE + tap: store", LEGEND, 11.5, 4)
     bracket(left(8), left(11) + kw, 451, "Gestures · press · SEL: bank", LEGEND, 11.5, 4)
     bracket(left(12), left(15) + kw, 451, "Gestures · hold · SEL: bank", LEGEND, 11.5, 4)
+    return img
+
+
+BLACK_LFO = [["Pitch", "LFO"], ["Pitch to", "X-Wave"], ["Cutoff", "LFO"], ["Cutoff", "to reso"], None,   # on the LFO pages
+             ["Pitch", "LFO"], ["Pitch to", "X-Wave"], ["Cutoff", "LFO"], ["Cutoff", "to reso"], ["Delay", "LFO"], None]  # (ui.c SW_LFO)
+BLACK_NOTES = ["F#3", "G#3", "A#3", "C#4", "D#4", "F#4", "G#4", "A#4", "C#5", "D#5", "F#5"]
+
+
+def black_keys(lfo):
+    """The eleven black keys alone, named for their jobs: normally (the drones), or on the LFO pages, where the keys that
+    change are named in the LFO's lilac; each key's note under it."""
+    S = 2.6
+    def P(v): return int(round(v * S))
+    w, h = 928, 150
+    img = Image.new("RGBA", (P(w), P(h)), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    def f(size, wt="Bold"):
+        return ImageFont.truetype(os.path.join(ROOT, "assets", "fonts", "BarlowSemiCondensed-%s.ttf" % wt), P(size))
+    def rect(x, y, rw, rh, r, fill, outline=None, width=0):
+        d.rounded_rectangle([P(x), P(y), P(x + rw), P(y + rh)], radius=P(r), fill=fill, outline=outline,
+                            width=P(width) if width else 0)
+    def text(x, y, s, size, fill, wt="Bold"):
+        d.text((P(x), P(y)), s, font=f(size, wt), fill=fill, anchor="ms")
+    rect(0, 0, w, h, 18, TRAY)
+    pitch = (w - 24) / 16
+    kw = pitch * .78
+    by, bh = 14, 96
+    for k, a in enumerate(BLACK_AFTER):
+        cx = 12 + (a + 1) * pitch
+        words, col = BLACK[k]
+        if lfo and BLACK_LFO[k]:
+            words, face, ink = BLACK_LFO[k], LILAC, INK
+        else:
+            face, ink = KEY_B, INK
+        rect(cx - kw / 2, by, kw, bh, kw / 2, face)
+        if lfo and BLACK_LFO[k] and k < 9:                     # on the LFO pages keys 1-4 are drone I's, 6-9 drone II's
+            col = AMBER if k < 4 else TEAL
+        if col:
+            rect(cx - 9, by + 9, 18, 5, 2.5, col)
+        for j, wd in enumerate(words):
+            text(cx, by + 52 + (j - (len(words) - 1) / 2) * 14 + 4.5, wd, 12 if lfo and BLACK_LFO[k] else 12.5, ink)
+        text(cx, by + bh + 26, BLACK_NOTES[k], 13, LEGEND, "SemiBold")
     return img
 
 

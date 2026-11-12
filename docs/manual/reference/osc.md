@@ -5,7 +5,11 @@ intro: EDIT: each drone's wave, its sub and its drive
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The knobs
+## Osc and Sub · Drive
+
+Each drone's waveform, its sub-oscillator and its drive.
+
+## Knobs
 
 [[EDIT]] opens Osc; [[EDIT]] again, Sub · Drive. KNOB 1–2 are drone I, KNOB 3–4 drone II.
 

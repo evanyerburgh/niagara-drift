@@ -1,14 +1,17 @@
 ---
-title: Playing in the browser
+title: Playing in a browser
 intro: The emulator: the mouse and the computer keys
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The emulator
+## Playing in a browser
 
-The [front page](https://evanyerburgh.github.io/niagara-drift/) runs the firmware itself in your browser, with sound:
-no FM-1 needed.
+The emulator on the front page runs the firmware itself, with sound: no FM-1 needed.
+
+## Mouse and keys
+
+Play it on the [front page](https://evanyerburgh.github.io/niagara-drift/).
 
 | Do | Mouse | Keyboard |
 |---|---|---|

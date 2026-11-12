@@ -5,7 +5,11 @@ intro: HOME: each drone's level, cutoff, pitch and resonance
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The knobs
+## Drones and Pitch
+
+The page you play from: each drone's level and cutoff; then its pitch and resonance.
+
+## Knobs
 
 [[HOME]] opens Drones; [[HOME]] again, Pitch. KNOB 1–2 are drone I, KNOB 3–4 drone II.
 

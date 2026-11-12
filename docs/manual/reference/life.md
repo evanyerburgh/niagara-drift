@@ -5,7 +5,11 @@ intro: ENV: Feedback, Drift, Character, Age; each drone's noise
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The knobs
+## Life and Tone
+
+What keeps the drones alive and worn, and each drone's noise.
+
+## Knobs
 
 [[ENV]] opens Life; [[ENV]] again, Tone.
 

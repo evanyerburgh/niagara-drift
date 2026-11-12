@@ -5,7 +5,11 @@ intro: GLO: the room's settings and the Tuning
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The knobs
+## Setup
+
+Settings for the FM-1 itself, not for a sound: how long changes take, the clock, the Tuning and the keys' touch.
+
+## Knobs
 
 [[GLO]] opens Setup 1; [[GLO]] again, Setup 2. These belong to the FM-1, not to a sound: scenes don't change them,
 except the Tuning.

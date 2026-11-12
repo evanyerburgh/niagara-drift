@@ -549,8 +549,8 @@ for (let i = 0; i < 6; i++) {
 const keys = [], GESTURES = ["Tick", "Chord", "Snarl", "Stutter", "Weight", "Shift", "Clean", "Wash"], BANKS = ["A", "B", "C", "D", "E", "F", "P1", "P2"];
 const BLACK_JOB = [[["Partner"], AMBER], [["Sub"], AMBER], [["Filter"], AMBER], [["Pitch", "lock"]], [["LFO", "reset"]],
   [["Partner"], TEAL], [["Sub"], TEAL], [["Filter"], TEAL], [["Pitch", "link"]], [["Hard", "sync"]], [["X-mod"]]];
-const BLACK_LFO = [["Osc", "wave"], ["Osc to", "X-Wave"], ["Filter to", "reso"], ["Filter", "wave"], null,   // on the LFO pages: what the
-  ["Osc", "wave"], ["Osc to", "X-Wave"], ["Filter to", "reso"], ["Filter", "wave"], ["Delay", "wave"], null];     // key switches to (null: as ever)
+const BLACK_LFO = [["Pitch", "LFO"], ["Pitch to", "X-Wave"], ["Cutoff", "LFO"], ["Cutoff", "to reso"], null,  // on the LFO pages: what the
+  ["Pitch", "LFO"], ["Pitch to", "X-Wave"], ["Cutoff", "LFO"], ["Cutoff", "to reso"], ["Delay", "LFO"], null];   // key switches to (null: as ever; ui.c SW_LFO)
 const blackNames = [];                                // each changing key's two names: [normal, LFO pages]
 (function keybed(x0, y0, w, h) {
   el("rect", { x: x0, y: y0, width: w, height: h, rx: 18, fill: TRAY });

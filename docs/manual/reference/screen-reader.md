@@ -1,14 +1,17 @@
 ---
-title: Hearing the screen
+title: Hearing your screen
 intro: The FM-1 Screen Reader, for players who can't see the screen
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The Screen Reader
+## Hearing your screen
 
-Niagara Drift can say what its screen shows, through Charles Vestal's
-[FM-1 Screen Reader](https://charlesvestal.github.io/fm1-reader/), a web page.
+Niagara Drift can say what its screen shows, for players who can't see it.
+
+## Screen Reader
+
+Charles Vestal's [FM-1 Screen Reader](https://charlesvestal.github.io/fm1-reader/) is a web page that speaks it.
 
 ### Connecting
 

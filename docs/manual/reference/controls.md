@@ -5,7 +5,11 @@ intro: The buttons and the pages, the header and the knobs
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## The knobs
+## Controls
+
+The FM-1's knobs and buttons, and the header at the top of the screen.
+
+## Knobs
 
 <img class="shot" src="../../img/panel-left.png" width="200" alt="The FM-1's left knobs: MASTER is Volume, SELECT the LFO rate, PRESETS Gesture time, ALGORITHM Movement; OCT− and OCT+ pick LFO I's and II's waves">
 
@@ -31,7 +35,7 @@ Gesture time: how fast the gestures move.
 
 What the page shows. On the drone pages, KNOB 1–2 are drone I and KNOB 3–4 drone II.
 
-## The buttons
+## Buttons
 
 <img src="../../img/panel-buttons.png" width="420" alt="The FM-1's knobs 1 to 4 for drone I and II, and its twelve buttons, each with the page it opens: FX Space, SEL Fine, ENV Life, LFO Sends, EDIT Osc, GLO Setup, HOME Drones, SAVE Store, ARP Swell, SEQ Partner, PLAY On/off, REC Loop">
 
@@ -61,7 +65,7 @@ Records your moves, then loops them.
 
 LFO I's and LFO II's shape.
 
-## The header
+## Header
 
 The top line of the screen.
 
