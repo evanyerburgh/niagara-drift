@@ -22,7 +22,10 @@ A second oscillator for each drone, and how the drones' pitches move: Shift, gli
 
 <img class="shot" src="../../img/screen-partner.png" width="240" alt="The Partner page: each drone and its partner as a knot, with the interval and the beating">
 
-Each drone has a partner: a second oscillator an interval above or below it.
+| Knob | What it does |
+|---|---|
+| **Interval** | from an octave below to an octave and a fifth above, each tempered or **just** (a pure ratio that doesn't beat) |
+| **Detune** | up to 30 cents, so the two beat |
 
 ### On and off
 
@@ -30,35 +33,16 @@ A black key switches each partner: [[F#3]] for drone I, [[F#4]] for drone II.
 
 <img src="../../img/black-keys-partner.png" width="560" alt="The black keys with the two partner keys picked out: F#3 for drone I, F#4 for drone II">
 
-### Interval
-
-From an octave below to an octave and a fifth above, each tempered or **just** (a pure ratio that doesn't beat).
-
-### Detune
-
-Up to 30 cents, so the two beat.
-
 ## Pitch moves
 
 <img class="shot" src="../../img/screen-partner2.png" width="240" alt="The Pitch moves page: Shift's move, drone II's last Wander notes, and the scale">
 
-How the drones' pitches move.
-
-### Shift's move
-
-Where the Shift gesture ([[E5]]) takes the drones: a fifth down to a fifth up.
-
-### Pitch glide
-
-How long a drone takes to reach a new pitch: up to 10 s.
-
-### Wander
-
-A slow random melody for drone II on the Scale. The knob is how often; 0 is off.
-
-### Scale
-
-For Wander and the Chord gesture: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just.
+| Knob | What it does |
+|---|---|
+| **Shift's move** | where the Shift gesture ([[E5]]) takes the drones: a fifth down to a fifth up |
+| **Pitch glide** | how long a drone takes to reach a new pitch: up to 10 s |
+| **Wander** | a slow random melody for drone II on the Scale. The knob is how often; 0 is off |
+| **Scale** | for Wander and the Chord gesture: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just |
 
 ## Good to know
 

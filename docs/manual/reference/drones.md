@@ -22,16 +22,14 @@ The page you play from: each drone's level and cutoff; then its pitch and resona
 
 <img class="shot" src="../../img/screen-play.png" width="240" alt="The Drones page: each drone's filter curve with its level in dB, its filter and key, and its note">
 
-The page you play from: each drone's level and filter cutoff.
+| Knob | What it does |
+|---|---|
+| **Level** | how loud each drone is. Halfway is about a quarter as loud |
+| **Cutoff** | opens or closes each drone's filter |
 
-### Level
+### Filter type
 
-How loud each drone is. Halfway is about a quarter as loud.
-
-### Cutoff
-
-Opens or closes each drone's filter. Its type, low-pass (LP), band-pass (BP) or high-pass (HP), is on a black key:
-[[A#3]] for drone I, [[A#4]] for drone II.
+Low-pass (LP), band-pass (BP) or high-pass (HP), on a black key: [[A#3]] for drone I, [[A#4]] for drone II.
 
 <img src="../../img/black-keys-filter.png" width="560" alt="The black keys with the two filter keys picked out: A#3 for drone I, A#4 for drone II">
 
@@ -39,21 +37,16 @@ Opens or closes each drone's filter. Its type, low-pass (LP), band-pass (BP) or 
 
 <img class="shot" src="../../img/screen-play2.png" width="240" alt="The Pitch page: each drone's waveform as strands, and drone II's interval from drone I">
 
-Each drone's note and its filter's resonance.
-
-### Pitch
-
-1.6 kHz down to 2 Hz, a note of the Tuning a click. With [[SEL]] held, a cent a click.
+| Knob | What it does |
+|---|---|
+| **Pitch** | 1.6 kHz down to 2 Hz, a note of the Tuning a click. With [[SEL]] held, a cent a click |
+| **Resonance** | boosts the filter at its cutoff. The last dot is red: there it rings on its own (self-oscillates) |
 
 ### Pitch link
 
 [[C#5]] links drone II to drone I: drone II's pitch knob then sets the interval between them.
 
 <img src="../../img/black-keys-link.png" width="560" alt="The black keys with the pitch link key picked out: C#5">
-
-### Resonance
-
-Boosts the filter at its cutoff. The last dot is red: there it rings on its own (self-oscillates).
 
 ## Good to know
 

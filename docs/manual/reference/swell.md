@@ -21,23 +21,14 @@ A tremolo on both drones, from a slow breath to a hard gate, on its own or in ti
 
 <img class="shot" src="../../img/screen-pulse.png" width="240" alt="The Swell page: two bars of the Swell, four breaths, as strands meeting at a dot">
 
-From a 33-second breath to a buzz. On the page, tap [[ARP]] to start or stop it.
+On the page, tap [[ARP]] to start or stop it.
 
-### Rate
-
-How fast it breathes. On a MIDI clock it's **Division**: 32 bars to a quarter note.
-
-### Depth
-
-How far it dips, down to −30 dB; all the way, silence.
-
-### Shape
-
-**Even** (a smooth breath) in the middle; a **ramp** to the right; a **pulse**, then a hard **gate**, to the left.
-
-### Swing
-
-Every other breath longer, up to 3 to 1.
+| Knob | What it does |
+|---|---|
+| **Rate** | how fast it breathes. On a MIDI clock it's **Division**: 32 bars to a quarter note |
+| **Depth** | how far it dips, down to −30 dB; all the way, silence |
+| **Shape** | **Even** (a smooth breath) in the middle; a **ramp** to the right; a **pulse**, then a hard **gate**, to the left |
+| **Swing** | every other breath longer, up to 3 to 1 |
 
 ## Good to know
 

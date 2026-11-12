@@ -22,53 +22,25 @@ The effects: a delay with six types, a drive, and a reverb with five.
 
 <img class="shot" src="../../img/screen-fx.png" width="240" alt="The Space page: the delay's echoes as half-rings on the left, the reverb's tail as rings on the right">
 
-Echoes of the drones, before the reverb.
-
-### Repeats
-
-How many echoes. Past about 85 they run away into self-oscillation.
-
-### Mix
-
-How loud the echoes are.
-
-### Time
-
-70 ms to 1.46 s. Turning it bends the echoes' pitch, as tape does.
-
-### Type
-
-[[SEL]] + Time: Clean, Wide, Ping-pong, Tape, Grain or Self.
-
-### Drive
-
-Distorts the drones and their echoes together: ghost notes, beating, crackle.
+| Knob | What it does |
+|---|---|
+| **Repeats** | how many echoes. Past about 85 they run away into self-oscillation |
+| **Mix** | how loud the echoes are |
+| **Time** | 70 ms to 1.46 s. Turning it bends the echoes' pitch, as tape does |
+| **Type** | [[SEL]] + Time: Clean, Wide, Ping-pong, Tape, Grain or Self |
+| **Drive** | distorts the drones and their echoes together: ghost notes, beating, crackle |
 
 ## Reverb
 
 <img class="shot" src="../../img/screen-fx2.png" width="240" alt="The Details page: drive, time, damp and type, with the two SEL choices above">
 
-A room around everything, last in the chain.
-
-### Length
-
-0.3 to 40 s. At the top, **Inf**: a freeze.
-
-### Mix
-
-How loud the reverb is.
-
-### Damp
-
-Darkens the tail.
-
-### Type
-
-Room, Hall, Cathedral, Chorus hall or Shimmer.
-
-### Into reverb
-
-[[SEL]] + Type: Both, Echoes or Drones.
+| Knob | What it does |
+|---|---|
+| **Length** | 0.3 to 40 s. At the top, **Inf**: a freeze |
+| **Mix** | how loud the reverb is |
+| **Damp** | darkens the tail |
+| **Type** | Room, Hall, Cathedral, Chorus hall or Shimmer |
+| **Into reverb** | [[SEL]] + Type: Both, Echoes or Drones |
 
 ## Good to know
 

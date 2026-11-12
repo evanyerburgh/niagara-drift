@@ -22,39 +22,26 @@ Each drone's waveform, its sub-oscillator and its drive.
 
 <img class="shot" src="../../img/screen-osc.png" width="240" alt="The Osc page: each drone's waveform on the sine to square scale, and its pulse width">
 
-Each drone's waveform.
-
-### X-Wave
-
-Blends sine → triangle → saw → square.
-
-### Width
-
-The square's pulse width.
+| Knob | What it does |
+|---|---|
+| **X-Wave** | blends sine → triangle → saw → square |
+| **Width** | the square's pulse width |
 
 ## Sub · Drive
 
 <img class="shot" src="../../img/screen-source.png" width="240" alt="The Sub · Drive page: each drone's osc and sub lanes, shaped by the drive, and its sub's octave">
 
-Each drone's sub-oscillator, an octave or more below, and its drive.
-
-### Osc/Sub
-
-Crossfades the oscillator with the sub (the knob reads "Osc/Sb").
+| Knob | What it does |
+|---|---|
+| **Osc/Sub** | crossfades the oscillator with the sub (the knob reads "Osc/Sb") |
+| **Sub wave** | hold [[SEL]] and turn Osc/Sub: Square, Sine, Triangle or Saw |
+| **Drive** | pushes the drone into its filter |
 
 ### Sub octave
 
 A black key steps each drone's sub through octaves and subharmonics: [[G#3]] for drone I, [[G#4]] for drone II.
 
 <img src="../../img/black-keys-sub.png" width="560" alt="The black keys with the two sub keys picked out: G#3 for drone I, G#4 for drone II">
-
-### Sub wave
-
-Hold [[SEL]] and turn Osc/Sub: Square, Sine, Triangle or Saw.
-
-### Drive
-
-Pushes the drone into its filter.
 
 ## Good to know
 

@@ -13,71 +13,35 @@ The FM-1's knobs and buttons, and the header at the top of the screen.
 
 <img class="shot" src="../../img/panel-left.png" width="200" alt="The FM-1's left knobs: MASTER is Volume, SELECT the LFO rate, PRESETS Gesture time, ALGORITHM Movement; OCT− and OCT+ pick LFO I's and II's waves">
 
-Four knobs on the left always do the same; four on the right change with the page.
-
-### MASTER
-
-The volume. Past about four-fifths of its turn it overdrives: thicker, at about the same loudness.
-
-### SELECT
-
-The LFO's rate.
-
-### ALGORITHM
-
-Movement: how much the LFO moves the sound.
-
-### PRESETS
-
-Gesture time: how fast the gestures move.
-
-### KNOB 1–4
+| Knob | What it does |
+|---|---|
+| **MASTER** | the volume. Past about four-fifths it overdrives: thicker, at about the same loudness |
+| **SELECT** | the LFO's rate |
+| **ALGORITHM** | Movement: how much the LFO moves the sound |
+| **PRESETS** | Gesture time: how fast the gestures move |
+| **KNOB 1–4** | what the page shows. On the drone pages, KNOB 1–2 are drone I, KNOB 3–4 drone II |
 
 <img src="../../img/panel-knobs.png" width="360" alt="The FM-1's knobs 1 to 4: KNOB 1 and 2 for drone I, KNOB 3 and 4 for drone II">
-
-What the page shows. On the drone pages, KNOB 1–2 are drone I and KNOB 3–4 drone II.
 
 ## Buttons
 
 <img src="../../img/panel-buttons.png" width="400" alt="The FM-1's twelve buttons, each with the page it opens: FX Space, SEL Fine, ENV Life, LFO Sends, EDIT Osc, GLO Setup, HOME Drones, SAVE Store, ARP Swell, SEQ Partner, PLAY On/off, REC Loop">
 
-Eight buttons open pages; four do something.
-
-### Page buttons
-
-[[HOME]], [[FX]], [[ENV]], [[LFO]], [[EDIT]], [[SEQ]], [[GLO]] and [[ARP]] each open a page. Tap again for its next.
-
-### PLAY
-
-Fades the drones in or out.
-
-### SAVE
-
-Saves the sound.
-
-### SEL
-
-Hold for fine steps, and with other controls for their second job.
-
-### REC
-
-Records your moves, then loops them.
-
-### OCT− and OCT+
-
-LFO I's and LFO II's shape.
+| Button | What it does |
+|---|---|
+| [[HOME]] [[FX]] [[ENV]] [[LFO]] [[EDIT]] [[SEQ]] [[GLO]] [[ARP]] | open a page; tap again for its next |
+| [[PLAY]] | fades the drones in or out |
+| [[SAVE]] | saves the sound |
+| [[SEL]] | hold for fine steps, and with other controls for their second job |
+| [[REC]] | records your moves, then loops them |
+| [[OCT−]] [[OCT+]] | LFO I's and LFO II's shape |
 
 ## Header
 
-The top line of the screen.
-
-### Left
-
-The page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT.
-
-### Right
-
-The sound: its bank and key ("A5", "P6 SEANCE"), "changed" once you've moved it.
+| Side | What it shows |
+|---|---|
+| **Left** | the page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT |
+| **Right** | the sound: its bank and key ("A5", "P6 SEANCE"), "changed" once you've moved it |
 
 ## Good to know
 
