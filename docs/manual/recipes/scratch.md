@@ -1,15 +1,15 @@
 ---
-title: Build up from Bare
-tab: From Bare
+title: Build a sound from scratch
+tab: From scratch
 intro: One drone with everything off, then a control at a time
 kicker: Tutorial
-description: A Niagara Drift tutorial: start from one plain drone and build a sound up yourself, a control at a time.
+description: A Niagara Drift tutorial: start from one plain drone (P16 Bare) and build a sound up yourself, a control at a time.
 image: bare-1.png
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-### Build up from Bare {#bare}
+### Build a sound from scratch {#scratch}
 
 *One drone, everything off, then a control at a time*
 

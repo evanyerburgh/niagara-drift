@@ -54,7 +54,7 @@ def icon(name, cls="ic"):
 MENU_ICON = {"Play it": "play", "Start here": "flag", "Recipes": "cooking-pot", "Reference": "book-open",
              "Shortcuts": "keyboard", "Help": "lifebuoy", "About": "info"}
 TAB_ICON = {"sounds": "waveform", "gestures": "hand-pointing", "scenes": "floppy-disk", "time": "timer",
-            "performing": "faders", "bare": "plant"}
+            "performing": "faders", "scratch": "plant"}
 MENU = [("", "Play it", "the emulator: the firmware itself, in your browser"),
         ("#start-here", "Start here", "the first steps, beside the emulator"),
         ("manual/recipes/", "Recipes", "how to get a sound or a move"),
@@ -303,7 +303,7 @@ def onpage(groups, base, label):
 
 # ---- pages -------------------------------------------------------------------------------------------------------
 
-RECIPE_KINDS = ["sounds", "gestures", "scenes", "time", "performing", "bare"]   # bare: the tutorial, one walk-through
+RECIPE_KINDS = ["sounds", "gestures", "scenes", "time", "performing", "scratch"]   # scratch: the tutorial, one walk-through
 
 
 def page_html(rel, meta, body, current, side=""):
