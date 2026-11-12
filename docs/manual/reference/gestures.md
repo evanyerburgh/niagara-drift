@@ -61,7 +61,7 @@ Easing off slows them; letting go, they climb back into the hum.
 
 ### Chord · [[A4]], pressure
 
-The partners move one at a time to a beatless chord from Wander's scale (Pitch moves, KNOB 4), on the Tuning's
+The partners move one at a time to a beatless chord on the Scale (Pitch moves, KNOB 4), on the Tuning's
 notes, a different voicing every press.
 
 ### Snarl · [[B4]], pressure

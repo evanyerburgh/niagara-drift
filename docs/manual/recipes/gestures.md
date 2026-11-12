@@ -31,7 +31,7 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 1. Press **Chord**, [[A4]], slowly harder: the drones move into a chord.
 2. Ease off: they come back.
 
-> **Good to know.** Chord builds its chord from Wander's scale, on the **Pitch moves** page ([[SEQ]] twice, KNOB 4):
+> **Good to know.** Chord builds its chord on the **Scale**, on the **Pitch moves** page ([[SEQ]] twice, KNOB 4):
 > change the scale and the chord changes.
 
 ![Drones, Chord at 90%](../media/g-press-0.png "CHORD 90%")

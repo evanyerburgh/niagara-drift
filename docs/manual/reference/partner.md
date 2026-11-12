@@ -10,7 +10,7 @@ intro: SEQ: each drone's partner; Shift, glide and Wander
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Partner | I interval | I detune | II interval | II detune |
-| Pitch moves | Shift's move | pitch glide | II wander | Wander's scale |
+| Pitch moves | Shift's move | pitch glide | II wander | scale |
 
 ## Partner
 
@@ -53,13 +53,13 @@ How long a drone takes to reach a new pitch, from a knob, a scene or Wander (up 
 
 ### Wander
 
-A slow random melody for drone II, on a scale over drone I, within an octave of its own pitch, now and then coming
+A slow random melody for drone II, on the Scale over drone I, within an octave of its own pitch, now and then coming
 home. The knob is how often: 25–30 s apart at the bottom, 0.5–2 s at the top; 0 is off. Pitch glide slides it.
 
-### Wander's scale
+### Scale
 
-Minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just (drone I's harmonics 1–8, pure).
-Its notes follow the Tuning (Setup 2). Chord builds its chord from it too.
+The scale for Wander and the Chord gesture: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian,
+or just (drone I's harmonics 1–8, pure). Its notes follow the Tuning (Setup 2).
 
 ### The picture
 
