@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" font-family="Inter Tight, Helvetica Neue, Arial, sans-serif">
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- The whole LFO: one clock, two waves, the five places they go (LFO sends, Mods). Drawn in the site's colors (web/manual/manual.css), as lfo-chain.svg. -->
+<defs>
+  <marker id="lfo-map-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#dcbcff"/></marker>
+  <marker id="lfo-map-d" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffb04a"/></marker>
+  <marker id="lfo-map-e" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#45e3d3"/></marker>
+  <marker id="lfo-map-p" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffd6f0"/></marker>
+</defs>
+<rect width="760" height="380" rx="16" fill="#24081f"/>
+<text x="84" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">CLOCK</text>
+<text x="250" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">WAVES</text>
+<text x="452" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">× MOVEMENT</text>
+<text x="624" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">MOVES</text>
+<rect x="36.0" y="173" width="96" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="84" y="195.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">Clock</text>
+<text x="84" y="162" font-size="13" fill="#d3b3c4" text-anchor="middle">SELECT: rate</text>
+<rect x="206.0" y="123" width="88" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="250" y="145.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO I</text>
+<text x="250" y="176" font-size="13" fill="#d3b3c4" text-anchor="middle">OCT− shape</text>
+<rect x="206.0" y="233" width="88" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="250" y="255.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO II</text>
+<text x="250" y="286" font-size="13" fill="#d3b3c4" text-anchor="middle">OCT+ shape</text>
+<path d="M132 190 C170 190 170 140 202 140" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-map-a)"/>
+<path d="M132 190 C170 190 170 250 202 250" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-map-a)"/>
+<path d="M206 258 C150 300 84 296 84 211" fill="none" stroke="#ffd6f0" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#lfo-map-p)"/>
+<text x="132" y="318" font-size="13" fill="#ffd6f0" text-anchor="middle">Speed mod (Mods KNOB 1 · 2)</text>
+<path d="M294 140 C380 140 400 80 470 80" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<path d="M294 250 C380 250 400 80 470 80" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<rect x="472.0" y="66" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="500" y="85" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">F#3</text>
+<path d="M528 80 H560" fill="none" stroke="#ffb04a" stroke-width="2" marker-end="url(#lfo-map-d)"/>
+<text x="568" y="79" font-size="15" fill="#ffb04a" text-anchor="start" font-weight="600">I pitch · X-Wave</text>
+<text x="568" y="96" font-size="12.5" fill="#d3b3c4" text-anchor="start">G#3 on · KNOB 1</text>
+<path d="M294 140 C380 140 400 150 470 150" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<path d="M294 250 C380 250 400 150 470 150" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<rect x="472.0" y="136" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="500" y="155" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">A#3</text>
+<path d="M528 150 H560" fill="none" stroke="#ffb04a" stroke-width="2" marker-end="url(#lfo-map-d)"/>
+<text x="568" y="149" font-size="15" fill="#ffb04a" text-anchor="start" font-weight="600">I cutoff · resonance</text>
+<text x="568" y="166" font-size="12.5" fill="#d3b3c4" text-anchor="start">C#4 on · KNOB 2</text>
+<path d="M294 140 C380 140 400 220 470 220" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<path d="M294 250 C380 250 400 220 470 220" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<rect x="472.0" y="206" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="500" y="225" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">F#4</text>
+<path d="M528 220 H560" fill="none" stroke="#45e3d3" stroke-width="2" marker-end="url(#lfo-map-e)"/>
+<text x="568" y="219" font-size="15" fill="#45e3d3" text-anchor="start" font-weight="600">II pitch · X-Wave</text>
+<text x="568" y="236" font-size="12.5" fill="#d3b3c4" text-anchor="start">G#4 on · KNOB 3</text>
+<path d="M294 140 C380 140 400 290 470 290" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<path d="M294 250 C380 250 400 290 470 290" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<rect x="472.0" y="276" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="500" y="295" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">A#4</text>
+<path d="M528 290 H560" fill="none" stroke="#45e3d3" stroke-width="2" marker-end="url(#lfo-map-e)"/>
+<text x="568" y="289" font-size="15" fill="#45e3d3" text-anchor="start" font-weight="600">II cutoff · resonance</text>
+<text x="568" y="306" font-size="12.5" fill="#d3b3c4" text-anchor="start">C#5 on · KNOB 4</text>
+<path d="M294 140 C380 140 400 352 470 352" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<path d="M294 250 C380 250 400 352 470 352" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<rect x="472.0" y="338" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="500" y="357" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">D#5</text>
+<path d="M528 352 H560" fill="none" stroke="#ffd6f0" stroke-width="2" marker-end="url(#lfo-map-p)"/>
+<text x="568" y="351" font-size="15" fill="#ffd6f0" text-anchor="start" font-weight="600">Delay time</text>
+<text x="568" y="368" font-size="12.5" fill="#d3b3c4" text-anchor="start">Mods KNOB 3</text>
+<line x1="452" y1="52" x2="452" y2="364" stroke="#dcbcff" stroke-width="1.2" stroke-dasharray="3 5" stroke-opacity=".7"/>
+<text x="424" y="372" font-size="11" fill="#d3b3c4" text-anchor="end" font-family="IBM Plex Mono, Menlo, monospace">ALGORITHM</text>
+</svg>

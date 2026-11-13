@@ -16,16 +16,23 @@ On every other page, each drone has three keys, and five more set the links betw
 
 <img src="../../img/black-keys-drones.png" width="720" alt="The black keys for the drones: F#3 Partner, G#3 Sub, A#3 Filter for drone I; C#4 Pitch lock, D#4 LFO reset; F#4 Partner, G#4 Sub, A#4 Filter for drone II; C#5 Pitch link, D#5 Hard sync, F#5 X-mod">
 
-| Key | Switches |
-|---|---|
-| [[F#3]] · [[F#4]] | drone I's · drone II's partner, on or off |
-| [[G#3]] · [[G#4]] | the sub: −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct |
-| [[A#3]] · [[A#4]] | the filter: low-, band- or high-pass |
-| [[C#4]] | pitch lock: scenes and Presets keep the drones' pitches (on to start) |
-| [[D#4]] | LFO reset |
-| [[C#5]] | pitch link: drone II follows drone I |
-| [[D#5]] | hard sync: drone II to drone I |
-| [[F#5]] | cross-mod: off, I moves II's cutoff, bend each other, Snarl |
+Each drone's own keys:
+
+| Switch | Drone I | Drone II | Choices |
+|---|---|---|---|
+| **Partner** | [[F#3]] | [[F#4]] | on or off |
+| **Sub** | [[G#3]] | [[G#4]] | −1 oct, −2 oct, ⅓, ⅕, −3 oct, −4 oct |
+| **Filter** | [[A#3]] | [[A#4]] | low-, band- or high-pass |
+
+The keys for both:
+
+| Key | Switch | Choices |
+|---|---|---|
+| [[C#4]] | **Pitch lock** | scenes and Presets keep the drones' pitches (on to start) |
+| [[D#4]] | **LFO reset** | restarts the LFO; hold to lock it to the Swell |
+| [[C#5]] | **Pitch link** | drone II follows drone I |
+| [[D#5]] | **Hard sync** | drone II to drone I |
+| [[F#5]] | **Cross-mod** | off, I moves II's cutoff, bend each other, Snarl |
 
 ## LFO keys
 
@@ -33,33 +40,43 @@ On the [LFO pages](lfo-pages.md), each drone's four keys set its two sends.
 
 <img src="../../img/black-keys-lfo.png" width="720" alt="The black keys on the LFO pages: F#3 Pitch LFO, G#3 Pitch to X-Wave, A#3 Cutoff LFO, C#4 Cutoff to reso for drone I; D#4 LFO reset; F#4, G#4, A#4, C#5 the same for drone II; D#5 Delay LFO; F#5 X-mod">
 
-| Key | Switches |
-|---|---|
-| [[F#3]] · [[F#4]] | which LFO moves the pitch: I, II or both |
-| [[G#3]] · [[G#4]] | the pitch send moves X-Wave instead |
-| [[A#3]] · [[A#4]] | which LFO moves the cutoff: I, II or both |
-| [[C#4]] · [[C#5]] | the cutoff send moves resonance instead |
-| [[D#5]] | which LFO moves the delay's time: I, II or both |
+Each drone's own keys:
+
+| Switch | Drone I | Drone II | Choices |
+|---|---|---|---|
+| **Pitch LFO** | [[F#3]] | [[F#4]] | which LFO moves the pitch: I, II or both |
+| **Pitch to X-Wave** | [[G#3]] | [[G#4]] | the pitch send moves X-Wave instead |
+| **Cutoff LFO** | [[A#3]] | [[A#4]] | which LFO moves the cutoff: I, II or both |
+| **Cutoff to reso** | [[C#4]] | [[C#5]] | the cutoff send moves resonance instead |
+
+The others:
+
+| Key | Switch | Choices |
+|---|---|---|
+| [[D#5]] | **Delay LFO** | which LFO moves the delay's time: I, II or both |
+| [[D#4]] · [[F#5]] | **LFO reset**, **Cross-mod** | as on every other page |
 
 ## Finding a key while you play
 
 <img class="shot" src="../../img/screen-keymap.png" width="240" alt="The black keys' map while SEL is held: the keys lit as on the panel, their groups named, the key touched named with its setting">
 
-### Hold SEL
+[[SEL]] + any black key shows what the key does, without switching it.
 
-The screen draws the black keys, lit as on the panel.
-
-### Touch a key
-
-While SEL is held, the screen names the key and its setting, without switching it.
+1. Hold [[SEL]]. The screen draws the black keys, lit as on the panel.
+2. Still holding SEL, press a black key. The screen names it and its setting; nothing changes.
+3. Let go of SEL, then tap the key to switch it.
 
 ## Good to know
 
-- **Lights:** dark is off, lit is on. A key of several choices is dim on its first, lit on the second, winking on a
-  third.
-- **Filter:** low-pass (dim), band-pass (winking), high-pass (lit).
-- **Sub:** −1 octave (dim), −2 octaves (lit), then the subharmonics ⅓ and ⅕ (winking).
-- **An LFO key:** LFO I (dim), II (lit), both (winking). The screen says what now moves what ("LFO II → I PITCH").
+**Lights:** dark is off, lit is on. A key of several choices shows which by its light:
+
+| Key | Dim | Lit | Winking |
+|---|---|---|---|
+| **Filter** | low-pass | high-pass | band-pass |
+| **Sub** | −1 oct | −2 oct | ⅓, ⅕ |
+| **An LFO key** | LFO I | LFO II | both |
+
+- **An LFO key** switched: the screen says what now moves what ("LFO II → I PITCH").
 - **Pitch lock:** the pitch knobs still tune.
 - **Pitch link:** KNOB 3 on Pitch sets the gap ("+7 st").
 - **LFO reset:** hold half a second to lock the LFO to the Swell; hold again to free it.

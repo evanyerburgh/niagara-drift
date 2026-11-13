@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# The Reference's screen header (tools/make_manual.py --renders): screens only. P6 played, a knob turned ("changed"),
+# Wash held: the page's name and the gesture at the left, the sound at the right.
+notips
+phones 1
+set 74 0
+set 71 0
+tapkey w5
+tap PLAY
+wait 3000
+expect view 0
+turn K1 4 150
+wait 800
+key w15 down
+wait 2000
+shot r-header-0.png
+key w15 up

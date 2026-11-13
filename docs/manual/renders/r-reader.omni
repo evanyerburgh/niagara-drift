@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# The Reference's Hearing your screen (tools/make_manual.py --renders): screens only. P1 tapped, played, Pitch opened
+# with a screen reader listening; the page sends "Pitch page. Drone 1: Pitch D3, Reso 25. Drone 2: Pitch A3, Reso 25."
+# (heard as "... resonance 25 ...": firmware/words.tsv)
+notips
+phones 1
+listen
+tapkey w0
+tap PLAY
+wait 9000
+tap HOME
+wait 1500
+said Pitch_page._Drone_1:_Pitch_D3,_Reso_25._Drone_2:_Pitch_A3,_Reso_25.
+shot r-reader-0.png

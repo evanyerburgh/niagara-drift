@@ -23,6 +23,9 @@ One cycle in 100 s to 70 Hz.
 
 Every LFO depth together, from still (0%) to double (200%).
 
+> **Movement scales what you set.** It only scales the depths you've set: at 0% nothing moves, at 100% (the middle)
+> the depths are as set.
+
 ### Shapes (OCT− and OCT+)
 
 LFO I's and LFO II's wave: tap for the next.
@@ -53,10 +56,14 @@ LFO I's and LFO II's wave: tap for the next.
 
 ## Good to know
 
+### Rate and shapes
+
 - **Rate:** most of the turn is 100 s to 10 s, a second a click. Slow rates show a cycle's length ("21s", "1m40").
 - **Shapes:** [[SEL]] + OCT steps back; each light pulses with its wave.
 - **AND and OR** are two square waves together, one 3 times as fast (LFO I) or 5 times (LFO II). AND steps between 2
   levels, OR 4: on a drone's pitch, a pattern of 2 or 4 notes.
-- **Movement** only scales depths you've set: at 0% nothing moves, at 100% (the middle) the depths are as set.
+
+### Movement and the other knob
+
 - **A depth that can't be heard** says why on the screen (Movement at 0%, or its wave off).
 - **PRESETS,** the other left knob, is Gesture time: see [Gestures](gestures.md).

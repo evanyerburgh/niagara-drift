@@ -73,14 +73,21 @@ main:focus { outline: none; }
 .prose img.shot ~ ul { list-style: none; padding-left: 0; }
 .prose img.shot ~ ul > li { overflow: hidden; position: relative; padding-left: 1.3rem; }
 .prose img.shot ~ ul > li::before { content: "•"; position: absolute; left: .35rem; }
-.prose img.shot ~ ol > li { overflow: hidden; }
-.prose h2, .prose h3 { clear: both; }   /* a subhead starts below the picture beside the table above it */
+.prose img.shot ~ ol { list-style: none; padding-left: 0; counter-reset: n; }   /* numbers drawn, as the bullets */
+.prose img.shot ~ ol > li { overflow: hidden; position: relative; padding-left: 1.6rem; counter-increment: n; }
+.prose img.shot ~ ol > li::before { content: counter(n) "."; position: absolute; left: .2rem; }
+.prose h2, .prose h3 { clear: both; scroll-margin-top: 20px; }   /* a subhead starts below the picture beside the table above it */
+.prose svg.diagram { display: block; clear: both; width: 100%; max-width: 760px; height: auto; margin: 1rem 0 1.4rem; }   /* a drawing (docs/manual/media/*.svg) */
+.prose svg.diagram.tall { display: none; max-width: 400px; }
+.prose svg.diagram:not(.wide) + p { margin-top: -.8rem; font-size: .88rem; line-height: 1.4; color: var(--muted); max-width: 760px; }   /* its caption */
+@media (max-width: 600px) { .prose svg.diagram.wide { display: none; } .prose svg.diagram.tall { display: block; } }
 @media (max-width: 600px) { .prose img.shot { float: none; display: block; margin: 0 0 16px; } }
 .prose img { max-width: 100%; height: auto; image-rendering: pixelated; border-radius: 8px; }
 .prose code { font: 500 .88em var(--mono); background: var(--card); padding: .05em .35em; border-radius: 5px; }
 .tablewrap { overflow-x: auto; margin: 1rem 0 1.4rem; }
 .prose table { border-collapse: collapse; width: 100%; font-size: .95rem; }
 .prose th, .prose td { text-align: left; vertical-align: top; padding: .5rem .7rem; border-bottom: 1px solid var(--rule); }
+.prose table:not(:has(thead)) td:first-child { width: 10rem; }   /* a list of terms (About's details): one column width down the page */
 .prose th { font: 500 .78rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .note { background: var(--card); border-left: 4px solid var(--lfo); border-radius: 0 12px 12px 0; padding: 4px 16px; margin: 1.2rem 0; }
 .lead { font-size: 1.15rem; }
@@ -105,16 +112,17 @@ main:focus { outline: none; }
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
 .tabs a { text-decoration: none; padding: .5em 1em; border-radius: 999px; background: var(--card); color: var(--ink); font-weight: 600; }
 .tabs a[aria-current] { background: var(--pale); color: var(--black); }
-.onpage-nav { margin-bottom: 40px; }
-.prose h2.group { font: 600 1.45rem/1.2 "Inter Tight", sans-serif; letter-spacing: -.01em; margin: 34px 0 12px; }
-.prose .onpage-nav h2.group:first-child { margin-top: 6px; }
-.onpage { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 0 0 8px; padding: 0; list-style: none; }
-.prose .onpage li { margin: 0; max-width: none; }
-.onpage a, .onpage li.soon div { display: block; height: 100%; border-radius: 14px; padding: 12px 14px; text-decoration: none; color: var(--ink); }
-.onpage a { background: var(--card); }
-.onpage a b { display: block; color: var(--pale); }
-.onpage span { font-size: .88rem; color: var(--muted); line-height: 1.35; display: block; margin-top: .2rem; }
-.onpage li.soon div { border: 1px dashed var(--rule); color: var(--muted); }
+.onpage-nav { margin: 0 0 36px; }   /* the page's recipes, a line a group (make_manual.py onpage) */
+.onpage { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.prose .onpage li { display: grid; grid-template-columns: 10rem minmax(0, 1fr); gap: 4px 16px; margin: 0; max-width: none;
+                    padding: .55rem 0; border-bottom: 1px solid var(--rule); }
+.onpage li > b { font: 500 .74rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding-top: .2rem; }
+.prose .onpage li:not(:has(> b)) { grid-template-columns: minmax(0, 1fr); }
+.onpage .names { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.onpage .names a { color: var(--pale); font-weight: 600; text-decoration: none; }
+.onpage .names a:hover { text-decoration: underline; }
+.onpage .soon { color: var(--muted); }
+@media (max-width: 600px) { .prose .onpage li { grid-template-columns: minmax(0, 1fr); } }
 .onpage li.soon small { display: block; font: 500 .68rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .onpage li.soon b { display: block; color: var(--ink); }
 
@@ -138,6 +146,7 @@ main:focus { outline: none; }
 @media (max-width: 640px) { .recipe-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: none;
                                            grid-template-areas: "how" "shots" "listen"; } }
 .prose .moves { counter-reset: m; list-style: none; padding: 0; margin: .4rem 0 0; }
+.prose h4.stage { font: 500 .78rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 1.4rem 0 .2rem; }   /* a walk-through's stages */
 .prose .moves li { counter-increment: m; position: relative; padding: .35rem 0 .35rem 2.4rem; margin: 0; }
 .moves li::before { content: counter(m); position: absolute; left: 0; top: .35rem; width: 1.7rem; height: 1.7rem; border-radius: 50%;
                     background: var(--pale); color: var(--black); font: 600 .9rem/1.7rem "Inter Tight", sans-serif; text-align: center; }

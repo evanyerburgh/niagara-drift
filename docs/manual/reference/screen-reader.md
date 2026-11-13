@@ -11,37 +11,29 @@ Niagara Drift can say what its screen shows, for players who can't see it.
 
 ## Screen Reader
 
-Charles Vestal's [FM-1 Screen Reader](https://charlesvestal.github.io/fm1-reader/) is a web page that speaks it.
+Charles Vestal's [FM-1 Screen Reader](https://charlesvestal.github.io/fm1-reader/) is a web page that speaks it. More
+about it, and the other firmwares it reads, in [its own guide](https://github.com/charlesvestal/fm1-reader#readme).
 
-### Connecting
+<img class="diagram" src="../media/reader.svg" alt="">
 
-Plug the FM-1 into a computer, open the Screen Reader in Chrome or Edge, and click Connect.
-
-### Its voice or yours
-
-It speaks in its own voice, or hands the words to your screen reader (VoiceOver, NVDA, JAWS, TalkBack).
+1. Plug the FM-1 into a computer over USB.
+2. Open the Screen Reader in Chrome or Edge, and click Connect.
+3. Listen: it speaks in its own voice, or hands the words to your screen reader (VoiceOver, NVDA, JAWS, TalkBack).
 
 ## What it says
 
-### Pages
+<img class="shot" src="../media/r-reader-0.png" width="240" alt="">
 
-A page's name and its knobs, as it opens.
+For the Pitch page pictured here, as it opens: "Pitch page. Drone 1: Pitch D3, resonance 25. Drone 2: Pitch A3,
+resonance 25."
 
-### Knobs
+| When | It says | For example |
+|---|---|---|
+| **A page opens** | its name and its knobs | "Pitch page. Drone 1: Pitch D3, resonance 25. Drone 2: Pitch A3, resonance 25." |
+| **A knob turns** | its name and value | "Drone 1 resonance 28" |
+| **A key is tapped** | what it set | "Drone 1 filter BP" |
+| **[[SEL]] held, a black key touched** | what it does and what a press would do, without switching it | "G sharp 3: drone 1 Sub, 1 octave down. Press for 2 octaves down" |
+| **PLAY, a scene, a gesture** | what started or is on its way | "Play"; "to Preset 2 embers"; "wash" |
+| **You ask** | everything on the screen: the page, whether it's playing, the sound | the page as it opens, then "Playing, on its way to Preset 2 embers. Swell on." |
 
-A knob's name and value, as it settles.
-
-### Keys
-
-What a key set, and what the next press does.
-
-### Messages
-
-PLAY and stop, a scene or Preset on its way, a gesture coming in.
-
-## Good to know
-
-- **Examples:** "Drones page. Drone 1: Level 84, Cutoff 57.5 …"; "Drone 1 Cutoff 60.5"; "Drone 1 band-pass filter,
-  A sharp 3 for high-pass"; "to Preset 2 Embers".
-- **[[SEL]] held, a black key touched:** it says what the key does, without switching it.
-- **On request:** everything on the screen: the page and its keys, whether it's playing, and the sound.
+The examples are the words as the Screen Reader says them; your own screen reader may pronounce them its own way.

@@ -5,62 +5,84 @@ intro: When something doesn't work
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## Quick answers
+When something doesn't work: pick what's happening.
 
-- **Drone II went quiet, the header says II OUT:** [[SEL]] + [[PLAY]] brings it back.
-- **Back to the sound before a scene:** [[SEL]] + [[SAVE]] (again to go forward).
-- **Drone II keeps jumping to other notes:** that's Wander. Turn it to 0 on Pitch moves ([[SEQ]] twice, KNOB 3).
-- **A knob's value is gray:** it can't be heard as things are, and the screen says why ("needs sqr", "needs
-  [[F#3]]", Movement at 0%).
-- **The low end is missing on the speaker:** it can't play the lowest notes and clicks; listen on headphones.
-- **A Preset doesn't play at its own pitch:** Pitch lock ([[C#4]]) keeps the pitch you're on; turn it off.
+<ul class="doors">
+<li><a href="#installing-and-updating"><img class="ic" src="../../web/manual/icons/download-simple.svg" alt=""><small>Getting it</small><b>Installing and updating</b><span>The web installer, a cable, keeping your sounds</span></a></li>
+<li><a href="#an-install-doesn-t-take"><img class="ic" src="../../web/manual/icons/lifebuoy.svg" alt=""><small>Stuck</small><b>An install doesn't take</b><span>Nothing changes, an error, an FM-1 that won't start</span></a></li>
+<li><a href="#sound-and-playing"><img class="ic" src="../../web/manual/icons/speaker-high.svg" alt=""><small>While playing</small><b>Something sounds wrong</b><span>A drone went quiet, notes jump, a value is gray, no bass</span></a></li>
+<li><a href="#backups"><img class="ic" src="../../web/manual/icons/floppy-disk.svg" alt=""><small>Your sounds</small><b>Backups</b><span>Saving and restoring your sounds and scenes</span></a></li>
+<li><a href="#going-back-or-to-another-firmware"><img class="ic" src="../../web/manual/icons/arrows-left-right.svg" alt=""><small>Leaving</small><b>Going back</b><span>To M-VAVE's firmware, or to another one</span></a></li>
+<li><a href="#report-a-problem"><img class="ic" src="../../web/manual/icons/flag.svg" alt=""><small>Still not right</small><b>Report a problem</b><span>Tell us what happened</span></a></li>
+</ul>
 
 ## Installing and updating
 
-- **Install** from the [web installer](https://evanyerburgh.github.io/niagara-drift/install/) in Chrome or Edge, with a
-  USB data cable straight into the computer.
-- **Update:** run the installer again. Your sounds and scenes are kept, unless that version's notes in the
-  [changelog](../../CHANGELOG.md) say otherwise.
-- Installing firmware is at your own risk.
+| To | Do |
+|---|---|
+| **Install** | open the [web installer](https://evanyerburgh.github.io/niagara-drift/install/) in Chrome or Edge, with a USB data cable straight into the computer |
+| **Update** | run the installer again. Your sounds and scenes are kept, unless that version's notes in the [changelog](../../CHANGELOG.md) say otherwise |
 
-## Backups
+Installing firmware is at your own risk.
 
-- **Before every install** over Niagara Drift, both installers save your sounds, scenes and settings to a file: the
-  web installer into your downloads (and it offers to put them back), the terminal one into
-  `~/niagara-drift-backups/`.
-- **Any time:** the web installer's "Your sounds and scenes" card saves or restores one, as
-  `python3 tools/fm1_install.py --backup` and `--restore FILE` do. Each reads the other's files.
-- **Trying another firmware:** back up first, restore when you come back.
-- **Another FM-1:** a backup leaves out the knobs' calibration, which belongs to each FM-1, so it can go onto another.
+## An install doesn't take
 
-**Restoring is safe.** The whole backup goes onto the FM-1 and is checked first, changing nothing. The FM-1 asks
-**RESTORE FROM USB?**: [[SEL]] puts it back, [[HOME]] keeps what it has (as does a minute without either). Then your
-sounds and scenes change all together or not at all, even if the power goes off halfway (the next power-on finishes
-it). A damaged file is refused before anything is written.
+Nothing is written until the FM-1 has checked the whole package, so trying again is safe. Work down the steps:
 
-## Going back, or to another firmware
-
-- **The installer's "Back to M-VAVE's firmware"** writes M-VAVE's firmware back, V16 or V15, over the same cable. Or
-  use M-VAVE's updater, M-UPGRADE, from [m-vave.com/download](https://www.m-vave.com/download).
-- **Other firmwares** mostly expect M-VAVE's: go back first, then install them.
-- **Safe mode:** if Niagara Drift fails to start twice in a row, it comes up with no sound and USB on, and the
-  installer still works.
-
-## If an install doesn't take
-
-1. Use a USB data cable straight into the computer, close other apps that use MIDI (a DAW, M-UPGRADE), replug, try
-   again. Nothing is written until the FM-1 has checked the whole package, so trying again is safe.
+1. Use a USB data cable straight into the computer, close other apps that use MIDI (a DAW, M-UPGRADE), replug, and
+   try again.
 2. Going back from 0.2 or another firmware, and nothing was written: choose the other M-VAVE file (V16 or V15). Each
    takes back only the version whose bootloader the FM-1 has; from 0.2.1 on, Niagara Drift takes either.
 3. Still stuck: hold [[OCT−]] and [[OCT+]] for 5 seconds. The FM-1 goes into its chip's own update mode, which no
    firmware can get in the way of, and [M-Flasher](https://github.com/jvitkauskas/m-flasher) (Windows, Mac, Linux)
    puts M-VAVE's firmware back. If an FM-1 won't start at all, see [BUILDING.md](../../BUILDING.md#install).
 
-**Newer FM-1s on 0.2:** up to 0.2, Niagara Drift didn't recognize the memory chip of some newer FM-1s; there it couldn't
-save and ignored installs. On such an FM-1 running 0.2, use step 3 to leave it. Since 0.2.1 it takes any standard
-chip: the newer UC25HQ80 (ID B36014) and the first Puya P25Q80 (856014).
+> **Newer FM-1s on 0.2.** Up to 0.2, Niagara Drift didn't recognize the memory chip of some newer FM-1s; there it
+> couldn't save and ignored installs. On such an FM-1 running 0.2, use step 3 to leave it. Since 0.2.1 it takes any
+> standard chip: the newer UC25HQ80 (ID B36014) and the first Puya P25Q80 (856014).
 
-## Something else
+## Sound and playing
+
+| What's happening | What to do |
+|---|---|
+| **Drone II went quiet,** [the header](reference/controls.md#screen-header) says II OUT | [[SEL]] + [[PLAY]] brings it back |
+| **You want the sound before a scene** | [[SEL]] + [[SAVE]] goes back; again goes forward |
+| **Drone II keeps jumping to other notes** | that's Wander: turn it to 0 on Pitch moves ([[SEQ]] twice, KNOB 3) |
+| **A knob's value is gray** | it can't be heard as things are; the screen says why ("needs sqr", "needs [[F#3]]", Movement at 0%) |
+| **The low end is missing on the speaker** | it can't play the lowest notes and clicks: listen on headphones |
+| **A Preset doesn't play at its own pitch** | Pitch lock ([[C#4]]) keeps the pitch you're on: turn it off |
+
+## Backups
+
+| When | What happens |
+|---|---|
+| **Before every install** over Niagara Drift | both installers save your sounds, scenes and settings to a file: the web installer into your downloads (and it offers to put them back), the terminal one into `~/niagara-drift-backups/` |
+| **Any time** | the web installer's "Your sounds and scenes" card saves or restores one, as `python3 tools/fm1_install.py --backup` and `--restore FILE` do; each reads the other's files |
+| **Trying another firmware** | back up first, restore when you come back |
+| **Onto another FM-1** | a backup leaves out the knobs' calibration, which belongs to each FM-1, so it can go onto another |
+
+### Restoring is safe
+
+<img class="shot" src="../media/r-help-0.png" width="240" alt="The FM-1 asking RESTORE FROM USB? in a banner over the Drones page">
+
+1. The whole backup goes onto the FM-1 and is checked first, changing nothing. A damaged file is refused before
+   anything is written.
+2. The FM-1 asks **RESTORE FROM USB?**: [[SEL]] puts it back; [[HOME]] keeps what it has, as does a minute without
+   either.
+3. Your sounds and scenes change all together or not at all, even if the power goes off halfway: the next power-on
+   finishes it.
+
+## Going back, or to another firmware
+
+| To | Do |
+|---|---|
+| **M-VAVE's firmware** | the installer's "Back to M-VAVE's firmware" writes V16 or V15 back over the same cable; or use M-VAVE's updater, M-UPGRADE, from [m-vave.com/download](https://www.m-vave.com/download) |
+| **Another firmware** | most expect M-VAVE's: go back first, then install them |
+
+> **Safe mode.** If Niagara Drift fails to start twice in a row, it comes up with no sound and USB on, and the
+> installer still works.
+
+## Report a problem
 
 It's tested on one FM-1 so far. If something goes wrong, sounds wrong or could be better,
 [open an issue](https://github.com/evanyerburgh/niagara-drift/issues): what you did, what happened, and the version

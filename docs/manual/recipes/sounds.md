@@ -1,14 +1,11 @@
 ---
 title: Sounds
-intro: Explore Niagara Drift and find the sounds you want to make
+intro: Ticks, bells, sync sweeps, warbling echoes, a frozen chord
 description: Recipes for sounds on Niagara Drift: ticks, a singing filter, hard sync, metallic cross-FM bells, stepped figures, warbling echoes, a frozen chord.
 image: ticks-1.png
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
-
-Each recipe is a sound that takes more than one knob: a key and a knob together, or settings on two or three pages.
-Each sound example starts from a different Preset.
 
 ## Tone and texture
 
@@ -19,7 +16,7 @@ Each sound example starts from a different Preset.
 Take drone I down to its lowest notes and its sub four octaves under that, and the sub stops being a tone: it becomes
 a slow tick, a few clicks a second under drone II, a pulse to play against.
 
-1. Press [[HOME]] for **Pitch**, and turn KNOB 1 down to drone I's lowest notes: **A0** (27.5 Hz), about 29 clicks
+1. Press [[HOME]] twice for **Pitch**, and turn KNOB 1 down to drone I's lowest notes: **A0** (27.5 Hz), about 29 clicks
    from where most Presets start.
 2. Press [[EDIT]] twice for **Sub · Drive**, and tap [[G#3]], drone I's sub, until the screen says **−4 oct**. It
    goes round −1, −2, ⅓, ⅕, −3, −4.
@@ -48,7 +45,7 @@ a slow tick, a few clicks a second under drone II, a pulse to play against.
 Turn a filter's resonance up and it rings on the drone's notes; let the LFO move the resonance instead of the cutoff,
 and the ring swells and fades on its own.
 
-1. Press [[HOME]] for **Pitch**, and turn KNOB 2 and KNOB 4, the resonances, up: the filters ring. Their last dot is
+1. Press [[HOME]] twice for **Pitch**, and turn KNOB 2 and KNOB 4, the resonances, up: the filters ring. Their last dot is
    red: there they ring on their own.
 2. Press [[HOME]] again for **Drones**, and turn the cutoffs (KNOB 2 and KNOB 4) up: the ring brighter.
 3. Press [[LFO]] for **LFO sends**, and tap [[C#4]] and [[C#5]]: on the LFO pages they switch each drone's cutoff
@@ -97,6 +94,30 @@ not its note, a tearing, vocal, laser-like sweep.
 
 ## Cross-mod
 
+### Drone I shaping drone II {#xfilter}
+
+*Drone I's sound moving drone II's filter*
+
+At key 11's first setting, drone I's sound moves drone II's filter, as fast as drone I sounds: drone II growls,
+buzzes and takes on drone I's pitch as a grain.
+
+1. Tap black key 11, [[F#5]], once: it lights, **I moves II's cutoff**.
+2. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up: the growl deepens.
+3. Press [[HOME]] twice for **Pitch**, and move drone I's pitch (KNOB 1): the growl changes its grain.
+
+> **Good to know.** It's strongest with drone II's filter resonant and band-pass ([[A#4]]), as in **Vespers** (P3)
+> here. **Seance** (P6) uses it gently.
+
+![Mods, I moves II's cutoff](../media/xfilter-0.png "I moves II's cutoff")
+![Pitch, drone I moved to G3](../media/xfilter-1.png "drone I moved to G3")
+
+**Listen** (`xfilter`)
+
+- 0:00 P3 Vespers as it starts: saws through band-pass filters
+- 0:01 key 11 once: drone I's sound moves drone II's filter: drone II growls and shimmers
+- 0:04 X-mod up: the growl deepens into a buzzing, vocal edge
+- 0:12 drone I's pitch moved: the growl changes its grain
+
 ### Metallic bells {#bells}
 
 *Cross-FM: each drone bending the other's pitch, high and pure, into bells*
@@ -122,30 +143,6 @@ into a metallic, bell-like sound; turned higher it clangs and runs wild.
 - 0:00 two pure sines, high, a tritone apart
 - 0:01 bend each other, X-mod up: they ring into one metallic, bell-like tone
 - 0:09 X-mod higher: the bells clang and run wild
-
-### Drone I shaping drone II {#xfilter}
-
-*Drone I's sound moving drone II's filter*
-
-At key 11's first setting, drone I's sound moves drone II's filter, as fast as drone I sounds: drone II growls,
-buzzes and takes on drone I's pitch as a grain.
-
-1. Tap black key 11, [[F#5]], once: it lights, **I moves II's cutoff**.
-2. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up: the growl deepens.
-3. Press [[HOME]] twice for **Pitch**, and move drone I's pitch (KNOB 1): the growl changes its grain.
-
-> **Good to know.** It's strongest with drone II's filter resonant and band-pass ([[A#4]]), as in **Vespers** (P3)
-> here. **Seance** (P6) uses it gently.
-
-![Mods, I moves II's cutoff](../media/xfilter-0.png "I moves II's cutoff")
-![Pitch, drone I moved to G3](../media/xfilter-1.png "drone I moved to G3")
-
-**Listen** (`xfilter`)
-
-- 0:00 P3 Vespers as it starts: saws through band-pass filters
-- 0:01 key 11 once: drone I's sound moves drone II's filter: drone II growls and shimmers
-- 0:04 X-mod up: the growl deepens into a buzzing, vocal edge
-- 0:12 drone I's pitch moved: the growl changes its grain
 
 ### Snarl {#snarl}
 
@@ -315,7 +312,7 @@ play over the frozen chord.
 
 1. Press [[FX]] for **Space**. Turn KNOB 4, the reverb's Mix, up, then KNOB 3, Length, all the way: **Inf**, "freeze"
    in blue.
-2. Press [[HOME]] for **Pitch**, and turn KNOB 1 and KNOB 3 to new notes: the drones play over the frozen chord.
+2. Press [[HOME]] twice for **Pitch**, and turn KNOB 1 and KNOB 3 to new notes: the drones play over the frozen chord.
 3. Turn Length back down to let it go, or stop with [[PLAY]].
 
 > **Good to know.** On Details, [[SEL]] + KNOB 4 picks what goes into the reverb: **Drones** freezes the drones and

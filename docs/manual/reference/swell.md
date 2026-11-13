@@ -13,6 +13,8 @@ A tremolo on both drones, from a slow breath to a hard gate, on its own or in ti
 
 [[ARP]] opens the Swell page.
 
+<img src="../../img/knobs-swell.png" width="520" alt="Knobs 1 to 4 on Swell: rate, depth, shape, swing">
+
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Swell | rate (on a MIDI clock: division) | depth | shape | swing |
@@ -32,7 +34,7 @@ On the page, tap [[ARP]] to start or stop it.
 
 ## Good to know
 
-- **The starting sound** has it on: a slow breath, 40 deep. The header says **on**, or **off · tap ARP**.
+- **The starting sound** has it on: a slow breath, 40 deep. [The header](controls.md#screen-header) says **on**, or **off · tap ARP**.
 - **"ramp 100":** the rise takes 97% of each breath.
 - **An LFO locked to the Swell** ([[D#4]], held) restarts on its bars, so it follows a clock too.
 - **The picture:** two bars, four breaths, as strands meeting at a dot where the Swell is now.

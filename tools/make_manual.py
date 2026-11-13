@@ -57,7 +57,7 @@ TAB_ICON = {"sounds": "waveform", "gestures": "hand-pointing", "scenes": "floppy
             "performing": "faders", "scratch": "plant"}
 MENU = [("", "Play it", "the emulator: the firmware itself, in your browser"),
         ("#start-here", "Start here", "the first steps, beside the emulator"),
-        ("manual/recipes/", "Recipes", "how to get a sound or a move"),
+        ("manual/recipes/sounds/", "Recipes", "how to get a sound or a move"),
         ("manual/reference/", "Reference", "every page, knob and key"),
         ("manual/reference/shortcuts/", "Shortcuts", "every combination, hold and tap"),
         ("manual/help/", "Help", "installing, going back, problems"),
@@ -227,9 +227,13 @@ def recipe_page(text):
     groups, recipes, i = [], [], 0
     while i < len(bl):
         kind, d = bl[i]
-        if kind == "h" and d[0] == 2:
-            groups.append((d[1], []))
-            i += 1
+        if kind == "h" and d[0] == 2:                 # a group: its heading and what's under it (a line, a picture)
+            groups.append((d[1], []))                 # above its recipes, as in the list at the top
+            j = i + 1
+            while j < len(bl) and not (bl[j][0] == "h" and bl[j][1][0] <= 3):
+                j += 1
+            recipes.append(f'<h2 class="group-head" id="{slug(d[1])}">{inline(d[1])}</h2>' + render(bl[i + 1:j]))
+            i = j
             continue
         if kind == "h" and d[0] == 3:
             t = d[1]
@@ -254,7 +258,7 @@ def recipe_page(text):
 
 
 def recipe_html(rid, title, body):
-    lead, moves, good, pics, listen = "", "", "", [], None
+    lead, moves, good, pics, listen, nmoves = "", "", "", [], None, 0
     k = 0
     while k < len(body):
         kind, d = body[k]
@@ -268,10 +272,16 @@ def recipe_html(rid, title, body):
             pics += re.findall(r'!\[([^\]]*)\]\(([^)\s]+) "([^"]*)"\)', d)
         elif kind == "p" and not lead:
             lead = inline(d)
-        elif kind == "ol":
-            moves = "".join(f"<li>{inline(t)}</li>" for _, t in d)
-        elif kind == "quote":
-            good = render(blocks(re.sub(r"^\*\*Good to know\.?\*\*\s*", "", d)))
+        elif kind == "ol":                             # the steps; a long walk-through in stages (#### heads), numbered
+            moves += (f'<ol class="moves" style="counter-reset: m {nmoves}">'     # straight through
+                      + "".join(f"<li>{inline(t)}</li>" for _, t in d) + "</ol>")
+            nmoves += len(d)
+        elif kind == "h" and d[0] == 4:
+            moves += f'<h4 class="stage">{inline(d[1])}</h4>'
+        elif kind == "quote":                          # a box: "Good to know", or its own bold label ("Where next.")
+            m = re.match(r"^\*\*([^*]+?)\.?\*\*\s*", d)
+            label = m.group(1) if m and m.group(1) != "Good to know" else "Good to know"
+            good += f"<div class=good><b>{inline(label)}</b>{render(blocks(d[m.end():] if m else d))}</div>"
         k += 1
     figs = "".join(f'<figure><img src="../../media/{Path(s).name}" alt="{html.escape(a)}"><figcaption>{inline(c)}</figcaption></figure>'
                    for a, s, c in pics)
@@ -284,21 +294,22 @@ def recipe_html(rid, title, body):
                f'src="../../media/{name}.mp4" aria-label="{html.escape(title)}: a sound example"></audio><ol>{li}</ol></div>')
     return (f'<section class="recipe" id="{rid}"><div class="recipe-head"><h3>{inline(title)}</h3>'
             f'</div>'
-            f'<div class="recipe-body"><div class="how">{f"<p class=lead>{lead}</p>" if lead else ""}<ol class="moves">{moves}</ol>'
-            f'{f"<div class=good><b>Good to know</b>{good}</div>" if good else ""}</div>'
+            f'<div class="recipe-body"><div class="how">{f"<p class=lead>{lead}</p>" if lead else ""}{moves}'
+            f'{good}</div>'
             + (f'<div class="screens">{figs}</div>' if figs else "") + f'{snd}</div></section>')
 
 
 def onpage(groups, base, label):
+    """The page's recipes as a compact list at its top (Evan, 2026-11-13: the cards pushed the first recipe a screen and
+    a half down): a line a group, its name then the recipes' names, each a link; one not written yet in gray."""
     out = ""
     for g, items in groups:
-        if g:
-            out += f'<h2 class="group" id="{slug(g)}">{inline(g)}</h2>'
-        out += '<ul class="onpage">' + "".join(
-            (f'<li><a href="{base}#{i}"><b>{inline(t)}</b><span>{inline(s)}</span></a></li>' if done else
-             f'<li class="soon"><div><small>coming</small><b>{inline(t)}</b><span>{inline(s)}</span></div></li>')
-            for i, t, s, done in items) + "</ul>"
-    return f'<nav class="onpage-nav" aria-label="{label}: the recipes">{out}</nav>'
+        names = " ".join(
+            (f'<a href="{base}#{i}" title="{html.escape(re.sub(r"<[^>]+>", "", inline(s)))}">{inline(t)}</a>' if done else
+             f'<span class="soon">{inline(t)} (coming)</span>')
+            for i, t, s, done in items)
+        out += f'<li>{f"<b>{inline(g)}</b>" if g else ""}<span class="names">{names}</span></li>'
+    return f'<nav class="onpage-nav" aria-label="{label}: the recipes"><ul class="onpage">{out}</ul></nav>'
 
 
 # ---- pages -------------------------------------------------------------------------------------------------------
@@ -361,20 +372,27 @@ def build(out):
         if rel.startswith("recipes/") and rel.split("/")[1] in RECIPE_KINDS:
             groups, recipes = recipe_page(text)
             first = text.split("\n## ", 1)[0].split("\n### ", 1)[0]     # the words before the first group or recipe
-            if len(recipes) == 1:                      # one walk-through (the tutorial): the page's title is its heading
-                body = tabs(rel.split("/")[1]) + render(blocks(first)) + re.sub(r'<div class="recipe-head">.*?</div>', "", recipes[0], flags=re.S)
+            only = [r for r in recipes if not r.startswith('<h2 class="group-head"')]
+            if len(only) == 1:                         # one walk-through (the tutorial): the page's title is its heading
+                body = tabs(rel.split("/")[1]) + render(blocks(first)) + re.sub(r'<div class="recipe-head">.*?</div>', "", only[0], flags=re.S)
             else:
                 body = (tabs(rel.split("/")[1]) + render(blocks(first)) + onpage(groups, "", meta.get("title", ""))
                         + "".join(recipes))
             meta.setdefault("kicker", "Recipes")
-        elif rel == "recipes":
-            body = tabs(None, "") + render(blocks(text), 0) + all_recipes()
+        elif rel == "recipes":                         # no landing page (Evan, 2026-11-13): the tabs are on every recipe
+            p = dst / rel / "index.html"               # page, so Recipes opens on Sounds; this address forwards there
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text('<!doctype html><html lang="en"><meta charset="utf-8"><title>Recipes · Niagara Drift</title>'
+                         '<link rel="canonical" href="sounds/"><meta http-equiv="refresh" content="0; url=sounds/">'
+                         '<p><a href="sounds/">Recipes: Sounds</a></p></html>', encoding="utf-8")
+            pages += 1
+            continue
         else:
             body = render(blocks(text))
             if kind == "reference":
                 side = reference_side(rel)
                 meta.setdefault("kicker", "Reference")
-        page = page_html(rel, meta, icons(rewrite_links(body, md)), current, side)
+        page = page_html(rel, meta, unique_ids(diagrams(icons(rewrite_links(body, md)))), current, side)
         p = dst / rel / "index.html" if rel else dst / "index.html"
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(page, encoding="utf-8")
@@ -391,17 +409,6 @@ def tabs(cur, base="../"):
         meta, _ = front((MAN / "recipes" / f"{k}.md").read_text(encoding="utf-8"))
         out += f'<a href="{base}{k}/"{" aria-current=\"page\"" if k == cur else ""}>{icon(TAB_ICON[k], "ti")}{meta.get("tab", meta["title"])}</a>'
     return out + "</nav>"
-
-
-def all_recipes():
-    out = ""
-    for k in RECIPE_KINDS:
-        meta, text = front((MAN / "recipes" / f"{k}.md").read_text(encoding="utf-8"))
-        groups, _ = recipe_page(text)
-        flat = [("", [it for _, items in groups for it in items])]
-        out += f'<h2 id="{k}">{inline(meta["title"])}</h2><p class="muted">{inline(meta.get("intro", "").rstrip("."))}</p>'
-        out += onpage(flat, f"{k}/", meta["title"])
-    return out
 
 
 def reference_side(rel):
@@ -429,6 +436,30 @@ def icons(body):
         s = (WEB / "icons" / f"{m.group(1)}.svg").read_text(encoding="utf-8").strip()
         return s.replace("<svg ", '<svg class="ic" aria-hidden="true" focusable="false" ', 1)
     return re.sub(r'<img class="ic" src="[^"]*icons/([\w-]+)\.svg" alt="">', svg, body)
+
+
+def unique_ids(body):
+    """A heading's anchor once per page: a later one of the same name (a Good to know subhead named as a section
+    above it) gets -2, -3 .., so a link to the section lands on the section."""
+    seen = {}
+    def one(m):
+        n = seen[m.group(1)] = seen.get(m.group(1), 0) + 1
+        return f' id="{m.group(1)}"' if n == 1 else f' id="{m.group(1)}-{n}"'
+    return re.sub(r' id="([^"]+)"', one, body)
+
+def diagrams(body):
+    """<img class="diagram" src="…/media/NAME.svg" alt="…"> (it shows on GitHub too) as the drawing's own SVG in the
+    page, so its words are the page's fonts and stay sharp; the alt text its label for screen readers."""
+    def one(name, cls, label):                   # alt="": the text beside it says it all, so it isn't read
+        s = (MAN / "media" / f"{name}.svg").read_text(encoding="utf-8").strip()
+        a11y = f'role="img" aria-label="{label}"' if label else 'aria-hidden="true"'
+        return s.replace("<svg ", f'<svg class="{cls}" {a11y} ', 1)
+
+    def svg(m):                                  # NAME-tall.svg beside it: the phone's, top to bottom, one shown
+        if (MAN / "media" / f"{m.group(1)}-tall.svg").exists():
+            return one(m.group(1), "diagram wide", m.group(2)) + one(m.group(1) + "-tall", "diagram tall", m.group(2))
+        return one(m.group(1), "diagram", m.group(2))
+    return re.sub(r'<img class="diagram" src="[^"]*media/([\w-]+)\.svg" alt="([^"]*)">', svg, body)
 
 
 def rewrite_links(body, md):

@@ -12,7 +12,7 @@ image: p-retune-1.png
 *Drone II out, a new note, back in*
 
 1. Hold [[SEL]] and tap [[PLAY]]: drone II fades out.
-2. Press [[HOME]] for **Pitch**, and turn KNOB 3 to a new note.
+2. Open **Pitch** ([[HOME]] opens Drones, [[HOME]] again Pitch), and turn KNOB 3 to a new note.
 3. [[SEL]] + [[PLAY]] again: it fades back in on the new chord.
 
 > **Good to know.** How fast it fades is **Fade** (Setup 1, KNOB 1).
@@ -48,7 +48,7 @@ image: p-retune-1.png
 
 *Hold its button, turn, let go*
 
-1. Hold a page's button, here [[FX]] for **Space**: the header says PEEK.
+1. Hold a page's button, here [[FX]] for **Space**: [the header](../reference/controls.md#screen-header) says PEEK.
 2. Turn a knob there.
 3. Let go: you're back where you were, the change kept.
 
@@ -61,7 +61,7 @@ image: p-retune-1.png
 2. Press [[ARP]] for the **Swell**, and turn KNOB 1, **Division**, to a note value: it breathes in time.
 
 > **Good to know.** **Sync** (Setup 1, KNOB 4) on follows a clock, off ignores it. More in
-> [MIDI](../reference/midi.md).
+> [MIDI in](../reference/midi.md).
 
 ![Swell, 1/4 at 80 BPM](../media/p-clock-0.png "1/4 at 80 BPM")
 ![Swell, 1/4 at 140 BPM](../media/p-clock-1.png "1/4 at 140 BPM")

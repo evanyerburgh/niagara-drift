@@ -9,20 +9,11 @@ image: g-stack-0.png
 
 Gestures are macros: one key moves several settings at once. **PRESETS** sets how fast.
 
-### Bloom into reverb, fade out slowly {#hold}
+## Pressure gestures
 
-*The longer you hold, the slower it fades*
+<img src="../../img/keys-gestures-press.png" width="720" alt="The pressure gesture keys picked out: G4 Tick, A4 Chord, B4 Snarl, C5 Stutter, further in the harder you press">
 
-1. Hold **Wash**, [[G5]], until the reverb has bloomed.
-2. Let go: it fades out as slowly as you held it in.
-
-![Drones, Wash at 100%](../media/g-hold-0.png "WASH 100%")
-
-**Listen** (`g-hold`)
-
-- 0:00 P1 Niagara
-- 0:01 Wash held 4 s: the reverb grows
-- 0:05 let go: it fades over 4 s
+Keys 9–12: the harder you press, the further in.
 
 ### Swell into a chord and back {#press}
 
@@ -43,6 +34,46 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 - 0:04 harder: a full chord
 - 0:08 eased off: back toward the start
 - 0:11 let go
+
+## Held gestures
+
+<img src="../../img/keys-gestures-hold.png" width="720" alt="The held gesture keys picked out: D5 Weight, E5 Shift, F5 Clean, G5 Wash, further in the longer you hold">
+
+Keys 13–16: the longer you hold, the further in.
+
+### Bloom into reverb, fade out slowly {#hold}
+
+*The longer you hold, the slower it fades*
+
+1. Hold **Wash**, [[G5]], until the reverb has bloomed.
+2. Let go: it fades out as slowly as you held it in.
+
+![Drones, Wash at 100%](../media/g-hold-0.png "WASH 100%")
+
+**Listen** (`g-hold`)
+
+- 0:00 P1 Niagara
+- 0:01 Wash held 4 s: the reverb grows
+- 0:05 let go: it fades over 4 s
+
+### Hit it fast, let it fade slowly {#speed}
+
+*Turn PRESETS after letting go*
+
+1. Hold a gesture on a fast Gesture time, and let go.
+2. Turn **PRESETS** left: it fades slowly. (Or slow in, then fast out.)
+
+![Drones, Wash leaving slowly at 12%](../media/g-speed-0.png "WASH 12%, leaving slowly")
+
+**Listen** (`g-speed`)
+
+- 0:00 P13 Telegraph, Gesture time fast
+- 0:01 Wash held 2 s: in fast
+- 0:03 let go, PRESETS turned left: a slow fade
+
+## Any gesture
+
+Tap, latch, stack and slow down: these work on every gesture key.
 
 ### Leave a gesture on while you play {#keep}
 
@@ -91,19 +122,3 @@ Gestures are macros: one key moves several settings at once. **PRESETS** sets ho
 
 - 0:00 P12 Ashram, Gesture time 33 s
 - 0:01 Weight tapped: it comes in on its own
-
-### Hit it fast, let it fade slowly {#speed}
-
-*Turn PRESETS after letting go*
-
-1. Hold a gesture on a fast Gesture time, and let go.
-2. Turn **PRESETS** left: it fades slowly. (Or slow in, then fast out.)
-
-![Drones, Wash leaving slowly at 12%](../media/g-speed-0.png "WASH 12%, leaving slowly")
-
-**Listen** (`g-speed`)
-
-- 0:00 P13 Telegraph, Gesture time fast
-- 0:01 Wash held 2 s: in fast
-- 0:03 let go, PRESETS turned left: a slow fade
-
