@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Quixotic7/RemoteFM1FW/main/docs/RemoteFM1Metadata.schema.json",
+  "schema": 1,
+  "card": {
+    "tag": "Drone synth",
+    "what": "Two drones that breathe and drift on their own, shaped by hand: from hypnotic and blissful to harsh, beating and self-oscillating. Presets and macros for instant ambient textures, and deep controls to pilot them into outer space.",
+    "category": "Synth",
+    "site": "https://evanyerburgh.github.io/niagara-drift/",
+    "port": "Niagara Drift FM-1",
+    "image": "docs/img/screen-play.png"
+  }
+}
