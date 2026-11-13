@@ -22,13 +22,13 @@ except the Tuning.
 
 | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|
-| fade | morph | scene time | sync |
+| Fade | Morph | Scene time | Sync |
 
 | Knob | What it does |
 |---|---|
-| **Fade** | how long PLAY takes: up to 60 s (1.5 s to start) |
-| **Morph** | how long a black key or a new LFO wave takes to move the sound: 0.02–30 s (2 s to start) |
-| **Scene time** | how long every scene move takes: 0.1 s to 5 minutes (about 8 s to start) |
+| **Fade** | How long PLAY takes: up to 60 s (1.5 s to start) |
+| **Morph** | How long a black key or a new LFO wave takes to move the sound: 0.02–30 s (2 s to start) |
+| **Scene time** | How long every scene move takes: 0.1 s to 5 minutes (about 8 s to start) |
 | **Sync** | **On** follows a MIDI clock; **Off** ignores it |
 
 ## Setup 2
@@ -37,30 +37,30 @@ except the Tuning.
 
 | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|
-| tuning | tune | stereo | pressure |
+| Tuning | Tune | Stereo | Pressure |
 
 | Knob | What it does |
 |---|---|
-| **Tuning** | the notes the pitch knobs move through ([Tunings](#tunings)) |
+| **Tuning** | The notes the pitch knobs move through ([Tunings](#tunings)) |
 | **Tune** | A's pitch: 427 to 453 Hz (440 to start) |
-| **Stereo** | mono to drone I left, drone II right |
-| **Pressure** | how hard you press the scene keys: up for a light touch, down for a firm one |
+| **Stereo** | Mono to drone I left, drone II right |
+| **Pressure** | How hard you press the scene keys: up for a light touch, down for a firm one |
 
 ## Tunings
 
-> **A sound carries its Tuning.** A scene saved on LMY brings LMY back, even with Pitch lock on. A Preset plays on
+> **A sound carries its Tuning.** A scene saved on LMY brings LMY back, even with Pitch lock on. A preset plays on
 > 12-tone unless it has its own. The Tuning changes half way through a scene's glide.
 
 | Tuning | What it is |
 |---|---|
-| **12-tone** | semitones |
-| **Quarter** | quarter tones |
-| **19-, 31-, 53-tone** | equal temperaments |
-| **Just** | just intonation (Ptolemy's 5-limit) |
-| **Harmonics** | the odd harmonics 1–15 of A: the drones as notes of one harmonic series |
+| **12-tone** | Semitones |
+| **Quarter** | Quarter tones |
+| **19-, 31-, 53-tone** | Equal temperaments |
+| **Just** | Just intonation (Ptolemy's 5-limit) |
+| **Harmonics** | The odd harmonics 1–15 of A: the drones as notes of one harmonic series |
 | **LMY** | La Monte Young's tuning for *The Well-Tuned Piano* |
 | **Harrison** | Lou Harrison's tuning for his National Steel guitar |
-| **Shrutis** | the 22 shrutis of Indian music |
+| **Shrutis** | The 22 shrutis of Indian music |
 | **Partch** | Harry Partch's 43 notes to the octave |
 
 ### Intervals on a Tuning

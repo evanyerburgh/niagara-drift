@@ -25,7 +25,7 @@ turn SELECT 55 50
 wait 1500
 shot figure-0.png
 wav figure.wav
-# @ the figure stepping: drone II bright, round four notes on LFO II's OR 5
+# @ The figure stepping: drone II bright, round four notes on LFO II's OR 5
 wait 2000
 tap SEQ
 tap SEQ

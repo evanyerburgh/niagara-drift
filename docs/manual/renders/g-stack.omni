@@ -19,8 +19,10 @@ wait 4000
 key w15 down
 wait 5000
 shot g-stack-0.png
-# @ let go of both: Wash leaves slowly, Snarl at once
+# @ Let go of both: Snarl goes at once, Wash leaves over about 5 s
 key w10 up
 key w15 up
 wait 5000
+# @ Back to Seance as it was
+wait 7000
 wavstop

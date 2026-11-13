@@ -15,14 +15,14 @@ wait 1500
 key w9 down
 pressure w9 40
 wait 3000
-# @ pressed harder: further in, a full, beatless chord
+# @ Pressed harder: further in, a full, beatless chord
 pressure w9 110
 wait 4000
 shot g-press-0.png
-# @ eased off: it comes back toward where it was
+# @ Eased off: it comes back toward where it was
 pressure w9 30
 wait 3000
-# @ let go: it goes
+# @ Let go: it goes
 key w9 up
 wait 3500
 wavstop

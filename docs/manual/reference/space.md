@@ -17,8 +17,8 @@ The effects: a delay with six types, a drive, and a reverb with five.
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Space | delay repeats | delay mix | reverb length | reverb mix |
-| Details | delay drive · SEL: — | delay time · SEL: delay type | reverb damp | reverb type · SEL: into reverb |
+| Space | Delay repeats | Delay mix | Reverb length | Reverb mix |
+| Details | Delay drive · SEL: — | Delay time · SEL: delay type | Reverb damp | Reverb type · SEL: into reverb |
 
 ## Delay
 
@@ -26,11 +26,11 @@ The effects: a delay with six types, a drive, and a reverb with five.
 
 | Knob | What it does |
 |---|---|
-| **Repeats** | how many echoes. Past about 85 they run away into self-oscillation |
-| **Mix** | how loud the echoes are |
+| **Repeats** | How many echoes. Past about 85 they run away into self-oscillation |
+| **Mix** | How loud the echoes are |
 | **Time** | 70 ms to 1.46 s. Turning it bends the echoes' pitch, as tape does |
 | **Type** | [[SEL]] + Time: one of six ([Delay types](#delay-types)) |
-| **Drive** | distorts the drones and their echoes together: ghost notes, beating, crackle |
+| **Drive** | Distorts the drones and their echoes together: ghost notes, beating, crackle |
 
 ### Delay types
 
@@ -38,10 +38,10 @@ Plain to most alive.
 
 | Type | What you hear |
 |---|---|
-| **Clean** | the echoes as played, no wow: a just-tuned drone stays still |
-| **Wide** | the right side's echoes at three-quarters of the left's time |
-| **Ping-pong** | the echoes bounce from side to side |
-| **Tape** | warm, with a gentle wow; a new sound starts with it |
+| **Clean** | The echoes as played, no wow: a just-tuned drone stays still |
+| **Wide** | The right side's echoes at three-quarters of the left's time |
+| **Ping-pong** | The echoes bounce from side to side |
+| **Tape** | Warm, with a gentle wow; a new sound starts with it |
 | **Grain** | Tape shaken by its own echoes |
 | **Self** | Tape that sags as its echoes get louder |
 
@@ -52,9 +52,9 @@ Plain to most alive.
 | Knob | What it does |
 |---|---|
 | **Length** | 0.3 to 40 s. At the top, **Inf**: a freeze |
-| **Mix** | how loud the reverb is |
-| **Damp** | darkens the tail |
-| **Type** | one of five ([Reverb types](#reverb-types)) |
+| **Mix** | How loud the reverb is |
+| **Damp** | Darkens the tail |
+| **Type** | One of five ([Reverb types](#reverb-types)) |
 | **Into reverb** | [[SEL]] + Type: Both, Echoes or Drones |
 
 ### Reverb types
@@ -63,11 +63,11 @@ Smallest to largest, then the two that move.
 
 | Type | What you hear |
 |---|---|
-| **Room** | small and close |
-| **Hall** | a hall: larger, a little further away |
-| **Cathedral** | the largest and furthest, the tail starting latest |
-| **Chorus hall** | a hall whose tail swings and shimmers, the widest |
-| **Shimmer** | the Hall with an octave above what's playing, washing in over about 8 s |
+| **Room** | Small and close |
+| **Hall** | A hall: larger, a little further away |
+| **Cathedral** | The largest and furthest, the tail starting latest |
+| **Chorus hall** | A hall whose tail swings and shimmers, the widest |
+| **Shimmer** | The Hall with an octave above what's playing, washing in over about 8 s |
 
 ## Good to know
 

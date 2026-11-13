@@ -15,14 +15,14 @@ wav freeze.wav
 # @ P10 Cistern as it starts as it starts
 wait 1500
 tap FX
-# @ reverb Mix up, then Length to the top (Inf): the chord freezes and holds
+# @ Reverb Mix up, then Length to the top (Inf): the chord freezes and holds
 turn K4 20 60
 turn K3 40 40
 wait 4500
 shot freeze-0.png
 tap HOME
 tap HOME
-# @ new notes for both drones (Pitch): they play over the frozen chord
+# @ New notes for both drones (Pitch): they play over the frozen chord
 turn K1 -5 60
 turn K3 3 60
 wait 4500

@@ -25,8 +25,8 @@ The page you play from: each drone's level and cutoff; then its pitch and resona
 
 | Knob | What it does |
 |---|---|
-| **Level** | how loud each drone is. Halfway is about a quarter as loud |
-| **Cutoff** | opens or closes each drone's filter |
+| **Level** | How loud each drone is. Halfway is about a quarter as loud |
+| **Cutoff** | Opens or closes each drone's filter |
 
 ### Filter type
 

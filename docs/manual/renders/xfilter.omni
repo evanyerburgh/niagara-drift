@@ -11,7 +11,7 @@ wait 2500
 wav xfilter.wav
 # @ P3 Vespers as it starts: saws through band-pass filters
 wait 1500
-# @ key 11 once: drone I's sound moves drone II's filter, at audio rate: drone II growls and shimmers
+# @ Key 11 once: drone I's sound moves drone II's filter, at audio rate: drone II growls and shimmers
 tapkey b10
 tap LFO
 tap LFO
@@ -20,7 +20,7 @@ shot xfilter-0.png
 # @ X-mod up: the growl deepens into a buzzing, vocal edge
 turn K4 45 80
 wait 5000
-# @ drone I's pitch moved (Pitch): the growl changes its grain
+# @ Drone I's pitch moved (Pitch): the growl changes its grain
 tap HOME
 tap HOME
 expect view 1

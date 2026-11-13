@@ -21,14 +21,14 @@ What keeps the drones alive and worn, and each drone's noise.
 
 | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|
-| feedback | drift | character | age |
+| Feedback | Drift | Character | Age |
 
 | Knob | What it does |
 |---|---|
-| **Feedback** | the finished sound, after the delay and reverb, fed back into the drones: a resonant, thickening color. Past about 70 it sings on its own |
-| **Drift** | slow random modulation: each drone's pitch, cutoff, wave, level and partner detune wander around where you set them. 0 holds everything still |
-| **Character** | the oscillators from clean to vintage: softer edges, a bent saw, a little pitch jitter |
-| **Age** | wear like an old tape: darker, a little hiss, slow wow and flutter |
+| **Feedback** | The finished sound, after the delay and reverb, fed back into the drones: a resonant, thickening color. Past about 70 it sings on its own |
+| **Drift** | Slow random modulation: each drone's pitch, cutoff, wave, level and partner detune wander around where you set them. 0 holds everything still |
+| **Character** | The oscillators from clean to vintage: softer edges, a bent saw, a little pitch jitter |
+| **Age** | Wear like an old tape: darker, a little hiss, slow wow and flutter |
 
 ## Tone
 
@@ -40,8 +40,8 @@ What keeps the drones alive and worn, and each drone's noise.
 
 | Knob | What it does |
 |---|---|
-| **Noise** | how much noise beside the oscillators: 100 is level with a saw. It goes through the drone's filter |
-| **Color** | white (left) to pink (right) |
+| **Noise** | How much noise beside the oscillators: 100 is level with a saw. It goes through the drone's filter |
+| **Color** | White (left) to pink (right) |
 
 ## Good to know
 

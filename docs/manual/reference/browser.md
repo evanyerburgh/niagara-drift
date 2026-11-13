@@ -15,10 +15,10 @@ Play it on the [front page](https://evanyerburgh.github.io/niagara-drift/).
 
 | To | With the mouse |
 |---|---|
-| **Turn a knob** | drag up or down, or scroll over it |
-| **Press a button or key** | click and hold |
+| **Turn a knob** | Drag up or down, or scroll over it |
+| **Press a button or key** | Click and hold |
 | **Hold a button** while you do something else | Shift-click or right-click; click again to let go |
-| **Slide across the white keys** | hold a click on one and drag sideways |
+| **Slide across the white keys** | Hold a click on one and drag sideways |
 
 ## Computer keys
 
@@ -28,13 +28,13 @@ A key held down holds the control, as a finger would.
 
 | Keys | On the FM-1 |
 |---|---|
-| **1 … 0, −** | black keys 1–11 |
-| **Q … I** | scene keys 1–8 |
-| **A … F** · **G … K** | gesture keys 9–12 · 13–16 |
+| **1 … 0, −** | Black keys 1–11 |
+| **Q … I** | Scene keys 1–8 |
+| **A … F** · **G … K** | Gesture keys 9–12 · 13–16 |
 | **Space** · **Return** · **Esc** | PLAY · SAVE · HOME |
 | **C** · **V** · **Z** · **X** | SEL · EDIT · OCT− · OCT+ |
 | **↑ ↓** · **← →** | LFO rate (SELECT) · Movement (ALGORITHM) |
-| **Tab**, then the arrows | any knob, one at a time |
+| **Tab**, then the arrows | Any knob, one at a time |
 
 ## Good to know
 

@@ -35,18 +35,19 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     /* P1 NIAGARA: the starting sound (0.2's P1, unchanged) */
     {-1},
     /* P2 EMBERS: triangles blooming toward saws and back, the two drones in turn, a pure-third partner each, a chorus
-     * hall */
+     * hall; Chord on major pentatonic (Evan, 2026-11-13: minor clashed with its F#) */
     {I_(GP_WAVE), 40, I_(GP_INTERVAL), 13, I_(GP_DETUNE), 10, I_(GP_CUTOFF), 700, I_(GP_RESO), 300,
      I_(GP_OLFO_DEPTH), 71, I_(GP_OLFO_DEST), 1, II_(GP_PITCH), 5386, II_(GP_WAVE), 40, II_(GP_INTERVAL), 13,
      II_(GP_DETUNE), 10, II_(GP_CUTOFF), 700, II_(GP_RESO), 300, II_(GP_LEVEL), 80, II_(GP_OLFO), 1,
      II_(GP_OLFO_DEPTH), -71, II_(GP_OLFO_DEST), 1, P_LFO_RATE, 78, P_PULSE_DEPTH, 30, P_DLY_MIX, 20, P_REV_MIX, 50,
-     P_REV_TYPE, 3, P_CHAR, 15, P_DLY_TYPE, 1, -1},
-    /* P3 VESPERS: saws through band-passes near a sung "ah", the waves morphing, a bright Cathedral */
+     P_REV_TYPE, 3, P_CHAR, 15, P_DLY_TYPE, 1, P_WSCALE, 1, -1},
+    /* P3 VESPERS: saws through band-passes near a sung "ah", the waves morphing, a bright Cathedral; Chord on Just
+     * 1-8 (Evan, 2026-11-13: minor clashed with its F#) */
     {I_(GP_INTERVAL), 9, I_(GP_MIX), 10, I_(GP_CUTOFF), 520, I_(GP_RESO), 450, I_(GP_MODE), 1, I_(GP_LEVEL), 100,
      I_(GP_OLFO_DEPTH), 45, I_(GP_OLFO_DEST), 1, I_(GP_FLFO_DEPTH), 18, II_(GP_WAVE), 67, II_(GP_INTERVAL), 13,
      II_(GP_MIX), 0, II_(GP_CUTOFF), 595, II_(GP_RESO), 450, II_(GP_MODE), 1, II_(GP_LEVEL), 100,
      II_(GP_OLFO_DEPTH), 55, II_(GP_OLFO_DEST), 1, II_(GP_FLFO_DEPTH), -18, P_LFO_RATE, 45, P_PULSE_RATE, 20,
-     P_PULSE_DEPTH, 30, P_DLY_MIX, 15, P_REV_MIX, 55, P_MOVE, 60, P_REV_LEN, 85, P_REV_DAMP, 20, -1},
+     P_PULSE_DEPTH, 30, P_DLY_MIX, 15, P_REV_MIX, 55, P_MOVE, 60, P_REV_LEN, 85, P_REV_DAMP, 20, P_WSCALE, 5, -1},
     /* P4 DREAMHOUSE: on Harmonics: A1 and its 7th harmonic, sines, partners pure fifths, the resonance swelling, a
      * little Feedback */
     {I_(GP_PITCH), 3300, I_(GP_WAVE), 20, I_(GP_INTERVAL), 13, I_(GP_DETUNE), 0, I_(GP_MIX), 0, I_(GP_CUTOFF), 700,

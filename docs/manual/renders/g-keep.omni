@@ -15,10 +15,10 @@ wait 1500
 tapkey w9
 wait 4000
 shot g-keep-0.png
-# @ tapped again: it goes
+# @ Tapped again: it goes
 tapkey w9
 wait 3500
-# @ pressed to 55%, SEL tapped: latched there
+# @ Pressed to 55%, SEL tapped: latched there
 pressure w9 0
 key w9 down
 pressure w9 40

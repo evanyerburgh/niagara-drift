@@ -1,37 +1,37 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# A recipe's render (tools/make_manual.py --renders): from P14, headphones, Pitch lock off, Scene time 0.
-# "# @" marks the listening times (tools/make_manual.py --times).
+# A recipe's render (tools/make_manual.py --renders): from P2 Embers, headphones, Pitch lock off, Scene time 0. Evan's
+# moves (2026-11-13), quickly: Osc/Sb to the sub, the sub to -4 oct, drone I's pitch down to 20.6 Hz, its level to 50
+# so the clicks are percussion under drone II; then the clicks, held. "# @" marks the listening times (--times).
 notips
 phones 1
 set 74 0
 set 71 0
-press SEL
-tapkey w15
-release SEL
-tapkey w5
+tapkey w1
 tap PLAY
 wait 3000
 wav ticks.wav
-# @ P14 Tape as it starts: worn, a hum under it
+# @ Embers (P2) as it starts: no clicks
 wait 1500
+tap EDIT
+tap EDIT
+# @ Osc/Sb to the sub, the sub to -4 oct, drone I's pitch quickly down to about 21 Hz, its level down to 50
+turn K1 70 15
+tapkey b1
+tapkey b1
+tapkey b1
+tapkey b1
+tapkey b1
 tap HOME
-# @ drone I turned down to its lowest notes, A0: a low buzz
-turn K1 -29 60
-wait 300
-tap EDIT
-tap EDIT
-tapkey b1
-tapkey b1
-tapkey b1
-tapkey b1
-tapkey b1
-# @ the sub at -4 oct, Osc/Sb all the way to it: the buzz breaks into ticks, about 3 a second
-turn K1 85 15
-wait 300
-shot ticks-0.png
-wait 8000
-# @ Drive up: each tick gets a harder edge
-turn K2 30 40
-wait 5000
-shot ticks-1.png
+tap HOME
+turn K1 -34 50
+tap HOME
+turn K1 -34 40
+# @ Clicks, about 2.6 a second, as percussion under drone II's blooming triangle
+wait 12000
 wavstop
+page 5
+wait 400
+shot ticks-0.png
+page 1
+wait 400
+shot ticks-1.png

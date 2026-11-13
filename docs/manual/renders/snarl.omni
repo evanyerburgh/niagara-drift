@@ -15,7 +15,7 @@ wait 500
 wav snarl.wav
 # @ P2 Embers, more echoes: steady triangles blooming toward saws
 wait 1500
-# @ key 11 three times: Snarl, the finished sound, echoes and all, starting to bend both drones
+# @ Key 11 three times: Snarl, the finished sound, echoes and all, starting to bend both drones
 tapkey b10
 tapkey b10
 tapkey b10

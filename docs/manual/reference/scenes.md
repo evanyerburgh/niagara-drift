@@ -40,18 +40,18 @@ Press all the way and hold a moment: the scene stays when you let go.
 
 ## Scene banks
 
-Eight banks of eight scenes: A to F are yours, and two hold the Presets.
+Eight banks of eight scenes: A to F are yours, and two hold the presets.
 
 ### Save a scene
 
 Hold [[SAVE]], tap a key.
 
-> **SAVE first.** Hold SAVE before you touch the key: a key pressed first plays its scene instead. The Presets can't
+> **SAVE first.** Hold SAVE before you touch the key: a key pressed first plays its scene instead. The presets can't
 > be saved over.
 
 ### Pick a bank
 
-<img src="../../img/keys-banks.png" width="720" alt="The eight gesture keys picked out, each with the bank it picks while SEL is held: banks A to F, then Presets P1 to 8 and P9 to 16">
+<img src="../../img/keys-banks.png" width="720" alt="The eight gesture keys picked out, each with the bank it picks while SEL is held: banks A to F, then presets P1 to 8 and P9 to 16">
 
 Hold [[SEL]] and tap a gesture key. The bank's scenes are then on white keys 1–8.
 
@@ -81,7 +81,7 @@ Hold [[SEL]] and tap a gesture key. The bank's scenes are then on white keys 1�
 
 ### From 0.2
 
-- **From 0.2:** scenes on keys 9–12 moved to empty keys 1–8 (the screen says how many). 0.2's Presets that 0.3
+- **From 0.2:** scenes on keys 9–12 moved to empty keys 1–8 (the screen says how many). 0.2's presets that 0.3
   doesn't keep (Eerie, Glass, Tanpura, Whistle, Cathedral, Metal) are in bank F, keys 1–6; Heaven is now Sibyl, Clean
   is Bare. Feedback moved to KNOB 1 on Life, Cross-mod to KNOB 4 on Mods, Tune to KNOB 2 on Setup 2; HOME opens
   Drones, FX opens Space.

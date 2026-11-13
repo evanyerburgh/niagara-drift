@@ -11,17 +11,21 @@ release SEL
 tapkey w6
 tap PLAY
 wait 2500
+page 1
+turn K1 12 60
+turn K3 12 60
+wait 1500
 tap FX
 expect view 13
 turn K1 15 40
 turn K2 25 40
 wait 1500
 wav shimmer.wav
-# @ P15 Falling, sines in the middle (G3 and E4), with its echoes up
+# @ P15 Falling with both drones an octave up (G4 and E5), its echoes up
 wait 1500
 tap FX
 expect view 14
-# @ the reverb's Type to Shimmer, Into Echoes (with SEL): over 8 seconds the echoes rise an octave into a halo
+# @ The reverb's Type to Shimmer, Into Echoes (with SEL): over 8 seconds the echoes rise an octave into a halo
 turn K4 2 300
 press SEL
 turn K4 1 300

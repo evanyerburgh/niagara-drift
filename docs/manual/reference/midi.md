@@ -15,11 +15,11 @@ Notes tune the drones and a clock puts them in time, over USB or the TRS jack.
 
 | Message | What it does |
 |---|---|
-| **Notes, channel 1** | tune drone I to the note |
-| **Notes, channel 2** | tune drone II; with Pitch link on, set the interval |
-| **Clock** | puts the drones in time: after about two beats it locks ("120 BPM") |
-| **Start** | brings the Swell back to its top at once; the LFO glides back to its own |
-| **Stop**, **Continue** | ignored: when the clock stops coming, everything carries on at the last tempo ("keeps 120") |
+| **Notes, channel 1** | Tune drone I to the note |
+| **Notes, channel 2** | Tune drone II; with Pitch link on, set the interval |
+| **Clock** | Puts the drones in time: after about two beats it locks ("120 BPM") |
+| **Start** | Brings the Swell back to its top at once; the LFO glides back to its own |
+| **Stop**, **Continue** | Ignored: when the clock stops coming, everything carries on at the last tempo ("keeps 120") |
 
 ## Sync
 
@@ -29,8 +29,8 @@ Setup 1, KNOB 4: **On** follows a clock, **Off** ignores it. Under it, what the 
 
 | Under Sync | Means |
 |---|---|
-| **120 BPM** | following a clock at that tempo |
-| **keeps 120** | the clock stopped; the last tempo carries on |
+| **120 BPM** | Following a clock at that tempo |
+| **keeps 120** | The clock stopped; the last tempo carries on |
 | **no clock** | Sync is on, but nothing is coming in |
 | **free time** | Sync is off: the drones keep their own time |
 
@@ -42,11 +42,11 @@ What follows the clock, with Sync on:
 
 | What | On the clock |
 |---|---|
-| **The Swell** (KNOB 1 on its page) | a breath a **Division**: 32 bars to 1/4 |
-| **The LFO** (SELECT) | a cycle a division: 32 bars to 1/16 ("LFO CYCLE") |
-| **The delay** (Time, Details) | a **note value**: 1/16, 1/8T, 1/8, 1/4T, 1/8D, 1/4, 1/2T, 1/4D, 1/2, 1/2D, 1 bar |
-| **Wander** | its notes land on the beat (on the bar, when slow), still at random |
-| **Scene time** (Setup 1) | in **bars**: 1, 2, 4, 8 or 16; a scene change ends on a bar line |
+| **The Swell** (KNOB 1 on its page) | A breath a **Division**: 32 bars to 1/4 |
+| **The LFO** (SELECT) | A cycle a division: 32 bars to 1/16 ("LFO CYCLE") |
+| **The delay** (Time, Details) | A **note value**: 1/16, 1/8T, 1/8, 1/4T, 1/8D, 1/4, 1/2T, 1/4D, 1/2, 1/2D, 1 bar |
+| **Wander** | Its notes land on the beat (on the bar, when slow), still at random |
+| **Scene time** (Setup 1) | In **bars**: 1, 2, 4, 8 or 16; a scene change ends on a bar line |
 
 ## Good to know
 
