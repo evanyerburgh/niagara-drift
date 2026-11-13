@@ -13,31 +13,25 @@ image: ticks-1.png
 
 *A sub so low it breaks into clicks, a few a second*
 
-Put drone I's sub four octaves down and all the way in, and it stops being a tone: a fast flutter. Turn drone I's
-pitch down to about 22 Hz and the flutter slows into clicks, about 3 a second, a pulse to play against drone II.
+Put drone I's sub four octaves down, all the way in, and turn drone I down to about 22 Hz: the sub stops being a
+tone and becomes clicks, about 3 a second, a pulse to play against drone II.
 
-1. Press [[EDIT]] twice for **Sub · Drive**, and tap [[G#3]], drone I's sub, until the screen says **−4 oct**. It
-   goes round −1, −2, ⅓, ⅕, −3, −4.
-2. Turn KNOB 1, Osc/Sb, all the way to the sub: **100**. The sub flutters, fast.
-3. Turn KNOB 2, Drive, up for a harder click.
-4. Press [[HOME]] twice for **Pitch**, and turn KNOB 1, drone I's pitch, down past **A0**, where the screen turns to
-   Hz, to about **22 Hz**: clicks, about 3 a second. Lower, they slow to one every second or two.
+1. Press [[EDIT]] twice for **Sub · Drive**, and turn KNOB 1, Osc/Sb, all the way to the sub: **100**.
+2. Tap [[G#3]], drone I's sub, until the screen says **−4 oct**. It goes round −1, −2, ⅓, ⅕, −3, −4.
+3. Press [[HOME]] twice for **Pitch**, and turn KNOB 1, drone I's pitch, quickly down past **A0**, where the screen
+   turns to Hz, to about **22 Hz**: clicks.
 
 > **Good to know.** The clicks a second are drone I's pitch ÷ 8 (the sub is ÷ 16, two clicks to its cycle): at D3, 18
 > a second; at A0 (27.5 Hz), about 3; at 22 Hz, 2.7; at 5 Hz, one every 1.6 s. The clicks reach the speaker, though
 > the hum under them doesn't. The **Tick** gesture ([[G4]]) does this on its own, faster as you press harder. Or take
 > drone I itself under 20 Hz with Osc/Sb at 0: a click each cycle, as in **Sonar** (P7).
 
-![Sub · Drive, drone I's sub at -4 oct, Osc/Sb 100, Drive 50](../media/ticks-0.png "−4 oct, all sub, Drive 50")
-![Pitch, drone I at 22 Hz](../media/ticks-1.png "drone I down to 22 Hz")
+![Sub · Drive, drone I's sub at -4 oct, Osc/Sb 100](../media/ticks-0.png "−4 oct, all sub")
+![Pitch, drone I at 22 Hz](../media/ticks-1.png "drone I at 22 Hz")
 
 **Listen** (`ticks`)
 
-- 0:00 P14 Tape as it starts: worn, a hum under it
-- 0:01 Drone I's sub at −4 oct, all the way in: a fast flutter, about 18 a second
-- 0:04 Drive up: each tick gets a harder edge
-- 0:06 Drone I's pitch turned down quickly, past A0 to 22 Hz: the flutter slows into clicks
-- 0:08 Held at 22 Hz: clicks, about 3 a second, under drone II
+- 0:00 Drone I at 22 Hz, its sub at −4 oct and all sub: clicks, about 3 a second, under drone II
 
 ### A singing filter {#sing}
 

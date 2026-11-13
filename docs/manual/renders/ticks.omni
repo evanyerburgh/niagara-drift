@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# A recipe's render (tools/make_manual.py --renders): from P14, headphones, Pitch lock off, Scene time 0.
-# "# @" marks the listening times (tools/make_manual.py --times).
+# A recipe's render (tools/make_manual.py --renders): from P14, headphones, Pitch lock off, Scene time 0. Evan's moves
+# (2026-11-13), made before the recording: Osc/Sb to the sub, the sub to -4 oct, drone I's pitch quickly to 22 Hz.
+# The clip is the clicks, held. "# @" marks the listening times (tools/make_manual.py --times).
 notips
 phones 1
 set 74 0
@@ -10,29 +11,26 @@ tapkey w15
 release SEL
 tapkey w5
 tap PLAY
-wait 1500
-wav ticks.wav
-# @ P14 Tape as it starts: worn, a hum under it
-wait 1000
+wait 3000
 tap EDIT
 tap EDIT
-tapkey b1
-tapkey b1
-tapkey b1
-tapkey b1
-tapkey b1
-# @ Drone I's sub at -4 oct, Osc/Sb all the way to it: a fast flutter, about 18 a second
 turn K1 85 15
-wait 1500
-# @ Drive up: each tick gets a harder edge
-turn K2 30 30
-shot ticks-0.png
-wait 1000
+tapkey b1
+tapkey b1
+tapkey b1
+tapkey b1
+tapkey b1
 tap HOME
 tap HOME
-# @ Drone I's pitch turned down quickly, past A0 to 22 Hz: the flutter slows into clicks
 turn K1 -33 60
-shot ticks-1.png
-# @ Held at 22 Hz: clicks, about 3 a second
+wait 1000
+wav ticks.wav
+# @ Drone I at 22 Hz, its sub at -4 oct and all sub: clicks, about 3 a second, under drone II
 wait 12000
 wavstop
+page 5
+wait 400
+shot ticks-0.png
+page 1
+wait 400
+shot ticks-1.png
