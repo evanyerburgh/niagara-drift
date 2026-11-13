@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# The release package, built by GitHub from the tagged commit and signed (a build attestation), with the FM-1
+# Firmware Hub's shared builder (zvenson/fm1-build, MIT; at v1, the tag the hub has reviewed), as Melodee and Shine On
+# do. The hub shows "Built by GitHub Actions from <commit>, signed" only for packages this workflow attested.
+# Push a tag vX.Y (on main, after the release PR): it builds ./build.sh --release X.Y on Linux (JieLi's toolchain, the
+# AC79 SDK at AC79NN_SDK_V1.2.1_2023-12-13, as BUILDING.md), attests the package and makes the release of that tag;
+# then the release skill gives the release its title and notes and publishes the site from that same file.
+# Check a package: gh attestation verify niagara-drift-X.Y.fwsc --repo evanyerburgh/niagara-drift
+#   --signer-workflow zvenson/fm1-build/.github/workflows/build.yml
+name: release
+on:
+  push:
+    tags: ['v*']
+jobs:
+  build:
+    uses: zvenson/fm1-build/.github/workflows/build.yml@v1
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    with:
+      build: ./build.sh --release "${GITHUB_REF_NAME#v}"
+      packages: build/niagara-drift-*.fwsc
