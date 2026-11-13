@@ -24,7 +24,7 @@ image: p-retune-1.png
 
 - 0:00 P8 Sibyl, Fade 3 s
 - 0:01 SEL + PLAY: drone II fades out
-- 0:05 retuned in the silence
+- 0:05 Retuned in the silence
 - 0:07 SEL + PLAY: back in on a minor chord
 
 ### Loop your moves {#loop}

@@ -7,7 +7,7 @@ image: g-stack-0.png
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-Gestures are macros: one key moves several settings at once. **PRESETS** sets how fast.
+Gestures are macros: one key moves several settings at once. The **PRESETS** knob (gesture time) sets how fast.
 
 ## Pressure gestures
 
@@ -22,8 +22,8 @@ Keys 9–12: the harder you press, the further in.
 1. Press **Chord**, [[A4]], slowly harder: the drones move into a chord.
 2. Ease off: they come back.
 
-> **Good to know.** Chord builds its chord on the **Scale**, on the **Pitch moves** page ([[SEQ]] twice, KNOB 4):
-> change the scale and the chord changes.
+> **Good to know.** Chord builds its chord on a chose **scale**. Set it on the **Pitch moves** page ([[SEQ]] twice, KNOB 4):
+> Change the scale and the chord changes.
 
 ![Drones, Chord at 90%](../media/g-press-0.png "CHORD 90%")
 
@@ -31,9 +31,9 @@ Keys 9–12: the harder you press, the further in.
 
 - 0:00 P3 Vespers
 - 0:01 Chord pressed lightly: the drones start to move
-- 0:04 harder: a full chord
-- 0:08 eased off: back toward the start
-- 0:11 let go
+- 0:04 Harder: a full chord
+- 0:08 Eased off: back toward the start
+- 0:11 Let go
 
 ## Held gestures
 
@@ -46,7 +46,7 @@ Keys 13–16: the longer you hold, the further in.
 *The longer you hold, the slower it fades*
 
 1. Hold **Wash**, [[G5]], until the reverb has bloomed.
-2. Let go: it fades out as slowly as you held it in.
+2. Let go and it fades out as slowly as you held it in.
 
 ![Drones, Wash at 100%](../media/g-hold-0.png "WASH 100%")
 
@@ -54,14 +54,14 @@ Keys 13–16: the longer you hold, the further in.
 
 - 0:00 P1 Niagara
 - 0:01 Wash held 4 s: the reverb grows
-- 0:05 let go: it fades over 4 s
+- 0:05 Let go: it fades over 4 s
 
-### Hit it fast, let it fade slowly {#speed}
+### Hit it fast and let it fade slowly {#speed}
 
 *Turn PRESETS after letting go*
 
 1. Hold a gesture on a fast Gesture time, and let go.
-2. Turn **PRESETS** left: it fades slowly. (Or slow in, then fast out.)
+2. Turn **PRESETS** left and the gesture fades slowly. (Or slow in, then fast out.)
 
 ![Drones, Wash leaving slowly at 12%](../media/g-speed-0.png "WASH 12%, leaving slowly")
 
@@ -69,7 +69,7 @@ Keys 13–16: the longer you hold, the further in.
 
 - 0:00 P13 Telegraph, Gesture time fast
 - 0:01 Wash held 2 s: in fast
-- 0:03 let go, PRESETS turned left: a slow fade
+- 0:03 Let go, PRESETS turned left: a slow fade
 
 ## Any gesture
 
@@ -80,8 +80,7 @@ Tap, latch, stack and slow down: these work on every gesture key.
 *A tap latches it; SEL latches it at a level*
 
 1. Tap a gesture key: it comes all the way in and stays. Tap again to let it go.
-2. Or hold a gesture key (or press it harder) until the screen shows a level you like, and tap [[SEL]] while still
-   holding it: it latches at that level. Let go when you like.
+2. Or hold a gesture key (or press it harder) until the screen shows a level you like, and tap [[SEL]] while still holding it: it latches at that level. Let go when you like.
 
 ![Drones, Chord latched](../media/g-keep-0.png "Tapped: CHORD latched")
 ![Drones, Chord pressed to 55%](../media/g-keep-1.png "CHORD 55%: tap SEL here")
@@ -90,8 +89,8 @@ Tap, latch, stack and slow down: these work on every gesture key.
 
 - 0:00 P2 Embers
 - 0:01 Chord tapped: all the way in, latched
-- 0:05 tapped again: it goes
-- 0:09 pressed to 55%, SEL tapped: latched there
+- 0:05 Tapped again: it goes
+- 0:09 Pressed to 55%, SEL tapped: latched there
 
 ### Build a climax {#stack}
 
@@ -107,11 +106,11 @@ Tap, latch, stack and slow down: these work on every gesture key.
 - 0:00 P6 Seance
 - 0:01 Snarl pressed: a growl
 - 0:05 Wash held on top: the climax
-- 0:10 both let go
+- 0:10 Both let go
 
 ### Transform a sound over half a minute {#minute}
 
-*A slow Gesture time and a tap*
+*A slow gesture time and a tap*
 
 1. Turn **PRESETS** all the way left: **GESTURE TIME 33 s**.
 2. Tap a gesture key: it comes in on its own.

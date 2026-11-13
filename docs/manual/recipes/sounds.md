@@ -122,29 +122,38 @@ buzzes and takes on drone I's pitch as a grain.
 
 ### Metallic bells {#bells}
 
-*Cross-FM: each drone bending the other's pitch, high and pure, into bells*
+*Cross-FM rings two high sines into metal; the LFO strikes it, again and again*
 
 Each drone's sound bends the other's pitch, FM synthesis between the two. On pure, high tones a tritone apart it rings
-into a metallic, bell-like sound; turned higher it clangs and runs wild.
+into a metallic tone. A bell is struck and dies away, so the LFO snaps the filters open and lets them close slowly: a
+bell struck every 2.5 s, ringing out.
 
 1. Press [[EDIT]] for **Osc**, and turn KNOB 1 and KNOB 3, the X-Waves, all the way down: **sine**.
 2. Press [[HOME]] twice for **Pitch**, and turn both drones high, a tritone apart (here C#6 and G6: the top of their
    range is about 1.6 kHz).
 3. Tap black key 11, [[F#5]], until it winks: **bend each other** (twice from off).
-4. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up: about 70 rings, 85 clangs.
+4. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up to about **70**: the sines ring into metal.
+5. Press [[HOME]] for **Drones**, and turn both cutoffs (KNOB 2 and KNOB 4) down to about **300 Hz**: the metal goes
+   dull.
+6. Press [[LFO]] for **LFO sends**. Tap OCT− until LFO I is **Round** (Roundtooth), and turn SELECT, the LFO's rate,
+   to about **0.4 Hz**. Tap [[A#4]] until drone II's cutoff says **LFO I** too.
+7. Turn KNOB 2 and KNOB 4, the cutoff sends, all the way left: **−100**. Each cycle the filters snap open and close
+   slowly: the bell is struck, and rings out.
 
-> **Good to know.** Simple intervals (an octave, a fifth) lock into harmonies instead of bells; awkward ones (a
-> tritone, a seventh) ring metallic. Lower down, on rich waves, cross-FM only thickens and roughens. If the Swell is
-> on, switch it off ([[ARP]], then [[ARP]] again on its page) so the bells ring steadily.
+> **Good to know.** Roundtooth rises fast and falls at the cycle's end; turned upside down (−100) it jumps and dies
+> away, a strike. SELECT sets how often it strikes. Simple intervals (an octave, a fifth) lock into harmonies instead
+> of bells; awkward ones (a tritone, a seventh) ring metallic. X-mod past 85 clangs and runs wild. If the Swell is on,
+> switch it off ([[ARP]], then [[ARP]] again on its page) so only the LFO strikes.
 
-![Mods, bend each other, X-mod 70](../media/bells-0.png "bend each other, 70")
-![Mods, X-mod 85](../media/bells-1.png "X-mod 85")
+![LFO sends, LFO I on Roundtooth at 0.39 Hz, both cutoffs on LFO I](../media/bells-0.png "Round, 0.39 Hz")
+![LFO sends, both cutoff sends at -100](../media/bells-1.png "both cutoffs −100")
 
 **Listen** (`bells`)
 
 - 0:00 two pure sines, high, a tritone apart
-- 0:01 bend each other, X-mod up: they ring into one metallic, bell-like tone
-- 0:09 X-mod higher: the bells clang and run wild
+- 0:01 bend each other, X-mod up: one metallic tone, but it never stops ringing
+- 0:07 the cutoffs down: the metal goes dull
+- 0:10 the cutoff sends at −100: a bell struck every 2.5 s, bright on the hit, then the top dies first
 
 ### Snarl {#snarl}
 

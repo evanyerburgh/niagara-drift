@@ -10,15 +10,14 @@ description: A Niagara Drift tutorial: start from one plain drone (P16 Bare) and
 
 ### Build a sound from scratch {#scratch}
 
-*No Preset needed: start bare, add what you like*
+*No preset needed: start bare, add what you like*
 
-You don't have to start from a Preset. **P16 Bare** is the FM-1 as an analog synth on its defaults: one saw through an
-open filter, everything else off. Build up from there, a control at a time, in any order.
+You don't have to start from a preset. **P16 Bare** is the FM-1 as an analog synth on its defaults: one saw through an open filter, everything else off. Build up from there, a control at a time, in any order.
 
 #### Start bare
 
 1. Press [[SEL]] + [[G5]], tap white key 8 (**P16 Bare**), then [[PLAY]]. Wait for the gold line under
-   [the header](../reference/controls.md#screen-header) to fill: Bare glides in over the Scene time.
+   [the header](../reference/controls.md#screen-header) to fill: Bare glides in over the scene time.
 
 #### Add what you like
 
