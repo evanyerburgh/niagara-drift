@@ -25,9 +25,9 @@ What keeps the drones alive and worn, and each drone's noise.
 
 | Knob | What it does |
 |---|---|
-| **Feedback** | The finished sound, after the delay and reverb, fed back into the drones: a resonant, thickening color. Past about 70 it sings on its own |
+| **Feedback** (on screen Feedbk) | The finished sound, after the delay and reverb, fed back into the drones: a resonant, thickening color. Past about 70 it sings on its own |
 | **Drift** | Slow random modulation: each drone's pitch, cutoff, wave, level and partner detune wander around where you set them. 0 holds everything still |
-| **Character** | The oscillators from clean to vintage: softer edges, a bent saw, a little pitch jitter |
+| **Character** (on screen Char.) | The oscillators from clean to vintage: softer edges, a bent saw, a little pitch jitter |
 | **Age** | Wear like an old tape: darker, a little hiss, slow wow and flutter |
 
 ## Tone

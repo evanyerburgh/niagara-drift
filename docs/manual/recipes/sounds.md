@@ -17,11 +17,11 @@ Put drone I's sub four octaves down, all the way in, and turn drone I down to ab
 tone and becomes clicks, about 2.6 a second. Turn drone I down and the clicks play like percussion under drone II.
 
 1. Hold [[SEL]] and tap [[F5]] for the presets, then tap white key 2: **Embers** (P2).
-2. Press [[EDIT]] twice for **Sub · Drive**, and turn KNOB 1, Osc/Sb, all the way to the sub: **100**.
+2. Press [[EDIT]] until you're on **Sub · Drive**, and turn KNOB 1, Osc/Sb, all the way to the sub: **100**.
 3. Tap [[G#3]], drone I's sub, until the screen says **−4 oct**. It goes round −1, −2, ⅓, ⅕, −3, −4.
-4. Press [[HOME]] twice for **Pitch**, and turn KNOB 1, drone I's pitch, quickly down past **A0**, where the screen
+4. Press [[HOME]] until you're on **Pitch**, and turn KNOB 1, drone I's pitch, quickly down past **A0**, where the screen
    turns to Hz, to about **21 Hz**: clicks.
-5. Press [[HOME]] for **Drones**, and turn KNOB 1, drone I's level, down to about **50**: the clicks under drone II.
+5. Press [[HOME]] until you're on **Drones**, and turn KNOB 1, drone I's level, down to about **50**: the clicks under drone II.
 
 > **Good to know.** The clicks a second are drone I's pitch ÷ 8 (the sub is ÷ 16, two clicks to its cycle): at D3, 18
 > a second; at A0 (27.5 Hz), about 3; at 21 Hz, 2.6; at 5 Hz, one every 1.6 s. The clicks reach the speaker, though
@@ -44,10 +44,10 @@ tone and becomes clicks, about 2.6 a second. Turn drone I down and the clicks pl
 Turn a filter's resonance up and it rings on the drone's notes; let the LFO move the resonance instead of the cutoff,
 and the ring swells and fades on its own.
 
-1. Press [[HOME]] twice for **Pitch**, and turn KNOB 2 and KNOB 4, the resonances, up: the filters ring. Their last dot is
+1. Press [[HOME]] until you're on **Pitch**, and turn KNOB 2 and KNOB 4, the resonances, up: the filters ring. Their last dot is
    red: there they ring on their own.
-2. Press [[HOME]] again for **Drones**, and turn the cutoffs (KNOB 2 and KNOB 4) up: the ring brighter.
-3. Press [[LFO]] for **LFO sends**, and tap [[C#4]] and [[C#5]]: on the LFO pages they switch each drone's cutoff
+2. Press [[HOME]] until you're on **Drones**, and turn the cutoffs (KNOB 2 and KNOB 4) up: the ring brighter.
+3. Press [[LFO]] until you're on **LFO sends**, and tap [[C#4]] and [[C#5]]: on the LFO pages they switch each drone's cutoff
    send to **resonance**.
 4. Turn KNOB 2 and KNOB 4, the resonance sends, up: the ring swells and fades as the LFO goes round.
 
@@ -70,14 +70,14 @@ and the ring swells and fades on its own.
 With hard sync, drone II restarts its wave on every cycle of drone I: turning drone II's pitch then changes its tone,
 not its note, a tearing, vocal, laser-like sweep.
 
-1. Press [[HOME]] for **Drones**: turn KNOB 4, drone II's cutoff, well up, and bring drone II forward (KNOB 3 up,
+1. Press [[HOME]] until you're on **Drones**: turn KNOB 4, drone II's cutoff, well up, and bring drone II forward (KNOB 3 up,
    KNOB 1 down).
 2. Tap black key 10, [[D#5]]: **hard sync**, drone II locked to drone I.
-3. Press [[HOME]] for **Pitch**, and turn KNOB 3, drone II's pitch, slowly up two octaves and back: the tone sweeps.
+3. Press [[HOME]] until you're on **Pitch**, and turn KNOB 3, drone II's pitch, slowly up two octaves and back: the tone sweeps.
 
 > **Good to know.** It's strongest with drone II above drone I and a saw or square in its wave (Osc page). To keep
-> it moving without a hand, send the LFO to drone II's pitch (LFO sends, KNOB 3) with a deep send: the LFO moves
-> only a few semitones, so the sweep is gentler. Here Abyss's own resonance LFO was turned off first (LFO sends,
+> it moving without a hand, send the LFO to drone II's pitch (LFO sends, KNOB 3): a send of about 30 moves it two
+> semitones each way, a gentle sweep; 100 swings it two octaves. Here Abyss's own resonance LFO was turned off first (LFO sends,
 > KNOB 2 and 4 to 0), so its slow ringing doesn't cover the sweep.
 
 ![Pitch, hard sync, drone II on B2](../media/sync-0.png "hard sync on, drone II on B2")
@@ -101,8 +101,8 @@ At key 11's first setting, drone I's sound moves drone II's filter, as fast as d
 buzzes and takes on drone I's pitch as a grain.
 
 1. Tap black key 11, [[F#5]], once: it lights, **I moves II's cutoff**.
-2. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up: the growl deepens.
-3. Press [[HOME]] twice for **Pitch**, and move drone I's pitch (KNOB 1): the growl changes its grain.
+2. Press [[LFO]] until you're on **Mods**, and turn KNOB 4, X-mod, up: the growl deepens.
+3. Press [[HOME]] until you're on **Pitch**, and move drone I's pitch (KNOB 1): the growl changes its grain.
 
 > **Good to know.** It's strongest with drone II's filter resonant and band-pass ([[A#4]]), as in **Vespers** (P3)
 > here. **Seance** (P6) uses it gently.
@@ -125,25 +125,26 @@ Each drone's sound bends the other's pitch, FM synthesis between the two. On pur
 into a metallic tone. A bell is struck and dies away, so the LFO snaps the filters open and lets them close slowly: a
 bell struck every 2.5 s, ringing out.
 
-1. Press [[EDIT]] for **Osc**, and turn KNOB 1 and KNOB 3, the X-Waves, all the way down: **sine**.
-2. Press [[HOME]] twice for **Pitch**, and turn both drones high, a tritone apart (here C#6 and G6: the top of their
+1. Press [[EDIT]] until you're on **Osc**, and turn KNOB 1 and KNOB 3, the X-Waves, all the way down: **sine**.
+2. Press [[HOME]] until you're on **Pitch**, and turn both drones high, a tritone apart (here C#6 and G6: the top of their
    range is about 1.6 kHz).
-3. Tap black key 11, [[F#5]], until it winks: **bend each other** (twice from off).
-4. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up to about **70**: the sines ring into metal.
-5. Press [[HOME]] for **Drones**, and turn both cutoffs (KNOB 2 and KNOB 4) down to about **300 Hz**: the metal goes
+3. Tap black key 11, [[F#5]], until it winks and the screen says **PITCH I <> II**: the drones bend each other's
+   pitch (twice from off).
+4. Press [[LFO]] until you're on **Mods**, and turn KNOB 4, X-mod, up to about **70**: the sines ring into metal.
+5. Press [[HOME]] until you're on **Drones**, and turn both cutoffs (KNOB 2 and KNOB 4) down to about **300 Hz**: the metal goes
    dull.
-6. Press [[LFO]] for **LFO sends**. Tap OCT− until LFO I is **Round** (Roundtooth), and turn SELECT, the LFO's rate,
+6. Press [[LFO]] until you're on **LFO sends**. Tap OCT− until LFO I is **Round** (Roundtooth), and turn SELECT, the LFO's rate,
    to about **0.4 Hz**. Tap [[A#4]] until drone II's cutoff says **LFO I** too.
 7. Turn KNOB 2 and KNOB 4, the cutoff sends, all the way left: **−100**. Each cycle the filters snap open and close
    slowly: the bell is struck, and rings out.
-8. Press [[FX]] for **Space**, and turn KNOB 4, the reverb's Mix, to about **40**: more room for it to ring in.
+8. Press [[FX]] until you're on **Space**, and turn KNOB 4, the reverb's Mix, to about **40**: more room for it to ring in.
 
 > **Good to know.** Roundtooth rises fast and falls at the cycle's end; turned upside down (−100) it jumps and dies
 > away, a strike. SELECT sets how often it strikes. Simple intervals (an octave, a fifth) lock into harmonies instead
 > of bells; awkward ones (a tritone, a seventh) ring metallic. X-mod past 85 clangs and runs wild. If the Swell is on,
 > switch it off ([[ARP]], then [[ARP]] again on its page) so only the LFO strikes.
 
-![Mods, bend each other, X-mod 70](../media/bells-0.png "bend each other, 70")
+![Mods, X-mod at 70 in pitch mode](../media/bells-0.png "X-mod pitch, 70")
 ![LFO sends, LFO I on Roundtooth at 0.39 Hz, both cutoff sends at -100](../media/bells-1.png "Round, both cutoffs −100")
 
 **Listen** (`bells`)
@@ -158,9 +159,9 @@ bell struck every 2.5 s, ringing out.
 At key 11's last setting, the finished sound, the delay's echoes included, bends both drones' pitch: a growl that
 drags and tears the pitch, and the echoes with it. It's clearest on a steady sound with plenty of echoes.
 
-1. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: more echoes for Snarl to drag.
+1. Press [[FX]] until you're on **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: more echoes for Snarl to drag.
 2. Tap black key 11, [[F#5]], three times from off: **Snarl** (it winks).
-3. Press [[LFO]] twice for **Mods**, and turn KNOB 4, X-mod, up: 40 a growl, 85 a snarl.
+3. Press [[LFO]] until you're on **Mods**, and turn KNOB 4, X-mod, up: 40 a growl, 85 a snarl.
 
 > **Good to know.** The **Snarl** gesture ([[B4]]) brings it in by pressure, with the drive and Feedback on top, and
 > leaves without a trace. **Clean** ([[F5]]) takes it out while you hold it.
@@ -183,13 +184,13 @@ drags and tears the pitch, and the echoes with it. It's clearest on a steady sou
 LFO II's **OR** shape adds two square waves, one five times as fast as the other: on a drone's pitch it steps round
 four notes, a figure that repeats. Wander then moves the whole figure to a new note now and then.
 
-1. Make drone II bright, so the figure stands out: press [[EDIT]] for **Osc** and turn KNOB 3, its wave, to a
+1. Make drone II bright, so the figure stands out: press [[EDIT]] until you're on **Osc** and turn KNOB 3, its wave, to a
    **saw**; then on **Drones** ([[HOME]]) turn KNOB 4, its cutoff, all the way up, KNOB 3, its level, up, and KNOB 1,
    drone I's level, down.
-2. Press [[LFO]] for **LFO sends**, and tap [[OCT+]], LFO II's wave, until the screen says **OR 5**.
+2. Press [[LFO]] until you're on **LFO sends**, and tap [[OCT+]], LFO II's wave, until the screen says **OR 5**.
 3. Turn KNOB 3, drone II's pitch send, up: 40 is about ±4 semitones.
 4. Turn SELECT, the LFO's rate, up for a quicker figure.
-5. Press [[SEQ]] twice for **Pitch moves**, and turn KNOB 3, Wander, up: every so often the figure starts on another
+5. Press [[SEQ]] until you're on **Pitch moves**, and turn KNOB 3, Wander, up: every so often the figure starts on another
    note.
 
 > **Good to know.** LFO I's OR ([[OCT−]]) is three times as fast: another figure. **AND** (AND 3 on LFO I, AND 5 on
@@ -212,14 +213,14 @@ two filters in turn.
 
 1. Press [[ARP]] for the **Swell** page (tap it again if the Swell is off), and turn KNOB 1 for about a breath a
    second.
-2. Press [[LFO]] for **LFO sends**. Tap [[OCT−]] until LFO I is **Square**, and tap key 8, [[A#4]], until LFO I moves
+2. Press [[LFO]] until you're on **LFO sends**. Tap [[OCT−]] until LFO I is **Square**, and tap key 8, [[A#4]], until LFO I moves
    drone II's cutoff too.
 3. Turn KNOB 2 and KNOB 4, the cutoff sends, one up and one down: the filters jump in turn. Turn SELECT to about the
    Swell's speed.
-4. Hold black key 5, [[D#4]], half a second: the LFO restarts on each of the Swell's breaths ("on Swell").
+4. Hold black key 5, [[D#4]], half a second: the LFO restarts every two of the Swell's breaths, a bar ("on Swell").
 
 > **Good to know.** Echoes blur the rhythm: if your sound has them, turn the delay's Mix down first ([[FX]],
-> KNOB 2). The Swell's speed sets the rhythm: the locked LFO restarts on each of its breaths. Hold [[D#4]]
+> KNOB 2). The Swell's speed sets the rhythm: the locked LFO restarts every bar, two breaths. Hold [[D#4]]
 > again to free the LFO. (With a MIDI clock, the Swell and the locked LFO follow its beat too.)
 
 ![LFO sends, LFO I Square on both cutoffs, on Swell](../media/swell-0.png "Square on both cutoffs, on Swell")
@@ -238,9 +239,9 @@ two filters in turn.
 Speed mod lets the LFO speed up and slow down on one of its own waves, so every wobble rushes, then drags. It's
 easiest to hear on a vibrato.
 
-1. Press [[LFO]] for **LFO sends**. Tap key 6, [[F#4]], until LFO I moves drone II's pitch, and turn KNOB 3, its pitch
+1. Press [[LFO]] until you're on **LFO sends**. Tap key 6, [[F#4]], until LFO I moves drone II's pitch, and turn KNOB 3, its pitch
    send, up: a slow vibrato.
-2. Press [[LFO]] again for **Mods**, and turn KNOB 1, Speed, all the way up: the LFO speeds up and slows down by up to
+2. Press [[LFO]] until you're on **Mods**, and turn KNOB 1, Speed, all the way up: the LFO speeds up and slows down by up to
    three octaves.
 3. Turn KNOB 2, Source, to **LFO I**: a regular rush and drag (LFO II's random glide makes it uneven).
 
@@ -265,18 +266,18 @@ easiest to hear on a vibrato.
 When the delay's time moves, its echoes bend in pitch, as tape does when it speeds up and slows down. Let an LFO move
 it, and every echo warbles; let the Swell dip the drones, and the bending echoes ring on their own in the gaps.
 
-1. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: clear echoes to bend.
+1. Press [[FX]] until you're on **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: clear echoes to bend.
 2. Press [[ARP]] for the **Swell** (tap it again if it's off), and turn KNOB 1 up for about a breath a second: the
    echoes sound in the gaps.
-3. Press [[LFO]] twice for **Mods**, and turn KNOB 3, Delay, all the way up: the LFO wobbles the delay's time by a
+3. Press [[LFO]] until you're on **Mods**, and turn KNOB 3, Delay, all the way up: the LFO wobbles the delay's time by a
    quarter, and every echo bends.
-4. Press [[FX]] twice for **Details**, and turn Time (KNOB 2) up: deeper, slower bends.
+4. Press [[FX]] until you're on **Details**, and turn Time (KNOB 2) up: deeper, slower bends.
 
 > **Good to know.** On the LFO pages, black key 10, [[D#5]], picks which LFO moves the delay's time: LFO I's
 > regular waves warble evenly, LFO II's random glide makes them wander, as here. Turning Time by hand bends the
 > echoes too. Movement (ALGORITHM) scales the warble with the other LFO sends.
 
-![Mods, Delay +100](../media/warble-0.png "Delay +100: ±28%")
+![Mods, Delay +100](../media/warble-0.png "Delay +100: ±28% with the preset's Movement")
 ![Details, a longer Time](../media/warble-1.png "a longer Time")
 
 **Listen** (`warble`)
@@ -292,8 +293,8 @@ it, and every echo warbles; let the Swell dip the drones, and the bending echoes
 The **Self** delay stretches its time as its echoes get louder, so loud echoes sag and wobble; **Drive** after it
 distorts the drones and their echoes together: ghost notes and crackle.
 
-1. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) up: the echoes pile up.
-2. Press [[FX]] again for **Details**. Hold [[SEL]] and turn KNOB 2 to **Self** (or **Grain**, whose own echoes shake
+1. Press [[FX]] until you're on **Space**, and turn Repeat (KNOB 1) up: the echoes pile up.
+2. Press [[FX]] until you're on **Details**. Hold [[SEL]] and turn KNOB 2 to **Self** (or **Grain**, whose own echoes shake
    its time).
 3. Turn KNOB 1, Drive, up.
 
@@ -317,9 +318,9 @@ distorts the drones and their echoes together: ghost notes and crackle.
 At its top, the reverb's Length is **Inf**: it never dies away, a freeze of what's in it. Move the drones and they
 play over the frozen chord.
 
-1. Press [[FX]] for **Space**. Turn KNOB 4, the reverb's Mix, up, then KNOB 3, Length, all the way: **Inf**, "freeze"
+1. Press [[FX]] until you're on **Space**. Turn KNOB 4, the reverb's Mix, up, then KNOB 3, Length, all the way: **Inf**, "freeze"
    in blue.
-2. Press [[HOME]] twice for **Pitch**, and turn KNOB 1 and KNOB 3 to new notes: the drones play over the frozen chord.
+2. Press [[HOME]] until you're on **Pitch**, and turn KNOB 1 and KNOB 3 to new notes: the drones play over the frozen chord.
 3. Turn Length back down to let it go, or stop with [[PLAY]].
 
 > **Good to know.** On Details, [[SEL]] + KNOB 4 picks what goes into the reverb: **Drones** freezes the drones and
@@ -342,12 +343,12 @@ The **Shimmer** reverb lifts what goes into it an octave, in two voices just apa
 echo rises into a bright halo while the drones stay dry. It shines on voices in the middle and up; on a low drone the
 octave stays low.
 
-1. If your drones are low, press [[HOME]] twice for **Pitch** and turn both up an octave (KNOB 1 and KNOB 3): the halo
+1. If your drones are low, press [[HOME]] until you're on **Pitch** and turn both up an octave (KNOB 1 and KNOB 3): the halo
    sparkles above them.
-2. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: more echoes.
-3. Press [[FX]] again for **Details**, and turn KNOB 4, the reverb's Type, to **Shimmer**.
+2. Press [[FX]] until you're on **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: more echoes.
+3. Press [[FX]] until you're on **Details**, and turn KNOB 4, the reverb's Type, to **Shimmer**.
 4. Hold [[SEL]] and turn KNOB 4: Into **Echoes**.
-5. Press [[FX]] for Space again, and turn the reverb's Mix (KNOB 4) up.
+5. Press [[FX]] until you're on **Space**, and turn the reverb's Mix (KNOB 4) up.
 
 > **Good to know.** The Shimmer washes in over about 8 seconds and out over 6. **Cistern** (P10) uses it on
 > everything.

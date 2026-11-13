@@ -77,9 +77,6 @@ Hold [[SEL]] and tap a gesture key. The bank's scenes are then on white keys 1�
 - **The keys' lights:** lit keys hold a scene; the one you're on blinks slowly until you change something.
 - **Keys 9–16** are the [gestures](gestures.md).
 
-### Saving
-
-
 ### From 0.2
 
 - **From 0.2:** scenes on keys 9–12 moved to empty keys 1–8 (the screen says how many). 0.2's presets that 0.3

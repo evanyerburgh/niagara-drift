@@ -18,7 +18,7 @@ The effects: a delay with six types, a drive, and a reverb with five.
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
 | Space | Delay repeats | Delay mix | Reverb length | Reverb mix |
-| Details | Delay drive · SEL: — | Delay time · SEL: delay type | Reverb damp | Reverb type · SEL: into reverb |
+| Details | Drive (after the delay) | Delay time · SEL: delay type | Reverb damp | Reverb type · SEL: into reverb |
 
 ## Delay
 
@@ -26,7 +26,7 @@ The effects: a delay with six types, a drive, and a reverb with five.
 
 | Knob | What it does |
 |---|---|
-| **Repeats** | How many echoes. Past about 85 they run away into self-oscillation |
+| **Repeats** (on screen Repeat) | How many echoes. Past about 85 they run away into self-oscillation |
 | **Mix** | How loud the echoes are |
 | **Time** | 70 ms to 1.46 s. Turning it bends the echoes' pitch, as tape does |
 | **Type** | [[SEL]] + Time: one of six ([Delay types](#delay-types)) |

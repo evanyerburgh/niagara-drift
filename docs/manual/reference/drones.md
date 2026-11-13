@@ -45,7 +45,7 @@ Low-pass (LP), band-pass (BP) or high-pass (HP), on a black key: [[A#3]] for dro
 | Knob | What it does |
 |---|---|
 | **Pitch** | 1.6 kHz down to 2 Hz, a note of the Tuning a click. With [[SEL]] held, a cent a click |
-| **Resonance** | boosts the filter at its cutoff. The last dot is red: there it rings on its own (self-oscillates) |
+| **Resonance** | Boosts the filter at its cutoff. The last dot is red: there it rings on its own (self-oscillates) |
 
 ### Pitch link
 
