@@ -40,7 +40,8 @@ Press all the way and hold a moment: the scene stays when you let go.
 
 ## Scene banks
 
-Eight banks of eight scenes: A to F are yours, and two hold the presets.
+Eight banks of eight scenes: banks 1 to 6 are yours, and two hold the presets. The screen names your scenes by bank
+and key, 3.5 for bank 3, key 5, and the presets by number, P5.
 
 ### Save a scene
 
@@ -51,18 +52,18 @@ Hold [[SAVE]], tap a key.
 
 ### Pick a bank
 
-<img src="../../img/keys-banks.png" width="720" alt="The eight gesture keys picked out, each with the bank it picks while SEL is held: banks A to F, then presets P1 to 8 and P9 to 16">
+<img src="../../img/keys-banks.png" width="720" alt="The eight gesture keys picked out, each with the bank it picks while SEL is held: banks 1 to 6, then presets P1 to 8 and P9 to 16">
 
 Hold [[SEL]] and tap a gesture key. The bank's scenes are then on white keys 1–8.
 
 | Key | Bank |
 |---|---|
-| [[G4]] | A |
-| [[A4]] | B |
-| [[B4]] | C |
-| [[C5]] | D |
-| [[D5]] | E |
-| [[E5]] | F |
+| [[G4]] | 1 |
+| [[A4]] | 2 |
+| [[B4]] | 3 |
+| [[C5]] | 4 |
+| [[D5]] | 5 |
+| [[E5]] | 6 |
 | [[F5]] | Presets P1–P8 |
 | [[G5]] | Presets P9–P16 |
 
@@ -72,7 +73,7 @@ Hold [[SEL]] and tap a gesture key. The bank's scenes are then on white keys 1�
 
 - **The glide** takes the Scene time (Setup 1). Turn a knob to stop it part way.
 - **A tap** is anything let go within half a second, however hard.
-- **The screen** says how far a press has gone ("A5 40%"), "KEPT" for a kept blend, and "→ A5" as it glides back.
+- **The screen** says how far a press has gone ("3.5 40%"), "KEPT" for a kept blend, and "→ 3.5" as it glides back.
 - **The keys' lights:** lit keys hold a scene; the one you're on blinks slowly until you change something.
 - **Keys 9–16** are the [gestures](gestures.md).
 
@@ -82,6 +83,6 @@ Hold [[SEL]] and tap a gesture key. The bank's scenes are then on white keys 1�
 ### From 0.2
 
 - **From 0.2:** scenes on keys 9–12 moved to empty keys 1–8 (the screen says how many). 0.2's presets that 0.3
-  doesn't keep (Eerie, Glass, Tanpura, Whistle, Cathedral, Metal) are in bank F, keys 1–6; Heaven is now Sibyl, Clean
+  doesn't keep (Eerie, Glass, Tanpura, Whistle, Cathedral, Metal) are in bank 6, keys 1–6 (6.1 to 6.6); Heaven is now Sibyl, Clean
   is Bare. Feedback moved to KNOB 1 on Life, Cross-mod to KNOB 4 on Mods, Tune to KNOB 2 on Setup 2; HOME opens
   Drones, FX opens Space.

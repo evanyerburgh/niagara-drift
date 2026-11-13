@@ -122,7 +122,7 @@ tap REC
 expect loop 0
 wait 8000
 expect gam0 0
-# A SCENE TAPPED IN THE LOOP: a scene with the cutoff up (bank A, key 1), the sound back down; recorded, the tap;
+# A SCENE TAPPED IN THE LOOP: a scene with the cutoff up (bank 1, key 1), the sound back down; recorded, the tap;
 # looped, each pass starts on the sound the recording began on and goes to the scene again
 press SEL
 tapkey w8

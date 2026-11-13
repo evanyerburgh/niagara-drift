@@ -74,7 +74,7 @@ class FakeFM1:
         self.image, self.unplug_after, self.after_write = image, unplug_after, after_write
         self.stored = stored                  # Niagara Drift's objects {obj: bytes}; None: no backup commands
         self.nobj = nobj                      # objects this firmware knows (older ones: 4, no Presets bank; 5, no
-                                              # banks D-F)
+                                              # banks 4-6)
         self.buf, self.restarted = bytearray(3840), 0
         self.safe, self.answer, self.staged, self.asked_with = safe, answer, {}, None   # 0.3's safe restore
         self.stall_after, self.bad_addr = stall_after, bad_addr
@@ -375,7 +375,7 @@ def backups():
     rc, out, err = cli(["--restore", str(f), "--yes"], dev6)
     ok(rc == 1 and dev6.stored == {0: b"mine"} and "kept" in out and not dev6.restarted,
        "... HOME: nothing changed")
-    nod = TMP / "no-d.json"                     # a backup with banks D-F empty (or from before them)
+    nod = TMP / "no-d.json"                     # a backup with banks 4-6 empty (or from before them)
     jn = json.loads(f.read_text())
     for k in ("5", "6", "7"):
         jn["objects"].pop(k, None)
@@ -384,8 +384,8 @@ def backups():
     dev7 = FakeFM1(image, identity="FM-1_800", stored={0: b"mine"}, safe=True, answer="sel", nobj=5)
     rc, out, err = cli(["--restore", str(nod), "--yes"], dev7)
     ok(rc == 0 and dev7.stored == {k: v for k, v in mine.items() if k < 5} and dev7.restarted == 1,
-       "... onto a 0.3 build from before banks D-F: their empty objects left out")
-    dfile = TMP / "with-d.json"                 # a backup holding bank D, onto one without it: refused, nothing changed
+       "... onto a 0.3 build from before banks 4-6: their empty objects left out")
+    dfile = TMP / "with-d.json"                 # a backup holding bank 4, onto one without it: refused, nothing changed
     jd = json.loads(f.read_text())
     jd["objects"]["5"] = base64.b64encode(b"bank D " * 10).decode()
     jd["crc32"]["5"] = zlib.crc32(b"bank D " * 10)
@@ -393,7 +393,7 @@ def backups():
     dev8 = FakeFM1(image, identity="FM-1_800", stored={0: b"mine"}, safe=True, answer="sel", nobj=5)
     rc, out, err = cli(["--restore", str(dfile), "--yes"], dev8)
     ok(rc != 0 and dev8.stored == {0: b"mine"} and not dev8.restarted,
-       "... one holding bank D onto it: refused, nothing changed")
+       "... one holding bank 4 onto it: refused, nothing changed")
     old = {k: v for k, v in objs.items() if k < 4}
     rc, out, err = cli(["--backup", str(TMP / "old.json")], FakeFM1(image, identity="FM-1_800", stored=dict(old), nobj=4))
     ok(rc == 0 and I.read_backup(str(TMP / "old.json")) == {k: v for k, v in old.items() if k != 1},

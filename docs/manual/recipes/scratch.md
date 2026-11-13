@@ -28,7 +28,7 @@ You don't have to start from a preset. **P16 Bare** is the FM-1 as an analog syn
 
 #### Keep it
 
-1. Hold [[SEL]] and tap [[G4]] for bank A, then hold [[SAVE]] and tap a white key: your sound is stored there.
+1. Hold [[SEL]] and tap [[G4]] for bank 1, then hold [[SAVE]] and tap a white key: your sound is stored there.
 
 > **Where next.** Take it further with a recipe: [A singing filter](sounds.md#sing),
 > [Ticks and clicks](sounds.md#ticks), [Freeze a chord, play over it](sounds.md#freeze),

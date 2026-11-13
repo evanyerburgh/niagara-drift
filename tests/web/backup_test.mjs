@@ -19,7 +19,7 @@ function reply(cmd, body) {
 // 0.3 (safe) the staging (0x74) and the question (0x75), answered "sel" or "home"; spoil: a byte lost on the way
 class FakeFM1 {
   constructor(objs, answers = true, safe = false, answer = "sel", nobj = 8) {   // nobj: objects it knows (5: a 0.3 build
-    this.nobj = nobj;                                                          // from before banks D-F)
+    this.nobj = nobj;                                                          // from before banks 4-6)
     this.store = objs; this.buf = []; this.q = []; this.answers = answers; this.restarted = false; this.reads = 0; this.onRead = null;
     this.safe = safe; this.answer = answer; this.staged = {}; this.spoil = false;
   }
@@ -109,13 +109,13 @@ check("THE SAFE RESTORE: all staged, nothing changed when the FM-1 asks", asked 
 check("... SEL: every object switched to (one the backup hasn't, emptied), the FM-1 restarting itself", res === "restored" &&
       same(safe.store[0], objs[0]) && same(safe.store[3], objs[3]) && safe.store[4].length === 0 && safe.restarted);
 const pre = new FakeFM1(empty(), true, true, "sel", 5);
-check("... onto a 0.3 build from before banks D-F: their empty objects left out, the rest restored",
+check("... onto a 0.3 build from before banks 4-6: their empty objects left out, the rest restored",
       (await ndRestore(pre, back)) === "restored" && same(pre.store[0], objs[0]) && !(5 in pre.store));
 const withD = { ...back, 5: fill(50, 9) };
 const pre2 = new FakeFM1(empty(), true, true, "sel", 5);
 let refusedD = false;
 try { await ndRestore(pre2, withD); } catch (e) { refusedD = e.code === "lost"; }
-check("... one holding bank D onto it: refused, nothing changed", refusedD && pre2.store[0].length === 0);
+check("... one holding bank 4 onto it: refused, nothing changed", refusedD && pre2.store[0].length === 0);
 const home = new FakeFM1(empty(), true, true, "home");
 check("... HOME: cancelled, nothing changed", (await ndRestore(home, back)) === "cancelled" && home.store[0].length === 0 &&
       !home.restarted);

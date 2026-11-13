@@ -335,7 +335,7 @@ def preset_keys(first, bank):
     return img
 
 
-BANKS = ("A", "B", "C", "D", "E", "F", "P1–8", "P9–16")
+BANKS = ("1", "2", "3", "4", "5", "6", "P1–8", "P9–16")
 GESTURE_NOTES = ("G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5")
 
 

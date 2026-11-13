@@ -31,7 +31,7 @@ resonance 25."
 |---|---|---|
 | **A page opens** | Its name and its knobs | "Pitch page. Drone 1: Pitch D3, resonance 25. Drone 2: Pitch A3, resonance 25." |
 | **A knob turns** | Its name and value | "Drone 1 resonance 28" |
-| **A key is tapped** | What it set | "Drone 1 filter BP" |
+| **A key is tapped** | What it set | "Drone 1 band-pass filter" |
 | **[[SEL]] held, a black key touched** | What it does and what a press would do, without switching it | "G sharp 3: drone 1 Sub, 1 octave down. Press for 2 octaves down" |
 | **PLAY, a scene, a gesture** | What started or is on its way | "Play"; "to Preset 2 embers"; "wash" |
 | **You ask** | Everything on the screen: the page, whether it's playing, the sound | The page as it opens, then "Playing, on its way to Preset 2 embers. Swell on." |

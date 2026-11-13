@@ -110,8 +110,8 @@ async function handshake(link, tries = 3) {
 // BACKUP / RESTORE (Niagara Drift v0.2 on; firmware/src/app/main_fm1.c backup_cmd, tools/fm1_install.py nd_backup): the
 // stored objects as they lie on the flash, read 24 bytes at a time (0x70), written back 128 at a time (0x71), staged
 // (0x74) and switched to together on a yes on the FM-1 (0x75; before 0.3, each committed, 0x72, then a restart). The file is tools/fm1_install.py's: either tool restores the other's.
-export const ND_OBJECTS = { 0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C", 4: "presets saved over",
-                            5: "bank D", 6: "bank E", 7: "bank F" };
+export const ND_OBJECTS = { 0: "sound and bank 1", 1: "panel", 2: "bank 2", 3: "bank 3", 4: "presets saved over",
+                            5: "bank 4", 6: "bank 5", 7: "bank 6" };
 const ND_OPTIONAL = new Set([4, 5, 6, 7]);     // firmware older than the Presets bank (v0.2) has no 4, older than 0.3's
                                                // eight banks no 5-7: not read from it, and not restored to it when empty
 const ND_UNIT = new Set([1]);                  // the panel's calibration belongs to the unit: never in a backup, never

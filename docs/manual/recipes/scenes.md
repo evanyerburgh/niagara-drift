@@ -7,17 +7,17 @@ image: s-blend-0.png
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-The 8 white keys are scenes: 6 banks of 8 (A to F) to fill with your own sounds, and the presets.
+The 8 white keys are scenes: 6 banks of 8 (1 to 6) to fill with your own sounds, and the presets.
 
 ### Make a preset your own {#save}
 
 *Pick a bank, change it, SAVE and a white key*
 
-1. Tap a preset, then pick bank A: hold [[SEL]] and tap [[G4]] (B to F are [[A4]] to [[E5]]).
+1. Tap a preset, then pick bank 1: hold [[SEL]] and tap [[G4]] (2 to 6 are [[A4]] to [[E5]]).
 2. Change it as you like.
 3. Hold [[SAVE]] and tap a white key: it's stored there ([the header](../reference/controls.md#screen-header) says A1). Tap that key later to glide back to it.
 
-> **Good to know.** Presets can't be saved over: your sounds go in A to F.
+> **Good to know.** Presets can't be saved over: your sounds go in banks 1 to 6.
 
 
 ### Blend two sounds and keep a mix {#blend}

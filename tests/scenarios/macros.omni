@@ -9,7 +9,7 @@ set 7 700
 set 28 680
 set 11 75
 set 32 61
-# a new FM-1 plays the Presets; these scenes go in bank A (SEL + G4)
+# a new FM-1 plays the Presets; these scenes go in bank 1 (SEL + G4)
 expect bank 3
 press SEL
 tapkey w8
@@ -189,7 +189,7 @@ expect heard77 0
 set 79 0
 wait 21000
 expect heard7 700
-# a scene keeps the gestures: A1 stored with Wash latched, recalled from none
+# a scene keeps the gestures: 1.1 stored with Wash latched, recalled from none
 tapkey w15
 wait 5000
 expect heard63 >60
