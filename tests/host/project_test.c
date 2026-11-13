@@ -466,6 +466,56 @@ int main(void)
                                                          proj_note_moved == 1 && proj_note_presets == 0);
         check("... F holds 0.2's Presets once (F7 empty)", scene_has(BANK_D + 2, 5) && !scene_has(BANK_D + 2, 6));
     }
+    {   /* A, B and C full on keys 1-8 (Evan, 2026-11-14): A10, B11 and C12 go to D1-D3, none left unplayed. The first
+         * save cut short after D, E and F: loaded again, the three found in D, not copied twice; nothing lost */
+        static proj_v35_t o;
+        static bank_v35_t bb;
+        int i, k, j;
+        memset(store_n, 0, sizeof store_n);
+        memset(&o, 0, sizeof o);
+        o.magic = PROJ_MAGIC;
+        o.format = 35u;
+        o.mtime = MTIME_DEF;
+        for (k = 0; k < NP35; k++)
+            o.par[k] = dr_param_info(k)->def;
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < NP35; k++)
+                o.scene[i][k] = dr_param_info(k)->def;
+        o.scene_used = 0x0FFu | 1u << 9;               /* A1-A8 and A10 */
+        o.scene[9][DR_GP(0, GP_PITCH)] = 4100;
+        memcpy(store[OBJ_PROJ], &o, sizeof o);
+        store_n[OBJ_PROJ] = (int)sizeof o;
+        for (j = 0; j < 2; j++) {                      /* B1-B8 and B11; C1-C8 and C12 */
+            memset(&bb, 0, sizeof bb);
+            bb.magic = BANK_MAGIC;
+            bb.format = 35u;
+            bb.used = (uint16_t)(0x0FFu | 1u << (10 + j));
+            for (i = 0; i < NSCENES; i++)
+                for (k = 0; k < NP35; k++)
+                    bb.scene[i][k] = dr_param_info(k)->def;
+            bb.scene[10 + j][DR_GP(0, GP_PITCH)] = (int16_t)(4200 + 100 * j);
+            memcpy(store[j ? OBJ_BANKC : OBJ_BANKB], &bb, sizeof bb);
+            store_n[j ? OBJ_BANKC : OBJ_BANKB] = (int)sizeof bb;
+        }
+        check("banks 1-3 full: loads", project_load() == 0);
+        check("... A10, B11, C12 to D1, D2, D3, none unplayed",
+              scene_has(BANK_D, 0) && scene_get(BANK_D, 0)[DR_GP(0, GP_PITCH)] == 4100 &&
+              scene_has(BANK_D, 1) && scene_get(BANK_D, 1)[DR_GP(0, GP_PITCH)] == 4200 &&
+              scene_has(BANK_D, 2) && scene_get(BANK_D, 2)[DR_GP(0, GP_PITCH)] == 4300 && !scene_has(BANK_D, 3) &&
+              !scene_has(BANK_D + 1, 0) && proj_note_moved == 3 && proj_note_stored == 0 &&
+              !scene_has(0, 9) && !scene_has(1, 10) && !scene_has(2, 11));
+        fail_obj = OBJ_BANKB;                          /* the power goes as B is written */
+        check("... the first save cut short after D, E and F", project_save() != 0 && store_n[OBJ_BANKD] > 0 &&
+                                                          ((const bank_v35_t *)store[OBJ_BANKB])->format == 35u);
+        fail_obj = -1;
+        check("... loaded again: the three found in D, not copied twice",
+              project_load() == 0 && proj_note_moved == 3 && proj_note_stored == 0 &&
+              scene_get(BANK_D, 2)[DR_GP(0, GP_PITCH)] == 4300 && !scene_has(BANK_D, 3) && !scene_has(BANK_D + 1, 0) &&
+              !scene_has(0, 9) && !scene_has(1, 10) && !scene_has(2, 11));
+        check("... saved and reloaded: nothing moves, all three in D", project_save() == 0 && project_load() == 0 &&
+                                                          proj_note_moved == 0 && scene_has(BANK_D, 2) &&
+                                                          !scene_has(BANK_D, 3) && scene_has(1, 7) && scene_has(2, 7));
+    }
     {   /* format 36 (108 values): loads, its sounds kept, each drone's sub wave the square it was (2026-10-28) */
         static proj_v36_t o;
         static bank_v36_t bb;

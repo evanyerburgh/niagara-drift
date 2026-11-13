@@ -771,3 +771,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   the first FM-1s' 0x856014 and the newer ones' 0xB36014, anything else RAM only (the rescue tool the same). 0.2.1's
   rule (any standard part of 1-16 MiB) took both but named neither, so thefirmwarehub.com, which reads the chips
   from the package, listed it as "it does not check the chip". Both numbers are now in the image.
+- 2026-11-14: updating from 0.2, a scene on keys 9–12 that finds no empty key 1–8 in its own bank goes on to banks 4
+  and 5 (new in 0.3, so empty: 16 keys for the 12 at most), so none is left unplayed (Evan). A's go to B, C, then D,
+  E; B's and C's to D and E before A or the other, since D-F are now saved before B and C: a first save cut short
+  never loses a scene, and one already in D or E isn't copied twice.

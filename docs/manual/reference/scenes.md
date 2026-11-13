@@ -79,7 +79,7 @@ Hold [[SEL]] and tap a gesture key. The bank's scenes are then on white keys 1�
 
 ### From 0.2
 
-- **From 0.2:** scenes on keys 9–12 moved to empty keys 1–8 (the screen says how many). 0.2's presets that 0.3
+- **From 0.2:** scenes on keys 9–12 moved to empty keys 1–8, their own bank's first, then banks 4 and 5 if needed (the screen says how many); none is written over. 0.2's presets that 0.3
   doesn't keep (Eerie, Glass, Tanpura, Whistle, Cathedral, Metal) are in bank 6, keys 1–6 (6.1 to 6.6); Heaven is now Sibyl, Clean
   is Bare. Feedback moved to KNOB 1 on Life, Cross-mod to KNOB 4 on Mods, Tune to KNOB 2 on Setup 2; HOME opens
   Drones, FX opens Space.
