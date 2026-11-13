@@ -754,3 +754,20 @@ at the end. The current state is in the [README](../README.md) and the code.
   a Preset by number, "P5". Picked over "B3-K5" and "B3-1" (B3 is a note, and the header had no room for "changed" or
   SWELL beside them) and over "3-1" (the screen's dash is a range: "1-8"). The Screen Reader says "bank 3 key 5". The
   header keeps 11 px between its sides (was 12) so "1.1 changed" fits beside DRONES and [PLAY]. Saved sounds unchanged.
+- 2026-11-14: **scenes keep their latched gestures** (Evan: "it's part of the sound and really cool"): a scene saved
+  with Chord latched brings Chord back. The header as it was: while the scene arrives it reads "CHORD latched", and
+  "CHORD latched  1.1" once there (naming the scene first, "CHORD → 1.1", moved more of the header on every tap;
+  Evan: "the previous behavior was better"). **Dreamhouse and Ashram 3 dB quieter, Tape 2 dB** (Evan: loud on
+  headphones; their loud moments against P1 on headphones +1.8, -1.8, +3.3 dB before, -1.2, -4.6, +1.8 after).
+  Players' saved sounds unchanged. A low cut at 12 Hz on the headphone output was tried and not taken (Evan: no low
+  cut): before the output's clip it softened a saw at 8 Hz and below by 3-6 dB, and after the clip it went past full
+  scale.
+- 2026-11-14: **four Presets get their own Swell** (Evan: five breathing with P1's Swell, the same 23 s breath in step,
+  "makes them sound too much the same"): Embers and Howl none (the bloom and the grind are their movement), Abyss a
+  slow deep tide (33 s, about 18 dB), Tape a tired breath (29 s, about 7 dB); Niagara keeps it. Picked by ear from
+  two options each. Their loud moments within 1.3 dB of before, so their levels stay; without dips Embers and Howl
+  are 4-5 dB louder on average.
+- 2026-11-14: **the flash chips by name**, as Felucca, Charles Vestal's fm1-base and fm1-x0x, and Melodee check them:
+  the first FM-1s' 0x856014 and the newer ones' 0xB36014, anything else RAM only (the rescue tool the same). 0.2.1's
+  rule (any standard part of 1-16 MiB) took both but named neither, so thefirmwarehub.com, which reads the chips
+  from the package, listed it as "it does not check the chip". Both numbers are now in the image.

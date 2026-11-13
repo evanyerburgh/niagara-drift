@@ -21,8 +21,8 @@ FM-1-transporter, docs/PROTOCOL.md), which were verified on hardware:
 
   1. JieLi's flash loader (wl82loader.bin, from github.com/kagaimiq/jl-uboot-tool, downloaded
      and checked against its hash) is loaded into RAM and started;
-  2. the chip key must be 980F and the flash a standard SPI NOR of 1 MiB or more (856014 on the first
-     FM-1s, maybe another part on newer ones), or nothing is done;
+  2. the chip key must be 980F and the flash 856014 (Puya P25Q80) or B36014 (UC25HQ80, the newer
+     FM-1s'), both 1 MiB, or nothing is done;
   3. the whole flash is read and saved as a backup before anything else;
   4. the package whose head [0, 0x4000) equals the FM-1's is chosen (none: nothing is written);
   5. only 4 KiB sectors in [0x4000, end of its app area) that differ from it are written (V15's area
@@ -47,6 +47,7 @@ LOADER_SHA256 = "d41da6126760c9d66660bcc0cac8d27d221806c5e369a8036921efe68dca537
 LOADER_ADDR, LOADER_ARG = 0x1C02000, 0x0001
 
 FLASH_SIZE = 0x100000
+FLASH_IDS = (0x856014, 0xB36014)     # Puya P25Q80 (the first FM-1s), UC25HQ80 (the newer ones): both 1 MiB, as fm1-x0x
 APP_MAX = 0xE0000          # the .fwsc flash entry is raw flash [0, end): V15 0x93000, V16 0xA9000
 WRITE_MIN = 0x4000         # flash header, SPL, isd_config: never written
 SECTOR = 0x1000
@@ -249,9 +250,9 @@ def rescue(dev, packages, loader, write, backup_dir, say=print, confirm=None):
     dev.start_loader(loader)
     key, typ, fid = dev.chip()
     say(f"  chip key {key:04X}, flash type {typ}, id {fid:06X}")
-    maker, size = fid >> 16, fid & 0xFF                 # as fl_id_ok() in firmware/hal/fm1_flash.h
-    if (key, typ) != (0x980F, 3) or maker in (0, 0xFF) or not 0x14 <= size <= 0x18:
-        raise Fail("this is not the FM-1's chip and flash (expected key 980F, type 3, a 1-16 MiB NOR); nothing written")
+    if (key, typ) != (0x980F, 3) or fid not in FLASH_IDS:   # as fl_id_ok() in firmware/hal/fm1_flash_id.h
+        raise Fail("this is not the FM-1's chip and flash (expected key 980F, type 3, id 856014 or B36014); "
+                   "nothing written")
     say("  reading the whole flash ...")
     t0 = time.time()
     now = dev.read(0, FLASH_SIZE)

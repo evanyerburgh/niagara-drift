@@ -407,7 +407,7 @@ static void fm1_main(void)
     uint32_t last_frame = 0;
     {
         uint32_t f = irq_save();
-        flash_ok = (uint8_t)fl_id_ok(FL_FAR(fl_jedec_ram)());   /* a standard NOR part, else RAM only */
+        flash_ok = (uint8_t)fl_id_ok(FL_FAR(fl_jedec_ram)());   /* a known 1 MiB part, else RAM only */
         irq_restore(f);
         if (flash_ok) {
             rs_boot();                              /* a restore's commit cut short by a power loss: finished (before

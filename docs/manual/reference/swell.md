@@ -34,7 +34,7 @@ On the page, tap [[ARP]] to start or stop it.
 
 ## Good to know
 
-- **The starting sound** has it on: a slow breath, 40 deep. [The header](controls.md#screen-header) says **on**, or **off · tap ARP**.
+- **The starting sound** has it on: a slow breath, 12 dB deep. [The header](controls.md#screen-header) says **on**, or **off · tap ARP**.
 - **"ramp 100":** the rise takes 97% of each breath.
 - **An LFO locked to the Swell** ([[D#4]], held) restarts on its bars, so it follows a clock too.
 - **The picture:** two bars, four breaths, as strands meeting at a dot where the Swell is now.
