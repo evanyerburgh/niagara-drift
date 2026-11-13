@@ -834,12 +834,30 @@ static void presets_move(void)
 }
 
 /* KEYS 9-12 BECOME GESTURES (format 36, Evan 2026-10-28): a bank plays keys 1-8. On the first start, a scene of
- * the player's on keys 9-12 moves to the first empty key 1-8 of its own bank, then of another (A, B, C); one with no
- * room stays stored there, unplayed, not lost. Then 0.2's Presets that 0.3 dropped go into bank F (OLD02_CHANGES).
- * proj_note says what happened, for the screen */
+ * the player's on keys 9-12 moves to the first empty key 1-8 of its own bank, then of another: A's to B, C, D, E;
+ * B's and C's to D and E (Evan, 2026-11-14: new in 0.3, so empty for a player from 0.2, 16 keys for the 12 at
+ * most), then A and the other; one with no room stays stored there, unplayed, not lost. Then 0.2's Presets that
+ * 0.3 dropped go into bank F (OLD02_CHANGES). proj_note says what happened, for the screen. Here b 0-2 is A-C, 3-4
+ * D-E */
 int proj_note_moved, proj_note_stored, proj_note_presets;
-static uint16_t *bank_used(int b) { return b ? &bank_bc[b - 1].used : &proj.scene_used; }
-static int16_t *bank_scene(int b, int n) { return b ? bank_bc[b - 1].scene[n] : proj.scene[n]; }
+static uint16_t *bank_used(int b)
+{
+    return b >= 3 ? &bank_x[b - 3].used : b ? &bank_bc[b - 1].used : &proj.scene_used;
+}
+static int16_t *bank_scene(int b, int n)
+{
+    return b >= 3 ? bank_x[b - 3].scene[n] : b ? bank_bc[b - 1].scene[n] : proj.scene[n];
+}
+static int in_de(const int16_t *s)             /* this scene is in D or E already: moved there by a first save cut
+                                                * short after D and E (they're saved before B and C) */
+{
+    int b, i;
+    for (b = 3; b <= 4; b++)
+        for (i = 0; i < NPLAY; i++)
+            if ((*bank_used(b) >> i & 1u) && memcmp(bank_scene(b, i), s, sizeof(int16_t) * DR_NPARAMS) == 0)
+                return 1;
+    return 0;
+}
 static int free_key(int b)                     /* the first empty key 1-8 of bank b, or -1 */
 {
     int i;
@@ -850,7 +868,9 @@ static int free_key(int b)                     /* the first empty key 1-8 of ban
 }
 static void keys_to_gestures(void)
 {
-    static const int8_t ORDER[3][3] = {{0, 1, 2}, {1, 0, 2}, {2, 1, 0}};   /* its own bank first */
+    /* its own bank first. B's and C's then D and E, saved before them, so a first save cut short never loses one
+     * (B's into A or C, saved after B, could be) */
+    static const int8_t ORDER[3][5] = {{0, 1, 2, 3, 4}, {1, 3, 4, 0, 2}, {2, 3, 4, 1, 0}};
     /* a first save cut short: B or C already written in this format (the banks go first), the project not. Those
      * moves and copies are on the flash already: only A's own scenes move again, within A, so nothing doubles */
     const int again = bank_fmt[0] >= 36u || bank_fmt[1] >= 36u;
@@ -859,17 +879,24 @@ static void keys_to_gestures(void)
         for (n = NPLAY; n < NSCENES; n++) {
             if (!(*bank_used(b) >> n & 1u))
                 continue;
-            for (k = 0; k < (again ? 1 : 3); k++) {
+            if (in_de(bank_scene(b, n))) {     /* its copy is on the flash already: not twice */
+                *bank_used(b) &= (uint16_t)~(1u << n);
+                proj_note_moved++;
+                continue;
+            }
+            for (k = 0; k < (again ? 1 : 5); k++) {
                 d = ORDER[b][k];
                 if ((i = free_key(d)) >= 0) {
                     memcpy(bank_scene(d, i), bank_scene(b, n), sizeof(int16_t) * DR_NPARAMS);
                     *bank_used(d) |= (uint16_t)(1u << i);
                     *bank_used(b) &= (uint16_t)~(1u << n);
+                    if (d >= 3)
+                        bank_dirty |= (uint8_t)(1u << (d - 3 + 4));   /* (bits 4-6: D-F) */
                     proj_note_moved++;
                     break;
                 }
             }
-            if (k == (again ? 1 : 3))
+            if (k == (again ? 1 : 5))
                 proj_note_stored++;
         }
     if (!bank_x[2].used) {                     /* 0.2's dropped Presets into F (a first save cut short may have
@@ -1065,17 +1092,18 @@ int project_save(void)                         /* the banks first, then the proj
 {
     int rc = 0, b, n;
     uint32_t h;
+    for (b = 0; b < 3; b++)                    /* D, E, F first: a scene moved there from B or C (keys_to_gestures)
+                                                * is on the flash before B or C is saved without it */
+        if (!rc && (bank_dirty >> (b + 4) & 1u)) {
+            rc = plat_store_save(BANKX_OBJ[b], &bank_x[b], sizeof bank_x[b]);
+            if (!rc)
+                bank_dirty &= (uint8_t)~(1u << (b + 4));
+        }
     for (b = 1; b <= 2; b++)
         if (!rc && (bank_dirty >> b & 1u)) {
             rc = plat_store_save(BANK_OBJ[b - 1], &bank_bc[b - 1], sizeof bank_bc[b - 1]);
             if (!rc)
                 bank_dirty &= (uint8_t)~(1u << b);
-        }
-    for (b = 0; b < 3; b++)                    /* D, E, F */
-        if (!rc && (bank_dirty >> (b + 4) & 1u)) {
-            rc = plat_store_save(BANKX_OBJ[b], &bank_x[b], sizeof bank_x[b]);
-            if (!rc)
-                bank_dirty &= (uint8_t)~(1u << (b + 4));
         }
     if (rc)
         return rc;
