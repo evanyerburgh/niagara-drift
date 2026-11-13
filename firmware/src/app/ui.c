@@ -1022,7 +1022,7 @@ static int scene_room(int p)
            p == P_SCENE_T || p == P_PRESS_SENS || p == P_SCENE_BARS || p == P_CLK_SYNC;
 }
 
-/* a scene's name: your banks' bank and key ("B3-5", at most 4 characters); the Presets by number ("P2", their
+/* a scene's name: your banks' bank and key ("3.5", Evan 2026-11-13: no letter to read as a note); the Presets by number ("P2", their
  * second bank "P9" ..) */
 static void scene_name(char *t, int bank, int n)
 {
@@ -1033,10 +1033,9 @@ static void scene_name(char *t, int bank, int n)
         itoa_u((uint32_t)n + 1u + (bank == BANK_PRESETS2 ? NPLAY : 0u), t + 1);
         return;
     }
-    t[0] = 'B';
-    t[1] = BANK_L[bank];
-    t[2] = '-';
-    itoa_u((uint32_t)n + 1u, t + 3);
+    t[0] = BANK_L[bank];
+    t[1] = '.';
+    itoa_u((uint32_t)n + 1u, t + 2);
 }
 
 #define SAVE_AUTO (-3)                                 /* save_now / save_ask: the autosave (no banner) */
@@ -1206,7 +1205,7 @@ static void scene_back(void)
     ui.morph = VISIT_BACK;
     ui.scene_at = ui.visit_from;
     ui.morph_t0 = plat_ms();
-    ui.morph_ms = (uint32_t)(scene_s() * 1000.0f);   /* (the header says "→ B1-5") */
+    ui.morph_ms = (uint32_t)(scene_s() * 1000.0f);   /* (the header says "→ 1.5") */
 }
 
 /* the sound moved x of the way from one set of values to another: smooth values glide, steps flip half way;
@@ -1318,7 +1317,7 @@ static int press_scaled(int p)
     return p < 0 ? p : (int)fm_clampf(127.0f * press_curve((float)p * (1.0f / 127.0f)) + 0.5f, 0.0f, 127.0f);
 }
 
-static char *press_label(char *t, int n)               /* "B1-5  40%": the scene, how far into it */
+static char *press_label(char *t, int n)               /* "1.5  40%": the scene, how far into it */
 {
     char *q = t;
     t[0] = 0;
@@ -1371,7 +1370,7 @@ static void press_run(void)                            /* each frame, while a sc
     if (ui.press_done)
         say_c(t, "TAKEN", K_GOLD);
     else
-        say_c(press_label(t, ui.press), 0, K_GOLD);   /* "B1-5  40%", as a gesture's (Evan, 2026-10-30) */
+        say_c(press_label(t, ui.press), 0, K_GOLD);   /* "1.5  40%", as a gesture's (Evan, 2026-10-30) */
 }
 
 /* a scene key's press changed the sound (tapped, taken or kept): SEL + SAVE goes back to the sound before it. Not
@@ -1385,7 +1384,7 @@ static void press_undo(void)
         tip(TIP_UNDO);
 }
 /* SEL tapped while a scene key is held (as a gesture's, Evan 2026-10-30): the blend stays where it is, a sound of
- * its own; "B1-5  40%  KEPT", and the first time, how to undo it */
+ * its own; "1.5  40%  KEPT", and the first time, how to undo it */
 static void press_keep(int n)
 {
     char t[16];
@@ -1430,7 +1429,7 @@ static void press_end(void)                            /* the key let go */
                                                         * (Evan, 2026-10-30: SEL is what keeps it) */
         ui.morph = VISIT_BACK;
         ui.visit = (int8_t)(-2 - n);                   /* (pressed again on the way: picked up from there) */
-        ui.scene_at = ui.visit_from;                   /* (the header says "→ B1-5", "→ back") */
+        ui.scene_at = ui.visit_from;                   /* (the header says "→ 1.5", "→ back") */
         loop_note(LP_BLEND_X, 0, ui.morph_ms);         /* the loop: back (its slide 0.5 s at most), and let go */
         loop_note(LP_BLEND_END, 0, 0);
     }
@@ -2751,7 +2750,7 @@ static void sp_knob(int i)
     }
 }
 
-/* a scene's name as said: "Preset 3 Vespers", "bank 3 key 5" (the screen's "P3", "B3-5") */
+/* a scene's name as said: "Preset 3 Vespers", "bank 3 key 5" (the screen's "P3", "3.5") */
 static void sp_scene(int bank, int n)
 {
     char t[4];
@@ -2938,7 +2937,7 @@ static void sp_screen(int all)
 }
 
 /* a banner's word as said: the drones' numerals as numbers ("II" 2), its arrows in words, a scene's key apart */
-static void sp_msg_word(const char *s, uint32_t k, int first)
+static void sp_msg_word(const char *s, uint32_t k, int first, int scene)
 {
     char w[24];
     if (k >= sizeof w)
@@ -2953,15 +2952,16 @@ static void sp_msg_word(const char *s, uint32_t k, int first)
         sp_cat("to");
     else if (sp_eq(w, "<>"))
         sp_cat("and");
-    else if (k == 4u && w[0] == 'B' && w[1] >= '1' && w[1] <= '6' && w[2] == '-' && w[3] >= '1' && w[3] <= '8') {
-        char t[14] = "bank 3 key 5";            /* a scene of yours: "B3-5", "bank 3 key 5" */
-        t[5] = w[1];
-        t[11] = w[3];
+    else if (k == 3u && scene && w[0] >= '1' && w[0] <= '6' && w[1] == '.' && w[2] >= '1' && w[2] <= '8') {
+        char t[14] = "bank 3 key 5";            /* a scene of yours: "3.5", "bank 3 key 5" (only where a scene's name
+                                                 * stands: a banner's first word, or after "SCENE"; else a value) */
+        t[5] = w[0];
+        t[11] = w[2];
         sp_cat(t);
     } else
         sp_word(w, k);
 }
-/* a banner: its two lines as one sentence. One that repeats its first line (a pressure blend's "B1-1 41%") is a readout:
+/* a banner: its two lines as one sentence. One that repeats its first line (a pressure blend's "1.1 41%") is a readout:
  * said once it settles */
 static void sp_msg(const char *a, const char *b)
 {
@@ -2969,7 +2969,7 @@ static void sp_msg(const char *a, const char *b)
     static uint32_t last_t;
     const uint32_t now = plat_ms();
     const char *l;
-    int i, first = 1, run;
+    int i, first = 1, run, after_scene = 0;
     if (!ann_on() || !a || !*a)
         return;
     run = sp_eq(last, a) && now - last_t < 1500u && b && *b;
@@ -2989,7 +2989,8 @@ static void sp_msg(const char *a, const char *b)
             while (l[k] && l[k] != ' ')
                 k++;
             if (k)
-                sp_msg_word(l, k, first);
+                sp_msg_word(l, k, first, first || after_scene);
+            after_scene = k == 5u && !memcmp(l, "SCENE", 5);
             first = 0;
             l += k;
             while (*l == ' ')

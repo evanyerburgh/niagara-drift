@@ -100,7 +100,7 @@ static void lk_page_name(int v, char *name)
 }
 
 /* the sound at the right: the scene it came from (bank << 4 | key; -1 none), and whether a hand has moved it since
- * (the spec: "B1-5 changed"). A bank picked (SEL + D5-G5) leaves the sound as it was: not a change */
+ * (the spec: "1.5 changed"). A bank picked (SEL + D5-G5) leaves the sound as it was: not a change */
 static int16_t lk_at = -1;
 static uint8_t lk_chg;
 static void lk_sound_at(void)
@@ -152,7 +152,7 @@ static struct {
     int8_t on, to, back;
     uint8_t bank;
 } lk_gl;
-#define LK_BAR_GAP 11                         /* the header: the least room between its left and right (11, not 12: "B1-1
+#define LK_BAR_GAP 11                         /* the header: the least room between its left and right (11, not 12: "1.1
                                                 * changed" beside DRONES and [PLAY], 2026-11-13) */
 static int lk_glide(uint32_t now, float *line, int *bank)
 {
@@ -170,7 +170,7 @@ static int lk_glide(uint32_t now, float *line, int *bank)
         lk_gl.to = (int8_t)(ui.morph == VISIT_BACK ? (ui.scene_at >= 0 ? ui.scene_at : -2) : ui.morph);
         lk_gl.bank = proj.bank;
         /* a scene key let go part way: the sound goes back, so the line it filled empties, still naming that scene
-         * (Evan, 2026-11-08: filling a new line to "→ B1-5" looked as if the change went on) */
+         * (Evan, 2026-11-08: filling a new line to "→ 1.5" looked as if the change went on) */
         lk_gl.back = (int8_t)(ui.morph == VISIT_BACK && ui.visit <= -2 && -2 - ui.visit < NPLAY);
         if (lk_gl.back) {
             lk_gl.to = (int8_t)(-2 - ui.visit);
@@ -302,7 +302,7 @@ static void lk_bar(void)
             chg = "changed";
     }
     if (glide != -1) {                         /* on its way: where to, in the sound's place, gold ("→ P3 EERIE",
-                                                * "→ B1-5", "→ back"; Evan, 2026-11-07: one place, no banner) */
+                                                * "→ 1.5", "→ back"; Evan, 2026-11-07: one place, no banner) */
         char *q = scopy(key, "\\ ");
         if (glide == -2)
             scopy(q, "back");
