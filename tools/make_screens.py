@@ -38,15 +38,33 @@ def main():
         dst = os.path.join(ROOT, "docs", "img", "keys-presets-%d.png" % n)
         preset_keys(first, bank).save(dst, optimize=True)
         print("keys:", os.path.relpath(dst, ROOT))
+    dst = os.path.join(ROOT, "docs", "img", "keys-gestures.png")   # the gesture keys (the manual's Gestures)
+    gesture_keys().save(dst, optimize=True)
+    print("keys:", os.path.relpath(dst, ROOT))
+    for n, only in (("press", (8, 11)), ("hold", (12, 15))):      # each kind alone (the manual's Gestures sections)
+        dst = os.path.join(ROOT, "docs", "img", "keys-gestures-%s.png" % n)
+        gesture_keys(only).save(dst, optimize=True)
+        print("keys:", os.path.relpath(dst, ROOT))
+    for n, banks in (("scenes", 0), ("banks", 1)):             # the white keys' two jobs (the manual's Scenes and banks)
+        dst = os.path.join(ROOT, "docs", "img", "keys-%s.png" % n)
+        scene_keys(banks).save(dst, optimize=True)
+        print("keys:", os.path.relpath(dst, ROOT))
+    GROUPS = {0: [(0, 2, "Drone I", AMBER), (3, 4, "Both", LABEL), (5, 7, "Drone II", TEAL), (8, 10, "Both", LABEL)],
+              1: [(0, 3, "Drone I", AMBER), (4, 4, "Both", LABEL), (5, 8, "Drone II", TEAL), (9, 9, "Delay", LILAC),
+                  (10, 10, "Both", LABEL)]}
     for n, lfo in (("drones", 0), ("lfo", 1)):                # the black keys' two sets of jobs (the manual's Black keys)
         dst = os.path.join(ROOT, "docs", "img", "black-keys-%s.png" % n)
-        black_keys(lfo).save(dst, optimize=True)
+        black_keys(lfo, groups=GROUPS[lfo]).save(dst, optimize=True)
         print("keys:", os.path.relpath(dst, ROOT))
     for n, lfo, only in (("filter", 0, (2, 7)), ("sub", 0, (1, 6)), ("partner", 0, (0, 5)), ("link", 0, (8,)),
                          ("sends", 1, (0, 1, 2, 3, 5, 6, 7, 8))):   # a page's own keys picked out
         dst = os.path.join(ROOT, "docs", "img", "black-keys-%s.png" % n)
         black_keys(lfo, only).save(dst, optimize=True)
         print("keys:", os.path.relpath(dst, ROOT))
+    for n, rows in KNOB_PAGES:                                 # each Reference page's knobs, its jobs under them
+        dst = os.path.join(ROOT, "docs", "img", "knobs-%s.png" % n)
+        page_knobs(rows).save(dst, optimize=True)
+        print("knobs:", os.path.relpath(dst, ROOT))
     pm = panel(os.path.join(out, "play.png"))
     dst = os.path.join(ROOT, "docs", "img", "panel.png")
     pm.save(dst, optimize=True)
@@ -160,18 +178,74 @@ def panel(play_png):
     return img
 
 
+# each Reference page's four knobs, its two pages' jobs under each (the manual's Knobs sections): (file, [(page, per
+# drone, [KNOB 1..4])]); a row per drone in amber and teal, a row for the whole sound pale
+KNOB_PAGES = [
+    ("drones", [("Drones", 1, ["Level", "Cutoff", "Level", "Cutoff"]), ("Pitch", 1, ["Pitch", "Resonance", "Pitch", "Resonance"])]),
+    ("lfo", [("LFO sends", 1, ["Pitch", "Cutoff", "Pitch", "Cutoff"]), ("Mods", 0, ["Speed mod", "Source", "Delay mod", "Cross-mod"])]),
+    ("partner", [("Partner", 1, ["Interval", "Detune", "Interval", "Detune"]), ("Pitch moves", 0, ["Shift", "Glide", "II wander", "Scale"])]),
+    ("osc", [("Osc", 1, ["X-Wave", "Width", "X-Wave", "Width"]), ("Sub · Drive", 1, ["Osc/sub", "Drive", "Osc/sub", "Drive"])]),
+    ("life", [("Life", 0, ["Feedback", "Drift", "Character", "Age"]), ("Tone", 1, ["Noise", "Color", "Noise", "Color"])]),
+    ("setup", [("Setup 1", 0, ["Fade", "Morph", "Scene time", "Sync"]), ("Setup 2", 0, ["Tuning", "Tune", "Stereo", "Pressure"])]),
+    ("swell", [("Swell", 0, ["Rate", "Depth", "Shape", "Swing"])]),
+    ("space", [("Space", 0, ["Repeats", "Delay mix", "Length", "Reverb mix"]), ("Details", 0, ["Drive", "Time", "Damp", "Type"])]),
+]
+
+
+def page_knobs(rows):
+    """KNOB 1-4 as on the panel, each page's job for each knob under it, the page's name at the row's left; "Drone I"
+    and "Drone II" under them when every row is per drone (else the colors alone: a pale row is the whole sound's)."""
+    S = 2.6
+    def P(v): return int(round(v * S))
+    lw, kx0, step, r, lh = 96, 160, 112, 22, 24
+    drones = all(per for _, per, _ in rows)
+    w = kx0 + 3 * step + 70
+    h = 104 + lh * len(rows) + (30 if drones else 6)
+    img = Image.new("RGBA", (P(w), P(h)), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    def f(size, wt="SemiBold"):
+        return ImageFont.truetype(os.path.join(ROOT, "assets", "fonts", "BarlowSemiCondensed-%s.ttf" % wt), P(size))
+    def text(x, y, t, size, fill, wt="SemiBold", anchor="ms"):
+        d.text((P(x), P(y)), t, font=f(size, wt), fill=fill, anchor=anchor)
+    d.rounded_rectangle([0, 0, P(w), P(h)], radius=P(18), fill=TRAY)
+    for i in range(4):
+        x, y = kx0 + i * step, 60
+        d.ellipse([P(x - r - 5), P(y - r - 5), P(x + r + 5), P(y + r + 5)], fill=BODY)
+        d.ellipse([P(x - r), P(y - r), P(x + r), P(y + r)], fill=KNOB, outline=(58, 58, 64), width=P(2))
+        d.line([P(x), P(y - r + 5), P(x), P(y - r + 15)], fill=LABEL, width=P(3))
+        text(x, y - r - 12, "KNOB %d" % (i + 1), 11, LEGEND)
+    for j, (page, per, jobs) in enumerate(rows):
+        y = 112 + j * lh
+        text(lw - 4 + 8, y, page, 12.5, LEGEND, anchor="rs")
+        for i, t in enumerate(jobs):
+            col = (AMBER if i < 2 else TEAL) if per else PALE
+            text(kx0 + i * step, y, t, 15, col)
+    if drones:
+        y = h - 16
+        for a, b, t, col in ((kx0 - 46, kx0 + step + 46, "Drone I", AMBER), (kx0 + 2 * step - 46, kx0 + 3 * step + 46, "Drone II", TEAL)):
+            tw = d.textlength(t, font=f(13)) / S / 2
+            m = (a + b) / 2
+            text(m, y + 4.5, t, 13, col)
+            for p, q in ((a, m - tw - 8), (m + tw + 8, b)):
+                d.line([P(p), P(y), P(q), P(y)], fill=col, width=P(1.2))
+            for x in (a, b):
+                d.line([P(x), P(y), P(x), P(y - 4)], fill=col, width=P(1.2))
+    return img
+
+
 BLACK_LFO = [["Pitch", "LFO"], ["Pitch to", "X-Wave"], ["Cutoff", "LFO"], ["Cutoff", "to reso"], None,   # on the LFO pages
              ["Pitch", "LFO"], ["Pitch to", "X-Wave"], ["Cutoff", "LFO"], ["Cutoff", "to reso"], ["Delay", "LFO"], None]  # (ui.c SW_LFO)
 BLACK_NOTES = ["F#3", "G#3", "A#3", "C#4", "D#4", "F#4", "G#4", "A#4", "C#5", "D#5", "F#5"]
 
 
-def black_keys(lfo, only=None):
+def black_keys(lfo, only=None, groups=None):
     """The eleven black keys alone, named for their jobs: normally (the drones), or on the LFO pages, where the keys that
     change are named in the LFO's lilac; each key's note under it. only: the keys a page is about, ringed, the rest
-    quiet."""
+    quiet. groups: (first key, last key, words, color) bracketed above them (the manual's Black keys)."""
     S = 2.6
     def P(v): return int(round(v * S))
-    w, h = 928, 150
+    top = 34 if groups else 0
+    w, h = 928, 150 + top
     img = Image.new("RGBA", (P(w), P(h)), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     def f(size, wt="Bold"):
@@ -184,7 +258,7 @@ def black_keys(lfo, only=None):
     rect(0, 0, w, h, 18, TRAY)
     pitch = (w - 24) / 16
     kw = pitch * .78
-    by, bh = 14, 96
+    by, bh = 14 + top, 96
     for k, a in enumerate(BLACK_AFTER):
         cx = 12 + (a + 1) * pitch
         words, col = BLACK[k]
@@ -206,6 +280,14 @@ def black_keys(lfo, only=None):
         for j, wd in enumerate(words):
             text(cx, by + 52 + (j - (len(words) - 1) / 2) * 14 + 4.5, wd, 12 if lfo and BLACK_LFO[k] else 12.5, ink)
         text(cx, by + bh + 26, BLACK_NOTES[k], 13, PALE if ring else LEGEND, "SemiBold")
+    for a, b, words, col in groups or ():
+        x1 = 12 + (BLACK_AFTER[a] + 1) * pitch - kw / 2
+        x2 = 12 + (BLACK_AFTER[b] + 1) * pitch + kw / 2
+        m, y = (x1 + x2) / 2, 30
+        text(m, 22, words, 16, col, "SemiBold")
+        d.line([P(x1), P(y), P(x2), P(y)], fill=col, width=P(1.2))
+        for x in (x1, x2):
+            d.line([P(x), P(y), P(x), P(y + 5)], fill=col, width=P(1.2))
     return img
 
 
@@ -250,6 +332,109 @@ def preset_keys(first, bank):
         text(m, 22, s, 14, col, "SemiBold")
     cap(left(0), left(7) + kw, "Presets P%d–P%d · tap: play" % (first, first + 7), LABEL)
     cap(left(bank) - 40, left(bank) + kw + 40, "bank", LILAC)
+    return img
+
+
+BANKS = ("A", "B", "C", "D", "E", "F", "P1–8", "P9–16")
+GESTURE_NOTES = ("G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5")
+
+
+def scene_keys(banks):
+    """The keyboard alone for the manual's Scenes and banks: the scene keys 1-8 lit with what a tap and a press do
+    (banks 0), or the eight gesture keys lit with the bank each picks with SEL, the scene keys quiet (banks 1): no
+    notes on them, as "A" on G4 read as two names (Evan, 2026-11-13)."""
+    S = 2.6
+    def P(v): return int(round(v * S))
+    w, h = 928, 300
+    img = Image.new("RGBA", (P(w), P(h)), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    def f(size, wt="Bold"):
+        return ImageFont.truetype(os.path.join(ROOT, "assets", "fonts", "BarlowSemiCondensed-%s.ttf" % wt), P(size))
+    def rect(x, y, rw, rh, r, fill, outline=None, width=0):
+        d.rounded_rectangle([P(x), P(y), P(x + rw), P(y + rh)], radius=P(r), fill=fill, outline=outline,
+                            width=P(width) if width else 0)
+    def text(x, y, t, size, fill, wt="Bold"):
+        d.text((P(x), P(y)), t, font=f(size, wt), fill=fill, anchor="ms")
+    rect(0, 0, w, h, 18, TRAY)
+    pitch = (w - 24) / 16
+    kw = pitch * .78
+    top = 40
+    wy, wh, by, bh = top + (h - top) * .46, (h - top) * .49, top + (h - top) * .05, (h - top) * .31
+    def left(i): return 12 + i * pitch + (pitch - kw) / 2
+    QUIET = (120, 120, 126)
+    for i in range(16):
+        kx = left(i) + kw / 2
+        if i < 8 and not banks:
+            rect(left(i), wy, kw, wh, kw / 2, KEY_W)
+            text(kx, wy + wh - 16, str(i + 1), 20, INK)
+        elif i >= 8 and banks:
+            rect(left(i), wy, kw, wh, kw / 2, PALE, LILAC, 2)
+            b = BANKS[i - 8]                                   # the bank's name only: a key's note (G4) beside
+            if b.startswith("P"):                              # a bank's letter (A) read as one more name
+                text(kx, wy + wh - 40, "Presets", 11.5, MUTED_KEY, "SemiBold")
+                text(kx, wy + wh - 16, b[1:], 15, INK)
+            else:
+                text(kx, wy + wh - 40, "bank", 12, MUTED_KEY, "SemiBold")
+                text(kx, wy + wh - 16, b, 22, INK)
+        else:
+            rect(left(i), wy, kw, wh, kw / 2, QUIET)
+    for a in BLACK_AFTER:
+        cx = 12 + (a + 1) * pitch
+        rect(cx - kw / 2, by, kw, bh, kw / 2, (70, 70, 76))
+    if banks:
+        m = (left(8) + left(15) + kw) / 2
+        text(m, 28, "hold SEL, tap a key: its bank", 20, LILAC, "SemiBold")
+    else:
+        m = (left(0) + left(7) + kw) / 2
+        text(m, 28, "Scenes · tap: glide · press: crossfade", 20, LABEL, "SemiBold")
+    return img
+
+
+GESTURES = ("Tick", "Chord", "Snarl", "Stutter", "Weight", "Shift", "Clean", "Wash")
+
+
+def gesture_keys(only=None):
+    """The keyboard alone for the manual's Gestures: keys 9-16 lit with their gestures and notes, "press" over 9-12 and
+    "hold" over 13-16; the scene keys and the black keys quiet. only: (8, 11) or (12, 15), that kind lit alone (the
+    manual's two sections)."""
+    S = 2.6
+    def P(v): return int(round(v * S))
+    w, h = 928, 300
+    img = Image.new("RGBA", (P(w), P(h)), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    def f(size, wt="Bold"):
+        return ImageFont.truetype(os.path.join(ROOT, "assets", "fonts", "BarlowSemiCondensed-%s.ttf" % wt), P(size))
+    def rect(x, y, rw, rh, r, fill, outline=None, width=0):
+        d.rounded_rectangle([P(x), P(y), P(x + rw), P(y + rh)], radius=P(r), fill=fill, outline=outline,
+                            width=P(width) if width else 0)
+    def text(x, y, t, size, fill, wt="Bold"):
+        d.text((P(x), P(y)), t, font=f(size, wt), fill=fill, anchor="ms")
+    rect(0, 0, w, h, 18, TRAY)
+    pitch = (w - 24) / 16
+    kw = pitch * .78
+    top = 40
+    wy, wh, by, bh = top + (h - top) * .46, (h - top) * .49, top + (h - top) * .05, (h - top) * .31
+    def left(i): return 12 + i * pitch + (pitch - kw) / 2
+    for i in range(16):
+        kx = left(i) + kw / 2
+        if i >= 8 and (only is None or only[0] <= i <= only[1]):
+            rect(left(i), wy, kw, wh, kw / 2, KEY_W)
+            text(kx, wy + wh - 36, GESTURES[i - 8], 14, INK)
+            text(kx, wy + wh - 14, GESTURE_NOTES[i - 8], 14, MUTED_KEY, "SemiBold")
+        else:
+            rect(left(i), wy, kw, wh, kw / 2, (120, 120, 126))
+    for a in BLACK_AFTER:
+        cx = 12 + (a + 1) * pitch
+        rect(cx - kw / 2, by, kw, bh, kw / 2, (70, 70, 76))
+    for a, b, t in ((8, 11, "pressure: press harder"), (12, 15, "hold: hold longer")):
+        if only is not None and (a, b) != tuple(only):
+            continue
+        x1, x2, y = left(a), left(b) + kw, 34
+        m = (x1 + x2) / 2
+        text(m, 28, t, 18, LABEL, "SemiBold")
+        for x in (x1, x2):
+            d.line([P(x), P(y), P(x), P(y + 5)], fill=LEGEND, width=P(1.2))
+        d.line([P(x1), P(y), P(x2), P(y)], fill=LEGEND, width=P(1.2))
     return img
 
 

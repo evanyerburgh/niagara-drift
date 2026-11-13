@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 384" font-family="Inter Tight, Helvetica Neue, Arial, sans-serif">
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- The emulator's computer keys: black keys on the number row, scenes on Q to I, gestures on A to K, the buttons around them, the arrows for the left knobs. Drawn in the site's colors (web/manual/manual.css), as lfo-chain.svg. -->
+<defs>
+  <marker id="emu-keys-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#dcbcff"/></marker>
+  <marker id="emu-keys-d" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffb04a"/></marker>
+  <marker id="emu-keys-e" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#45e3d3"/></marker>
+  <marker id="emu-keys-p" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffd6f0"/></marker>
+</defs>
+<rect width="900" height="384" rx="16" fill="#24081f"/>
+<rect x="24" y="24" width="60" height="46" rx="7" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="30" y="38" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">esc</text>
+<text x="54.0" y="60" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">HOME</text>
+<rect x="24" y="84" width="46" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="74" y="84" width="46" height="46" rx="7" fill="#3a3a40"/>
+<text x="80" y="98" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">1</text>
+<text x="97.0" y="120" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">1</text>
+<rect x="124" y="84" width="46" height="46" rx="7" fill="#3a3a40"/>
+<text x="130" y="98" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">2</text>
+<text x="147.0" y="120" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">2</text>
+<rect x="174" y="84" width="46" height="46" rx="7" fill="#3a3a40"/>
+<text x="180" y="98" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">3</text>
+<text x="197.0" y="120" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">3</text>
+<rect x="224" y="84" width="46" height="46" rx="7" fill="#3a3a40"/>
+<text x="230" y="98" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">4</text>
+<text x="247.0" y="120" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">4</text>
+<rect x="274" y="84" width="46" height="46" rx="7" fill="#3a3a40"/>
+<text x="280" y="98" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">5</text>
+<text x="297.0" y="120" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">5</text>
+<rect x="324" y="84" width="46" height="46" rx="7" fill="#3a3a40"/>
+<text x="330" y="98" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">6</text>
+<text x="347.0" y="120" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">6</text>
+<rect x="374" y="84" width="46" height="46" rx="7" fill="#3a3a40"/>
+<text x="380" y="98" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">7</text>
+<text x="397.0" y="120" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">7</text>
+<rect x="424" y="84" width="46" height="46" rx="7" fill="#3a3a40"/>
+<text x="430" y="98" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">8</text>
+<text x="447.0" y="120" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">8</text>
+<rect x="474" y="84" width="46" height="46" rx="7" fill="#3a3a40"/>
+<text x="480" y="98" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">9</text>
+<text x="497.0" y="120" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">9</text>
+<rect x="524" y="84" width="46" height="46" rx="7" fill="#3a3a40"/>
+<text x="530" y="98" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">0</text>
+<text x="547.0" y="120" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">10</text>
+<rect x="574" y="84" width="46" height="46" rx="7" fill="#3a3a40"/>
+<text x="580" y="98" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">-</text>
+<text x="597.0" y="120" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">11</text>
+<rect x="624" y="84" width="46" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="24" y="134" width="75" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="103" y="134" width="46" height="46" rx="7" fill="#d9dadc"/>
+<text x="109" y="148" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">Q</text>
+<text x="126.0" y="170" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">1</text>
+<rect x="153" y="134" width="46" height="46" rx="7" fill="#d9dadc"/>
+<text x="159" y="148" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">W</text>
+<text x="176.0" y="170" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">2</text>
+<rect x="203" y="134" width="46" height="46" rx="7" fill="#d9dadc"/>
+<text x="209" y="148" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">E</text>
+<text x="226.0" y="170" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">3</text>
+<rect x="253" y="134" width="46" height="46" rx="7" fill="#d9dadc"/>
+<text x="259" y="148" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">R</text>
+<text x="276.0" y="170" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">4</text>
+<rect x="303" y="134" width="46" height="46" rx="7" fill="#d9dadc"/>
+<text x="309" y="148" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">T</text>
+<text x="326.0" y="170" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">5</text>
+<rect x="353" y="134" width="46" height="46" rx="7" fill="#d9dadc"/>
+<text x="359" y="148" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">Y</text>
+<text x="376.0" y="170" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">6</text>
+<rect x="403" y="134" width="46" height="46" rx="7" fill="#d9dadc"/>
+<text x="409" y="148" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">U</text>
+<text x="426.0" y="170" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">7</text>
+<rect x="453" y="134" width="46" height="46" rx="7" fill="#d9dadc"/>
+<text x="459" y="148" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">I</text>
+<text x="476.0" y="170" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">8</text>
+<rect x="503" y="134" width="46" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="553" y="134" width="46" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="24" y="184" width="88" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="116" y="184" width="46" height="46" rx="7" fill="#ffd6f0" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="122" y="198" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">A</text>
+<text x="139.0" y="220" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">9</text>
+<rect x="166" y="184" width="46" height="46" rx="7" fill="#ffd6f0" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="172" y="198" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">S</text>
+<text x="189.0" y="220" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">10</text>
+<rect x="216" y="184" width="46" height="46" rx="7" fill="#ffd6f0" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="222" y="198" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">D</text>
+<text x="239.0" y="220" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">11</text>
+<rect x="266" y="184" width="46" height="46" rx="7" fill="#ffd6f0" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="272" y="198" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">F</text>
+<text x="289.0" y="220" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">12</text>
+<rect x="316" y="184" width="46" height="46" rx="7" fill="#ffd6f0"/>
+<text x="322" y="198" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">G</text>
+<text x="339.0" y="220" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">13</text>
+<rect x="366" y="184" width="46" height="46" rx="7" fill="#ffd6f0"/>
+<text x="372" y="198" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">H</text>
+<text x="389.0" y="220" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">14</text>
+<rect x="416" y="184" width="46" height="46" rx="7" fill="#ffd6f0"/>
+<text x="422" y="198" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">J</text>
+<text x="439.0" y="220" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">15</text>
+<rect x="466" y="184" width="46" height="46" rx="7" fill="#ffd6f0"/>
+<text x="472" y="198" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#14000f" fill-opacity=".7">K</text>
+<text x="489.0" y="220" font-size="13" fill="#14000f" text-anchor="middle" font-weight="700">16</text>
+<rect x="516" y="184" width="46" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="566" y="184" width="46" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="616" y="184" width="96" height="46" rx="7" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="622" y="198" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">return</text>
+<text x="664.0" y="220" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">SAVE</text>
+<rect x="24" y="234" width="112" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="140" y="234" width="46" height="46" rx="7" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="146" y="248" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">Z</text>
+<text x="163.0" y="270" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">OCT−</text>
+<rect x="190" y="234" width="46" height="46" rx="7" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="196" y="248" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">X</text>
+<text x="213.0" y="270" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">OCT+</text>
+<rect x="240" y="234" width="46" height="46" rx="7" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="246" y="248" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">C</text>
+<text x="263.0" y="270" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">SEL</text>
+<rect x="290" y="234" width="46" height="46" rx="7" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="296" y="248" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">V</text>
+<text x="313.0" y="270" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">EDIT</text>
+<rect x="340" y="234" width="46" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="390" y="234" width="46" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="440" y="234" width="46" height="46" rx="7" fill="none" stroke="#d3b3c4" stroke-opacity=".25"/>
+<rect x="190" y="284" width="300" height="46" rx="7" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="196" y="298" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#fbe9f2" fill-opacity=".7">space</text>
+<text x="340.0" y="320" font-size="13" fill="#fbe9f2" text-anchor="middle" font-weight="700">PLAY</text>
+<rect x="786" y="234" width="46" height="46" rx="7" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="792" y="248" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#dcbcff" fill-opacity=".7">↑</text>
+<rect x="736" y="284" width="46" height="46" rx="7" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="742" y="298" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#dcbcff" fill-opacity=".7">←</text>
+<rect x="786" y="284" width="46" height="46" rx="7" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="792" y="298" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#dcbcff" fill-opacity=".7">↓</text>
+<rect x="836" y="284" width="46" height="46" rx="7" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="842" y="298" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#dcbcff" fill-opacity=".7">→</text>
+<text x="812" y="348" font-size="12.5" fill="#dcbcff" text-anchor="middle">↑ ↓ LFO rate</text>
+<text x="812" y="364" font-size="12.5" fill="#dcbcff" text-anchor="middle">← → Movement</text>
+<text x="700" y="112" font-size="14" fill="#fbe9f2" text-anchor="start" font-weight="600">black keys 1–11</text>
+<text x="620" y="162" font-size="14" fill="#fbe9f2" text-anchor="start" font-weight="600">scenes 1–8</text>
+<text x="726" y="204" font-size="14" fill="#ffd6f0" text-anchor="start" font-weight="600">gestures 9–16</text>
+<text x="726" y="221" font-size="12" fill="#d3b3c4" text-anchor="start">9–12 press · 13–16 hold</text>
+</svg>

@@ -7,7 +7,7 @@ intro: What every page, knob and key does, in the order of the buttons
 
 <ul class="cards">
 <li><a href="presets.md"><img class="ic" src="../../../web/manual/icons/stack.svg" alt=""><b>Presets</b><span>16 sounds to start from</span></a></li>
-<li><a href="controls.md"><img class="ic" src="../../../web/manual/icons/sliders-horizontal.svg" alt=""><b>Controls</b><span>the buttons, the pages, the header</span></a></li>
+<li><a href="controls.md"><img class="ic" src="../../../web/manual/icons/sliders-horizontal.svg" alt=""><b>Controls</b><span>knobs, buttons, the screen header</span></a></li>
 <li><a href="drones.md"><img class="ic" src="../../../web/manual/icons/waveform.svg" alt=""><b>Drones and Pitch</b><span>HOME: levels, cutoffs, pitch, resonance</span></a></li>
 <li><a href="life.md"><img class="ic" src="../../../web/manual/icons/speaker-high.svg" alt=""><b>Life and Tone</b><span>ENV: Feedback, Drift, Character, Age; noise</span></a></li>
 <li><a href="osc.md"><img class="ic" src="../../../web/manual/icons/wave-square.svg" alt=""><b>Osc and Sub · Drive</b><span>EDIT: each drone's wave, sub and drive</span></a></li>
@@ -20,7 +20,7 @@ intro: What every page, knob and key does, in the order of the buttons
 <li><a href="scenes.md"><img class="ic" src="../../../web/manual/icons/floppy-disk.svg" alt=""><b>Scenes and banks</b><span>the white keys</span></a></li>
 <li><a href="gestures.md"><img class="ic" src="../../../web/manual/icons/hand-pointing.svg" alt=""><b>Gestures</b><span>the 8 gesture keys</span></a></li>
 <li><a href="black-keys.md"><img class="ic" src="../../../web/manual/icons/piano-keys.svg" alt=""><b>Black keys</b><span>switches</span></a></li>
-<li><a href="midi.md"><img class="ic" src="../../../web/manual/icons/metronome.svg" alt=""><b>MIDI</b><span>notes and the clock in</span></a></li>
+<li><a href="midi.md"><img class="ic" src="../../../web/manual/icons/metronome.svg" alt=""><b>MIDI in</b><span>notes and the clock</span></a></li>
 <li><a href="screen-reader.md"><img class="ic" src="../../../web/manual/icons/ear.svg" alt=""><b>Hearing your screen</b><span>the FM-1 Screen Reader</span></a></li>
 <li><a href="browser.md"><img class="ic" src="../../../web/manual/icons/browser.svg" alt=""><b>Playing in a browser</b><span>the emulator's mouse and keys</span></a></li>
 <li><a href="shortcuts.md"><img class="ic" src="../../../web/manual/icons/keyboard.svg" alt=""><b>Shortcuts</b><span>every combination, hold and tap</span></a></li>

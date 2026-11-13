@@ -13,14 +13,15 @@ Each drone's waveform, its sub-oscillator and its drive.
 
 [[EDIT]] opens Osc; [[EDIT]] again, Sub · Drive. KNOB 1–2 are drone I, KNOB 3–4 drone II.
 
-| Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
-|---|---|---|---|---|
-| Osc | I X-Wave | I Width (pulse width) | II X-Wave | II Width |
-| Sub · Drive | I osc/sub (+ SEL: sub wave) | I drive | II osc/sub (+ SEL: sub wave) | II drive |
+<img src="../../img/knobs-osc.png" width="520" alt="Knobs 1 to 4 on Osc (X-Wave, width) and Sub · Drive (osc/sub, drive); KNOB 1 and 2 drone I, KNOB 3 and 4 drone II">
 
 ## Osc
 
 <img class="shot" src="../../img/screen-osc.png" width="240" alt="The Osc page: each drone's waveform on the sine to square scale, and its pulse width">
+
+| KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
+|---|---|---|---|
+| I X-Wave | I Width (pulse width) | II X-Wave | II Width |
 
 | Knob | What it does |
 |---|---|
@@ -30,6 +31,10 @@ Each drone's waveform, its sub-oscillator and its drive.
 ## Sub · Drive
 
 <img class="shot" src="../../img/screen-source.png" width="240" alt="The Sub · Drive page: each drone's osc and sub lanes, shaped by the drive, and its sub's octave">
+
+| KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
+|---|---|---|---|
+| I osc/sub (+ SEL: sub wave) | I drive | II osc/sub (+ SEL: sub wave) | II drive |
 
 | Knob | What it does |
 |---|---|

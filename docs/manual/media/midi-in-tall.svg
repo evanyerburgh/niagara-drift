@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 420" font-family="Inter Tight, Helvetica Neue, Arial, sans-serif">
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- MIDI in, top to bottom (the phone's midi-in.svg). Drawn in the site's colors (web/manual/manual.css), as lfo-chain.svg. -->
+<defs>
+  <marker id="midi-in-tall-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#dcbcff"/></marker>
+  <marker id="midi-in-tall-d" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffb04a"/></marker>
+  <marker id="midi-in-tall-e" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#45e3d3"/></marker>
+  <marker id="midi-in-tall-p" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffd6f0"/></marker>
+</defs>
+<rect width="360" height="420" rx="16" fill="#24081f"/>
+<rect x="94.0" y="17" width="172" height="34" rx="17" fill="none" stroke="#ffd6f0" stroke-width="1.5"/>
+<text x="180" y="39.5" font-size="16" fill="#ffd6f0" text-anchor="middle" font-weight="600">DAW, drum machine</text>
+<text x="180" y="70" font-size="13" fill="#d3b3c4" text-anchor="middle">or a keyboard</text>
+<path d="M180 78 V96" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#midi-in-tall-a)"/>
+<rect x="132.0" y="98" width="96" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="180" y="117" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">USB · TRS</text>
+<path d="M180 126 V146 M24 146 H180 M24 146 V352" fill="none" stroke="#ffd6f0" stroke-width="2"/>
+<path d="M24 180 H44" fill="none" stroke="#ffb04a" stroke-width="2" marker-end="url(#midi-in-tall-d)"/>
+<text x="52" y="185" font-size="15" fill="#ffb04a" text-anchor="start" font-weight="600">Notes, channel 1</text>
+<text x="52" y="206" font-size="13.5" fill="#fbe9f2" text-anchor="start">drone I's pitch</text>
+<path d="M24 260 H44" fill="none" stroke="#45e3d3" stroke-width="2" marker-end="url(#midi-in-tall-e)"/>
+<text x="52" y="265" font-size="15" fill="#45e3d3" text-anchor="start" font-weight="600">Notes, channel 2</text>
+<text x="52" y="286" font-size="13.5" fill="#fbe9f2" text-anchor="start">drone II's pitch, or the interval</text>
+<path d="M24 340 H44" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#midi-in-tall-a)"/>
+<text x="52" y="345" font-size="15" fill="#dcbcff" text-anchor="start" font-weight="600">Clock</text>
+<text x="52" y="366" font-size="13.5" fill="#fbe9f2" text-anchor="start">Swell, LFO, delay, Wander, Scene time</text>
+<text x="52" y="404" font-size="12.5" fill="#d3b3c4" text-anchor="start">Sync on (Setup 1, KNOB 4)</text>
+</svg>

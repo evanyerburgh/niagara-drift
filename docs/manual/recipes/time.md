@@ -13,8 +13,10 @@ Three times on **Setup 1** ([[GLO]]): Fade (KNOB 1), Morph (KNOB 2) and Scene ti
 
 *Scene time, from 0.1 s to 5 minutes*
 
-1. Turn **Scene time** all the way left: a scene key cuts to its sound.
-2. Turn it up: the same key glides there, as slowly as you set.
+1. Tap [[GLO]] to open Setup 1.
+2. Turn **Scene time** (KNOB 3) all the way left.
+3. Tap a different scene key: the sound cuts straight to it.
+4. Turn Scene time up, then tap another scene key: the sound glides there, taking as long as Scene time says.
 
 ![Setup 1, Scene time 0.10 s](../media/t-cuts-0.png "Scene 0.10 s: a cut")
 ![Setup 1, Scene time 7.8 s](../media/t-cuts-1.png "Scene 7.8 s: a glide")
@@ -25,6 +27,21 @@ Three times on **Setup 1** ([[GLO]]): Fade (KNOB 1), Morph (KNOB 2) and Scene ti
 - 0:01 P5 Abyss tapped: a cut
 - 0:04 P1 tapped: a cut back
 - 0:06 Scene time 8 s, P5 tapped: a slow glide
+
+### Stop a glide part way {#stop}
+
+*Turn a knob while a scene is on its way*
+
+1. Tap a scene on a slow Scene time.
+2. Turn any knob on the way: the glide stops there, a sound between the two.
+
+![Drones, the glide stopped by a turn of Cutoff](../media/t-stop-0.png "Stopped part way")
+
+**Listen** (`t-stop`)
+
+- 0:00 P1 Niagara, Scene time 8 s
+- 0:01 P5 Abyss tapped: a slow glide
+- 0:04 a knob turned: the glide stops there
 
 ### Make a switch move slowly {#morph}
 
@@ -56,18 +73,3 @@ Three times on **Setup 1** ([[GLO]]): Fade (KNOB 1), Morph (KNOB 2) and Scene ti
 
 - 0:00 P13 Telegraph, Fade 10 s, PLAY tapped: in over 10 s
 - 0:12 SEL + PLAY: drone II fades out
-
-### Stop a glide part way {#stop}
-
-*Turn a knob while a scene is on its way*
-
-1. Tap a scene on a slow Scene time.
-2. Turn any knob on the way: the glide stops there, a sound between the two.
-
-![Drones, the glide stopped by a turn of Cutoff](../media/t-stop-0.png "Stopped part way")
-
-**Listen** (`t-stop`)
-
-- 0:00 P1 Niagara, Scene time 8 s
-- 0:01 P5 Abyss tapped: a slow glide
-- 0:04 a knob turned: the glide stops there

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 720" font-family="Inter Tight, Helvetica Neue, Arial, sans-serif">
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- Mods' three pieces, top to bottom (the phone's lfo-mods.svg). Drawn in the site's colors (web/manual/manual.css), as lfo-chain.svg. -->
+<defs>
+  <marker id="lfo-mods-tall-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#dcbcff"/></marker>
+  <marker id="lfo-mods-tall-d" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffb04a"/></marker>
+  <marker id="lfo-mods-tall-e" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#45e3d3"/></marker>
+  <marker id="lfo-mods-tall-p" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffd6f0"/></marker>
+</defs>
+<rect width="360" height="720" rx="16" fill="#24081f"/>
+<rect x="16" y="10" width="328" height="222" rx="12" fill="none" stroke="#d3b3c4" stroke-opacity=".45" stroke-width="1.2"/>
+<text x="180" y="30" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">SPEED MOD</text>
+<rect x="132.0" y="53" width="96" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="180" y="75.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">Clock</text>
+<rect x="125.0" y="143" width="110" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="180" y="165.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO I · II</text>
+<path d="M180 87 V140" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-mods-tall-a)"/>
+<path d="M235 160 C282 160 282 70 231 70" fill="none" stroke="#ffd6f0" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#lfo-mods-tall-p)"/>
+<text x="180" y="206" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 1: how far, ±3 octaves</text>
+<text x="180" y="224" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 2: which LFO, I, II or both</text>
+<rect x="16" y="246" width="328" height="222" rx="12" fill="none" stroke="#d3b3c4" stroke-opacity=".45" stroke-width="1.2"/>
+<text x="180" y="266" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">DELAY MOD</text>
+<rect x="125.0" y="289" width="110" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="180" y="311.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO I · II</text>
+<path d="M180 323 V338" fill="none" stroke="#dcbcff" stroke-width="2"/>
+<rect x="152.0" y="338" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="180" y="357" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">D#5</text>
+<path d="M180 366 V379" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-mods-tall-a)"/>
+<text x="180" y="402" font-size="16" fill="#ffd6f0" text-anchor="middle" font-weight="600">Delay time</text>
+<text x="180" y="442" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 3: how far, ±25%</text>
+<text x="180" y="460" font-size="13" fill="#d3b3c4" text-anchor="middle">× Movement; heard with delay mix</text>
+<rect x="16" y="482" width="328" height="222" rx="12" fill="none" stroke="#d3b3c4" stroke-opacity=".45" stroke-width="1.2" stroke-dasharray="4 4"/>
+<text x="180" y="502" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">CROSS-MOD · NOT THE LFO</text>
+<rect x="92.0" y="525" width="64" height="34" rx="17" fill="none" stroke="#ffb04a" stroke-width="1.5"/>
+<text x="124" y="547.5" font-size="16" fill="#ffb04a" text-anchor="middle" font-weight="600">I</text>
+<rect x="204.0" y="525" width="64" height="34" rx="17" fill="none" stroke="#45e3d3" stroke-width="1.5"/>
+<text x="236" y="547.5" font-size="16" fill="#45e3d3" text-anchor="middle" font-weight="600">II</text>
+<path d="M158 536 H202" fill="none" stroke="#ffb04a" stroke-width="2" marker-end="url(#lfo-mods-tall-d)"/>
+<path d="M202 550 H158" fill="none" stroke="#45e3d3" stroke-width="2" marker-end="url(#lfo-mods-tall-e)"/>
+<rect x="152.0" y="574" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="180" y="593" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">F#5</text>
+<text x="180" y="622" font-size="13.5" fill="#fbe9f2" text-anchor="middle">I moves II's cutoff</text>
+<text x="180" y="640" font-size="13.5" fill="#fbe9f2" text-anchor="middle">bend each other (cross-FM)</text>
+<text x="180" y="658" font-size="13.5" fill="#fbe9f2" text-anchor="middle">Snarl: the sound bends both</text>
+<text x="180" y="688" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 4: how deep</text>
+</svg>

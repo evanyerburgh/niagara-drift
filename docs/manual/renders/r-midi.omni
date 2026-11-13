@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# The Reference's MIDI page (tools/make_manual.py --renders): screens only. P1 played, a MIDI clock at 120 BPM:
+# Setup 1 with Sync locked to it, then Details with the delay's Time as a note value.
+notips
+phones 1
+tapkey w0
+tap PLAY
+wait 2000
+clock 120
+wait 9000
+tap GLO
+wait 1500
+shot r-midi-0.png
+tap FX
+tap FX
+wait 1500
+shot r-midi-1.png

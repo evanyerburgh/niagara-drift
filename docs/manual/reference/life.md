@@ -13,14 +13,15 @@ What keeps the drones alive and worn, and each drone's noise.
 
 [[ENV]] opens Life; [[ENV]] again, Tone.
 
-| Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
-|---|---|---|---|---|
-| Life | feedback | drift | character | age |
-| Tone | I noise | I color | II noise | II color |
+<img src="../../img/knobs-life.png" width="520" alt="Knobs 1 to 4 on Life (feedback, drift, character, age) and Tone (each drone's noise and color)">
 
 ## Life
 
 <img class="shot" src="../../img/screen-life.png" width="240" alt="The Life page: feedback rings, a flame, a hand-drawn wave and a worn wave above the four knobs">
+
+| KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
+|---|---|---|---|
+| feedback | drift | character | age |
 
 | Knob | What it does |
 |---|---|
@@ -32,6 +33,10 @@ What keeps the drones alive and worn, and each drone's noise.
 ## Tone
 
 <img class="shot" src="../../img/screen-tone.png" width="240" alt="The Tone page: each drone's noise as snow, cut off by its filter">
+
+| KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
+|---|---|---|---|
+| I noise | I color | II noise | II color |
 
 | Knob | What it does |
 |---|---|

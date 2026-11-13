@@ -13,14 +13,15 @@ The page you play from: each drone's level and cutoff; then its pitch and resona
 
 [[HOME]] opens Drones; [[HOME]] again, Pitch. KNOB 1–2 are drone I, KNOB 3–4 drone II.
 
-| Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
-|---|---|---|---|---|
-| Drones | I level | I cutoff | II level | II cutoff |
-| Pitch | I pitch | I resonance | II pitch | II resonance |
+<img src="../../img/knobs-drones.png" width="520" alt="Knobs 1 to 4 on Drones and Pitch: level and pitch, cutoff and resonance; KNOB 1 and 2 drone I, KNOB 3 and 4 drone II">
 
 ## Drones
 
 <img class="shot" src="../../img/screen-play.png" width="240" alt="The Drones page: each drone's filter curve with its level in dB, its filter and key, and its note">
+
+| KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
+|---|---|---|---|
+| I level | I cutoff | II level | II cutoff |
 
 | Knob | What it does |
 |---|---|
@@ -36,6 +37,10 @@ Low-pass (LP), band-pass (BP) or high-pass (HP), on a black key: [[A#3]] for dro
 ## Pitch
 
 <img class="shot" src="../../img/screen-play2.png" width="240" alt="The Pitch page: each drone's waveform as strands, and drone II's interval from drone I">
+
+| KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
+|---|---|---|---|
+| I pitch | I resonance | II pitch | II resonance |
 
 | Knob | What it does |
 |---|---|
