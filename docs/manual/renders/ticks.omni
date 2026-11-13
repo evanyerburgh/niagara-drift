@@ -10,14 +10,10 @@ tapkey w15
 release SEL
 tapkey w5
 tap PLAY
-wait 3000
+wait 1500
 wav ticks.wav
 # @ P14 Tape as it starts: worn, a hum under it
-wait 1500
-tap HOME
-# @ drone I turned down to its lowest notes, A0: a low buzz
-turn K1 -29 60
-wait 300
+wait 1000
 tap EDIT
 tap EDIT
 tapkey b1
@@ -25,13 +21,20 @@ tapkey b1
 tapkey b1
 tapkey b1
 tapkey b1
-# @ the sub at -4 oct, Osc/Sb all the way to it: the buzz breaks into ticks, about 3 a second
+# @ drone I's sub at -4 oct, Osc/Sb all the way to it: a fast flutter, about 18 a second
 turn K1 85 15
-wait 300
-shot ticks-0.png
-wait 8000
+wait 1500
 # @ Drive up: each tick gets a harder edge
-turn K2 30 40
-wait 5000
+turn K2 30 30
+shot ticks-0.png
+wait 1000
+tap HOME
+tap HOME
+# @ drone I's pitch swept down, a semitone every quarter second: the flutter slows into ticks
+turn K1 -29 250
+# @ past A0, into Hz: single clicks, slower and slower
+turn K1 -31 250
 shot ticks-1.png
+# @ at 4.6 Hz: a click every second or two
+wait 4000
 wavstop

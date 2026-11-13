@@ -11,32 +11,34 @@ image: ticks-1.png
 
 ### Ticks and clicks {#ticks}
 
-*A sub so low it breaks into a few clicks a second*
+*A sub so low it breaks into clicks, swept down until they come one by one*
 
-Take drone I down to its lowest notes and its sub four octaves under that, and the sub stops being a tone: it becomes
-a slow tick, a few clicks a second under drone II, a pulse to play against.
+Put drone I's sub four octaves down and all the way in, and it stops being a tone: a fast flutter. Sweep drone I's
+pitch down and the flutter slows into ticks, then single clicks, a pulse to play against drone II.
 
-1. Press [[HOME]] twice for **Pitch**, and turn KNOB 1 down to drone I's lowest notes: **A0** (27.5 Hz), about 29 clicks
-   from where most Presets start.
-2. Press [[EDIT]] twice for **Sub · Drive**, and tap [[G#3]], drone I's sub, until the screen says **−4 oct**. It
+1. Press [[EDIT]] twice for **Sub · Drive**, and tap [[G#3]], drone I's sub, until the screen says **−4 oct**. It
    goes round −1, −2, ⅓, ⅕, −3, −4.
-3. Turn KNOB 1, Osc/Sb, all the way to the sub: **100**.
-4. Turn KNOB 2, Drive, up for a harder click.
+2. Turn KNOB 1, Osc/Sb, all the way to the sub: **100**. The sub flutters, fast.
+3. Turn KNOB 2, Drive, up for a harder click.
+4. Press [[HOME]] twice for **Pitch**, and turn KNOB 1, drone I's pitch, slowly down: the flutter slows into ticks.
+   Keep going past **A0**, where the screen turns to Hz: at about **5 Hz**, a click every second or two.
 
-> **Good to know.** The ticks come at drone I's pitch ÷ 16, two to a cycle (each edge of the sub's square): lower
-> drone I, slower ticks. Higher, or at −3 oct, they blur into a flutter. The clicks reach the speaker, though the hum
-> under them doesn't. The **Tick** gesture ([[G4]]) does this on its own, faster as you press harder. Or take drone I
-> itself under 20 Hz (Pitch, KNOB 1): a click each cycle, as in **Sonar** (P7).
+> **Good to know.** The clicks a second are drone I's pitch ÷ 8 (the sub is ÷ 16, two clicks to its cycle): at D3, 18
+> a second; at A0 (27.5 Hz), about 3; at 4.6 Hz, one every 1.7 s. The clicks reach the speaker, though the hum under
+> them doesn't. The **Tick** gesture ([[G4]]) does this on its own, faster as you press harder. Or take drone I itself
+> under 20 Hz with Osc/Sb at 0: a click each cycle, as in **Sonar** (P7).
 
-![Sub · Drive, drone I's sub at -4 oct, Osc/Sb 100](../media/ticks-0.png "−4 oct, all sub")
-![Sub · Drive, Drive 50](../media/ticks-1.png "Drive 50")
+![Sub · Drive, drone I's sub at -4 oct, Osc/Sb 100, Drive 50](../media/ticks-0.png "−4 oct, all sub, Drive 50")
+![Pitch, drone I at 4.6 Hz](../media/ticks-1.png "drone I down to 4.6 Hz")
 
 **Listen** (`ticks`)
 
 - 0:00 P14 Tape as it starts: worn, a hum under it
-- 0:01 drone I turned down to its lowest notes, A0: a low buzz
-- 0:04 the sub at −4 oct, all the way in: the buzz breaks into ticks, about 3 a second
-- 0:13 Drive up: each tick gets a harder edge
+- 0:01 drone I's sub at −4 oct, all the way in: a fast flutter, about 18 a second
+- 0:04 Drive up: each tick gets a harder edge
+- 0:06 drone I's pitch swept down, a semitone every quarter second: the flutter slows into ticks
+- 0:13 past A0, into Hz: single clicks, slower and slower
+- 0:21 at 4.6 Hz: a click every second or two
 
 ### A singing filter {#sing}
 
