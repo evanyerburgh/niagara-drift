@@ -30,11 +30,9 @@ shot ticks-0.png
 wait 1000
 tap HOME
 tap HOME
-# @ Drone I's pitch swept down, a semitone every quarter second: the flutter slows into ticks
-turn K1 -29 250
-# @ Past A0, into Hz: single clicks, slower and slower
-turn K1 -31 250
+# @ Drone I's pitch turned down quickly, past A0 to 22 Hz: the flutter slows into clicks
+turn K1 -33 60
 shot ticks-1.png
-# @ At 4.6 Hz: a click every second or two
-wait 4000
+# @ Held at 22 Hz: clicks, about 3 a second
+wait 12000
 wavstop
