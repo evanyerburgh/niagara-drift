@@ -42,12 +42,12 @@ Hold [[SEL]] and tap [[G5]] for this bank, then tap white keys 1–8.
 | P13 | **Telegraph** | A stepped figure on drone II's pitch and filter over a low D; every 20 seconds or so the whole figure moves to a new note |
 | P14 | **Tape** | Worn: D and F, a wide square and a saw, Age and lots of Character, tape wow, a tape delay, hiss |
 | P15 | **Falling** | On the LMY Tuning: sines on E4 and G3, the filters opening slowly, a falling, gliding top, feedback, the bass wandering slowly |
-| P16 | **Bare** (locked) | One oscillator, everything else off: a plain saw to build from. Drone II is out: SEL + PLAY brings it in |
+| P16 | **Bare** | One oscillator, everything else off: a plain saw to build from. Drone II is out: SEL + PLAY brings it in |
 
 ## Good to know
 
 - **Pitch lock** ([[C#4]]) is on when a new FM-1 starts: the presets keep the pitch you're on. Turn it off to hear
-  each at its own notes and Tuning.
+  each at its own notes. A preset's Tuning comes with it either way.
 - **They're fixed:** to keep your changes, save them in a bank of your own, 1 to 6
   ([recipe](../recipes/scenes.md#save)).
 - **Most are rooted on D,** so moving between them keeps the root.

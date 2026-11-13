@@ -51,16 +51,15 @@ def icon(name, cls="ic"):
     return s.replace("<svg ", f'<svg class="{cls}" aria-hidden="true" focusable="false" ', 1)
 
 
-MENU_ICON = {"Play it": "play", "Start here": "flag", "Recipes": "cooking-pot", "Reference": "book-open",
+MENU_ICON = {"Play it": "play", "Recipes": "cooking-pot", "Reference": "book-open",
              "Shortcuts": "keyboard", "Help": "lifebuoy", "About": "info"}
 TAB_ICON = {"sounds": "waveform", "gestures": "hand-pointing", "scenes": "floppy-disk", "time": "timer",
             "performing": "faders", "scratch": "plant"}
-MENU = [("", "Play it", "the emulator: the firmware itself, in your browser"),
-        ("#start-here", "Start here", "the first steps, beside the emulator"),
+MENU = [("", "Play it", "the emulator, and the first steps under it"),
         ("manual/recipes/sounds/", "Recipes", "how to get a sound or a move"),
         ("manual/reference/", "Reference", "every page, knob and key"),
         ("manual/reference/shortcuts/", "Shortcuts", "every combination, hold and tap"),
-        ("manual/help/", "Help", "installing, going back, problems"),
+        ("manual/help/", "Help", "installing, going back, feedback"),
         ("manual/about/", "About", "what it does, the details, where it came from")]
 
 
@@ -69,7 +68,7 @@ def menu_html(up, current):
     items = "".join(f'<a href="{up}{h}"{" aria-current=\"page\"" if n == current else ""}>{icon(MENU_ICON[n], "mi")}'
                     f'<span>{n}<small>{s}</small></span></a>'
                     for h, n, s in MENU)
-    return (f'<a href="{up}install/">Install</a><a href="{up}manual/help/#report-a-problem">Feedback</a><a href="{REPO}" aria-label="Source on GitHub">Source{GH}</a>'
+    return (f'<a href="{up}install/">Install</a><a href="{up}manual/help/#send-feedback">Feedback</a><a href="{REPO}" aria-label="Source on GitHub">Source{GH}</a>'
             f'<details class="menubtn"><summary aria-label="Menu" title="Menu">Menu</summary><div class="panel">{items}</div></details>')
 
 
@@ -222,8 +221,10 @@ def front(text):
 # ---- recipes -----------------------------------------------------------------------------------------------------
 
 def recipe_page(text):
-    """A recipe page: (groups of (id, title, line, written)), the recipes' HTML)."""
+    """A recipe page: (groups of (id, title, line, written)), the recipes' HTML). A page without groups gives its
+    recipes h2, so no heading level is skipped after the banner's h1."""
     bl = blocks(text)
+    hl = 3 if any(k == "h" and d[0] == 2 for k, d in bl) else 2
     groups, recipes, i = [], [], 0
     while i < len(bl):
         kind, d = bl[i]
@@ -250,14 +251,14 @@ def recipe_page(text):
                 groups.append(("", []))
             groups[-1][1].append((rid, title, line, not coming))
             if not coming:
-                recipes.append(recipe_html(rid, title, body[1:]))
+                recipes.append(recipe_html(rid, title, body[1:], hl))
             i = j
             continue
         i += 1
     return groups, recipes
 
 
-def recipe_html(rid, title, body):
+def recipe_html(rid, title, body, hl=3):
     lead, moves, good, pics, listen, nmoves = "", "", "", [], None, 0
     k = 0
     while k < len(body):
@@ -277,7 +278,7 @@ def recipe_html(rid, title, body):
                       + "".join(f"<li>{inline(t)}</li>" for _, t in d) + "</ol>")
             nmoves += len(d)
         elif kind == "h" and d[0] == 4:
-            moves += f'<h4 class="stage">{inline(d[1])}</h4>'
+            moves += f'<h{hl + 1} class="stage">{inline(d[1])}</h{hl + 1}>'
         elif kind == "quote":                          # a box: "Good to know", or its own bold label ("Where next.")
             m = re.match(r"^\*\*([^*]+?)\.?\*\*\s*", d)
             label = m.group(1) if m and m.group(1) != "Good to know" else "Good to know"
@@ -290,9 +291,9 @@ def recipe_html(rid, title, body):
         name, rows = listen
         li = "".join(f'<li><button data-t="{int(mm) * 60 + int(ss)}" aria-label="Play {html.escape(title)} from {mm}:{ss}">'
                      f'{mm}:{ss}</button><span>{inline(w)}</span></li>' for mm, ss, w in rows)
-        snd = (f'<div class="listen"><h4 id="{rid}-listen">Listen</h4><audio controls preload="none" '
+        snd = (f'<div class="listen"><h{hl + 1} id="{rid}-listen">Listen</h{hl + 1}><audio controls preload="metadata" '
                f'src="../../media/{name}.mp4" aria-label="{html.escape(title)}: a sound example"></audio><ol>{li}</ol></div>')
-    return (f'<section class="recipe" id="{rid}"><div class="recipe-head"><h3>{inline(title)}</h3>'
+    return (f'<section class="recipe" id="{rid}"><div class="recipe-head"><h{hl}>{inline(title)}</h{hl}>'
             f'</div>'
             f'<div class="recipe-body"><div class="how">{f"<p class=lead>{lead}</p>" if lead else ""}{moves}'
             f'{good}</div>'
@@ -309,12 +310,24 @@ def onpage(groups, base, label):
              f'<span class="soon">{inline(t)} (coming)</span>')
             for i, t, s, done in items)
         out += f'<li>{f"<b>{inline(g)}</b>" if g else ""}<span class="names">{names}</span></li>'
-    return f'<nav class="onpage-nav" aria-label="{label}: the recipes"><ul class="onpage">{out}</ul></nav>'
+    # folded on a phone, where the list was a screen before the first recipe (the 2026-11-13 review), as the reference's
+    n = sum(1 for _, items in groups for *_, done in items if done)
+    return (f'<nav class="onpage-nav" aria-label="{label}: the recipes"><details><summary>All {n} recipes on this page</summary>'
+            f'<ul class="onpage">{out}</ul></details></nav>'
+            '<script>if (matchMedia("(min-width: 821px)").matches) document.querySelector(".onpage-nav details").open = true;</script>')
 
 
 # ---- pages -------------------------------------------------------------------------------------------------------
 
 RECIPE_KINDS = ["sounds", "gestures", "scenes", "time", "performing", "scratch"]   # scratch: the tutorial, one walk-through
+
+
+def banner_html(up, title, intro, kicker="", current=""):
+    """The red banner with the menu, a page's kicker, title and intro (the install page has it too: make_pages.py)."""
+    return f"""<div class="top"><div class="top-in">
+<nav class="menu" aria-label="Site"><a class="homeicon" href="{up}" aria-label="Home: Niagara Drift, play it in your browser" title="Home">{HOME}</a>{menu_html(up, current)}</nav>
+<div class="title"><small>{"Niagara Drift" + (" · " + kicker if kicker else "")}</small><h1>{inline(title)}</h1><p>{inline(intro)}</p></div>
+</div></div>"""
 
 
 def page_html(rel, meta, body, current, side=""):
@@ -332,10 +345,7 @@ def page_html(rel, meta, body, current, side=""):
 <link rel="stylesheet" href="{mup}manual.css"></head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<div class="top"><div class="top-in">
-<nav class="menu" aria-label="Site"><a class="homeicon" href="{up}" aria-label="Home: Niagara Drift, play it in your browser" title="Home">{HOME}</a>{menu_html(up, current)}</nav>
-<div class="title"><small>{"Niagara Drift" + (" · " + kicker if kicker else "")}</small><h1>{inline(title)}</h1><p>{inline(intro)}</p></div>
-</div></div>
+{banner_html(up, title, intro, kicker, current)}
 <main id="main" tabindex="-1" class="page{' side' if side else ''}">{side}<div class="prose">{body}</div></main>
 <p class="foot">Niagara Drift · free, open-source firmware (GPL-3.0) for the M-VAVE FM-1. Sound examples are rendered from the
 firmware's own code on a computer, with headphones' settings, not recorded from an FM-1. <a href="{mup}about/">About</a> ·
@@ -364,7 +374,10 @@ def build(out):
             continue
         rel = page_rel(md)
         meta, text = front(md.read_text(encoding="utf-8"))
+        text = re.sub(r"<!-- github -->.*?<!-- /github -->\n?", "", text, flags=re.S)   # for the GitHub copy only
         kind = rel.split("/")[0] if rel else ""
+        if kind == "reference":                        # "## Drones and Pitch" under the banner's "Drones and Pitch":
+            text = re.sub(r"\A((?:\s*<!--.*?-->)?\s*)## " + re.escape(meta.get("title", "")) + r"\n", r"\1", text, flags=re.S)
         current = {"recipes": "Recipes", "help": "Help", "about": "About"}.get(kind, "Reference" if kind == "reference" else "")
         if rel == "reference/shortcuts":
             current = "Shortcuts"
@@ -374,7 +387,9 @@ def build(out):
             first = text.split("\n## ", 1)[0].split("\n### ", 1)[0]     # the words before the first group or recipe
             only = [r for r in recipes if not r.startswith('<h2 class="group-head"')]
             if len(only) == 1:                         # one walk-through (the tutorial): the page's title is its heading
-                body = tabs(rel.split("/")[1]) + render(blocks(first)) + re.sub(r'<div class="recipe-head">.*?</div>', "", only[0], flags=re.S)
+                one = re.sub(r'<div class="recipe-head">.*?</div>', "", only[0], flags=re.S)
+                one = re.sub(r'<h3 class="stage">(.*?)</h3>', r'<h2 class="stage">\1</h2>', one)
+                body = tabs(rel.split("/")[1]) + render(blocks(first)) + one
             else:
                 body = (tabs(rel.split("/")[1]) + render(blocks(first)) + onpage(groups, "", meta.get("title", ""))
                         + "".join(recipes))
@@ -426,7 +441,11 @@ def reference_side(rel):
         meta, _ = front((MAN / "reference" / f"{n}.md").read_text(encoding="utf-8"))
         cur = ' aria-current="page"' if n == here else ""
         li += f'<li><a href="{"../" if here else ""}{n}/"{cur}>{inline(meta["title"])}</a></li>'
-    return f'<nav class="toc" aria-label="The reference"><h2>Reference</h2><ul>{li}</ul></nav>'
+    # folded on a phone (the list was two screens before the page's content: the 2026-11-13 review), open beside the
+    # page on a wide screen: opened before it's drawn there, so it never shows folded (manual.js keeps it in step)
+    return (f'<nav class="toc" aria-label="The reference"><details><summary>All reference pages<small>{len(order)}</small></summary>'
+            f'<h2>Reference</h2><ul>{li}</ul></details></nav>'
+            '<script>if (matchMedia("(min-width: 821px)").matches) document.querySelector(".toc details").open = true;</script>')
 
 
 def page_rel(md):

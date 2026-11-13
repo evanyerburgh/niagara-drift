@@ -26,11 +26,15 @@ Every LFO depth together, from still (0%) to double (200%).
 > **Movement scales what you set.** It only scales the depths you've set: at 0% nothing moves, at 100% (the middle)
 > the depths are as set.
 
+| Movement scales | Movement leaves alone |
+|---|---|
+| **LFO sends:** all four | **Mods: Speed mod** |
+| **Mods: Delay mod** (the delay's wobble) | **Mods: X-mod** (cross-mod: that's sound, not the LFO) |
+| | The rate, the shapes, and where the waves go |
+
 ### Shapes (OCT− and OCT+)
 
 LFO I's and LFO II's wave: tap for the next.
-
-## Shapes
 
 | LFO I | LFO II |
 |---|---|
@@ -45,14 +49,6 @@ LFO I's and LFO II's wave: tap for the next.
 | Random | Rnd glide |
 | AND 3 | AND 5 |
 | OR 3 | OR 5 |
-
-## Movement
-
-| Movement scales | Movement leaves alone |
-|---|---|
-| **LFO sends:** all four | **Mods: Speed mod** |
-| **Mods: Delay mod** (the delay's wobble) | **Mods: Cross-mod** (that's sound, not the LFO) |
-| | The rate, the shapes, and where the waves go |
 
 ## Good to know
 

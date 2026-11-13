@@ -7,7 +7,7 @@ image: g-stack-0.png
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-Gestures are macros: one key moves several settings at once. The **PRESETS** knob (gesture time) sets how fast.
+Gestures are macros: one key moves several settings at once. The **PRESETS** knob (Gesture time) sets how fast.
 
 ## Pressure gestures
 
@@ -22,7 +22,7 @@ Keys 9–12: the harder you press, the further in.
 1. Press **Chord**, [[A4]], slowly harder: the drones move into a chord.
 2. Ease off: they come back.
 
-> **Good to know.** Chord builds its chord on the **Scale**, set on the **Pitch moves** page ([[SEQ]] twice, KNOB 4):
+> **Good to know.** Chord builds its chord on the **Scale**, set on the **Pitch moves** page ([[SEQ]] until you're on it, KNOB 4):
 > change the Scale and the chord changes. A preset can bring its own: Vespers' is Just 1-8, the harmonics; Embers',
 > major pentatonic.
 
@@ -112,7 +112,7 @@ Tap, latch, stack and slow down: these work on every gesture key.
 
 ### Transform a sound over half a minute {#minute}
 
-*A slow gesture time and a tap*
+*A slow Gesture time and a tap*
 
 1. Turn **PRESETS** all the way left: **GESTURE TIME 33 s**.
 2. Tap a gesture key: it comes in on its own.

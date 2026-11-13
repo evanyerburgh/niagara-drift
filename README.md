@@ -20,7 +20,7 @@ eight banks you pick with SEL and the gesture keys; keys 9–12 and the top four
 Drones, Pitch · ENV Life, Tone · EDIT Osc, Sub · Drive · SEQ Partner, Pitch moves · LFO LFO sends, Mods · ARP Swell ·
 FX Space, Details · GLO Setup 1, 2.*
 
-**Status: 0.2.** It runs on the FM-1 (tested on one unit so far) and in the browser:
+**Status: 0.2.** It runs on the FM-1 and in the browser:
 [try it](https://evanyerburgh.github.io/niagara-drift/) without an FM-1, the same code with sound.
 
 ## What it does
@@ -88,9 +88,10 @@ plays its sound (from 0.3).
 
 ## Problems and ideas
 
-It's tested on one FM-1 so far. If something goes wrong, sounds wrong or could be better, please
-[open an issue](https://github.com/evanyerburgh/niagara-drift/issues): say what you did, what happened, and
-what the startup screen says the version is.
+Ideas, requests, what you think, or something that went wrong:
+[send feedback](https://evanyerburgh.github.io/niagara-drift/manual/help/#send-feedback) (no account needed) or
+[open an issue](https://github.com/evanyerburgh/niagara-drift/issues). For a problem, say what you did, what happened,
+and what the startup screen says the version is.
 
 ## Building and testing
 

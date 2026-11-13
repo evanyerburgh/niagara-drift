@@ -13,7 +13,7 @@ Three times on **Setup 1** ([[GLO]]): Fade (KNOB 1), Morph (KNOB 2) and Scene ti
 
 *Scene time, from 0.1 s to 5 minutes*
 
-1. Tap [[GLO]] to open Setup 1.
+1. Press [[GLO]] until you're on **Setup 1**.
 2. Turn **Scene time** (KNOB 3) all the way left.
 3. Tap a different scene key: the sound cuts straight to it.
 4. Turn Scene time up, then tap another scene key: the sound glides there, taking as long as Scene time says.

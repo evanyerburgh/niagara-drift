@@ -18,7 +18,7 @@ Every combination of keys, and every hold and tap, in one place.
 | [[SEL]] + [[PLAY]] | Drone II alone fades out, or back in |
 | [[SEL]] + [[SAVE]] | Back to the sound before your last scene tap or blend; again, forward. Keep SEL down until you've let go of SAVE |
 | [[SEL]] + a gesture key | Picks the bank the scene keys play ([Scene banks](scenes.md#pick-a-bank)) |
-| Tap [[SEL]] while holding a scene key | The blend stays where it is ("A5 40% KEPT") |
+| Tap [[SEL]] while holding a scene key | The blend stays where it is ("1.5 40% KEPT") |
 | Tap [[SEL]] while holding a gesture | It latches at the level it has reached |
 
 ### Knobs
@@ -60,7 +60,6 @@ Every combination of keys, and every hold and tap, in one place.
 |---|---|
 | Hold a page button | Peek at its page: turn a knob, let go, and you're back |
 | Tap a page button again | Its next page ("1/2") |
-| Hold [[ARP]] | Peek at the Swell page |
 | Tap [[ARP]] on the Swell page | The Swell on or off |
 | Tap [[REC]] three times | Record your moves, loop them, stop |
 

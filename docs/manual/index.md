@@ -13,5 +13,7 @@ description: The Niagara Drift manual: start here, recipes, reference, shortcuts
 <li><a href="help.md"><img class="ic" src="../../web/manual/icons/lifebuoy.svg" alt=""><small>Stuck</small><b>Help</b><span>Installing, updating, backing up, going back to M-VAVE's firmware, problems</span></a></li>
 </ul>
 
+<!-- github -->
 On GitHub these pages read as they are; on the [site](https://evanyerburgh.github.io/niagara-drift/manual/) the
 recipes play their sounds.
+<!-- /github -->

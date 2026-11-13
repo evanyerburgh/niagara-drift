@@ -28,7 +28,7 @@ except the Tuning.
 |---|---|
 | **Fade** | How long PLAY takes: up to 60 s (1.5 s to start) |
 | **Morph** | How long a black key or a new LFO wave takes to move the sound: 0.02–30 s (2 s to start) |
-| **Scene time** | How long every scene move takes: 0.1 s to 5 minutes (about 8 s to start) |
+| **Scene time** (on screen Scene) | How long every scene move takes: 0.1 s to 5 minutes (about 8 s to start) |
 | **Sync** | **On** follows a MIDI clock; **Off** ignores it |
 
 ## Setup 2
@@ -44,7 +44,7 @@ except the Tuning.
 | **Tuning** | The notes the pitch knobs move through ([Tunings](#tunings)) |
 | **Tune** | A's pitch: 427 to 453 Hz (440 to start) |
 | **Stereo** | Mono to drone I left, drone II right |
-| **Pressure** | How hard you press the scene keys: up for a light touch, down for a firm one |
+| **Pressure** (on screen Press.) | How hard you press the scene keys: up for a light touch, down for a firm one |
 
 ## Tunings
 
@@ -60,7 +60,7 @@ except the Tuning.
 | **Harmonics** | The odd harmonics 1–15 of A: the drones as notes of one harmonic series |
 | **LMY** | La Monte Young's tuning for *The Well-Tuned Piano* |
 | **Harrison** | Lou Harrison's tuning for his National Steel guitar |
-| **Shrutis** | The 22 shrutis of Indian music |
+| **Shrutis** (on screen Shruti) | The 22 shrutis of Indian music |
 | **Partch** | Harry Partch's 43 notes to the octave |
 
 ### Intervals on a Tuning
@@ -70,7 +70,7 @@ hear is within 10 cents; otherwise the familiar name ("5th").
 
 ## Good to know
 
-### The knobs
+### Knobs
 
 - **The time knobs** give most of their turn to slow times, a second about a quarter of the way.
 - **Sync** shows the clock under it: "no clock", "120 BPM", "keeps 120" (stopped, at the last tempo) or "free time".
@@ -84,7 +84,7 @@ hear is within 10 cents; otherwise the familiar name ("5th").
   Tune moves them; LMY's 1/1 is C, Harrison's and Partch's G.
 - **Wander, Chord, a partner's interval and Shift** take the Tuning's notes.
 
-### The pictures
+### Pictures
 
-- **The pictures:** on Setup 1, a row for each time, ending where its knob is; on Setup 2, the Tuning as a ring, a tick
+- On Setup 1, a row for each time, ending where its knob is; on Setup 2, the Tuning as a ring, a tick
   a note, turned by Tune.

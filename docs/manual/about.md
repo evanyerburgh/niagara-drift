@@ -58,7 +58,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 
 ## Technical details
 
-### The sound
+### Sound
 
 | | |
 |---|---|

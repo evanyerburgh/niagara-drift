@@ -45,7 +45,7 @@ A black key switches each partner: [[F#3]] for drone I, [[F#4]] for drone II.
 | Knob | What it does |
 |---|---|
 | **Shift's move** | Where the Shift gesture ([[E5]]) takes the drones: a fifth down to a fifth up |
-| **Pitch glide** | How long a drone takes to reach a new pitch: up to 10 s |
+| **Pitch glide** (on screen Glide) | How long a drone takes to reach a new pitch: up to 10 s |
 | **Wander** | A slow random melody for drone II on the Scale. The knob is how often; 0 is off |
 | **Scale** | For Wander and the Chord gesture: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just |
 
@@ -64,7 +64,7 @@ A black key switches each partner: [[F#3]] for drone I, [[F#4]] for drone II.
   the knob, 0.5–2 s at the top. Pitch glide slides its notes.
 - **Just** (on the Scale) is drone I's harmonics 1–8. The Scale's notes follow the Tuning.
 
-### The pictures
+### Pictures
 
-- **The pictures:** on Partner, each drone and its partner as a knot that rolls as they beat ("beats 2.0/s"). On Pitch
+- On Partner, each drone and its partner as a knot that rolls as they beat ("beats 2.0/s"). On Pitch
   moves, Shift's move on the left and drone II's last four Wander notes on the right.

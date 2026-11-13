@@ -26,7 +26,7 @@ The harder you press, the further in. Ease off and it comes back out.
 |---|---|---|
 | [[G4]] | **Tick** | The sub sinks into slow clicks; pressing harder speeds them into a flutter |
 | [[A4]] | **Chord** | The partners move to a beatless chord on the Scale (Pitch moves), a different voicing every press |
-| [[B4]] | **Snarl** | Drone II detunes, Snarl grows, the drive bites, and Feedback sings at the top |
+| [[B4]] | **Snarl** | Drone II detunes, Snarl grows, each drone's drive bites, and Feedback sings at the top |
 | [[C5]] | **Stutter** | The Swell chops the drones, deeper and harder into a gate |
 
 ### Held gestures: keys 13–16
@@ -35,7 +35,7 @@ The longer you hold, the further in. Let go and it leaves.
 
 | Key | Gesture | What it does |
 |---|---|---|
-| [[D5]] | **Weight** | A full, warm bass: the drones and the sub come up, the cutoffs ease down, drive rounds it off |
+| [[D5]] | **Weight** | A full, warm bass: the drones and the sub come up, the cutoffs ease down, each drone's drive rounds it off |
 | [[E5]] | **Shift** | A new chord, a voice at a time: drone I glides by Shift's move (Pitch moves), drone II follows |
 | [[F5]] | **Clean** | A clean sound with your notes kept: the grit goes, then the movement, then the effects |
 | [[G5]] | **Wash** | The delay, then a reverb growing toward a freeze, the dry sound breathing in and out of it |

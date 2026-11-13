@@ -29,7 +29,7 @@ The FM-1's knobs and buttons, and the screen header at the top of the screen.
 
 | Button | What it does |
 |---|---|
-| [[HOME]] [[FX]] [[ENV]] [[LFO]] [[EDIT]] [[SEQ]] [[GLO]] [[ARP]] | open a page; tap again for its next |
+| [[HOME]] [[FX]] [[ENV]] [[LFO]] [[EDIT]] [[SEQ]] [[GLO]] [[ARP]] | Open their pages. [[HOME]] always opens Drones and [[FX]] Space; the others open the page you last used there. Tap again for its other page |
 | [[PLAY]] | Fades the drones in or out |
 | [[SAVE]] | Saves the sound |
 | [[SEL]] | Hold for fine steps, and with other controls for their second job |
@@ -51,7 +51,8 @@ The FM-1's knobs and buttons, and the screen header at the top of the screen.
 
 - **Hold a page button to peek:** turn a knob, let go, and you're back ("let go: DRONES").
 - **HOME and FX** always open Drones and Space; the other buttons open the page you last used there.
-- **The drone pages:** Drones, Tone, Osc, Sub · Drive, Partner, LFO sends; their knob names underlined amber and teal.
+- **The drone pages:** Drones, Pitch, Tone, Osc, Sub · Drive, Partner, LFO sends: each shows drone I and drone II in
+  their own colors.
 - **On the way to a scene** the header says where, in gold ("→ P3 VESPERS"), a gold line filling under it.
 
 ### Buttons

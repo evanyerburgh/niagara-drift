@@ -1,11 +1,11 @@
 ---
-title: MIDI in
+title: MIDI
 intro: Notes, the clock and Sync
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-## MIDI in
+## MIDI
 
 Notes tune the drones and a clock puts them in time, over USB or the TRS jack.
 
@@ -57,7 +57,7 @@ Recipe: [Play in time with a MIDI clock](../recipes/performing.md#clock)
 - **Notes tune,** even with Pitch lock on; they don't start or stop the drones. Note-offs, velocity, other channels
   and controllers (CC) are ignored.
 
-### The clock
+### Clock
 
 - **Sync off** ignores the clock and Start; notes still tune.
 - **The clock** needs to be at least 20 BPM.
