@@ -138,20 +138,20 @@ bell struck every 2.5 s, ringing out.
    to about **0.4 Hz**. Tap [[A#4]] until drone II's cutoff says **LFO I** too.
 7. Turn KNOB 2 and KNOB 4, the cutoff sends, all the way left: **−100**. Each cycle the filters snap open and close
    slowly: the bell is struck, and rings out.
+8. Press [[FX]] for **Space**, and turn KNOB 4, the reverb's Mix, to about **40**: more room for it to ring in.
 
 > **Good to know.** Roundtooth rises fast and falls at the cycle's end; turned upside down (−100) it jumps and dies
 > away, a strike. SELECT sets how often it strikes. Simple intervals (an octave, a fifth) lock into harmonies instead
 > of bells; awkward ones (a tritone, a seventh) ring metallic. X-mod past 85 clangs and runs wild. If the Swell is on,
 > switch it off ([[ARP]], then [[ARP]] again on its page) so only the LFO strikes.
 
-![LFO sends, LFO I on Roundtooth at 0.39 Hz, both cutoffs on LFO I](../media/bells-0.png "Round, 0.39 Hz")
-![LFO sends, both cutoff sends at -100](../media/bells-1.png "both cutoffs −100")
+![Mods, bend each other, X-mod 70](../media/bells-0.png "bend each other, 70")
+![LFO sends, LFO I on Roundtooth at 0.39 Hz, both cutoff sends at -100](../media/bells-1.png "Round, both cutoffs −100")
 
 **Listen** (`bells`)
 
-- 0:00 Two pure sines, high, a tritone apart, bending each other: one metallic tone that never stops ringing
-- 0:01 The cutoffs down, the LFO on both, the sends to −100: the metal goes dull
-- 0:06 A bell struck every 2.5 s, bright on the hit, the top dying first
+- 0:00 A bell struck every 2.5 s (0:03, 0:05, 0:08, 0:10, 0:13): bright and clangy on the hit
+- 0:03 The top dies first, and it fades about 25 dB into a dark hum before the next
 
 ### Snarl {#snarl}
 

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# A recipe's render (tools/make_manual.py --renders): from P1, headphones, Pitch lock off, Scene time 0. The two high
-# sines are set up before the recording (the moves take ~8 s); the clip starts on them, then strikes them.
+# A recipe's render (tools/make_manual.py --renders): from P1, headphones, Pitch lock off, Scene time 0. Everything is
+# set before the recording (the recipe's moves reach the same settings, the reverb at 40); the clip is the bells.
 # "# @" marks the listening times (tools/make_manual.py --times).
 notips
 phones 1
@@ -24,29 +24,24 @@ turn K4 30 60
 wait 1500
 tapkey b10
 tapkey b10
-tap LFO
-tap LFO
-turn K4 30 80
-wait 1000
+set 43 70
+set 48 4
+set 47 103
+set 16 1
+set 37 1
+set 17 -100
+set 38 -100
+set 7 400
+set 28 400
+set 63 40
+wait 500
 wav bells.wav
-# @ Two pure sines, high, a tritone apart, bending each other at X-mod 70: one metallic tone that never stops ringing
-wait 1500
-# @ The cutoffs down to about 300 Hz, LFO I on Roundtooth at 0.4 Hz on both cutoffs, the sends to -100: struck
-tap HOME
-turn K2 -24 25
-turn K4 -25 25
-tap LFO
-tap LFO
-tap OCT-
-tap OCT-
-tap OCT-
-turn SELECT 29 40
-tapkey b7
-tapkey b7
-shot bells-0.png
-turn K2 -50 10
-turn K4 -15 20
-# @ A bell struck every 2.5 s: bright on the hit, the top dying first
+# @ A bell struck every 2.5 s: bright and clangy on the hit, then the top dies first and it fades into a dark hum
 wait 14000
-shot bells-1.png
 wavstop
+page 7
+wait 400
+shot bells-0.png
+page 6
+wait 400
+shot bells-1.png
