@@ -761,3 +761,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   before, -1.2, -4.6, +1.8 after). Players' saved sounds unchanged. A low cut at 12 Hz on the headphone output was
   tried and not taken (Evan: no low cut): before the output's clip it softened a saw at 8 Hz and below by 3-6 dB, and
   after the clip it went past full scale.
+- 2026-11-14: **four Presets get their own Swell** (Evan: five breathing with P1's Swell, the same 23 s breath in step,
+  "makes them sound too much the same"): Embers and Howl none (the bloom and the grind are their movement), Abyss a
+  slow deep tide (33 s, about 18 dB), Tape a tired breath (29 s, about 7 dB); Niagara keeps it. Picked by ear from
+  two options each. Their loud moments within 1.3 dB of before, so their levels stay; without dips Embers and Howl
+  are 4-5 dB louder on average.

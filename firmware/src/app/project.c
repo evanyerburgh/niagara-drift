@@ -36,12 +36,13 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     /* P1 NIAGARA: the starting sound (0.2's P1, unchanged) */
     {-1},
     /* P2 EMBERS: triangles blooming toward saws and back, the two drones in turn, a pure-third partner each, a chorus
-     * hall; Chord on major pentatonic (Evan, 2026-11-13: minor clashed with its F#) */
+     * hall; Chord on major pentatonic (Evan, 2026-11-13: minor clashed with its F#); no Swell, the bloom its movement
+     * (Evan, 2026-11-14: five Presets breathing with P1's Swell sounded too much the same) */
     {I_(GP_WAVE), 40, I_(GP_INTERVAL), 13, I_(GP_DETUNE), 10, I_(GP_CUTOFF), 700, I_(GP_RESO), 300,
      I_(GP_OLFO_DEPTH), 71, I_(GP_OLFO_DEST), 1, II_(GP_PITCH), 5386, II_(GP_WAVE), 40, II_(GP_INTERVAL), 13,
      II_(GP_DETUNE), 10, II_(GP_CUTOFF), 700, II_(GP_RESO), 300, II_(GP_LEVEL), 80, II_(GP_OLFO), 1,
      II_(GP_OLFO_DEPTH), -71, II_(GP_OLFO_DEST), 1, P_LFO_RATE, 78, P_PULSE_DEPTH, 30, P_DLY_MIX, 20, P_REV_MIX, 50,
-     P_REV_TYPE, 3, P_CHAR, 15, P_DLY_TYPE, 1, P_WSCALE, 1, -1},
+     P_REV_TYPE, 3, P_CHAR, 15, P_DLY_TYPE, 1, P_WSCALE, 1, P_PULSE, 0, -1},
     /* P3 VESPERS: saws through band-passes near a sung "ah", the waves morphing, a bright Cathedral; Chord on Just
      * 1-8 (Evan, 2026-11-13: minor clashed with its F#) */
     {I_(GP_INTERVAL), 9, I_(GP_MIX), 10, I_(GP_CUTOFF), 520, I_(GP_RESO), 450, I_(GP_MODE), 1, I_(GP_LEVEL), 100,
@@ -58,13 +59,13 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      P_GLIDE, 16, P_PULSE, 0, P_DLY_MIX, 15, P_REV_MIX, 55, P_FEEDBACK, 25, P_WSCALE, 5, P_REV_LEN, 85, P_TUNING, 6,
      -1},
     /* P5 ABYSS: dark: D3 over B2, a third's subharmonic, closed resonant filters swept slowly on their resonance
-     * (0.2's P2) */
+     * (0.2's P2); its own Swell, a slow deep tide (33 s, 18 dB; Evan, 2026-11-14) */
     {I_(GP_INTERVAL), 0, I_(GP_MIX), 45, I_(GP_SUBOCT), 3, I_(GP_CUTOFF), 650, I_(GP_RESO), 450, I_(GP_DRIVE), 70,
      I_(GP_LEVEL), 100, I_(GP_FLFO_DEPTH), 100, I_(GP_FLFO_DEST), 1, I_(GP_NOISE), 8, II_(GP_PITCH), 4700,
      II_(GP_WAVE), 100, II_(GP_WIDTH), 70, II_(GP_DETUNE), 30, II_(GP_CUTOFF), 610, II_(GP_RESO), 450,
      II_(GP_DRIVE), 60, II_(GP_LEVEL), 100, II_(GP_FLFO_DEPTH), -100, II_(GP_FLFO_DEST), 1, P_LFO_RATE, 61,
      P_DLY_TIME, 85, P_DLY_REPEATS, 45, P_DLY_MIX, 15, P_REV_MIX, 40, P_REV_TYPE, 1, P_FEEDBACK, 30, P_CHAR, 27,
-     P_DLY_TYPE, 1, P_REV_LEN, 75, P_REV_DAMP, 80, -1},
+     P_DLY_TYPE, 1, P_REV_LEN, 75, P_REV_DAMP, 80, P_PULSE_RATE, 0, P_PULSE_DEPTH, 60, P_PULSE_SHAPE, 0, -1},
     /* P6 SEANCE: eerie: Eerie's hollow bass (D3, a fifth under it) under a high band-pass voice (A4 -19) on Harrison;
      * cross-mod, long swinging echoes, a chorus hall; Wander at its slowest */
     {I_(GP_WAVE), 20, I_(GP_INTERVAL), 1, I_(GP_DETUNE), 35, I_(GP_CUTOFF), 600, II_(GP_PITCH), 6881,
@@ -89,12 +90,12 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      P_PULSE_DEPTH, 30, P_PULSE_SHAPE, 0, P_DLY_TIME, 80, P_DLY_REPEATS, 60, P_REV_MIX, 65, P_MOVE, 55,
      P_DLY_TYPE, 1, P_REV_LEN, 92, P_REV_DAMP, 20, -1},
     /* P9 HOWL: D2 and Eb2 grinding, Feedback 85, a random LFO on the filters, quick enough
-     * that the grind comes back however Howl is started (Evan, 2026-11-10; 0.2's P9) */
+     * that the grind comes back however Howl is started (Evan, 2026-11-10; 0.2's P9); no Swell (2026-11-14) */
     {I_(GP_PITCH), 3800, I_(GP_CUTOFF), 740, I_(GP_RESO), 600, I_(GP_DRIVE), 75, I_(GP_LEVEL), 92,
      I_(GP_FLFO_DEPTH), 100, I_(GP_FLFO_DEST), 1, II_(GP_PITCH), 3900, II_(GP_CUTOFF), 780, II_(GP_RESO), 600,
      II_(GP_MODE), 1, II_(GP_DRIVE), 75, II_(GP_LEVEL), 92, P_LFO_RATE, 100, P_LFO_W1, 8, P_DLY_TIME, 20,
      P_DLY_REPEATS, 45, P_DLY_MIX, 40, P_REV_MIX, 50, P_REV_TYPE, 0, P_MOVE, 40, P_FEEDBACK, 85, P_CHAR, 21,
-     P_REV_LEN, 40, -1},
+     P_REV_LEN, 40, P_PULSE, 0, -1},
     /* P10 CISTERN: reeds (Deep Listening's cistern): saw-square drones, drone I rounder with a sine sub, a bellows
      * Swell, a Tape delay a second long, the Shimmer reverb */
     {I_(GP_WAVE), 45, I_(GP_WIDTH), 0, I_(GP_MIX), 35, I_(GP_CUTOFF), 600, I_(GP_RESO), 150, I_(GP_DRIVE), 10,
@@ -126,12 +127,13 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      II_(GP_OLFO_DEPTH), -70, II_(GP_FLFO), 1, II_(GP_FLFO_DEPTH), 40, P_LFO_RATE, 113, P_LFO_W1, 10, P_GLIDE, 0,
      P_PULSE_RATE, 9, P_PULSE_DEPTH, 35, P_PULSE_SHAPE, 0, P_DLY_TIME, 40, P_DLY_REPEATS, 45, P_DLY_MIX, 30,
      P_REV_MIX, 20, P_WANDER, 10, P_WSCALE, 2, P_DLY_TYPE, 2, -1},
-    /* P14 TAPE: worn: D3 and F3, a wide square and a saw, Age and Character, a 0.54 Hz wow (0.2's P7, more worn) */
+    /* P14 TAPE: worn: D3 and F3, a wide square and a saw, Age and Character, a 0.54 Hz wow (0.2's P7, more worn); a
+     * tired breath of its own (29 s, ~7 dB; Evan, 2026-11-14) */
     {I_(GP_WAVE), 100, I_(GP_WIDTH), 35, I_(GP_CUTOFF), 720, I_(GP_LEVEL), 78, I_(GP_OLFO_DEPTH), 7,
      I_(GP_FLFO_DEPTH), 40, I_(GP_NOISE), 18, II_(GP_PITCH), 5300, II_(GP_WAVE), 67, II_(GP_CUTOFF), 700,
      II_(GP_LEVEL), 78, II_(GP_OLFO), 1, II_(GP_OLFO_DEPTH), 6, II_(GP_FLFO_DEPTH), -40, II_(GP_NOISE), 12,
      P_LFO_RATE, 106, P_DLY_REPEATS, 55, P_DLY_MIX, 35, P_REV_MIX, 25, P_REV_TYPE, 0, P_FEEDBACK, 15, P_CHAR, 67,
-     P_AGE, 45, P_REV_LEN, 35, -1},
+     P_AGE, 45, P_REV_LEN, 35, P_PULSE_RATE, 2, P_PULSE_DEPTH, 20, -1},
     /* P15 FALLING: on LMY: sines on E4 and G3, the filters opening, a slow falling top, Feedback 64, Wander slow in
      * the bass */
     {I_(GP_PITCH), 6429, I_(GP_WAVE), 0, I_(GP_INTERVAL), 9, I_(GP_DETUNE), 15, I_(GP_MIX), 33, I_(GP_CUTOFF), 300,
