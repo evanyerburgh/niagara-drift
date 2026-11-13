@@ -13,27 +13,29 @@ image: ticks-1.png
 
 *A sub so low it breaks into clicks, a few a second*
 
-Put drone I's sub four octaves down, all the way in, and turn drone I down to about 22 Hz: the sub stops being a
-tone and becomes clicks, about 3 a second, ringing in the delay and reverb.
+Put drone I's sub four octaves down, all the way in, and turn drone I down to about 21 Hz: the sub stops being a
+tone and becomes clicks, about 2.6 a second. Turn drone I down and the clicks play like percussion under drone II.
 
-1. Press [[EDIT]] twice for **Sub · Drive**, and turn KNOB 1, Osc/Sb, all the way to the sub: **100**.
-2. Tap [[G#3]], drone I's sub, until the screen says **−4 oct**. It goes round −1, −2, ⅓, ⅕, −3, −4.
-3. Press [[HOME]] twice for **Pitch**, and turn KNOB 1, drone I's pitch, quickly down past **A0**, where the screen
-   turns to Hz, to about **22 Hz**: clicks.
+1. Hold [[SEL]] and tap [[F5]] for the presets, then tap white key 2: **Embers** (P2).
+2. Press [[EDIT]] twice for **Sub · Drive**, and turn KNOB 1, Osc/Sb, all the way to the sub: **100**.
+3. Tap [[G#3]], drone I's sub, until the screen says **−4 oct**. It goes round −1, −2, ⅓, ⅕, −3, −4.
+4. Press [[HOME]] twice for **Pitch**, and turn KNOB 1, drone I's pitch, quickly down past **A0**, where the screen
+   turns to Hz, to about **21 Hz**: clicks.
+5. Press [[HOME]] for **Drones**, and turn KNOB 1, drone I's level, down to about **50**: the clicks under drone II.
 
 > **Good to know.** The clicks a second are drone I's pitch ÷ 8 (the sub is ÷ 16, two clicks to its cycle): at D3, 18
-> a second; at A0 (27.5 Hz), about 3; at 22 Hz, 2.7; at 5 Hz, one every 1.6 s. The clicks reach the speaker, though
+> a second; at A0 (27.5 Hz), about 3; at 21 Hz, 2.6; at 5 Hz, one every 1.6 s. The clicks reach the speaker, though
 > the hum under them doesn't. The **Tick** gesture ([[G4]]) does this on its own, faster as you press harder. Or take
 > drone I itself under 20 Hz with Osc/Sb at 0: a click each cycle, as in **Sonar** (P7).
 
 ![Sub · Drive, drone I's sub at -4 oct, Osc/Sb 100](../media/ticks-0.png "−4 oct, all sub")
-![Pitch, drone I at 22 Hz](../media/ticks-1.png "drone I at 22 Hz")
+![Pitch, drone I at 21 Hz](../media/ticks-1.png "drone I at 21 Hz")
 
 **Listen** (`ticks`)
 
-- 0:00 P1 Niagara as it starts: no clicks
-- 0:01 Osc/Sb to the sub, the sub to −4 oct, drone I's pitch quickly down to 22 Hz
-- 0:04 Clicks, about 3 a second, ringing in P1's delay and reverb
+- 0:00 Embers (P2) as it starts: no clicks
+- 0:01 Osc/Sb to the sub, the sub to −4 oct, drone I's pitch quickly down to about 21 Hz, its level down to 50
+- 0:06 Clicks, about 2.6 a second, as percussion under drone II's blooming triangle
 
 ### A singing filter {#sing}
 

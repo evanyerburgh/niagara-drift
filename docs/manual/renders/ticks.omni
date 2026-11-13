@@ -1,20 +1,20 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# A recipe's render (tools/make_manual.py --renders): from P1, headphones, Pitch lock off, Scene time 0. Evan's moves
-# (2026-11-13), quickly: Osc/Sb to the sub, the sub to -4 oct, drone I's pitch down to 22 Hz; then the clicks, held.
-# "# @" marks the listening times (tools/make_manual.py --times).
+# A recipe's render (tools/make_manual.py --renders): from P2 Embers, headphones, Pitch lock off, Scene time 0. Evan's
+# moves (2026-11-13), quickly: Osc/Sb to the sub, the sub to -4 oct, drone I's pitch down to 20.6 Hz, its level to 50
+# so the clicks are percussion under drone II; then the clicks, held. "# @" marks the listening times (--times).
 notips
 phones 1
 set 74 0
 set 71 0
-tapkey w0
+tapkey w1
 tap PLAY
 wait 3000
 wav ticks.wav
-# @ P1 Niagara as it starts: no clicks
+# @ Embers (P2) as it starts: no clicks
 wait 1500
 tap EDIT
 tap EDIT
-# @ Osc/Sb to the sub, the sub to -4 oct, drone I's pitch quickly down to 22 Hz
+# @ Osc/Sb to the sub, the sub to -4 oct, drone I's pitch quickly down to about 21 Hz, its level down to 50
 turn K1 70 15
 tapkey b1
 tapkey b1
@@ -23,8 +23,10 @@ tapkey b1
 tapkey b1
 tap HOME
 tap HOME
-turn K1 -33 50
-# @ Clicks, about 3 a second, ringing in P1's delay and reverb
+turn K1 -34 50
+tap HOME
+turn K1 -34 40
+# @ Clicks, about 2.6 a second, as percussion under drone II's blooming triangle
 wait 12000
 wavstop
 page 5
