@@ -247,7 +247,6 @@ figcaption { font-size: .85rem; color: var(--muted); margin-top: .35rem; line-he
 .feedback legend { font-weight: 600; color: var(--pale); margin-bottom: 6px; padding: 0; }
 .feedback fieldset label { display: flex; align-items: center; gap: 8px; font-weight: 400; color: var(--ink); }
 .feedback input[type=radio] { accent-color: var(--pale); width: 1.1em; height: 1.1em; }
-.feedback .if-problem { display: grid; gap: 14px; } .feedback .if-problem[hidden] { display: none; }
 .feedback .gotcha { position: absolute; left: -9999px; }
 .feedback .sent-note { margin: 0; color: var(--muted); font-size: .9rem; }
 .feedback button { justify-self: start; font: 600 1rem "Inter Tight", sans-serif; color: var(--black); background: var(--pale);

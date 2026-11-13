@@ -109,33 +109,20 @@ document.querySelectorAll(".listen").forEach((l) => {
   l.querySelectorAll("button[data-t]").forEach((b) => b.addEventListener("click", () => { a.currentTime = +b.dataset.t; a.play(); }));
 });
 // the feedback form (Help): sent to Formspree from the page, with the page and the browser; the answer said in place
-// What it's about sets the message's hint and the subject; the FM-1 and version are asked only about a problem
-const HINT = { "an idea or request": "A feature you'd like, a sound you're after, something that could work better",
-               "what I think": "What you like, what you don't, how you use it",
-               "a problem": "What you did, what you heard or saw, what you expected" };
 document.querySelectorAll("form.feedback").forEach((f) => {
   const st = f.querySelector(".feedback-status"), go = f.querySelector("button[type=submit]");
-  const kind = () => (f.querySelector("input[name=About]:checked") || {}).value || "";
-  const fit = () => {
-    const k = kind(), box = f.querySelector(".if-problem");
-    f.querySelector("textarea").placeholder = HINT[k] || "";
-    if (box) { box.hidden = k !== "a problem"; box.querySelectorAll("input").forEach((i) => { i.disabled = box.hidden; }); }
-  };
-  f.querySelectorAll("input[name=About]").forEach((r) => r.addEventListener("change", fit));
-  fit();
   f.addEventListener("submit", async (e) => {
     e.preventDefault();
     const d = new FormData(f);
     d.append("Page", location.href);
     d.append("Browser", navigator.userAgent);
-    d.append("_subject", "Niagara Drift feedback: " + (kind() || "a message"));
+    d.append("_subject", "Niagara Drift feedback");
     go.disabled = true;
     st.textContent = "Sending";
     try {
       const r = await fetch(f.action, { method: "POST", body: d, headers: { Accept: "application/json" } });
       if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.status);
       f.reset();
-      fit();
       st.textContent = "Sent. Thank you.";
     } catch (err) {
       st.textContent = "Not sent (" + err.message + "). Try again, or open an issue on GitHub.";

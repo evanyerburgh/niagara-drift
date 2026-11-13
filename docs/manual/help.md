@@ -88,12 +88,7 @@ Ideas, requests, what you like or don't, or something that went wrong: tell us h
 account you can also [open an issue](https://github.com/evanyerburgh/niagara-drift/issues).
 
 <form class="feedback" action="https://formspree.io/f/xppdwkel" method="POST">
-<fieldset class="kind"><legend>What's it about</legend><label><input type="radio" name="About" value="an idea or request" checked> An idea or request</label><label><input type="radio" name="About" value="what I think"> What I think</label><label><input type="radio" name="About" value="a problem"> A problem</label></fieldset>
-<label>Your message<textarea name="Message" rows="5" required placeholder="A feature you'd like, a sound you're after, something that could work better"></textarea></label>
-<div class="if-problem">
-<fieldset><legend>Which FM-1</legend><label><input type="radio" name="FM-1" value="older"> Older</label><label><input type="radio" name="FM-1" value="newer (M-VAVE under the screen)"> Newer, with M-VAVE under the screen</label><label><input type="radio" name="FM-1" value="not sure" checked> Not sure</label></fieldset>
-<label>Version <small>on the startup screen, if you know it</small><input name="Version" placeholder="e.g. 0.3"></label>
-</div>
+<label>Your message<textarea name="Message" rows="5" required placeholder="An idea, what you think, or what went wrong (for a problem, the version on the startup screen helps)"></textarea></label>
 <label>Your email <small>optional, only if you'd like an answer</small><input type="email" name="email" autocomplete="email"></label>
 <input type="text" name="_gotcha" class="gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
 <p class="sent-note">Sent with it: this page's address and your browser's name.</p>
