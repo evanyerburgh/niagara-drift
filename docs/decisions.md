@@ -766,3 +766,7 @@ at the end. The current state is in the [README](../README.md) and the code.
   slow deep tide (33 s, about 18 dB), Tape a tired breath (29 s, about 7 dB); Niagara keeps it. Picked by ear from
   two options each. Their loud moments within 1.3 dB of before, so their levels stay; without dips Embers and Howl
   are 4-5 dB louder on average.
+- 2026-11-14: **the flash chips by name**, as Felucca, Charles Vestal's fm1-base and fm1-x0x, and Melodee check them:
+  the first FM-1s' 0x856014 and the newer ones' 0xB36014, anything else RAM only (the rescue tool the same). 0.2.1's
+  rule (any standard part of 1-16 MiB) took both but named neither, so thefirmwarehub.com, which reads the chips
+  from the package, listed it as "it does not check the chip". Both numbers are now in the image.
