@@ -397,7 +397,13 @@ def build(out):
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(page, encoding="utf-8")
         pages += 1
-    missing = sorted({m for p in dst.rglob("index.html") for m in re.findall(r'src="[^"]*media/([\w-]+\.mp4)"', p.read_text())}
+    for p in dst.rglob("index.html"):                  # each sound and picture tagged with its contents: a browser
+        t = p.read_text(encoding="utf-8")                # that kept an earlier one fetches the new one (Safari did)
+        def tag(m):
+            f = dst / "media" / m.group(2)
+            return m.group(0) if not f.exists() else f'{m.group(1)}{m.group(2)}?v={hashlib.sha1(f.read_bytes()).hexdigest()[:8]}"'
+        p.write_text(re.sub(r'(src="[^"]*media/)([\w.-]+\.(?:mp4|png))"', tag, t), encoding="utf-8")
+    missing = sorted({m for p in dst.rglob("index.html") for m in re.findall(r'src="[^"]*media/([\w-]+\.mp4)(?:\?v=\w+)?"', p.read_text())}
                      - {f.name for f in (dst / "media").glob("*.mp4")})
     print(f"manual: {dst}: {pages} pages" + (f"; no sound yet for {len(missing)} recipes (tools/make_manual.py --renders)"
                                                if missing else ""))
@@ -503,6 +509,7 @@ def check():
                 if re.match(r"[a-z]+:|data:", href):
                     continue
                 path, _, frag = href.partition("#")
+                path = path.split("?v=")[0]
                 if not path:
                     if frag and frag not in ids:
                         bad.append(f"{p.relative_to(out)}: #{frag} isn't on the page")

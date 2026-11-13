@@ -149,10 +149,9 @@ bell struck every 2.5 s, ringing out.
 
 **Listen** (`bells`)
 
-- 0:00 Two pure sines, high, a tritone apart
-- 0:01 Bend each other, X-mod up: one metallic tone, but it never stops ringing
-- 0:07 The cutoffs down: the metal goes dull
-- 0:10 The cutoff sends at −100: a bell struck every 2.5 s, bright on the hit, then the top dies first
+- 0:00 Two pure sines, high, a tritone apart, bending each other: one metallic tone that never stops ringing
+- 0:01 The cutoffs down, the LFO on both, the sends to −100: the metal goes dull
+- 0:06 A bell struck every 2.5 s, bright on the hit, the top dying first
 
 ### Snarl {#snarl}
 

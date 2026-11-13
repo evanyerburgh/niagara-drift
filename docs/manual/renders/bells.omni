@@ -22,22 +22,19 @@ tap HOME
 turn K2 30 60
 turn K4 30 60
 wait 1500
-wav bells.wav
-# @ Two pure sines, high, a tritone apart (C#6 and G6), the Swell off
-wait 1500
-# @ Key 11 twice, bend each other, X-mod up: they ring into one metallic tone, but it never stops ringing
 tapkey b10
 tapkey b10
 tap LFO
 tap LFO
 turn K4 30 80
-wait 3000
-# @ The cutoffs down, to about 300 Hz: the metal goes dull
+wait 1000
+wav bells.wav
+# @ Two pure sines, high, a tritone apart, bending each other at X-mod 70: one metallic tone that never stops ringing
+wait 1500
+# @ The cutoffs down to about 300 Hz, LFO I on Roundtooth at 0.4 Hz on both cutoffs, the sends to -100: struck
 tap HOME
 turn K2 -24 25
 turn K4 -25 25
-wait 1000
-# @ LFO I on Roundtooth, a cycle every 2.5 s, drone II's cutoff on it too
 tap LFO
 tap LFO
 tap OCT-
@@ -47,9 +44,9 @@ turn SELECT 29 40
 tapkey b7
 tapkey b7
 shot bells-0.png
-# @ Both cutoff sends all the way left, -100: each cycle the filters snap open and close slowly, a bell struck and ringing out
 turn K2 -50 10
-turn K4 -15 40
-wait 12000
+turn K4 -15 20
+# @ A bell struck every 2.5 s: bright on the hit, the top dying first
+wait 14000
 shot bells-1.png
 wavstop
