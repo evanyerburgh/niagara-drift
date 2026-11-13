@@ -71,3 +71,25 @@ document.querySelectorAll(".listen").forEach((l) => {
   const a = l.querySelector("audio");
   l.querySelectorAll("button[data-t]").forEach((b) => b.addEventListener("click", () => { a.currentTime = +b.dataset.t; a.play(); }));
 });
+// the feedback form (Help): sent to Formspree from the page, with the page and the browser; the answer said in place
+document.querySelectorAll("form.feedback").forEach((f) => {
+  const st = f.querySelector(".feedback-status"), go = f.querySelector("button[type=submit]");
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const d = new FormData(f);
+    d.append("Page", location.href);
+    d.append("Browser", navigator.userAgent);
+    d.append("_subject", "Niagara Drift feedback");
+    go.disabled = true;
+    st.textContent = "Sending";
+    try {
+      const r = await fetch(f.action, { method: "POST", body: d, headers: { Accept: "application/json" } });
+      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.status);
+      f.reset();
+      st.textContent = "Sent. Thank you.";
+    } catch (err) {
+      st.textContent = "Not sent (" + err.message + "). Try again, or open an issue on GitHub.";
+    }
+    go.disabled = false;
+  });
+});

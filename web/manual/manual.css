@@ -189,3 +189,21 @@ figcaption { font-size: .85rem; color: var(--muted); margin-top: .35rem; line-he
 .ti { width: 18px; height: 18px; vertical-align: -.2em; margin-right: .4rem; }
 .cards li > a { display: block; height: 100%; text-decoration: none; color: inherit; margin: -14px -16px; padding: 14px 16px; border-radius: 14px; }
 .cards li > a:hover b { text-decoration: underline; }
+
+/* the feedback form (Help) */
+.feedback { display: grid; gap: 14px; max-width: 640px; background: var(--card); border-radius: 20px; padding: 20px; margin: 1rem 0 2rem; }
+.feedback label { display: grid; gap: 6px; font-weight: 600; color: var(--pale); }
+.feedback label small { font-weight: 400; color: var(--muted); }
+.feedback input:not([type=radio]), .feedback textarea { font: 400 1rem "Inter Tight", sans-serif; color: var(--ink); background: var(--black);
+  border: 1px solid var(--muted); border-radius: 12px; padding: .6em .8em; }
+.feedback input:focus-visible, .feedback textarea:focus-visible { outline: 3px solid var(--pale); outline-offset: 2px; }
+.feedback fieldset { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.feedback legend { font-weight: 600; color: var(--pale); margin-bottom: 6px; padding: 0; }
+.feedback fieldset label { display: flex; align-items: center; gap: 8px; font-weight: 400; color: var(--ink); }
+.feedback input[type=radio] { accent-color: var(--pale); width: 1.1em; height: 1.1em; }
+.feedback .gotcha { position: absolute; left: -9999px; }
+.feedback .sent-note { margin: 0; color: var(--muted); font-size: .9rem; }
+.feedback button { justify-self: start; font: 600 1rem "Inter Tight", sans-serif; color: var(--black); background: var(--pale);
+  border: 0; border-radius: 999px; padding: .6em 1.6em; cursor: pointer; }
+.feedback button:disabled { opacity: .6; cursor: default; }
+.feedback-status { margin: 0; min-height: 1.6em; }

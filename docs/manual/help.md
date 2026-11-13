@@ -84,6 +84,16 @@ Nothing is written until the FM-1 has checked the whole package, so trying again
 
 ## Report a problem
 
-It's tested on one FM-1 so far. If something goes wrong, sounds wrong or could be better,
-[open an issue](https://github.com/evanyerburgh/niagara-drift/issues): what you did, what happened, and the version
-on the startup screen.
+It's tested on one FM-1 so far. If something goes wrong, sounds wrong or could be better, tell us here. No account
+needed. With a GitHub account you can also [open an issue](https://github.com/evanyerburgh/niagara-drift/issues).
+
+<form class="feedback" action="https://formspree.io/f/xppdwkel" method="POST">
+<label>What happened<textarea name="What happened" rows="5" required placeholder="What you did, what you heard or saw, what you expected"></textarea></label>
+<fieldset><legend>Which FM-1</legend><label><input type="radio" name="FM-1" value="older"> Older</label><label><input type="radio" name="FM-1" value="newer (M-VAVE under the screen)"> Newer, with M-VAVE under the screen</label><label><input type="radio" name="FM-1" value="not sure" checked> Not sure</label></fieldset>
+<label>Version <small>on the startup screen, if you know it</small><input name="Version" placeholder="0.3"></label>
+<label>Your email <small>optional, only if you'd like an answer</small><input type="email" name="email" autocomplete="email"></label>
+<input type="text" name="_gotcha" class="gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+<p class="sent-note">Sent with it: this page's address and your browser's name, to help find the problem.</p>
+<button type="submit">Send</button>
+<p class="feedback-status" role="status"></p>
+</form>
