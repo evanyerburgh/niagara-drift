@@ -37,6 +37,16 @@ progress { width: 100%; height: 6px; margin-top: 1rem; accent-color: var(--pale)
 pre { color: var(--muted); font: 500 .75rem/1.5 var(--mono); white-space: pre-wrap; margin: 1rem 0 0; max-height: 12rem; overflow: auto; }
 pre:empty { display: none; }
 input[type=file] { font: inherit; font-size: .9rem; color: var(--muted); max-width: 100%; }
+/* a failed install: what happened, sent to the developer (Formspree) */
+#report { border-top: 1px solid var(--rule); margin-top: 1.2rem; padding-top: 1.2rem; }
+#report label { display: grid; gap: 4px; margin: 0 0 .8rem; font-weight: 600; color: var(--pale); }
+#report label small { font-weight: 400; color: var(--muted); }
+#report textarea, #report input { font: 400 1rem "Inter Tight", sans-serif; color: var(--ink); background: var(--black);
+  border: 1px solid var(--muted); border-radius: 12px; padding: .55em .8em; }
+#report textarea:focus-visible { outline: 3px solid var(--pale); outline-offset: 3px; }
+#report summary { cursor: pointer; color: var(--muted); font-size: .92rem; margin: 0 0 .8rem; }
+#report pre { margin: 0 0 .8rem; }
+#reportstatus { min-height: 1.6em; margin: .6rem 0 0; }
 .foot { color: var(--black); font-size: .9rem; margin-top: 2rem; } .foot a { color: var(--black); }
 </style>
 </head>
@@ -57,6 +67,15 @@ input[type=file] { font: inherit; font-size: .9rem; color: var(--muted); max-wid
     <p class="small" id="saved" hidden></p>
     <p id="putback" hidden><button id="putbackgo" data-t="putback"></button></p>
     <pre id="log"></pre>
+    <div id="report" hidden>
+      <h2 data-t="reporth"></h2>
+      <p class="small" data-t="reportwhy"></p>
+      <label><span data-t="reportnote"></span><textarea id="reportnote" rows="3"></textarea></label>
+      <label><span data-t="reportmail"></span> <small data-t="reportmailwhy"></small><input id="reportmail" type="email" autocomplete="email"></label>
+      <details><summary data-t="reportwhat"></summary><pre id="reportpreview"></pre></details>
+      <p><button id="reportgo" data-t="reportsend"></button></p>
+      <p class="small" id="reportstatus" role="status"></p>
+    </div>
   </div>
   <div class="card">
     <h2 data-t="soundsh"></h2>
@@ -177,6 +196,16 @@ const TEXT = {
     badbackup: "That isn't a Niagara Drift backup file.",
     damaged: "That backup file is damaged (its checksums don't match), so nothing was written. Choose another.",
     changed: "The FM-1 changed while it was being saved. Stop it (PLAY) and try again.",
+    reporth: "Send this to the developer",
+    reportwhy: "It didn't work. Sending what happened helps fix it for everyone. No account needed.",
+    reportnote: "Anything to add? (optional)",
+    reportmail: "Your email",
+    reportmailwhy: "optional, only if you'd like an answer",
+    reportwhat: "What's sent: the message above, this page's version, your browser's name and the install's log",
+    reportsend: "Send",
+    reportsending: "Sending",
+    reportsent: "Sent. Thank you: it will be looked at.",
+    reportfail: "Not sent: ",
   },
 };
 const lang = "en";
@@ -197,6 +226,33 @@ const meta = /*META*/;
 ndV = meta.version;
 
 let writing = false;
+/* a failed install, a restore or a backup: offer to send it (the developer's Formspree form) */
+const REPORT_TO = "https://formspree.io/f/xppdwkel";
+function report() {
+  return { "What happened": $("status").textContent, "Note": $("reportnote").value.trim(), email: $("reportmail").value.trim(),
+           "Niagara Drift (this page)": ndV, "Browser": navigator.userAgent, "Log": $("log").textContent.trim() };
+}
+function showReport() {
+  const r = report();
+  $("reportpreview").textContent = ["What happened", "Niagara Drift (this page)", "Browser", "Log"].map((k) => k + ": " + r[k]).join("\n");
+  $("reportstatus").textContent = "";
+  $("report").hidden = false;
+}
+$("reportgo").addEventListener("click", async () => {
+  const d = new FormData();
+  for (const [k, v] of Object.entries(report())) if (v) d.append(k, v);
+  d.append("_subject", "Niagara Drift: an install that didn't work");
+  $("reportgo").disabled = true;
+  $("reportstatus").textContent = t("reportsending");
+  try {
+    const r = await fetch(REPORT_TO, { method: "POST", body: d, headers: { Accept: "application/json" } });
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.status);
+    $("reportstatus").textContent = t("reportsent");
+  } catch (e) {
+    $("reportstatus").textContent = t("reportfail") + e.message;
+    $("reportgo").disabled = false;
+  }
+});
 let lastBackup = null, chosen = null;
 function download(name, text) {
   const a = document.createElement("a");
@@ -270,7 +326,7 @@ async function run(img, product, isStock) {
   if (!midi) return;
   writing = true;
   buttons();
-  $("saved").hidden = $("putback").hidden = true;
+  $("saved").hidden = $("putback").hidden = $("report").hidden = true;
   try {
     const up = new Updater(midi, log);
     const total = 74 + 1167;
@@ -286,7 +342,9 @@ async function run(img, product, isStock) {
     const ota = await up.find((id) => /^ota-/i.test(id.model));
     if (ota) {
       ota.link.close();
-      sayK((await up.resume(img, step)) ? (isStock ? "stockdone" : "done") : "stopped");
+      const ok = await up.resume(img, step);
+      sayK(ok ? (isStock ? "stockdone" : "done") : "stopped");
+      if (!ok) showReport();
     } else {
       sayK("backingup");
       const b = await saveBackup(up);      /* first: the sound and scenes, to a file (Niagara Drift running) */
@@ -316,6 +374,8 @@ async function run(img, product, isStock) {
     else if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
     else sayK("error", e && e.message);
     log(String(e && e.stack || e));
+    if (!(isStock && e && e.code === "mismatch"))   /* (a stock install that worked) */
+      showReport();
   }
   writing = false;
   buttons();
@@ -334,6 +394,7 @@ async function restore(objs) {               /* a backup back onto a Niagara Dri
     if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
     else sayK("error", e && e.message);
     log(String(e && e.stack || e));
+    showReport();
   }
   writing = false;
   buttons();
