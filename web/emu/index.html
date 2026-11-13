@@ -141,6 +141,9 @@ body.drawn .g-card, body.drawn .start-col, body.drawn .doors a, body.drawn .try-
 .bands .ground { fill: var(--card); }
 .bands .on-card { fill: var(--card-violet); }
 .bands .on-card.dark { fill: var(--card-dark); }
+/* a phone: the bands cross more of each card's words, so their violet there is darker (small gray words 7.9:1, as on the
+ * card itself; 5.5:1 before) */
+@media (max-width: 760px) { :root { --card-violet: #3c0c5c; } }
 .guide h3 { font: 600 1.45rem/1.15 "Inter Tight", sans-serif; letter-spacing: -.015em; margin: 0 0 .9rem; color: var(--ink); }
 /* a section's title on the red: large, on a black label (a band may pass behind) */
 .full { grid-column: 1 / -1; }

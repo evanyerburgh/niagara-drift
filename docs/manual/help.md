@@ -35,11 +35,28 @@ Nothing is written until the FM-1 has checked the whole package, so trying again
    takes back only the version whose bootloader the FM-1 has; from 0.2.1 on, Niagara Drift takes either.
 3. Still stuck: hold [[OCT−]] and [[OCT+]] for 5 seconds. The FM-1 goes into its chip's own update mode, which no
    firmware can get in the way of, and [M-Flasher](https://github.com/jvitkauskas/m-flasher) (Windows, Mac, Linux)
-   puts M-VAVE's firmware back. If an FM-1 won't start at all, see [BUILDING.md](../../BUILDING.md#install).
+   puts M-VAVE's firmware back. If an FM-1 won't start at all, see [below](#an-fm-1-that-won-t-start).
 
 > **Newer FM-1s on 0.2.** Up to 0.2, Niagara Drift didn't recognize the memory chip of some newer FM-1s; there it
 > couldn't save and ignored installs. On such an FM-1 running 0.2, use step 3 to leave it. Since 0.2.1 it takes any
 > standard chip: the newer UC25HQ80 (ID B36014) and the first Puya P25Q80 (856014).
+
+## An FM-1 that won't start
+
+The FM-1's chip has its own update mode that no firmware can overwrite, so an FM-1 that won't start can still be put
+back on M-VAVE's firmware from a computer, with a USB data cable straight in.
+
+1. Switch it off and on. After two failed starts in a row it comes up in safe mode (no sound, USB on): open the
+   [install page](https://evanyerburgh.github.io/niagara-drift/install/) and install again, or put M-VAVE's firmware back.
+2. Nothing on the screen at all: switch it off and on a few more times. After four failed starts it opens the chip's
+   update mode by itself.
+3. Download [M-Flasher](https://github.com/jvitkauskas/m-flasher/releases/latest), a free app for Mac, Windows and
+   Linux. It finds the FM-1 in its update mode: choose M-VAVE's FM-1 file and press REVIEW & FLASH. It saves the whole
+   FM-1 to a file before it writes anything. The install page's "Trouble installing?" card shows each step.
+4. Switch the FM-1 off and on: it starts with M-VAVE's firmware, and the install page works again.
+
+> **Good to know.** A terminal on a Mac or Linux can do step 3 with `tools/fm1_rescue.sh`, a script that checks the
+> chip and backs it up first ([BUILDING.md](../../BUILDING.md#install)).
 
 ## Sound and playing
 
