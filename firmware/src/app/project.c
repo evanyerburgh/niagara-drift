@@ -27,7 +27,8 @@ static uint32_t proj_hash(void)
 /* the Presets (0.3, Evan, 2026-11-09, after eight audition rounds): two banks of eight, P1 the starting sound, P16 the
  * bare one (one oscillator, everything off); between them sounds that move and show what the synth can do, in
  * different moods. Each a list of changes from the defaults, ended by -1; all fixed. The drones' levels set so each
- * one's loud moments meet P1's (the mean of A-weighted and 200 Hz high-passed power, 95th percentile of 0.4 s) */
+ * one's loud moments meet P1's (the mean of A-weighted and 200 Hz high-passed power, 95th percentile of 0.4 s);
+ * Dreamhouse and Ashram 3 dB under that, Tape 2 dB: loud on headphones, where bass counts (Evan, 2026-11-14) */
 #define I_(p) DR_GP(0, p)
 #define II_(p) DR_GP(1, p)
 #define PRESET_N 100
@@ -51,9 +52,9 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     /* P4 DREAMHOUSE: on Harmonics: A1 and its 7th harmonic, sines, partners pure fifths, the resonance swelling, a
      * little Feedback */
     {I_(GP_PITCH), 3300, I_(GP_WAVE), 20, I_(GP_INTERVAL), 13, I_(GP_DETUNE), 0, I_(GP_MIX), 0, I_(GP_CUTOFF), 700,
-     I_(GP_RESO), 350, I_(GP_LEVEL), 66, I_(GP_FLFO_DEPTH), 70, I_(GP_FLFO_DEST), 1, II_(GP_PITCH), 6669,
+     I_(GP_RESO), 350, I_(GP_LEVEL), 56, I_(GP_FLFO_DEPTH), 70, I_(GP_FLFO_DEST), 1, II_(GP_PITCH), 6669,
      II_(GP_WAVE), 0, II_(GP_INTERVAL), 13, II_(GP_DETUNE), 0, II_(GP_MIX), 0, II_(GP_CUTOFF), 680,
-     II_(GP_RESO), 300, II_(GP_LEVEL), 48, II_(GP_FLFO_DEPTH), -60, II_(GP_FLFO_DEST), 1, P_LFO_RATE, 50,
+     II_(GP_RESO), 300, II_(GP_LEVEL), 40, II_(GP_FLFO_DEPTH), -60, II_(GP_FLFO_DEST), 1, P_LFO_RATE, 50,
      P_GLIDE, 16, P_PULSE, 0, P_DLY_MIX, 15, P_REV_MIX, 55, P_FEEDBACK, 25, P_WSCALE, 5, P_REV_LEN, 85, P_TUNING, 6,
      -1},
     /* P5 ABYSS: dark: D3 over B2, a third's subharmonic, closed resonant filters swept slowly on their resonance
@@ -112,9 +113,9 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
     /* P12 ASHRAM: a warm organ on Eb: a filtered pulse with a sine sub, a second voice ~24 c sharp, the bass wandering
      * in Dorian on the Shruti Tuning, a chorus hall */
     {I_(GP_PITCH), 5100, I_(GP_WAVE), 85, I_(GP_WIDTH), 20, I_(GP_DETUNE), 80, I_(GP_MIX), 25, I_(GP_CUTOFF), 500,
-     I_(GP_RESO), 100, I_(GP_DRIVE), 10, I_(GP_LEVEL), 100, I_(GP_FLFO_DEPTH), 20, II_(GP_PITCH), 3900,
+     I_(GP_RESO), 100, I_(GP_DRIVE), 10, I_(GP_LEVEL), 84, I_(GP_FLFO_DEPTH), 20, II_(GP_PITCH), 3900,
      II_(GP_WAVE), 50, II_(GP_INTERVAL), 13, II_(GP_DETUNE), 6, II_(GP_MIX), 30, II_(GP_CUTOFF), 480,
-     II_(GP_RESO), 60, II_(GP_DRIVE), 0, II_(GP_LEVEL), 100, II_(GP_FLFO_DEPTH), -15, P_LFO_RATE, 40, P_GLIDE, 20,
+     II_(GP_RESO), 60, II_(GP_DRIVE), 0, II_(GP_LEVEL), 84, II_(GP_FLFO_DEPTH), -15, P_LFO_RATE, 40, P_GLIDE, 20,
      P_DRIFT, 35, P_PULSE_RATE, 25, P_PULSE_DEPTH, 25, P_PULSE_SHAPE, 0, P_DLY_TIME, 120, P_DLY_REPEATS, 35,
      P_DLY_MIX, 10, P_REV_TYPE, 3, P_DLY_LFO_DEPTH, 0, P_CHAR, 20, P_WANDER, 35, P_AGE, 20, P_WSCALE, 4,
      P_REV_LEN, 75, P_REV_DAMP, 50, P_SUBW_0, 1, P_SUBW_1, 1, P_TUNING, 9, -1},
@@ -126,9 +127,9 @@ static const int16_t PRESET_CHANGES[][PRESET_N + 1] = {
      P_PULSE_RATE, 9, P_PULSE_DEPTH, 35, P_PULSE_SHAPE, 0, P_DLY_TIME, 40, P_DLY_REPEATS, 45, P_DLY_MIX, 30,
      P_REV_MIX, 20, P_WANDER, 10, P_WSCALE, 2, P_DLY_TYPE, 2, -1},
     /* P14 TAPE: worn: D3 and F3, a wide square and a saw, Age and Character, a 0.54 Hz wow (0.2's P7, more worn) */
-    {I_(GP_WAVE), 100, I_(GP_WIDTH), 35, I_(GP_CUTOFF), 720, I_(GP_LEVEL), 87, I_(GP_OLFO_DEPTH), 7,
+    {I_(GP_WAVE), 100, I_(GP_WIDTH), 35, I_(GP_CUTOFF), 720, I_(GP_LEVEL), 78, I_(GP_OLFO_DEPTH), 7,
      I_(GP_FLFO_DEPTH), 40, I_(GP_NOISE), 18, II_(GP_PITCH), 5300, II_(GP_WAVE), 67, II_(GP_CUTOFF), 700,
-     II_(GP_LEVEL), 87, II_(GP_OLFO), 1, II_(GP_OLFO_DEPTH), 6, II_(GP_FLFO_DEPTH), -40, II_(GP_NOISE), 12,
+     II_(GP_LEVEL), 78, II_(GP_OLFO), 1, II_(GP_OLFO_DEPTH), 6, II_(GP_FLFO_DEPTH), -40, II_(GP_NOISE), 12,
      P_LFO_RATE, 106, P_DLY_REPEATS, 55, P_DLY_MIX, 35, P_REV_MIX, 25, P_REV_TYPE, 0, P_FEEDBACK, 15, P_CHAR, 67,
      P_AGE, 45, P_REV_LEN, 35, -1},
     /* P15 FALLING: on LMY: sines on E4 and G3, the filters opening, a slow falling top, Feedback 64, Wander slow in
