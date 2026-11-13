@@ -69,7 +69,7 @@ def menu_html(up, current):
     items = "".join(f'<a href="{up}{h}"{" aria-current=\"page\"" if n == current else ""}>{icon(MENU_ICON[n], "mi")}'
                     f'<span>{n}<small>{s}</small></span></a>'
                     for h, n, s in MENU)
-    return (f'<a href="{up}install/">Install</a><a href="{up}manual/help/#report-a-problem">Feedback</a><a href="{REPO}" aria-label="Source on GitHub">Source{GH}</a>'
+    return (f'<a href="{up}install/">Install</a><a href="{up}manual/help/#send-feedback">Feedback</a><a href="{REPO}" aria-label="Source on GitHub">Source{GH}</a>'
             f'<details class="menubtn"><summary aria-label="Menu" title="Menu">Menu</summary><div class="panel">{items}</div></details>')
 
 

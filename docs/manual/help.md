@@ -13,7 +13,7 @@ Pick what's happening.
 <li><a href="#sound-and-playing"><img class="ic" src="../../web/manual/icons/speaker-high.svg" alt=""><small>While playing</small><b>Something sounds wrong</b><span>A drone went quiet, notes jump, a value is gray, no bass</span></a></li>
 <li><a href="#backups"><img class="ic" src="../../web/manual/icons/floppy-disk.svg" alt=""><small>Your sounds</small><b>Backups</b><span>Saving and restoring your sounds and scenes</span></a></li>
 <li><a href="#going-back-or-to-another-firmware"><img class="ic" src="../../web/manual/icons/arrows-left-right.svg" alt=""><small>Leaving</small><b>Going back</b><span>To M-VAVE's firmware, or to another one</span></a></li>
-<li><a href="#report-a-problem"><img class="ic" src="../../web/manual/icons/flag.svg" alt=""><small>Still not right</small><b>Report a problem</b><span>Tell us what happened</span></a></li>
+<li><a href="#send-feedback"><img class="ic" src="../../web/manual/icons/flag.svg" alt=""><small>Ideas, opinions, problems</small><b>Send feedback</b><span>A feature you'd like, what you think, or what went wrong</span></a></li>
 </ul>
 
 ## Installing and updating
@@ -82,18 +82,21 @@ Nothing is written until the FM-1 has checked the whole package, so trying again
 > **Safe mode.** If Niagara Drift fails to start twice in a row, it comes up with no sound and USB on, and the
 > installer still works.
 
-## Report a problem
+## Send feedback
 
-It's tested on one FM-1 so far. If something goes wrong, sounds wrong or could be better, tell us here. No account
-needed. With a GitHub account you can also [open an issue](https://github.com/evanyerburgh/niagara-drift/issues).
+Ideas, requests, what you like or don't, or something that went wrong: tell us here. No account needed. With a GitHub
+account you can also [open an issue](https://github.com/evanyerburgh/niagara-drift/issues).
 
 <form class="feedback" action="https://formspree.io/f/xppdwkel" method="POST">
-<label>What happened<textarea name="What happened" rows="5" required placeholder="What you did, what you heard or saw, what you expected"></textarea></label>
+<fieldset class="kind"><legend>What's it about</legend><label><input type="radio" name="About" value="an idea or request" checked> An idea or request</label><label><input type="radio" name="About" value="what I think"> What I think</label><label><input type="radio" name="About" value="a problem"> A problem</label></fieldset>
+<label>Your message<textarea name="Message" rows="5" required placeholder="A feature you'd like, a sound you're after, something that could work better"></textarea></label>
+<div class="if-problem">
 <fieldset><legend>Which FM-1</legend><label><input type="radio" name="FM-1" value="older"> Older</label><label><input type="radio" name="FM-1" value="newer (M-VAVE under the screen)"> Newer, with M-VAVE under the screen</label><label><input type="radio" name="FM-1" value="not sure" checked> Not sure</label></fieldset>
 <label>Version <small>on the startup screen, if you know it</small><input name="Version" placeholder="e.g. 0.3"></label>
+</div>
 <label>Your email <small>optional, only if you'd like an answer</small><input type="email" name="email" autocomplete="email"></label>
 <input type="text" name="_gotcha" class="gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
-<p class="sent-note">Sent with it: this page's address and your browser's name, to help find the problem.</p>
+<p class="sent-note">Sent with it: this page's address and your browser's name.</p>
 <button type="submit">Send</button>
 <p class="feedback-status" role="status"></p>
 </form>
