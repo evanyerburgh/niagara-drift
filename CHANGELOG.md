@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.3 (2026-11)
+
+A new look on every page, sixteen new presets, eight gestures and eleven Tunings, with a manual that is now the
+site's own pages. An update from 0.2 or 0.2.1 keeps your sound and scenes. Tested on an older FM-1; it saves on the
+newer FM-1s' memory chip too, as 0.2.1 does.
+
+- **A new look:** every page redrawn, dark and glowing, with a picture of the sound at the top and what you're turning
+  under it. Whatever moves shows its value, and an LFO moving a setting moves its picture. Keys and buttons are named
+  in boxes by their note. The panel's lights follow the screen: dark always means off, and when stopped only PLAY
+  moves (it breathes).
+- **Sixteen presets** in two banks, each its own mood and each moving over a minute: Niagara, Embers, Vespers,
+  Dreamhouse, Abyss, Seance, Sonar, Sibyl, Howl, Cistern, Piston, Ashram, Telegraph, Tape, Falling and Bare. After an
+  update, 0.2's presets that 0.3 doesn't keep (Eerie, Glass, Tanpura, Whistle, Cathedral, Metal) are in bank 6.
+- **Eight gestures:** Weight, Shift, Clean and Wash on the top keys; Tick, Chord, Snarl and Stutter on keys 9–12, as
+  deep as you press. Tap one in to stay; a scene saved with a gesture latched brings it back.
+- **Eleven Tunings:** 12-tone, quarter tones, 19-, 31- and 53-tone, just, the harmonics, La Monte Young's, Lou
+  Harrison's, the shrutis and Partch's 43 notes. The pitch knobs land on the Tuning's notes, the screen names the
+  interval between the drones in the Tuning's own terms, and Partner, Shift, Wander and Chord follow it. A sound
+  carries its Tuning. Tune A from 427 to 453 Hz.
+- **Banks by number:** six of your own and two of presets, picked with SEL and a gesture key: 48 scenes of yours. A
+  scene reads as 3.5 (bank 3, key 5).
+- **New sounds:** a Shimmer reverb (one sparkling octave that washes in and out); Grain and Self delays whose echoes
+  move their own time; a drive after the delay; cross-FM and Snarl, the drones bending each other's pitch; a Feedback
+  that sings; each drone's own sub wave; pitch down to 2 Hz and the sub to 4 octaves down.
+- **The LFO:** the stepped AND and OR waves; its slowest rate a cycle in 100 s; X-Wave and resonance turn
+  at their ends, so every part of a sweep is heard.
+- **MIDI clock:** the Swell, the LFO, the delay, Wander and Scene time follow it; Sync on Setup 1 lets the drone run
+  free of it.
+- **Pages:** HOME opens Drones (the levels and cutoffs), FX opens Space (the effects' amounts). Feedback moved to
+  KNOB 1 on Life, Cross-mod to KNOB 4 on Mods, Tune to KNOB 2 on Setup 2 (a tip says so, once).
+- **The motion loop** records gestures and scenes too.
+- **Screen reader:** the screen as words, for Charles Vestal's FM-1 Screen Reader.
+- **The installer** saves your sound and scenes before it installs, and its "Your sounds and scenes" card puts them
+  back; a restore that is cut short finishes at the next start.
+- **The manual** is now the site's own pages: Play it, Recipes, Reference, Shortcuts and Help, and feedback without an
+  account.
+
 ## 0.2.1 (2026-11)
 
 Getting on and off Niagara Drift, on every FM-1. The sound is the same as 0.2's, and an update from 0.2 keeps your

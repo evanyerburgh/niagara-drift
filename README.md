@@ -2,8 +2,7 @@
 
 **A drone synth for the M-VAVE FM-1.**
 
-> **This is 0.3, in development** (what's on `main` now); its manual is in [docs/manual](docs/manual/index.md). For
-> the released 0.2.1, see
+> **This is the manual for 0.3**; its pages are in [docs/manual](docs/manual/index.md). For 0.2.1, see
 > [the README of 0.2.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.2.1/README.md); for 0.1 beta,
 > [the README of 0.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.1-beta/README.md).
 
@@ -20,7 +19,7 @@ eight banks you pick with SEL and the gesture keys; keys 9–12 and the top four
 Drones, Pitch · ENV Life, Tone · EDIT Osc, Sub · Drive · SEQ Partner, Pitch moves · LFO LFO sends, Mods · ARP Swell ·
 FX Space, Details · GLO Setup 1, 2.*
 
-**Status: 0.2.** It runs on the FM-1 and in the browser:
+**Status: 0.3.** It runs on the FM-1 and in the browser:
 [try it](https://evanyerburgh.github.io/niagara-drift/) without an FM-1, the same code with sound.
 
 ## What it does
@@ -63,7 +62,7 @@ FX Space, Details · GLO Setup 1, 2.*
    or the FM-1 until it says Done. Then press PLAY.
 
 Or from a terminal, with the file from the [releases](https://github.com/evanyerburgh/niagara-drift/releases):
-`pip3 install mido python-rtmidi`, then `python3 tools/fm1_install.py niagara-drift-0.2.fwsc`.
+`pip3 install mido python-rtmidi`, then `python3 tools/fm1_install.py niagara-drift-0.3.fwsc`.
 
 **What it replaces:** Niagara Drift takes the place of M-VAVE's firmware, so the FM-1's own sounds and
 sequencer are gone until you go back (below).
