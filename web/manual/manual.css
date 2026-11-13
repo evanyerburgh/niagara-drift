@@ -23,7 +23,7 @@ main:focus { outline: none; }
 .top-over { position: absolute; inset: 0; z-index: 2; pointer-events: none; color: var(--pale); clip-path: url(#topclip); }
 .top-over .menu { visibility: hidden; }
 .top-in { position: relative; max-width: 1080px; margin: 0 auto; padding: 0 16px; }
-.title { padding: 9vh 0 13vh; min-height: 300px; position: relative; z-index: 1; }
+.title { padding: 4vh 0 7vh; position: relative; z-index: 1; }   /* short: the page's content starts high (2026-11-13) */
 .title small { font: 500 1rem var(--mono); letter-spacing: .12em; text-transform: uppercase; }
 .title h1 { font: 500 clamp(2.6rem, 7vw, 5rem)/.95 "Inter Tight", sans-serif; letter-spacing: -.03em; margin: .2em 0 .25em; }
 .title p { font: 500 clamp(1.2rem, 2vw, 1.5rem)/1.35 "Inter Tight", sans-serif; max-width: 40ch; margin: 0;
@@ -118,6 +118,7 @@ main:focus { outline: none; }
 
 /* the doors on the manual's first page and the reference's */
 .doors { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; padding: 0; list-style: none; }
+@media (min-width: 900px) { .doors:has(> li:nth-child(6)):not(:has(> li:nth-child(7))) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }   /* six: 3 x 2 */
 .doors a { display: block; height: 100%; background: var(--card); border-radius: 20px; padding: 18px 20px; text-decoration: none; color: var(--ink); }
 .doors small { font: 500 .72rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .doors b { display: block; font: 600 1.4rem "Inter Tight", sans-serif; color: var(--pale); margin: .25rem 0; }
@@ -130,7 +131,10 @@ main:focus { outline: none; }
 @media (max-width: 820px) { .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -16px 22px; padding: 0 16px;
                                     scroll-padding: 0 16px; }
                             .tabs::-webkit-scrollbar { display: none; } .tabs a { white-space: nowrap; flex: none; } }
-.onpage-nav { margin: 0 0 36px; }   /* the page's recipes, a line a group (make_manual.py onpage) */
+.onpage-nav { margin: 0 0 36px; }
+/* a group of recipes: a small label, as in the list at the top, so each recipe's title is the big heading */
+.prose h2.group-head { font: 500 .85rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+                       margin: 3rem 0 0; padding: 0; border: 0; }   /* the page's recipes, a line a group (make_manual.py onpage) */
 .onpage { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
 .prose .onpage li { display: grid; grid-template-columns: 10rem minmax(0, 1fr); gap: 4px 16px; margin: 0; max-width: none;
                     padding: .55rem 0; border-bottom: 1px solid var(--rule); }
@@ -187,6 +191,21 @@ figcaption { font-size: .85rem; color: var(--muted); margin-top: .35rem; line-he
 .listen { background: var(--card); border-radius: 16px; padding: 16px 18px; margin: 0; }
 .prose .listen :is(h3, h4) { font: 600 1.05rem "Inter Tight", sans-serif; margin: 0; }
 .listen audio { width: 100%; margin: .4rem 0 .6rem; }
+/* the player in the site's colors (manual.js; without script the browser's own player shows) */
+.pl { display: flex; align-items: center; gap: 12px; margin: .5rem 0 .7rem; }
+.pl .pp { all: unset; width: 40px; height: 40px; border-radius: 50%; background: var(--pale); display: grid; place-items: center; cursor: pointer; flex: none; }
+.pl .pp::before { content: ""; border-left: 13px solid var(--black); border-top: 8px solid transparent; border-bottom: 8px solid transparent; margin-left: 4px; }
+.pl .pp.on::before { width: 4px; height: 14px; border: solid var(--black); border-width: 0 4px; margin: 0; }
+.pl .pp:focus-visible { outline: 3px solid var(--pale); outline-offset: 3px; }
+.pl input[type=range] { flex: 1; min-width: 0; -webkit-appearance: none; appearance: none; height: 18px; background: transparent; cursor: pointer; margin: 0; }
+.pl input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px;
+  background: linear-gradient(var(--pale) 0 0) 0 / var(--p, 0%) 100% no-repeat, #ffffff2e; }
+.pl input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: #ffffff2e; }
+.pl input[type=range]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--pale); }
+.pl input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--pale); margin-top: -4px; }
+.pl input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 50%; background: var(--pale); }
+.pl input[type=range]:focus-visible { outline: 3px solid var(--pale); outline-offset: 4px; border-radius: 4px; }
+.pl .tm { font: 500 .8rem var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .prose .listen ol { list-style: none; padding: 0; margin: 0; }
 .prose .listen li { display: grid; grid-template-columns: 3.4rem 1fr; gap: 10px; padding: .25rem 0; margin: 0; border-top: 1px solid var(--rule); font-size: .95rem; }
 .listen li button { all: unset; cursor: pointer; font: 500 .85rem var(--mono); color: var(--pale); text-decoration: underline; }

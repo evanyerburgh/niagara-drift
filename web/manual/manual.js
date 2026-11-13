@@ -72,6 +72,38 @@ addEventListener("resize", pairs);
 // the reference's list and a recipe page's: open on a wide screen, folded on a phone (make_manual.py)
 const wide = matchMedia("(min-width: 821px)");
 wide.addEventListener("change", () => document.querySelectorAll(".toc details, .onpage-nav details").forEach((d) => { d.open = wide.matches; }));
+// each sound's player in the site's colors over the hidden <audio> (the browser's own player differs by browser and
+// was the one gray thing on the page): play / pause, a bar to seek, the time; one sound at a time
+const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+document.querySelectorAll(".listen audio").forEach((a) => {
+  const p = document.createElement("div"), name = (a.getAttribute("aria-label") || "").replace(/: a sound example$/, "");
+  p.className = "pl";
+  p.setAttribute("role", "group");
+  p.setAttribute("aria-label", a.getAttribute("aria-label") || "A sound example");
+  p.innerHTML = '<button type="button" class="pp"></button><input type="range" min="0" max="1" step="0.1" value="0"><span class="tm">0:00</span>';
+  const b = p.querySelector("button"), r = p.querySelector("input"), tm = p.querySelector(".tm");
+  b.setAttribute("aria-label", "Play " + name);
+  r.setAttribute("aria-label", "Position in " + name);
+  a.after(p);
+  a.controls = false;
+  a.hidden = true;
+  const show = () => {
+    const d = a.duration || 0;
+    r.max = d || 1;
+    r.value = a.currentTime;
+    r.style.setProperty("--p", d ? (a.currentTime / d * 100) + "%" : "0%");
+    tm.textContent = fmt(a.currentTime) + (d ? " / " + fmt(d) : "");
+  };
+  b.addEventListener("click", () => { if (a.paused) a.play(); else a.pause(); });
+  a.addEventListener("play", () => {
+    b.classList.add("on"); b.setAttribute("aria-label", "Pause " + name);
+    document.querySelectorAll(".listen audio").forEach((o) => { if (o !== a) o.pause(); });
+  });
+  a.addEventListener("pause", () => { b.classList.remove("on"); b.setAttribute("aria-label", "Play " + name); });
+  for (const e of ["timeupdate", "loadedmetadata", "seeked", "ended"]) a.addEventListener(e, show);
+  r.addEventListener("input", () => { a.currentTime = +r.value; show(); });
+  show();
+});
 document.querySelectorAll(".listen").forEach((l) => {
   const a = l.querySelector("audio");
   l.querySelectorAll("button[data-t]").forEach((b) => b.addEventListener("click", () => { a.currentTime = +b.dataset.t; a.play(); }));
