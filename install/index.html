@@ -1,0 +1,863 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only
+     Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments
+     Niagara Drift's web installer: Felucca's installer page (web/index_pkg.html, by way of X0X and FoMni), in
+     Niagara Drift's look, English only. tools/make_pages.py inlines fm1pkg.js and fm1ota.js and the package's
+     metadata, and puts in the site's banner and menu (make_manual.py's, styled by ../manual/manual.css); it is served at
+     install/, beside the emulator page. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install Niagara Drift</title>
+<meta name="description" content="Install Niagara Drift on an M-VAVE FM-1 from Chrome or Edge, over USB; or put M-VAVE's firmware back.">
+<link rel="stylesheet" href="../manual/manual.css">
+<style>
+/* the install page in the site's look: the manual's banner, menu and colors (manual.css, the banner put in by
+ * tools/make_pages.py at the TOP mark), its cards on the near-black; the Install card first and marked */
+main { max-width: 680px; margin: 0 auto; padding: 32px 16px 64px; }
+.card { background: var(--card); border-radius: 20px; padding: 22px 24px; margin: 0 0 16px; }
+.card.first { border: 2px solid var(--pale); padding: 26px 28px; }
+.card.first h2 { font-size: 1.9rem; }
+h2 { font: 600 1.35rem/1.2 "Inter Tight", sans-serif; letter-spacing: -.01em; margin: 0 0 .8rem; color: var(--pale); }
+p { margin: 0 0 .8rem; }
+ol { margin: 0 0 1rem; padding-left: 1.3rem; } li { margin: 0 0 .35rem; }
+.small { color: var(--muted); font-size: .92rem; }
+.risk { border-left: 4px solid var(--lfo); padding: 2px 0 2px 12px; margin: 0 0 1.1rem; font-size: .95rem; }
+button { font: 600 1rem "Inter Tight", sans-serif; background: var(--pale); color: var(--black); border: 0; border-radius: 999px;
+         padding: .6em 1.6em; cursor: pointer; }
+button.big { font-size: 1.15rem; padding: .75em 2.2em; }
+button:disabled { opacity: .35; cursor: default; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--pale); outline-offset: 3px; }
+#status { margin: 1rem 0 0; min-height: 1.6em; font-weight: 600; }
+progress { width: 100%; height: 6px; margin-top: 1rem; accent-color: var(--pale); }
+pre { color: var(--muted); font: 500 .75rem/1.5 var(--mono); white-space: pre-wrap; margin: 1rem 0 0; max-height: 12rem; overflow: auto; }
+pre:empty { display: none; }
+/* a file to choose: a label over it, its button a pale outline as the site's other buttons */
+.pick { display: grid; gap: 6px; margin: 0 0 .9rem; color: var(--ink); font-size: .95rem; }
+input[type=file] { font: 400 .9rem "Inter Tight", sans-serif; color: var(--muted); max-width: 100%; }
+input[type=file]::file-selector-button { font: 600 .95rem "Inter Tight", sans-serif; color: var(--pale); background: transparent;
+  border: 1.5px solid var(--pale); border-radius: 999px; padding: .4em 1.1em; margin-right: .8em; cursor: pointer; }
+input[type=file]::file-selector-button:hover { background: var(--black); }
+/* a failed install: what happened, sent to the developer (Formspree) */
+#report { border-top: 1px solid var(--rule); margin-top: 1.2rem; padding-top: 1.2rem; }
+#report label { display: grid; gap: 4px; margin: 0 0 .8rem; font-weight: 600; color: var(--pale); }
+#report label small { font-weight: 400; color: var(--muted); }
+#report textarea, #report input { font: 400 1rem "Inter Tight", sans-serif; color: var(--ink); background: var(--black);
+  border: 1px solid var(--muted); border-radius: 12px; padding: .55em .8em; }
+#report textarea:focus-visible { outline: 3px solid var(--pale); outline-offset: 3px; }
+#report summary { cursor: pointer; color: var(--muted); font-size: .92rem; margin: 0 0 .8rem; }
+#report pre { margin: 0 0 .8rem; }
+#reportstatus { min-height: 1.6em; margin: .6rem 0 0; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="top"><div class="top-in">
+<nav class="menu" aria-label="Site"><a class="homeicon" href="../" aria-label="Home: Niagara Drift, play it in your browser" title="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2 12 3.5l9 7.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.6 9.6V20h4.6v-5.6h3.6V20h4.6V9.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg></a><a href="../install/">Install</a><a href="../manual/help/#send-feedback">Feedback</a><a href="https://github.com/evanyerburgh/niagara-drift" aria-label="Source on GitHub">Source<svg class="gh" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a><details class="menubtn"><summary aria-label="Menu" title="Menu">Menu</summary><div class="panel"><a href="../"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M231.36,116.19,87.28,28.06a14,14,0,0,0-14.18-.27A13.69,13.69,0,0,0,66,39.87V216.13a13.69,13.69,0,0,0,7.1,12.08,14,14,0,0,0,14.18-.27l144.08-88.13a13.82,13.82,0,0,0,0-23.62Zm-6.26,13.38L81,217.7a2,2,0,0,1-2.06,0,1.78,1.78,0,0,1-1-1.61V39.87a1.78,1.78,0,0,1,1-1.61A2.06,2.06,0,0,1,80,38a2,2,0,0,1,1,.31L225.1,126.43a1.82,1.82,0,0,1,0,3.14Z"/></svg><span>Play it<small>the emulator, and the first steps under it</small></span></a><a href="../manual/recipes/sounds/"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M90,48V16a6,6,0,0,1,12,0V48a6,6,0,0,1-12,0Zm38,6a6,6,0,0,0,6-6V16a6,6,0,0,0-12,0V48A6,6,0,0,0,128,54Zm32,0a6,6,0,0,0,6-6V16a6,6,0,0,0-12,0V48A6,6,0,0,0,160,54Zm91.6,46.8L222,123v61a30,30,0,0,1-30,30H64a30,30,0,0,1-30-30V123L4.4,100.8a6,6,0,0,1,7.2-9.6L34,108V80a6,6,0,0,1,6-6H216a6,6,0,0,1,6,6v28l22.4-16.8a6,6,0,0,1,7.2,9.6ZM210,86H46v98a18,18,0,0,0,18,18H192a18,18,0,0,0,18-18Z"/></svg><span>Recipes<small>how to get a sound or a move</small></span></a><a href="../manual/reference/"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,50H160a38,38,0,0,0-32,17.55A38,38,0,0,0,96,50H24a6,6,0,0,0-6,6V200a6,6,0,0,0,6,6H96a26,26,0,0,1,26,26,6,6,0,0,0,12,0,26,26,0,0,1,26-26h72a6,6,0,0,0,6-6V56A6,6,0,0,0,232,50ZM96,194H30V62H96a26,26,0,0,1,26,26V204.31A37.86,37.86,0,0,0,96,194Zm130,0H160a37.87,37.87,0,0,0-26,10.32V88a26,26,0,0,1,26-26h66Z"/></svg><span>Reference<small>every page, knob and key</small></span></a><a href="../manual/reference/shortcuts/"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,50H32A14,14,0,0,0,18,64V192a14,14,0,0,0,14,14H224a14,14,0,0,0,14-14V64A14,14,0,0,0,224,50Zm2,142a2,2,0,0,1-2,2H32a2,2,0,0,1-2-2V64a2,2,0,0,1,2-2H224a2,2,0,0,1,2,2Zm-20-64a6,6,0,0,1-6,6H56a6,6,0,0,1,0-12H200A6,6,0,0,1,206,128Zm0-32a6,6,0,0,1-6,6H56a6,6,0,0,1,0-12H200A6,6,0,0,1,206,96ZM70,160a6,6,0,0,1-6,6H56a6,6,0,0,1,0-12h8A6,6,0,0,1,70,160Zm96,0a6,6,0,0,1-6,6H96a6,6,0,0,1,0-12h64A6,6,0,0,1,166,160Zm40,0a6,6,0,0,1-6,6h-8a6,6,0,0,1,0-12h8A6,6,0,0,1,206,160Z"/></svg><span>Shortcuts<small>every combination, hold and tap</small></span></a><a href="../manual/help/"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M128,26A102,102,0,1,0,230,128,102.12,102.12,0,0,0,128,26Zm36.47,130a45.87,45.87,0,0,0,0-56l31.24-31.23a89.81,89.81,0,0,1,0,118.44ZM94,128a34,34,0,1,1,34,34A34,34,0,0,1,94,128Zm93.22-67.71L156,91.53a45.87,45.87,0,0,0-56,0L68.78,60.29a89.81,89.81,0,0,1,118.44,0ZM60.29,68.78,91.53,100a45.87,45.87,0,0,0,0,56L60.29,187.22a89.81,89.81,0,0,1,0-118.44Zm8.49,126.93L100,164.47a45.87,45.87,0,0,0,56,0l31.23,31.24a89.81,89.81,0,0,1-118.44,0Z"/></svg><span>Help<small>installing, going back, feedback</small></span></a><a href="../manual/about/"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M142,176a6,6,0,0,1-6,6,14,14,0,0,1-14-14V128a2,2,0,0,0-2-2,6,6,0,0,1,0-12,14,14,0,0,1,14,14v40a2,2,0,0,0,2,2A6,6,0,0,1,142,176ZM124,94a10,10,0,1,0-10-10A10,10,0,0,0,124,94Zm106,34A102,102,0,1,1,128,26,102.12,102.12,0,0,1,230,128Zm-12,0a90,90,0,1,0-90,90A90.1,90.1,0,0,0,218,128Z"/></svg><span>About<small>what it does, the details, where it came from</small></span></a></div></details></nav>
+<div class="title"><small>Niagara Drift</small><h1>Install</h1><p>Niagara Drift 0.3 on your FM-1, from Chrome or Edge, over USB</p></div>
+</div></div>
+<main id="main" tabindex="-1">
+  <div class="card first">
+    <h2 data-t="installh"></h2>
+    <ol>
+      <li data-t="step1"></li>
+      <li data-t="step2"></li>
+      <li data-t="step3"></li>
+    </ol>
+    <p class="risk"><span data-t="riskline"></span> <a href="#risks" data-t="risklink"></a></p>
+    <p><button id="go" class="big" disabled data-t="install"></button></p>
+    <progress id="bar" max="100" value="0"></progress>
+    <p id="status" role="status"></p>
+    <p class="small" id="saved" hidden></p>
+    <p id="putback" hidden><button id="putbackgo" data-t="putback"></button></p>
+    <pre id="log"></pre>
+    <div id="report" hidden>
+      <h2 data-t="reporth"></h2>
+      <p class="small" data-t="reportwhy"></p>
+      <label><span data-t="reportnote"></span><textarea id="reportnote" rows="3"></textarea></label>
+      <label><span data-t="reportmail"></span> <small data-t="reportmailwhy"></small><input id="reportmail" type="email" autocomplete="email"></label>
+      <details><summary data-t="reportwhat"></summary><pre id="reportpreview"></pre></details>
+      <p><button id="reportgo" data-t="reportsend"></button></p>
+      <p class="small" id="reportstatus" role="status"></p>
+    </div>
+  </div>
+  <div class="card" id="risks">
+    <h2 data-t="riskh"></h2>
+    <p class="small" data-t="beta"></p>
+    <p class="small" data-t="safe"></p>
+    <p class="small"><span data-t="brick"></span>
+      <a href="../manual/help/#an-fm-1-that-won-t-start" data-t="bricklink"></a></p>
+    <p class="small"><span data-t="helpline"></span> <a href="../manual/help/" data-t="helplink"></a></p>
+  </div>
+  <div class="card">
+    <h2 data-t="soundsh"></h2>
+    <p class="small" data-t="soundswhy"></p>
+    <p><button id="backupgo" disabled data-t="backupnow"></button></p>
+    <label class="pick"><span data-t="restore1"></span><input type="file" id="restorefile" accept=".json,application/json"></label>
+    <p><button id="restorego" disabled data-t="restorenow"></button></p>
+  </div>
+  <div class="card">
+    <h2 data-t="stockh"></h2>
+    <p class="small" data-t="stockwhy"></p>
+    <ol class="small">
+      <li><span data-t="stock1"></span> <a id="stocklink" href="https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc">V16 (FM-1.fwsc)</a>,
+        <span data-t="stockalt"></span> <a href="https://www.m-vave.com/download" target="_blank" rel="noopener">m-vave.com/download</a>.<br>
+        <span data-t="stock1b"></span> <a id="stocklink15" href="https://web.archive.org/web/20261009203224id_/https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc">V15 (FM-1.fwsc)</a></li>
+      <li><label class="pick"><span data-t="stock2"></span><input type="file" id="stockfile" accept=".fwsc"></label></li>
+      <li data-t="stock3"></li>
+    </ol>
+    <p><button id="stockgo" disabled data-t="stockinstall"></button></p>
+  </div>
+  <div class="card" id="trouble">
+    <h2 data-t="trubh"></h2>
+    <p class="small" data-t="trubwhy"></p>
+    <ol class="small">
+      <li><span data-t="trub1"></span> <a href="https://github.com/jvitkauskas/m-flasher/releases/latest" target="_blank" rel="noopener">M-Flasher</a>
+        <span data-t="trub1b"></span></li>
+      <li data-t="trub2"></li>
+      <li data-t="trub3"></li>
+      <li><span data-t="trub4"></span> <a href="https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc">V16 (FM-1.fwsc)</a>
+        <span data-t="trub4b"></span></li>
+      <li data-t="trub5"></li>
+      <li data-t="trub6"></li>
+    </ol>
+    <p class="small"><span data-t="trubmore"></span>
+      <a href="https://github.com/jvitkauskas/m-flasher/blob/main/docs/usage.md" target="_blank" rel="noopener" data-t="trubmorelink"></a></p>
+  </div>
+</main>
+<p class="foot">Niagara Drift is free, open-source firmware (GPL-3.0, no warranty), not made or endorsed by M-VAVE. This installer
+  is Felucca's, by Leo Kuroshita (<a href="https://hugelton.com" target="_blank" rel="noopener">Hügelton Instruments</a>), by way of
+  X0X and FoMni by Charles Vestal. M-VAVE and FM-1 are trademarks of their owners.
+  <a href="https://github.com/evanyerburgh/niagara-drift">Source</a></p>
+<script src="../manual/manual.js"></script>
+<script type="module">
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments
+//
+// FM-1 .fwsc packages in the browser: the package identity and the image the
+// device reads during an update.
+
+const BLOCKS = 20, BLK = 0x30, KEEP = 0x2F;
+
+// the package identity ("FM-1_904"): one marker byte after each of the first 20 blocks
+function productOf(fwsc) {
+  if (fwsc.length < BLOCKS * BLK) throw new Error("not an FM-1 package (too short)");
+  let s = "";
+  for (let i = 0; i < BLOCKS; i++) {
+    const m = fwsc[i * BLK + KEEP];
+    if (m !== 0x7D) s += String.fromCharCode((m - i - 1) & 0xFF);
+  }
+  return s;
+}
+
+// the image the device addresses during an update: the .fwsc without the 20 marker bytes
+function logicalImage(fwsc) {
+  const out = new Uint8Array(fwsc.length - BLOCKS);
+  for (let i = 0; i < BLOCKS; i++) out.set(fwsc.subarray(i * BLK, i * BLK + KEEP), i * KEEP);
+  out.set(fwsc.subarray(BLOCKS * BLK), BLOCKS * KEEP);
+  return out;
+}
+
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments
+//
+// The FM-1 USB-MIDI update protocol (M-UPGRADE compatible) over WebMIDI.
+// Step 1: the running firmware reads parts of the package and stages the update
+// loader. Step 2: the loader reads the whole image and writes it. In both steps
+// the device sends cmd 0x30 read requests on the logical image and we answer.
+
+const HS_QUERY = [0xF0, 0x00, 0x32, 0x45, 0x00, 0x00, 0x00, 0x40, 0x7F, 0xF7];
+const UPGRADE = [0xF0, 0x22, 0x24, 0x35, 0x7F, 0xF7];
+const MAXDATA = 512;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const IS_OTA = (id) => /^ota-/i.test(id.model);
+
+// errors carry a code the pages translate: notfound, model, stopped, noloader, lost, noreturn,
+// mismatch (detail: the identity the device reports), badreq
+function fail(code, msg, detail = "") { const e = new Error(msg); e.code = code; e.detail = detail; return e; }
+
+function pack7(data) {
+  const out = []; let acc = 0, nb = 0;
+  for (const b of data) {
+    acc |= b << nb; nb += 8;
+    while (nb >= 7) { out.push(acc & 0x7F); acc >>>= 7; nb -= 7; }
+  }
+  if (nb) out.push(acc & 0x7F);
+  return out;
+}
+
+function unpack7(s) {
+  const out = []; let acc = 0, nb = 0;
+  for (const b of s) {
+    acc |= (b & 0x7F) << nb; nb += 7;
+    while (nb >= 8) { out.push(acc & 0xFF); acc >>>= 8; nb -= 8; }
+  }
+  return out;
+}
+
+function response(addr, data, fl = 0) {
+  const len = data.length;
+  const body = [0x00, 0x59, 0x30, (len + 8) & 0xFF, ((len + 8) >> 8) & 0xFF, 0, fl,
+    addr & 0xFF, (addr >>> 8) & 0xFF, (addr >>> 16) & 0xFF, (addr >>> 24) & 0xFF,
+    len & 0xFF, (len >> 8) & 0xFF, 0, ...data];
+  let s = 0;
+  for (let i = 6; i < body.length; i++) s += body[i];
+  body.push(~s & 0xFF);
+  return [0xF0, ...pack7(body), 0xF7];
+}
+
+function parseRequest(pkt) {
+  if (pkt[0] !== 0xF0 || pkt[pkt.length - 1] !== 0xF7) return null;
+  const u = unpack7(pkt.slice(1, -1));
+  if (u.length !== 15 || u[0] !== 0 || u[1] !== 0x59 || u[2] !== 0x30) return null;
+  let s = 0;
+  for (let i = 6; i < 14; i++) s += u[i];
+  if ((~s & 0xFF) !== u[14]) return null;
+  return { fl: u[6], addr: (u[7] | (u[8] << 8) | (u[9] << 16) | (u[10] << 24)) >>> 0, len: u[11] | (u[12] << 8) | (u[13] << 16) };
+}
+
+function parseIdentity(pkt) {
+  const d = unpack7(pkt.slice(1, -1));
+  if (d.length !== 34 || d[0] !== 0 || d[1] !== 0x59 || d[2] !== 0x11) return null;
+  const txt = String.fromCharCode(...d.slice(6, 33)).replace(/\0+$/, "");
+  const m = /^([^_]+)_(\d+)$/.exec(txt);
+  return m ? { text: txt, model: m[1], version: parseInt(m[2], 10) } : null;
+}
+
+// one MIDI in/out pair with a SysEx queue
+class Link {
+  constructor(input, output) {
+    this.input = input; this.output = output; this.q = []; this.waiter = null;
+    input.onmidimessage = (ev) => {
+      if (ev.data[0] !== 0xF0) return;
+      this.q.push(Array.from(ev.data));
+      if (this.waiter) { const w = this.waiter; this.waiter = null; w(); }
+    };
+  }
+  get lost() { return this.input.state === "disconnected" || this.output.state === "disconnected"; }
+  // false when the port is gone (unplugged): WebMIDI throws on a disconnected output
+  send(bytes) {
+    try { this.output.send(bytes); return true; } catch (_) { return false; }
+  }
+  drain() { this.q.length = 0; }
+  async read(ms) {
+    if (!this.q.length) {
+      let tm;
+      await Promise.race([new Promise((r) => { this.waiter = r; }), new Promise((r) => { tm = setTimeout(r, ms); })]);
+      clearTimeout(tm);
+      this.waiter = null;
+    }
+    return this.q.shift() || null;
+  }
+  close() { this.input.onmidimessage = null; }
+}
+
+async function handshake(link, tries = 3) {
+  link.drain();
+  for (let t = 0; t < tries; t++) {
+    if (!link.send(HS_QUERY)) return null;
+    const end = Date.now() + 1000;
+    while (Date.now() < end) {
+      const p = await link.read(end - Date.now());
+      if (!p) break;
+      const id = parseIdentity(p);
+      if (id) return id;
+    }
+  }
+  return null;
+}
+
+// BACKUP / RESTORE (Niagara Drift v0.2 on; firmware/src/app/main_fm1.c backup_cmd, tools/fm1_install.py nd_backup): the
+// stored objects as they lie on the flash, read 24 bytes at a time (0x70), written back 128 at a time (0x71), staged
+// (0x74) and switched to together on a yes on the FM-1 (0x75; before 0.3, each committed, 0x72, then a restart). The file is tools/fm1_install.py's: either tool restores the other's.
+const ND_OBJECTS = { 0: "sound and bank 1", 1: "panel", 2: "bank 2", 3: "bank 3", 4: "presets saved over",
+                            5: "bank 4", 6: "bank 5", 7: "bank 6" };
+const ND_OPTIONAL = new Set([4, 5, 6, 7]);     // firmware older than the Presets bank (v0.2) has no 4, older than 0.3's
+                                               // eight banks no 5-7: not read from it, and not restored to it when empty
+const ND_UNIT = new Set([1]);                  // the panel's calibration belongs to the unit: never in a backup, never
+                                               // restored from one (as fm1-base's: a backup goes onto any FM-1)
+// zlib's CRC-32 (Python's zlib.crc32): each object's, in the file, checked before anything is written back
+const CRC_T = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+function ndCrc32(a) { let c = 0xFFFFFFFF; for (const b of a) c = CRC_T[(c ^ b) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+
+function ndMsg(cmd, body = []) {
+  let s = 0;
+  for (const b of body) s += b;
+  const u = [0x00, 0x59, cmd, body.length & 0xFF, (body.length >> 8) & 0xFF, 0, ...body, ~s & 0xFF];
+  return [0xF0, ...pack7(u), 0xF7];
+}
+
+function ndReply(pkt, cmd) {
+  if (!pkt || pkt.length < 2 || pkt[0] !== 0xF0 || pkt[pkt.length - 1] !== 0xF7) return null;
+  const u = unpack7(pkt.slice(1, -1));
+  if (u.length < 7 || u[0] !== 0 || u[1] !== 0x59 || u[2] !== cmd || (u[3] | (u[4] << 8) | (u[5] << 16)) + 7 !== u.length) return null;
+  let s = 0;
+  for (let i = 6; i < u.length - 1; i++) s += u[i];
+  return (~s & 0xFF) === u[u.length - 1] ? u.slice(6, -1) : null;
+}
+
+// send, and the reply to it (want(reply) says which one it is), or null
+async function ndTransact(link, cmd, body, want, tries = 3) {
+  for (let t = 0; t < tries; t++) {
+    if (!link.send(ndMsg(cmd, body))) throw fail("lost", "FM-1 disconnected");
+    const end = Date.now() + 1000;
+    while (Date.now() < end) {
+      const r = ndReply(await link.read(end - Date.now()), cmd);
+      if (r && want(r)) return r;
+    }
+  }
+  return null;
+}
+
+// {obj: Uint8Array} (empty when none is stored), or null: this firmware can't make a backup (not Niagara Drift). Each
+// object is read twice: one that changed meanwhile (a save while it was read) is refused, as Melodee's are
+async function ndBackup(link) {
+  const first = await ndReadAll(link);
+  if (!first) return null;
+  const again = await ndReadAll(link);
+  const same = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
+  if (Object.keys(first).join() !== Object.keys(again).join() || Object.keys(first).some((k) => !same(first[k], again[k])))
+    throw fail("changed", "backup: the FM-1 changed while it was read");
+  return first;
+}
+
+async function ndReadAll(link) {
+  const objs = {};
+  for (const k of Object.keys(ND_OBJECTS)) {
+    const obj = +k;
+    if (ND_UNIT.has(obj)) continue;
+    let data = [], off = 0, total = null;
+    while (total === null || off < total) {
+      const o = off;
+      const r = await ndTransact(link, 0x70, [obj, o & 0xFF, o >> 8], (r) => r.length >= 5 && r[0] === obj && (r[1] | (r[2] << 8)) === o);
+      if (!r) {
+        if (obj === 0 && off === 0) return null;
+        if (ND_OPTIONAL.has(obj) && off === 0) { data = null; break; }
+        throw fail("lost", `backup: no answer reading the ${ND_OBJECTS[obj]}`);
+      }
+      total = r[3] | (r[4] << 8);
+      const chunk = r.slice(5);
+      if (total && !chunk.length) throw fail("lost", `backup: the ${ND_OBJECTS[obj]} came back short`);
+      data = data.concat(chunk);
+      off += chunk.length;
+      if (!total) break;
+    }
+    if (data) objs[obj] = Uint8Array.from(data);
+  }
+  return objs;
+}
+
+// THE SAFE RESTORE (v0.3; main_fm1.c 0x74 / 0x75): each object into the FM-1's buffer, then staged there, checked
+// against its CRC-32 (nothing changes yet); then the FM-1 asks on its screen (onAsk: tell the player), SEL yes, HOME
+// no. "restored" (it restarts itself), "cancelled" (HOME, or a minute without an answer). Firmware before it (no
+// answer to the first stage) gets the old way: each object written at once, then a restart
+async function ndRestore(link, objs, log = () => {}, onAsk = () => {}) {
+  // every object (fm1-base's journal holds them all): one the backup hasn't, empty, so the FM-1 matches the backup;
+  // never the calibration (an older backup's: the FM-1 keeps its own)
+  const ks = Object.keys(ND_OBJECTS).map(Number).sort((a, b) => a - b).filter((k) => !ND_UNIT.has(k));
+  let mask = 0, old = false;
+  for (const k of ks) {
+    const data = objs[k] || new Uint8Array(0);
+    if (old && !data.length) continue;
+    for (let off = 0; off < data.length; off += 128) {
+      const part = Array.from(data.subarray(off, off + 128)), o = off;
+      const r = await ndTransact(link, 0x71, [k, o & 0xFF, o >> 8, ...part], (r) => r.length >= 4 && r[0] === k && (r[1] | (r[2] << 8)) === o);
+      if (!r || r[3]) throw fail("lost", `restore: the ${ND_OBJECTS[k]} wasn't accepted`);
+    }
+    const c = ndCrc32(data), n = data.length;
+    if (!old) {
+      const r = await ndTransact(link, 0x74, [k, n & 0xFF, n >> 8, c & 0xFF, (c >>> 8) & 0xFF, (c >>> 16) & 0xFF, c >>> 24], (r) => r.length >= 2 && r[0] === k);
+      if (r && r[1] === 1 && !n && ND_OPTIONAL.has(k) && mask) continue;   // an empty bank this firmware hasn't
+      if (!r && !mask) { old = true; log("(this firmware writes them one at a time)"); if (!n) continue; }
+      else if (!r || r[1]) throw fail("lost", `restore: the ${ND_OBJECTS[k]} couldn't be staged (${r ? ["", "refused", "damaged on the way", "flash"][r[1]] : "no answer"}): nothing changed`);
+      else { mask |= 1 << k; log(`staged: ${ND_OBJECTS[k]} (${n} bytes)`); }
+    }
+    if (old) {
+      const r = await ndTransact(link, 0x72, [k, n & 0xFF, n >> 8], (r) => r.length >= 2 && r[0] === k);
+      if (!r || r[1]) throw fail("lost", `restore: the ${ND_OBJECTS[k]} couldn't be written`);
+      log(`restored: ${ND_OBJECTS[k]} (${n} bytes)`);
+    }
+  }
+  if (old) { link.send(ndMsg(0x73)); return "restored"; }
+  const a = await ndTransact(link, 0x75, [mask], (r) => r.length >= 1);
+  if (!a || a[0] !== 0xFF) throw fail("lost", "restore: the FM-1 didn't ask: nothing changed");
+  onAsk();
+  const end = Date.now() + 70000;              // (it asks for a minute)
+  while (Date.now() < end) {
+    const r = ndReply(await link.read(end - Date.now()), 0x75);
+    if (!r || !r.length || r[0] === 0xFF) continue;
+    if (r[0] === 0) return "restored";
+    if (r[0] === 1) return "cancelled";
+    throw fail("lost", "restore: the FM-1 couldn't switch to the backup: nothing changed");
+  }
+  throw fail("lost", "restore: no answer from the FM-1");
+}
+
+const b64 = (a) => { let s = ""; for (const b of a) s += String.fromCharCode(b); return btoa(s); };
+const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+const two = (n) => String(n).padStart(2, "0");
+
+// the backup file, as tools/fm1_install.py writes it; and its name, as it names it
+function ndBackupFile(objs, identity, when = new Date()) {
+  const saved = `${when.getFullYear()}-${two(when.getMonth() + 1)}-${two(when.getDate())} ${two(when.getHours())}:${two(when.getMinutes())}:${two(when.getSeconds())}`;
+  const o = {}, crc32 = {};
+  for (const k of Object.keys(objs)) { o[k] = b64(objs[k]); crc32[k] = ndCrc32(objs[k]); }
+  return JSON.stringify({ niagara_drift_backup: 1, identity, saved, objects: o, crc32 }, null, 1);
+}
+function ndBackupName(when = new Date()) {
+  return `backup-${when.getFullYear()}${two(when.getMonth() + 1)}${two(when.getDate())}-${two(when.getHours())}${two(when.getMinutes())}${two(when.getSeconds())}.json`;
+}
+function ndReadBackup(text) {
+  let j;
+  try { j = JSON.parse(text); } catch (_) { throw fail("badbackup", "not a Niagara Drift backup"); }
+  if (!j || j.niagara_drift_backup !== 1 || typeof j.objects !== "object") throw fail("badbackup", "not a Niagara Drift backup");
+  const objs = {}, crcs = j.crc32 || {};      // (none before 2026-10-30)
+  for (const [k, v] of Object.entries(j.objects)) {
+    if (!(k in ND_OBJECTS)) throw fail("badbackup", "unknown objects in the backup");
+    try { objs[+k] = unb64(v); } catch (_) { throw fail("badbackup", "not a Niagara Drift backup"); }
+  }
+  if (j.crc32 && (Object.keys(crcs).sort().join() !== Object.keys(objs).sort().join() ||
+                  Object.keys(objs).some((k) => ndCrc32(objs[k]) !== crcs[k])))
+    throw fail("damaged", "the backup is damaged (a checksum doesn't match)");
+  return objs;
+}
+
+class Updater {
+  constructor(access, log) {
+    this.access = access;
+    this.log = log || (() => {});
+  }
+
+  // every in/out pair with the same port name that answers the handshake
+  async find(filter) {
+    const outs = [...this.access.outputs.values()];
+    for (const input of this.access.inputs.values()) {
+      if (input.state === "disconnected") continue;
+      if (!/fm-1|felucca|ota|composite|sinco|usb-midi/i.test(input.name || "")) continue;   // never probe other gear
+      const output = outs.find((o) => o.name === input.name) || (outs.length === 1 ? outs[0] : null);
+      if (!output) continue;
+      try { await input.open(); await output.open(); } catch (_) { continue; }
+      const link = new Link(input, output);
+      const id = await handshake(link, 2);
+      if (id && (!filter || filter(id))) return { link, id, name: input.name };
+      link.close();
+    }
+    return null;
+  }
+
+  async waitFor(filter, ms) {
+    const end = Date.now() + ms;
+    while (Date.now() < end) {
+      const dev = await this.find(filter);
+      if (dev) return dev;
+      await sleep(1000);
+    }
+    return null;
+  }
+
+  // serve read requests until the device asks for one of the finish addresses; stops early
+  // when the port disappears (lost: true) instead of waiting out idleMs
+  async serve(link, image, finishAddr, idleMs, onProgress) {
+    let served = 0, last = Date.now();
+    for (;;) {
+      const pkt = await link.read(1000);
+      if (!pkt) {
+        if (link.lost) return { served, finished: false, lost: true };
+        if (Date.now() - last > idleMs) return { served, finished: false };
+        continue;
+      }
+      const r = parseRequest(pkt);
+      if (!r) continue;
+      last = Date.now();
+      if (r.addr === 0xE0000000 || r.addr === 0xF0000000) {
+        link.send(response(r.addr, [...new TextEncoder().encode("success"), 0]));
+        if (r.addr === finishAddr) return { served, finished: true };
+        continue;
+      }
+      if (r.len > MAXDATA || r.addr + r.len > image.length) throw fail("badreq", `bad request ${r.addr.toString(16)}+${r.len}`);
+      await sleep(10);
+      if (!link.send(response(r.addr, Array.from(image.subarray(r.addr, r.addr + r.len)), r.fl))) {
+        return { served, finished: false, lost: true };
+      }
+      served++;
+      if (onProgress) onProgress(served, r.addr);
+    }
+  }
+
+  // full install: running firmware -> loader -> new firmware
+  async install(image, product, onStep) {
+    const step = onStep || (() => {});
+    const dev = await this.find((id) => !IS_OTA(id));
+    if (!dev) throw fail("notfound", "FM-1 not found (USB cable, and no other app using it?)");
+    const [model] = product.split("_");
+    if (dev.id.model !== model) { dev.link.close(); throw fail("model", `the device is ${dev.id.text}, the package is for ${product}`); }
+    step("start", dev.id.text);
+    dev.link.send(UPGRADE);
+    await sleep(2000);
+    const s1 = await this.serve(dev.link, image, 0xE0000000, 8000, (n) => step("verify", n));
+    dev.link.close();
+    if (!s1.finished) throw Object.assign(fail(s1.lost ? "lost" : "stopped", `the device ${s1.lost ? "was disconnected" : "stopped"} after ${s1.served} requests: nothing was written`), { step: 1 });
+    step("loader");
+    await sleep(3000);
+    const ota = await this.waitFor(IS_OTA, 30000);
+    if (!ota) throw fail("noloader", "the update loader did not appear. Replug the USB cable and press Install again: the device stays in update mode until it is finished.");
+    const s2 = await this.write(ota, image, step);
+    if (!s2.finished) throw fail(s2.lost ? "lost" : "stopped", `the loader ${s2.lost ? "was disconnected" : "stopped"} after ${s2.served} requests. Replug and press Install again to resume.`);
+    step("reboot");
+    await sleep(3000);
+    const back = await this.waitFor((id) => !IS_OTA(id), 40000);
+    if (!back) throw fail("noreturn", "the device did not come back: power-cycle it");
+    back.link.close();
+    if (back.id.text !== product) throw fail("mismatch", `installed, but the device reports ${back.id.text}`, back.id.text);
+    step("done", back.id.text);
+    return back.id.text;
+  }
+
+  // Niagara Drift running: its saved objects and its identity, or null (another firmware, or update mode)
+  async backup() {
+    const dev = await this.find((id) => !IS_OTA(id));
+    if (!dev) throw fail("notfound", "FM-1 not found (USB cable, and no other app using it?)");
+    try {
+      const objs = await ndBackup(dev.link);
+      return objs ? { objs, identity: dev.id.text } : null;
+    } finally { dev.link.close(); }
+  }
+
+  // Niagara Drift running: write a backup back (it restarts with it): "restored", "cancelled" (on the FM-1), or false
+  // when the firmware can't take one; onAsk: the FM-1 is asking
+  async restore(objs, onAsk) {
+    const dev = await this.find((id) => !IS_OTA(id));
+    if (!dev) throw fail("notfound", "FM-1 not found (USB cable, and no other app using it?)");
+    try {
+      if (!(await ndTransact(dev.link, 0x70, [0, 0, 0], (r) => r.length >= 5 && r[0] === 0))) return false;
+      return await ndRestore(dev.link, objs, this.log, onAsk);
+    } finally { dev.link.close(); }
+  }
+
+  // step 2 with the loader found by find()/waitFor()
+  async write(ota, image, step) {
+    ota.link.send(UPGRADE);
+    await sleep(2000);
+    const s2 = await this.serve(ota.link, image, 0xF0000000, 180000, (n) => step("write", n));
+    ota.link.close();
+    return s2;
+  }
+
+  // resume: the device is already in update mode (loader) -> true when the write finished
+  async resume(image, onStep) {
+    const ota = await this.find(IS_OTA);
+    if (!ota) return false;
+    return (await this.write(ota, image, onStep || (() => {}))).finished;
+  }
+}
+
+const $ = (id) => document.getElementById(id);
+const TEXT = {
+  en: {
+    installh: "In three steps",
+    step1: "Open this page in Chrome or Edge (they can talk to the FM-1 over USB; Safari and Firefox can't).",
+    step2: "Connect the FM-1 straight to the computer with a USB data cable (no hub) and switch it on. Close any other app that uses MIDI.",
+    step3: "Press Install and allow MIDI when the browser asks. It takes about two minutes: don't unplug or touch the FM-1 until it says Done.",
+    install: "Install",
+    riskh: "Before you start",
+    riskline: "At your own risk. If anything goes wrong, this page can put M-VAVE's firmware back.",
+    risklink: "Before you start",
+    helpline: "Questions, or something not right:",
+    helplink: "Help",
+    beta: "Installing is at your own risk: no one involved can be responsible if your FM-1 is damaged or misbehaves.",
+    safe: "If it ever fails to start twice in a row, it comes up in safe mode (no sound, USB on), where this page can install again or put the stock firmware back.",
+    brick: "If an FM-1 won't start at all, it can still be put back on M-VAVE's firmware:",
+    bricklink: "an FM-1 that won't start",
+    stockh: "Back to M-VAVE's firmware",
+    stockwhy: "This writes M-VAVE's own FM-1 firmware (V16 or V15) back, over the same cable, from Niagara Drift or its safe mode. Your Niagara Drift sound and scenes are lost.",
+    stock1: "Download M-VAVE's FM-1 firmware:",
+    stockalt: "also on",
+    stock1b: "If the FM-1 doesn't take it, from the Internet Archive:",
+    stock2: "Choose the file you downloaded:",
+    stock3: "Connect the FM-1 by USB and press the button below.",
+    stockinstall: "Install M-VAVE's firmware",
+    stockok: "That is M-VAVE's FM-1 {V}. Press the button to install it.",
+    stockbad: "That isn't M-VAVE's FM-1 V16 or V15 file. Choose a file from the links above.",
+    stockhead: "Nothing was written. The FM-1 takes back only the version whose bootloader it already has: choose the other file (V16 or V15) and press the button again.",
+    stockdone: "Done. The FM-1 has restarted with M-VAVE's firmware.",
+    stockfirst: "First, Niagara Drift is updated to {ND}, which takes back either M-VAVE version. Then M-VAVE's firmware: ",
+    trubh: "Trouble installing?",
+    trubwhy: "If nothing here reaches the FM-1 (a newer FM-1 running Niagara Drift 0.2 ignores every install), M-Flasher, a free app by Julius Vitkauskas, puts M-VAVE's firmware back from outside. It takes about ten minutes, once; then this page works again.",
+    trub1: "Download",
+    trub1b: "for your computer: on a Mac the .dmg, on Windows the .zip.",
+    trub2: "Open it. It isn't signed, so the first time your computer warns you. On Windows: \"More info\", then \"Run anyway\". On a Mac: System Settings → Privacy & Security → \"Open Anyway\". It asks for your password: it needs it to reach the FM-1.",
+    trub3: "Connect the FM-1 with a USB data cable, straight into the computer. M-Flasher finds it: press DOWNLOAD MODE.",
+    trub4: "Choose M-VAVE's",
+    trub4b: "and press REVIEW & FLASH. It backs up the whole FM-1 before it writes anything.",
+    trub5: "When it's done, unplug the FM-1 and switch it off and on: it starts with M-VAVE's firmware.",
+    trub6: "Come back to this page and press Install.",
+    trubmore: "More on each step:",
+    trubmorelink: "M-Flasher's guide",
+    nomidi: "This browser can't do it. Open the page in Chrome or Edge.", loadfail: "Couldn't load the firmware: ",
+    start: "Starting", verify: "Checking", loader: "Switching to update mode", write: "Writing",
+    reboot: "Restarting", done: "Done: the FM-1 runs Niagara Drift. Press PLAY.", stopped: "Stopped. Replug the USB cable and press Install again. If it stops again, see \"Trouble installing?\" below.",
+    error: "Error: ",
+    denied: "MIDI access wasn't allowed. Allow MIDI in the site settings (the address bar) and press Install again.",
+    notfound: "No FM-1 found. Check the cable is a data cable, straight into the computer, close other apps that use MIDI, and press Install again.",
+    model: "The connected device isn't an FM-1.",
+    lost: "The USB connection was lost. Replug it and press Install again.",
+    noloader: "The FM-1 in update mode wasn't found. Replug the USB cable and press Install again (it stays in update mode until it's finished).",
+    noreturn: "The FM-1 didn't come back. Switch it off and on.",
+    mismatch: "Written, but the FM-1 reports another version: ",
+    badpkg: "The firmware file is damaged. Reload the page.",
+    leave: "Writing. Don't close the page.",
+    backingup: "Saving your sounds and scenes first",
+    savedto: "Your sounds and scenes were saved first, to ",
+    savedhint: " (in your downloads). If any are missing afterwards, put them back:",
+    putback: "Put the backup back",
+    soundsh: "Your sounds and scenes",
+    soundswhy: "Every install saves them to a file first, when the FM-1 runs Niagara Drift (not the knobs' calibration, which belongs to each FM-1). You can also save them, or put a saved file back, here: the FM-1 restarts with it. The terminal installer makes and reads the same files.",
+    backupnow: "Save them to a file",
+    restore1: "Or choose a backup file to put back:",
+    restorenow: "Put this backup back",
+    restoring: "Putting the backup back",
+    restored: "Done: the FM-1 restarts with the backup's sound and scenes.",
+    restoreask: "On the FM-1, press SEL to put the backup back (HOME keeps what it has).",
+    restorecancel: "Not put back: the FM-1 kept its sound and scenes.",
+    nobackup: "This FM-1 isn't running Niagara Drift (0.2 or later), so there's nothing to save or put back.",
+    backupdone: "Saved to ",
+    badbackup: "That isn't a Niagara Drift backup file.",
+    damaged: "That backup file is damaged (its checksums don't match), so nothing was written. Choose another.",
+    changed: "The FM-1 changed while it was being saved. Stop it (PLAY) and try again.",
+    reporth: "Send this to the developer",
+    reportwhy: "It didn't work. Sending what happened helps fix it for everyone. No account needed.",
+    reportnote: "Anything to add? (optional)",
+    reportmail: "Your email",
+    reportmailwhy: "optional, only if you'd like an answer",
+    reportwhat: "What's sent: the message above, this page's version, your browser's name and the install's log",
+    reportsend: "Send",
+    reportsending: "Sending",
+    reportsent: "Sent. Thank you: it will be looked at.",
+    reportfail: "Not sent: ",
+  },
+};
+const lang = "en";
+let stockV = "", ndV = "";                         /* the stock version chosen, this page's Niagara Drift: {V}, {ND} */
+const t = (k) => (TEXT[lang][k] || "").replace("{V}", stockV).replace("{ND}", ndV);
+let lastKey = null, lastArg = "";
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach((e) => { e.textContent = t(e.dataset.t); });
+  if (lastKey) $("status").textContent = t(lastKey) + lastArg;
+}
+applyLang();
+const sayK = (k, arg = "") => { lastKey = k; lastArg = arg; $("status").textContent = t(k) + arg; };
+const say = (txt) => { lastKey = null; $("status").textContent = txt; };
+const log = (t) => { $("log").textContent += t + "\n"; };
+let image = null;
+const meta = {"version": "0.3", "product": "FM-1_8000300", "pkg": "../firmware/niagara-drift-0.3.fwsc"};
+ndV = meta.version;
+
+let writing = false;
+/* a failed install, a restore or a backup: offer to send it (the developer's Formspree form) */
+const REPORT_TO = "https://formspree.io/f/xppdwkel";
+function report() {
+  return { "What happened": $("status").textContent, "Note": $("reportnote").value.trim(), email: $("reportmail").value.trim(),
+           "Niagara Drift (this page)": ndV, "Browser": navigator.userAgent, "Log": $("log").textContent.trim() };
+}
+function showReport() {
+  const r = report();
+  $("reportpreview").textContent = ["What happened", "Niagara Drift (this page)", "Browser", "Log"].map((k) => k + ": " + r[k]).join("\n");
+  $("reportstatus").textContent = "";
+  $("report").hidden = false;
+}
+$("reportgo").addEventListener("click", async () => {
+  const d = new FormData();
+  for (const [k, v] of Object.entries(report())) if (v) d.append(k, v);
+  d.append("_subject", "Niagara Drift: an install that didn't work");
+  $("reportgo").disabled = true;
+  $("reportstatus").textContent = t("reportsending");
+  try {
+    const r = await fetch(REPORT_TO, { method: "POST", body: d, headers: { Accept: "application/json" } });
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.status);
+    $("reportstatus").textContent = t("reportsent");
+  } catch (e) {
+    $("reportstatus").textContent = t("reportfail") + e.message;
+    $("reportgo").disabled = false;
+  }
+});
+let lastBackup = null, chosen = null;
+function download(name, text) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+async function saveBackup(up) {               /* Niagara Drift running: its objects to a file, kept for putting back */
+  const b = await up.backup();
+  if (!b) return null;
+  const name = ndBackupName();
+  download(name, ndBackupFile(b.objs, b.identity));
+  lastBackup = { objs: b.objs, name };
+  log(`backup: ${name}`);
+  return lastBackup;
+}
+function buttons() {
+  $("go").disabled = writing || !image;
+  $("stockgo").disabled = writing || !stock;
+  $("backupgo").disabled = writing || !navigator.requestMIDIAccess;
+  $("restorego").disabled = writing || !chosen;
+  $("putbackgo").disabled = writing;
+}
+async function midiAccess() {
+  try { return await navigator.requestMIDIAccess({ sysex: true }); }
+  catch (e) { sayK("denied"); return null; }
+}
+window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault(); e.returnValue = t("leave"); } });
+
+(async () => {
+  if (!navigator.requestMIDIAccess) { sayK("nomidi"); return; }
+  try {
+    const r = await fetch(meta.pkg);
+    if (!r.ok) throw new Error(`${meta.pkg}: HTTP ${r.status}`);
+    const pkg = new Uint8Array(await r.arrayBuffer());
+    if (productOf(pkg) !== meta.product) { sayK("badpkg"); return; }
+    image = logicalImage(pkg);
+    say(`Niagara Drift ${meta.version}: ready`);
+    $("go").disabled = false;
+  } catch (e) { sayK("loadfail", e.message); }
+})();
+
+/* stock firmware: M-VAVE's FM-1 V16 or V15, chosen by the user (M-VAVE's server allows no cross-site
+   download) and checked against its SHA-256 before anything is written. The FM-1 takes back only the one whose
+   flash head it has (firmware/src/ota.c: M-VAVE's loader rewrites the head; M-UPGRADE gives V16 its own) */
+const STOCK = {
+  "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a": "V15",
+  "d017fb65e70aca97ee29d944470c3515a74581df5c0576bf70de917c7b2b61d5": "V16",
+};
+let stock = null;
+$("stockfile").addEventListener("change", async (e) => {
+  stock = null;
+  $("stockgo").disabled = true;
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  try {
+    const raw = new Uint8Array(await f.arrayBuffer());
+    const hex = [...new Uint8Array(await crypto.subtle.digest("SHA-256", raw))].map((b) => b.toString(16).padStart(2, "0")).join("");
+    if (!STOCK[hex]) { sayK("stockbad"); return; }
+    stock = { image: logicalImage(raw), product: productOf(raw) };
+    stockV = STOCK[hex];
+    $("stockgo").disabled = writing;
+    sayK("stockok");
+  } catch (err) { sayK("error", err && err.message); }
+});
+
+async function run(img, product, isStock) {
+  const midi = await midiAccess();
+  if (!midi) return;
+  writing = true;
+  buttons();
+  $("saved").hidden = $("putback").hidden = $("report").hidden = true;
+  try {
+    const up = new Updater(midi, log);
+    const total = 74 + 1167;
+    const step = (k, a) => {
+      log(`${k} ${a ?? ""}`);
+      if (k === "start") sayK("start");
+      if (k === "verify") { sayK("verify"); $("bar").value = (a / total) * 100; }
+      if (k === "loader") sayK("loader");
+      if (k === "write") { sayK("write"); $("bar").value = ((74 + a) / total) * 100; }
+      if (k === "reboot") sayK("reboot");
+      if (k === "done") { $("bar").value = 100; sayK(isStock ? "stockdone" : "done"); }
+    };
+    const ota = await up.find((id) => /^ota-/i.test(id.model));
+    if (ota) {
+      ota.link.close();
+      const ok = await up.resume(img, step);
+      sayK(ok ? (isStock ? "stockdone" : "done") : "stopped");
+      if (!ok) showReport();
+    } else {
+      sayK("backingup");
+      const b = await saveBackup(up);      /* first: the sound and scenes, to a file (Niagara Drift running) */
+      if (b) {
+        $("saved").textContent = t("savedto") + b.name + (isStock ? "." : t("savedhint"));
+        $("saved").hidden = false;
+      }
+      if (isStock && image) {
+        /* Niagara Drift before 0.2.1 takes back only the M-VAVE version whose bootloader the FM-1 has: update it
+           first (its sound kept), then write M-VAVE's. A release's identity is FM-1_8XXYYZZ; dev builds are left be */
+        const dev = await up.find((id) => !/^ota-/i.test(id.model));
+        const v = dev ? dev.id.version : 0;
+        if (dev) dev.link.close();
+        if (dev && dev.id.model === "FM-1" && v >= 8000000 && v < 8000201) {
+          const first = (k, a) => { log(`first ${k} ${a ?? ""}`); $("status").textContent = t("stockfirst") + (k === "done" ? "" : t(k)); };
+          await up.install(image, meta.product, first);
+          await new Promise((r) => setTimeout(r, 3000));   /* the new firmware starting */
+        }
+      }
+      await up.install(img, product, step);
+      if (b && !isStock)
+        $("putback").hidden = false;
+    }
+  } catch (e) {
+    if (isStock && e && e.code === "mismatch") { $("bar").value = 100; sayK("stockdone"); }   /* stock names itself its own way */
+    else if (isStock && e && e.code === "stopped" && e.step === 1) sayK("stockhead");          /* the other version's head */
+    else if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
+    else sayK("error", e && e.message);
+    log(String(e && e.stack || e));
+    if (!(isStock && e && e.code === "mismatch"))   /* (a stock install that worked) */
+      showReport();
+  }
+  writing = false;
+  buttons();
+}
+
+async function restore(objs) {               /* a backup back onto a Niagara Drift FM-1: it restarts */
+  const midi = await midiAccess();
+  if (!midi) return;
+  writing = true;
+  buttons();
+  try {
+    sayK("restoring");
+    const r = await new Updater(midi, log).restore(objs, () => sayK("restoreask"));
+    sayK(r === "restored" ? "restored" : r === "cancelled" ? "restorecancel" : "nobackup");
+  } catch (e) {
+    if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
+    else sayK("error", e && e.message);
+    log(String(e && e.stack || e));
+    showReport();
+  }
+  writing = false;
+  buttons();
+}
+$("backupgo").addEventListener("click", async () => {
+  const midi = await midiAccess();
+  if (!midi) return;
+  writing = true;
+  buttons();
+  try {
+    const b = await saveBackup(new Updater(midi, log));
+    if (b) sayK("backupdone", b.name);
+    else sayK("nobackup");
+  } catch (e) {
+    if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
+    else sayK("error", e && e.message);
+  }
+  writing = false;
+  buttons();
+});
+$("restorefile").addEventListener("change", async (e) => {
+  chosen = null;
+  const f = e.target.files && e.target.files[0];
+  if (f) {
+    try { chosen = ndReadBackup(await f.text()); } catch (err) { sayK(err && err.code === "damaged" ? "damaged" : "badbackup"); }
+  }
+  buttons();
+});
+$("restorego").addEventListener("click", () => { if (chosen) restore(chosen); });
+$("putbackgo").addEventListener("click", () => { if (lastBackup) restore(lastBackup.objs); });
+buttons();
+
+$("go").addEventListener("click", () => run(image, meta.product, false));
+$("stockgo").addEventListener("click", () => { if (stock) run(stock.image, stock.product, true); });
+</script>
+</body>
+</html>
