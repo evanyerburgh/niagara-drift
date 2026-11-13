@@ -22,8 +22,9 @@ Keys 9–12: the harder you press, the further in.
 1. Press **Chord**, [[A4]], slowly harder: the drones move into a chord.
 2. Ease off: they come back.
 
-> **Good to know.** Chord builds its chord on a chose **scale**. Set it on the **Pitch moves** page ([[SEQ]] twice, KNOB 4):
-> Change the scale and the chord changes.
+> **Good to know.** Chord builds its chord on the **Scale**, set on the **Pitch moves** page ([[SEQ]] twice, KNOB 4):
+> change the Scale and the chord changes. A preset can bring its own: Vespers' is Just 1-8, the harmonics; Embers',
+> major pentatonic.
 
 ![Drones, Chord at 90%](../media/g-press-0.png "CHORD 90%")
 
