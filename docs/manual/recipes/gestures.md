@@ -107,7 +107,8 @@ Tap, latch, stack and slow down: these work on every gesture key.
 - 0:00 P6 Seance
 - 0:01 Snarl pressed: a growl
 - 0:05 Wash held on top: the climax
-- 0:10 Both let go
+- 0:10 Both let go: Snarl goes at once, Wash leaves over about 5 s
+- 0:15 Back to Seance as it was
 
 ### Transform a sound over half a minute {#minute}
 
