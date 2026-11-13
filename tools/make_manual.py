@@ -51,16 +51,15 @@ def icon(name, cls="ic"):
     return s.replace("<svg ", f'<svg class="{cls}" aria-hidden="true" focusable="false" ', 1)
 
 
-MENU_ICON = {"Play it": "play", "Start here": "flag", "Recipes": "cooking-pot", "Reference": "book-open",
+MENU_ICON = {"Play it": "play", "Recipes": "cooking-pot", "Reference": "book-open",
              "Shortcuts": "keyboard", "Help": "lifebuoy", "About": "info"}
 TAB_ICON = {"sounds": "waveform", "gestures": "hand-pointing", "scenes": "floppy-disk", "time": "timer",
             "performing": "faders", "scratch": "plant"}
-MENU = [("", "Play it", "the emulator: the firmware itself, in your browser"),
-        ("#start-here", "Start here", "the first steps, beside the emulator"),
+MENU = [("", "Play it", "the emulator, and the first steps under it"),
         ("manual/recipes/sounds/", "Recipes", "how to get a sound or a move"),
         ("manual/reference/", "Reference", "every page, knob and key"),
         ("manual/reference/shortcuts/", "Shortcuts", "every combination, hold and tap"),
-        ("manual/help/", "Help", "installing, going back, problems"),
+        ("manual/help/", "Help", "installing, going back, feedback"),
         ("manual/about/", "About", "what it does, the details, where it came from")]
 
 
