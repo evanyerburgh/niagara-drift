@@ -340,18 +340,20 @@ The **Shimmer** reverb lifts what goes into it an octave, in two voices just apa
 echo rises into a bright halo while the drones stay dry. It shines on voices in the middle and up; on a low drone the
 octave stays low.
 
-1. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: more echoes.
-2. Press [[FX]] again for **Details**, and turn KNOB 4, the reverb's Type, to **Shimmer**.
-3. Hold [[SEL]] and turn KNOB 4: Into **Echoes**.
-4. Press [[FX]] for Space again, and turn the reverb's Mix (KNOB 4) up.
+1. If your drones are low, press [[HOME]] twice for **Pitch** and turn both up an octave (KNOB 1 and KNOB 3): the halo
+   sparkles above them.
+2. Press [[FX]] for **Space**, and turn Repeat (KNOB 1) and Mix (KNOB 2) up: more echoes.
+3. Press [[FX]] again for **Details**, and turn KNOB 4, the reverb's Type, to **Shimmer**.
+4. Hold [[SEL]] and turn KNOB 4: Into **Echoes**.
+5. Press [[FX]] for Space again, and turn the reverb's Mix (KNOB 4) up.
 
 > **Good to know.** The Shimmer washes in over about 8 seconds and out over 6. **Cistern** (P10) uses it on
-> everything. If your drones are low, raise them an octave or two (Pitch page) and the halo sparkles.
+> everything.
 
 ![Space, more echoes, the reverb's Mix up](../media/shimmer-0.png "more echoes, the reverb up")
 ![Details, Shimmer, Into Echoes](../media/shimmer-1.png "Shimmer, Into Echoes")
 
 **Listen** (`shimmer`)
 
-- 0:00 P15 Falling, sines in the middle (G3 and E4), with its echoes up
+- 0:00 P15 Falling with both drones an octave up (G4 and E5), its echoes up
 - 0:01 The reverb to Shimmer, Into Echoes: over 8 seconds the echoes rise an octave into a halo
