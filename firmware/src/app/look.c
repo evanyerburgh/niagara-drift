@@ -202,8 +202,7 @@ static int lk_glide(uint32_t now, float *line, int *bank)
  * moved it); on its way to a scene, where to, in gold ("→ P3 EERIE"); peeking, where letting go goes ("let go:
  * DRONES"). A glide or a fade fills a gold line under it. When it's full, what gives way, in order: PLAY's state to its
  * short form ("PLAY", as before), the "1/2", "changed", SWELL, the Preset's name (Evan, 2026-11-10: the name stays, so
- * the player sees which Preset is playing), a latched gesture's "latched" (its word stays), the key (Evan, 2026-11-14:
- * a scene tapped must say which; it had given way to "CHORD latched"), PLAY's state;
+ * the player sees which Preset is playing), the key (Evan, 2026-11-01), then a latched gesture's word, PLAY's state;
  * the page's name never */
 static void lk_bar(void)
 {
@@ -340,14 +339,12 @@ static void lk_bar(void)
         key[0] = 0;
     }
     for (drop = 0; drop < 9; drop++) {         /* 0 all; 1 PLAY's state short; 2 no 1/2; 3 no "changed";
-                                                * 4 no SWELL; 5 no name; 6 a latched gesture by its fill, alone
-                                                * ("CHORD"); 7 no key (or "→ P3"); 8 no PLAY's state (a peek keeps where
-                                                * it goes). The key before a latched gesture's "latched" (Evan,
-                                                * 2026-11-14: a scene that brings back its gestures read "CHORD latched",
-                                                * not 1.1) */
+                                                * 4 no SWELL; 5 no name; 6 no key (or "→ P3"); 7 a latched gesture by its fill,
+                                                * alone ("CHORD"); 8 no PLAY's state (a peek keeps where
+                                                * it goes) */
         const char *st = !state || (drop >= 8 && !peek) ? 0 : drop >= 1 ? st_short : state;
         int32_t x = 8 + text_w(&LK_F_PAGE, name), rx = 232, gap = 0;
-        if (drop == 6 && gb >= 0 && gest_pct < 0)
+        if (drop == 7 && gb >= 0 && gest_pct < 0)
             gname[glen] = 0;
         if (peek)
             x += 6 + text_w(&LK_F_SEL, "PEEK") + 6;
@@ -368,7 +365,7 @@ static void lk_bar(void)
             rx -= gap + text_w(&LK_F_TAG, chg);
             gap = 6;
         }
-        if (key[0] && drop < 7)
+        if (key[0] && drop < 6)
             rx -= gap + text_w(&LK_F_TAG, key);
         if (rx >= x + LK_BAR_GAP)
             break;
@@ -398,7 +395,7 @@ static void lk_bar(void)
             rx -= gap + text_w(&LK_F_TAG, chg);
             gap = 6;
         }
-        if (key[0] && drop < 7) {
+        if (key[0] && drop < 6) {
             rx -= gap + text_w(&LK_F_TAG, key);
             gap = 6;
         }
@@ -432,7 +429,7 @@ static void lk_bar(void)
             cv_text(rx, bl - LK_B(LK_F_TAG), &LK_F_TAG, chg, LK_LABEL);
             gap = 6;
         }
-        if (key[0] && drop < 7) {
+        if (key[0] && drop < 6) {
             rx -= gap + text_w(&LK_F_TAG, key);
             cv_text(rx, bl - LK_B(LK_F_TAG), &LK_F_TAG, key, key_col);
         }

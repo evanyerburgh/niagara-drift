@@ -755,12 +755,13 @@ at the end. The current state is in the [README](../README.md) and the code.
   SWELL beside them) and over "3-1" (the screen's dash is a range: "1-8"). The Screen Reader says "bank 3 key 5". The
   header keeps 11 px between its sides (was 12) so "1.1 changed" fits beside DRONES and [PLAY]. Saved sounds unchanged.
 - 2026-11-14: **scenes keep their latched gestures** (Evan: "it's part of the sound and really cool"): a scene saved
-  with Chord latched brings Chord back. The header names the scene on its way ("CHORD → 1.1"): a latched gesture's
-  "latched" now gives way before the scene's key (it had read "CHORD latched", with no 1.1). **Dreamhouse and Ashram
-  3 dB quieter, Tape 2 dB** (Evan: loud on headphones; their loud moments against P1 on headphones +1.8, -1.8, +3.3 dB
-  before, -1.2, -4.6, +1.8 after). Players' saved sounds unchanged. A low cut at 12 Hz on the headphone output was
-  tried and not taken (Evan: no low cut): before the output's clip it softened a saw at 8 Hz and below by 3-6 dB, and
-  after the clip it went past full scale.
+  with Chord latched brings Chord back. The header as it was: while the scene arrives it reads "CHORD latched", and
+  "CHORD latched  1.1" once there (naming the scene first, "CHORD → 1.1", moved more of the header on every tap;
+  Evan: "the previous behavior was better"). **Dreamhouse and Ashram 3 dB quieter, Tape 2 dB** (Evan: loud on
+  headphones; their loud moments against P1 on headphones +1.8, -1.8, +3.3 dB before, -1.2, -4.6, +1.8 after).
+  Players' saved sounds unchanged. A low cut at 12 Hz on the headphone output was tried and not taken (Evan: no low
+  cut): before the output's clip it softened a saw at 8 Hz and below by 3-6 dB, and after the clip it went past full
+  scale.
 - 2026-11-14: **four Presets get their own Swell** (Evan: five breathing with P1's Swell, the same 23 s breath in step,
   "makes them sound too much the same"): Embers and Howl none (the bloom and the grind are their movement), Abyss a
   slow deep tide (33 s, about 18 dB), Tape a tired breath (29 s, about 7 dB); Niagara keeps it. Picked by ear from
