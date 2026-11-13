@@ -749,3 +749,8 @@ at the end. The current state is in the [README](../README.md) and the code.
   screens are committed, the sounds made at release (40 recipes would add ~25 MB to git). The front page: the poster
   as a short hero, the emulator, the manual's doors and four recipes to try. Words: nothing that sounds like bad
   design (hidden, buried), no closing period on a banner's line, no Lyra-8 in the new words (the credit line keeps it).
+- 2026-11-13: **your banks by number** (Evan: "calling a G note bank A"): banks 1 to 6 (SEL + G4 .. E5), the
+  Presets' two as before (P1-8, P9-16); a scene of yours named by bank and key, "3.5" (the header, banners, "→ 3.5"),
+  a Preset by number, "P5". Picked over "B3-K5" and "B3-1" (B3 is a note, and the header had no room for "changed" or
+  SWELL beside them) and over "3-1" (the screen's dash is a range: "1-8"). The Screen Reader says "bank 3 key 5". The
+  header keeps 11 px between its sides (was 12) so "1.1 changed" fits beside DRONES and [PLAY]. Saved sounds unchanged.

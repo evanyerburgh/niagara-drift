@@ -397,7 +397,7 @@ header nav { z-index: 6; }
         <li>Tap white keys 1–8: a preset on each</li>
         <li>Hold a gesture key, then let go: the top eight white keys</li>
         <li>Turn KNOB 1–4: each drone's level and cutoff</li>
-        <li>To keep your sound: <kbd>SEL</kbd> + <kbd>G4</kbd> (bank A), hold <kbd>SAVE</kbd> and tap a white key to save it there</li>
+        <li>To keep your sound: <kbd>SEL</kbd> + <kbd>G4</kbd> (bank 1), hold <kbd>SAVE</kbd> and tap a white key to save it there</li>
       </ol>
       <p class="start-callout"><b>Or build it up yourself:</b> start from one drone with everything off, and add a control
         at a time. <a href="manual/recipes/scratch/">Build a sound from scratch →</a></p>
@@ -604,10 +604,10 @@ function hit(c, cls) {
   c.hit = d;
 }
 // what each control does, on hover (the Buttons list below says the same)
-const TIP = { FX: "Space: the delay's repeats and mix, the reverb's length (to Inf) and mix (again: Details: drive, time, damp, reverb type; SEL + KNOB 2: the delay type; SEL + KNOB 4: what goes into the reverb)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a gesture key: a bank (A to F, the presets, P9–P16); with PLAY: drone II alone",
+const TIP = { FX: "Space: the delay's repeats and mix, the reverb's length (to Inf) and mix (again: Details: drive, time, damp, reverb type; SEL + KNOB 2: the delay type; SEL + KNOB 4: what goes into the reverb)", SEL: "Hold while turning: fine (pitch in cents, cutoff and resonance in tenths); with a gesture key: a bank (1 to 6, the presets, P9–P16); with PLAY: drone II alone",
   ENV: "Life: feedback, drift, character, age (again: Tone: noise and its color, white to pink); hold to peek", LFO: "LFO sends: each drone's pitch and cutoff sends; the keys pick the routing (again: Mods: speed mod, source, delay mod, cross-mod)",
   EDIT: "Osc: X-Wave, pulse width (again: Sub · Drive: osc mix, with SEL the sub's wave; drive); hold to peek", GLO: "Setup 1: fade, morph, scene time, sync (again: Setup 2: tuning, tune, stereo width, pressure)",
-  HOME: "Drones: levels, cutoffs (again: Pitch: pitches, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in banks A to F)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
+  HOME: "Drones: levels, cutoffs (again: Pitch: pitches, resonance)", SAVE: "Save; hold it first, then tap a white key: store a scene (in banks 1 to 6)", ARP: "Swell: tap for its page, tap again there: on / off; hold to peek", SEQ: "Partner: interval, detune (again: Pitch moves: Shift's move, pitch glide, Wander, its scale)",
   PLAY: "Drones in / out (with SEL: drone II alone)", REC: "Motion loop: tap to record knob moves, gestures and scenes, again to loop, again to stop", "OCT-": "LFO I: tap for the next shape (with SEL: the one before)", "OCT+": "LFO II: tap for the next shape (with SEL: the one before)",
   SELECT: "LFO rate", PRESETS: "Gesture time: how long every gesture takes, left slower, right faster", ALGORITHM: "Movement: every LFO depth together",
   KNOB1: "Drone I", KNOB2: "Drone I", KNOB3: "Drone II", KNOB4: "Drone II", MASTER: "Volume" };
@@ -628,7 +628,7 @@ BLACK_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", `Key ${k + 
   (BLACK_TIP[k][1] !== BLACK_TIP[k][0] ? `; on the LFO pages: ${BLACK_TIP[k][1]}` : "")));
 WHITE_K.forEach((n, k) => keys[n].g.setAttribute("aria-description", k < 8
   ? `Scene ${k + 1} (${"QWERTYUIASDFGHJK"[k]}): tap to go there, hold to visit and let go to come back (on the FM-1, press harder to blend in); ` +
-    `in banks A to F, hold SAVE first, then this key, to store (the presets are fixed); blinks while it's the sound`
+    `in banks 1 to 6, hold SAVE first, then this key, to store (the presets are fixed); blinks while it's the sound`
   : k < 12 ? `${GESTURES[k - 8]} (${"QWERTYUIASDFGHJK"[k]}): a gesture: hold to bring it in (on the FM-1, as deep as you press), let go and it goes; ` +
     `tap: all the way, to stay; SEL tapped while holding: it stays where it got to. With SEL: bank ${BANKS[k - 8]}`
   : `${GESTURES[k - 8]} (${"QWERTYUIASDFGHJK"[k]}): a gesture: hold to bring it in, let go and it leaves as slowly as you held it; ` +

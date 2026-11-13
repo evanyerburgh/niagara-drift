@@ -54,3 +54,14 @@ said Playing,_Preset_2_EMBERS
 tap PLAY
 wait 100
 said Stop
+# your banks by number (Evan, 2026-11-13): bank 1, a scene stored on its first key, "1.1" said as bank and key
+press SEL
+tapkey w8
+release SEL
+wait 100
+said BANK_1
+press SAVE
+tapkey w0
+release SAVE
+wait 100
+said SCENE_bank_1_key_1_STORED

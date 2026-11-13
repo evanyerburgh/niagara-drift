@@ -220,10 +220,10 @@ def pair_output(name, outs):
 
 
 # -------------------------------------------------------- backup / restore ---
-# Niagara Drift's stored objects (firmware/src/app/main_fm1.c, backup_cmd): the sound and bank A, the panel
-# calibration, banks B and C (and D, E, F since 0.3's eight banks), read and written as they lie on the flash.
-OBJECTS = {0: "sound and bank A", 1: "panel", 2: "bank B", 3: "bank C", 4: "presets saved over",
-           5: "bank D", 6: "bank E", 7: "bank F"}
+# Niagara Drift's stored objects (firmware/src/app/main_fm1.c, backup_cmd): the sound and bank 1, the panel
+# calibration, banks 2 and 3 (and 4, 5, 6 since 0.3's eight banks), read and written as they lie on the flash.
+OBJECTS = {0: "sound and bank 1", 1: "panel", 2: "bank 2", 3: "bank 3", 4: "presets saved over",
+           5: "bank 4", 6: "bank 5", 7: "bank 6"}
 OPTIONAL = {4, 5, 6, 7}            # firmware older than the Presets bank (v0.2) has no 4, older than 0.3's eight banks
                                    # no 5-7: none to keep from it, and an empty one isn't restored to it
 UNIT = {1}                         # the panel's calibration belongs to the unit: never in a backup, never restored

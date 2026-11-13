@@ -43,7 +43,7 @@ The FM-1's knobs and buttons, and the screen header at the top of the screen.
 | Side | What it shows |
 |---|---|
 | **Left** | The page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT |
-| **Right** | The sound: its bank and key ("A5", "P6 SEANCE"), "changed" once you've moved it |
+| **Right** | The sound: its bank and key ("3.5", "P6 SEANCE"), "changed" once you've moved it |
 
 ## Good to know
 

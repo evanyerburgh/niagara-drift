@@ -100,7 +100,7 @@ static void lk_page_name(int v, char *name)
 }
 
 /* the sound at the right: the scene it came from (bank << 4 | key; -1 none), and whether a hand has moved it since
- * (the spec: "A5 changed"). A bank picked (SEL + D5-G5) leaves the sound as it was: not a change */
+ * (the spec: "1.5 changed"). A bank picked (SEL + D5-G5) leaves the sound as it was: not a change */
 static int16_t lk_at = -1;
 static uint8_t lk_chg;
 static void lk_sound_at(void)
@@ -152,6 +152,8 @@ static struct {
     int8_t on, to, back;
     uint8_t bank;
 } lk_gl;
+#define LK_BAR_GAP 11                         /* the header: the least room between its left and right (11, not 12: "1.1
+                                                * changed" beside DRONES and [PLAY], 2026-11-13) */
 static int lk_glide(uint32_t now, float *line, int *bank)
 {
     if (ui.press >= 0) {                       /* a scene key held: the blend follows the finger */
@@ -168,7 +170,7 @@ static int lk_glide(uint32_t now, float *line, int *bank)
         lk_gl.to = (int8_t)(ui.morph == VISIT_BACK ? (ui.scene_at >= 0 ? ui.scene_at : -2) : ui.morph);
         lk_gl.bank = proj.bank;
         /* a scene key let go part way: the sound goes back, so the line it filled empties, still naming that scene
-         * (Evan, 2026-11-08: filling a new line to "→ A5" looked as if the change went on) */
+         * (Evan, 2026-11-08: filling a new line to "→ 1.5" looked as if the change went on) */
         lk_gl.back = (int8_t)(ui.morph == VISIT_BACK && ui.visit <= -2 && -2 - ui.visit < NPLAY);
         if (lk_gl.back) {
             lk_gl.to = (int8_t)(-2 - ui.visit);
@@ -210,7 +212,7 @@ static void lk_bar(void)
     const int peek = ui.hold_btn >= 0 && !ui.hold_cycle && (ui.hold_turned || now - ui.hold_t >= HOLD_MS);
     float line = -1.0f;                      /* the line under the header, 0..1 (a glide's or the fade's), or none */
     uint32_t h;
-    char name[20], half[6] = "", rec[12] = "REC ", gname[20], key[8] = "", back[28] = "let go: ";
+    char name[20], half[6] = "", rec[12] = "REC ", gname[20], key[10] = "", back[28] = "let go: ";
     const char *badge[6], *sound = 0, *state, *st_short, *chg = 0;
     uint16_t bcol[6], st_col = LK_LABEL, name_col = LK_WHITE, key_col = LK_LABEL;
     int nb = 0, swell = -1, gb = -1, glen = 0, show_half, show_chg, show_name;
@@ -300,7 +302,7 @@ static void lk_bar(void)
             chg = "changed";
     }
     if (glide != -1) {                         /* on its way: where to, in the sound's place, gold ("→ P3 EERIE",
-                                                * "→ A5", "→ back"; Evan, 2026-11-07: one place, no banner) */
+                                                * "→ 1.5", "→ back"; Evan, 2026-11-07: one place, no banner) */
         char *q = scopy(key, "\\ ");
         if (glide == -2)
             scopy(q, "back");
@@ -365,7 +367,7 @@ static void lk_bar(void)
         }
         if (key[0] && drop < 6)
             rx -= gap + text_w(&LK_F_TAG, key);
-        if (rx >= x + 12)
+        if (rx >= x + LK_BAR_GAP)
             break;
     }
     show_half = drop < 2;
@@ -397,15 +399,15 @@ static void lk_bar(void)
             rx -= gap + text_w(&LK_F_TAG, key);
             gap = 6;
         }
-        if (chg && !show_chg && rx - 6 - text_w(&LK_F_TAG, chg) >= x + 12) {
+        if (chg && !show_chg && rx - 6 - text_w(&LK_F_TAG, chg) >= x + LK_BAR_GAP) {
             show_chg = 1;
             rx -= 6 + text_w(&LK_F_TAG, chg);
         }
-        if (half[0] && !peek && !show_half && rx >= x + 4 + text_w(&LK_F_HALF, half) + 12) {
+        if (half[0] && !peek && !show_half && rx >= x + 4 + text_w(&LK_F_HALF, half) + LK_BAR_GAP) {
             show_half = 1;
             x += 4 + text_w(&LK_F_HALF, half);
         }
-        if (sound && !show_name && rx - 6 - text_w(&LK_F_SOUND, sound) >= x + 12)
+        if (sound && !show_name && rx - 6 - text_w(&LK_F_SOUND, sound) >= x + LK_BAR_GAP)
             show_name = 1;
     }
     cv_begin(240, LK_BAR_H, LK_BG);
@@ -2770,7 +2772,7 @@ static void lk_values(void)
 /* the keyboard in the picture's place (the board 321:284): the white keys dark, each black key lit in its group's
  * color when on (drone I amber, the global two neutral, drone II cyan, the links green; on the LFO pages the LFO's
  * routing), the groups named above a bracket each, the one touched outlined in white with a mark under it; the top
- * four whites the banks (A B C P), the one playing in gold. In the values' place the key touched, its group and
+ * four whites the banks (1 2 3 P), the one playing in gold. In the values' place the key touched, its group and
  * setting ("LINKS · [D#5]", "HARD SYNC ON"); none yet, how to ask. The header "KEYS [SEL] held" */
 typedef struct {
     uint8_t k0, n;
@@ -2829,7 +2831,7 @@ static void lk_keymap(void)
     for (i = 0; i < 16; i++)                   /* the white keys, 15 px each, as outlines on the ground (Evan, 2026-11-07:
                                                 * the filled slate keyboard was the one big flat fill on any screen) */
         lk_box(i * 15, LK_KEY_Y, 14, LK_KEY_WH, LK_WHITE_KEY);
-    {                                          /* G4-G5 with SEL: the banks, in a row (A .. F, the Presets' two) */
+    {                                          /* G4-G5 with SEL: the banks, in a row (1 .. 6, the Presets' two) */
         const int32_t base = LK_KEY_Y + 87;
         cv_text(NPLAY * 15 - 4 - text_w(&LK_F_SMALL, "banks"), base - LK_B(LK_F_SMALL), &LK_F_SMALL, "banks", LK_LABEL);
         for (i = 0; i < 8; i++) {

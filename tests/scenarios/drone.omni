@@ -18,7 +18,7 @@ expect par74 0
 # Pages: 0 Drones 1 Pitch 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO sends 7 Mods 8 Partner 9 Pitch moves
 # 10 Setup 1 11 Setup 2 12 Swell 13 Space 14 Details. "page V" goes to page V at once, in no time: since v0.3 moved
 # the knobs, the script turns each on its new page and comes back, its timing (and its sound) as before.
-# a new FM-1 plays the Presets; these scenes go in bank A (SEL + G4)
+# a new FM-1 plays the Presets; these scenes go in bank 1 (SEL + G4)
 expect bank 3
 press SEL
 tapkey w8
@@ -653,7 +653,7 @@ expect scene_at -1
 tapkey w0
 wait 1500
 expect par7 650
-# banks: SEL + one of the eight gesture keys (G4 .. G5: A B C D E F, the Presets' two) picks the bank; keys 1-8 play it
+# banks: SEL + one of the eight gesture keys (G4 .. G5: 1 2 3 4 5 6, the Presets' two) picks the bank; keys 1-8 play it
 expect bank 0
 press SEL
 tapkey w9
@@ -727,7 +727,7 @@ expect par0 5000
 # (P5 Abyss puts drone II on B2, 4700: locked, it stays on P1's A3)
 expect par21 5700
 tapkey b3
-# back to A; bank B's scene survives a reboot
+# back to 1; bank 2's scene survives a reboot
 press SEL
 tapkey w8
 release SEL

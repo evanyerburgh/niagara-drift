@@ -48,7 +48,7 @@ Hold [[SEL]] and tap [[G5]] for this bank, then tap white keys 1–8.
 
 - **Pitch lock** ([[C#4]]) is on when a new FM-1 starts: the presets keep the pitch you're on. Turn it off to hear
   each at its own notes and Tuning.
-- **They're fixed:** to keep your changes, save them in a bank of your own, A to F
+- **They're fixed:** to keep your changes, save them in a bank of your own, 1 to 6
   ([recipe](../recipes/scenes.md#save)).
 - **Most are rooted on D,** so moving between them keeps the root.
 - **Their loudest moments match P1's;** Bare is quieter on purpose.
