@@ -2030,10 +2030,12 @@ static void input(void)
         mtime_turn(e);
     for (i = 0; i < 4; i++)
         if ((e = plat_enc(EN_K1 + (int)i)) != 0) {
+            const int kp = knob_param((int)i);
             knob_turn((int)i, e);
             if (ui.btn >> B_SEL & 1u)
                 ui.btn_used |= 1u << B_SEL;            /* SEL + a knob: SEL used (no map after it) */
-            ui.scene_at = -1;                          /* the sound is no longer the scene's */
+            if (kp < 0 || !scene_room(kp))             /* the sound is no longer the scene's; a room setting (Fade, */
+                ui.scene_at = -1;                      /* Stereo ...) isn't the sound's: no "changed" (the 0.3 review) */
             ui.morph = -1;                             /* a hand on a knob: the morph stops where it is */
             ui.visit = -1;                             /* ... and a visit held becomes a stay (no way back) */
             ui.press = -1;                             /* ... a crossfade too, where it is */
