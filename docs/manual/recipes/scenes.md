@@ -1,13 +1,13 @@
 ---
 title: Scenes and saving
 intro: Keep a sound, move between sounds, and get back to where you were
-description: Recipes for Niagara Drift's 48 scenes: make a Preset your own, blend between two sounds by pressure, undo a scene change.
+description: Recipes for Niagara Drift's 48 scenes: make a preset your own, blend between two sounds by pressure, undo a scene change.
 image: s-blend-0.png
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-The 8 white keys are scenes: 6 banks of 8 (A to F) to fill with your own sounds, and the Presets.
+The 8 white keys are scenes: 6 banks of 8 (A to F) to fill with your own sounds, and the presets.
 
 ### Make a preset your own {#save}
 

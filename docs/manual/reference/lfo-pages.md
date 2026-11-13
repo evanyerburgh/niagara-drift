@@ -25,8 +25,8 @@ Where the LFO goes, and what else it moves.
 
 | Knob | What it does |
 |---|---|
-| **Pitch send** | how far the LFO moves the drone's pitch, or its X-Wave instead ([[G#3]], [[G#4]] on the LFO pages) |
-| **Cutoff send** | how far the LFO moves the drone's cutoff, or its resonance instead ([[C#4]], [[C#5]] on the LFO pages) |
+| **Pitch send** | How far the LFO moves the drone's pitch, or its X-Wave instead ([[G#3]], [[G#4]] on the LFO pages) |
+| **Cutoff send** | How far the LFO moves the drone's cutoff, or its resonance instead ([[C#4]], [[C#5]] on the LFO pages) |
 
 ### How a send works
 
@@ -48,14 +48,14 @@ On the LFO pages, each drone's four black keys pick the LFO for each send and wh
 
 | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|
-| speed mod | source (LFO) | delay mod | cross-mod |
+| Speed mod | Source (LFO) | Delay mod | Cross-mod |
 
 | Knob | What it does |
 |---|---|
-| **Speed mod** | the LFO speeds up and slows down on one of its own waves, up to 3 octaves either way |
-| **Source** | which LFO moves the speed: I, II or both |
-| **Delay mod** | how far the LFO wobbles the delay's time, up to ±25% |
-| **Cross-mod** | how deep cross-mod goes, in the mode [[F#5]] picks: I moves II's cutoff, bend each other (cross-FM) or Snarl |
+| **Speed mod** | The LFO speeds up and slows down on one of its own waves, up to 3 octaves either way |
+| **Source** | Which LFO moves the speed: I, II or both |
+| **Delay mod** | How far the LFO wobbles the delay's time, up to ±25% |
+| **Cross-mod** | How deep cross-mod goes, in the mode [[F#5]] picks: I moves II's cutoff, bend each other (cross-FM) or Snarl |
 
 ### How the Mods work
 

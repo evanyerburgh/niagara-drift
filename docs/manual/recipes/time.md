@@ -41,7 +41,7 @@ Three times on **Setup 1** ([[GLO]]): Fade (KNOB 1), Morph (KNOB 2) and Scene ti
 
 - 0:00 P1 Niagara, Scene time 8 s
 - 0:01 P5 Abyss tapped: a slow glide
-- 0:04 a knob turned: the glide stops there
+- 0:04 A knob turned: the glide stops there
 
 ### Make a switch move slowly {#morph}
 
@@ -57,7 +57,7 @@ Three times on **Setup 1** ([[GLO]]): Fade (KNOB 1), Morph (KNOB 2) and Scene ti
 - 0:00 P3 Vespers, Morph 0.02 s
 - 0:01 [[A#3]] tapped: thin and bright, at once
 - 0:04 Morph 8 s, tapped again: the body comes back slowly
-- 0:12 again: it thins as slowly
+- 0:12 Again: it thins as slowly
 
 ### Fade in slowly, or fade one drone out {#fades}
 

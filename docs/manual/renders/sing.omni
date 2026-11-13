@@ -24,7 +24,7 @@ wav sing.wav
 # @ P15 Falling, both resonances up (Pitch) and both cutoffs opened (Drones): the filters ring on the drones' notes
 wait 1500
 tap LFO
-# @ keys 4 and 9 on the LFO pages move the filter LFOs to resonance: the ring swells and fades
+# @ Keys 4 and 9 on the LFO pages move the filter LFOs to resonance: the ring swells and fades
 tapkey b3
 tapkey b8
 turn K2 40 60

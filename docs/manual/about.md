@@ -63,11 +63,11 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 | | |
 |---|---|
 | **Audio** | 44.1 kHz stereo; 32-bit floating point inside, 24-bit out; a block every 5.8 ms |
-| **Oscillators** | virtual analog, 4 shapes blended continuously (sine, triangle, saw, square) with pulse width; saw and pulse band-limited (polyBLEP); hard sync; cross-FM |
-| **Partner** | a second oscillator on each drone: an octave or a fifth or fourth below, unison, a third, fourth or fifth above, an octave, or an octave and a fifth; each tempered or just (pure, beatless); detune up to 30 cents for slow beating |
-| **Sub and noise** | a sub of 4 waves (square, sine, triangle, saw), 1–4 octaves down or the subharmonics ⅓ and ⅕; under a low drone the lowest become ticks and pulses ([recipe](recipes/sounds.md#ticks)); noise from white to pink |
-| **Filter** | a state-variable filter (zero-delay feedback, after Andrew Simper): low-, band- or high-pass, resonant to self-oscillation; an antialiased drive |
-| **Effects** | a delay of 70 ms to 1.46 s in six types, from clean to tape; a drive between the delay and the reverb; a reverb of eight lines, 0.3 to 40 s or a freeze, in five types ([Space and Details](reference/space.md)) |
+| **Oscillators** | Virtual analog, 4 shapes blended continuously (sine, triangle, saw, square) with pulse width; saw and pulse band-limited (polyBLEP); hard sync; cross-FM |
+| **Partner** | A second oscillator on each drone: an octave or a fifth or fourth below, unison, a third, fourth or fifth above, an octave, or an octave and a fifth; each tempered or just (pure, beatless); detune up to 30 cents for slow beating |
+| **Sub and noise** | A sub of 4 waves (square, sine, triangle, saw), 1–4 octaves down or the subharmonics ⅓ and ⅕; under a low drone the lowest become ticks and pulses ([recipe](recipes/sounds.md#ticks)); noise from white to pink |
+| **Filter** | A state-variable filter (zero-delay feedback, after Andrew Simper): low-, band- or high-pass, resonant to self-oscillation; an antialiased drive |
+| **Effects** | A delay of 70 ms to 1.46 s in six types, from clean to tape; a drive between the delay and the reverb; a reverb of eight lines, 0.3 to 40 s or a freeze, in five types ([Space and Details](reference/space.md)) |
 
 ### Movement and tuning
 
@@ -75,20 +75,20 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 |---|---|
 | **LFO** | 2 waves of 10 shapes each (20 in all: triangles, squares, saws, exponentials, patterns, random, AND and OR steps), one cycle in 100 s to 70 Hz, on pitch, wave, cutoff, resonance and the delay |
 | **Tuning** | A from 427 to 453 Hz (440 to start, 432 for those who like it), 1 Hz a click or 0.1 with SEL; 12-tone, quarter tones, 19-, 31- and 53-tone, just, the harmonics, LMY, Harrison, the shrutis, Partch |
-| **Detuning** | each drone a cent at a time off its Tuning's notes (SEL + a pitch knob), kept as you move between notes; each partner up to 30 cents, for beating; Drift lets the detune wander |
+| **Detuning** | Each drone a cent at a time off its Tuning's notes (SEL + a pitch knob), kept as you move between notes; each partner up to 30 cents, for beating; Drift lets the detune wander |
 
 ### Playing and connecting
 
 | | |
 |---|---|
-| **Polyphonic aftertouch** | the scene keys' and keys 9–12's own pressure, read as they're held: scenes crossfade and the pressure gestures follow it; the touch is a setting (Setup 2); sent out over USB too ([MIDI in](reference/midi.md#good-to-know)) |
-| **MIDI** | in, over USB and TRS: notes on channels 1 and 2 tune the drones; the clock (24 pulses a beat) and Start, with Sync on or off ([MIDI in](reference/midi.md)) |
+| **Polyphonic aftertouch** | The scene keys' and keys 9–12's own pressure, read as they're held: scenes crossfade and the pressure gestures follow it; the touch is a setting (Setup 2); sent out over USB too ([MIDI in](reference/midi.md#good-to-know)) |
+| **MIDI** | In, over USB and TRS: notes on channels 1 and 2 tune the drones; the clock (24 pulses a beat) and Start, with Sync on or off ([MIDI in](reference/midi.md)) |
 
 ### Storage and license
 
 | | |
 |---|---|
-| **Storage** | 6 banks of 8 scenes and 16 Presets in the FM-1's flash; backups to a file before every install; a restore that a power cut can't break ([Help](help.md)) |
+| **Storage** | 6 banks of 8 scenes and 16 presets in the FM-1's flash; backups to a file before every install; a restore that a power cut can't break ([Help](help.md)) |
 | **License** | GPL-3.0, source on [GitHub](https://github.com/evanyerburgh/niagara-drift) |
 
 ## Where it came from
@@ -98,13 +98,13 @@ in the Stylophone CPM DS-2, the Moog Subharmonicon and the Soma Lyra-8, and has 
 
 | From | By | What it gave |
 |---|---|---|
-| [FoMni](https://github.com/charlesvestal/fm1-fomni) and [X0X](https://github.com/charlesvestal/fm1-x0x) | Charles Vestal | the code it started from, the host simulator, the browser emulator |
-| [Felucca](https://github.com/hugelton/Felucca) | Leo Kuroshita, Hügelton Instruments | the FM-1 platform: hardware layer, USB, update loader, storage, installer |
-| [MONK-1](https://github.com/charlesvestal/fm1-monk) | Charles Vestal | reading the keys' pressure |
-| [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) | Quixotic7 | the delay and reverb's design; the scene crossfade and backup-before-install ideas |
-| [fm1-base](https://github.com/charlesvestal/fm1-base) | Charles Vestal | the safe restore's flash core (MPL-2.0) |
-| [FM-1 Screen Reader](https://github.com/charlesvestal/fm1-reader) | Charles Vestal | the screen's words over USB and the page that speaks them (its firmware side from fm1-base, MPL-2.0); thanks to João Durães (WoodJack) for asking for it |
-| [Groove OS](https://www.groove-os.com/) | | the idea of running FM-1 firmware in a browser |
+| [FoMni](https://github.com/charlesvestal/fm1-fomni) and [X0X](https://github.com/charlesvestal/fm1-x0x) | Charles Vestal | The code it started from, the host simulator, the browser emulator |
+| [Felucca](https://github.com/hugelton/Felucca) | Leo Kuroshita, Hügelton Instruments | The FM-1 platform: hardware layer, USB, update loader, storage, installer |
+| [MONK-1](https://github.com/charlesvestal/fm1-monk) | Charles Vestal | Reading the keys' pressure |
+| [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) | Quixotic7 | The delay and reverb's design; the scene crossfade and backup-before-install ideas |
+| [fm1-base](https://github.com/charlesvestal/fm1-base) | Charles Vestal | The safe restore's flash core (MPL-2.0) |
+| [FM-1 Screen Reader](https://github.com/charlesvestal/fm1-reader) | Charles Vestal | The screen's words over USB and the page that speaks them (its firmware side from fm1-base, MPL-2.0); thanks to João Durães (WoodJack) for asking for it |
+| [Groove OS](https://www.groove-os.com/) | | The idea of running FM-1 firmware in a browser |
 
 Made by Evan Yerburgh; not made or endorsed by M-VAVE, Hügelton Instruments or the makers of any instrument it began
 from. Licenses in [LICENSING.md](../../LICENSING.md). The site is set in Inter Tight, IBM Plex Mono and Barlow Semi

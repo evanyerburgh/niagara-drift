@@ -21,7 +21,7 @@ tapkey b1
 tapkey b1
 tapkey b1
 tapkey b1
-# @ drone I's sub at -4 oct, Osc/Sb all the way to it: a fast flutter, about 18 a second
+# @ Drone I's sub at -4 oct, Osc/Sb all the way to it: a fast flutter, about 18 a second
 turn K1 85 15
 wait 1500
 # @ Drive up: each tick gets a harder edge
@@ -30,11 +30,11 @@ shot ticks-0.png
 wait 1000
 tap HOME
 tap HOME
-# @ drone I's pitch swept down, a semitone every quarter second: the flutter slows into ticks
+# @ Drone I's pitch swept down, a semitone every quarter second: the flutter slows into ticks
 turn K1 -29 250
-# @ past A0, into Hz: single clicks, slower and slower
+# @ Past A0, into Hz: single clicks, slower and slower
 turn K1 -31 250
 shot ticks-1.png
-# @ at 4.6 Hz: a click every second or two
+# @ At 4.6 Hz: a click every second or two
 wait 4000
 wavstop

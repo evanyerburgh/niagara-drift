@@ -17,7 +17,7 @@ A tremolo on both drones, from a slow breath to a hard gate, on its own or in ti
 
 | Page | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|
-| Swell | rate (on a MIDI clock: division) | depth | shape | swing |
+| Swell | Rate (on a MIDI clock: division) | Depth | Shape | Swing |
 
 ## Controls
 
@@ -27,10 +27,10 @@ On the page, tap [[ARP]] to start or stop it.
 
 | Knob | What it does |
 |---|---|
-| **Rate** | how fast it breathes. On a MIDI clock it's **Division**: 32 bars to a quarter note |
-| **Depth** | how far it dips, down to −30 dB; all the way, silence |
+| **Rate** | How fast it breathes. On a MIDI clock it's **Division**: 32 bars to a quarter note |
+| **Depth** | How far it dips, down to −30 dB; all the way, silence |
 | **Shape** | **Even** (a smooth breath) in the middle; a **ramp** to the right; a **pulse**, then a hard **gate**, to the left |
-| **Swing** | every other breath longer, up to 3 to 1 |
+| **Swing** | Every other breath longer, up to 3 to 1 |
 
 ## Good to know
 

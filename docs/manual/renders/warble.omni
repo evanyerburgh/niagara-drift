@@ -28,7 +28,7 @@ shot warble-0.png
 tap FX
 tap FX
 expect view 14
-# @ a longer Time (Details): deeper, slower bends
+# @ A longer Time (Details): deeper, slower bends
 turn K2 15 60
 wait 6000
 shot warble-1.png

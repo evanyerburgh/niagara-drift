@@ -20,17 +20,17 @@ wait 500
 wav sync.wav
 # @ P5 Abyss, drone II opened and brought forward (its resonance LFO off)
 wait 1500
-# @ hard sync on: drone II locked to drone I, a harder, buzzier edge
+# @ Hard sync on: drone II locked to drone I, a harder, buzzier edge
 tapkey b9
 wait 2000
 shot sync-0.png
-# @ drone II's pitch turned slowly up two octaves: under the sync its tone tears upward, a vocal, laser-like sweep
+# @ Drone II's pitch turned slowly up two octaves: under the sync its tone tears upward, a vocal, laser-like sweep
 turn K3 24 250
 wait 500
 shot sync-1.png
-# @ and back down: the sweep falls
+# @ And back down: the sweep falls
 turn K3 -24 250
-# @ up again, faster
+# @ Up again, faster
 turn K3 24 120
 wait 1500
 wavstop

@@ -18,7 +18,7 @@ press SEL
 tap PLAY
 release SEL
 wait 3500
-# @ drone II retuned in the silence (Pitch, KNOB 3)
+# @ Drone II retuned in the silence (Pitch, KNOB 3)
 tap HOME
 expect view 1
 turn K3 -8 150

@@ -25,8 +25,8 @@ Each drone's waveform, its sub-oscillator and its drive.
 
 | Knob | What it does |
 |---|---|
-| **X-Wave** | blends sine → triangle → saw → square |
-| **Width** | the square's pulse width |
+| **X-Wave** | Blends sine → triangle → saw → square |
+| **Width** | The square's pulse width |
 
 ## Sub · Drive
 
@@ -38,9 +38,9 @@ Each drone's waveform, its sub-oscillator and its drive.
 
 | Knob | What it does |
 |---|---|
-| **Osc/Sub** | crossfades the oscillator with the sub (the knob reads "Osc/Sb") |
-| **Sub wave** | hold [[SEL]] and turn Osc/Sub: Square, Sine, Triangle or Saw |
-| **Drive** | pushes the drone into its filter |
+| **Osc/Sub** | Crossfades the oscillator with the sub (the knob reads "Osc/Sb") |
+| **Sub wave** | Hold [[SEL]] and turn Osc/Sub: Square, Sine, Triangle or Saw |
+| **Drive** | Pushes the drone into its filter |
 
 ### Sub octave
 

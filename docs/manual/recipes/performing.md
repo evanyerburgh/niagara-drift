@@ -69,4 +69,4 @@ image: p-retune-1.png
 **Listen** (`p-clock`)
 
 - 0:00 P10 Cistern, a clock at 80 BPM: a breath a beat
-- 0:05 the clock at 140 BPM: faster
+- 0:05 The clock at 140 BPM: faster

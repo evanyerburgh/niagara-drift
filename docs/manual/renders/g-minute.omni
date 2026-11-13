@@ -15,7 +15,7 @@ turn PRESET -40 30
 wav g-minute.wav
 # @ P12 Ashram, Gesture time slow
 wait 1500
-# @ tap Weight (D5): it comes in on its own, slowly, no key held
+# @ Tap Weight (D5): it comes in on its own, slowly, no key held
 tapkey w12
 wait 12000
 shot g-minute-0.png

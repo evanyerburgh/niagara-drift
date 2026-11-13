@@ -20,8 +20,8 @@ When something doesn't work: pick what's happening.
 
 | To | Do |
 |---|---|
-| **Install** | open the [web installer](https://evanyerburgh.github.io/niagara-drift/install/) in Chrome or Edge, with a USB data cable straight into the computer |
-| **Update** | run the installer again. Your sounds and scenes are kept, unless that version's notes in the [changelog](../../CHANGELOG.md) say otherwise |
+| **Install** | Open the [web installer](https://evanyerburgh.github.io/niagara-drift/install/) in Chrome or Edge, with a USB data cable straight into the computer |
+| **Update** | Run the installer again. Your sounds and scenes are kept, unless that version's notes in the [changelog](../../CHANGELOG.md) say otherwise |
 
 Installing firmware is at your own risk.
 
@@ -47,19 +47,19 @@ Nothing is written until the FM-1 has checked the whole package, so trying again
 |---|---|
 | **Drone II went quiet,** [the header](reference/controls.md#screen-header) says II OUT | [[SEL]] + [[PLAY]] brings it back |
 | **You want the sound before a scene** | [[SEL]] + [[SAVE]] goes back; again goes forward |
-| **Drone II keeps jumping to other notes** | that's Wander: turn it to 0 on Pitch moves ([[SEQ]] twice, KNOB 3) |
-| **A knob's value is gray** | it can't be heard as things are; the screen says why ("needs sqr", "needs [[F#3]]", Movement at 0%) |
-| **The low end is missing on the speaker** | it can't play the lowest notes and clicks: listen on headphones |
-| **A Preset doesn't play at its own pitch** | Pitch lock ([[C#4]]) keeps the pitch you're on: turn it off |
+| **Drone II keeps jumping to other notes** | That's Wander: turn it to 0 on Pitch moves ([[SEQ]] twice, KNOB 3) |
+| **A knob's value is gray** | It can't be heard as things are; the screen says why ("needs sqr", "needs [[F#3]]", Movement at 0%) |
+| **The low end is missing on the speaker** | It can't play the lowest notes and clicks: listen on headphones |
+| **A preset doesn't play at its own pitch** | Pitch lock ([[C#4]]) keeps the pitch you're on: turn it off |
 
 ## Backups
 
 | When | What happens |
 |---|---|
-| **Before every install** over Niagara Drift | both installers save your sounds, scenes and settings to a file: the web installer into your downloads (and it offers to put them back), the terminal one into `~/niagara-drift-backups/` |
-| **Any time** | the web installer's "Your sounds and scenes" card saves or restores one, as `python3 tools/fm1_install.py --backup` and `--restore FILE` do; each reads the other's files |
-| **Trying another firmware** | back up first, restore when you come back |
-| **Onto another FM-1** | a backup leaves out the knobs' calibration, which belongs to each FM-1, so it can go onto another |
+| **Before every install** over Niagara Drift | Both installers save your sounds, scenes and settings to a file: the web installer into your downloads (and it offers to put them back), the terminal one into `~/niagara-drift-backups/` |
+| **Any time** | The web installer's "Your sounds and scenes" card saves or restores one, as `python3 tools/fm1_install.py --backup` and `--restore FILE` do; each reads the other's files |
+| **Trying another firmware** | Back up first, restore when you come back |
+| **Onto another FM-1** | A backup leaves out the knobs' calibration, which belongs to each FM-1, so it can go onto another |
 
 ### Restoring is safe
 
@@ -76,8 +76,8 @@ Nothing is written until the FM-1 has checked the whole package, so trying again
 
 | To | Do |
 |---|---|
-| **M-VAVE's firmware** | the installer's "Back to M-VAVE's firmware" writes V16 or V15 back over the same cable; or use M-VAVE's updater, M-UPGRADE, from [m-vave.com/download](https://www.m-vave.com/download) |
-| **Another firmware** | most expect M-VAVE's: go back first, then install them |
+| **M-VAVE's firmware** | The installer's "Back to M-VAVE's firmware" writes V16 or V15 back over the same cable; or use M-VAVE's updater, M-UPGRADE, from [m-vave.com/download](https://www.m-vave.com/download) |
+| **Another firmware** | Most expect M-VAVE's: go back first, then install them |
 
 > **Safe mode.** If Niagara Drift fails to start twice in a row, it comes up with no sound and USB on, and the
 > installer still works.

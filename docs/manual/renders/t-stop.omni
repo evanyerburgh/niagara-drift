@@ -14,7 +14,7 @@ wav t-stop.wav
 wait 1000
 tapkey w4
 wait 3500
-# @ a knob turned part way: the glide stops where it is, a sound between the two
+# @ A knob turned part way: the glide stops where it is, a sound between the two
 turn K2 1 60
 wait 600
 shot t-stop-0.png

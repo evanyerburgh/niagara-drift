@@ -26,7 +26,7 @@ turn K2 15 60
 turn K4 40 60
 turn SELECT 40 50
 wait 4000
-# @ hold key 5: the LFO locked to the Swell, so each jump lands on its breath
+# @ Hold key 5: the LFO locked to the Swell, so each jump lands on its breath
 key b4 down
 wait 700
 key b4 up

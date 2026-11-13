@@ -19,7 +19,7 @@ wait 4000
 key w15 down
 wait 5000
 shot g-stack-0.png
-# @ let go of both: Wash leaves slowly, Snarl at once
+# @ Let go of both: Wash leaves slowly, Snarl at once
 key w10 up
 key w15 up
 wait 5000

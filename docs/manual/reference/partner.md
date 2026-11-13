@@ -25,8 +25,8 @@ A second oscillator for each drone, and how the drones' pitches move: Shift, gli
 
 | Knob | What it does |
 |---|---|
-| **Interval** | from an octave below to an octave and a fifth above, each tempered or **just** (a pure ratio that doesn't beat) |
-| **Detune** | up to 30 cents, so the two beat |
+| **Interval** | From an octave below to an octave and a fifth above, each tempered or **just** (a pure ratio that doesn't beat) |
+| **Detune** | Up to 30 cents, so the two beat |
 
 ### On and off
 
@@ -40,14 +40,14 @@ A black key switches each partner: [[F#3]] for drone I, [[F#4]] for drone II.
 
 | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|
-| Shift's move | pitch glide | II wander | scale |
+| Shift's move | Pitch glide | II wander | Scale |
 
 | Knob | What it does |
 |---|---|
-| **Shift's move** | where the Shift gesture ([[E5]]) takes the drones: a fifth down to a fifth up |
-| **Pitch glide** | how long a drone takes to reach a new pitch: up to 10 s |
-| **Wander** | a slow random melody for drone II on the Scale. The knob is how often; 0 is off |
-| **Scale** | for Wander and the Chord gesture: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just |
+| **Shift's move** | Where the Shift gesture ([[E5]]) takes the drones: a fifth down to a fifth up |
+| **Pitch glide** | How long a drone takes to reach a new pitch: up to 10 s |
+| **Wander** | A slow random melody for drone II on the Scale. The knob is how often; 0 is off |
+| **Scale** | For Wander and the Chord gesture: minor pentatonic, major pentatonic, fifths and octaves, whole tone, Dorian, or just |
 
 ## Good to know
 

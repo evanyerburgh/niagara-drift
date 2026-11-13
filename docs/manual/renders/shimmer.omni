@@ -21,7 +21,7 @@ wav shimmer.wav
 wait 1500
 tap FX
 expect view 14
-# @ the reverb's Type to Shimmer, Into Echoes (with SEL): over 8 seconds the echoes rise an octave into a halo
+# @ The reverb's Type to Shimmer, Into Echoes (with SEL): over 8 seconds the echoes rise an octave into a halo
 turn K4 2 300
 press SEL
 turn K4 1 300

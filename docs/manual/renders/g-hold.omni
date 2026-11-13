@@ -15,7 +15,7 @@ wait 1500
 key w15 down
 wait 4000
 shot g-hold-0.png
-# @ let go: it fades over 4 s
+# @ Let go: it fades over 4 s
 key w15 up
 wait 5000
 wavstop

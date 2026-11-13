@@ -34,11 +34,11 @@ pitch down and the flutter slows into ticks, then single clicks, a pulse to play
 **Listen** (`ticks`)
 
 - 0:00 P14 Tape as it starts: worn, a hum under it
-- 0:01 drone I's sub at −4 oct, all the way in: a fast flutter, about 18 a second
+- 0:01 Drone I's sub at −4 oct, all the way in: a fast flutter, about 18 a second
 - 0:04 Drive up: each tick gets a harder edge
-- 0:06 drone I's pitch swept down, a semitone every quarter second: the flutter slows into ticks
-- 0:13 past A0, into Hz: single clicks, slower and slower
-- 0:21 at 4.6 Hz: a click every second or two
+- 0:06 Drone I's pitch swept down, a semitone every quarter second: the flutter slows into ticks
+- 0:13 Past A0, into Hz: single clicks, slower and slower
+- 0:21 At 4.6 Hz: a click every second or two
 
 ### A singing filter {#sing}
 
@@ -63,7 +63,7 @@ and the ring swells and fades on its own.
 **Listen** (`sing`)
 
 - 0:00 P15 Falling, both resonances up and both cutoffs opened: the filters ring on the drones' notes
-- 0:01 the filter LFOs moved to resonance: the ring swells and fades, slowly, again and again
+- 0:01 The filter LFOs moved to resonance: the ring swells and fades, slowly, again and again
 
 
 ### Hard sync sweep {#sync}
@@ -89,10 +89,10 @@ not its note, a tearing, vocal, laser-like sweep.
 **Listen** (`sync`)
 
 - 0:00 P5 Abyss, drone II opened and brought forward
-- 0:01 hard sync on: a harder, buzzier edge
-- 0:03 drone II's pitch turned slowly up two octaves: its tone tears upward, a vocal, laser-like sweep
-- 0:10 and back down: the sweep falls
-- 0:16 up again, faster
+- 0:01 Hard sync on: a harder, buzzier edge
+- 0:03 Drone II's pitch turned slowly up two octaves: its tone tears upward, a vocal, laser-like sweep
+- 0:10 And back down: the sweep falls
+- 0:16 Up again, faster
 
 ## Cross-mod
 
@@ -116,9 +116,9 @@ buzzes and takes on drone I's pitch as a grain.
 **Listen** (`xfilter`)
 
 - 0:00 P3 Vespers as it starts: saws through band-pass filters
-- 0:01 key 11 once: drone I's sound moves drone II's filter: drone II growls and shimmers
+- 0:01 Key 11 once: drone I's sound moves drone II's filter: drone II growls and shimmers
 - 0:04 X-mod up: the growl deepens into a buzzing, vocal edge
-- 0:12 drone I's pitch moved: the growl changes its grain
+- 0:12 Drone I's pitch moved: the growl changes its grain
 
 ### Metallic bells {#bells}
 
@@ -150,10 +150,10 @@ bell struck every 2.5 s, ringing out.
 
 **Listen** (`bells`)
 
-- 0:00 two pure sines, high, a tritone apart
-- 0:01 bend each other, X-mod up: one metallic tone, but it never stops ringing
-- 0:07 the cutoffs down: the metal goes dull
-- 0:10 the cutoff sends at −100: a bell struck every 2.5 s, bright on the hit, then the top dies first
+- 0:00 Two pure sines, high, a tritone apart
+- 0:01 Bend each other, X-mod up: one metallic tone, but it never stops ringing
+- 0:07 The cutoffs down: the metal goes dull
+- 0:10 The cutoff sends at −100: a bell struck every 2.5 s, bright on the hit, then the top dies first
 
 ### Snarl {#snarl}
 
@@ -204,7 +204,7 @@ four notes, a figure that repeats. Wander then moves the whole figure to a new n
 
 **Listen** (`figure`)
 
-- 0:00 the figure stepping: drone II bright, round four notes on LFO II's OR 5
+- 0:00 The figure stepping: drone II bright, round four notes on LFO II's OR 5
 - 0:02 Wander up: every few seconds the whole figure moves to a new note
 
 ### A filter rhythm in time with Swell {#swell}
@@ -233,7 +233,7 @@ two filters in turn.
 
 - 0:00 P8 Sibyl, its delay off and its Swell quick: the drones breathe about once a second
 - 0:01 LFO I to Square on both cutoffs: the filters jump in turn
-- 0:11 the LFO locked to the Swell: each jump lands on its breath
+- 0:11 The LFO locked to the Swell: each jump lands on its breath
 
 ### LFO chasing itself {#chase}
 
@@ -287,7 +287,7 @@ it, and every echo warbles; let the Swell dip the drones, and the bending echoes
 
 - 0:00 P8 Sibyl with its echoes up and its Swell quick: the drones dip about once a second, the echoes ring in the gaps
 - 0:01 Delay all the way up: every echo bends in pitch, clearest in the gaps
-- 0:10 a longer Time: deeper, slower bends
+- 0:10 A longer Time: deeper, slower bends
 
 ### Crackling echoes {#crackle}
 
@@ -311,7 +311,7 @@ distorts the drones and their echoes together: ghost notes and crackle.
 
 - 0:00 P11 Piston as it starts
 - 0:01 Repeat up: the echoes pile up
-- 0:03 the delay to Self: its time stretching as the echoes get louder
+- 0:03 The delay to Self: its time stretching as the echoes get louder
 - 0:08 Drive up: the drones and their echoes distorted together, ghost notes and crackle
 
 ### Freeze a chord, play over it {#freeze}
@@ -335,8 +335,8 @@ play over the frozen chord.
 **Listen** (`freeze`)
 
 - 0:00 P10 Cistern as it starts
-- 0:01 reverb Mix up, then Length to the top: the chord freezes and holds
-- 0:08 new notes for both drones: they play over the frozen chord
+- 0:01 Reverb Mix up, then Length to the top: the chord freezes and holds
+- 0:08 New notes for both drones: they play over the frozen chord
 
 ### Shimmer on echoes {#shimmer}
 
@@ -360,4 +360,4 @@ octave stays low.
 **Listen** (`shimmer`)
 
 - 0:00 P15 Falling, sines in the middle (G3 and E4), with its echoes up
-- 0:01 the reverb to Shimmer, Into Echoes: over 8 seconds the echoes rise an octave into a halo
+- 0:01 The reverb to Shimmer, Into Echoes: over 8 seconds the echoes rise an octave into a halo

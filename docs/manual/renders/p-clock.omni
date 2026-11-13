@@ -21,7 +21,7 @@ wav p-clock.wav
 # @ P10 Cistern; a MIDI clock at 80 BPM, the Swell's Division at 1/4: a breath a beat
 wait 5000
 shot p-clock-0.png
-# @ the clock at 140 BPM: the Swell follows, faster
+# @ The clock at 140 BPM: the Swell follows, faster
 clock 140
 wait 6000
 shot p-clock-1.png

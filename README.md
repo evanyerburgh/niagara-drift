@@ -25,13 +25,13 @@ FX Space, Details · GLO Setup 1, 2.*
 
 ## What it does
 
-- **16 Presets** to start from, each a different side of the instrument and each moving over a minute: Niagara,
-  Embers, Vespers, Dreamhouse, Abyss, Seance, Sonar and Sibyl on keys 1–8 of the Presets bank; Howl, Cistern, Piston,
+- **16 presets** to start from, each a different side of the instrument and each moving over a minute: Niagara,
+  Embers, Vespers, Dreamhouse, Abyss, Seance, Sonar and Sibyl on keys 1–8 of the presets bank; Howl, Cistern, Piston,
   Ashram, Telegraph, Tape, Falling and Bare on keys 1–8 of the second.
 - **Eight gestures**, each several settings moving together on top of your sound: **Weight**, **Shift**, **Clean** and
   **Wash** on the top keys, in while you hold and out as slowly as you held; **Tick**, **Chord**, **Snarl** and
   **Stutter** on keys 9–12, as deep as you press. Tap any of them in to stay.
-- **Scenes**: 8 on the white keys in each of six banks (48 of yours), plus the Presets' two, recalled gliding over the
+- **Scenes**: 8 on the white keys in each of six banks (48 of yours), plus the presets' two, recalled gliding over the
   Scene time, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob moves, gestures and scenes.
 - **It moves on its own**: the LFO, the Swell, **Drift**, **Wander** (drone II's slow random melody on a scale) and
   **Age** (tape wear) keep it breathing without a hand on it.
@@ -76,7 +76,7 @@ kept, unless that version's notes in the [changelog](CHANGELOG.md) say otherwise
 
 ## Manual
 
-- [Start here](https://evanyerburgh.github.io/niagara-drift/#start-here): two ways in, from a Preset or from a bare saw,
+- [Start here](https://evanyerburgh.github.io/niagara-drift/#start-here): two ways in, from a preset or from a bare saw,
   on the site's front page
 - [Recipes](docs/manual/recipes/index.md): how to get a sound or a move, across the pages
 - [Reference](docs/manual/reference/index.md): every page, knob and key

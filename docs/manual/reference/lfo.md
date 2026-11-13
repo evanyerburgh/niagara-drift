@@ -52,7 +52,7 @@ LFO I's and LFO II's wave: tap for the next.
 |---|---|
 | **LFO sends:** all four | **Mods: Speed mod** |
 | **Mods: Delay mod** (the delay's wobble) | **Mods: Cross-mod** (that's sound, not the LFO) |
-| | the rate, the shapes, and where the waves go |
+| | The rate, the shapes, and where the waves go |
 
 ## Good to know
 

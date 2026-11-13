@@ -28,7 +28,7 @@ The keys for both:
 
 | Key | Switch | Choices |
 |---|---|---|
-| [[C#4]] | **Pitch lock** | scenes and Presets keep the drones' pitches (on to start) |
+| [[C#4]] | **Pitch lock** | scenes and presets keep the drones' pitches (on to start) |
 | [[D#4]] | **LFO reset** | restarts the LFO; hold to lock it to the Swell |
 | [[C#5]] | **Pitch link** | drone II follows drone I |
 | [[D#5]] | **Hard sync** | drone II to drone I |
@@ -44,17 +44,17 @@ Each drone's own keys:
 
 | Switch | Drone I | Drone II | Choices |
 |---|---|---|---|
-| **Pitch LFO** | [[F#3]] | [[F#4]] | which LFO moves the pitch: I, II or both |
-| **Pitch to X-Wave** | [[G#3]] | [[G#4]] | the pitch send moves X-Wave instead |
-| **Cutoff LFO** | [[A#3]] | [[A#4]] | which LFO moves the cutoff: I, II or both |
-| **Cutoff to reso** | [[C#4]] | [[C#5]] | the cutoff send moves resonance instead |
+| **Pitch LFO** | [[F#3]] | [[F#4]] | Which LFO moves the pitch: I, II or both |
+| **Pitch to X-Wave** | [[G#3]] | [[G#4]] | The pitch send moves X-Wave instead |
+| **Cutoff LFO** | [[A#3]] | [[A#4]] | Which LFO moves the cutoff: I, II or both |
+| **Cutoff to reso** | [[C#4]] | [[C#5]] | The cutoff send moves resonance instead |
 
 The others:
 
 | Key | Switch | Choices |
 |---|---|---|
-| [[D#5]] | **Delay LFO** | which LFO moves the delay's time: I, II or both |
-| [[D#4]] · [[F#5]] | **LFO reset**, **Cross-mod** | as on every other page |
+| [[D#5]] | **Delay LFO** | Which LFO moves the delay's time: I, II or both |
+| [[D#4]] · [[F#5]] | **LFO reset**, **Cross-mod** | As on every other page |
 
 ## Finding a key while you play
 

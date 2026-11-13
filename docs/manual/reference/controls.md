@@ -17,11 +17,11 @@ The FM-1's knobs and buttons, and the screen header at the top of the screen.
 
 | Knob | What it does |
 |---|---|
-| **MASTER** | the volume. Past about four-fifths it overdrives: thicker, at about the same loudness |
-| **SELECT** | the LFO's rate |
+| **MASTER** | The volume. Past about four-fifths it overdrives: thicker, at about the same loudness |
+| **SELECT** | The LFO's rate |
 | **ALGORITHM** | Movement: how much the LFO moves the sound |
 | **PRESETS** | Gesture time: how fast the gestures move |
-| **KNOB 1–4** | what the page shows. On the drone pages, KNOB 1–2 are drone I, KNOB 3–4 drone II |
+| **KNOB 1–4** | What the page shows. On the drone pages, KNOB 1–2 are drone I, KNOB 3–4 drone II |
 
 ## Buttons
 
@@ -30,10 +30,10 @@ The FM-1's knobs and buttons, and the screen header at the top of the screen.
 | Button | What it does |
 |---|---|
 | [[HOME]] [[FX]] [[ENV]] [[LFO]] [[EDIT]] [[SEQ]] [[GLO]] [[ARP]] | open a page; tap again for its next |
-| [[PLAY]] | fades the drones in or out |
-| [[SAVE]] | saves the sound |
-| [[SEL]] | hold for fine steps, and with other controls for their second job |
-| [[REC]] | records your moves, then loops them |
+| [[PLAY]] | Fades the drones in or out |
+| [[SAVE]] | Saves the sound |
+| [[SEL]] | Hold for fine steps, and with other controls for their second job |
+| [[REC]] | Records your moves, then loops them |
 | [[OCT−]] [[OCT+]] | LFO I's and LFO II's shape |
 
 ## Screen header
@@ -42,8 +42,8 @@ The FM-1's knobs and buttons, and the screen header at the top of the screen.
 
 | Side | What it shows |
 |---|---|
-| **Left** | the page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT |
-| **Right** | the sound: its bank and key ("A5", "P6 SEANCE"), "changed" once you've moved it |
+| **Left** | The page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT |
+| **Right** | The sound: its bank and key ("A5", "P6 SEANCE"), "changed" once you've moved it |
 
 ## Good to know
 
