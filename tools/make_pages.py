@@ -58,7 +58,7 @@ def main(pkg, version, out):
         if front.count(mark) != 1:
             raise SystemExit(f"web/emu/index.html must contain {mark} once")
     acts = ACTIONS.replace("__PKG__", name).replace("__REPO__", REPO).replace("__VERSION__", html.escape(label))
-    news = f'<a class="ver" href="{REPO}/blob/v{html.escape(version)}/CHANGELOG.md">{html.escape(label)} · What’s new</a>'
+    news = f'<a class="ver" href="{REPO}/blob/v{html.escape(version)}/CHANGELOG.md" aria-label="{html.escape(label)}: what’s new">{html.escape(label)}<span class="wn"> · What’s new</span></a>'
     front = front.replace("<!--NAV-->", news)     # beside Install and Source, top right
     (out / "index.html").write_text(front.replace("<!--ACTIONS-->", acts), encoding="utf-8")
     subprocess.run([sys.executable, str(SRC / "tools" / "make_manual.py"), str(out)], check=True)   # out/manual/
@@ -69,10 +69,14 @@ def main(pkg, version, out):
     lib = strip_module((SRC / "web" / "fm1pkg.js").read_text(encoding="utf-8")) + "\n" + \
         strip_module((SRC / "web" / "fm1ota.js").read_text(encoding="utf-8"))
     meta = json.dumps({"version": label, "product": product, "pkg": "../firmware/" + name})
-    for mark in ("/*LIB*/", "/*META*/"):
+    sys.path.insert(0, str(SRC / "tools"))
+    from make_manual import banner_html  # noqa: E402  (the site's banner and menu, as on the manual's pages)
+    top = banner_html("../", "Install", f"Niagara Drift {label} on your FM-1, from Chrome or Edge, over USB", current="")
+    for mark in ("/*LIB*/", "/*META*/", "<!--TOP-->"):
         if page.count(mark) != 1:
             raise SystemExit(f"installer.html must contain {mark} once")
-    (out / "install" / "index.html").write_text(page.replace("/*LIB*/", lib).replace("/*META*/", meta), encoding="utf-8")
+    page = page.replace("<!--TOP-->", top).replace("/*LIB*/", lib).replace("/*META*/", meta)
+    (out / "install" / "index.html").write_text(page, encoding="utf-8")
     (out / ".nojekyll").write_text("")
     print(f"site: {out}: index.html (the emulator), install/ ({product}), firmware/{name} ({len(raw)} B)")
 

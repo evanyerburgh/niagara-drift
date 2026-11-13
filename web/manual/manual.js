@@ -37,6 +37,7 @@
   }
   function draw(now) {
     const W = top.clientWidth, H = top.clientHeight, t = 30 + (still.matches ? 0 : (now - t1) / 1000);
+    if (!W || !H) return;                    // no size yet (n = 0 in shape): nothing to draw
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
     B.forEach((b, i) => { const d = shape(b, W, H, t); paths[i].setAttribute("d", d); cuts[i].setAttribute("d", d); });
   }
@@ -46,6 +47,7 @@
   requestAnimationFrame(tick);
   still.addEventListener("change", () => requestAnimationFrame(tick));
   addEventListener("resize", () => draw(performance.now()));
+  addEventListener("load", () => draw(performance.now()));   // still (reduced motion) and sized only now
 })();
 document.addEventListener("click", (e) => document.querySelectorAll("details.menubtn[open]").forEach((d) => { if (!d.contains(e.target)) d.open = false; }));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll("details.menubtn[open]").forEach((d) => d.open = false); });
@@ -67,6 +69,9 @@ addEventListener("load", () => {   // then back to the linked recipe, which the 
   if (t) t.scrollIntoView({ behavior: "instant" });
 });
 addEventListener("resize", pairs);
+// the reference's list and a recipe page's: open on a wide screen, folded on a phone (make_manual.py)
+const wide = matchMedia("(min-width: 821px)");
+wide.addEventListener("change", () => document.querySelectorAll(".toc details, .onpage-nav details").forEach((d) => { d.open = wide.matches; }));
 document.querySelectorAll(".listen").forEach((l) => {
   const a = l.querySelector("audio");
   l.querySelectorAll("button[data-t]").forEach((b) => b.addEventListener("click", () => { a.currentTime = +b.dataset.t; a.play(); }));

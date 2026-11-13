@@ -5,7 +5,7 @@ intro: When something doesn't work
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
-When something doesn't work: pick what's happening.
+Pick what's happening.
 
 <ul class="doors">
 <li><a href="#installing-and-updating"><img class="ic" src="../../web/manual/icons/download-simple.svg" alt=""><small>Getting it</small><b>Installing and updating</b><span>The web installer, a cable, keeping your sounds</span></a></li>
@@ -90,7 +90,7 @@ needed. With a GitHub account you can also [open an issue](https://github.com/ev
 <form class="feedback" action="https://formspree.io/f/xppdwkel" method="POST">
 <label>What happened<textarea name="What happened" rows="5" required placeholder="What you did, what you heard or saw, what you expected"></textarea></label>
 <fieldset><legend>Which FM-1</legend><label><input type="radio" name="FM-1" value="older"> Older</label><label><input type="radio" name="FM-1" value="newer (M-VAVE under the screen)"> Newer, with M-VAVE under the screen</label><label><input type="radio" name="FM-1" value="not sure" checked> Not sure</label></fieldset>
-<label>Version <small>on the startup screen, if you know it</small><input name="Version" placeholder="0.3"></label>
+<label>Version <small>on the startup screen, if you know it</small><input name="Version" placeholder="e.g. 0.3"></label>
 <label>Your email <small>optional, only if you'd like an answer</small><input type="email" name="email" autocomplete="email"></label>
 <input type="text" name="_gotcha" class="gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
 <p class="sent-note">Sent with it: this page's address and your browser's name, to help find the problem.</p>

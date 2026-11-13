@@ -59,6 +59,12 @@ header nav { align-items: start; }
 header nav a.ver { background: var(--pale); color: var(--black); text-transform: none; letter-spacing: .02em; }   /* the release, put in by tools/make_pages.py */
 /* a phone: the pills (Install, Source) above the title, not beside it */
 @media (max-width: 560px) { header, .over { padding-top: 3.8rem; } header nav { top: 1rem; } }
+/* a phone: the pills on one row (Source as GitHub's mark alone; its name stays for screen readers) */
+@media (max-width: 480px) { header nav { gap: .35rem; font-size: .8rem; letter-spacing: .05em; }
+  header nav a, header nav summary { padding: .4em .75em; white-space: nowrap; }
+  header nav a.ver .wn { display: none; }   /* the version alone: "What's new" is behind it */
+  header nav a[aria-label^="Source"] { font-size: 0; line-height: 0; padding: .32rem .6rem; }
+  header nav a[aria-label^="Source"] .gh { width: 1.2rem; height: 1.2rem; margin: 0; vertical-align: 0; } }
 a:focus-visible, button:focus-visible { outline: 3px solid var(--pale); outline-offset: 3px; }
 .vcap { position: absolute; right: .2rem; top: calc(5vh + 3.6rem); writing-mode: vertical-rl; font: 500 .95rem var(--mono);
         letter-spacing: .14em; text-transform: uppercase; }
@@ -98,6 +104,10 @@ a { color: var(--accent); }
 .bar .state, .turn { background: var(--black); color: var(--ink); padding: .4em 1em; border-radius: 999px; font: 500 .85rem/1.4 var(--mono); }   /* a band may pass behind */
 .bar button { font: 600 .95rem "Inter Tight", sans-serif; color: var(--black); background: var(--pale); border: 0; padding: .45em 1.1em; border-radius: 999px; cursor: pointer; }
 .bar .cpu { font-variant-numeric: tabular-nums; }
+/* after Switch on, until PLAY is first pressed: what to do next (first-time visitors stalled at "stopped") */
+.playhint { background: var(--pale); color: var(--black); padding: .4em 1em; border-radius: 999px; font: 600 .9rem/1.4 "Inter Tight", sans-serif; }
+.playhint kbd { font: 500 .85em var(--mono); background: transparent; color: var(--black); border: 1.5px solid var(--black); border-radius: 5px; padding: 0 .35em; }
+.playhint[hidden] { display: none; }
 .guide { --muted: #e2c8d5; --d1: #ffb04a; --d2: #45e3d3; --lfo: #dcbcff; --fx: var(--ink); --pulse: var(--ink); --setup: var(--ink);
          display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2.4rem; margin: 3.2rem 0 0; }
 /* the cards drift: one to a row, left then right; two to a row, the wider one swapping sides */
@@ -113,7 +123,8 @@ a { color: var(--accent); }
 .actions a:hover b, .actions a:focus-visible b { text-decoration: underline; }
 .actions b { display: block; font: 600 1.2rem "Inter Tight", sans-serif; }
 .actions span { display: block; font: 500 .8rem/1.4 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
-.actions-note { position: relative; z-index: 2; margin: 0 0 1rem; display: inline-block; background: var(--card); color: var(--ink);
+.actions-note { position: relative; z-index: 2;   /* solid, not tinted by the bands: its small words keep 4.5:1 on the red */
+                margin: 0 0 1rem; display: inline-block; background: var(--card); color: var(--ink);
                 padding: .4em 1em; border-radius: 14px; font: 500 .85rem/1.5 var(--mono); }
 @media (max-width: 760px) { .actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .foot { position: relative; z-index: 2; margin: 5rem -16px 0; padding: 2.4rem max(16px, calc(50vw - 520px)) 2.8rem; background: var(--card);
@@ -121,7 +132,7 @@ a { color: var(--accent); }
 .foot p { margin: 0 0 .6rem; max-width: 70ch; } .foot a { color: var(--pale); }
 .foot p { font-size: .95rem; line-height: 1.55; }
 .foot-nod { font: 500 .8rem/1.6 var(--mono) !important; letter-spacing: .03em; color: var(--muted); }
-body.drawn .g-card, body.drawn .start-col, body.drawn .doors a, body.drawn .try-row a, body.drawn .foot, body.drawn .actions a, body.drawn .actions-note { background: transparent; }   /* the bands tint them */
+body.drawn .g-card, body.drawn .start-col, body.drawn .doors a, body.drawn .try-row a, body.drawn .foot, body.drawn .actions a { background: transparent; }   /* the bands tint them */
 .bands .ground { fill: var(--card); }
 .bands .on-card { fill: var(--card-violet); }
 .bands .on-card.dark { fill: var(--card-dark); }
@@ -383,6 +394,7 @@ header nav { z-index: 6; }
 
 <div class="bar">
   <span class="state"><span id="status">Off</span> <span class="cpu" id="cpu"></span></span>
+  <span class="playhint" id="playhint" role="status" hidden>Press <kbd>PLAY</kbd> to start the drones</span>
   <a class="keys-link" href="#keys">Computer keys ↓</a>
   <button id="reset" type="button" aria-label="Factory reset" title="Factory reset: forget your sound and scenes, and start again from the factory settings">Reset</button>
 </div>
@@ -648,6 +660,7 @@ function syncButtons() {
   let m = latched;
   for (const b of btnHeldBy.values()) m |= 1 << b;
   if (m !== btnMask) { btnMask = m; send({ type: "buttons", mask: m }); }
+  if (m & (1 << BTN.PLAY)) document.getElementById("playhint").hidden = true;   // PLAY found: the hint has done its job
   for (const b of Object.values(buttons)) {
     b.g.classList.toggle("held", !!(m & (1 << b.bit)));
     b.g.classList.toggle("latched", !!(latched & (1 << b.bit)));
@@ -866,6 +879,7 @@ async function switchOn() {
     await ac.resume();
     document.getElementById("start").hidden = true;
     status.textContent = ac.sampleRate === 44100 ? "On" : `On (the browser runs audio at ${ac.sampleRate} Hz)`;
+    document.getElementById("playhint").hidden = !!(btnMask & (1 << BTN.PLAY));
     syncButtons(); syncKeys();
   } catch (err) {
     go.disabled = false;
@@ -897,7 +911,7 @@ document.getElementById("reset").addEventListener("click", () => {
   const SPEED = .045, T0 = 45;                 // where it starts: the shape chosen
   const paths = B.map((b) => el("path", b.dark ? { class: "dark" } : {}, bands));
   const cuts = B.map(() => el("path", {}, clip));
-  const cards = [...document.querySelectorAll(".g-card, .foot, .actions a, .actions-note, .start-col, .doors a, .try-row a")], grain = document.querySelector(".grain");
+  const cards = [...document.querySelectorAll(".g-card, .foot, .actions a, .start-col, .doors a, .try-row a")], grain = document.querySelector(".grain");
   const ground = el("g", {}, bands), cardclip = el("clipPath", { id: "cardclip" }, bands.querySelector("defs"));
   const tiles = cards.map(() => el("rect", { class: "ground" }, ground));
   const tclip = cards.map(() => el("rect", {}, cardclip));
