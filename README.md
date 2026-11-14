@@ -138,3 +138,5 @@ GPL-3.0-only (the files from fm1-base keep their MPL-2.0); see [LICENSING.md](LI
 
 Niagara Drift isn't affiliated with or endorsed by M-VAVE, Hügelton Instruments or the makers of any
 instrument that inspired it.
+
+You can also try Niagara Drift in the browser, no flashing needed, in the free community [FM-1 Emulator](https://fm1-emulator.atst.tools/).
