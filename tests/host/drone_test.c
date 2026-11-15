@@ -59,6 +59,7 @@ static void dry_init(void)
 }
 static float peak, sumsq;
 static long frames, upcross, nonzero;
+#define SILENT_Q 84                                 /* -100 dBFS of the output's full scale */
 static int finite_ok = 1;
 static int32_t last_l;
 
@@ -76,7 +77,8 @@ static void run(int blocks)
                 finite_ok = 0;
             peak = fmaxf(peak, fmaxf(fabsf(l), fabsf(r)));
             sumsq += l * l + r * r;
-            nonzero += buf[2 * i] != 0 || buf[2 * i + 1] != 0;
+            /* silence: under -100 dBFS (the headphone low cut's 12 Hz tail rings out under it, unheard) */
+            nonzero += abs(buf[2 * i]) > SILENT_Q || abs(buf[2 * i + 1]) > SILENT_Q;
             upcross += last_l < 0 && buf[2 * i] >= 0;
             last_l = buf[2 * i];
             frames++;
@@ -958,13 +960,26 @@ int main(void)
                     check("delay repeats 50: each echo quieter", e[1] < 0.8f * e[0] && e[2] < 0.8f * e[1] && e[3] < 0.8f * e[2]);
                     {   /* and darker: fewer zero crossings a second in the 4th echo than the 1st */
                         int c1 = (int)(0.0997f * DR_SR) - (int)(0.05f * DR_SR) + 1500, c4 = c1 + (int)(3.0f * 0.0997f * DR_SR);
-                        int z1 = 0, z4 = 0, i;
-                        for (i = 1; i < 1764; i++) {
-                            z1 += (cap[c1 + i - 1] < 0.0f) != (cap[c1 + i] < 0.0f);
-                            z4 += (cap[c4 + i - 1] < 0.0f) != (cap[c4 + i] < 0.0f);
+                        /* darker: the slope's power against the level's (the window's mean out: the headphone
+                         * low cut moves an echo's baseline, which zero crossings counted) */
+                        float m1 = 0.0f, m4 = 0.0f, d1 = 0.0f, d4 = 0.0f, p1 = 0.0f, p4 = 0.0f;
+                        int i;
+                        for (i = 0; i < 1764; i++) {
+                            m1 += cap[c1 + i];
+                            m4 += cap[c4 + i];
                         }
-                        printf("    darker each time: zero crossings %d (echo 1), %d (echo 4)\n", z1, z4);
-                        check("delay: each repeat darker", z4 < z1);
+                        m1 /= 1764.0f;
+                        m4 /= 1764.0f;
+                        for (i = 1; i < 1764; i++) {
+                            float a1 = cap[c1 + i] - m1, a4 = cap[c4 + i] - m4;
+                            d1 += (cap[c1 + i] - cap[c1 + i - 1]) * (cap[c1 + i] - cap[c1 + i - 1]);
+                            d4 += (cap[c4 + i] - cap[c4 + i - 1]) * (cap[c4 + i] - cap[c4 + i - 1]);
+                            p1 += a1 * a1;
+                            p4 += a4 * a4;
+                        }
+                        printf("    darker each time: slope / level %.4f (echo 1), %.4f (echo 4)\n", (double)(d1 / p1),
+                               (double)(d4 / p4));
+                        check("delay: each repeat darker", d4 / p4 < d1 / p1);
                     }
                 } else {
                     printf("    repeats 100: echo 1 %.3f, echo 8 %.3f\n", (double)e[0], (double)e[7]);
@@ -1761,6 +1776,9 @@ int main(void)
             dr_set(DR_GP(0, GP_CUTOFF), 900);
             dr_set(DR_GP(0, GP_RESO), 0);
             dr_set(DR_GP(0, GP_PITCH), pc[t]);
+            dr_set(DR_GP(0, GP_LEVEL), 45);      /* under the output's clip: the drone's make-up, not the clip, measured
+                                                  * (at its level the 8 Hz tips reached it, and the headphone low cut,
+                                                  * which reshapes a ramp under 12 Hz into taller tips, lost them there) */
             dr_play(1);
             run(secs(2.0f));
             capture(cap, 44100, 0);
