@@ -25,9 +25,68 @@ struct om_dbg {
 } om_dbg __attribute__((section(".noinit")));
 static uint8_t safe_mode;                           /* two failed boots: no audio, USB on (safe_main) */
 
+#if OM_CPU2
+/* The second core's test ("The second core", step 2): CPU1 started at power-on (felucca-bsp's fm1_cpu1.h), and each
+ * audio block a job that keeps it busy ~2 ms (~34 % of the block: Rings' 8 strings, the Mutable try) reading a 4 KB
+ * table in RAM and checking its sum. A misread of the job (its check word), a fault or a late job retires CPU1 (one
+ * core until power-off: FM1_CPU1_FALLBACK) and is counted; a misread of the table counts as a bad sum. Read with
+ * `tools/fm1_cpu.py --cores` (SysEx 0x7B). */
+#define C2_WORDS 1024u
+#define C2_BUSY_US 2000u
+static uint32_t c2_table[C2_WORDS];
+static uint32_t c2_sum;                             /* the table's, as CPU0 made it */
+static struct {                                     /* the job's (CPU1 writes, CPU0 reads after the wait) */
+    volatile uint32_t passes, bad, last_us, max_us;
+} c2_job __attribute__((aligned(32)));
+static struct {                                     /* CPU0's */
+    uint32_t two, off_ms, wait_max_us, rails_boot;
+} c2;
+
+static uint32_t c2_table_sum(void)
+{
+    uint32_t i, s = 0;
+    for (i = 0; i < C2_WORDS; i++)
+        s = (s << 1 | s >> 31) ^ c2_table[i];
+    return s;
+}
+
+static void c2_work(uint32_t arg)                   /* on CPU1, from the flash, as a real job would be */
+{
+    uint32_t t0 = fm1_ticks(), n = 0, us;
+    (void)arg;
+    do {
+        if (c2_table_sum() != c2_sum)
+            c2_job.bad++;
+        n++;
+        us = (fm1_ticks() - t0) / FM1_TICKS_PER_US;
+    } while (us < C2_BUSY_US);
+    c2_job.passes += n;
+    c2_job.last_us = us;
+    if (us > c2_job.max_us)
+        c2_job.max_us = us;
+}
+
+static void c2_start(void)                          /* power-on, before the audio and the timers */
+{
+    static const char when[] = __DATE__ " " __TIME__;
+    uint32_t i, x = 0x12345678u, id = 2166136261u;
+    for (i = 0; i < C2_WORDS; i++)
+        c2_table[i] = x = x * 1664525u + 1013904223u;
+    c2_sum = c2_table_sum();
+    for (i = 0; when[i]; i++)
+        id = (id ^ (uint8_t)when[i]) * 16777619u;
+    fm1_cpu1_bar_build(id);                         /* a bar a crash set for an earlier build is lifted */
+    if (!bootguard.failed && !safe_mode)            /* not after a failed start: one core */
+        c2.two = fm1_cpu1_start() == 0;
+}
+#endif
+
 static void render_block(int32_t *o)                /* ALNK0: one half, measured */
 {
     uint32_t t0 = fm1_ticks(), us, budget = HALF_FRAMES * 1000000u / FS;
+#if OM_CPU2
+    int on2 = fm1_cpu1_run(c2_work, 0);
+#endif
     om_dbg.in_audio = 1;
 #if FELUCCA_UAC
     uac_render_start();
@@ -41,6 +100,17 @@ static void render_block(int32_t *o)                /* ALNK0: one half, measured
 #endif
         }
     }
+#if OM_CPU2
+    if (on2) {
+        uint32_t w0 = fm1_ticks(), w;
+        fm1_cpu1_wait();
+        w = (fm1_ticks() - w0) / FM1_TICKS_PER_US;
+        if (w > c2.wait_max_us)
+            c2.wait_max_us = w;
+    }
+    if (c2.two && fm1_cpu1_gave_up && !c2.off_ms)
+        c2.off_ms = fm1_ms | 1u;                    /* when it was retired */
+#endif
     us = (fm1_ticks() - t0) / FM1_TICKS_PER_US;
     om_dbg.cpu_q8 = (om_dbg.cpu_q8 * 15u + (us * 256u) / budget) / 16u;
     audio_cpu_pct = (om_dbg.cpu_q8 * 100u) >> 8;
@@ -392,6 +462,23 @@ static void dbg_service(void)
             b[i] = (uint8_t)(w[i / 4u] >> (8u * (i % 4u)));
         ota_send_msg(0x7E, b, sizeof b);
     }
+#if OM_CPU2
+    else if (d == 7u && ota_dec[2] == 0x7B) {      /* the second core's test (c2_start), two pages of 8 words */
+        uint32_t w[8], i;
+        uint8_t b[32];
+        if (ota_dec[3] == 0) {
+            w[0] = c2.two, w[1] = fm1_cpu1_on, w[2] = fm1_cpu1_gave_up, w[3] = fm1_cpu1_mb.jobs;
+            w[4] = fm1_cpu1_mb.rejected, w[5] = fm1_cpu1_fault.count, w[6] = c2_job.bad, w[7] = c2.off_ms;
+        } else {
+            w[0] = c2_job.max_us, w[1] = c2_job.last_us, w[2] = c2_job.passes, w[3] = c2.wait_max_us;
+            w[4] = c2.two ? fm1_cpu1_stack_used() : 0u, w[5] = c2.rails_boot;
+            w[6] = fm1_vdc14() << 8 | fm1_sysvdd(), w[7] = fm1_ms;
+        }
+        for (i = 0; i < 32u; i++)
+            b[i] = (uint8_t)(w[i / 4u] >> (8u * (i % 4u)));
+        ota_send_msg(0x7B, b, sizeof b);
+    }
+#endif
 }
 
 /* black from power-on until the UI's own animation, which fades in from black (FoMni's splash was here) */
@@ -448,6 +535,9 @@ static void fm1_main(void)
     dr_init();
     project_load();                                 /* defaults when nothing (or another format) is saved */
     project_apply();
+#if OM_CPU2
+    c2_start();
+#endif
     audio_init();
     usb_start();
 #if OM_TRS
@@ -536,13 +626,19 @@ static void fm1_main(void)
 
 void fm1_cstart(void)
 {
-    uint32_t *s, *d, p3, src, wdt;
+    uint32_t *s, *d, p3, src, wdt, rails, tries;
+    fm1_cpu1_stop();                                /* a reset that left the second core running: held first */
     fm1_time_init();
     fm1_reset_reason();
     p3 = fm1_boot.p3_rst;
     src = fm1_boot.rst_src;
     wdt = fm1_boot.wdt_con;
     fm1_wdt_arm(0x0D);
+    rails = fm1_vdc14() << 8 | fm1_sysvdd();        /* as the boot loader left them */
+    for (tries = 0; tries < 3u && !(fm1_vdc14() == 7u && fm1_sysvdd() == 15u); tries++) {
+        fm1_vdc14_raise(7);                         /* M-VAVE's own supplies, before anything loads them: 1.60 V, */
+        fm1_sysvdd_raise(15);                       /* then 1.38 V (fm1_sys.h; fm1-base, X0X 1.0.9 and Saadet do the same) */
+    }
     if (bootguard.magic != BOOTGUARD_MAGIC) {
         bootguard.magic = BOOTGUARD_MAGIC;
         bootguard.failed = 0;
@@ -572,6 +668,11 @@ void fm1_cstart(void)
     fm1_boot.p3_rst = (uint8_t)p3;
     fm1_boot.rst_src = src;
     fm1_boot.wdt_con = (uint8_t)wdt;
+#if OM_CPU2
+    c2.rails_boot = rails;                          /* (after the .bss clear) */
+#else
+    (void)rails;
+#endif
     fm1_main();
     for (;;)
         ;

@@ -4,10 +4,18 @@
  * The instrument (dsp/drone.c) is a separate unit compiled at -O2 by tools/build.py; this one is
  * -Os. Order matters. */
 #include <stdint.h>
+#ifndef OM_CPU2
+#define OM_CPU2 1                 /* the second core (felucca-bsp's fm1_cpu1.h): started at power-on, a job each block */
+#endif
+#define FM1_CPU1 OM_CPU2          /* (before the first HAL header: fm1_irq.h and fm1_sys.h read it) */
+#define FM1_CPU1_FALLBACK 1       /* a misread, a fault or a late job: one core until power-off, no restart */
 #include "fm1_time.h"
 #include "fm1_sys.h"
 #include "fm1_irq.h"
 #include "fm1_guard.h"
+#if OM_CPU2
+#include "fm1_cpu1.h"
+#endif
 /* the key pressure (MONK-1's, from Velo): the scan tick hands each analog row sample to app/plat_fm1.c */
 static void plat_analog_sample(uint32_t col, uint32_t rowbit, uint32_t v, uint32_t driven);
 static int plat_analog_drive(uint32_t col, uint32_t rowbit);
