@@ -27,7 +27,7 @@ The chip is small, and the sound comes first. A change can spend these only when
 or less flash, take that version, proven by `tools/same_samples.py`.
 
 - **RAM:** .data + .bss under 96 KB, the pool with at least 8 KB spare; the build fails past either.
-  The pool is close (11 KB spare in October 2026); the main RAM has room since #50 (64 KB of 96): a new buffer or table
+  The pool is close (11 KB spare in October 2026); the main RAM is 82 KB of 96 (November 2026, 0.3): a new buffer or table
   in RAM still needs a reason.
 - **CPU:** the engine's worst case (`tests/host/drone_cost.c`) under its limit; on the device the
   longest audio block (`tools/fm1_cpu.py`) about 69 % in the worst realistic case at 0.2: keep the
