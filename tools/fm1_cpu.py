@@ -41,14 +41,17 @@ def cores(link):
     pages = []
     for cmd in (0x7B, 0x7A):
         q = b"\xF0" + pack7(bytes([0x00, 0x59, cmd, 0, 0, 0, 0xFF])) + b"\xF7"
-        link.drain()
-        link.send(q)
-        t = time.monotonic() + 1.0
-        while (left := t - time.monotonic()) > 0:
-            p = link.read(left)
-            d = p and unpack7(p[1:-1])
-            if d and len(d) == 39 and d[:3] == bytes([0x00, 0x59, cmd]) and ~sum(d[6:38]) & 0xFF == d[38]:
-                pages.append([int.from_bytes(d[6 + 4 * i:10 + 4 * i], "little") for i in range(8)])
+        for _ in range(3):              # (the first query after the port opens is often lost)
+            link.drain()
+            link.send(q)
+            t = time.monotonic() + 1.0
+            while (left := t - time.monotonic()) > 0:
+                p = link.read(left)
+                d = p and unpack7(p[1:-1])
+                if d and len(d) == 39 and d[:3] == bytes([0x00, 0x59, cmd]) and ~sum(d[6:38]) & 0xFF == d[38]:
+                    pages.append([int.from_bytes(d[6 + 4 * i:10 + 4 * i], "little") for i in range(8)])
+                    break
+            if len(pages) == (cmd == 0x7B and 1 or 2):
                 break
         else:
             sys.exit("fm1_cpu: no reply to --cores (a build without the second core's test)")

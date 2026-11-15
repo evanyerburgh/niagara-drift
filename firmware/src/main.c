@@ -7,6 +7,9 @@
 #ifndef OM_CPU2
 #define OM_CPU2 1                 /* the second core (felucca-bsp's fm1_cpu1.h): started at power-on, a job each block */
 #endif
+#ifndef OM_RAILS
+#define OM_RAILS 1                /* M-VAVE's own supplies at start (fm1_cstart) */
+#endif
 #define FM1_CPU1 OM_CPU2          /* (before the first HAL header: fm1_irq.h and fm1_sys.h read it) */
 #define FM1_CPU1_FALLBACK 1       /* a misread, a fault or a late job: one core until power-off, no restart */
 #include "fm1_time.h"

@@ -636,7 +636,7 @@ void fm1_cstart(void)
     wdt = fm1_boot.wdt_con;
     fm1_wdt_arm(0x0D);
     rails = fm1_vdc14() << 8 | fm1_sysvdd();        /* as the boot loader left them */
-    for (tries = 0; tries < 3u && !(fm1_vdc14() == 7u && fm1_sysvdd() == 15u); tries++) {
+    for (tries = 0; OM_RAILS && tries < 3u && !(fm1_vdc14() == 7u && fm1_sysvdd() == 15u); tries++) {
         fm1_vdc14_raise(7);                         /* M-VAVE's own supplies, before anything loads them: 1.60 V, */
         fm1_sysvdd_raise(15);                       /* then 1.38 V (fm1_sys.h; fm1-base, X0X 1.0.9 and Saadet do the same) */
     }
