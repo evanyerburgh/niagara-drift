@@ -39,15 +39,15 @@ def rails(v):
 
 def cores(link):
     pages = []
-    for page in (0, 1):
-        q = b"\xF0" + pack7(bytes([0x00, 0x59, 0x7B, page, 0, 0, 0xFF])) + b"\xF7"
+    for cmd in (0x7B, 0x7A):
+        q = b"\xF0" + pack7(bytes([0x00, 0x59, cmd, 0, 0, 0, 0xFF])) + b"\xF7"
         link.drain()
         link.send(q)
         t = time.monotonic() + 1.0
         while (left := t - time.monotonic()) > 0:
             p = link.read(left)
             d = p and unpack7(p[1:-1])
-            if d and len(d) == 39 and d[:3] == b"\x00\x59\x7B" and ~sum(d[6:38]) & 0xFF == d[38]:
+            if d and len(d) == 39 and d[:3] == bytes([0x00, 0x59, cmd]) and ~sum(d[6:38]) & 0xFF == d[38]:
                 pages.append([int.from_bytes(d[6 + 4 * i:10 + 4 * i], "little") for i in range(8)])
                 break
         else:

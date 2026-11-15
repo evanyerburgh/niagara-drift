@@ -30,7 +30,7 @@ static uint8_t safe_mode;                           /* two failed boots: no audi
  * audio block a job that keeps it busy ~2 ms (~34 % of the block: Rings' 8 strings, the Mutable try) reading a 4 KB
  * table in RAM and checking its sum. A misread of the job (its check word), a fault or a late job retires CPU1 (one
  * core until power-off: FM1_CPU1_FALLBACK) and is counted; a misread of the table counts as a bad sum. Read with
- * `tools/fm1_cpu.py --cores` (SysEx 0x7B). */
+ * `tools/fm1_cpu.py --cores` (SysEx 0x7B and 0x7A). */
 #define C2_WORDS 1024u
 #define C2_BUSY_US 2000u
 static uint32_t c2_table[C2_WORDS];
@@ -463,10 +463,11 @@ static void dbg_service(void)
         ota_send_msg(0x7E, b, sizeof b);
     }
 #if OM_CPU2
-    else if (d == 7u && ota_dec[2] == 0x7B) {      /* the second core's test (c2_start), two pages of 8 words */
+    else if (d == 7u && (ota_dec[2] == 0x7B || ota_dec[2] == 0x7A)) {   /* the second core's test (c2_start): 0x7B
+                                                                          * and 0x7A, 8 words each */
         uint32_t w[8], i;
         uint8_t b[32];
-        if (ota_dec[3] == 0) {
+        if (ota_dec[2] == 0x7B) {
             w[0] = c2.two, w[1] = fm1_cpu1_on, w[2] = fm1_cpu1_gave_up, w[3] = fm1_cpu1_mb.jobs;
             w[4] = fm1_cpu1_mb.rejected, w[5] = fm1_cpu1_fault.count, w[6] = c2_job.bad, w[7] = c2.off_ms;
         } else {
@@ -476,7 +477,7 @@ static void dbg_service(void)
         }
         for (i = 0; i < 32u; i++)
             b[i] = (uint8_t)(w[i / 4u] >> (8u * (i % 4u)));
-        ota_send_msg(0x7B, b, sizeof b);
+        ota_send_msg(ota_dec[2], b, sizeof b);
     }
 #endif
 }
