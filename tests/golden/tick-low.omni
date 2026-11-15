@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): Tick held on headphones with the drones low (E1 and B1, the subs two
+# octaves down), lightly then hard, then let go: the headphone low cut (2026-11-15) keeps its sub under 1 Hz from
+# pinning the output's clip. And the header's gesture where the room is tight: TICK beside "P2 EMBERS" on Tone (the
+# draw had kept a pixel more than the layout), CHORD and STUTTER by name alone on Pitch moves and Sub · Drive. Not a
+# test of its own (no expectations).
+notips
+phones 1
+set 74 0
+set 71 0
+pressure w8 0
+pressure w9 0
+pressure w11 0
+set 0 2800
+set 21 3500
+set 6 2
+set 27 2
+tap PLAY
+wav tick-low.wav
+wait 3000
+key w8 down
+pressure w8 60
+wait 5000
+pressure w8 127
+wait 5000
+pressure w8 0
+key w8 up
+wait 5000
+wavstop
+tapkey w1
+wait 2000
+set 55 1
+page 3
+wait 500
+key w8 down
+pressure w8 100
+wait 1500
+shot tick-tone.png
+pressure w8 0
+key w8 up
+wait 9000
+page 9
+key w9 down
+pressure w9 100
+wait 1500
+shot chord-moves.png
+pressure w9 0
+key w9 up
+wait 9000
+page 5
+key w11 down
+pressure w11 100
+wait 1500
+shot stutter-sub.png
+pressure w11 0
+key w11 up

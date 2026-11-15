@@ -77,6 +77,7 @@ hear is within 10 cents; otherwise the familiar name ("5th").
 - **Tune** moves 1 Hz a click, 0.1 with [[SEL]] ("432Hz").
 - **A drone playing alone** sits in the middle, whatever Stereo says.
 - **The speaker** gets a low cut (about 120 Hz) for bass it can't play; it's off while headphones are in.
+  Headphones get one far below hearing (12 Hz), so the slowest subs and Tick's beats don't push the sound into its limit.
 
 ### Tunings
 

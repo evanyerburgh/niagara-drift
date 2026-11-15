@@ -215,7 +215,7 @@ static void lk_bar(void)
     char name[20], half[6] = "", rec[12] = "REC ", gname[20], key[10] = "", back[28] = "let go: ";
     const char *badge[6], *sound = 0, *state, *st_short, *chg = 0;
     uint16_t bcol[6], st_col = LK_LABEL, name_col = LK_WHITE, key_col = LK_LABEL;
-    int nb = 0, swell = -1, gb = -1, glen = 0, show_half, show_chg, show_name;
+    int nb = 0, swell = -1, gb = -1, glen = 0, gtrim = 0, show_half, show_chg, show_name;
     lk_sound_at();
     gest = lk_gesture();
     glide = lk_glide(now, &line, &gbank);
@@ -339,20 +339,24 @@ static void lk_bar(void)
         key[0] = 0;
     }
     for (drop = 0; drop < 9; drop++) {         /* 0 all; 1 PLAY's state short; 2 no 1/2; 3 no "changed";
-                                                * 4 no SWELL; 5 no name; 6 no key (or "→ P3"); 7 a latched gesture by its fill,
-                                                * alone ("CHORD"); 8 no PLAY's state (a peek keeps where
+                                                * 4 no SWELL; 5 no name; 6 no key (or "→ P3"); 7 the gesture by its name
+                                                * alone, latched or held ("CHORD"); 8 no PLAY's state (a peek keeps where
                                                 * it goes) */
         const char *st = !state || (drop >= 8 && !peek) ? 0 : drop >= 1 ? st_short : state;
         int32_t x = 8 + text_w(&LK_F_PAGE, name), rx = 232, gap = 0;
-        if (drop == 7 && gb >= 0 && gest_pct < 0)
+        if (drop == 7 && gb >= 0) {          /* the gesture by its name alone: latched ("CHORD"), or held with no
+                                              * room for its % (Evan, 2026-11-15: on PITCH MOVES, SUB · DRIVE
+                                              * "CHORD 38%" didn't fit and nothing showed) */
             gname[glen] = 0;
+            gtrim = 1;
+        }
         if (peek)
             x += 6 + text_w(&LK_F_SEL, "PEEK") + 6;
         else if (half[0] && drop < 2)
             x += 4 + text_w(&LK_F_HALF, half);
         for (i = 0; i < nb; i++)
             if (!(i == swell && drop >= 4))
-                x += 12 + lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
+                x += 12 + lk_badge_w(i == gb && gest_pct >= 0 && !gtrim, badge[i]);
         if (st) {
             rx -= lk_ktext_w(&LK_F_TAG, st);
             gap = 10;
@@ -380,7 +384,7 @@ static void lk_bar(void)
         int32_t x = 8 + text_w(&LK_F_PAGE, name) + (peek ? 12 + text_w(&LK_F_SEL, "PEEK") : 0), rx = 232, gap = 0;
         for (i = 0; i < nb; i++)
             if (!(i == swell && drop >= 4))
-                x += 12 + lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
+                x += 12 + lk_badge_w(i == gb && gest_pct >= 0 && !gtrim, badge[i]);
         if (half[0] && !peek && drop < 2)
             x += 4 + text_w(&LK_F_HALF, half);
         if (state) {
@@ -444,10 +448,11 @@ static void lk_bar(void)
             x = cv_text(x + 4, bl - LK_B(LK_F_HALF), &LK_F_HALF, half, lk_mix(0x07060Bu, 0xFFFFFFu, 0.6f));
         }
         for (i = 0; i < nb; i++) {             /* the badges, as many as fit (still too many: the last go) */
-            const int32_t w = lk_badge_w(i == gb && gest_pct >= 0, badge[i]);
+            const int32_t w = lk_badge_w(i == gb && gest_pct >= 0 && !gtrim, badge[i]);
             if (i == swell && drop >= 4)
                 continue;
-            if (x + 12 + w > rx - 12)
+            if (x + 12 + w > rx - LK_BAR_GAP)  /* the layout's own gap (it was 12 here: a badge the layout kept by
+                                                * a pixel, TICK beside "P2 EMBERS", went missing; Evan 2026-11-15) */
                 break;
             cv_text(x + 12, bl - LK_B(LK_F_TAG), &LK_F_TAG, badge[i], bcol[i]);
             x += 12 + w;

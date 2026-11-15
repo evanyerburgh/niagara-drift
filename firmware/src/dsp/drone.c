@@ -845,6 +845,11 @@ static float spk[2][2];                          /* the speaker low cut's states
 volatile uint8_t dr_phones;
 #define SPK_CUT 61.0f                            /* the speaker's low cut, fixed (2026-10-20: ~120 Hz; P_SPEAKER unused) */
 static float spk_x, spk_f;                       /* ... how far it's in (0..1), its knob (the corner) */
+/* the HEADPHONE low cut: 12 dB at 12 Hz, under hearing, before the clip (Evan, 2026-11-15: Tick's sub swinging
+ * under 1 Hz at low pitches had pinned each side against the clip in turn, the drones squeezed out, one side
+ * silent, 51-74 % of the time held lightly; with it, ~1 %). The speaker has its own, above; crossfaded the same way */
+#define HP_CUT_HZ 12.0f
+static float hpc[2][2], hpc_x;
 /* every parameter as it sounds: gliding to its setting. A knob's detent glides over the time until the
  * next is due (dr_pslide, as a pitch's); anything else (a scene's morph, MIDI, a load) over 25 ms. The
  * engine reads the continuous ones from here, so a slow turn is a sweep, never a staircase */
@@ -945,6 +950,8 @@ void dr_init(void)
     dr_pulse = 1.0f;
     spk_x = dr_phones ? 0.0f : 1.0f;
     spk_f = SPK_CUT;
+    hpc_x = dr_phones ? 1.0f : 0.0f;
+    hpc[0][0] = hpc[0][1] = hpc[1][0] = hpc[1][1] = 0.0f;
     fx_clear();
     q_r = q_w;
 }
@@ -1448,7 +1455,7 @@ static void drain(void)
                 fb_ring[g] = 0.0f;
             fb_c = 1.0f;
             for (g = 0; g < 2; g++)              /* and the output filters' memories */
-                spk[g][0] = spk[g][1] = 0.0f;
+                spk[g][0] = spk[g][1] = hpc[g][0] = hpc[g][1] = 0.0f;
             break;
         }
         }
@@ -2717,6 +2724,24 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
             }
             if (spk_x <= 0.0f)                   /* off: its states cleared for the next time it's on */
                 spk[0][0] = spk[0][1] = spk[1][0] = spk[1][1] = 0.0f;
+        }
+        if (dr_phones || hpc_x > 0.0f) {    /* the HEADPHONE low cut (HP_CUT_HZ), the speaker's form */
+            const float on = dr_phones ? 1.0f : 0.0f, xs = 1.0f / (0.02f * DR_SR);
+            const float gc = fm_tanf(FM_PI * HP_CUT_HZ * (1.0f / DR_SR));
+            const float a1 = 1.0f / (1.0f + gc * (gc + 1.41421356f)), a2 = gc * a1, a3 = gc * a2;
+            for (j = 0; j < k; j++) {
+                int c;
+                hpc_x = toward(hpc_x, on, xs);
+                for (c = 0; c < 2; c++) {
+                    float *m = c ? mixr : mixl, v3 = m[j] - hpc[c][1];
+                    float v1 = a1 * hpc[c][0] + a2 * v3, v2 = hpc[c][1] + a2 * hpc[c][0] + a3 * v3;
+                    hpc[c][0] = 2.0f * v1 - hpc[c][0];
+                    hpc[c][1] = 2.0f * v2 - hpc[c][1];
+                    m[j] = m[j] - hpc_x * (1.41421356f * v1 + v2);
+                }
+            }
+            if (hpc_x <= 0.0f)
+                hpc[0][0] = hpc[0][1] = hpc[1][0] = hpc[1][1] = 0.0f;
         }
         for (j = 0; j < k; j++) {                /* the MASTER (its top fifth drives into the clip), the clip; */
             float o;                             /* the dip after it (a straight line: out 20 ms, back 30 ms) */
