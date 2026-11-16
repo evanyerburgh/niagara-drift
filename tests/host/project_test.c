@@ -8,6 +8,8 @@
 
 static uint8_t store[OBJ_NOBJ][PLAT_STORE_MAX];
 static int store_n[OBJ_NOBJ] = {0};
+static uint32_t store_buf[PLAT_STORE_MAX / 4u];
+void *plat_store_buf(void) { return store_buf; }
 int plat_store_load(uint32_t obj, void *dst, uint32_t max)
 {
     int n = store_n[obj];

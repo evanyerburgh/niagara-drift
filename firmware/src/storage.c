@@ -34,13 +34,13 @@ static int st_read(uint32_t off, void *dst, uint32_t n);
 static int st_erase(uint32_t off);
 static int st_prog(uint32_t off, const void *src, uint32_t n);
 
-static uint32_t st_crc32(const void *p, uint32_t n)   /* zlib CRC-32, 4 bits per step */
+static uint32_t st_crc32c(uint32_t c, const void *p, uint32_t n)   /* zlib's crc32(c, p, n): chains */
 {
     static const uint32_t T[16] = {
         0x00000000u, 0x1DB71064u, 0x3B6E20C8u, 0x26D930ACu, 0x76DC4190u, 0x6B6B51F4u, 0x4DB26158u, 0x5005713Cu,
         0xEDB88320u, 0xF00F9344u, 0xD6D6A3E8u, 0xCB61B38Cu, 0x9B64C2B0u, 0x86D3D2D4u, 0xA00AE278u, 0xBDBDF21Cu};
     const uint8_t *b = p;
-    uint32_t c = 0xFFFFFFFFu;
+    c = ~c;
     while (n--) {
         c ^= *b++;
         c = (c >> 4) ^ T[c & 15u];
@@ -48,6 +48,7 @@ static uint32_t st_crc32(const void *p, uint32_t n)   /* zlib CRC-32, 4 bits per
     }
     return ~c;
 }
+static uint32_t st_crc32(const void *p, uint32_t n) { return st_crc32c(0u, p, n); }   /* zlib CRC-32, 4 bits per step */
 
 static uint32_t st_sector(uint32_t obj, uint32_t copy)  /* flash offset of copy A (0) / B (1) */
 {
@@ -78,30 +79,44 @@ static int st_body(uint32_t obj, uint32_t copy, const st_hdr_t *h)   /* payload 
     return 0;
 }
 
+static int st_body_ok(uint32_t obj, uint32_t copy, const st_hdr_t *h)   /* the payload's CRC ok: 0; st_buf untouched
+                                                                         * (it may hold what a save is writing) */
+{
+    uint32_t chunk[16], off, c = 0u, base = st_sector(obj, copy) + ST_PAYLOAD_OFF;
+    for (off = 0; off < h->len; off += sizeof chunk) {
+        const uint32_t n = h->len - off < sizeof chunk ? h->len - off : sizeof chunk;
+        if (st_read(base + off, chunk, n))
+            return -1;
+        c = st_crc32c(c, chunk, n);
+    }
+    return c == h->crc ? 0 : -1;
+}
+
 /* the current copy: the valid one with the highest seq (A on a tie), -1 when
  * neither is valid. Headers first, so only the winner's payload is read (it
  * is left in st_buf); *h gets its header. */
-static int st_current(uint32_t obj, st_hdr_t *h)
+static int st_pick(uint32_t obj, st_hdr_t *h, int keep)   /* keep 0: the winner checked, st_buf untouched */
 {
     st_hdr_t a, b;
     int va = st_head(obj, 0, &a) == 0, vb = st_head(obj, 1, &b) == 0;
     if (vb && (!va || b.seq > a.seq)) {
-        if (st_body(obj, 1, &b) == 0) {
+        if ((keep ? st_body(obj, 1, &b) : st_body_ok(obj, 1, &b)) == 0) {
             *h = b;
             return 1;
         }
         vb = 0;
     }
-    if (va && st_body(obj, 0, &a) == 0) {
+    if (va && (keep ? st_body(obj, 0, &a) : st_body_ok(obj, 0, &a)) == 0) {
         *h = a;
         return 0;
     }
-    if (vb && st_body(obj, 1, &b) == 0) {
+    if (vb && (keep ? st_body(obj, 1, &b) : st_body_ok(obj, 1, &b)) == 0) {
         *h = b;
         return 1;
     }
     return -1;
 }
+static int st_current(uint32_t obj, st_hdr_t *h) { return st_pick(obj, h, 1); }
 
 /* load object into dst (up to max bytes); returns the length, or -1 */
 static int st_load(uint32_t obj, void *dst, uint32_t max)
@@ -112,6 +127,11 @@ static int st_load(uint32_t obj, void *dst, uint32_t max)
         return -1;
     if (h.len > max)
         h.len = max;
+    if (dst == (void *)st_buf) {               /* in place (plat_store_buf): what's past it zeroed, as a fresh buffer */
+        for (i = h.len; i < max && i < ST_PAYLOAD_MAX; i++)
+            st_buf[i] = 0;
+        return (int)h.len;
+    }
     for (i = 0; i < h.len; i++)
         ((uint8_t *)dst)[i] = st_buf[i];
     return (int)h.len;
@@ -124,11 +144,12 @@ static int st_save(uint32_t obj, const void *src, uint32_t len)
     st_hdr_t h;
     if (len > ST_PAYLOAD_MAX)
         return -1;
-    cur = st_current(obj, &h);
+    cur = st_pick(obj, &h, 0);                    /* (src may be st_buf: a load in place, changed) */
     seq = cur < 0 ? 0u : h.seq;
     base = st_sector(obj, cur == 0 ? 1u : 0u);       /* write the other copy */
-    for (off = 0; off < len; off++)
-        st_buf[off] = ((const uint8_t *)src)[off];    /* the driver wants RAM sources */
+    if (src != (const void *)st_buf)
+        for (off = 0; off < len; off++)
+            st_buf[off] = ((const uint8_t *)src)[off];    /* the driver wants RAM sources */
     if ((rc = st_erase(base)) != 0)
         return rc;
     for (off = 0; off < len; off += 256u) {

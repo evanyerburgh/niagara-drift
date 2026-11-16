@@ -42,6 +42,8 @@ int plat_store_load(uint32_t obj, void *dst, uint32_t max);   /* bytes loaded, <
 int plat_store_save(uint32_t obj, const void *src, uint32_t len);   /* 0 = ok; -10 held (a restore coming) */
 int plat_store_held(void);             /* 1: a restore from USB is staged, saves wait (it restarts after) */
 #define PLAT_STORE_MAX 3840u           /* bytes per object */
+void *plat_store_buf(void);            /* the store's own buffer, PLAT_STORE_MAX bytes, 4-aligned: a load into it is in
+                                        * place (no second copy in RAM); the next store call reuses it */
 enum { OBJ_PROJ, OBJ_PANEL, OBJ_BANKB, OBJ_BANKC, OBJ_BANKP, OBJ_BANKD, OBJ_BANKE, OBJ_BANKF, OBJ_NOBJ };
 /* flash: OBJ_PROJ 0xFC000, OBJ_PANEL 0xDC000, OBJ_BANKB 0x97000, OBJ_BANKC 0x99000, OBJ_BANKP 0x9B000 (the Presets
  * saved over), OBJ_BANKD 0x9D000, OBJ_BANKE 0xDE000, OBJ_BANKF 0x9F000 and 0xFE000 (its two copies apart, as

@@ -90,6 +90,30 @@ int main(void)
     nor[st_sector(OBJ_PANEL, 0) + 8] ^= 0x01;    /* both headers broken */
     nor[st_sector(OBJ_PANEL, 1) + 8] ^= 0x01;
     bad += check("both headers broken -> nothing", st_load(OBJ_PANEL, got, sizeof got) < 0);
+    {   /* in place (plat_store_buf, project.c's ld): loaded into st_buf, changed there, saved from there; the
+         * save's choice of copy must not reload st_buf over the change (the old Presets object, project.c) */
+        uint8_t big[3000], back[3000], *q = st_buf;
+        uint32_t i;
+        for (i = 0; i < sizeof big; i++)
+            big[i] = (uint8_t)(i * 7u + 3u);
+        bad += check("in place: saved", st_save(OBJ_BANKP, big, sizeof big) == 0);
+        memset(st_buf, 0xAA, sizeof st_buf);
+        n = st_load(OBJ_BANKP, st_buf, sizeof st_buf);
+        bad += check("in place: loads, the rest zeroed", n == (int)sizeof big && !memcmp(q, big, sizeof big) &&
+                                                             q[sizeof big] == 0 && q[sizeof st_buf - 1u] == 0);
+        q[5] ^= 0x5A;
+        big[5] ^= 0x5A;
+        bad += check("in place: changed and saved from st_buf", st_save(OBJ_BANKP, st_buf, (uint32_t)n) == 0);
+        memset(back, 0, sizeof back);
+        bad += check("... the change kept", st_load(OBJ_BANKP, back, sizeof back) == (int)sizeof big &&
+                                                !memcmp(back, big, sizeof big));
+        nor[st_sector(OBJ_BANKP, 0) + ST_PAYLOAD_OFF + 9] ^= 0x01;   /* a rotten newer copy: the save still picks */
+        nor[st_sector(OBJ_BANKP, 1) + ST_PAYLOAD_OFF + 9] ^= 0x01;   /* (both bodies flipped: neither valid) */
+        bad += check("rotten bodies: nothing loads", st_load(OBJ_BANKP, back, sizeof back) < 0);
+        bad += check("... a save over them", st_save(OBJ_BANKP, big, sizeof big) == 0 &&
+                                                 st_load(OBJ_BANKP, back, sizeof back) == (int)sizeof big &&
+                                                 !memcmp(back, big, sizeof big));
+    }
     {   /* OMNI map: every copy of every object a sector in a data region, none in the sample slots
          * (0xA0000..0xDBFFF) or the key_mac sector (0xFF000), no two the same (F's two copies apart, as Felucca's) */
         uint32_t o, p, c, d, ok = 1;

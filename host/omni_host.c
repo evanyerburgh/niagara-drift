@@ -141,6 +141,8 @@ _Static_assert(OBJ_NOBJ == 8, "store_len: one -1 an object");
 static uint32_t store_writes;
 static int save_cut, save_cut_due;   /* "savecut 1": each save cuts the next audio block to silence, as the FM-1's erase
                                       * does (main.c audio_silence: the DMA buffer zeroed for a block, ~5.8 ms) */
+static uint32_t store_buf[PLAT_STORE_MAX / 4u];
+void *plat_store_buf(void) { return store_buf; }
 int plat_store_load(uint32_t obj, void *dst, uint32_t max)
 {
     int n;
