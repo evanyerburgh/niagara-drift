@@ -46,7 +46,7 @@ PAIRS = [
     ('aria-label="The manual"', 'aria-label="マニュアル"', 2),
     ("<h2 data-recolor>Start here</h2>", "<h2 data-recolor>はじめに</h2>", 1),
     ('The drones wait for <kbd>PLAY</kbd>, and the white keys hold sounds, not notes.',
-     'ドローンは<kbd>PLAY</kbd>を押すまで待っています。白鍵が呼び出すのは音程ではなく、サウンドです。', (0, 1)),     # 0 until #112 (Start here's first line) is on main
+     'ドローンは<kbd>PLAY</kbd>を押すまで待っています。白鍵が呼び出すのは音程ではなく、サウンドです。', 1),
     ("<li>Tap <kbd>PLAY</kbd> and the drones fade in</li>", "<li><kbd>PLAY</kbd>をタップすると、ドローンがフェード・インします</li>", 1),
     ("<li>Tap white keys 1–8. There's a preset on each</li>", "<li>白鍵1–8をタップします。それぞれにプリセットが入っています</li>", 1),
     ("<li>Hold a gesture key (the top eight white keys), then let go</li>", "<li>ジェスチャー・キー（上の8つの白鍵）を長押しして、離します</li>", 1),

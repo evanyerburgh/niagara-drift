@@ -73,6 +73,13 @@ JA_NOTE = ('<div class="note ja-note"><p>このページはAIによる翻訳で�
            '間違いに気づいたら、<a href="{up}ja/manual/help/#send-feedback">お知らせください</a>。</p></div>')
 
 
+def lang_item(href, lang, name, small):
+    """The other language as the menu's last item: shown only on phones (≤480 px), where the row has no room for its
+    pill (manual.css, web/emu/index.html)."""
+    return (f'<a class="langitem" href="{href}" hreflang="{lang}">{icon("arrows-left-right", "mi")}'
+            f'<span><span lang="{lang}">{name}</span><small>{small}</small></span></a>')
+
+
 def menu_html(up, current, lang="en", other="ja/"):
     """Install, Source, the other language (other: its page, from the site's root) and the menu (the front page has
     the same, web/emu/index.html)."""
@@ -82,13 +89,15 @@ def menu_html(up, current, lang="en", other="ja/"):
         return (f'<a href="{up}ja/install/">インストール</a><a href="{up}ja/manual/help/#send-feedback">フィードバック</a>'
                 f'<a href="{REPO}" aria-label="GitHubのソース">ソース{GH}</a>'
                 f'<a class="lang" href="{up}{other}" lang="en" hreflang="en">English</a>'
-                f'<details class="menubtn"><summary aria-label="メニュー" title="メニュー">メニュー</summary><div class="panel">{items}</div></details>')
+                f'<details class="menubtn"><summary aria-label="メニュー" title="メニュー">メニュー</summary><div class="panel">{items}'
+                f'{lang_item(up + other, "en", "English", "英語のページへ")}</div></details>')
     items = "".join(f'<a href="{up}{h}"{" aria-current=\"page\"" if n == current else ""}>{icon(MENU_ICON[n], "mi")}'
                     f'<span>{n}<small>{s}</small></span></a>'
                     for h, n, s in MENU)
     return (f'<a href="{up}install/">Install</a><a href="{up}manual/help/#send-feedback">Feedback</a><a href="{REPO}" aria-label="Source on GitHub">Source{GH}</a>'
             f'<a class="lang" href="{up}{other}" lang="ja" hreflang="ja">日本語</a>'
-            f'<details class="menubtn"><summary aria-label="Menu" title="Menu">Menu</summary><div class="panel">{items}</div></details>')
+            f'<details class="menubtn"><summary aria-label="Menu" title="Menu">Menu</summary><div class="panel">{items}'
+            f'{lang_item(up + other, "ja", "日本語", "in Japanese")}</div></details>')
 
 
 # ---- Markdown ----------------------------------------------------------------------------------------------------
