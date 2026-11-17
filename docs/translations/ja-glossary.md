@@ -22,6 +22,14 @@ checked by a native speaker: corrections welcome.
 6. **Names stay as they are**: Niagara Drift, FM-1, M-VAVE, M-Flasher, M-UPGRADE, Chrome, Edge, GitHub. The Presets'
    names (NIAGARA, SONAR, ...) and the Tunings' (La Monte Young, Partch) stay in English letters.
 7. **Drone I / drone II**: ドローン I / ドローン II (Roman numerals, as on screen).
+8. **Every heading keeps the English page's link name**: `## ノブ {#knobs}`, `### クリックとチック {#ticks}`, so a link
+   to a section (gestures.md#keep) lands on it in both languages. The drawings (docs/manual/media/*-ja.svg,
+   `tools/make_diagrams.py ja`) follow rule 1: the FM-1's names stay, the words around them are translated.
+9. **A step that presses a button until a page shows** reads 「**Pitch**ページになるまで[[HOME]]を押し」: most buttons
+   open the page last used there, so "press once" would land on the wrong page. [[ARP]] opens the Swell page at once.
+10. **Style:** no あなた (お使いの, 自分の, or nothing); "：" for labels and lists, not to join two clauses (use 。 or 、);
+    counters with 個 or 種類 (11個の黒鍵, 16種類のサウンド); seconds in prose as 秒 (0.1秒), "s" only when quoting
+    the screen (GESTURE TIME 33 s); ms stays ms.
 
 ## Terms
 
@@ -130,4 +138,31 @@ checked by a native speaker: corrections welcome.
 | start here | はじめに | |
 | good to know | 補足 | |
 | listen | 聴いてみる | the recipes' Listen line |
-| translated by AI, not yet checked | AIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。 | the note at the top of each page |
+| beating (two tones) | うなり / うなる | |
+| latch / latched | ラッチ / ラッチされる | the screen's "latched" stays |
+| peek (at a page) | のぞく | |
+| glide (a scene, a pitch) | なめらかに移る / すべる | a scene: なめらかに移る; a pitch: すべる |
+| crossfade by pressure | 押した分だけクロスフェード | |
+| gesture key | ジェスチャー・キー | |
+| pressure gesture / held gesture | 押す強さのジェスチャー / 長押しのジェスチャー | |
+| tutorial | チュートリアル | |
+| speed mod / delay mod | スピード・モジュレーション / ディレイ・モジュレーション | in prose; the screen's Speed mod, Delay mod stay |
+| send (LFO) | センド | ピッチ・センド, カットオフ・センド |
+| runaway (echoes) | 暴走 | the screen's "runaway" stays |
+| tail (reverb) | 残響 | |
+| the pictures (a page's drawing) | 画面の絵 | Good to know's "The pictures" |
+| stepped figure | ステップするフレーズ | |
+| growl, snarl (the sound) | グロウル | うなり is only for beating |
+| blend (a scene crossfade kept) | ブレンド | not 配合 |
+| a gesture leaves / let go | 抜ける | not 去る |
+| unlatch | 解除する | |
+| restart (LFO reset) / back to the wave's start (hard sync) | リスタート / 先頭に戻る | not やり直す |
+| the starting sound | 起動時のサウンド | |
+| the room's settings (Setup) | 演奏環境の設定 | |
+| rush / drag (timing) | 走る / もたる | |
+| wow and flutter | ワウ・フラッター | |
+| breathing (a light) | 明滅する | |
+| Pitch glide (in prose) | グライド | beside すべる for a pitch moving |
+| reverb types in prose | as on screen: Chorus hallのリバーブ, Cathedralリバーブ | |
+| minor chord | マイナー・コード | not 短調 (a key) |
+| translated with AI | このマニュアルはAIで翻訳しました。より自然な表現があれば、お知らせください。 | one line in each page's small print (Evan, 2026-11-18: no box at the top) |

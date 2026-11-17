@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-only
-"""The front page in Japanese (2026-11-17, the first part: the front page, the install page and Help), made from the
+"""The front page in Japanese (2026-11-17; the whole manual in Japanese since 2026-11-18), made from the
 English one (web/emu/index.html), so the two never drift apart in anything but their words.
 
   tools/make_ja.py SITE_DIR      SITE_DIR/ja/index.html from SITE_DIR/index.html (web/emu/build.sh, tools/make_pages.py)
@@ -56,17 +56,17 @@ PAIRS = [
     ("""<b>Or build it up yourself:</b> start from one drone with everything off, and add a control
         at a time. <a href="manual/recipes/scratch/">Build a sound from scratch →</a>""",
      """<b>自分で組み立てることもできます：</b>すべてオフのドローン1つから始めて、コントロールを1つずつ加えます。
-        <a href="manual/recipes/scratch/">ゼロからサウンドを作る（英語）→</a>""", 1),
+        <a href="manual/recipes/scratch/">ゼロからサウンドを作る →</a>""", 1),
     ("<small>I want a sound</small><b>Recipes</b><span>Ticks, metallic bells, warbling echoes, gestures, scenes, transitions</span>",
-     "<small>音を作りたい</small><b>レシピ（英語）</b><span>クリック、金属的なベル、揺れるエコー、ジェスチャー、シーン、トランジション</span>", 1),
+     "<small>音を作りたい</small><b>レシピ</b><span>クリック、金属的なベル、揺れるエコー、ジェスチャー、シーン、トランジション</span>", 1),
     ("<small>What does this do</small><b>Reference</b><span>Every page, knob and key, in the order of the buttons</span>",
-     "<small>これは何をする？</small><b>リファレンス（英語）</b><span>すべてのページ、ノブ、キーを、ボタンの順に</span>", 1),
+     "<small>これは何をする？</small><b>リファレンス</b><span>すべてのページ、ノブ、キーを、ボタンの順に</span>", 1),
     ("<small>Quick lookup</small><b>Shortcuts</b><span>Every key combination, hold and tap</span>",
-     "<small>すぐに調べる</small><b>ショートカット（英語）</b><span>キーの組み合わせ、長押しとタップ</span>", 1),
+     "<small>すぐに調べる</small><b>ショートカット</b><span>キーの組み合わせ、長押しとタップ</span>", 1),
     ('<a href="manual/help/"><svg', '<a href="ja/manual/help/"><svg', 2),     # the door and the menu's (the menu is redrawn below)
     ("<small>Stuck</small><b>Help</b><span>Installing, going back, problems</span>",
      "<small>困ったとき</small><b>ヘルプ</b><span>インストール、元に戻す、トラブル</span>", 1),
-    ("<h2 data-recolor>Recipes to try</h2>", "<h2 data-recolor>試してみたいレシピ（英語）</h2>", 1),
+    ("<h2 data-recolor>Recipes to try</h2>", "<h2 data-recolor>試してみたいレシピ</h2>", 1),
     ('alt="The Sub · Drive page, drone I\'s sub at -4 oct"><b>Ticks and clicks</b><span>a sub under 20 Hz turns into a pulse</span>',
      'alt="Sub · Driveページ、ドローン Iのサブが-4 oct"><b>クリックとチック</b><span>20 Hz以下のサブがパルスに変わる</span>', 1),
     ('alt="The Mods page, cross-mod bend each other, X-mod 85"><b>Metallic bells</b><span>cross-FM: two high drones ringing into bells</span>',
@@ -88,7 +88,7 @@ PAIRS = [
     ("""<p><b>Niagara Drift</b> is free, open-source firmware (GPL‑3.0) for the M-VAVE FM‑1, made by Evan Yerburgh; not made or endorsed by M-VAVE.
     <a href="manual/about/">About</a> · <a href="https://github.com/evanyerburgh/niagara-drift" aria-label="Source on GitHub">Source on GitHub</a></p>""",
      """<p><b>Niagara Drift</b>は、Evan YerburghによるM-VAVE FM‑1用の無料・オープンソースのファームウェア（GPL‑3.0）です。M-VAVEによる製品や公認のものではありません。
-    <a href="manual/about/">概要（英語）</a> · <a href="https://github.com/evanyerburgh/niagara-drift">GitHubのソース</a></p>""", 1),
+    {NOTE} <a href="manual/about/">概要</a> · <a href="https://github.com/evanyerburgh/niagara-drift">GitHubのソース</a></p>""", 1),
     # the script's words
     ('go.textContent = "Starting...";', 'go.textContent = "起動中…";', 1),
     ("cpu.textContent = `Niagara Drift uses ${m.load}% of this computer's time`;",
@@ -114,8 +114,8 @@ def front_ja(page):
     if not nav:
         raise SystemExit("make_ja: no <nav><!--NAV--> ... </details></nav> in the front page")
     page = page.replace(nav.group(0), "<nav><!--NAV-->" + menu_html("", "Play it", "ja", "") + "</nav>")
-    page = page.replace('<a href="manual/help/">', '<a href="ja/manual/help/">')
-    page = page.replace("<!--ACTIONS-->", "<!--ACTIONS-->\n" + JA_NOTE.format(up="").replace('class="note ja-note"', 'class="ja-note"'), 1)
+    page = page.replace('href="manual/', 'href="ja/manual/')     # every manual page is in Japanese too (2026-11-18)
+    page = page.replace("{NOTE}", JA_NOTE.format(up=""), 1)          # the AI note in the footer's small print
     left = re.findall(r'href="#[\w-]*"', page)
     if left:
         raise SystemExit(f"make_ja: in-page links read through <base> go to the English page: {left}")
