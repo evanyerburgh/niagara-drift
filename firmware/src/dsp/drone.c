@@ -9,6 +9,30 @@
 #include "drone.h"
 #include "fastmath.h"
 
+/* THE HOT LOOPS IN RAM (0.3.1; the way of fm1-base's PLAT_RAM_CODE, Henri David's): the FM-1 runs its code from the
+ * flash chip through a small cache, and a loop bigger than the cache keeps waiting for the flash. The drones' loop
+ * (render_group) and the effects' (fx_run, drone_fx.c) are copied to RAM at power-on (section .app_ram, in the RAM
+ * code region beside the flash driver: app.ld) and run there: the same code, the same samples, less time. Measured on
+ * the FM-1 with a heavy sound (Thomas Loop's, 2026-11-17), the drones' loop alone: 83-88 % average and blocks to 94 %
+ * became 74-78 % and 85 %. The build sets OM_RAM_CODE=1; OM_RAM_CODE=0 ./build.sh leaves both in the flash (to
+ * compare); the host and the emulator have no such section. */
+#ifndef OM_RAM_CODE
+#define OM_RAM_CODE 0
+#endif
+#if OM_RAM_CODE
+#define DR_RAM_CODE __attribute__((section(".app_ram"), noinline, flatten))   /* flatten: every helper inlined (a call
+                                                                                 * from RAM doesn't reach the flash) */
+#define DR_INL __attribute__((always_inline))   /* a helper flatten left out of line somewhere */
+#define DR_FAR(fn) fn##_far                    /* a call from RAM to a function left in the flash: through a pointer
+                                                * (once a block, never a sample) */
+#define DR_FAR_FN(ret, fn, args) static ret (*volatile const fn##_far) args = fn;
+#else
+#define DR_RAM_CODE
+#define DR_INL
+#define DR_FAR(fn) fn
+#define DR_FAR_FN(ret, fn, args)
+#endif
+
 #define BARRIER() __asm__ volatile("" ::: "memory")
 #define CR 16u                                  /* control rate: one update every 16 samples */
 #define BLK 256u
@@ -787,6 +811,7 @@ float dr_partner_semi(int g, int iv)
         return DR_IV_SEMI[iv];
     return dr_tun_over(g, fm_floorf(DR_IV_SEMI[iv] + 0.5f), IV_J[iv]);
 }
+DR_FAR_FN(float, dr_partner_semi, (int, int))
 /* SHIFT along the Tuning (Evan, 2026-11-07): its knob steps from note to note of the Tuning over drone I (SEL: a cent,
  * off the notes); on a note the move is so many of the Tuning's notes, and each drone moves that many from its own
  * nearest note; off a note, its cents (an older sound's +700c on 19-tone stays 700c) */
@@ -1501,7 +1526,7 @@ static inline float sub_wave(int w, float ph, float dt)
 #define OSC_TRI_K 1.7f
 /* the square brought down 3 dB: it was the loudest wave on the speaker, 2.7-4.1 dB over the saw (Evan, 2026-10-30) */
 #define OSC_SQ_K 0.70794578f
-static inline float osc(int wave, float ph, float dt, float pw)
+static inline DR_INL float osc(int wave, float ph, float dt, float pw)
 {
     switch (wave) {
     case DR_SINE:
@@ -1920,7 +1945,7 @@ static inline float route_at(const grp_t *v, int i, uint32_t t)
     return v->rw[i] >= 1.0f ? b : lfo_at(v->rp[i], t) + (b - lfo_at(v->rp[i], t)) * v->rw[i];
 }
 
-static void render_group(int g, uint32_t n)
+static DR_RAM_CODE void render_group(int g, uint32_t n)
 {
     grp_t *v = &grp[g];
     const int16_t *p = &par[DR_GP(g, 0)];
@@ -2013,7 +2038,7 @@ static void render_group(int g, uint32_t n)
     {   /* on a Tuning the interval follows the drone's note (dr_partner_semi): when the drone's pitch moves under it, it
          * glides there (~20 ms) as the pitch does, no step; a new interval switches at once, as it always has (and on
          * 12-tone and Quarter it never moves) */
-        const float it = dr_partner_semi(g, iv);
+        const float it = DR_FAR(dr_partner_semi)(g, iv);
         if (v->ivi != iv || fm_fabsf(it - v->ivs) < 1e-4f)
             v->ivs = it;
         else
@@ -2553,6 +2578,8 @@ static void pf_run(uint32_t n)
 }
 
 #define OUT_KNEE 0.7f
+DR_FAR_FN(void, render_group, (int, uint32_t))   /* the flash calls it in RAM the same way */
+DR_FAR_FN(void, fx_run, (float *, float *, uint32_t))
 /* the output clip: straight up to OUT_KNEE, then a tanh into full scale (a tanh all the way put a 3rd harmonic
  * on everything, -18 dB on a sine at 4/5, and cancelled a triangle's own) */
 static inline float outclip(float x)
@@ -2616,7 +2643,7 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
         }
         if (fade > 0.0f || fade_target > 0.0f) {
             for (g = 0; g < DR_NGROUPS; g++)
-                render_group(g, k);
+                DR_FAR(render_group)(g, k);
         } else {                                 /* stopped: the pitches go straight where they're set, */
             pulse_a = par[P_PULSE] ? 1.0f : 0.0f;    /* and the switches are where they're set */
             pf_run(0);
@@ -2651,7 +2678,7 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
          * rest until PLAY */
         if (fade > 0.0f || fade_target > 0.0f || fx_quiet < 160u) {
             float pk = 0.0f;
-            fx_run(mixl, mixr, k);
+            DR_FAR(fx_run)(mixl, mixr, k);
             clean_hold(mixl, mixr, k);
             for (j = 0; j < k; j++)
                 pk = fm_maxf(pk, fm_maxf(fm_fabsf(mixl[j]), fm_fabsf(mixr[j])));

@@ -5,9 +5,12 @@
 uint32_t plat_ms(void) { return fm1_ms; }
 uint32_t plat_us(void) { return MQ_NOW_US(); }
 
+/* one look at the panel: plat_buttons() takes it (the buttons and the keys held, no tap since the last look lost:
+ * hal/fm1_taps.h), plat_keys() gives that look's keys. The UI calls them in this order, once each time round. */
+static uint32_t look_keys;
 uint32_t plat_buttons(void)
 {
-    uint32_t raw = fm1_in.buttons, out = 0, i;
+    uint32_t raw = fm1_input_held(&look_keys), out = 0, i;
     for (i = 0; i < NB; i++)
         if (raw & (1u << panel.btn[i]))
             out |= 1u << i;
@@ -15,7 +18,7 @@ uint32_t plat_buttons(void)
 }
 
 int plat_headphones(void) { return fm1_jack_phones(); }
-uint32_t plat_keys(void) { return fm1_in.notes & ((1u << NKEYS) - 1u); }
+uint32_t plat_keys(void) { return look_keys & ((1u << NKEYS) - 1u); }
 
 int32_t plat_enc(int role)
 {
