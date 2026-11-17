@@ -32,6 +32,7 @@
 #include "fm1_gpio.h"
 
 #include "fm1_adc.h"
+#include "fm1_taps.h"
 
 #ifndef FM1_INPUT_IDLE
 #define FM1_INPUT_IDLE() ((void)0)
@@ -112,6 +113,7 @@ static volatile struct {
     uint32_t buttons;            /* debounced: bit i = button i (0..13) */
     uint32_t pressed, released;  /* button edges since the last fm1_input_edges() */
     uint32_t notes_pressed;      /* note-key press edges since the last fm1_input_note_edges() */
+    uint32_t notes_released;     /* note-key let-go edges since the last fm1_input_held() */
     uint8_t raw[FM1_NCOL];       /* last frame, packed rows, 1 = closed */
     uint8_t cnt[FM1_NKEY];
     uint8_t enc_prev[FM1_NENC], enc_last[FM1_NENC];
@@ -255,8 +257,11 @@ static void fm1__key(uint32_t id, uint32_t closed)
                 fm1_in.notes_pressed |= 1u << (id - 14u);
             fm1_in.notes |= 1u << (id - 14u);
         }
-        else
+        else {
+            if (fm1_in.notes & (1u << (id - 14u)))
+                fm1_in.notes_released |= 1u << (id - 14u);
             fm1_in.notes &= ~(1u << (id - 14u));
+        }
     } else if (on != ((fm1_in.buttons >> id) & 1u)) {
         fm1_in.buttons ^= 1u << id;
         if (on)
@@ -574,6 +579,19 @@ static uint32_t fm1_input_note_edges(void)
     fm1_in.notes_pressed = 0;
     fm1__unlock(k);
     return p;
+}
+
+/* what the UI reads each look: the buttons and note keys held, with every tap since its last look kept
+ * (fm1_taps.h); the edges are taken, so one reader only (panel_setup's fm1_input_edges runs before the UI) */
+static uint32_t fm1_input_held(uint32_t *notes)
+{
+    static uint32_t seen_b, seen_n;
+    uint32_t k = fm1__lock();
+    uint32_t b = fm1_taps(fm1_in.buttons, fm1_in.pressed, fm1_in.released, &seen_b);
+    *notes = fm1_taps(fm1_in.notes, fm1_in.notes_pressed, fm1_in.notes_released, &seen_n);
+    fm1_in.pressed = fm1_in.released = fm1_in.notes_pressed = fm1_in.notes_released = 0;
+    fm1__unlock(k);
+    return b;
 }
 
 /* LED of key id (button 0..13 or note key 14..40) */
