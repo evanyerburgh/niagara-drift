@@ -710,16 +710,16 @@ static int lk_heard(int g, float *bright, float *close)
 static float lk_cut_hist[DR_NGROUPS][LK_STRANDS];
 static void lk_curve(int g, int32_t x0, int32_t top, int32_t bot);
 
+static void lk_pitch_lanes(void);
 static void lk_pic_drones1(void)
 {
-    const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 2, bot = LK_PIC_H - 2, mid = (top + bot) / 2, half = (bot - top) / 2;
+    const int32_t top = 2 + (int32_t)LK_F_DRONE.h + 2, bot = LK_PIC_H - 2, half = (bot - top) / 2;
     static uint32_t drawn;
     const uint32_t now = plat_ms();
     const int back = now - drawn > 200u;     /* back after a while away: every strand from now (as lk_curve) */
     int g, j, i;
     drawn = now;
-    for (g = 0; g < DR_NGROUPS; g++) {
-        const int32_t x0 = g ? 128 : 8;
+    for (g = 0; g < DR_NGROUPS; g++) {         /* each drone's last six captures, smoothed, scaled to its peak */
         float m = 0.0f, k;
         for (i = 0; i < DR_SCOPE_N; i++)
             m = fm_maxf(m, fm_fabsf(dr_scope[g][i]));
@@ -735,45 +735,8 @@ static void lk_pic_drones1(void)
                 for (j = 0; j < LK_STRANDS - 1; j++)
                     lk_hist[g][j][i] = lk_hist[g][LK_STRANDS - 1][i];
         }
-        if (plat_ms() < ui.touch_t[g ? 3 : 1] + 300u) {   /* its Reso turning, and 1.5 s after: the filter curve
-                                                         * as on Drones, the peak growing (Evan, 2026-11-08: the
-                                                         * waves hardly show the resonance); the waves' history
-                                                         * kept going, so they come back as they are now */
-            lk_curve(g, g ? 130 : 10, top + 2, LK_PIC_H - 6);
-            continue;
-        }
-        {   /* scaled to its own loudness, but as quiet as it is heard near silence: smaller and dimmer, then a
-             * thin gray line */
-            float br, cl;
-            if (!lk_heard(g, &br, &cl)) {
-                cv_rect(x0, mid, DR_SCOPE_N, 1, LK_UNLIT);
-                continue;
-            }
-            for (j = 0; j < LK_STRANDS; j++) { /* the oldest first, deep; the newest last, light */
-                const uint16_t c = lk_mix(0x07060Bu, lk_ramp888(g, (float)j / (float)(LK_STRANDS - 1)), br);
-                for (i = 1; i < DR_SCOPE_N; i++) {
-                    const int32_t a = (int32_t)((float)lk_hist[g][j][i - 1] * cl), b = (int32_t)((float)lk_hist[g][j][i] * cl);
-                    cv_line(x0 + i - 1, mid - a, x0 + i, mid - b, c);
-                    cv_line(x0 + i - 1, mid + 1 - a, x0 + i, mid + 1 - b, c);
-                }
-            }
-        }
     }
-    cv_rect(120, 4, 1, LK_PIC_H - 8, LK_RULE); /* drone I | drone II */
-    cv_text(10, 2, &LK_F_DRONE, "I", LK_DRONE[0]);
-    {   /* "II", and its interval from drone I after it, on the names' baseline */
-        char t[24];
-        const int c1 = proj.par[DR_GP(0, GP_PITCH)],
-                  c2 = proj.par[P_PLINK] ? c1 + proj.par[P_PLINK_OFF] : proj.par[DR_GP(1, GP_PITCH)];
-        const int32_t x1 = 130 + text_w(&LK_F_DRONE, "II") + 6, iy = 2 + LK_B(LK_F_DRONE) - LK_B(LK_F_SMALL);
-        int32_t ax;
-        if (!dr_tun_name(proj.par[P_TUNING], c1, c1, c2, t))
-            lk_interval(t, c2 - c1);
-        cv_text(130, 2, &LK_F_DRONE, "II", LK_DRONE[1]);
-        ax = cv_text(x1, iy, &LK_F_SMALL, t, LK_DRONE[1]);
-        if (c2 != c1)
-            lk_arrow(ax + 5, iy + LK_B(LK_F_SMALL) - 1, 11, c2 > c1, LK_DRONE[1]);
-    }
+    lk_pitch_lanes();
     for (i = 0; i < 4; i += 2)                 /* a pitch knob turning: its fine tuning, SEL's job, and how far
                                                 * it has the knob off the Tuning's notes ("fine +3"; Evan,
                                                 * 2026-11-07: on the other Tunings the note's own cents hid it) */
@@ -2130,6 +2093,147 @@ static void lk_pic_space(void)
     cv_text(130, 2, &LK_F_SMALL, "REVERB", LK_REV_C);
 }
 
+/* Pitch's picture (Evan, 2026-11-17): one wave over the other on one clock, drone I above, drone II below, each
+ * drone's name at its lane's left (II with its interval, the arrow first), so the two pitches can be compared */
+static void lk_pitch_lanes(void)
+{
+    const float p1 = dr_pitch[0] + dr_mac_pitch(0), p2 = dr_pitch[1] + dr_mac_pitch(1);
+    /* Across the page two cycles of the lower drone; each drone's captured cycle repeated at its own rate, placed by
+     * when it was captured (the engine's common sample clock), so a detune slides II along I at the beat rate and a
+     * pure interval stands still. A tick where each cycle starts, on the lanes' inner edges (a wave with several
+     * bumps a cycle still counts). Its Reso turning or its filter key tapped: the river bed, below */
+    static const char *const MODE[3] = {"LP", "BP", "HP"};
+    const int32_t x0 = 8, w = 224, H = LK_PIC_H, lh = H / 2;
+    const float ci0 = dr_scope_ci[0] > 1e-6f ? dr_scope_ci[0] : 8.1757989f * fm_exp2f(p1 / 12.0f) / DR_SR;
+    const float ci1 = dr_scope_ci[1] > 1e-6f ? dr_scope_ci[1] : 8.1757989f * fm_exp2f(p2 / 12.0f) / DR_SR;
+    const float win = 2.0f / fm_minf(ci0, ci1);        /* samples across the page */
+    const float lag = (float)(int32_t)(dr_scope_t0[0] - dr_scope_t0[1]);   /* II's capture began this much earlier */
+    int g, j, i;
+    for (g = 0; g < 2; g++) {
+        const int32_t ly = g * lh, base = ly + 2 + LK_B(LK_F_DRONE);
+        const int32_t wt = ly + (int32_t)LK_F_DRONE.h + (g ? 7 : 3), wb = ly + lh - (g ? 3 : 7);   /* room for the
+                                                * ticks: under I's wave, over II's */
+        const int32_t mid = (wt + wb) / 2, amp = (wb - wt) / 2;
+        const float ci = g ? ci1 : ci0, dec = (float)(dr_scope_dec[g] ? dr_scope_dec[g] : 1u);
+        const float off = g ? lag * ci1 : 0.0f;  /* II's phase at I's capture start */
+        const int over = plat_ms() < ui.filt_t[g];   /* its filter key tapped: the type and key by the name */
+        const int reso = plat_ms() < ui.touch_t[g ? 3 : 1] + 300u;   /* its Reso turning, and 1.5 s after */
+        float br, cl;
+        int32_t x;
+        x = cv_text(10, ly + 2, &LK_F_DRONE, g ? "II" : "I", LK_DRONE[g]) + 6;
+        if (over) {                            /* "BP [A#3]", the interval giving way meanwhile */
+            const int m = gpar(g, GP_MODE);
+            lk_key(cv_text(x, base - LK_B(LK_F_SMALL), &LK_F_SMALL, MODE[(unsigned)m < 3u ? m : 0], LK_DRONE[g]) + 5,
+                   base, LK_BKEY[g ? 7 : 2]);
+        } else if (g) {
+            char t[24];
+            const int c1 = proj.par[DR_GP(0, GP_PITCH)],
+                      c2 = proj.par[P_PLINK] ? c1 + proj.par[P_PLINK_OFF] : proj.par[DR_GP(1, GP_PITCH)];
+            if (!dr_tun_name(proj.par[P_TUNING], c1, c1, c2, t))
+                lk_interval(t, c2 - c1);
+            if (c2 != c1) {                    /* the arrow first, beside the name: which drone is higher, at a
+                                                * glance (Evan, 2026-11-17) */
+                lk_arrow(x, base - 1, 11, c2 > c1, LK_DRONE[1]);
+                x += 13;
+            }
+            cv_text(x, base - LK_B(LK_F_SMALL), &LK_F_SMALL, t, LK_DRONE[1]);
+        }
+        {   /* its Reso turning or its filter key tapped: the filter's curve as a still, thin line, a river bed, and
+             * the wave flowing on it as the river, its middle following the bed (Evan, 2026-11-17: "a river bed where
+             * the wave form is a moving river"); in about 0.2 s, back over about 0.5 s */
+            static float mx[2];
+            static uint32_t last[2];
+            static int16_t bed[2][57];
+            const uint32_t now = plat_ms();
+            const float dt = fm_minf((float)(now - last[g]) * 0.001f, 0.1f);
+            const float ra = (float)amp * 0.35f;      /* the river's half height on its bed: a third of the lane, the
+                                                * bed's span the rest (a lane is ~32 px: the peak needs the room) */
+            const float gap = 3.0f;                   /* between the river and its bed, so the bed reads (Evan,
+                                                * 2026-11-17: "a tiny bit more room"); the wave slides up with it */
+            const float span = (float)(wb - wt) - 2.0f * ra - gap, rr = reso_now(g) * 0.001f;
+            const float bx = 56.0f * fm_clampf(dr_cut[g] * 0.01f, 0.0f, 1.0f), bs = (22.0f - 14.0f * rr) * 0.25f;
+            last[g] = now;
+            mx[g] = over || reso ? fm_minf(mx[g] + dt / 0.2f, 1.0f) : fm_maxf(mx[g] - dt / 0.5f, 0.0f);
+            if (mx[g] > 0.0f)
+                for (i = 0; i <= 56; i++) {         /* the filter's shape, -24 .. 0 dB over the bed's lower half;
+                                                * the resonance a peak at the cutoff over the upper half, its height
+                                                * Reso as heard, evenly over the dial (the review: 5-6 px at 86) */
+                    const float d = filt_db(g, dr_cut[g], 100.0f * (float)i / 56.0f), u = ((float)i - bx) / bs;
+                    const float pk = u > -3.0f && u < 3.0f ? rr * fm_exp2f(-1.442695f * u * u) : 0.0f;
+                    bed[g][i] = (int16_t)(wb - (int32_t)(((fm_clampf(d, -24.0f, 0.0f) + 24.0f) / 24.0f * 0.35f + 0.65f * pk) *
+                                                         span + 0.5f));
+                }
+            if (!lk_heard(g, &br, &cl)) {
+                cv_rect(x0, mid, w, 1, LK_UNLIT);
+                continue;
+            }
+            {
+                const float sc = (float)amp / (float)((H - 2 - (2 + (int32_t)LK_F_DRONE.h + 2)) / 2);
+                const float m = mx[g] * mx[g] * (3.0f - 2.0f * mx[g]);   /* eased */
+                if (m > 0.0f) {                /* the bed: 1 px, still, light (the drone's light end halfway to
+                                                * white, the review: drone II's read gray), coming in with it; a
+                                                * white tick under the cutoff */
+                    const uint32_t l = lk_ramp888(g, 1.0f);
+                    const uint32_t hi = ((l >> 16 & 255u) + 255u) / 2u << 16 | ((l >> 8 & 255u) + 255u) / 2u << 8 |
+                                        ((l & 255u) + 255u) / 2u;
+                    const uint16_t bc = lk_mix(0x07060Bu, hi, m);
+                    const int32_t cx = x0 + (int32_t)(bx * 4.0f);
+                    for (i = 1; i <= 56; i++)
+                        cv_line(x0 + 4 * (i - 1), bed[g][i - 1], x0 + 4 * i, bed[g][i], bc);
+                    if (m > 0.5f)
+                        cv_rect(cx < x0 + 1 ? x0 + 1 : cx > x0 + w - 3 ? x0 + w - 3 : cx, wb + 1, 2, 4, LK_WHITE);
+                }
+                for (j = 0; j < LK_STRANDS; j++) {
+                    const uint16_t c = lk_mix(0x07060Bu, lk_ramp888(g, (float)j / (float)(LK_STRANDS - 1)), br);
+                    int32_t py = 0;
+                    for (i = 0; i < w; i++) {
+                        float ph = off + (float)i / (float)(w - 1) * win * ci;   /* cycles */
+                        int k;
+                        int32_t y;
+                        float v;
+                        ph -= fm_floorf(ph);
+                        k = (int)((ph / ci + 1.0f) / dec) - 1;   /* point k sits at ((k + 1) dec - 1) samples */
+                        k = k < 0 ? 0 : k > DR_SCOPE_N - 1 ? DR_SCOPE_N - 1 : k;
+                        v = (float)lk_hist[g][j][k] * sc;   /* its lane's height at any level: a quiet drone dims,
+                                                * it doesn't shrink (the review) */
+                        y = mid - (int32_t)v;
+                        if (m > 0.0f) {        /* on the bed: its middle ra over the bed, its height ra */
+                            const float u = (float)i * 0.25f;
+                            const int a = u >= 56.0f ? 55 : (int)u;
+                            const float f = u - (float)a, b = (float)bed[g][a] + ((float)bed[g][a + 1] - (float)bed[g][a]) * f;
+                            const float yr = b - gap - ra - v * ra / (float)(amp > 0 ? amp : 1);
+                            y = (int32_t)((float)y + ((yr - (float)y) * m) + 0.5f);
+                        }
+                        if (i) {
+                            cv_line(x0 + i - 1, py, x0 + i, y, c);
+                            cv_line(x0 + i - 1, py + 1, x0 + i, y + 1, c);
+                        }
+                        py = y;
+                    }
+                }
+                if (m > 0.5f) {                /* on the bed: the cycle ticks sit on it (the review) */
+                    for (i = 0; i < w; i++) {
+                        const float a = off + (float)i / (float)(w - 1) * win * ci, b = off + (float)(i + 1) / (float)(w - 1) * win * ci;
+                        if (i == 0 ? a - fm_floorf(a) < 1e-3f : fm_floorf(b) != fm_floorf(a)) {
+                            const int32_t tx = i < 1 ? 1 : i > w - 3 ? w - 3 : i;
+                            const int ia = tx / 4 > 55 ? 55 : tx / 4;
+                            cv_rect(x0 + tx, bed[g][ia] - 2, 2, 5, LK_DRONE[g]);
+                        }
+                    }
+                    continue;
+                }
+            }
+            for (i = 0; i < w; i++) {          /* a tick at each cycle's start: under I's wave, over II's; 2 px,
+                                                * kept in from the edges (the review) */
+                const float a = off + (float)i / (float)(w - 1) * win * ci, b = off + (float)(i + 1) / (float)(w - 1) * win * ci;
+                if (i == 0 ? a - fm_floorf(a) < 1e-3f : fm_floorf(b) != fm_floorf(a)) {
+                    const int32_t tx = x0 + (i < 1 ? 1 : i > w - 3 ? w - 3 : i);
+                    cv_rect(tx, g ? wt - 5 : wb, 2, 5, LK_DRONE[g]);
+                }
+            }
+        }
+    }
+}
 static void lk_pic(void)
 {
     const int msg = plat_ms() < ui.msg_until;

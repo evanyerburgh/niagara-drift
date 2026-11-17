@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): the Pitch page (0.3.1): drone I's wave over drone II's on one
+# time line, cycle ticks, the interval with its arrow first; a few cents' detune sliding; Reso and a filter key as
+# the river bed under the wave. No expectations (main's build plays this script too).
+notips
+phones 1
+set 74 0
+set 71 0
+tap PLAY
+wav pitch-page.wav
+wait 2500
+page 1
+wait 1500
+shot pitch-5th.png
+press SEL
+spin K3 4
+release SEL
+wait 1500
+shot pitch-detune-a.png
+wait 1000
+shot pitch-detune-b.png
+spin K3 -7
+wait 2500
+shot pitch-unison.png
+spin K3 12
+wait 2500
+shot pitch-octave.png
+spin K4 30
+wait 300
+shot pitch-reso.png
+tapkey b2
+wait 400
+shot pitch-filter-key.png
+wait 2500
+shot pitch-back.png

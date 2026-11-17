@@ -36,7 +36,7 @@ Low-pass (LP), band-pass (BP) or high-pass (HP), on a black key: [[A#3]] for dro
 
 ## Pitch
 
-<img class="shot" src="../../img/screen-play2.png" width="240" alt="The Pitch page: each drone's waveform as strands, and drone II's interval from drone I">
+<img class="shot" src="../../img/screen-play2.png" width="240" alt="The Pitch page: drone I's wave above drone II's on one time line, a tick where each cycle starts, and drone II's interval from drone I">
 
 | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|
@@ -60,5 +60,11 @@ Low-pass (LP), band-pass (BP) or high-pass (HP), on a black key: [[A#3]] for dro
 - **A fine offset stays** (with SEL, +3 cents stays +3 from note to note) until you change the Tuning; "fine +3" shows
   it.
 - **The pictures:** on Drones, each filter's curve, its level in dB under it, its note at the right; a silent drone is
-  a thin gray curve. On Pitch, each wave as strands that fan out as it moves, and drone II's interval from drone I
-  ("5th ↑").
+  a thin gray curve. On Pitch, drone I's wave above drone II's on one time line, so you
+  see their pitches side by side: at a fifth drone II runs three cycles to drone I's two, at an octave four. A tick
+  marks where each cycle starts. Drone II's name has its interval from drone I, the arrow first ("↑ 5th"). A few
+  cents off a pure interval, drone II's wave slides slowly against drone I's, faster the further off; in tune, it
+  stands still.
+- **Resonance and filter type on Pitch:** while you turn a resonance, or for a moment after you tap a filter key,
+  that drone's filter curve shows as a thin, still line under its wave, and the wave rides on it, rising over the
+  resonance's peak. A filter key also shows its type and key by the drone's name ("BP [[A#3]]").

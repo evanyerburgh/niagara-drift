@@ -714,6 +714,8 @@ typedef struct {
     uint8_t linked;                               /* PITCH LINK was on last tick */
     uint16_t sc_n, sc_dec, sc_cnt, sc_wait;       /* the scope: points taken, a point every sc_dec samples */
     uint16_t sc_arm;                              /* ... samples armed without a cycle starting */
+    uint32_t sc_t0;                               /* ... the sample it started on (sc_clk) */
+    float sc_ci;                                  /* ... the cycles a sample then */
     float slide;                                  /* semitones a control tick toward the pitch; 0: there */
     float st;                                     /* where the slide is: the Glide follows it */
     uint16_t slide_ms;                            /* dr_slide: the next pitch change's slide, ms */
@@ -889,6 +891,10 @@ volatile float dr_cut[DR_NGROUPS];
 volatile float dr_xw[DR_NGROUPS], dr_reso[DR_NGROUPS];
 volatile float dr_fb, dr_snarl;
 volatile float dr_scope[DR_NGROUPS][DR_SCOPE_N];
+volatile uint32_t dr_scope_t0[DR_NGROUPS];
+volatile float dr_scope_ci[DR_NGROUPS];
+volatile uint16_t dr_scope_dec[DR_NGROUPS];
+static uint32_t sc_clk;                          /* samples rendered: the scopes' common clock */
 static float sc_buf[DR_NGROUPS][DR_SCOPE_N];
 static float pulse_ph, pulse_g = 1.0f;           /* the pulse: phase over two beats (0..2), its gain */
 static float pulse_a;                            /* the pulse coming in / going out (Morph), 0..1 */
@@ -2394,6 +2400,9 @@ static DR_RAM_CODE void render_group(int g, uint32_t n)
                         int q;
                         for (q = 0; q < DR_SCOPE_N; q++)
                             dr_scope[g][q] = sc_buf[g][q];
+                        dr_scope_t0[g] = v->sc_t0;
+                        dr_scope_ci[g] = v->sc_ci;
+                        dr_scope_dec[g] = v->sc_dec;
                         v->sc_wait = 1500;      /* ~34 ms, then the next */
                     }
                 }
@@ -2408,6 +2417,8 @@ static DR_RAM_CODE void render_group(int g, uint32_t n)
                 v->sc_n = 0;
                 v->sc_cnt = 0;
                 v->sc_dec = (uint16_t)(d < 1.0f ? 1.0f : d > 4000.0f ? 4000.0f : d);
+                v->sc_t0 = sc_clk + j + 1;      /* the next sample starts the cycle */
+                v->sc_ci = ci;
             }
             if (g == 1)                         /* for drone I's cross-FM, next block */
                 ybuf[j] = y;
@@ -2644,6 +2655,7 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
         if (fade > 0.0f || fade_target > 0.0f) {
             for (g = 0; g < DR_NGROUPS; g++)
                 DR_FAR(render_group)(g, k);
+            sc_clk += k;
         } else {                                 /* stopped: the pitches go straight where they're set, */
             pulse_a = par[P_PULSE] ? 1.0f : 0.0f;    /* and the switches are where they're set */
             pf_run(0);

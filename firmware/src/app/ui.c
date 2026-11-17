@@ -173,6 +173,8 @@ static struct {
     char glab[2][16];                  /* SELECT / ALGORITHM / PRESETS turned: their name and value (top bar) */
     uint32_t glab_until;
     uint32_t touch_t[4];               /* each knob: lit until then (each its own timer: two hands) */
+    uint32_t filt_t[2];                /* each drone's filter key: Pitch shows its type and key, and its filter's
+                                        * curve under its wave, until then */
     uint8_t sel_lit;                   /* bit i: knob i last turned with SEL held, on a page where that's a second job */
     uint8_t sel_turned;                /* a second job turned since SEL went down (the key map stays away) */
     int8_t morph;                      /* the scene being morphed to (VISIT_BACK: back from a visit), or -1 */
@@ -629,6 +631,8 @@ static void sw_flip(sw_t w)
         static const char *const MODE[3] = {"LP", "BP", "HP"};
         int m = (proj.par[base + GP_MODE] + 1) % 3;
         param_set(base + GP_MODE, m);
+        ui.filt_t[w.g] = plat_ms() + 1500u;   /* Pitch shows the type, the key and the filter's curve a while, as for
+                                                * a Reso turned (Evan, 2026-11-17) */
         what = "FILTER";
         st = MODE[m];
         break;
@@ -659,7 +663,7 @@ static void sw_flip(sw_t w)
     default: return;
     }
     if ((w.s == S_PARTNER && ui.view == V_PARTNER) || (w.s == S_SUBOCT && ui.view == V_SOURCE) ||
-        (w.s == S_HP && ui.view == V_PLAY) || (w.s == S_XMOD && ui.view == V_LFO2) ||
+        (w.s == S_HP && (ui.view == V_PLAY || ui.view == V_PLAY2)) || (w.s == S_XMOD && ui.view == V_LFO2) ||
         (ui.view == V_LFO && (w.s == S_OTAP || w.s == S_ODEST || w.s == S_FTAP || w.s == S_FDEST)) ||
         (w.s == S_DTAP && ui.view == V_LFO2))
         return;                                /* the page shows it and its key: no banner (Evan, 2026-11-02; the LFO
