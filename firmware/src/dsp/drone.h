@@ -311,4 +311,7 @@ float dr_age_now(float *ph);                   /* Age as heard now (its 20 s wea
  * renewed about 30 times a second */
 #define DR_SCOPE_N 104
 extern volatile float dr_scope[DR_NGROUPS][DR_SCOPE_N];
+extern volatile uint32_t dr_scope_t0[DR_NGROUPS];   /* each capture's start, in samples of one clock for both */
+extern volatile float dr_scope_ci[DR_NGROUPS];      /* ... its oscillator's cycles a sample then */
+extern volatile uint16_t dr_scope_dec[DR_NGROUPS];  /* ... samples a point */
 extern volatile float dr_pitch[DR_NGROUPS];    /* each drone's pitch now (MIDI note, fractional while sliding) */
