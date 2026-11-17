@@ -61,10 +61,14 @@ Low-pass (LP), band-pass (BP) or high-pass (HP), on a black key: [[A#3]] for dro
   it.
 - **The pictures:** on Drones, each filter's curve, its level in dB under it, its note at the right; a silent drone is
   a thin gray curve. On Pitch, drone I's wave above drone II's on one time line, so you
-  see their pitches side by side: at a fifth drone II runs three cycles to drone I's two, at an octave four. A tick
-  marks where each cycle starts. Drone II's name has its interval from drone I, the arrow first ("↑ 5th"). A few
+  see their pitches side by side: at a fifth drone II runs three cycles to drone I's two, at an octave four.
+- **The ticks** above and below the waves mark where each cycle starts: drone I's under its wave, drone II's over
+  its own, so the two rows face each other. Count them to see the interval (two of drone I's to three of drone II's
+  is a fifth); in unison they line up.
+- **The interval:** drone II's name has its interval from drone I, the arrow first ("↑ 5th"). A few
   cents off a pure interval, drone II's wave slides slowly against drone I's, faster the further off; in tune, it
   stands still.
 - **Resonance and filter type on Pitch:** while you turn a resonance, or for a moment after you tap a filter key,
-  that drone's filter curve shows as a thin, still line under its wave, and the wave rides on it, rising over the
-  resonance's peak. A filter key also shows its type and key by the drone's name ("BP [[A#3]]").
+  that drone's filter curve grows to fill the picture, the other drone fading out under it, and the wave rides on
+  it, rising over the resonance's peak; a white tick under it marks the cutoff. Let go and it slides back down to
+  the wave. A filter key also shows its type and key by the drone's name ("BP [[A#3]]").
