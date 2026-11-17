@@ -45,7 +45,13 @@ static void led_pos_init(void)
     }
 }
 /* a level 0..255 as the eye sees it; 255 is steadily lit, below that the HAL's PWM: the share of frames lit
- * is the level squared (the eye's curve, roughly), at least one frame in 32 for any level above 0 */
+ * is the level squared (the eye's curve, roughly), at least one frame in 32 for any level above 0.
+ * Moving (a gesture coming in, a scene's key filling), a light lands between two of the 32 steps by taking the
+ * one above as often as it's nearer it (the remainder carried from one UI frame to the next), so it fades
+ * rather than steps, from dark; still for LED_STILL frames, it rounds, so a steady light never shimmers. In the
+ * UI's frame, never the audio's: a few adds a light, 60 times a second at most */
+#define LED_STILL 8u
+static uint8_t led_last[NB + NKEYS], led_moving[NB + NKEYS], led_carry[NB + NKEYS];
 void plat_leds(const uint8_t *buttons, const uint8_t *keys)
 {
     uint8_t nl[FM1_NCOL] = {0}, pw[FM1_LED_PHASES][FM1_NCOL];
@@ -54,6 +60,11 @@ void plat_leds(const uint8_t *buttons, const uint8_t *keys)
     for (i = 0; i < NB + NKEYS; i++) {
         uint32_t id = i < NB ? panel.btn[i] : 14u + (i - NB), lv = i < NB ? buttons[i] : keys[i - NB], d;
         uint8_t q = led_pos[id], m;
+        if (lv != led_last[i]) {
+            led_last[i] = (uint8_t)lv;
+            led_moving[i] = LED_STILL;
+        } else if (led_moving[i])
+            led_moving[i]--;
         if (!lv || q == 0xFF)
             continue;
         m = (uint8_t)(1u << (q & 7u));
@@ -61,9 +72,19 @@ void plat_leds(const uint8_t *buttons, const uint8_t *keys)
             nl[q >> 3] |= m;
             continue;
         }
-        d = (lv * lv * FM1_LED_PHASES + 255u * 255u / 2u) / (255u * 255u);
-        if (!d)
-            d = 1;
+        d = lv * lv * FM1_LED_PHASES * 256u / (255u * 255u);   /* frames lit, x 256 */
+        if (led_moving[i]) {
+            uint32_t r = led_carry[i] + (d & 255u);
+            led_carry[i] = (uint8_t)r;
+            d = (d >> 8) + (r >> 8);
+            if (!d)
+                continue;                              /* under one frame: lit only every so often */
+        } else {
+            led_carry[i] = 0;
+            d = (d + 128u) >> 8;
+            if (!d)
+                d = 1;
+        }
         for (f = 0; f < FM1_LED_PHASES; f++)       /* d frames of 32, evenly spread */
             if ((f + 1u) * d / FM1_LED_PHASES != f * d / FM1_LED_PHASES)
                 pw[f][q >> 3] |= m;

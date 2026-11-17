@@ -227,13 +227,18 @@ expect store_writes 1
 expect mtime 50
 spin PRESET -50
 expect mtime 100
+expect klvlw12 0
 tapkey w12
 wait 8000
 expect gam0 >18
 expect gam0 <30
+# its key: dark at rest, lit as far as the gesture is heard, from 0 (2026-11-17)
+expect klvlw12 >45
+expect klvlw12 <77
 tapkey w12
 wait 40000
 expect gam0 0
+expect klvlw12 0
 spin PRESET 100
 expect mtime 0
 tapkey w12

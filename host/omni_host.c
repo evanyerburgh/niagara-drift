@@ -484,6 +484,8 @@ static int expect(const char *what, const char *val)
         int g = atoi(what + 5);
         got = g >= 0 && g < DR_NGEST ? (ui.g_sent[g] + 5) / 10 : -1;
     }
+    else if (!strncmp(what, "klvl", 4))           /* klvlK: key K's light, 0..255 (w0..w15 white, b0..b10 black) */
+        got = lvl_keys[key_of(what + 4)];
     else if (!strncmp(what, "gam", 3)) {         /* gamN: gesture N's amount now, x 100 (0-3 the top keys, 4-7 G4-C5) */
         int g = atoi(what + 3);
         got = g >= 0 && g < DR_NGEST ? (int)(ui.g_amt[g] * 100.0f + 0.5f) : -1;
