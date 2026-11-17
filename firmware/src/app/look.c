@@ -2053,7 +2053,7 @@ static void lk_ring_tilt(int32_t cx, int32_t cy, float rx, float ry, int tilt, u
  * each dimmer as it ages, drawn while over -26 dB; Drive thickens the lines. Wide: the right at 0.75 of the time;
  * Ping-pong: odd repeats left, even right; Grain jittered, Self stretching (as the engine). Past Repeats 85 they stop
  * shrinking: runaway, in the header */
-static float lk_dly_x(float ms) { return 24.0f + 29.0f * fm_logf(1.0f + ms * 0.01f); }
+static float lk_dly_x(float ms) { return 20.0f + 31.0f * fm_logf(1.0f + ms * 0.01f); }   /* 2 s at x 114 */
 static void lk_pic_delay(void)
 {
     const int ty = (unsigned)proj.par[P_DLY_TYPE] < DR_NDLY ? proj.par[P_DLY_TYPE] : DR_DLY_TAPE;
@@ -2066,9 +2066,9 @@ static void lk_pic_delay(void)
     const int32_t mid = 68;
     static const uint32_t C[2][2] = {{0xB4D9FFu, 0x1F6BFFu}, {0xB8FFF0u, 0x3CBFAFu}};   /* new, old: L blue, R aqua */
     int side, k;
-    cv_text(4, 26, &LK_F_SMALL, "L", LK_LABEL);
-    cv_text(4, 92, &LK_F_SMALL, "R", LK_LABEL);
-    lk_ring(24, mid, 6.0f, 40.0f, 0, w, LK_INK);   /* the sound */
+    cv_text(2, 26, &LK_F_SMALL, "L", LK_LABEL);
+    cv_text(2, 92, &LK_F_SMALL, "R", LK_LABEL);
+    lk_ring(19, mid, 4.0f, 40.0f, 0, w, LK_INK);   /* the sound */
     for (side = 0; side < 2; side++) {
         float a = 1.0f;
         const float step = ms * (side && ty == 1 ? 0.75f : 1.0f);
@@ -2079,7 +2079,7 @@ static void lk_pic_delay(void)
             float hgt, age;
             a *= fb;
             hgt = 40.0f * fm_sqrtf(wet * a);
-            if (x > 112.0f || wet * a < 0.0025f)   /* off the axis, or under -26 dB */
+            if (x > 115.0f || wet * a < 0.0025f)   /* off the axis, or under -26 dB */
                 break;
             if (!heard)
                 continue;
@@ -2088,8 +2088,8 @@ static void lk_pic_delay(void)
                     lk_mix(0x07060Bu, lk_mix888(C[side][0], C[side][1], age), 1.0f - 0.4f * age));
         }
     }
-    cv_rect(113 - text_w(&LK_F_SMALL, "2 s"), 87, text_w(&LK_F_SMALL, "2 s") + 4, (int32_t)LK_F_SMALL.h - 2, LK_BG);
-    cv_text(115 - text_w(&LK_F_SMALL, "2 s"), 86, &LK_F_SMALL, "2 s", LK_LABEL);
+    cv_text(117 - text_w(&LK_F_SMALL, "2 s"), 2, &LK_F_SMALL, "2 s", LK_LABEL);   /* on the name's line, clear of
+                                                                                 * the echoes (the review, 2026-11-17) */
 }
 
 /* the tail as rings on a time axis that opens out near the start (x 136 + 25.5 ln(1 + t / 1 s): 40 s at the half's
@@ -2103,31 +2103,31 @@ static void lk_pic_reverb(void)
     static const float WIDE[DR_NREV] = {0.16f, 0.24f, 0.324f, 0.27f, 0.30f};   /* Room, Hall, Cathedral, Chorus hall, Shimmer */
     const int ty = (unsigned)proj.par[P_REV_TYPE] < DR_NREV ? proj.par[P_REV_TYPE] : 2, into = proj.par[P_DLY_ROUTE];
     const float len = rev_secs(proj.par[P_REV_LEN]), mix = (float)proj.par[P_REV_MIX] * 0.01f;
-    const float damp = (float)proj.par[P_REV_DAMP] * 0.01f, r0 = 6.0f + 20.0f * mix;
-    const int32_t mid = 46;
+    const float damp = (float)proj.par[P_REV_DAMP] * 0.01f, r0 = 8.0f + 26.0f * mix;   /* as tall as the delay's */
+    const int32_t mid = 62;
     float t = 0.0f;
     int k;
     for (k = 0; k < 9; k++, t = k == 1 ? 0.42f : t * 1.75f) {
-        const float x = 136.0f + 25.5f * fm_logf(1.0f + t), a = len <= 0.0f ? 1.0f : 1.0f - t / len;
+        const float x = 137.0f + 25.7f * fm_logf(1.0f + t), a = len <= 0.0f ? 1.0f : 1.0f - t / len;
         const float ry = r0 * a, age = (float)k / 6.0f;
         uint32_t c;
         if (x > 231.0f || ry < 2.0f)           /* off the axis, or died away */
             break;
         c = lk_mix888(lk_mix888(0xC9F6FFu, 0x507FCEu, fm_minf(age, 1.0f)), 0x3A3646u, fm_minf(damp * age, 0.85f));
-        lk_ring_tilt((int32_t)(x + 0.5f), mid, 3.0f + 0.5f * WIDE[ty] * ry, ry, ty == 3 ? (k & 1 ? -1 : 1) : 0,
+        lk_ring_tilt((int32_t)(x + 0.5f), mid, 3.0f + 0.38f * WIDE[ty] * ry, ry,   /* as wide as before */ ty == 3 ? (k & 1 ? -1 : 1) : 0,
                      mix > 0.0f ? lk_mix(0x07060Bu, c, 1.0f) : LK_UNLIT);
     }
-    cv_text(126, 78, &FONT_XS, "echoes", mix > 0.0f && into != 2 ? LK_INK : LK_LABEL);   /* Into: Both, Echoes, Drones; */
-    cv_text(126, 90, &FONT_XS, "drones", mix > 0.0f && into != 1 ? LK_INK : LK_LABEL);   /* at 15 in half a page (Evan) */
-    cv_rect(229 - text_w(&LK_F_SMALL, "40 s"), 87, text_w(&LK_F_SMALL, "40 s") + 4, (int32_t)LK_F_SMALL.h - 2, LK_BG);
-    cv_text(231 - text_w(&LK_F_SMALL, "40 s"), 86, &LK_F_SMALL, "40 s", LK_LABEL);
+    cv_text(130, 104, &FONT_XS, "echoes", mix > 0.0f && into != 2 ? LK_INK : LK_LABEL);   /* Into: Both, Echoes, */
+    cv_text(138 + text_w(&FONT_XS, "echoes"), 104, &FONT_XS, "drones",                    /* Drones; at 15 (Evan), */
+            mix > 0.0f && into != 1 ? LK_INK : LK_LABEL);                                 /* one line under the rings */
+    cv_text(233 - text_w(&LK_F_SMALL, "40 s"), 2, &LK_F_SMALL, "40 s", LK_LABEL);   /* on the name's line */
 }
 
 static void lk_pic_space(void)
 {
     lk_pic_delay();
     lk_pic_reverb();
-    cv_rect(120, 4, 1, LK_PIC_H - 8, LK_RULE);   /* DELAY | REVERB */
+    cv_rect(123, 4, 1, LK_PIC_H - 8, LK_RULE);   /* DELAY | REVERB */
     cv_text(10, 2, &LK_F_SMALL, "DELAY", LK_FX);
     cv_text(130, 2, &LK_F_SMALL, "REVERB", LK_REV_C);
 }
