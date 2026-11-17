@@ -20,10 +20,10 @@ from make_manual import JA_NOTE, menu_html  # noqa: E402
 SPEC_EN = """Two drones that breathe and drift on their own. Play them with knobs, gestures and scenes, from a calm, glowing hum
     to harsh, beating, self-oscillating sound."""
 SPEC_JA = "ひとりでに呼吸し、漂う2つのドローン。ノブ、ジェスチャー、シーンで弾き、穏やかに光るハムから、荒々しくうなり、自己発振する音まで。"
-DESC_EN = ("Microtonal drone synthesizer firmware for the M-VAVE FM-1: two drones that breathe and drift on their own, played with "
-           "knobs, gestures and scenes, from a calm, glowing hum to harsh, beating, self-oscillating sound.")
-DESC_JA = ("M-VAVE FM-1用のマイクロトーナル・ドローン・シンセ・ファームウェア。ひとりでに呼吸し、漂う2つのドローンを、ノブ、ジェスチャー、"
-           "シーンで弾きます。穏やかに光るハムから、荒々しくうなり、自己発振する音まで。")
+DESC_EN = ("Drone synthesizer firmware for the M-VAVE FM-1: two drones that breathe and drift on their own, played with "
+           "knobs, gestures and scenes in microtonal tunings, from a calm, glowing hum to harsh, beating, self-oscillating sound.")
+DESC_JA = ("M-VAVE FM-1用のドローン・シンセ・ファームウェア。ひとりでに呼吸し、漂う2つのドローンを、マイクロトーナルなチューニングで、"
+           "ノブ、ジェスチャー、シーンを使って弾きます。穏やかに光るハムから、荒々しくうなり、自己発振する音まで。")
 
 # (English, Japanese, how many times the English is in the page)
 PAIRS = [
