@@ -208,6 +208,8 @@ def build_app():
     flags = [*CFLAGS, *FPU, "-Ifirmware/hal", "-Ifirmware/src", "-Ibuild/gen"]
     for flag in ("OM_CDC", "OM_CLOCK_TEST", "OM_RAM_CODE"):
         v = os.environ.get(flag)    # unset: the default in firmware/src/main.c
+        if flag == "OM_RAM_CODE" and v is None:
+            v = "1"                 # the audio's hot loops run from RAM (drone.c); OM_RAM_CODE=0: from the flash, to compare
         if v in ("0", "1"):
             flags.append(f"-D{flag}={v}")
     flags.append(f'-DFELUCCA_ID="{PRODUCT}"')
@@ -289,8 +291,8 @@ def check(img, syms, dis, rt):
     else:
         notes.append(f".ram_text: {len([ln for ln in rt.splitlines() if LINE.match(ln)])} insns, no calls outside "
                      f".app_ram ({ar[1] - ar[0]} B of RAM code for speed)")
-    if symv_safe(syms, "_rt_end") - 0x01C00000 > 0x6000:
-        errors.append("RAM code past its 24 KB region")
+    if symv_safe(syms, "_rt_end") - 0x01C00000 > 0x8000:
+        errors.append("RAM code past its 32 KB region")
     for ln in dis.splitlines():     # nothing may call or load an address in the chip ROM
         mm = LINE.match(ln)
         if not mm:

@@ -9,11 +9,13 @@
 #include "drone.h"
 #include "fastmath.h"
 
-/* THE HOT LOOP IN RAM (0.3.1; fm1-base's PLAT_RAM_CODE, Henri David's): the FM-1 runs its code from the flash chip
- * through a small cache, and a loop bigger than the cache keeps waiting for the flash. The drones' per-sample loop
- * is copied to RAM at power-on (section .app_ram, in the RAM code region beside the flash driver: app.ld) and runs
- * there: the same code, the same samples, less time. OM_RAM_CODE=0 ./build.sh leaves it in the flash (to compare);
- * the host and the emulator have no such section. */
+/* THE HOT LOOPS IN RAM (0.3.1; the way of fm1-base's PLAT_RAM_CODE, Henri David's): the FM-1 runs its code from the
+ * flash chip through a small cache, and a loop bigger than the cache keeps waiting for the flash. The drones' loop
+ * (render_group) and the effects' (fx_run, drone_fx.c) are copied to RAM at power-on (section .app_ram, in the RAM
+ * code region beside the flash driver: app.ld) and run there: the same code, the same samples, less time. Measured on
+ * the FM-1 with a heavy sound (Thomas Loop's, 2026-11-17), the drones' loop alone: 83-88 % average and blocks to 94 %
+ * became 74-78 % and 85 %. The build sets OM_RAM_CODE=1; OM_RAM_CODE=0 ./build.sh leaves both in the flash (to
+ * compare); the host and the emulator have no such section. */
 #ifndef OM_RAM_CODE
 #define OM_RAM_CODE 0
 #endif
@@ -2575,6 +2577,7 @@ static void pf_run(uint32_t n)
 
 #define OUT_KNEE 0.7f
 DR_FAR_FN(void, render_group, (int, uint32_t))   /* the flash calls it in RAM the same way */
+DR_FAR_FN(void, fx_run, (float *, float *, uint32_t))
 /* the output clip: straight up to OUT_KNEE, then a tanh into full scale (a tanh all the way put a 3rd harmonic
  * on everything, -18 dB on a sine at 4/5, and cancelled a triangle's own) */
 static inline float outclip(float x)
@@ -2673,7 +2676,7 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
          * rest until PLAY */
         if (fade > 0.0f || fade_target > 0.0f || fx_quiet < 160u) {
             float pk = 0.0f;
-            fx_run(mixl, mixr, k);
+            DR_FAR(fx_run)(mixl, mixr, k);
             clean_hold(mixl, mixr, k);
             for (j = 0; j < k; j++)
                 pk = fm_maxf(pk, fm_maxf(fm_fabsf(mixl[j]), fm_fabsf(mixr[j])));
