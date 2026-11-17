@@ -1748,32 +1748,30 @@ static void lk_pic_setup1(void)
     const float frac[3] = {(float)proj.par[P_FADE] * 0.01f, (float)proj.par[P_MORPH] * 0.01f,
                            dr_ext_spb > 0.0f ? (float)proj.par[P_SCENE_BARS] / (float)(DR_NBARS - 1)
                                              : (float)proj.par[P_SCENE_T] * 0.01f};
-    int r, i, s;
-    for (r = 0; r < 3; r++) {
-        const int32_t base = 16 + 40 * r, top = base + 7, bot = base + 21;
-        const int32_t xe = 20 + (int32_t)(fm_clampf(frac[r], 0.0f, 1.0f) * 200.0f + 0.5f);
-        int16_t y[101];
+    int r, i, s, k;
+    for (r = 0; r < 3; r++) {                  /* the change starts 6 px in, so the shortest time is a jump, not a flat
+                                                * line (the review, 2026-11-17); no "a" / "b": gray going, white coming */
+        const int32_t base = 16 + 40 * r, top = base + 7, bot = base + 21, x0 = 12, xs = x0 + 6;
+        const int32_t xe = xs + (int32_t)(fm_clampf(frac[r], 0.0f, 1.0f) * 202.0f + 0.5f);
+        int16_t y[105];
         int32_t x = 12;                        /* words at 18, the knob's in bold (19: the one bold near it); the
                                                 * longest, morph's, 215 px */
         x = cv_text(x, base - LK_B(LK_F_SMALL), &LK_F_SMALL, PRE[r], LK_LABEL);
         x = cv_text(x, base - LK_B(FONT_B), &FONT_B, BOLD[r], LK_INK);
         lk_ktext(x, base - LK_B(LK_F_SMALL), &LK_F_SMALL, POST[r], LK_LABEL);
-        for (s = r ? 0 : 1; s < 2; s++) {     /* s 0: a going out; 1: b coming in (Fade's rise) */
-            for (i = 0; i <= 100; i++) {
-                const int32_t xi = 20 + 2 * i;
-                const float u = xi >= xe ? 1.0f : lk_ease((float)(xi - 20) / (float)(xe > 20 ? xe - 20 : 1));
+        for (s = r ? 0 : 1; s < 2; s++) {     /* s 0: the old going out; 1: the new coming in (Fade's rise) */
+            const int extra = (r ? 0 : 1) + (lit(r) ? 1 : 0);   /* Fade 3 px, the knob being turned 1 more */
+            for (i = 0; i <= 104; i++) {
+                const int32_t xi = x0 + 2 * i;
+                const float u = xi < xs ? 0.0f : xi >= xe ? 1.0f : lk_ease((float)(xi - xs) / (float)(xe > xs ? xe - xs : 1));
                 y[i] = (int16_t)(s ? bot - (int32_t)((float)(bot - top) * u + 0.5f) : top + (int32_t)((float)(bot - top) * u + 0.5f));
             }
-            lk_plot(20, y, 101, s ? LK_WHITE : LK_UNLIT);
-            if (!r) {                          /* Fade: one thick line, 3 px */
-                for (i = 0; i <= 100; i++)
-                    y[i]++;
-                lk_plot(20, y, 101, LK_WHITE);
+            lk_plot(x0, y, 105, s ? LK_WHITE : LK_UNLIT);
+            for (k = 0; k < extra; k++) {
+                for (i = 0; i <= 104; i++)
+                    y[i] = (int16_t)(y[i] + (s ? 1 : -1));   /* thicker away from the other line */
+                lk_plot(x0, y, 105, s ? LK_WHITE : LK_UNLIT);
             }
-        }
-        if (r) {
-            cv_text(10, top - LK_B(LK_F_SMALL) + 5, &LK_F_SMALL, "a", LK_LABEL);   /* beside where each starts */
-            cv_text(10, bot - LK_B(LK_F_SMALL) + 5, &LK_F_SMALL, "b", LK_WHITE);
         }
         if (lit(r))                            /* the knob's time: where the change ends */
             cv_round(xe - 3, top - 3 + (r ? 0 : 1), 7, 7, 3, LK_WHITE);
