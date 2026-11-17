@@ -40,8 +40,8 @@ main:focus { outline: none; }
 .menu a.homeicon { margin-right: auto; padding: .42rem .7rem; line-height: 0; }
 .menu a.homeicon svg { width: 1.25rem; height: 1.25rem; }
 @media (max-width: 480px) { .menu { gap: 6px 3px; font-size: .74rem; letter-spacing: .05em; }
-  .menu > a { padding: .45em .75em; white-space: nowrap; } .menu > a[aria-label^="Source"] { font-size: 0; padding: .42rem .7rem; line-height: 0; }
-  .menu > a[aria-label^="Source"] .gh { width: 1.25rem; height: 1.25rem; margin: 0; vertical-align: 0; } }
+  .menu > a { padding: .45em .75em; white-space: nowrap; } .menu > a[aria-label^="Source"], .menu > a[aria-label^="GitHub"] { font-size: 0; padding: .42rem .7rem; line-height: 0; }
+  .menu > a[aria-label^="Source"] .gh, .menu > a[aria-label^="GitHub"] .gh { width: 1.25rem; height: 1.25rem; margin: 0; vertical-align: 0; } }
 .gh { width: 1.05em; height: 1.05em; vertical-align: -.17em; margin-left: .45em; }
 .menubtn { position: relative; }
 .menubtn summary { list-style: none; cursor: pointer; font-size: 0; line-height: 0; display: block; padding: .5rem .8rem;
