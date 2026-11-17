@@ -2,13 +2,11 @@
 
 **A drone synth for the M-VAVE FM-1.**
 
-> **This is the manual for 0.3**; its pages are in [docs/manual](docs/manual/index.md). For 0.2.1, see
-> [the README of 0.2.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.2.1/README.md); for 0.1 beta,
-> [the README of 0.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.1-beta/README.md).
+Two drones that breathe and drift, and you play them: levels, filters and pitch under your hands, gestures and
+scenes that move a whole sound at once. A journey on headphones, alone or with other instruments. Lyra vibes, made for
+the FM-1.
 
-Niagara Drift is open-source firmware that turns the M-VAVE
-FM-1 into a drone synthesizer: two always-on drones you tune, shape and move rather than play note by
-note.
+It isn't a groovebox: the keys don't play melodies, there's no sequencer, and it doesn't compose for you.
 
 ![The FM-1 with what every control does in Niagara Drift written on it](docs/img/panel.png)
 
@@ -21,6 +19,10 @@ FX Space, Details · GLO Setup 1, 2.*
 
 **Status: 0.3.** It runs on the FM-1 and in the browser:
 [try it](https://evanyerburgh.github.io/niagara-drift/) without an FM-1, the same code with sound.
+
+This manual describes the newest version; its pages are in [docs/manual](docs/manual/index.md). Older versions:
+[0.2.1](https://github.com/evanyerburgh/niagara-drift/blob/v0.2.1/README.md),
+[0.1 beta](https://github.com/evanyerburgh/niagara-drift/blob/v0.1-beta/README.md).
 
 ## What it does
 

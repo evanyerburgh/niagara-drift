@@ -1,9 +1,15 @@
 ---
 title: About
-intro: Two drones that breathe and drift on their own, as open-source firmware for the M-VAVE FM-1
+intro: Open-source drone synth firmware for the M-VAVE FM-1
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
+
+Two drones that breathe and drift, and you play them: levels, filters and pitch under your hands, gestures and
+scenes that move a whole sound at once. A journey on headphones, alone or with other instruments. Lyra vibes, made for
+the FM-1.
+
+It isn't a groovebox: the keys don't play melodies, there's no sequencer, and it doesn't compose for you.
 
 ## What it does
 
