@@ -69,7 +69,7 @@ USBデータ・ケーブルでパソコンに直接つなげば、M-VAVEのフ�
 | 起きていること | すること |
 |---|---|
 | **何も聞こえない** | [[PLAY]]を押します：ドローンがフェード・インします（止まっているときはPLAYがゆっくり明滅）。次にMASTERを上げ、Dronesページで各ドローンのレベル（KNOB 1とKNOB 3）を上げます |
-| **ドローン IIが鳴らなくなった。**[ヘッダー](../reference/controls.md#screen-header)にII OUTと表示 | [[SEL]] + [[PLAY]]で戻ります |
+| **ドローン IIが鳴らなくなった。**[ヘッダー](reference/controls.md#screen-header)にII OUTと表示 | [[SEL]] + [[PLAY]]で戻ります |
 | **ドローン Iが鳴らなくなった。**ヘッダーにI OUTと表示 | [[HOME]] + [[PLAY]]で戻ります |
 | **シーンを選ぶ前の音に戻したい** | [[SEL]] + [[SAVE]]で戻ります。もう一度押すと先に進みます |
 | **ドローン IIが勝手に別の音に飛ぶ** | Wanderです：Pitch movesページ（そのページになるまで[[SEQ]]、KNOB 3）で0にします |

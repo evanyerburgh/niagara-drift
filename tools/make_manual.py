@@ -55,20 +55,37 @@ MENU_ICON = {"Play it": "play", "Recipes": "cooking-pot", "Reference": "book-ope
              "Shortcuts": "keyboard", "Help": "lifebuoy", "About": "info"}
 TAB_ICON = {"sounds": "waveform", "gestures": "hand-pointing", "scenes": "floppy-disk", "time": "timer",
             "performing": "faders", "scratch": "plant"}
-JA = MAN / "ja"                                    # the Japanese pages (2026-11-17: Help first; the rest link to English)
+JA = MAN / "ja"                                    # the Japanese pages (Help 2026-11-17, the rest 2026-11-18)
 MENU = [("", "Play it", "the emulator, and the first steps under it"),
         ("manual/recipes/sounds/", "Recipes", "how to get a sound or a move"),
         ("manual/reference/", "Reference", "every page, knob and key"),
         ("manual/reference/shortcuts/", "Shortcuts", "every combination, hold and tap"),
         ("manual/help/", "Help", "installing, going back, feedback"),
         ("manual/about/", "About", "what it does, the details, where it came from")]
-# Japanese: the pages not translated yet go to the English ones, marked 英語 (docs/translations/ja-glossary.md)
+# Japanese: a page not translated goes to the English one, marked 英語 (ja_href; docs/translations/ja-glossary.md)
 MENU_JA = [("ja/", "Play it", "弾いてみる", "エミュレーターと、その下の最初の一歩"),
-           ("manual/recipes/sounds/", "Recipes", "レシピ（英語）", "音や動きの作り方"),
-           ("manual/reference/", "Reference", "リファレンス（英語）", "すべてのページ、ノブ、キー"),
-           ("manual/reference/shortcuts/", "Shortcuts", "ショートカット（英語）", "キーの組み合わせ、長押しとタップ"),
+           ("manual/recipes/sounds/", "Recipes", "レシピ", "音や動きの作り方"),
+           ("manual/reference/", "Reference", "リファレンス", "すべてのページ、ノブ、キー"),
+           ("manual/reference/shortcuts/", "Shortcuts", "ショートカット", "キーの組み合わせ、長押しとタップ"),
            ("ja/manual/help/", "Help", "ヘルプ", "インストール、元に戻す、フィードバック"),
-           ("manual/about/", "About", "概要（英語）", "できること、詳細、成り立ち")]
+           ("manual/about/", "About", "概要", "できること、詳細、成り立ち")]
+
+
+def ja_href(h):
+    """An English manual page's address (manual/X/), as the Japanese page's where there is one (ja/manual/X/)."""
+    if not h.startswith("manual/"):
+        return h
+    rel = h[len("manual/"):].strip("/")
+    return "ja/" + h if (JA / ((rel or "index") + ".md")).exists() or (JA / rel / "index.md").exists() else h
+# the words the page code writes itself, per language (Japanese: docs/translations/ja-glossary.md)
+WORDS = {"en": {"good": "Good to know", "listen": "Listen", "play_from": "Play {t} from {m}:{s}", "example": "{t}: a sound example",
+                "all_recipes": "All {n} recipes on this page", "coming": "(coming)", "recipes_of": "{l}: the recipes",
+                "kinds": "Recipe kinds", "all_ref": "All reference pages", "ref": "Reference", "the_ref": "The reference",
+                "recipes": "Recipes"},
+         "ja": {"good": "補足", "listen": "聴いてみる", "play_from": "{t}を{m}:{s}から再生", "example": "{t}：音の例",
+                "all_recipes": "このページのレシピ（{n}）", "coming": "（準備中）", "recipes_of": "{l}：レシピ",
+                "kinds": "レシピの種類", "all_ref": "リファレンスのページ", "ref": "リファレンス", "the_ref": "リファレンス",
+                "recipes": "レシピ"}}
 JA_NOTE = ('<div class="note ja-note"><p>このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。'
            '間違いに気づいたら、<a href="{up}ja/manual/help/#send-feedback">お知らせください</a>。</p></div>')
 
@@ -84,8 +101,9 @@ def menu_html(up, current, lang="en", other="ja/"):
     """Install, Source, the other language (other: its page, from the site's root) and the menu (the front page has
     the same, web/emu/index.html)."""
     if lang == "ja":
-        items = "".join(f'<a href="{up}{h}"{" aria-current=\"page\"" if n == current else ""}>{icon(MENU_ICON[n], "mi")}'
-                        f'<span>{j}<small>{s}</small></span></a>' for h, n, j, s in MENU_JA)
+        items = "".join(f'<a href="{up}{ja_href(h)}"{" aria-current=\"page\"" if n == current else ""}>{icon(MENU_ICON[n], "mi")}'
+                        f'<span>{j}{"" if ja_href(h) != h or h.startswith("ja/") else "（英語）"}<small>{s}</small></span></a>'
+                        for h, n, j, s in MENU_JA)
         return (f'<a href="{up}ja/install/">インストール</a><a href="{up}ja/manual/help/#send-feedback">フィードバック</a>'
                 f'<a href="{REPO}" aria-label="GitHubのソース">ソース{GH}</a>'
                 f'<a class="lang" href="{up}{other}" lang="en" hreflang="en">English</a>'
@@ -248,7 +266,7 @@ def front(text):
 
 # ---- recipes -----------------------------------------------------------------------------------------------------
 
-def recipe_page(text):
+def recipe_page(text, lang="en"):
     """A recipe page: (groups of (id, title, line, written)), the recipes' HTML). A page without groups gives its
     recipes h2, so no heading level is skipped after the banner's h1."""
     bl = blocks(text)
@@ -257,11 +275,13 @@ def recipe_page(text):
     while i < len(bl):
         kind, d = bl[i]
         if kind == "h" and d[0] == 2:                 # a group: its heading and what's under it (a line, a picture)
-            groups.append((d[1], []))                 # above its recipes, as in the list at the top
+            m = re.search(r"\s*\{#([\w-]+)\}\s*$", d[1])
+            gt = d[1][:m.start()] if m else d[1]
+            groups.append((gt, []))                   # above its recipes, as in the list at the top
             j = i + 1
             while j < len(bl) and not (bl[j][0] == "h" and bl[j][1][0] <= 3):
                 j += 1
-            recipes.append(f'<h2 class="group-head" id="{slug(d[1])}">{inline(d[1])}</h2>' + render(bl[i + 1:j]))
+            recipes.append(f'<h2 class="group-head" id="{m.group(1) if m else slug(gt)}">{inline(gt)}</h2>' + render(bl[i + 1:j]))
             i = j
             continue
         if kind == "h" and d[0] == 3:
@@ -279,19 +299,20 @@ def recipe_page(text):
                 groups.append(("", []))
             groups[-1][1].append((rid, title, line, not coming))
             if not coming:
-                recipes.append(recipe_html(rid, title, body[1:], hl))
+                recipes.append(recipe_html(rid, title, body[1:], hl, lang))
             i = j
             continue
         i += 1
     return groups, recipes
 
 
-def recipe_html(rid, title, body, hl=3):
+def recipe_html(rid, title, body, hl=3, lang="en"):
+    W = WORDS[lang]
     lead, moves, good, pics, listen, nmoves = "", "", "", [], None, 0
     k = 0
     while k < len(body):
         kind, d = body[k]
-        if kind == "p" and d.startswith("**Listen**"):
+        if kind == "p" and d.startswith(("**Listen**", "**聴いてみる**")):
             name = re.search(r"`([\w-]+)`", d).group(1)
             rows = body[k + 1][1] if k + 1 < len(body) and body[k + 1][0] == "ul" else []
             listen = (name, [re.match(r"(\d+):(\d\d)\s+(.*)", r[1]).groups() for r in rows])
@@ -308,8 +329,8 @@ def recipe_html(rid, title, body, hl=3):
         elif kind == "h" and d[0] == 4:
             moves += f'<h{hl + 1} class="stage">{inline(d[1])}</h{hl + 1}>'
         elif kind == "quote":                          # a box: "Good to know", or its own bold label ("Where next.")
-            m = re.match(r"^\*\*([^*]+?)\.?\*\*\s*", d)
-            label = m.group(1) if m and m.group(1) != "Good to know" else "Good to know"
+            m = re.match(r"^\*\*([^*]+?)[.。]?\*\*\s*", d)
+            label = m.group(1) if m and m.group(1) not in ("Good to know", "補足") else W["good"]
             good += f"<div class=good><b>{inline(label)}</b>{render(blocks(d[m.end():] if m else d))}</div>"
         k += 1
     figs = "".join(f'<figure><img src="../../media/{Path(s).name}" alt="{html.escape(a)}"><figcaption>{inline(c)}</figcaption></figure>'
@@ -317,10 +338,11 @@ def recipe_html(rid, title, body, hl=3):
     snd = ""
     if listen:
         name, rows = listen
-        li = "".join(f'<li><button data-t="{int(mm) * 60 + int(ss)}" aria-label="Play {html.escape(title)} from {mm}:{ss}">'
+        t = html.escape(title)
+        li = "".join(f'<li><button data-t="{int(mm) * 60 + int(ss)}" aria-label="{W["play_from"].format(t=t, m=mm, s=ss)}">'
                      f'{mm}:{ss}</button><span>{inline(w)}</span></li>' for mm, ss, w in rows)
-        snd = (f'<div class="listen"><h{hl + 1} id="{rid}-listen">Listen</h{hl + 1}><audio controls preload="metadata" '
-               f'src="../../media/{name}.mp4" aria-label="{html.escape(title)}: a sound example"></audio><ol>{li}</ol></div>')
+        snd = (f'<div class="listen"><h{hl + 1} id="{rid}-listen">{W["listen"]}</h{hl + 1}><audio controls preload="metadata" '
+               f'src="../../media/{name}.mp4" aria-label="{W["example"].format(t=t)}"></audio><ol>{li}</ol></div>')
     return (f'<section class="recipe" id="{rid}"><div class="recipe-head"><h{hl}>{inline(title)}</h{hl}>'
             f'</div>'
             f'<div class="recipe-body"><div class="how">{f"<p class=lead>{lead}</p>" if lead else ""}{moves}'
@@ -328,19 +350,20 @@ def recipe_html(rid, title, body, hl=3):
             + (f'<div class="screens">{figs}</div>' if figs else "") + f'{snd}</div></section>')
 
 
-def onpage(groups, base, label):
+def onpage(groups, base, label, lang="en"):
     """The page's recipes as a compact list at its top (Evan, 2026-11-13: the cards pushed the first recipe a screen and
     a half down): a line a group, its name then the recipes' names, each a link; one not written yet in gray."""
     out = ""
     for g, items in groups:
         names = " ".join(
             (f'<a href="{base}#{i}" title="{html.escape(re.sub(r"<[^>]+>", "", inline(s)))}">{inline(t)}</a>' if done else
-             f'<span class="soon">{inline(t)} (coming)</span>')
+             f'<span class="soon">{inline(t)} {WORDS[lang]["coming"]}</span>')
             for i, t, s, done in items)
         out += f'<li>{f"<b>{inline(g)}</b>" if g else ""}<span class="names">{names}</span></li>'
     # folded on a phone, where the list was a screen before the first recipe (the 2026-11-13 review), as the reference's
     n = sum(1 for _, items in groups for *_, done in items if done)
-    return (f'<nav class="onpage-nav" aria-label="{label}: the recipes"><details><summary>All {n} recipes on this page</summary>'
+    W = WORDS[lang]
+    return (f'<nav class="onpage-nav" aria-label="{W["recipes_of"].format(l=label)}"><details><summary>{W["all_recipes"].format(n=n)}</summary>'
             f'<ul class="onpage">{out}</ul></details></nav>'
             '<script>if (matchMedia("(min-width: 821px)").matches) document.querySelector(".onpage-nav details").open = true;</script>')
 
@@ -384,7 +407,7 @@ def page_html(rel, meta, body, current, side="", lang="en"):
 <a class="skip" href="#main">{"本文へ移動" if lang == "ja" else "Skip to content"}</a>
 {banner_html(up, title, intro, kicker, current, lang, other)}
 <main id="main" tabindex="-1" class="page{' side' if side else ''}">{side}<div class="prose">{JA_NOTE.format(up=up) if lang == "ja" else ""}{body}</div></main>
-{FOOT_JA.format(mup=mup, repo=REPO) if lang == "ja" else FOOT_EN.format(mup=mup, repo=REPO)}
+{FOOT_JA.format(about=up + ja_href("manual/about/"), repo=REPO) if lang == "ja" else FOOT_EN.format(mup=mup, repo=REPO)}
 <script src="{mup}manual.js"></script>
 </body></html>"""
 
@@ -392,7 +415,7 @@ def page_html(rel, meta, body, current, side="", lang="en"):
 FOOT_EN = '<p class="foot">Niagara Drift · free, open-source firmware (GPL-3.0) for the M-VAVE FM-1. Sound examples are rendered from the\nfirmware\'s own code on a computer, with headphones\' settings, not recorded from an FM-1. <a href="{mup}about/">About</a> ·\n<a href="{repo}">Source on GitHub</a></p>'
 FOOT_JA = ('<p class="foot">Niagara Drift · M-VAVE FM-1用の無料・オープンソースのファームウェア（GPL-3.0）。音の例は'
            'ファームウェア自身のコードからパソコン上で作ったもので（ヘッドホンの設定）、FM-1から録音したものではありません。'
-           '<a href="{mup}about/">概要（英語）</a> · <a href="{repo}">GitHubのソース</a></p>\n')
+           '<a href="{about}">概要</a> · <a href="{repo}">GitHubのソース</a></p>\n')
 
 
 def alt_links(rel, lang, up):
@@ -417,50 +440,7 @@ def build(out):
         shutil.copy(f, dst / "media" / f.name)
     for f in AUDIO.glob("*.mp4") if AUDIO.exists() else []:
         shutil.copy(f, dst / "media" / f.name)
-    pages = 0
-    for md in sorted(MAN.rglob("*.md")):
-        if md.relative_to(MAN).as_posix().startswith(("renders/", "ja/")):
-            continue
-        rel = page_rel(md)
-        meta, text = front(md.read_text(encoding="utf-8"))
-        text = re.sub(r"<!-- github -->.*?<!-- /github -->\n?", "", text, flags=re.S)   # for the GitHub copy only
-        kind = rel.split("/")[0] if rel else ""
-        if kind == "reference":                        # "## Drones and Pitch" under the banner's "Drones and Pitch":
-            text = re.sub(r"\A((?:\s*<!--.*?-->)?\s*)## " + re.escape(meta.get("title", "")) + r"\n", r"\1", text, flags=re.S)
-        current = {"recipes": "Recipes", "help": "Help", "about": "About"}.get(kind, "Reference" if kind == "reference" else "")
-        if rel == "reference/shortcuts":
-            current = "Shortcuts"
-        side = ""
-        if rel.startswith("recipes/") and rel.split("/")[1] in RECIPE_KINDS:
-            groups, recipes = recipe_page(text)
-            first = text.split("\n## ", 1)[0].split("\n### ", 1)[0]     # the words before the first group or recipe
-            only = [r for r in recipes if not r.startswith('<h2 class="group-head"')]
-            if len(only) == 1:                         # one walk-through (the tutorial): the page's title is its heading
-                one = re.sub(r'<div class="recipe-head">.*?</div>', "", only[0], flags=re.S)
-                one = re.sub(r'<h3 class="stage">(.*?)</h3>', r'<h2 class="stage">\1</h2>', one)
-                body = tabs(rel.split("/")[1]) + render(blocks(first)) + one
-            else:
-                body = (tabs(rel.split("/")[1]) + render(blocks(first)) + onpage(groups, "", meta.get("title", ""))
-                        + "".join(recipes))
-            meta.setdefault("kicker", "Recipes")
-        elif rel == "recipes":                         # no landing page (Evan, 2026-11-13): the tabs are on every recipe
-            p = dst / rel / "index.html"               # page, so Recipes opens on Sounds; this address forwards there
-            p.parent.mkdir(parents=True, exist_ok=True)
-            p.write_text('<!doctype html><html lang="en"><meta charset="utf-8"><title>Recipes · Niagara Drift</title>'
-                         '<link rel="canonical" href="sounds/"><meta http-equiv="refresh" content="0; url=sounds/">'
-                         '<p><a href="sounds/">Recipes: Sounds</a></p></html>', encoding="utf-8")
-            pages += 1
-            continue
-        else:
-            body = render(blocks(text))
-            if kind == "reference":
-                side = reference_side(rel)
-                meta.setdefault("kicker", "Reference")
-        page = page_html(rel, meta, unique_ids(diagrams(icons(rewrite_links(body, md)))), current, side)
-        p = dst / rel / "index.html" if rel else dst / "index.html"
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(page, encoding="utf-8")
-        pages += 1
+    pages = pages_of(MAN, dst, "en")
     pages += build_ja(out)
     for p in list(dst.rglob("index.html")) + list((out / "ja" / "manual").rglob("index.html")):   # each sound and picture tagged with its contents: a browser
         t = p.read_text(encoding="utf-8")                # that kept an earlier one fetches the new one (Safari did)
@@ -475,47 +455,86 @@ def build(out):
 
 
 def build_ja(out):
-    """The Japanese pages (docs/manual/ja) into out/ja/manual/: plain pages (no recipes or reference yet); links to the
-    pages not translated go to the English ones."""
+    """The Japanese pages (docs/manual/ja) into out/ja/manual/, made as the English ones; a link to a page not
+    translated goes to the English one."""
     dst = out / "ja" / "manual"
     if dst.exists():
         shutil.rmtree(dst)
-    n = 0
-    for md in sorted(JA.rglob("*.md")) if JA.exists() else []:
-        rel = page_rel(md, JA)
+    return pages_of(JA, dst, "ja") if JA.exists() else 0
+
+
+def pages_of(root, dst, lang):
+    """Every page of one language (root: docs/manual or docs/manual/ja) into dst; how many."""
+    W, pages = WORDS[lang], 0
+    for md in sorted(root.rglob("*.md")):
+        if md.relative_to(root).as_posix().startswith(("renders/", "ja/")):
+            continue
+        rel = page_rel(md, root)
         meta, text = front(md.read_text(encoding="utf-8"))
-        text = re.sub(r"<!-- github -->.*?<!-- /github -->\n?", "", text, flags=re.S)
-        current = {"help": "Help"}.get(rel, "")
-        body = render(blocks(text))
-        page = page_html(rel, meta, unique_ids(diagrams(icons(rewrite_links(body, md, "ja")))), current, lang="ja")
+        text = re.sub(r"<!-- github -->.*?<!-- /github -->\n?", "", text, flags=re.S)   # for the GitHub copy only
+        kind = rel.split("/")[0] if rel else ""
+        if kind == "reference":                        # "## Drones and Pitch" under the banner's "Drones and Pitch":
+            text = re.sub(r"\A((?:\s*<!--.*?-->)?\s*)## " + re.escape(meta.get("title", "")) + r"(?:\s*\{#[\w-]+\})?\n", r"\1",
+                          text, flags=re.S)
+        current = {"recipes": "Recipes", "help": "Help", "about": "About"}.get(kind, "Reference" if kind == "reference" else "")
+        if rel == "reference/shortcuts":
+            current = "Shortcuts"
+        side = ""
+        if rel.startswith("recipes/") and rel.split("/")[1] in RECIPE_KINDS:
+            groups, recipes = recipe_page(text, lang)
+            first = text.split("\n## ", 1)[0].split("\n### ", 1)[0]     # the words before the first group or recipe
+            only = [r for r in recipes if not r.startswith('<h2 class="group-head"')]
+            tb = tabs(rel.split("/")[1], root=root, lang=lang)
+            if len(only) == 1:                         # one walk-through (the tutorial): the page's title is its heading
+                one = re.sub(r'<div class="recipe-head">.*?</div>', "", only[0], flags=re.S)
+                one = re.sub(r'<h3 class="stage">(.*?)</h3>', r'<h2 class="stage">\1</h2>', one)
+                body = tb + render(blocks(first)) + one
+            else:
+                body = (tb + render(blocks(first)) + onpage(groups, "", meta.get("title", ""), lang) + "".join(recipes))
+            meta.setdefault("kicker", W["recipes"])
+        elif rel == "recipes":                         # no landing page (Evan, 2026-11-13): the tabs are on every recipe
+            p = dst / rel / "index.html"               # page, so Recipes opens on Sounds; this address forwards there
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(f'<!doctype html><html lang="{lang}"><meta charset="utf-8"><title>{W["recipes"]} · Niagara Drift</title>'
+                         '<link rel="canonical" href="sounds/"><meta http-equiv="refresh" content="0; url=sounds/">'
+                         f'<p><a href="sounds/">{W["recipes"]}: Sounds</a></p></html>', encoding="utf-8")
+            pages += 1
+            continue
+        else:
+            body = render(blocks(text))
+            if kind == "reference":
+                side = reference_side(rel, root, lang)
+                meta.setdefault("kicker", W["ref"])
+        page = page_html(rel, meta, unique_ids(diagrams(icons(rewrite_links(body, md, lang)))), current, side, lang)
         p = dst / rel / "index.html" if rel else dst / "index.html"
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(page, encoding="utf-8")
-        n += 1
-    return n
+        pages += 1
+    return pages
 
 
-def tabs(cur, base="../"):
-    out = '<nav class="tabs" aria-label="Recipe kinds">'
+def tabs(cur, base="../", root=MAN, lang="en"):
+    out = f'<nav class="tabs" aria-label="{WORDS[lang]["kinds"]}">'
     for k in RECIPE_KINDS:
-        meta, _ = front((MAN / "recipes" / f"{k}.md").read_text(encoding="utf-8"))
+        meta, _ = front((root / "recipes" / f"{k}.md").read_text(encoding="utf-8"))
         out += f'<a href="{base}{k}/"{" aria-current=\"page\"" if k == cur else ""}>{icon(TAB_ICON[k], "ti")}{meta.get("tab", meta["title"])}</a>'
     return out + "</nav>"
 
 
-def reference_side(rel):
+def reference_side(rel, root=MAN, lang="en"):
     """The reference's pages at the side, in the order of docs/manual/reference/index.md's list."""
-    order = re.findall(r'(?:\]\(|href=")([\w-]+)\.md[)"]', (MAN / "reference" / "index.md").read_text(encoding="utf-8"))
+    W = WORDS[lang]
+    order = re.findall(r'(?:\]\(|href=")([\w-]+)\.md[)"]', (root / "reference" / "index.md").read_text(encoding="utf-8"))
     here = rel.split("/")[1] if "/" in rel else ""
     li = ""
     for n in order:
-        meta, _ = front((MAN / "reference" / f"{n}.md").read_text(encoding="utf-8"))
+        meta, _ = front((root / "reference" / f"{n}.md").read_text(encoding="utf-8"))
         cur = ' aria-current="page"' if n == here else ""
         li += f'<li><a href="{"../" if here else ""}{n}/"{cur}>{inline(meta["title"])}</a></li>'
     # folded on a phone (the list was two screens before the page's content: the 2026-11-13 review), open beside the
     # page on a wide screen: opened before it's drawn there, so it never shows folded (manual.js keeps it in step)
-    return (f'<nav class="toc" aria-label="The reference"><details><summary>All reference pages<small>{len(order)}</small></summary>'
-            f'<h2>Reference</h2><ul>{li}</ul></details></nav>'
+    return (f'<nav class="toc" aria-label="{W["the_ref"]}"><details><summary>{W["all_ref"]}<small>{len(order)}</small></summary>'
+            f'<h2>{W["ref"]}</h2><ul>{li}</ul></details></nav>'
             '<script>if (matchMedia("(min-width: 821px)").matches) document.querySelector(".toc details").open = true;</script>')
 
 
@@ -581,7 +600,7 @@ def rewrite_links(body, md, lang="en"):
                 url = "manual/" + (t + "/" if t else "")
             return f'href="{up}{url}{"#" + frag if frag else ""}"'
         body = re.sub(r'href="([^"]+)"', fix_ja, body)
-        return re.sub(r'src="(?:\.\./)*(?:img|media)/([\w.-]+\.png)"', lambda m: f'src="{up}manual/media/{m.group(1)}"', body)
+        return re.sub(r'src="(?:\.\./)*(?:img|media)/([\w.-]+\.(?:png|mp4))"', lambda m: f'src="{up}manual/media/{m.group(1)}"', body)
     rel = page_rel(md)
     depth = rel.count("/") + 1 if rel else 0
 

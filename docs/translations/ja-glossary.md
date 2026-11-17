@@ -22,6 +22,9 @@ checked by a native speaker: corrections welcome.
 6. **Names stay as they are**: Niagara Drift, FM-1, M-VAVE, M-Flasher, M-UPGRADE, Chrome, Edge, GitHub. The Presets'
    names (NIAGARA, SONAR, ...) and the Tunings' (La Monte Young, Partch) stay in English letters.
 7. **Drone I / drone II**: ドローン I / ドローン II (Roman numerals, as on screen).
+8. **Every heading keeps the English page's link name**: `## ノブ {#knobs}`, `### クリックとチック {#ticks}`, so a link
+   to a section (gestures.md#keep) lands on it in both languages. The drawings (docs/manual/media/*-ja.svg,
+   `tools/make_diagrams.py ja`) follow rule 1: the FM-1's names stay, the words around them are translated.
 
 ## Terms
 
@@ -130,4 +133,18 @@ checked by a native speaker: corrections welcome.
 | start here | はじめに | |
 | good to know | 補足 | |
 | listen | 聴いてみる | the recipes' Listen line |
+| beating (two tones) | うなり / うなる | |
+| latch / latched | ラッチ / ラッチされる | the screen's "latched" stays |
+| peek (at a page) | のぞく | |
+| glide (a scene, a pitch) | なめらかに移る / すべる | a scene: なめらかに移る; a pitch: すべる |
+| crossfade by pressure | 押した分だけクロスフェード | |
+| gesture key | ジェスチャー・キー | |
+| pressure gesture / held gesture | 押す強さのジェスチャー / 長押しのジェスチャー | |
+| tutorial | チュートリアル | |
+| speed mod / delay mod | スピード・モジュレーション / ディレイ・モジュレーション | in prose; the screen's Speed mod, Delay mod stay |
+| send (LFO) | センド | ピッチ・センド, カットオフ・センド |
+| runaway (echoes) | 暴走 | the screen's "runaway" stays |
+| tail (reverb) | 残響 | |
+| the pictures (a page's drawing) | 画面の絵 | Good to know's "The pictures" |
+| stepped figure | ステップするフレーズ | |
 | translated by AI, not yet checked | AIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。 | the note at the top of each page |

@@ -1,8 +1,50 @@
 # SPDX-License-Identifier: GPL-3.0-only
 """The manual's drawings of the LFO's routing (docs/manual/media/lfo-*.svg, committed): one send's chain top to bottom
 for phones, the whole map and Mods' three pieces, each wide and tall (tools/make_manual.py shows the tall one on a
-phone), MIDI in (midi-in), the screen reader (reader) and the emulator's computer keys (emu-keys). In the site's colors, as lfo-chain.svg (drawn by hand). Run from the repo: python3 tools/make_diagrams.py"""
+phone), MIDI in (midi-in), the screen reader (reader) and the emulator's computer keys (emu-keys). In the site's colors, as lfo-chain.svg (drawn by hand). Run from the repo: python3 tools/make_diagrams.py
+
+  python3 tools/make_diagrams.py ja     the Japanese manual's copies (NAME-ja.svg, NAME-ja-tall.svg): the same drawings,
+                                        their words from JA (docs/translations/ja-glossary.md: the FM-1's own names stay)"""
+import re
 import sys
+
+LANG = sys.argv[1] if len(sys.argv) > 1 else "en"
+JA = {
+    "WHICH LFO": "どのLFO", "HOW MUCH": "どれだけ", "SCALED BY": "スケール", "MOVES": "動かすもの",
+    "I, II or both": "I、II、または両方", "KNOB 1 · middle: none": "KNOB 1 · 真ん中でゼロ",
+    "Movement (ALGORITHM)": "Movement（ALGORITHM）", "pitch or X-Wave": "ピッチかX-Wave",
+    "I pitch": "I ピッチ", "key off": "キー・オフ", "key on": "キー・オン",
+    "CLOCK": "クロック", "WAVES": "波", "Clock": "クロック", "SELECT: rate": "SELECT：レート",
+    "OCT− shape": "OCT−：波形", "OCT+ shape": "OCT+：波形", "Speed mod (Mods KNOB 1 · 2)": "Speed mod（ModsのKNOB 1 · 2）",
+    "I pitch · X-Wave": "I ピッチ · X-Wave", "I cutoff · resonance": "I カットオフ · レゾナンス",
+    "II pitch · X-Wave": "II ピッチ · X-Wave", "II cutoff · resonance": "II カットオフ · レゾナンス",
+    "Delay time": "ディレイ・タイム", "Mods KNOB 3": "ModsのKNOB 3", "× Movement (ALGORITHM)": "× Movement（ALGORITHM）",
+    "CROSS-MOD · NOT THE LFO": "CROSS-MOD · LFOではない",
+    "KNOB 1: how far, ±3 octaves": "KNOB 1：幅、±3オクターブ", "KNOB 2: which LFO, I, II or both": "KNOB 2：どのLFO（I、II、両方）",
+    "KNOB 3: how far, ±25%": "KNOB 3：幅、±25%", "× Movement; heard with delay mix": "× Movement、ミックスで聞こえる",
+    "I moves II's cutoff": "IがIIのカットオフを動かす", "bend each other (cross-FM)": "互いを曲げる（クロスFM）",
+    "Snarl: the sound bends both": "Snarl：音が両方を曲げる", "KNOB 4: how deep": "KNOB 4：深さ",
+    "DAW, drum machine": "DAW、ドラム・マシン", "or a keyboard": "またはキーボード",
+    "Notes, channel 1": "ノート、ch 1", "Notes, channel 2": "ノート、ch 2",
+    "drone I's pitch": "ドローン Iのピッチ", "drone II's pitch, or the interval": "ドローン IIのピッチ、または音程",
+    "Swell, LFO, delay, Wander, Scene time": "Swell、LFO、ディレイ、Wander、Scene time",
+    "Sync on (Setup 1, KNOB 4)": "Syncがオン（Setup 1、KNOB 4）",
+    "PLUG IN": "つなぐ", "OPEN, CONNECT": "開いて、CONNECT", "LISTEN": "聴く", "Chrome or Edge": "ChromeかEdge",
+    "its own voice": "自分の声", "your screen reader": "あなたのスクリーン・リーダー", "your screen": "あなたの",
+    "reader": "スクリーン・リーダー",
+    "↑ ↓ LFO rate": "↑ ↓ LFOのレート", "black keys 1–11": "黒鍵1–11", "scenes 1–8": "シーン1–8",
+    "gestures 9–16": "ジェスチャー9–16", "9–12 press · 13–16 hold": "9–12 押す · 13–16 長押し",
+}
+
+
+def tr(s):
+    """A drawing's words in the language being drawn ("G#3 on · KNOB 1": the key's part, then the knob's)."""
+    if LANG != "ja":
+        return s
+    m = re.fullmatch(r"(\S+) on · (.+)", s)
+    if m:
+        return f"{m.group(1)}オン · {tr(m.group(2))}"
+    return JA.get(s, s)
 
 LFO, D1, D2, INK, MUTED, CARD, PALE = "#dcbcff", "#ffb04a", "#45e3d3", "#fbe9f2", "#d3b3c4", "#24081f", "#ffd6f0"
 SANS = "Inter Tight, Helvetica Neue, Arial, sans-serif"
@@ -12,6 +54,8 @@ OUT = "docs/manual/media/"
 
 class Svg:
     def __init__(self, name, w, h, about):
+        if LANG == "ja":                          # lfo-map-tall: lfo-map-ja-tall (make_manual.py shows NAME-tall on a phone)
+            name = re.sub(r"(-tall)?$", lambda m: "-ja" + (m.group(1) or ""), name, count=1)
         self.name, self.w, self.h, self.p = name, w, h, []
         self.add(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" font-family="{SANS}">')
         self.add("<!-- SPDX-License-Identifier: GPL-3.0-only -->")
@@ -33,11 +77,11 @@ class Svg:
     def text(self, x, y, s, size=13, col=MUTED, anchor="start", weight=None, mono=False):
         w = f' font-weight="{weight}"' if weight else ""
         f = f' font-family="{MONO}"' if mono else ""
-        self.add(f'<text x="{x}" y="{y}" font-size="{size}" fill="{col}" text-anchor="{anchor}"{w}{f}>{s}</text>')
+        self.add(f'<text x="{x}" y="{y}" font-size="{size}" fill="{col}" text-anchor="{anchor}"{w}{f}>{tr(s)}</text>')
 
     def step(self, x, y, s, anchor="middle"):     # a step's name, small capitals in the mono
         self.add(f'<text x="{x}" y="{y}" font-family="{MONO}" font-size="11" letter-spacing="1.3" fill="{MUTED}" '
-                 f'text-anchor="{anchor}">{s}</text>')
+                 f'text-anchor="{anchor}">{tr(s)}</text>')
 
     def pill(self, cx, cy, s, col=LFO, w=88):
         self.add(f'<rect x="{cx - w / 2}" y="{cy - 17}" width="{w}" height="34" rx="17" fill="none" stroke="{col}" stroke-width="1.5"/>')
@@ -177,8 +221,9 @@ s.step(254, 74, "IN")
 for y, (what, to, col) in zip((50, 105, 160), MIDI_ROWS):
     s.arrow(f"M302 105 C324 105 324 {y} 342 {y}", col, end=False)
     s.text(350, y + 5, what, 15, col, weight=600)
-    s.arrow(f"M476 {y} H500", col)
-    s.text(508, y + 5, to, 13.5, INK)
+    dx = -26 if LANG == "ja" else 0               # Japanese: its short left labels make room for the longer right ones
+    s.arrow(f"M{476 + dx} {y} H{500 + dx}", col)
+    s.text(508 + dx, y + 5, to, 13.5, INK)
 s.text(350, y + 24, "Sync on (Setup 1, KNOB 4)", 12.5)
 s.save()
 
