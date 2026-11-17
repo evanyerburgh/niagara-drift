@@ -74,6 +74,7 @@ checked by a native speaker: corrections welcome.
 | tuning (a scale system) | チューニング | the screen's Tuning stays English as a name |
 | just (intonation) | 純正律 | |
 | equal temperament | 平均律 | |
+| microtonal | マイクロトーナル | as Japanese synth makers write it (微分音 is the theory term) |
 | octave | オクターブ | |
 | cent | セント | |
 | oscillator | オシレーター | |

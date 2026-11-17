@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): the header with the motion loop playing and a gesture (0.3.1): on
+# PITCH MOVES, the longest page name, LOOP gives way while the gesture shows and comes back once it's gone.
+# No expectations (main's build plays this script too).
+notips
+tap PLAY
+wait 1500
+tapkey w0
+wait 2000
+tap REC
+wait 200
+spin K2 5
+wait 300
+tap REC
+wait 300
+key w12 down
+wait 1500
+page 9
+wait 120
+shot pitch-moves-gesture.png
+key w12 up
+wait 9000
+shot pitch-moves-loop.png
