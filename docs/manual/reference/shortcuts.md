@@ -62,6 +62,7 @@ Every combination of keys, and every hold and tap, in one place.
 | Tap a page button again | Its next page ("1/2") |
 | Tap [[ARP]] on the Swell page | The Swell on or off |
 | Tap [[REC]] three times | Record your moves, loop them, stop |
+| [[HOME]] + [[PLAY]] | Drone I alone fades out, or back in |
 
 ### Black keys
 
