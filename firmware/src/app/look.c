@@ -2053,7 +2053,7 @@ static void lk_ring_tilt(int32_t cx, int32_t cy, float rx, float ry, int tilt, u
  * each dimmer as it ages, drawn while over -26 dB; Drive thickens the lines. Wide: the right at 0.75 of the time;
  * Ping-pong: odd repeats left, even right; Grain jittered, Self stretching (as the engine). Past Repeats 85 they stop
  * shrinking: runaway, in the header */
-static float lk_dly_x(float ms) { return 20.0f + 31.0f * fm_logf(1.0f + ms * 0.01f); }   /* 2 s at x 114 */
+static float lk_dly_x(float ms) { return 27.0f + 29.0f * fm_logf(1.0f + ms * 0.01f); }   /* 2 s at x 115 */
 static void lk_pic_delay(void)
 {
     const int ty = (unsigned)proj.par[P_DLY_TYPE] < DR_NDLY ? proj.par[P_DLY_TYPE] : DR_DLY_TAPE;
@@ -2068,7 +2068,7 @@ static void lk_pic_delay(void)
     int side, k;
     cv_text(2, 26, &LK_F_SMALL, "L", LK_LABEL);
     cv_text(2, 92, &LK_F_SMALL, "R", LK_LABEL);
-    lk_ring(19, mid, 4.0f, 40.0f, 0, w, LK_INK);   /* the sound */
+    lk_ring(26, mid, 4.0f, 40.0f, 0, w, LK_INK);   /* the sound, clear of L / R (Evan, 2026-11-17) */
     for (side = 0; side < 2; side++) {
         float a = 1.0f;
         const float step = ms * (side && ty == 1 ? 0.75f : 1.0f);
