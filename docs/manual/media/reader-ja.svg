@@ -9,7 +9,7 @@
 </defs>
 <rect width="760" height="180" rx="16" fill="#24081f"/>
 <text x="80" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">つなぐ</text>
-<text x="330" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">開いて、CONNECT</text>
+<text x="330" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">開いてCONNECT</text>
 <text x="610" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">聴く</text>
 <rect x="30.0" y="73" width="100" height="34" rx="17" fill="none" stroke="#ffd6f0" stroke-width="1.5"/>
 <text x="80" y="95.5" font-size="16" fill="#ffd6f0" text-anchor="middle" font-weight="600">FM-1</text>
@@ -22,7 +22,7 @@
 <text x="330" y="106" font-size="13" fill="#d3b3c4" text-anchor="middle">ChromeかEdge</text>
 <path d="M410 90 C440 90 440 62 470 62" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#reader-ja-a)"/>
 <path d="M410 90 C440 90 440 120 470 120" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#reader-ja-a)"/>
-<text x="480" y="67" font-size="15" fill="#fbe9f2" text-anchor="start" font-weight="600">自分の声</text>
-<text x="480" y="125" font-size="15" fill="#fbe9f2" text-anchor="start" font-weight="600">あなたのスクリーン・リーダー</text>
+<text x="480" y="67" font-size="15" fill="#fbe9f2" text-anchor="start" font-weight="600">内蔵の音声</text>
+<text x="480" y="125" font-size="15" fill="#fbe9f2" text-anchor="start" font-weight="600">お使いのスクリーン・リーダー</text>
 <text x="480" y="143" font-size="12.5" fill="#d3b3c4" text-anchor="start">VoiceOver, NVDA, JAWS, TalkBack</text>
 </svg>

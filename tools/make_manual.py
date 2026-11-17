@@ -16,6 +16,7 @@ with three additions that read well on GitHub too:
 On a recipe page (docs/manual/recipes/*.md): a ## heading is a group of recipes; each ### heading is a recipe whose
 first paragraph, in *italics*, is its line in the list at the top; then what you hear, the moves (1. 2. 3.), a quote
 for Good to know, its pictures, and **Listen** (`NAME`) with its times (- 0:03 what to listen for)."""
+import functools
 import hashlib
 import html
 import math
@@ -141,6 +142,17 @@ def inline(s):
     return s
 
 
+CJK = re.compile(r"[\u3000-\u30ff\u3400-\u9fff\uff00-\uffef]")
+
+
+def join(a, b):
+    """Two lines of one paragraph: a space between English words, none inside a Japanese sentence (a line that starts
+    with Japanese, or Japanese then punctuation), which a browser would show as a gap."""
+    if a and b and (CJK.match(b[0]) or (CJK.match(a[-1]) and (not b[0].isascii() or a[-1] in "。、：）」"))):
+        return a + b
+    return a + " " + b if a else b
+
+
 def blocks(text):
     """The Markdown's blocks: (kind, data) in order."""
     lines = text.split("\n")
@@ -178,7 +190,7 @@ def blocks(text):
                 elif re.match(r"  +(\d+\.|-)\s", l2):
                     items.append([1, re.sub(r"^\s+(\d+\.|-)\s+", "", l2)])
                 else:
-                    items[-1][1] += " " + l2.strip()
+                    items[-1][1] = join(items[-1][1], l2.strip())
                 i += 1
             out.append(("ol" if ordered else "ul", items))
             continue
@@ -193,7 +205,7 @@ def blocks(text):
         while i < len(lines) and lines[i].strip() and not re.match(r"#{1,4}\s|\||>|(\d+\.|-)\s", lines[i]):
             p.append(lines[i].strip())
             i += 1
-        out.append(("p", " ".join(p)))
+        out.append(("p", functools.reduce(join, p, "")))
     return out
 
 

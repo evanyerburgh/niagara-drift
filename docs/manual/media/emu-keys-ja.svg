@@ -135,5 +135,5 @@
 <text x="700" y="112" font-size="14" fill="#fbe9f2" text-anchor="start" font-weight="600">黒鍵1–11</text>
 <text x="620" y="162" font-size="14" fill="#fbe9f2" text-anchor="start" font-weight="600">シーン1–8</text>
 <text x="726" y="204" font-size="14" fill="#ffd6f0" text-anchor="start" font-weight="600">ジェスチャー9–16</text>
-<text x="726" y="221" font-size="12" fill="#d3b3c4" text-anchor="start">9–12 押す · 13–16 長押し</text>
+<text x="726" y="221" font-size="12" fill="#d3b3c4" text-anchor="start">9–12 押す強さ · 13–16 長押し</text>
 </svg>

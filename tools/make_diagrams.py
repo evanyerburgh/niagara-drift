@@ -10,7 +10,7 @@ import sys
 
 LANG = sys.argv[1] if len(sys.argv) > 1 else "en"
 JA = {
-    "WHICH LFO": "どのLFO", "HOW MUCH": "どれだけ", "SCALED BY": "スケール", "MOVES": "動かすもの",
+    "WHICH LFO": "どのLFO", "HOW MUCH": "量", "SCALED BY": "倍率", "MOVES": "動かすもの",
     "I, II or both": "I、II、または両方", "KNOB 1 · middle: none": "KNOB 1 · 真ん中でゼロ",
     "Movement (ALGORITHM)": "Movement（ALGORITHM）", "pitch or X-Wave": "ピッチかX-Wave",
     "I pitch": "I ピッチ", "key off": "キー・オフ", "key on": "キー・オン",
@@ -21,19 +21,19 @@ JA = {
     "Delay time": "ディレイ・タイム", "Mods KNOB 3": "ModsのKNOB 3", "× Movement (ALGORITHM)": "× Movement（ALGORITHM）",
     "CROSS-MOD · NOT THE LFO": "CROSS-MOD · LFOではない",
     "KNOB 1: how far, ±3 octaves": "KNOB 1：幅、±3オクターブ", "KNOB 2: which LFO, I, II or both": "KNOB 2：どのLFO（I、II、両方）",
-    "KNOB 3: how far, ±25%": "KNOB 3：幅、±25%", "× Movement; heard with delay mix": "× Movement、ミックスで聞こえる",
-    "I moves II's cutoff": "IがIIのカットオフを動かす", "bend each other (cross-FM)": "互いを曲げる（クロスFM）",
+    "KNOB 3: how far, ±25%": "KNOB 3：幅、±25%", "× Movement; heard with delay mix": "× Movement、ディレイのMixで聞こえる",
+    "I moves II's cutoff": "IがIIのカットオフを動かす", "bend each other (cross-FM)": "互いのピッチを曲げる（クロスFM）",
     "Snarl: the sound bends both": "Snarl：音が両方を曲げる", "KNOB 4: how deep": "KNOB 4：深さ",
     "DAW, drum machine": "DAW、ドラム・マシン", "or a keyboard": "またはキーボード",
     "Notes, channel 1": "ノート、ch 1", "Notes, channel 2": "ノート、ch 2",
     "drone I's pitch": "ドローン Iのピッチ", "drone II's pitch, or the interval": "ドローン IIのピッチ、または音程",
     "Swell, LFO, delay, Wander, Scene time": "Swell、LFO、ディレイ、Wander、Scene time",
     "Sync on (Setup 1, KNOB 4)": "Syncがオン（Setup 1、KNOB 4）",
-    "PLUG IN": "つなぐ", "OPEN, CONNECT": "開いて、CONNECT", "LISTEN": "聴く", "Chrome or Edge": "ChromeかEdge",
-    "its own voice": "自分の声", "your screen reader": "あなたのスクリーン・リーダー", "your screen": "あなたの",
+    "PLUG IN": "つなぐ", "OPEN, CONNECT": "開いてCONNECT", "LISTEN": "聴く", "Chrome or Edge": "ChromeかEdge",
+    "its own voice": "内蔵の音声", "your screen reader": "お使いのスクリーン・リーダー", "your screen": "お使いの",
     "reader": "スクリーン・リーダー",
     "↑ ↓ LFO rate": "↑ ↓ LFOのレート", "black keys 1–11": "黒鍵1–11", "scenes 1–8": "シーン1–8",
-    "gestures 9–16": "ジェスチャー9–16", "9–12 press · 13–16 hold": "9–12 押す · 13–16 長押し",
+    "gestures 9–16": "ジェスチャー9–16", "9–12 press · 13–16 hold": "9–12 押す強さ · 13–16 長押し",
 }
 
 

@@ -9,10 +9,10 @@ intro: M-VAVE FM-1用の、オープンソースのドローン・シンセ・�
 このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[About](../about.md)
 <!-- /github -->
 
-呼吸し、漂う2つのドローンを、あなたが弾きます：手の下にあるレベル、フィルター、ピッチ。そしてサウンド全体を一度に動かす
+呼吸し、漂う2つのドローンを、自分の手で弾きます。レベル、フィルター、ピッチを手で操り、そしてサウンド全体を一度に動かす
 ジェスチャーとシーン。ヘッドホンで聴く旅を、ひとりで、またはほかの楽器と一緒に。Lyraの雰囲気を、FM-1のために。
 
-グルーヴボックスではありません：鍵盤でメロディーは弾かず、シーケンサーもなく、あなたの代わりに作曲もしません。
+グルーヴボックスではありません：鍵盤でメロディーは弾かず、シーケンサーもなく、自動で作曲もしません。
 
 ## できること {#what-it-does}
 
@@ -20,10 +20,10 @@ intro: M-VAVE FM-1用の、オープンソースのドローン・シンセ・�
 
 <ul class="cards">
 <li><img class="ic" src="../../../web/manual/icons/waveform.svg" alt=""><b>2つのドローン</b><span>バーチャル・アナログ：サイン波から矩形波までの波形、ある音程に置いたパートナー（2つめのオシレーター）、サブ、ノイズを、それぞれ自分のレゾナントなフィルターとドライブへ</span></li>
-<li><img class="ic" src="../../../web/manual/icons/music-notes-simple.svg" alt=""><b>11のTuning</b><span>12音と、10のマイクロトーナルなTuning：4分音からHarry Partchの43音まで、La Monte Young、Lou Harrison、シュルティ。音程はそれぞれの書き方で名前が付きます</span></li>
-<li><img class="ic" src="../../../web/manual/icons/intersect.svg" alt=""><b>FMクロス・モジュレーション</b><span>ドローンの間のFM：互いのピッチを曲げる、または最終的な音が両方を曲げる（Snarl）。またはドローン IがドローンIIのフィルターを動かす</span></li>
+<li><img class="ic" src="../../../web/manual/icons/music-notes-simple.svg" alt=""><b>11種類のTuning</b><span>12音と、10のマイクロトーナルなTuning：4分音からHarry Partchの43音まで、La Monte Young、Lou Harrison、シュルティ。音程はそれぞれの書き方で名前が付きます</span></li>
+<li><img class="ic" src="../../../web/manual/icons/intersect.svg" alt=""><b>FMクロス・モジュレーション</b><span>ドローンの間のFM：互いのピッチを曲げる、または最終的な音が両方を曲げる（Snarl）。またはドローン Iがドローン IIのフィルターを動かす</span></li>
 <li><img class="ic" src="../../../web/manual/icons/arrows-clockwise.svg" alt=""><b>FeedbackとCharacter</b><span>最終的な音をドローンに戻す。オシレーターをクリーンからビンテージへ</span></li>
-<li><img class="ic" src="../../../web/manual/icons/broadcast.svg" alt=""><b>6つのディレイ、5つのリバーブ</b><span>クリーンからテープ、自分で揺らぐエコーまで。その後にドライブ。ルームからフリーズまでのリバーブ</span></li>
+<li><img class="ic" src="../../../web/manual/icons/broadcast.svg" alt=""><b>6種類のディレイ、5種類のリバーブ</b><span>クリーンからテープ、自分で揺らぐエコーまで。その後にドライブ。ルームからフリーズまでのリバーブ</span></li>
 </ul>
 
 ### 動き {#movement}
@@ -38,20 +38,20 @@ intro: M-VAVE FM-1用の、オープンソースのドローン・シンセ・�
 ### 演奏 {#playing}
 
 <ul class="cards">
-<li><img class="ic" src="../../../web/manual/icons/stack.svg" alt=""><b>16のプリセット</b><span>それぞれが楽器の違う一面を見せ、1分かけて変わっていきます</span></li>
-<li><img class="ic" src="../../../web/manual/icons/hand-pointing.svg" alt=""><b>8つのジェスチャー</b><span>マクロ：いくつもの設定を、あなたのサウンドの上で、それぞれの順番で一度に。長押し、強く押す、タップで残す</span></li>
-<li><img class="ic" src="../../../web/manual/icons/floppy-disk.svg" alt=""><b>48のサウンドを保存</b><span>8つのシーンが入る6つのバンクを、あなたが埋めます。それぞれなめらかに入ってくるか、キーを強く押すにつれてクロスフェードします</span></li>
+<li><img class="ic" src="../../../web/manual/icons/stack.svg" alt=""><b>16種類のプリセット</b><span>それぞれが楽器の違う一面を見せ、1分かけて変わっていきます</span></li>
+<li><img class="ic" src="../../../web/manual/icons/hand-pointing.svg" alt=""><b>8つのジェスチャー</b><span>マクロ：いくつもの設定を、サウンドの上で、それぞれの順番で一度に。長押し、強く押す、タップで残す</span></li>
+<li><img class="ic" src="../../../web/manual/icons/floppy-disk.svg" alt=""><b>48のサウンドを保存</b><span>8つのシーンが入る6つのバンクを、自由に使えます。それぞれなめらかに入ってくるか、キーを強く押すにつれてクロスフェードします</span></li>
 <li><img class="ic" src="../../../web/manual/icons/repeat.svg" alt=""><b>モーション・ループ</b><span>ノブの動き、ジェスチャー、シーンを記録し、再生します</span></li>
-<li><img class="ic" src="../../../web/manual/icons/path.svg" alt=""><b>飛ばない</b><span>すべてがなめらかに移ります（モーフ）：ボタン、キー、シーンが、あなたが決めた時間をかけて新しい設定へ動きます</span></li>
+<li><img class="ic" src="../../../web/manual/icons/path.svg" alt=""><b>急に変わらない</b><span>すべてがなめらかに移ります（モーフ）：ボタン、キー、シーンが、設定した時間をかけて新しい設定へ動きます</span></li>
 </ul>
 
 ### つなぐ {#connect}
 
 <ul class="cards">
-<li><img class="ic" src="../../../web/manual/icons/metronome.svg" alt=""><b>MIDIイン</b><span>USBまたはTRSでMIDIクロックに従います：Swell、LFO、ディレイ、Wander、シーンがそのテンポに合います。チャンネル1と2のノートでドローンをチューニング</span></li>
+<li><img class="ic" src="../../../web/manual/icons/metronome.svg" alt=""><b>MIDIイン</b><span>USBまたはTRSでMIDIクロックに従います。Swell、LFO、ディレイ、Wander、シーンがそのテンポに合います。チャンネル1と2のノートでドローンをチューニング</span></li>
 <li><img class="ic" src="../../../web/manual/icons/ear.svg" alt=""><b>画面を聴く</b><span>FM-1 Screen Readerで、画面が見えないプレイヤーのために、画面の内容を読み上げます</span></li>
 <li><img class="ic" src="../../../web/manual/icons/browser.svg" alt=""><b>ブラウザーで弾く</b><span>トップ・ページのエミュレーターはファームウェアそのもので、音も出ます。FM-1はいりません</span></li>
-<li><img class="ic" src="../../../web/manual/icons/download-simple.svg" alt=""><b>ブラウザーからインストール</b><span>ChromeかEdgeから、インストール、アップデート、バックアップ、M-VAVEのファームウェアへの戻し</span></li>
+<li><img class="ic" src="../../../web/manual/icons/download-simple.svg" alt=""><b>ブラウザーからインストール</b><span>ChromeかEdgeから、インストール、アップデート、バックアップ、M-VAVEのファームウェアへ戻す</span></li>
 </ul>
 
 ## 動画 {#videos}
@@ -67,7 +67,7 @@ intro: M-VAVE FM-1用の、オープンソースのドローン・シンセ・�
 <figcaption><a href="https://www.youtube.com/watch?v=bVre9eF2Rm4">無数の窓口 - collective unconscious - [soundtrack][5.1ch専用][FM-1 Niagara]</a> · Mirrorofes</figcaption></figure>
 </div>
 
-## 詳細 {#technical-details}
+## 仕様 {#technical-details}
 
 ### サウンド {#sound}
 
@@ -92,20 +92,20 @@ intro: M-VAVE FM-1用の、オープンソースのドローン・シンセ・�
 
 | | |
 |---|---|
-| **ポリフォニック・アフタータッチ** | シーンのキーとキー9–12それぞれの押す強さを、押している間読み取ります：シーンはクロスフェードし、押す強さのジェスチャーがそれに従います。タッチは設定できます（Setup 2）。USBで送り出しもします（[MIDIイン](reference/midi.md#good-to-know)） |
+| **ポリフォニック・アフタータッチ** | シーンのキーとキー9–12それぞれの押す強さを、押している間読み取ります。シーンはクロスフェードし、押す強さのジェスチャーがそれに従います。タッチは設定できます（Setup 2）。USBで送り出しもします（[MIDIイン](reference/midi.md#good-to-know)） |
 | **MIDI** | USBとTRSでイン：チャンネル1と2のノートでドローンをチューニング。クロック（1拍24パルス）とスタート、Syncのオン・オフあり（[MIDIイン](reference/midi.md)） |
 
 ### 保存とライセンス {#storage-and-license}
 
 | | |
 |---|---|
-| **保存** | 8つのシーンの6つのバンクと16のプリセットを、FM-1のフラッシュに。インストールのたびに、その前にファイルへバックアップ。停電でも壊れない復元（[ヘルプ](help.md)） |
+| **保存** | 8シーン×6バンクと16種類のプリセットを、FM-1のフラッシュに。インストールのたびに、その前にファイルへバックアップ。途中で電源が切れても壊れない復元（[ヘルプ](help.md)） |
 | **ライセンス** | GPL-3.0。ソースは[GitHub](https://github.com/evanyerburgh/niagara-drift)に |
 
 ## 成り立ち {#where-it-came-from}
 
 名前は、『Day of Niagara』（the Theatre of Eternal Music、1965年）と、La Monte Youngの『Drift Studies』から。Stylophone CPM
-DS-2、Moog Subharmonicon、Soma Lyra-8のアイデアから始まり、それ自身の楽器へと育ちました。
+DS-2、Moog Subharmonicon、Soma Lyra-8のアイデアから始まり、独自の楽器へと育ちました。
 
 | もと | 作者 | 受け取ったもの |
 |---|---|---|

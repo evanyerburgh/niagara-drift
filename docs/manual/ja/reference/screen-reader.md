@@ -23,13 +23,13 @@ Charles Vestalの[FM-1 Screen Reader](https://charlesvestal.github.io/fm1-reader
 
 1. FM-1をUSBでパソコンにつなぎます。
 2. ChromeかEdgeでScreen Readerを開き、Connectをクリックします。
-3. 聴きます：自分の声で読み上げるか、言葉をあなたのスクリーン・リーダー（VoiceOver、NVDA、JAWS、TalkBack）に渡します。
+3. 聴きます。Screen Reader自身の音声で読み上げるか、言葉をお使いのスクリーン・リーダー（VoiceOver、NVDA、JAWS、TalkBack）に渡します。
 
 ## 読み上げる内容 {#what-it-says}
 
 <img class="shot" src="../../media/r-reader-0.png" width="240" alt="">
 
-ここに示したPitchページなら、開いたときにこう読み上げます：「Pitch page. Drone 1: Pitch D3, resonance 25. Drone 2: Pitch A3,
+ここに示したPitchページなら、開いたときにこう読み上げます。「Pitch page. Drone 1: Pitch D3, resonance 25. Drone 2: Pitch A3,
 resonance 25.」
 
 | いつ | 読み上げる内容 | 例 |
@@ -41,4 +41,4 @@ resonance 25.」
 | **PLAY、シーン、ジェスチャー** | 始まったもの、または移っている途中のもの | 「Play」「to Preset 2 embers」「wash」 |
 | **尋ねたとき** | 画面のすべて：ページ、演奏中かどうか、サウンド | 開いたときのページの内容、続いて「Playing, on its way to Preset 3 vespers. Swell on.」 |
 
-例は、Screen Readerが読み上げる言葉そのものです（英語）。あなたのスクリーン・リーダーでは、発音が異なることがあります。
+例は、Screen Readerが読み上げる言葉そのものです（英語）。お使いのスクリーン・リーダーでは、発音が異なることがあります。
