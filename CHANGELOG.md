@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.3.1 (2026-11)
+
+Heavy sounds play smoothly, drone I can sit out on its own, and the manual is in Japanese. An update from 0.3 keeps
+your sound and scenes, and 0.3 still reads a sound saved on 0.3.1. Tested on an older FM-1.
+
+- **Heavy sounds:** with Shimmer, Feedback and a fast LFO at once, a page button could take a few tries and a change
+  could drop the sound out for seconds. The audio now runs lighter (about 14 points of load) and every tap is seen.
+- **Drone I out on its own:** HOME + PLAY fades drone I out and back in over the Fade time, beside SEL + PLAY for
+  drone II. The header says I OUT.
+- **SEL + a pitch knob glides when turned quickly:** a cent a click turned slowly, as before; turned quickly it sweeps
+  freely between the notes.
+- **The delay's Time bends** like tape when spun fast, instead of a short bright zip; a scene or preset that jumps
+  the time swoops the echoes to it.
+- **Headphones:** Tick held lightly with the drones low no longer throws the sound from side to side (a gentle cut
+  under 12 Hz, before the output).
+- **The gesture keys** light from dark as far as the gesture is heard, and every light on the panel fades without
+  steps.
+- **The screens:** Pitch draws the two drones' waves on one time line, so a pure interval stands still and a detune
+  slides; turning a Reso or tapping a filter key grows that drone's filter curve to fill the picture. Space's labels
+  are off the drawings and runaway's tail thins out; Setup 1 shows the shortest times as a jump; the header shows a
+  held gesture where LOOP was.
+- **The manual in Japanese,** every page (translated with AI; better wording welcome), and a careful pass over the
+  English one, checked against the firmware.
+
 ## 0.3 (2026-11)
 
 A new look on every page, sixteen new presets, eight gestures and eleven Tunings, with a manual that is now the
