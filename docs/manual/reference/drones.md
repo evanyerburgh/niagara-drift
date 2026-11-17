@@ -44,7 +44,7 @@ Low-pass (LP), band-pass (BP) or high-pass (HP), on a black key: [[A#3]] for dro
 
 | Knob | What it does |
 |---|---|
-| **Pitch** | 1.6 kHz down to 2 Hz, a note of the Tuning a click. With [[SEL]] held, a cent a click |
+| **Pitch** | 1.6 kHz down to 2 Hz, a note of the Tuning a click. With [[SEL]] held, a cent a click turned slowly, up to 40 cents a click turned quickly: a free glide between the notes |
 | **Resonance** | Boosts the filter at its cutoff. The last dot is red: there it rings on its own (self-oscillates) |
 
 ### Pitch link
@@ -57,6 +57,8 @@ Low-pass (LP), band-pass (BP) or high-pass (HP), on a black key: [[A#3]] for dro
 
 - **Under 27 Hz** a drone becomes a pulse of clicks; the speaker can't play that low, so listen on headphones.
 - **Pitch glides** from note to note, so a steady turn is one slide.
+- **A quick turn with SEL** glides freely, off the Tuning's notes; slow down for single cents. Where you stop is the
+  fine offset.
 - **A fine offset stays** (with SEL, +3 cents stays +3 from note to note) until you change the Tuning; "fine +3" shows
   it.
 - **The pictures:** on Drones, each filter's curve, its level in dB under it, its note at the right; a silent drone is

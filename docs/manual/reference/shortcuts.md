@@ -25,7 +25,7 @@ Every combination of keys, and every hold and tap, in one place.
 
 | Do | What it does |
 |---|---|
-| [[SEL]] held, a knob | Fine steps: a pitch knob a cent at a time, cutoff and resonance in tenths, Shift's move a cent |
+| [[SEL]] held, a knob | Fine steps: a pitch knob a cent at a time (more when turned quickly, to glide), cutoff and resonance in tenths, Shift's move a cent |
 | [[SEL]] + KNOB 1 or 3 on Sub · Drive | Each drone's sub wave |
 | [[SEL]] + KNOB 2 on Details | The delay's type |
 | [[SEL]] + KNOB 4 on Details | What goes into the reverb |

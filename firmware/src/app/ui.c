@@ -369,7 +369,9 @@ static int32_t accel(int role, int32_t s, int range)
 }
 
 /* a pitch knob (or the link offset): a detent is the next step of the Tuning, up or down (2 when turned quickly, on a
- * smooth curve: 70 detents a second; Evan, on the FM-1, 4x went too far); with SEL held, 1 cent.
+ * smooth curve: 70 detents a second; Evan, on the FM-1, 4x went too far); with SEL held, 1 cent turned slowly, more
+ * when turned quickly, up to PITCH_FINE_MAX at 70 a second, so a quick turn glides freely between the notes as 0.1's
+ * 60 cents did (Evan, 2026-11-18: "1 cent when turned slower and somewhat faster on fast so people can glide more").
  * Each step slides over the time since the last detent (15..600 ms): the next one is due about then, so a steady turn
  * is one slide through the grid's notes, as an analog knob's; a first detent after a pause slides over 300 ms. */
 /* THE TUNING (v0.3, Setup 2 KNOB 4; Evan, 2026-10-30): every detent moves the pitch to the grid's next step, so the
@@ -396,6 +398,9 @@ static int grid_k(int p, int v) { return dr_grid_k(tun_t(p), v, tun_root(p)); }
 static int grid_at(int p, int k) { return dr_grid_at(tun_t(p), k, tun_root(p)); }
 static int grid_near(int p, int v) { return grid_at(p, grid_k(p, v)); }
 static int tun_i(int p) { return p == P_PLINK_OFF ? 2 : p == DR_GP(1, GP_PITCH); }   /* its proj.tun_off */
+#ifndef PITCH_FINE_MAX
+#define PITCH_FINE_MAX 40                              /* cents a detent with SEL, turned at 70 detents a second */
+#endif
 static void pitch_turn(int g, int p, int role, int32_t s)
 {
     uint32_t now = plat_ms(), dt = now - ui.enc_t[role], a = (uint32_t)(s < 0 ? -s : s), slide;
@@ -407,9 +412,18 @@ static void pitch_turn(int g, int p, int role, int32_t s)
      * 15 .. 600 ms; after a pause (a first detent), 300 ms */
     slide = accel_off ? 15u : dt < 15u ? 15u : dt > 600u ? 300u : dt;
     if (ui.btn >> B_SEL & 1u) {                        /* fine: SEL held; where it ends is the offset kept */
-        int v = proj.par[p] + (int)s;
+        const float sp = 1000.0f / (float)(dt ? dt : 1u), x = fm_clampf((sp - 10.0f) * (1.0f / 60.0f), 0.0f, 1.0f);
+        const dr_param_t *in = dr_param_info(p);
+        int v;
         ui.btn_used |= 1u << B_SEL;
-        cents = (int)s;
+        cents = (int)s * (int)(accel_off ? 1.0f : 1.0f + (float)(PITCH_FINE_MAX - 1) * x * x + 0.5f);   /* 1 slow */
+        v = proj.par[p] + cents;
+        if (v > in->hi || v < in->lo) {                /* the range's ends */
+            v = v > in->hi ? in->hi : in->lo;
+            cents = v - proj.par[p];
+            if (!cents)
+                return;
+        }
         v -= grid_near(p, v);
         proj.tun_off[ti] = (int8_t)(v < -127 ? -127 : v > 127 ? 127 : v);
         tun_keep_t = -1;                               /* a new offset of the hand's: none kept to come back */
