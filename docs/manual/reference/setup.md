@@ -82,7 +82,7 @@ hear is within 10 cents; otherwise the familiar name ("5th").
 ### Tunings
 
 - **Just and Shruti move with drone I** (a movable do): its pitch knob picks the tonic. The others are built on A, so
-  Tune moves them; LMY's 1/1 is C, Harrison's and Partch's G.
+  Tune moves them; La Monte Young's 1/1 is C, Lou Harrison's and Harry Partch's G.
 - **Wander, Chord, a partner's interval and Shift** take the Tuning's notes.
 
 ### Pictures

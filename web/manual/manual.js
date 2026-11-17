@@ -111,21 +111,23 @@ document.querySelectorAll(".listen").forEach((l) => {
 // the feedback form (Help): sent to Formspree from the page, with the page and the browser; the answer said in place
 document.querySelectorAll("form.feedback").forEach((f) => {
   const st = f.querySelector(".feedback-status"), go = f.querySelector("button[type=submit]");
+  const ja = document.documentElement.lang === "ja";
   f.addEventListener("submit", async (e) => {
     e.preventDefault();
     const d = new FormData(f);
     d.append("Page", location.href);
     d.append("Browser", navigator.userAgent);
-    d.append("_subject", "Niagara Drift feedback");
+    d.append("_subject", ja ? "Niagara Drift feedback (Japanese)" : "Niagara Drift feedback");
     go.disabled = true;
-    st.textContent = "Sending";
+    st.textContent = ja ? "送信中" : "Sending";
     try {
       const r = await fetch(f.action, { method: "POST", body: d, headers: { Accept: "application/json" } });
       if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.status);
       f.reset();
-      st.textContent = "Sent. Thank you.";
+      st.textContent = ja ? "送信しました。ありがとうございます。" : "Sent. Thank you.";
     } catch (err) {
-      st.textContent = "Not sent (" + err.message + "). Try again, or open an issue on GitHub.";
+      st.textContent = ja ? "送信できませんでした（" + err.message + "）。もう一度試すか、GitHubでIssueを開いてください。"
+                          : "Not sent (" + err.message + "). Try again, or open an issue on GitHub.";
     }
     go.disabled = false;
   });

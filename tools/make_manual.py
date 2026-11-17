@@ -55,21 +55,49 @@ MENU_ICON = {"Play it": "play", "Recipes": "cooking-pot", "Reference": "book-ope
              "Shortcuts": "keyboard", "Help": "lifebuoy", "About": "info"}
 TAB_ICON = {"sounds": "waveform", "gestures": "hand-pointing", "scenes": "floppy-disk", "time": "timer",
             "performing": "faders", "scratch": "plant"}
+JA = MAN / "ja"                                    # the Japanese pages (2026-11-17: Help first; the rest link to English)
 MENU = [("", "Play it", "the emulator, and the first steps under it"),
         ("manual/recipes/sounds/", "Recipes", "how to get a sound or a move"),
         ("manual/reference/", "Reference", "every page, knob and key"),
         ("manual/reference/shortcuts/", "Shortcuts", "every combination, hold and tap"),
         ("manual/help/", "Help", "installing, going back, feedback"),
         ("manual/about/", "About", "what it does, the details, where it came from")]
+# Japanese: the pages not translated yet go to the English ones, marked 英語 (docs/translations/ja-glossary.md)
+MENU_JA = [("ja/", "Play it", "弾いてみる", "エミュレーターと、その下の最初の一歩"),
+           ("manual/recipes/sounds/", "Recipes", "レシピ（英語）", "音や動きの作り方"),
+           ("manual/reference/", "Reference", "リファレンス（英語）", "すべてのページ、ノブ、キー"),
+           ("manual/reference/shortcuts/", "Shortcuts", "ショートカット（英語）", "キーの組み合わせ、長押しとタップ"),
+           ("ja/manual/help/", "Help", "ヘルプ", "インストール、元に戻す、フィードバック"),
+           ("manual/about/", "About", "概要（英語）", "できること、詳細、成り立ち")]
+JA_NOTE = ('<div class="note ja-note"><p>このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。'
+           '間違いに気づいたら、<a href="{up}ja/manual/help/#send-feedback">お知らせください</a>。</p></div>')
 
 
-def menu_html(up, current):
-    """Install, Source and the menu (the front page has the same, web/emu/index.html)."""
+def lang_item(href, lang, name, small):
+    """The other language as the menu's last item: shown only on phones (≤480 px), where the row has no room for its
+    pill (manual.css, web/emu/index.html)."""
+    return (f'<a class="langitem" href="{href}" hreflang="{lang}">{icon("arrows-left-right", "mi")}'
+            f'<span><span lang="{lang}">{name}</span><small>{small}</small></span></a>')
+
+
+def menu_html(up, current, lang="en", other="ja/"):
+    """Install, Source, the other language (other: its page, from the site's root) and the menu (the front page has
+    the same, web/emu/index.html)."""
+    if lang == "ja":
+        items = "".join(f'<a href="{up}{h}"{" aria-current=\"page\"" if n == current else ""}>{icon(MENU_ICON[n], "mi")}'
+                        f'<span>{j}<small>{s}</small></span></a>' for h, n, j, s in MENU_JA)
+        return (f'<a href="{up}ja/install/">インストール</a><a href="{up}ja/manual/help/#send-feedback">フィードバック</a>'
+                f'<a href="{REPO}" aria-label="GitHubのソース">ソース{GH}</a>'
+                f'<a class="lang" href="{up}{other}" lang="en" hreflang="en">English</a>'
+                f'<details class="menubtn"><summary aria-label="メニュー" title="メニュー">メニュー</summary><div class="panel">{items}'
+                f'{lang_item(up + other, "en", "English", "英語のページへ")}</div></details>')
     items = "".join(f'<a href="{up}{h}"{" aria-current=\"page\"" if n == current else ""}>{icon(MENU_ICON[n], "mi")}'
                     f'<span>{n}<small>{s}</small></span></a>'
                     for h, n, s in MENU)
     return (f'<a href="{up}install/">Install</a><a href="{up}manual/help/#send-feedback">Feedback</a><a href="{REPO}" aria-label="Source on GitHub">Source{GH}</a>'
-            f'<details class="menubtn"><summary aria-label="Menu" title="Menu">Menu</summary><div class="panel">{items}</div></details>')
+            f'<a class="lang" href="{up}{other}" lang="ja" hreflang="ja">日本語</a>'
+            f'<details class="menubtn"><summary aria-label="Menu" title="Menu">Menu</summary><div class="panel">{items}'
+            f'{lang_item(up + other, "ja", "日本語", "in Japanese")}</div></details>')
 
 
 # ---- Markdown ----------------------------------------------------------------------------------------------------
@@ -322,36 +350,57 @@ def onpage(groups, base, label):
 RECIPE_KINDS = ["sounds", "gestures", "scenes", "time", "performing", "scratch"]   # scratch: the tutorial, one walk-through
 
 
-def banner_html(up, title, intro, kicker="", current=""):
+def banner_html(up, title, intro, kicker="", current="", lang="en", other="ja/"):
     """The red banner with the menu, a page's kicker, title and intro (the install page has it too: make_pages.py)."""
+    home = (f'<a class="homeicon" href="{up}ja/" aria-label="ホーム：Niagara Driftをブラウザーで弾く" title="ホーム">{HOME}</a>'
+            if lang == "ja" else
+            f'<a class="homeicon" href="{up}" aria-label="Home: Niagara Drift, play it in your browser" title="Home">{HOME}</a>')
     return f"""<div class="top"><div class="top-in">
-<nav class="menu" aria-label="Site"><a class="homeicon" href="{up}" aria-label="Home: Niagara Drift, play it in your browser" title="Home">{HOME}</a>{menu_html(up, current)}</nav>
+<nav class="menu" aria-label="Site">{home}{menu_html(up, current, lang, other)}</nav>
 <div class="title"><small>{"Niagara Drift" + (" · " + kicker if kicker else "")}</small><h1>{inline(title)}</h1><p>{inline(intro)}</p></div>
 </div></div>"""
 
 
-def page_html(rel, meta, body, current, side=""):
+def page_html(rel, meta, body, current, side="", lang="en"):
     depth = 1 + (rel.count("/") + 1 if rel else 0)    # folders under the site's root
+    if lang == "ja":
+        depth += 1                                     # ja/manual/...
     up, mup = "../" * depth, "../" * (depth - 1)
-    title, intro = meta.get("title", ""), meta.get("intro", "").rstrip(".")
+    if lang == "ja":
+        mup = up + "manual/"                           # one style and script for both languages
+    other = (("manual/" + rel + "/" if rel else "manual/") if lang == "ja" else
+             ("ja/manual/" + rel + "/" if (JA / ((rel or "index") + ".md")).exists() else "ja/"))
+    title, intro = meta.get("title", ""), meta.get("intro", "").rstrip(".。")
     kicker = meta.get("kicker", "")
     desc = html.escape(meta.get("description", meta.get("intro", "")))
     img = f'<meta property="og:image" content="{up}manual/media/{meta["image"]}">' if meta.get("image") else ""
     return f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(title)} · Niagara Drift</title>
+<html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{html.escape(title)} · Niagara Drift</title>{alt_links(rel, lang, up)}
 <meta name="description" content="{desc}"><meta property="og:title" content="{html.escape(title)} · Niagara Drift">
 <meta property="og:description" content="{desc}">{img}<meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="{mup}manual.css"></head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
-{banner_html(up, title, intro, kicker, current)}
-<main id="main" tabindex="-1" class="page{' side' if side else ''}">{side}<div class="prose">{body}</div></main>
-<p class="foot">Niagara Drift · free, open-source firmware (GPL-3.0) for the M-VAVE FM-1. Sound examples are rendered from the
-firmware's own code on a computer, with headphones' settings, not recorded from an FM-1. <a href="{mup}about/">About</a> ·
-<a href="{REPO}">Source on GitHub</a></p>
+<a class="skip" href="#main">{"本文へ移動" if lang == "ja" else "Skip to content"}</a>
+{banner_html(up, title, intro, kicker, current, lang, other)}
+<main id="main" tabindex="-1" class="page{' side' if side else ''}">{side}<div class="prose">{JA_NOTE.format(up=up) if lang == "ja" else ""}{body}</div></main>
+{FOOT_JA.format(mup=mup, repo=REPO) if lang == "ja" else FOOT_EN.format(mup=mup, repo=REPO)}
 <script src="{mup}manual.js"></script>
 </body></html>"""
+
+
+FOOT_EN = '<p class="foot">Niagara Drift · free, open-source firmware (GPL-3.0) for the M-VAVE FM-1. Sound examples are rendered from the\nfirmware\'s own code on a computer, with headphones\' settings, not recorded from an FM-1. <a href="{mup}about/">About</a> ·\n<a href="{repo}">Source on GitHub</a></p>'
+FOOT_JA = ('<p class="foot">Niagara Drift · M-VAVE FM-1用の無料・オープンソースのファームウェア（GPL-3.0）。音の例は'
+           'ファームウェア自身のコードからパソコン上で作ったもので（ヘッドホンの設定）、FM-1から録音したものではありません。'
+           '<a href="{mup}about/">概要（英語）</a> · <a href="{repo}">GitHubのソース</a></p>\n')
+
+
+def alt_links(rel, lang, up):
+    """The page in the other language, for search engines (hreflang): only where both exist."""
+    if not (JA / ((rel or "index") + ".md")).exists():
+        return ""
+    en, ja = up + ("manual/" + rel + "/" if rel else "manual/"), up + ("ja/manual/" + rel + "/" if rel else "ja/manual/")
+    return f'<link rel="alternate" hreflang="en" href="{en}"><link rel="alternate" hreflang="ja" href="{ja}">'
 
 
 def build(out):
@@ -370,7 +419,7 @@ def build(out):
         shutil.copy(f, dst / "media" / f.name)
     pages = 0
     for md in sorted(MAN.rglob("*.md")):
-        if md.relative_to(MAN).as_posix().startswith("renders/"):
+        if md.relative_to(MAN).as_posix().startswith(("renders/", "ja/")):
             continue
         rel = page_rel(md)
         meta, text = front(md.read_text(encoding="utf-8"))
@@ -412,7 +461,8 @@ def build(out):
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(page, encoding="utf-8")
         pages += 1
-    for p in dst.rglob("index.html"):                  # each sound and picture tagged with its contents: a browser
+    pages += build_ja(out)
+    for p in list(dst.rglob("index.html")) + list((out / "ja" / "manual").rglob("index.html")):   # each sound and picture tagged with its contents: a browser
         t = p.read_text(encoding="utf-8")                # that kept an earlier one fetches the new one (Safari did)
         def tag(m):
             f = dst / "media" / m.group(2)
@@ -422,6 +472,27 @@ def build(out):
                      - {f.name for f in (dst / "media").glob("*.mp4")})
     print(f"manual: {dst}: {pages} pages" + (f"; no sound yet for {len(missing)} recipes (tools/make_manual.py --renders)"
                                                if missing else ""))
+
+
+def build_ja(out):
+    """The Japanese pages (docs/manual/ja) into out/ja/manual/: plain pages (no recipes or reference yet); links to the
+    pages not translated go to the English ones."""
+    dst = out / "ja" / "manual"
+    if dst.exists():
+        shutil.rmtree(dst)
+    n = 0
+    for md in sorted(JA.rglob("*.md")) if JA.exists() else []:
+        rel = page_rel(md, JA)
+        meta, text = front(md.read_text(encoding="utf-8"))
+        text = re.sub(r"<!-- github -->.*?<!-- /github -->\n?", "", text, flags=re.S)
+        current = {"help": "Help"}.get(rel, "")
+        body = render(blocks(text))
+        page = page_html(rel, meta, unique_ids(diagrams(icons(rewrite_links(body, md, "ja")))), current, lang="ja")
+        p = dst / rel / "index.html" if rel else dst / "index.html"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(page, encoding="utf-8")
+        n += 1
+    return n
 
 
 def tabs(cur, base="../"):
@@ -448,9 +519,9 @@ def reference_side(rel):
             '<script>if (matchMedia("(min-width: 821px)").matches) document.querySelector(".toc details").open = true;</script>')
 
 
-def page_rel(md):
+def page_rel(md, root=MAN):
     """docs/manual/X/index.md and X.md are both the page manual/X/ ("" for the manual's first page)."""
-    rel = md.relative_to(MAN).with_suffix("").as_posix()
+    rel = md.relative_to(root).with_suffix("").as_posix()
     return "" if rel == "index" else rel[:-6] if rel.endswith("/index") else rel
 
 
@@ -487,8 +558,30 @@ def diagrams(body):
     return re.sub(r'<img class="diagram" src="[^"]*media/([\w-]+)\.svg" alt="([^"]*)">', svg, body)
 
 
-def rewrite_links(body, md):
-    """Links written between the Markdown files (../help.md, gestures.md#keep) as the site's pages."""
+def rewrite_links(body, md, lang="en"):
+    """Links written between the Markdown files (../help.md, gestures.md#keep) as the site's pages. A Japanese page's
+    links go to the Japanese page where there is one (written as it), else to the English one (written ../X.md)."""
+    if lang == "ja":
+        rel = page_rel(md, JA)
+        up = "../" * (2 + (rel.count("/") + 1 if rel else 0))      # to the site's root
+
+        def fix_ja(m):
+            href = m.group(1)
+            path, _, frag = href.partition("#")
+            if re.match(r"[a-z]+:", href) or not path.endswith(".md"):
+                return m.group(0)
+            target = (md.parent / path).resolve()
+            if not target.is_relative_to(MAN):
+                return f'href="{REPO}/blob/main/{target.relative_to(SRC).as_posix()}{"#" + frag if frag else ""}"'
+            if target.is_relative_to(JA):
+                t = page_rel(target, JA)
+                url = "ja/manual/" + (t + "/" if t else "")
+            else:
+                t = page_rel(target)
+                url = "manual/" + (t + "/" if t else "")
+            return f'href="{up}{url}{"#" + frag if frag else ""}"'
+        body = re.sub(r'href="([^"]+)"', fix_ja, body)
+        return re.sub(r'src="(?:\.\./)*(?:img|media)/([\w.-]+\.png)"', lambda m: f'src="{up}manual/media/{m.group(1)}"', body)
     rel = page_rel(md)
     depth = rel.count("/") + 1 if rel else 0
 
@@ -518,7 +611,7 @@ def check():
         out = Path(tmp)
         build(out)
         site = out / "manual"
-        for p in site.rglob("index.html"):
+        for p in list(site.rglob("index.html")) + list((out / "ja" / "manual").rglob("index.html")):
             t = p.read_text(encoding="utf-8")
             ids = set(re.findall(r'id="([^"]+)"', t))
             for img in re.findall(r"<img [^>]*>", t):
@@ -539,8 +632,9 @@ def check():
                         bad.append(f"{p.relative_to(out)}: {name}.mp4 has no render (docs/manual/renders/{name}.omni)")
                     continue
                 tgt = (p.parent / path).resolve()
-                if path.startswith("../") and not str(tgt).startswith(str(site.resolve())):
-                    continue                   # the front page, install/: outside the manual
+                if path.startswith("../") and not (str(tgt).startswith(str(site.resolve()))
+                                                   or str(tgt).startswith(str((out / "ja" / "manual").resolve()))):
+                    continue                   # the front pages, install/: outside the manual
                 if tgt.is_dir():
                     tgt = tgt / "index.html"
                 if not tgt.exists():

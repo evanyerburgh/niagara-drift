@@ -17,7 +17,7 @@ It isn't a groovebox: the keys don't play melodies, there's no sequencer, and it
 
 <ul class="cards">
 <li><img class="ic" src="../../web/manual/icons/waveform.svg" alt=""><b>2 drones</b><span>Virtual-analog: each a wave from sine to square, a partner (a second oscillator) at an interval, a sub and noise, into its own resonant filter and drive</span></li>
-<li><img class="ic" src="../../web/manual/icons/music-notes-simple.svg" alt=""><b>11 tunings</b><span>12-tone to Partch's 43 notes, La Monte Young's, Harrison's, the shrutis; intervals named in each one's terms</span></li>
+<li><img class="ic" src="../../web/manual/icons/music-notes-simple.svg" alt=""><b>11 tunings</b><span>12-tone to Harry Partch's 43 notes, La Monte Young's, Lou Harrison's, the shrutis; intervals named in each one's terms</span></li>
 <li><img class="ic" src="../../web/manual/icons/intersect.svg" alt=""><b>FM cross-mod</b><span>FM between the drones: each bending the other's pitch, or the finished sound bending both (Snarl); or drone I moving drone II's filter</span></li>
 <li><img class="ic" src="../../web/manual/icons/arrows-clockwise.svg" alt=""><b>Feedback and Character</b><span>The finished sound fed back into the drones; the oscillators from clean to vintage</span></li>
 <li><img class="ic" src="../../web/manual/icons/broadcast.svg" alt=""><b>6 delays, 5 reverbs</b><span>Clean to tape and self-warping echoes, a drive after them, reverbs from a room to a freeze</span></li>
@@ -80,7 +80,7 @@ It isn't a groovebox: the keys don't play melodies, there's no sequencer, and it
 | | |
 |---|---|
 | **LFO** | 2 waves of 10 shapes each (20 in all: triangles, squares, saws, exponentials, patterns, random, AND and OR steps), one cycle in 100 s to 70 Hz, on pitch, wave, cutoff, resonance and the delay |
-| **Tuning** | A from 427 to 453 Hz (440 to start, 432 for those who like it), 1 Hz a click or 0.1 with SEL; 12-tone, quarter tones, 19-, 31- and 53-tone, just, the harmonics, LMY, Harrison, the shrutis, Partch |
+| **Tuning** | A from 427 to 453 Hz (440 to start, 432 for those who like it), 1 Hz a click or 0.1 with SEL; 12-tone, quarter tones, 19-, 31- and 53-tone, just, the harmonics, La Monte Young's (LMY), Lou Harrison's, the shrutis, Harry Partch's |
 | **Detuning** | Each drone a cent at a time off its Tuning's notes (SEL + a pitch knob), kept as you move between notes; each partner up to 30 cents, for beating; Drift lets the detune wander |
 
 ### Playing and connecting

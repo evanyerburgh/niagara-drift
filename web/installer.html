@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: GPL-3.0-only
      Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments
      Niagara Drift's web installer: Felucca's installer page (web/index_pkg.html, by way of X0X and FoMni), in
-     Niagara Drift's look, English only. tools/make_pages.py inlines fm1pkg.js and fm1ota.js and the package's
+     Niagara Drift's look, in English and Japanese (ja/install/). tools/make_pages.py inlines fm1pkg.js and fm1ota.js and the package's
      metadata, and puts in the site's banner and menu (make_manual.py's, styled by ../manual/manual.css); it is served at
      install/, beside the emulator page. -->
 <html lang="en">
@@ -215,9 +215,93 @@ const TEXT = {
     reportsending: "Sending",
     reportsent: "Sent. Thank you: it will be looked at.",
     reportfail: "Not sent: ",
+    ready: "Niagara Drift {ND}: ready",
+  },
+  ja: {
+    installh: "3つの手順で",
+    step1: "このページをChromeまたはEdgeで開きます（USBでFM-1と通信できます。SafariとFirefoxではできません）。",
+    step2: "USBデータ・ケーブルでFM-1をパソコンに直接つなぎ（ハブは使わない）、電源を入れます。MIDIを使う他のアプリは閉じてください。",
+    step3: "インストールを押し、ブラウザーにたずねられたらMIDIを許可します。約2分かかります。「完了」と表示されるまで、ケーブルを抜いたりFM-1に触れたりしないでください。",
+    install: "インストール",
+    riskh: "始める前に",
+    riskline: "自己責任で行ってください。問題が起きても、このページでM-VAVEのファームウェアに戻せます。",
+    risklink: "始める前に",
+    helpline: "質問や、おかしなことがあれば：",
+    helplink: "ヘルプ",
+    beta: "インストールは自己責任です。FM-1が壊れたり、おかしな動作をしたりしても、関係者は責任を負えません。",
+    safe: "2回続けて起動に失敗すると、セーフ・モード（音は出ず、USBは使える）で立ち上がります。そこから、このページでもう一度インストールするか、元のファームウェアに戻せます。",
+    brick: "FM-1がまったく起動しなくても、M-VAVEのファームウェアに戻せます：",
+    bricklink: "FM-1が起動しない",
+    stockh: "M-VAVEのファームウェアに戻す",
+    stockwhy: "M-VAVE純正のFM-1ファームウェア（V16またはV15）を、同じケーブルで、Niagara Driftまたはそのセーフ・モードから書き戻します。サウンドとシーンは先にファイルに保存され、その後置き換えられます。",
+    stock1: "M-VAVEのFM-1ファームウェアをダウンロード：",
+    stockalt: "こちらにもあります：",
+    stock1b: "FM-1が受け付けない場合は、Internet Archiveから：",
+    stock2: "ダウンロードしたファイルを選びます：",
+    stock3: "FM-1をUSBでつなぎ、下のボタンを押します。",
+    stockinstall: "M-VAVEのファームウェアをインストール",
+    stockok: "M-VAVEのFM-1 {V}です。ボタンを押してインストールします。",
+    stockbad: "M-VAVEのFM-1 V16またはV15のファイルではありません。上のリンクからファイルを選んでください。",
+    stockhead: "何も書き込まれませんでした。FM-1が受け付けるのは、すでに入っているブートローダーに合うバージョンだけです。もう一方のファイル（V16またはV15）を選び、もう一度ボタンを押してください。",
+    stockdone: "完了しました。FM-1はM-VAVEのファームウェアで再起動しました。",
+    stockfirst: "まず、Niagara Driftを{ND}にアップデートします（どちらのM-VAVEバージョンも受け付けます）。次にM-VAVEのファームウェア：",
+    trubh: "インストールがうまくいかない？",
+    trubwhy: "ここから何もFM-1に届かない場合（Niagara Drift 0.2を使っている新しいFM-1は、すべてのインストールを受け付けません）、Julius Vitkauskasによる無料アプリM-Flasherが、外側からM-VAVEのファームウェアに戻します。一度だけ、約10分かかります。その後はこのページがまた使えます。",
+    trub1: "ダウンロード：",
+    trub1b: "（Macは.dmg、Windowsは.zip）。",
+    trub2: "開きます。署名されていないため、初回はパソコンが警告します。Windowsでは「詳細情報」→「実行」。Macでは「システム設定」→「プライバシーとセキュリティ」→「このまま開く」。パスワードをたずねられます：FM-1にアクセスするために必要です。",
+    trub3: "USBデータ・ケーブルでFM-1をパソコンに直接つなぎます。M-Flasherが見つけたら、DOWNLOAD MODEを押します。",
+    trub4: "M-VAVEの",
+    trub4b: "を選び、REVIEW & FLASHを押します。書き込む前にFM-1全体をバックアップします。",
+    trub5: "終わったらケーブルを抜き、FM-1の電源を切って入れ直します：M-VAVEのファームウェアで起動します。",
+    trub6: "このページに戻り、インストールを押します。",
+    trubmore: "各手順の詳細：",
+    trubmorelink: "M-Flasherのガイド（英語）",
+    nomidi: "このブラウザーではできません。ChromeまたはEdgeで開いてください。", loadfail: "ファームウェアを読み込めませんでした：",
+    start: "開始中", verify: "確認中", loader: "アップデート・モードに切り替え中", write: "書き込み中",
+    reboot: "再起動中", done: "完了：FM-1はNiagara Driftで動いています。PLAYを押してください。", stopped: "止まりました。USBケーブルを差し直し、もう一度インストールを押してください。また止まる場合は、下の「インストールがうまくいかない？」を見てください。",
+    error: "エラー：",
+    denied: "MIDIへのアクセスが許可されませんでした。サイトの設定（アドレス・バー）でMIDIを許可し、もう一度インストールを押してください。",
+    notfound: "FM-1が見つかりません。データ・ケーブルでパソコンに直接つながっているか確かめ、MIDIを使う他のアプリを閉じて、もう一度インストールを押してください。",
+    model: "つながっている機器はFM-1ではありません。",
+    lost: "USBの接続が切れました。差し直して、もう一度インストールを押してください。",
+    noloader: "アップデート・モードのFM-1が見つかりません。USBケーブルを差し直し、もう一度インストールを押してください（終わるまでアップデート・モードのままです）。",
+    noreturn: "FM-1が戻ってきませんでした。電源を切って入れ直してください。",
+    mismatch: "書き込みましたが、FM-1は別のバージョンを報告しています：",
+    badpkg: "ファームウェアのファイルが壊れています。ページを再読み込みしてください。",
+    leave: "書き込み中です。ページを閉じないでください。",
+    backingup: "まずサウンドとシーンを保存しています",
+    savedto: "サウンドとシーンは先に保存されました：",
+    savedhint: "（ダウンロード・フォルダー）。後で足りないものがあれば、元に戻せます：",
+    putback: "バックアップを元に戻す",
+    soundsh: "サウンドとシーン",
+    soundswhy: "FM-1でNiagara Driftが動いていれば、インストールのたびに先にファイルに保存されます（ノブのキャリブレーションは除く。FM-1ごとのものです）。ここで保存したり、保存したファイルを戻したりもできます：FM-1はそれで再起動します。ターミナル版インストーラーも同じファイルを作り、読めます。",
+    backupnow: "ファイルに保存",
+    restore1: "または、戻すバックアップ・ファイルを選びます：",
+    restorenow: "このバックアップを戻す",
+    restoring: "バックアップを戻しています",
+    restored: "完了：FM-1はバックアップのサウンドとシーンで再起動します。",
+    restoreask: "FM-1でSELを押すとバックアップを戻します（HOMEで今のまま）。",
+    restorecancel: "戻しませんでした：FM-1は今のサウンドとシーンのままです。",
+    nobackup: "このFM-1ではNiagara Drift（0.2以降）が動いていないので、保存したり戻したりするものはありません。",
+    backupdone: "保存しました：",
+    badbackup: "Niagara Driftのバックアップ・ファイルではありません。",
+    damaged: "このバックアップ・ファイルは壊れています（チェックサムが合いません）。何も書き込んでいません。別のファイルを選んでください。",
+    changed: "保存中にFM-1の状態が変わりました。止めて（PLAY）からもう一度試してください。",
+    reporth: "開発者に送る",
+    reportwhy: "うまくいきませんでした。何が起きたかを送ると、みんなのために直す助けになります。アカウントは不要です。日本語で大丈夫です。",
+    reportnote: "ほかに伝えたいこと（任意）",
+    reportmail: "メール・アドレス",
+    reportmailwhy: "任意。返事がほしい場合のみ",
+    reportwhat: "送られるもの：上のメッセージ、このページのバージョン、ブラウザーの名前、インストールのログ",
+    reportsend: "送信",
+    reportsending: "送信中",
+    reportsent: "送信しました。ありがとうございます。確認します。",
+    reportfail: "送信できませんでした：",
+    ready: "Niagara Drift {ND}：準備ができました",
   },
 };
-const lang = "en";
+const lang = "en";                                 /* tools/make_pages.py makes ja/install/ with "ja" */
 let stockV = "", ndV = "";                         /* the stock version chosen, this page's Niagara Drift: {V}, {ND} */
 const t = (k) => (TEXT[lang][k] || "").replace("{V}", stockV).replace("{ND}", ndV);
 let lastKey = null, lastArg = "";
@@ -301,7 +385,7 @@ window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault
     const pkg = new Uint8Array(await r.arrayBuffer());
     if (productOf(pkg) !== meta.product) { sayK("badpkg"); return; }
     image = logicalImage(pkg);
-    say(`Niagara Drift ${meta.version}: ready`);
+    sayK("ready");
     $("go").disabled = false;
   } catch (e) { sayK("loadfail", e.message); }
 })();
