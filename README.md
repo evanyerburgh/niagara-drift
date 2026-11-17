@@ -58,7 +58,8 @@ FX Space, Details · GLO Setup 1, 2.*
 1. Open the [web installer](https://evanyerburgh.github.io/niagara-drift/install/) in **Chrome or Edge**
    (they can talk to the FM-1 over USB; Safari and Firefox can't).
 2. Connect the FM-1 straight to the computer with a USB **data** cable (no hub) and switch it on.
-3. Press **Install** and allow MIDI when the browser asks. It takes about two minutes; don't touch the cable
+3. Press **Install** and allow MIDI when the browser asks. Over Niagara Drift, it saves your sounds and scenes
+   to a file first. It takes about two minutes; don't touch the cable
    or the FM-1 until it says Done. Then press PLAY.
 
 Or from a terminal, with the file from the [releases](https://github.com/evanyerburgh/niagara-drift/releases):
