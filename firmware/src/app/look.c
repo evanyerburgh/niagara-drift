@@ -2013,7 +2013,7 @@ static void lk_ring_tilt(int32_t cx, int32_t cy, float rx, float ry, int tilt, u
  * loud (40 sqrt(wet fb^k), an eighth as wide), the left channel's opening up in the FX blue and the right's down in aqua,
  * each dimmer as it ages, drawn while over -26 dB; Drive thickens the lines. Wide: the right at 0.75 of the time;
  * Ping-pong: odd repeats left, even right; Grain jittered, Self stretching (as the engine). Past Repeats 85 they stop
- * shrinking: runaway, in the header */
+ * shrinking: runaway, in the header, the repeats past the third drawn thinner and dimmer */
 static float lk_dly_x(float ms) { return 27.0f + 29.0f * fm_logf(1.0f + ms * 0.01f); }   /* 2 s at x 115 */
 static void lk_pic_delay(void)
 {
@@ -2025,6 +2025,7 @@ static void lk_pic_delay(void)
     const int w = (int)(2.0f + (float)proj.par[P_DLY_DRIVE] * 0.015f + 0.5f);   /* 2 px as every page, 3 from Drive 34,
                                                                                   * 4 at 100 (Evan, 2026-11-07) */
     const int32_t mid = 68;
+    const int run = proj.par[P_DLY_REPEATS] > 85;   /* as the header's "runaway" */
     static const uint32_t C[2][2] = {{0xB4D9FFu, 0x1F6BFFu}, {0xB8FFF0u, 0x3CBFAFu}};   /* new, old: L blue, R aqua */
     int side, k;
     cv_text(2, 26, &LK_F_SMALL, "L", LK_LABEL);
@@ -2037,7 +2038,7 @@ static void lk_pic_delay(void)
             const int heard = ty != 2 || (k & 1) != side;   /* ping-pong: odd repeats on the left, even on the right */
             const float t = step * (float)k;
             const float x = lk_dly_x(t) + 0.5f * (float)echo_shift(ty, k);
-            float hgt, age;
+            float hgt, age, late;
             a *= fb;
             hgt = 40.0f * fm_sqrtf(wet * a);
             if (x > 115.0f || wet * a < 0.0025f)   /* off the axis, or under -26 dB */
@@ -2045,8 +2046,10 @@ static void lk_pic_delay(void)
             if (!heard)
                 continue;
             age = fm_minf((float)(k - 1) * 0.1f, 1.0f);
-            lk_ring((int32_t)(x + 0.5f), side ? mid + 1 : mid, hgt * 0.125f, hgt, side ? 2 : 1, w,
-                    lk_mix(0x07060Bu, lk_mix888(C[side][0], C[side][1], age), 1.0f - 0.4f * age));
+            late = run && k > 3 ? fm_minf((float)(k - 3) * 0.125f, 1.0f) : 0.0f;   /* runaway: past the first
+                                                                                   * three, thinner and dimmer */
+            lk_ring((int32_t)(x + 0.5f), side ? mid + 1 : mid, hgt * 0.125f, hgt, side ? 2 : 1, late > 0.0f ? w / 2 : w,
+                    lk_mix(0x07060Bu, lk_mix888(C[side][0], C[side][1], age), 1.0f - 0.4f * age - 0.35f * late));
         }
     }
     cv_text(117 - text_w(&LK_F_SMALL, "2 s"), 2, &LK_F_SMALL, "2 s", LK_LABEL);   /* on the name's line, clear of
@@ -2064,7 +2067,9 @@ static void lk_pic_reverb(void)
     static const float WIDE[DR_NREV] = {0.16f, 0.24f, 0.324f, 0.27f, 0.30f};   /* Room, Hall, Cathedral, Chorus hall, Shimmer */
     const int ty = (unsigned)proj.par[P_REV_TYPE] < DR_NREV ? proj.par[P_REV_TYPE] : 2, into = proj.par[P_DLY_ROUTE];
     const float len = rev_secs(proj.par[P_REV_LEN]), mix = (float)proj.par[P_REV_MIX] * 0.01f;
-    const float damp = (float)proj.par[P_REV_DAMP] * 0.01f, r0 = 8.0f + 26.0f * mix;   /* as tall as the delay's */
+    const float damp = (float)proj.par[P_REV_DAMP] * 0.01f;
+    const float r0 = mix > 0.0f ? 12.0f + 22.0f * mix : 8.0f;   /* as tall as the delay's; lit, half again Mix 0's gray
+                                                                * ring at least (the review, 2026-11-17) */
     const int32_t mid = 62;
     float t = 0.0f;
     int k;
