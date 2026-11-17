@@ -2266,8 +2266,7 @@ static void sw_text(sw_t w, const char **name, const char **st)
 static uint8_t wave_lvl(float w) { return (uint8_t)(fm_clampf(0.5f + 0.5f * w, 0.0f, 1.0f) * 255.0f + 0.5f); }
 
 /* THE LIGHTS (Evan, 2026-11-07, after the lights review: ~/niagara-drift-notes/reviews/2026-11-07-lights.md). One
- * clock for every slow blink; a dim step for a first choice, visible beside dark (2 frames of 32: the gesture glow's
- * 40 is 1); stopped, PLAY breathes and nothing else moves */
+ * clock for every slow blink; a dim step for a first choice, visible beside dark (2 frames of 32); stopped, PLAY breathes and nothing else moves */
 #define LED_DIM 64
 #define BLINK_MS 1200u
 static int blink(uint32_t on_ms) { return plat_ms() % BLINK_MS < on_ms; }
@@ -2406,8 +2405,10 @@ static void leds(void)
         k[WHITE_K[ui.scene_at]] = (now - ui.flash_t) % 160u < 80u ? 255 : 0;
     else if (ui.flash_t && ui.press >= 0 && now - ui.flash_t < 480u)
         k[WHITE_K[ui.press]] = (now - ui.flash_t) % 160u < 80u ? 255 : 0;
-    for (i = 0; i < DR_NGEST; i++)                   /* the gestures: a dim glow, lit as far as each is in */
-        k[gkey((int)i)] = (uint8_t)(40.0f + 215.0f * ui.g_amt[i]);
+    for (i = 0; i < DR_NGEST; i++)                   /* the gestures: dark at rest, lit as far as each is heard,
+                                                        * from 0 (Evan, 2026-11-17: the hand's, or the loop's if more,
+                                                        * as the engine has it) */
+        k[gkey((int)i)] = (uint8_t)(255.0f * fm_clampf(fm_maxf(ui.g_amt[i], loop_gest((int)i)), 0.0f, 1.0f) + 0.5f);
     if (keymap_on())                                   /* SEL held, the map on screen: the eight gesture keys are
                                                         * the banks, the one playing lit (as the map draws them) */
         for (i = 0; i < 8u; i++)

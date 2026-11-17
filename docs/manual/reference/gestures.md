@@ -73,6 +73,8 @@ Recipes: [Gestures](../recipes/gestures.md) · [Ticks and clicks](../recipes/sou
 
 ### On the panel and the screen
 
+- **The keys' lights:** a gesture's key is dark until it's played, then lights as far as the gesture is in, and
+  fades as it leaves. A latched one stays lit at its level.
 - **[The header](controls.md#screen-header)** shows the last one played and how far in ("WASH 40%"), or "latched". Scenes remember which are
   latched: a scene tapped brings them back.
 - **Pairs on the panel:** each key of 9–12 pairs with the key four to its right: Tick and Weight the low end, Chord and
