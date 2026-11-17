@@ -6,7 +6,7 @@ intro: ARP：両方のドローンにかかるトレモロ。テンポに合わ�
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Swell](../../reference/swell.md)
+AIで翻訳したページです。英語版：[Swell](../../reference/swell.md)
 <!-- /github -->
 
 ## Swell {#swell}

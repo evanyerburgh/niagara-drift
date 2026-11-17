@@ -58,7 +58,7 @@ JA_INSTALL = [('<html lang="en">', '<html lang="ja">'),
                """<p class="foot">Niagara Driftは無料・オープンソースのファームウェア（GPL-3.0、無保証）で、M-VAVEによる製品や公認のものではありません。
   このインストーラーはLeo Kuroshita（<a href="https://hugelton.com" target="_blank" rel="noopener">Hügelton Instruments</a>）によるFeluccaのもので、
   Charles VestalのX0XとFoMniを経ています。M-VAVEとFM-1は各所有者の商標です。
-  <a href="https://github.com/evanyerburgh/niagara-drift">ソース</a></p>""")]
+  {NOTE} <a href="https://github.com/evanyerburgh/niagara-drift">ソース</a></p>""")]
 
 
 def main(pkg, version, out):
@@ -112,12 +112,11 @@ def main(pkg, version, out):
     meta_j = json.dumps({"version": label, "product": product, "pkg": "../../firmware/" + name})
     top_j = banner_html("../../", "インストール", f"Niagara Drift {label}をFM-1に。ChromeまたはEdgeから、USBで", current="",
                         lang="ja", other="install/")
-    note_j = JA_NOTE.format(up="../../")
     for en_, ja_ in JA_INSTALL:
         if ja.count(en_) != 1:
             raise SystemExit(f"installer.html must contain once: {en_[:80]}")
         ja = ja.replace(en_, ja_)
-    ja = (ja.replace("<!--TOP-->", top_j).replace('<main id="main" tabindex="-1">', '<main id="main" tabindex="-1">\n' + note_j, 1)
+    ja = (ja.replace("<!--TOP-->", top_j).replace("{NOTE}", JA_NOTE.format(up="../../"), 1)
           .replace("/*LIB*/", lib).replace("/*META*/", meta_j))
     (out / "ja" / "install").mkdir(parents=True)
     (out / "ja" / "install" / "index.html").write_text(ja, encoding="utf-8")

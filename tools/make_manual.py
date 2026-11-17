@@ -87,8 +87,10 @@ WORDS = {"en": {"good": "Good to know", "listen": "Listen", "play_from": "Play {
                 "all_recipes": "このページのレシピ（{n}）", "coming": "（準備中）", "recipes_of": "{l}：レシピ",
                 "kinds": "レシピの種類", "all_ref": "リファレンスのページ", "ref": "リファレンス", "the_ref": "リファレンス",
                 "recipes": "レシピ"}}
-JA_NOTE = ('<div class="note ja-note"><p>このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。'
-           '間違いに気づいたら、<a href="{up}ja/manual/help/#send-feedback">お知らせください</a>。</p></div>')
+# a quiet line in the Japanese pages' small print (Evan, 2026-11-18: the boxed note at the top was "too prominent and too
+# strong"); {up}: the site's root from the page
+JA_NOTE = ('このマニュアルはAIで翻訳しました。より自然な表現があれば、'
+           '<a href="{up}ja/manual/help/#send-feedback">お知らせください</a>。')
 
 
 def lang_item(href, lang, name, small):
@@ -418,8 +420,8 @@ def page_html(rel, meta, body, current, side="", lang="en"):
 <body>
 <a class="skip" href="#main">{"本文へ移動" if lang == "ja" else "Skip to content"}</a>
 {banner_html(up, title, intro, kicker, current, lang, other)}
-<main id="main" tabindex="-1" class="page{' side' if side else ''}">{side}<div class="prose">{JA_NOTE.format(up=up) if lang == "ja" else ""}{body}</div></main>
-{FOOT_JA.format(about=up + ja_href("manual/about/"), repo=REPO) if lang == "ja" else FOOT_EN.format(mup=mup, repo=REPO)}
+<main id="main" tabindex="-1" class="page{' side' if side else ''}">{side}<div class="prose">{body}</div></main>
+{FOOT_JA.format(note=JA_NOTE.format(up=up), about=up + ja_href("manual/about/"), repo=REPO) if lang == "ja" else FOOT_EN.format(mup=mup, repo=REPO)}
 <script src="{mup}manual.js"></script>
 </body></html>"""
 
@@ -427,7 +429,7 @@ def page_html(rel, meta, body, current, side="", lang="en"):
 FOOT_EN = '<p class="foot">Niagara Drift · free, open-source firmware (GPL-3.0) for the M-VAVE FM-1. Sound examples are rendered from the\nfirmware\'s own code on a computer, with headphones\' settings, not recorded from an FM-1. <a href="{mup}about/">About</a> ·\n<a href="{repo}">Source on GitHub</a></p>'
 FOOT_JA = ('<p class="foot">Niagara Drift · M-VAVE FM-1用の無料・オープンソースのファームウェア（GPL-3.0）。音の例は'
            'ファームウェア自身のコードからパソコン上で作ったもので（ヘッドホンの設定）、FM-1から録音したものではありません。'
-           '<a href="{about}">概要</a> · <a href="{repo}">GitHubのソース</a></p>\n')
+           '{note} <a href="{about}">概要</a> · <a href="{repo}">GitHubのソース</a></p>\n')
 
 
 def alt_links(rel, lang, up):

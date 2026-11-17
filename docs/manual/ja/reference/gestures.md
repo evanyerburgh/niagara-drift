@@ -6,7 +6,7 @@ intro: 8つのジェスチャー・キー：押す強さで4つ、長押しで4�
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Gestures](../../reference/gestures.md)
+AIで翻訳したページです。英語版：[Gestures](../../reference/gestures.md)
 <!-- /github -->
 
 ## ジェスチャー {#gestures}

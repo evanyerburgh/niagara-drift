@@ -165,4 +165,4 @@ checked by a native speaker: corrections welcome.
 | Pitch glide (in prose) | グライド | beside すべる for a pitch moving |
 | reverb types in prose | as on screen: Chorus hallのリバーブ, Cathedralリバーブ | |
 | minor chord | マイナー・コード | not 短調 (a key) |
-| translated by AI, not yet checked | AIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。 | the note at the top of each page |
+| translated with AI | このマニュアルはAIで翻訳しました。より自然な表現があれば、お知らせください。 | one line in each page's small print (Evan, 2026-11-18: no box at the top) |

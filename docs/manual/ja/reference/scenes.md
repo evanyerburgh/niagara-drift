@@ -6,7 +6,7 @@ intro: 白鍵：保存したサウンドへ、なめらかに移る、または�
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Scenes and banks](../../reference/scenes.md)
+AIで翻訳したページです。英語版：[Scenes and banks](../../reference/scenes.md)
 <!-- /github -->
 
 ## シーンとバンク {#scenes-and-banks}

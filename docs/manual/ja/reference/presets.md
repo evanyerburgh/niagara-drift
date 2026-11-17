@@ -6,7 +6,7 @@ intro: 最初に使える16種類のサウンド。どれも1分かけて変わ�
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Presets](../../reference/presets.md)
+AIで翻訳したページです。英語版：[Presets](../../reference/presets.md)
 <!-- /github -->
 
 ## プリセット {#presets}

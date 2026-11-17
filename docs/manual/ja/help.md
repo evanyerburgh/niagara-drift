@@ -7,7 +7,7 @@ description: Niagara Driftのヘルプ：インストールとアップデート
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Help](../help.md)
+AIで翻訳したページです。英語版：[Help](../help.md)
 <!-- /github -->
 
 起きていることを選んでください。

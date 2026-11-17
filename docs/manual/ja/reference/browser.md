@@ -6,7 +6,7 @@ intro: エミュレーター：マウスとパソコンのキー
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Playing in a browser](../../reference/browser.md)
+AIで翻訳したページです。英語版：[Playing in a browser](../../reference/browser.md)
 <!-- /github -->
 
 ## ブラウザーで弾く {#playing-in-a-browser}

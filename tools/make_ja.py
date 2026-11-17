@@ -88,7 +88,7 @@ PAIRS = [
     ("""<p><b>Niagara Drift</b> is free, open-source firmware (GPL‑3.0) for the M-VAVE FM‑1, made by Evan Yerburgh; not made or endorsed by M-VAVE.
     <a href="manual/about/">About</a> · <a href="https://github.com/evanyerburgh/niagara-drift" aria-label="Source on GitHub">Source on GitHub</a></p>""",
      """<p><b>Niagara Drift</b>は、Evan YerburghによるM-VAVE FM‑1用の無料・オープンソースのファームウェア（GPL‑3.0）です。M-VAVEによる製品や公認のものではありません。
-    <a href="manual/about/">概要</a> · <a href="https://github.com/evanyerburgh/niagara-drift">GitHubのソース</a></p>""", 1),
+    {NOTE} <a href="manual/about/">概要</a> · <a href="https://github.com/evanyerburgh/niagara-drift">GitHubのソース</a></p>""", 1),
     # the script's words
     ('go.textContent = "Starting...";', 'go.textContent = "起動中…";', 1),
     ("cpu.textContent = `Niagara Drift uses ${m.load}% of this computer's time`;",
@@ -115,7 +115,7 @@ def front_ja(page):
         raise SystemExit("make_ja: no <nav><!--NAV--> ... </details></nav> in the front page")
     page = page.replace(nav.group(0), "<nav><!--NAV-->" + menu_html("", "Play it", "ja", "") + "</nav>")
     page = page.replace('href="manual/', 'href="ja/manual/')     # every manual page is in Japanese too (2026-11-18)
-    page = page.replace("<!--ACTIONS-->", "<!--ACTIONS-->\n" + JA_NOTE.format(up="").replace('class="note ja-note"', 'class="ja-note"'), 1)
+    page = page.replace("{NOTE}", JA_NOTE.format(up=""), 1)          # the AI note in the footer's small print
     left = re.findall(r'href="#[\w-]*"', page)
     if left:
         raise SystemExit(f"make_ja: in-page links read through <base> go to the English page: {left}")

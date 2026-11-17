@@ -6,7 +6,7 @@ intro: GLO：演奏環境の設定とTuning
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Setup](../../reference/setup.md)
+AIで翻訳したページです。英語版：[Setup](../../reference/setup.md)
 <!-- /github -->
 
 ## Setup {#setup}

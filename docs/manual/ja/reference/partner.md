@@ -6,7 +6,7 @@ intro: SEQ：パートナー、Shift、グライド、Wander
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Partner and Pitch moves](../../reference/partner.md)
+AIで翻訳したページです。英語版：[Partner and Pitch moves](../../reference/partner.md)
 <!-- /github -->
 
 ## PartnerとPitch moves {#partner-and-pitch-moves}

@@ -6,7 +6,7 @@ intro: ノート、クロック、Sync
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[MIDI](../../reference/midi.md)
+AIで翻訳したページです。英語版：[MIDI](../../reference/midi.md)
 <!-- /github -->
 
 ## MIDI {#midi}

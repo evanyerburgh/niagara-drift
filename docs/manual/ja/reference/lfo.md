@@ -6,7 +6,7 @@ intro: レート、波形、Movement
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[LFO](../../reference/lfo.md)
+AIで翻訳したページです。英語版：[LFO](../../reference/lfo.md)
 <!-- /github -->
 
 ## LFO {#lfo}

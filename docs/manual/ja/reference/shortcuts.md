@@ -6,7 +6,7 @@ intro: キーの組み合わせ、長押しとタップのすべて
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Shortcuts](../../reference/shortcuts.md)
+AIで翻訳したページです。英語版：[Shortcuts](../../reference/shortcuts.md)
 <!-- /github -->
 
 ## ショートカット {#shortcuts}

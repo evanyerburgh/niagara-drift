@@ -9,7 +9,7 @@ description: Niagara Driftのチュートリアル：シンプルなドローン
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Build a sound from scratch](../../recipes/scratch.md)
+AIで翻訳したページです。英語版：[Build a sound from scratch](../../recipes/scratch.md)
 <!-- /github -->
 
 ### ゼロからサウンドを作る {#scratch}

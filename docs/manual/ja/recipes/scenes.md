@@ -8,7 +8,7 @@ image: s-blend-0.png
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Scenes and saving](../../recipes/scenes.md)
+AIで翻訳したページです。英語版：[Scenes and saving](../../recipes/scenes.md)
 <!-- /github -->
 
 白鍵1–8はシーンです。自分のサウンドを入れる8つずつ6つのバンク（1から6）と、プリセットがあります。

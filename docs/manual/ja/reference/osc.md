@@ -6,7 +6,7 @@ intro: EDIT：各ドローンの波形、サブ、ドライブ
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Osc and Sub · Drive](../../reference/osc.md)
+AIで翻訳したページです。英語版：[Osc and Sub · Drive](../../reference/osc.md)
 <!-- /github -->
 
 ## OscとSub · Drive {#osc-and-sub-drive}

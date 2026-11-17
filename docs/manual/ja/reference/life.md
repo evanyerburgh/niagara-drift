@@ -6,7 +6,7 @@ intro: ENV：Feedback、Drift、Character、Age、各ドローンのノイズ
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Life and Tone](../../reference/life.md)
+AIで翻訳したページです。英語版：[Life and Tone](../../reference/life.md)
 <!-- /github -->
 
 ## LifeとTone {#life-and-tone}

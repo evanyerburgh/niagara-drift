@@ -6,7 +6,7 @@ intro: スイッチと、LFOページでのLFOのルーティング
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Black keys](../../reference/black-keys.md)
+AIで翻訳したページです。英語版：[Black keys](../../reference/black-keys.md)
 <!-- /github -->
 
 ## 黒鍵 {#black-keys}

@@ -8,7 +8,7 @@ image: p-retune-1.png
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Performing](../../recipes/performing.md)
+AIで翻訳したページです。英語版：[Performing](../../recipes/performing.md)
 <!-- /github -->
 
 ### スライドせずに和音を変える {#retune}

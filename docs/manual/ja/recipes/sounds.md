@@ -8,7 +8,7 @@ image: ticks-1.png
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Sounds](../../recipes/sounds.md)
+AIで翻訳したページです。英語版：[Sounds](../../recipes/sounds.md)
 <!-- /github -->
 
 ## 音色と質感 {#tone-and-texture}

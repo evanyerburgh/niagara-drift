@@ -6,7 +6,7 @@ intro: HOME：各ドローンのレベル、カットオフ、ピッチ、レゾ
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Drones and Pitch](../../reference/drones.md)
+AIで翻訳したページです。英語版：[Drones and Pitch](../../reference/drones.md)
 <!-- /github -->
 
 ## DronesとPitch {#drones-and-pitch}

@@ -8,7 +8,7 @@ image: t-cuts-1.png
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Time and transitions](../../recipes/time.md)
+AIで翻訳したページです。英語版：[Time and transitions](../../recipes/time.md)
 <!-- /github -->
 
 **Setup 1**（[[GLO]]）に3つの時間があります。Fade（KNOB 1）、Morph（KNOB 2）、Scene time（KNOB 3）。

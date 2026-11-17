@@ -6,7 +6,7 @@ intro: 画面が見えないプレイヤーのための、FM-1 Screen Reader
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[Hearing your screen](../../reference/screen-reader.md)
+AIで翻訳したページです。英語版：[Hearing your screen](../../reference/screen-reader.md)
 <!-- /github -->
 
 ## 画面を聴く {#hearing-your-screen}

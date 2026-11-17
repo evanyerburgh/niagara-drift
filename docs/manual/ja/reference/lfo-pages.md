@@ -6,7 +6,7 @@ intro: LFO：LFOの行き先と、ほかに動かすもの
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 
 <!-- github -->
-このページはAIによる翻訳です。ネイティブ・スピーカーによる確認はまだです。英語版：[LFO sends and Mods](../../reference/lfo-pages.md)
+AIで翻訳したページです。英語版：[LFO sends and Mods](../../reference/lfo-pages.md)
 <!-- /github -->
 
 ## LFO sendsとMods {#lfo-sends-and-mods}
