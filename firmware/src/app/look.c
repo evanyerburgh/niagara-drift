@@ -227,7 +227,8 @@ static void lk_bar(void)
                                                               * the number says more than four cells did) */
     h = hash(hash(2166136261u ^ rec_s ^ (ui.view == V_PULSE ? (uint32_t)ui_clock_bpm() << 20 : 0u),
                   0x4C42u | ui.view << 16 | ui.playing << 21 | ui.loop << 22 | (uint32_t)proj.par[P_PULSE] << 24 |
-                      (uint32_t)proj.par[P_II_OUT] << 25 | (uint32_t)peek << 26 | (uint32_t)lk_chg << 27),
+                      (uint32_t)(proj.par[P_II_OUT] & 1) << 25 | (uint32_t)peek << 26 | (uint32_t)lk_chg << 27 |
+                      (uint32_t)(proj.par[P_II_OUT] >> 1 & 1) << 28),
              (uint32_t)fade_q() | (uint32_t)(glide + 2) << 8 | (uint32_t)(uint8_t)lk_at << 16 |
                  (uint32_t)proj.bank << 24 | (uint32_t)(ui.view == V_PULSE && dr_ext_spb > 0.0f) << 28 |
                  (uint32_t)((ui.view == V_FX || ui.view == V_FX2) && proj.par[P_DLY_REPEATS] > 85) << 29 |
@@ -288,9 +289,9 @@ static void lk_bar(void)
         badge[nb] = "runaway";
         bcol[nb++] = LK_RED;
     }
-    if (proj.par[P_II_OUT] && nb < 6) {
-        badge[nb] = "II OUT";
-        bcol[nb++] = LK_DRONE[1];
+    if (proj.par[P_II_OUT] && nb < 6) {            /* a drone out on its own (both: one badge) */
+        badge[nb] = proj.par[P_II_OUT] == 3 ? "I+II OUT" : proj.par[P_II_OUT] == 2 ? "I OUT" : "II OUT";
+        bcol[nb++] = LK_DRONE[proj.par[P_II_OUT] == 1];
     }
     state = !ui.playing ? (fade_q() > 0 ? "FADING OUT" : "[PLAY] to start") : fade_q() < 20 ? "FADING IN" : 0;
     st_short = !ui.playing && fade_q() == 0 ? "[PLAY]" : "FADING";

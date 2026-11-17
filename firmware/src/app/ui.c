@@ -519,8 +519,9 @@ static void knob_turn(int i, int32_t e)
             ui.sel_turned = 1;
         }               /* SEL let go: not a tap */
     }
-    if (proj.par[P_II_OUT] && k.g == 1)        /* drone II out: say how it comes back, on any page (Evan, 2026-10-18) */
-        say_c("II OFF", "turn on [SEL] + [PLAY]", K_DRONE[1]);   /* (Evan, 2026-11-02: say what to do) */
+    if (k.g < 2 && DR_OUT(proj.par[P_II_OUT], k.g))   /* a drone out: say how it comes back, on any page (Evan, 2026-10-18) */
+        say_c(k.g ? "II OFF" : "I OFF", k.g ? "turn on [SEL] + [PLAY]" : "turn on [HOME] + [PLAY]",
+              K_DRONE[k.g]);                       /* (Evan, 2026-11-02: say what to do) */
     if (k.p == GP_PITCH && k.g < G)
         pitch_turn(k.g, p, EN_K1 + i, e);
     else if (dr_param_info(p)->hi - dr_param_info(p)->lo > 24)
@@ -1898,8 +1899,14 @@ static void input(void)
             }
             if (i == B_PLAY && (btn >> B_SEL & 1u)) {  /* SEL + PLAY: drone II alone, out / in */
                 ui.btn_used |= 1u << B_SEL;
-                param_set(P_II_OUT, !proj.par[P_II_OUT]);   /* a sound's: scenes keep it */
-                say_c("DRONE II", proj.par[P_II_OUT] ? "OUT" : "IN", K_DRONE[1]);
+                param_set(P_II_OUT, proj.par[P_II_OUT] ^ 1);   /* a sound's: scenes keep it */
+                say_c("DRONE II", DR_OUT(proj.par[P_II_OUT], 1) ? "OUT" : "IN", K_DRONE[1]);
+            } else if (i == B_PLAY && (btn >> B_HOME & 1u)) {   /* HOME + PLAY (0.3.1, Evan): drone I alone, out /
+                                                        * in, beside drone II's SEL + PLAY; HOME's hold was a peek:
+                                                        * let go, back on the page it came from */
+                ui.hold_turned = 1;
+                param_set(P_II_OUT, proj.par[P_II_OUT] ^ 2);
+                say_c("DRONE I", DR_OUT(proj.par[P_II_OUT], 0) ? "OUT" : "IN", K_DRONE[0]);
             } else if (i == B_PLAY) {                  /* PLAY on the press */
                 static uint8_t seeded;
                 if (!seeded) {                         /* the random ones from when the hand first pressed
@@ -2933,7 +2940,7 @@ static void sp_screen(int all)
         sp_cat(proj.par[gl_par(i)] ? " latched." : " on.");
     }
     if (proj.par[P_II_OUT])
-        sp_cat(" Drone 2 out.");
+        sp_cat(proj.par[P_II_OUT] == 3 ? " Both drones out." : proj.par[P_II_OUT] == 2 ? " Drone 1 out." : " Drone 2 out.");
     if (ui.loop != L_IDLE)
         sp_cat(ui.loop == L_REC ? " Recording a loop." : " Loop playing.");
 }
