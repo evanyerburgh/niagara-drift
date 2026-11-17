@@ -28,7 +28,7 @@ The effects: a delay with six types, a drive, and a reverb with five.
 |---|---|
 | **Repeats** (on screen Repeat) | How many echoes. Past about 85 they run away into self-oscillation |
 | **Mix** | How loud the echoes are |
-| **Time** | 70 ms to 1.46 s. Turning it bends the echoes' pitch, as tape does |
+| **Time** | 70 ms to 1.45 s. Turning it bends the echoes' pitch, as tape does |
 | **Type** | [[SEL]] + Time: one of six ([Delay types](#delay-types)) |
 | **Drive** | Distorts the drones and their echoes together: ghost notes, beating, crackle |
 

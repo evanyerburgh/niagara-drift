@@ -20,7 +20,7 @@ Pick what's happening.
 
 | To | Do |
 |---|---|
-| **Install** | Open the [web installer](https://evanyerburgh.github.io/niagara-drift/install/) in Chrome or Edge, with a USB data cable straight into the computer |
+| **Install** | Open the [web installer](https://evanyerburgh.github.io/niagara-drift/install/) in Chrome or Edge, with a USB data cable straight into the computer. Over Niagara Drift it saves your sounds and scenes to a file first |
 | **Update** | Run the installer again. Your sounds and scenes are kept, unless that version's notes in the [changelog](../../CHANGELOG.md) say otherwise |
 
 Installing firmware is at your own risk.

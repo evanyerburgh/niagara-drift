@@ -23,6 +23,7 @@ You don't have to start from a preset. **P16 Bare** is a plain analog synth: one
 
 1. **Shape it:** on **Drones**, where you start, turn KNOB 2 down: drone I's cutoff darkens the saw.
 2. **A second drone:** [[SEL]] + [[PLAY]] brings in drone II, a fifth above; on **Pitch** ([[HOME]]), KNOB 3 tunes it.
+   Either drone can sit out while you build: [[SEL]] + [[PLAY]] fades drone II out or in, [[HOME]] + [[PLAY]] drone I.
 3. **Movement:** turn ALGORITHM up from 0%, then on **LFO sends** ([[LFO]]) turn KNOB 2 up: the filter breathes.
 4. **Space:** on **Space** ([[FX]]), KNOB 2 for echoes, KNOB 4 for reverb.
 

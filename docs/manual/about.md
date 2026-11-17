@@ -1,9 +1,15 @@
 ---
 title: About
-intro: Two drones that breathe and drift on their own, as open-source firmware for the M-VAVE FM-1
+intro: Open-source drone synth firmware for the M-VAVE FM-1
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
+
+Two drones that breathe and drift, and you play them: levels, filters and pitch under your hands, gestures and
+scenes that move a whole sound at once. A journey on headphones, alone or with other instruments. Lyra vibes, made for
+the FM-1.
+
+It isn't a groovebox: the keys don't play melodies, there's no sequencer, and it doesn't compose for you.
 
 ## What it does
 
@@ -67,7 +73,7 @@ intro: Two drones that breathe and drift on their own, as open-source firmware f
 | **Partner** | A second oscillator on each drone: an octave or a fifth or fourth below, unison, a third, fourth or fifth above, an octave, or an octave and a fifth; each tempered or just (pure, beatless); detune up to 30 cents for slow beating |
 | **Sub and noise** | A sub of 4 waves (square, sine, triangle, saw), 1–4 octaves down or the subharmonics ⅓ and ⅕; under a low drone the lowest become ticks and pulses ([recipe](recipes/sounds.md#ticks)); noise from white to pink |
 | **Filter** | A state-variable filter (zero-delay feedback, after Andrew Simper): low-, band- or high-pass, resonant to self-oscillation; an antialiased drive |
-| **Effects** | A delay of 70 ms to 1.46 s in six types, from clean to tape; a drive between the delay and the reverb; a reverb of eight lines, 0.3 to 40 s or a freeze, in five types ([Space and Details](reference/space.md)) |
+| **Effects** | A delay of 70 ms to 1.45 s in six types, from clean to tape; a drive between the delay and the reverb; a reverb of eight lines, 0.3 to 40 s or a freeze, in five types ([Space and Details](reference/space.md)) |
 
 ### Movement and tuning
 
