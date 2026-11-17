@@ -74,7 +74,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Time", 0, DR_DLY_TMAX, 50}, {"Repeats", 0, 100, 50}, {"Dly mix", 0, 100, 25}, {"Rev mix", 0, 100, 35},
     {"Type", 0, DR_NREV - 1, 2}, {"Dly LFO", DR_LFO_I, DR_LFO_BOTH, DR_LFO_I}, {"Delay mod", -100, 100, 20},
     {"LFO lock", 0, 1, 0}, {"Speed mod", -100, 100, 0}, {"Source", DR_LFO_I, DR_LFO_BOTH, DR_LFO_II},
-    {"Morph", 0, 100, 34}, {"Scene time", 0, 100, 40}, {"II out", 0, 1, 0}, {"Speaker", 0, 100, 0},
+    {"Morph", 0, 100, 34}, {"Scene time", 0, 100, 40}, {"II out", 0, 3, 0}, {"Speaker", 0, 100, 0},
     {"Pitch lock", 0, 1, 1}, {"Movement", 0, 100, 50}, {"Feedback", 0, 100, 0}, {"Character", 0, 100, 0},
     {"Wander", 0, 100, 0}, {"Age", 0, 100, 0}, {"Shift move", 0, 2 * DR_SHIFT_MID, 2 * DR_SHIFT_MID}, {"Scale", 0, DR_NWSCALE - 1, 0},
     {"D5 depth", 0, 100, 70}, {"E5 depth", 0, 100, 100}, {"F5 depth", 0, 100, 100}, {"G5 depth", 0, 100, 70},
@@ -637,7 +637,7 @@ void dr_param_text(int i, int v, char *b)
             b++;
         copy_s(b, "%");
     } else if (i == P_II_OUT)
-        copy_s(b, v ? "Out" : "In");
+        copy_s(b, v == 3 ? "Both out" : v == 2 ? "I out" : v ? "Out" : "In");
     else if (i == P_SPEAKER) {                   /* "off", "120Hz" */
         if (!v)
             copy_s(b, "Off");
@@ -944,7 +944,7 @@ void dr_init(void)
         *v = (grp_t){0};
         v->pitch = v->ps1 = v->ps2 = v->st = (float)par[DR_GP(g, GP_PITCH)] * 0.01f;
         v->cut = 4.32192809f + (float)par[DR_GP(g, GP_CUTOFF)] * 0.00981378f;
-        v->gf = v->gtarget = g == 1 && par[P_II_OUT] ? 0.0f : 1.0f;   /* drone II out on its own: out */
+        v->gf = v->gtarget = g < 2 && DR_OUT(par[P_II_OUT], g) ? 0.0f : 1.0f;   /* a drone out on its own: out */
         v->lv = (float)(par[DR_GP(g, GP_LEVEL)] * par[DR_GP(g, GP_LEVEL)]) * 0.0001f * 0.4f;
         v->ph = 0.25f * (float)g;                  /* not all edges together */
         v->pph = 0.5f + 0.13f * (float)g;
@@ -1417,8 +1417,10 @@ static void drain(void)
             if (a < DR_NPARAMS) {
                 base[a] = (int16_t)(b < PARAMS[a].lo ? PARAMS[a].lo : b > PARAMS[a].hi ? PARAMS[a].hi : b);
                 par[a] = (int16_t)heard(a);    /* with the macros' offset on it, if any */
-                if (a == P_II_OUT)             /* drone II out on its own: it fades as a voice does */
-                    grp[1].gtarget = b ? 0.0f : 1.0f;
+                if (a == P_II_OUT) {           /* a drone out on its own: it fades as a voice does */
+                    grp[0].gtarget = DR_OUT(base[a], 0) ? 0.0f : 1.0f;
+                    grp[1].gtarget = DR_OUT(base[a], 1) ? 0.0f : 1.0f;
+                }
                 if (a >= P_WANDER && a <= P_GD_3)
                     mac_dirty = 1;             /* an amount or a depth: the offsets again */
                 {   /* its glide: a step a sample, to arrive over the time asked for (or 25 ms) */

@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py): a drone out on its own. HOME + PLAY fades drone I out and in (0.3.1),
+# beside drone II's SEL + PLAY; from another page HOME's hold is a peek, so the page stays; both out is one badge;
+# a knob of a drone that's out says how to bring it back. Not a test of its own (no expectations: main's build plays this script too).
+notips
+phones 1
+set 74 0
+set 71 0
+tap PLAY
+wav drone-out.wav
+wait 2500
+# from Life (page 2): HOME held, PLAY: drone I out, drone II plays on; back on Life when HOME is let go
+page 2
+press HOME
+tap PLAY
+release HOME
+wait 3000
+shot one-out-life.png
+# drone II too (SEL + PLAY): both out, one badge
+press SEL
+tap PLAY
+release SEL
+wait 3000
+page 0
+wait 100
+shot both-out.png
+# drone I's knob while it's out: the banner says how it comes back
+spin K1 1
+wait 200
+shot one-off-banner.png
+wait 3000
+# each back in on its own
+press HOME
+tap PLAY
+release HOME
+wait 3000
+press SEL
+tap PLAY
+release SEL
+wait 3000
+wavstop

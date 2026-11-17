@@ -42,7 +42,7 @@ The FM-1's knobs and buttons, and the screen header at the top of the screen.
 
 | Side | What it shows |
 |---|---|
-| **Left** | The page's name, then what's running: REC or LOOP, SWELL, a gesture, II OUT |
+| **Left** | The page's name, then what's running: REC or LOOP, SWELL, a gesture, I OUT or II OUT |
 | **Right** | The sound: its bank and key ("3.5", "P6 SEANCE"), "changed" once you've moved it |
 
 ## Good to know
@@ -57,7 +57,7 @@ The FM-1's knobs and buttons, and the screen header at the top of the screen.
 
 ### Buttons
 
-- **SEL + PLAY** fades drone II alone. Stopped, PLAY breathes slowly, and nothing else on the panel moves.
+- **SEL + PLAY** fades drone II alone, and **HOME + PLAY** fades drone I alone: again brings it back. Stopped, PLAY breathes slowly, and nothing else on the panel moves.
 - **SAVE** saves at once (the sound dips for about 50 ms while playing), and glows dimly while something isn't saved.
 - **SEL** gives a pitch knob single cents, cutoff and resonance tenths. It glows when it can keep what you're holding.
 - **REC:** tap to record, tap to loop, tap to stop; up to 5 minutes, the time in the header. See

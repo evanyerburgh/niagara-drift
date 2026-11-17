@@ -36,6 +36,7 @@
 
 #define DR_SR 44100.0f
 #define DR_NGROUPS 2                           /* the drones */
+#define DR_OUT(v, g) ((v) >> ((g) ^ 1) & 1)      /* P_II_OUT's value v: drone g (0, 1) is out */
 
 /* a drone's parameters; drone g's copy of GP_x is parameter DR_GP(g, GP_x) */
 enum {
@@ -109,8 +110,9 @@ enum {
                                      * the sound to its new setting: OCT, filter mode, pulse, partner, sub, the
                                      * links, the LFO routes */
     P_SCENE_T,                      /* 0..100 = 0.1 s .. 5 min (x^4: 1 s at 23): a scene's morph (the white keys) */
-    P_II_OUT,                       /* drone II faded out on its own (1; SEL + PLAY), a sound's (P12 Clean: one
-                                     * oscillator); was Tuning until 30, 0 since */
+    P_II_OUT,                       /* the drones faded out on their own, a sound's: bit 0 drone II (SEL + PLAY; P12
+                                     * Clean: one oscillator), bit 1 drone I (0.3.1, HOME + PLAY; DR_OUT). The same
+                                     * slot and format, so 0.3 reads a 0.3.1 save; was Tuning until 30, 0 since */
     P_SPEAKER,                      /* 0..100: a low cut for a small speaker, 0 off (headphones) .. 240 Hz */
     P_PLOCK,                        /* the pitches locked (1): the pitch knobs do nothing (a switch) */
     P_MOVE,                         /* MOVEMENT, 0..100 = every LFO depth x 0 .. x 2 (50: as set) */

@@ -64,6 +64,7 @@ back on M-VAVE's firmware from a computer, with a USB data cable straight in.
 |---|---|
 | **You hear nothing** | Press [[PLAY]]: the drones fade in (stopped, PLAY breathes slowly). Then turn up MASTER, and each drone's level on Drones (KNOB 1 and KNOB 3) |
 | **Drone II went quiet,** [the header](reference/controls.md#screen-header) says II OUT | [[SEL]] + [[PLAY]] brings it back |
+| **Drone I went quiet,** the header says I OUT | [[HOME]] + [[PLAY]] brings it back |
 | **You want the sound before a scene** | [[SEL]] + [[SAVE]] goes back; again goes forward |
 | **Drone II keeps jumping to other notes** | That's Wander: turn it to 0 on Pitch moves ([[SEQ]] until you're on it, KNOB 3) |
 | **A knob's value is gray** | It can't be heard as things are; the screen says why ("needs sqr", "needs [[F#3]]", Movement at 0%) |
