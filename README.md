@@ -40,6 +40,9 @@ This manual describes the newest version; its pages are in [docs/manual](docs/ma
   partner oscillator at an interval (tempered or just) with detune, a sub one to four octaves down
   (the lowest two click under a low drone) or a subharmonic (⅓, ⅕ of the pitch), and a white or pink noise, into its own self-oscillating
   filter (low-, band- or high-pass) with drive. Pitch is free between notes, from 2 Hz to 1.6 kHz.
+- **Microtonal**: eleven Tunings the pitch knobs move through, 12-tone and ten microtonal ones (quarter tones,
+  19-, 31- and 53-tone, just intonation, the harmonic series, the shrutis, La Monte Young's, Lou Harrison's and Harry
+  Partch's 43 notes), the interval between the drones named in each one's own terms; A tuned from 427 to 453 Hz.
 - **Links** between them: pitch link, hard sync, and cross-mod: drone I's sound moving drone II's cutoff, or each
   drone's sound bending the other's pitch (cross-FM, as on the Lyra-8).
 - **The Ultra LFO**, after the DS-2's: one rate, two waves of ten shapes each (one of them truly

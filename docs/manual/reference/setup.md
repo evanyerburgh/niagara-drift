@@ -48,6 +48,10 @@ except the Tuning.
 
 ## Tunings
 
+Eleven Tunings: 12-tone and ten microtonal ones, with notes between a piano's keys. Equal temperaments of 19, 31 and
+53 notes, just intonation, the harmonic series, the Indian shrutis and the tunings of La Monte Young, Lou Harrison and
+Harry Partch.
+
 > **A sound carries its Tuning.** A scene saved on LMY brings LMY back, even with Pitch lock on. A preset plays on
 > 12-tone unless it has its own. The Tuning changes half way through a scene's glide.
 
