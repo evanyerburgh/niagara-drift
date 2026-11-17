@@ -101,6 +101,7 @@ static uint8_t dly_odd;                  /* a full-rate sample in hand (the firs
 static float dly_in[2];                  /* ... it, left and right */
 
 static float dly_t = 0.177f * DR_SR;    /* the left's time, in samples, smoothed */
+static float dly_kt = 0.177f * DR_SR;    /* the knob's time, in samples, moving at most 0.5 a sample (below) */
 volatile float dr_dly_ms;               /* ... in ms, each block (the host's probe) */
 static float dly_lp[2], dly_hp[2], dly_olp[2];
 static float dly_ph1, dly_ph2;           /* the wow's two sines */
@@ -567,7 +568,7 @@ static void fx_clear(void)
     self_s = self_e = self_e2 = self_es = 0.0f;
     drv_m = drv_pi = drv_pw = drv_dc[0] = drv_dc[1] = 0.0f;
     drv_k = drv_g = 1.0f;
-    dly_t = dly_ms_now() * 0.001f * DR_SR;    /* at its time, no glide from an old one */
+    dly_kt = dly_t = dly_ms_now() * 0.001f * DR_SR;    /* at its time, no glide from an old one */
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
     dly_xf = 1.0f;
@@ -582,7 +583,7 @@ static void fx_clear(void)
 /* resting (stopped and silent): the delay's time and type go straight to their knobs */
 static void fx_rest(void)
 {
-    dly_t = dly_ms_now() * 0.001f * DR_SR;
+    dly_kt = dly_t = dly_ms_now() * 0.001f * DR_SR;
     dly_c = DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     dly_pt = dly_qt = (uint8_t)((unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE);
     dly_xf = 1.0f;
@@ -666,7 +667,14 @@ static DR_RAM_CODE void fx_run(float *l, float *r, uint32_t n)
                 dly_rw = fm_minf(dly_rw + rstep, 1.0f);
                 lfo = lfo_at(dly_rp, j / CR) + (lfo - lfo_at(dly_rp, j / CR)) * dly_rw;
             }
-            t = ms * 0.001f * DR_SR * (1.0f + damt * lfo);
+            {   /* the knob's time moves at most half a sample a sample, as a tape motor or a bucket brigade's
+                 * clock: a fast spin of Time had sent the echoes to 3-5x speed for an instant, a bright zip (row 38,
+                 * Evan 2026-11-18); a slow turn never reaches the limit, and the LFO's movement isn't limited */
+                const float k = ms * 0.001f * DR_SR;
+                dly_kt = fade <= 0.0f && fade_target <= 0.0f ? k :   /* stopped: there at once */
+                         k > dly_kt + 0.5f ? dly_kt + 0.5f : k < dly_kt - 0.5f ? dly_kt - 0.5f : k;
+            }
+            t = dly_kt * (1.0f + damt * lfo);
             dly_t += (t - dly_t) * 0.00045f;                       /* ~50 ms: tape-like */
         }
         if (!(j % CR)) {
