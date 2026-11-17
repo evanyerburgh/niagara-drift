@@ -26,8 +26,8 @@ enum { EN_SELECT, EN_ALGO, EN_PRESET, EN_K1, EN_K2, EN_K3, EN_K4, NE };
 
 uint32_t plat_ms(void);
 uint32_t plat_us(void);                 /* microseconds, as MIDI packets are stamped (v0.3: the clock) */
-uint32_t plat_buttons(void);           /* held: bit B_* */
-uint32_t plat_keys(void);              /* held: bit k = key k (0 = F3) */
+uint32_t plat_buttons(void);           /* held: bit B_*; takes a look at the panel (call it first, once a round) */
+uint32_t plat_keys(void);              /* held at that look: bit k = key k (0 = F3) */
 int32_t plat_enc(int role);            /* detents since the last call, + = clockwise; EN_* */
 uint32_t plat_master(void);            /* MASTER pot, 0..4096 gain Q12 */
 int plat_pressure(uint32_t k);         /* key k's pressure 0..127 while held (0 when not), -1: it has no sensing */

@@ -206,8 +206,10 @@ def build_loader():
 
 def build_app():
     flags = [*CFLAGS, *FPU, "-Ifirmware/hal", "-Ifirmware/src", "-Ibuild/gen"]
-    for flag in ("OM_CDC", "OM_CLOCK_TEST"):
+    for flag in ("OM_CDC", "OM_CLOCK_TEST", "OM_RAM_CODE"):
         v = os.environ.get(flag)    # unset: the default in firmware/src/main.c
+        if flag == "OM_RAM_CODE" and v is None:
+            v = "1"                 # the audio's hot loops run from RAM (drone.c); OM_RAM_CODE=0: from the flash, to compare
         if v in ("0", "1"):
             flags.append(f"-D{flag}={v}")
     flags.append(f'-DFELUCCA_ID="{PRODUCT}"')
@@ -258,6 +260,11 @@ def build_app():
     return bytes(img), syms, dis, rt
 
 
+def symv_safe(syms, name):
+    m = re.search(r"^([0-9a-f]+) .*\s" + name + r"$", syms, re.M)
+    return int(m.group(1), 16) if m else 0
+
+
 def check(img, syms, dis, rt):
     errors, notes = [], []
     m = re.search(r"^([0-9a-f]+) .*\s_start$", syms, re.M)
@@ -265,11 +272,27 @@ def check(img, syms, dis, rt):
         errors.append(f"_start is not at {APP_XIP:#x}")
     if img[:4] != bytes.fromhex("04818000"):
         errors.append(f"image starts with {img[:4].hex()}, not the entry stub")
-    rt_calls = [ln for ln in rt.splitlines() if re.search(r"\bcall\b", ln)]
+    # .app_ram (inside .ram_text, _ar_start.._ar_end): the audio's hot loop, in RAM for speed with the flash on (fm1-base's
+    # PLAT_RAM_CODE). It may call: the linker refuses a direct call that would leave RAM, a call through a pointer is a
+    # DR_FAR one (drone.c). The rest of .ram_text runs with the flash off and calls nothing.
+    ar = [int(m.group(1), 16) if m else 0 for m in
+          (re.search(r"^([0-9a-f]+) .*\s" + n + r"$", syms, re.M) for n in ("_ar_start", "_ar_end"))]
+    rt_calls = []
+    for ln in rt.splitlines():
+        mm = LINE.match(ln)
+        if not mm or not re.search(r"\bcall", ln):
+            continue
+        if ar[0] <= int(mm.group(1), 16) < ar[1]:
+            pass
+        else:
+            rt_calls.append(ln)
     if rt_calls:                    # RAM code runs with the flash off: no calls into XIP
         errors.append(f".ram_text contains calls: {rt_calls[:3]}")
     else:
-        notes.append(f".ram_text: {len([ln for ln in rt.splitlines() if LINE.match(ln)])} insns, no calls")
+        notes.append(f".ram_text: {len([ln for ln in rt.splitlines() if LINE.match(ln)])} insns, no calls outside "
+                     f".app_ram ({ar[1] - ar[0]} B of RAM code for speed)")
+    if symv_safe(syms, "_rt_end") - 0x01C00000 > 0x8000:
+        errors.append("RAM code past its 32 KB region")
     for ln in dis.splitlines():     # nothing may call or load an address in the chip ROM
         mm = LINE.match(ln)
         if not mm:

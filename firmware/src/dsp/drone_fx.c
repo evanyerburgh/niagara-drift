@@ -595,13 +595,18 @@ static void fx_rest(void)
 #define RV_WET 0.55f                     /* the wet's level: 0.1's reverb's at the same mix, 1 dB under (its peaks) */
 
 /* the effects, in place on the stereo block l, r (n frames) */
-static void fx_run(float *l, float *r, uint32_t n)
+/* fx_run runs from RAM (drone.c, DR_RAM_CODE): what it does once a block stays in the flash, called through pointers */
+DR_FAR_FN(float, dly_ms_now, (void))
+DR_FAR_FN(void, rv_clear, (void))
+DR_FAR_FN(void, rv_coefs, (float))
+DR_FAR_FN(void, rv_block, (uint32_t, float))
+static DR_RAM_CODE void fx_run(float *l, float *r, uint32_t n)
 {
     /* the mixes and the repeats as they glide (pfs), and in a straight line across the block from where the
      * last one ended: read raw (par), each detent was a step, a click on a soft sound */
     /* stopped or stopping, the repeats can't run away: they ring out (QA 2026-10-20: at 90+ the howl went on after
      * PLAY, with "PLAY to start" on the screen) */
-    const float ms = dly_ms_now(),
+    const float ms = DR_FAR(dly_ms_now)(),
                 fbg1 = fade_target <= 0.0f ? fm_minf(rep_g(pfs[P_DLY_REPEATS]), 0.85f) : rep_g(pfs[P_DLY_REPEATS]);
     const float dm = pfs[P_DLY_MIX] * 0.01f, dry1e = fm_sqrtf(1.0f - dm), wet1e = fm_sqrtf(dm);
     const float rm = pfs[P_REV_MIX] * 0.01f, dry2e = fm_sqrtf(1.0f - rm), wet2e = fm_sqrtf(rm);
@@ -621,7 +626,7 @@ static void fx_run(float *l, float *r, uint32_t n)
     int mono = 0;
     uint32_t j;
     if (!rv.ready)
-        rv_clear();
+        DR_FAR(rv_clear)();
     if ((uint8_t)par[P_DLY_LFO] != dly_rt) {
         dly_rp = dly_rt;
         dly_rt = (uint8_t)par[P_DLY_LFO];
@@ -645,7 +650,7 @@ static void fx_run(float *l, float *r, uint32_t n)
         dly_c.ping = 0.0f;               /* settled on a mono type */
         mono = 1;
     }
-    rv_coefs(ease);
+    DR_FAR(rv_coefs)(ease);
     dr_dly_ms = dly_t * (1000.0f / DR_SR);
     /* DELAY */
     for (j = 0; j < n; j++) {
@@ -763,7 +768,7 @@ static void fx_run(float *l, float *r, uint32_t n)
         }
     }
     /* REVERB at the half rate: the send down, the network, the wet up */
-    rv_block(n / 2u, (float)n / DR_SR);
+    DR_FAR(rv_block)(n / 2u, (float)n / DR_SR);
     {   /* Shimmer washes in over 8 s and out over 6; none and not the type: the shift isn't run */
         const float was = sh.amt;
         sh.amt = par[P_REV_TYPE] == RV_SHIMMER ? fm_minf(sh.amt + (float)n * (1.0f / (SH_IN_S * DR_SR)), 1.0f)
