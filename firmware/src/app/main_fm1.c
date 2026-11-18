@@ -139,8 +139,9 @@ static void render_block(int32_t *o)                /* ALNK0: one half, measured
 #if OM_CPU2
     if (on2)
         c2_collect();
-    if (fm1_cpu1_busy())                            /* the backstop: no job outlives this interrupt (CPU1's jobs run
-                                                     * from the flash, which the main loop may turn off) */
+    if (fm1_cpu1_outstanding())                     /* the backstop: no job outlives this interrupt (CPU1's jobs run
+                                                     * from the flash, which the main loop may turn off); a refused or
+                                                     * faulted one retires CPU1 here, so the flash isn't held */
         fm1_cpu1_wait();
     if (c2.two && fm1_cpu1_gave_up && !c2.off_ms)
         c2.off_ms = fm1_ms | 1u;                    /* when it was retired */

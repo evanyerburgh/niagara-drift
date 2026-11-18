@@ -321,6 +321,14 @@ static inline int fm1_cpu1_busy(void)            /* (a misread or a fault: not b
     return fm1_cpu1_on && fm1_cpu1_mb.complete != fm1_cpu1_mb.request && !fm1_cpu1_mb.rejected && !fm1_cpu1_fault.count;
 }
 
+/* a job handed over and not yet seen back, whatever became of it (running, refused, faulted): fm1_cpu1_wait settles
+ * it (done, or CPU1 retired). The audio interrupt's backstop asks this, not fm1_cpu1_busy, which is 0 after a misread */
+static inline int fm1_cpu1_outstanding(void)
+{
+    FM1_CPU1_SYNC();
+    return fm1_cpu1_on && fm1_cpu1_mb.complete != fm1_cpu1_mb.request;
+}
+
 static int fm1_cpu1_wait(void)
 {
     const uint32_t t0 = fm1_cpu1_t_run;
