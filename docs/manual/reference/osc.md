@@ -1,6 +1,6 @@
 ---
 title: Osc and Sub · Drive
-intro: EDIT: each drone's wave, its sub and its drive
+intro: "EDIT: each drone's wave, its sub and its drive"
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->

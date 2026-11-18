@@ -1,7 +1,7 @@
 ---
 title: Gestures
 intro: Move several settings at once, in their own order, then let them go
-description: Recipes for Niagara Drift's gestures: hold, press harder, keep, stack, make one last a minute, change its speed.
+description: "Recipes for Niagara Drift's gestures: hold, press harder, keep, stack, make one last a minute, change its speed."
 image: g-stack-0.png
 ---
 

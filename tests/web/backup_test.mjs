@@ -3,7 +3,7 @@
 // backup_cmd does (firmware/src/app/main_fm1.c): every object read back as stored, written back as given, the
 // file as tools/fm1_install.py writes it. node tests/web/backup_test.mjs [FILE]: FILE gets a backup file (for
 // tools/fm1_install.py's read_backup to read: tests/run_tests.sh)
-import { pack7, unpack7, ndBackup, ndRestore, ndBackupFile, ndReadBackup, ndBackupName, ndCrc32 } from "../../web/fm1ota.js";
+import { pack7, unpack7, ndBackup, ndRestore, ndBackupFile, ndReadBackup, ndBackupName, ndCrc32, Updater } from "../../web/fm1ota.js";
 import { writeFileSync } from "node:fs";
 
 let fails = 0;
@@ -134,6 +134,22 @@ check("an older backup (no checksums, a calibration in it) restores, the FM-1 ke
       same(keeps.store[1], [7, 7]) && same(keeps.store[0], objs[0]));
 
 check("not Niagara Drift (no answer): nothing to back up", (await ndBackup(new FakeFM1({}, false))) === null);
+
+// FM-1 not found: the log says what each MIDI port did (a player's report then shows why)
+const port = (name, opens = true) => ({ name, state: "connected", onmidimessage: null, send() {},
+  async open() { if (!opens) throw Object.assign(new Error("busy"), { name: "InvalidAccessError" }); } });
+const access = (ins, outs) => ({ inputs: new Map(ins.map((p, i) => [i, p])), outputs: new Map(outs.map((p, i) => [i, p])) });
+async function notFound(acc) {
+  const lines = [];
+  try { await new Updater(acc, (l) => lines.push(l)).backup(); return null; }
+  catch (e) { return e.code === "notfound" ? `${e.why} | ${lines.join("\n")}` : null; }
+}
+check("not found, no ports: the log says so, and why: none", (await notFound(access([], []))) === "none | MIDI ports: no MIDI inputs (0 outputs)");
+check("not found, the FM-1's port held by another app: the log names it, why: busy",
+      (await notFound(access([port("Niagara Drift FM-1 MIDI 1", false), port("Keystep")], [port("Niagara Drift FM-1 MIDI 1")]))) ===
+      "busy | MIDI ports: Niagara Drift FM-1 MIDI 1: wouldn't open (InvalidAccessError); Keystep: not probed");
+check("not found, an FM-1 port that doesn't answer: the log says no answer, why: silent",
+      (await notFound(access([port("Niagara Drift FM-1")], [port("Niagara Drift FM-1")]))) === "silent | MIDI ports: Niagara Drift FM-1: no answer");
 
 if (process.argv[2]) writeFileSync(process.argv[2], text);
 console.log(fails ? `backup: ${fails} FAILED` : "backup: all ok");

@@ -1,6 +1,6 @@
 ---
 title: Playing in a browser
-intro: The emulator: the mouse and the computer keys
+intro: "The emulator: the mouse and the computer keys"
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->

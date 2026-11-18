@@ -1,6 +1,6 @@
 ---
 title: Drones and Pitch
-intro: HOME: each drone's level, cutoff, pitch and resonance
+intro: "HOME: each drone's level, cutoff, pitch and resonance"
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->

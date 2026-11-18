@@ -1,6 +1,6 @@
 ---
 title: Life and Tone
-intro: ENV: Feedback, Drift, Character, Age; each drone's noise
+intro: "ENV: Feedback, Drift, Character, Age; each drone's noise"
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->

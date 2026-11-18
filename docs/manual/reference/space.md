@@ -1,6 +1,6 @@
 ---
 title: Space and Details
-intro: FX: the delay, the drive and the reverb
+intro: "FX: the delay, the drive and the reverb"
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->

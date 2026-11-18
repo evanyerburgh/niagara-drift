@@ -1,7 +1,7 @@
 ---
 title: Time and transitions
-intro: Fast cuts or slow glides: time your transitions, and stop them part way
-description: Recipes for Niagara Drift's times: cut or glide between scenes, make a switch move slowly, fade in over seconds, stop a glide part way.
+intro: "Fast cuts or slow glides: time your transitions, and stop them part way"
+description: "Recipes for Niagara Drift's times: cut or glide between scenes, make a switch move slowly, fade in over seconds, stop a glide part way."
 image: t-cuts-1.png
 ---
 

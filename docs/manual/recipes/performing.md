@@ -1,7 +1,7 @@
 ---
 title: Performing
-intro: Play it live: change chords unheard, loop your hands, reach another page, play in time
-description: Recipes for playing Niagara Drift live: retune a drone in silence, loop your knob moves, peek at another page, follow a MIDI clock.
+intro: "Play it live: change chords unheard, loop your hands, reach another page, play in time"
+description: "Recipes for playing Niagara Drift live: retune a drone in silence, loop your knob moves, peek at another page, follow a MIDI clock."
 image: p-retune-1.png
 ---
 

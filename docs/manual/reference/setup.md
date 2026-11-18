@@ -1,6 +1,6 @@
 ---
 title: Setup
-intro: GLO: the room's settings and the Tuning
+intro: "GLO: the room's settings and the Tuning"
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->

@@ -8,12 +8,12 @@ intro: When something doesn't work
 Pick what's happening.
 
 <ul class="doors">
-<li><a href="#installing-and-updating"><img class="ic" src="../../web/manual/icons/download-simple.svg" alt=""><small>Getting it</small><b>Installing and updating</b><span>The web installer, a cable, keeping your sounds</span></a></li>
-<li><a href="#an-install-doesn-t-take"><img class="ic" src="../../web/manual/icons/lifebuoy.svg" alt=""><small>Stuck</small><b>An install doesn't take</b><span>Nothing changes, an error, an FM-1 that won't start</span></a></li>
-<li><a href="#sound-and-playing"><img class="ic" src="../../web/manual/icons/speaker-high.svg" alt=""><small>While playing</small><b>Something sounds wrong</b><span>A drone went quiet, notes jump, a value is gray, no bass</span></a></li>
-<li><a href="#backups"><img class="ic" src="../../web/manual/icons/floppy-disk.svg" alt=""><small>Your sounds</small><b>Backups</b><span>Saving and restoring your sounds and scenes</span></a></li>
-<li><a href="#going-back-or-to-another-firmware"><img class="ic" src="../../web/manual/icons/arrows-left-right.svg" alt=""><small>Leaving</small><b>Going back</b><span>To M-VAVE's firmware, or to another one</span></a></li>
-<li><a href="#send-feedback"><img class="ic" src="../../web/manual/icons/flag.svg" alt=""><small>Ideas, opinions, problems</small><b>Send feedback</b><span>A feature you'd like, what you think, or what went wrong</span></a></li>
+<li><a href="#installing-and-updating"><img class="ic" src="../../web/manual/icons/download-simple.svg" alt="" width="24" height="24"><small>Getting it</small><br><b>Installing and updating</b><br><span>The web installer, a cable, keeping your sounds</span></a></li>
+<li><a href="#an-install-doesn-t-take"><img class="ic" src="../../web/manual/icons/lifebuoy.svg" alt="" width="24" height="24"><small>Stuck</small><br><b>An install doesn't take</b><br><span>Nothing changes, an error, an FM-1 that won't start</span></a></li>
+<li><a href="#sound-and-playing"><img class="ic" src="../../web/manual/icons/speaker-high.svg" alt="" width="24" height="24"><small>While playing</small><br><b>Something sounds wrong</b><br><span>A drone went quiet, notes jump, a value is gray, no bass</span></a></li>
+<li><a href="#backups"><img class="ic" src="../../web/manual/icons/floppy-disk.svg" alt="" width="24" height="24"><small>Your sounds</small><br><b>Backups</b><br><span>Saving and restoring your sounds and scenes</span></a></li>
+<li><a href="#going-back-or-to-another-firmware"><img class="ic" src="../../web/manual/icons/arrows-left-right.svg" alt="" width="24" height="24"><small>Leaving</small><br><b>Going back</b><br><span>To M-VAVE's firmware, or to another one</span></a></li>
+<li><a href="#send-feedback"><img class="ic" src="../../web/manual/icons/flag.svg" alt="" width="24" height="24"><small>Ideas, opinions, problems</small><br><b>Send feedback</b><br><span>A feature you'd like, what you think, or what went wrong</span></a></li>
 </ul>
 
 ## Installing and updating
