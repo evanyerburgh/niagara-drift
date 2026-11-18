@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LFO sendsとMods · Niagara Drift</title><link rel="alternate" hreflang="en" href="../../../../manual/reference/lfo-pages/"><link rel="alternate" hreflang="ja" href="../../../../ja/manual/reference/lfo-pages/">
+<meta name="description" content="LFO：LFOの行き先と、ほかに動かすもの"><meta property="og:title" content="LFO sendsとMods · Niagara Drift">
+<meta property="og:description" content="LFO：LFOの行き先と、ほかに動かすもの"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../../../manual/manual.css"></head>
+<body>
+<a class="skip" href="#main">本文へ移動</a>
+<div class="top"><div class="top-in">
+<nav class="menu" aria-label="Site"><a class="homeicon" href="../../../../ja/" aria-label="ホーム：Niagara Driftをブラウザーで弾く" title="ホーム"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2 12 3.5l9 7.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.6 9.6V20h4.6v-5.6h3.6V20h4.6V9.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg></a><a href="../../../../ja/install/">インストール</a><a href="../../../../ja/manual/help/#send-feedback">フィードバック</a><a href="https://github.com/evanyerburgh/niagara-drift" aria-label="GitHubのソース">ソース<svg class="gh" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a><a class="lang" href="../../../../manual/reference/lfo-pages/" lang="en" hreflang="en">English</a><details class="menubtn"><summary aria-label="メニュー" title="メニュー">メニュー</summary><div class="panel"><a href="../../../../ja/"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M231.36,116.19,87.28,28.06a14,14,0,0,0-14.18-.27A13.69,13.69,0,0,0,66,39.87V216.13a13.69,13.69,0,0,0,7.1,12.08,14,14,0,0,0,14.18-.27l144.08-88.13a13.82,13.82,0,0,0,0-23.62Zm-6.26,13.38L81,217.7a2,2,0,0,1-2.06,0,1.78,1.78,0,0,1-1-1.61V39.87a1.78,1.78,0,0,1,1-1.61A2.06,2.06,0,0,1,80,38a2,2,0,0,1,1,.31L225.1,126.43a1.82,1.82,0,0,1,0,3.14Z"/></svg><span>弾いてみる<small>エミュレーターと、その下の最初の一歩</small></span></a><a href="../../../../ja/manual/recipes/sounds/"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M90,48V16a6,6,0,0,1,12,0V48a6,6,0,0,1-12,0Zm38,6a6,6,0,0,0,6-6V16a6,6,0,0,0-12,0V48A6,6,0,0,0,128,54Zm32,0a6,6,0,0,0,6-6V16a6,6,0,0,0-12,0V48A6,6,0,0,0,160,54Zm91.6,46.8L222,123v61a30,30,0,0,1-30,30H64a30,30,0,0,1-30-30V123L4.4,100.8a6,6,0,0,1,7.2-9.6L34,108V80a6,6,0,0,1,6-6H216a6,6,0,0,1,6,6v28l22.4-16.8a6,6,0,0,1,7.2,9.6ZM210,86H46v98a18,18,0,0,0,18,18H192a18,18,0,0,0,18-18Z"/></svg><span>レシピ<small>音や動きの作り方</small></span></a><a href="../../../../ja/manual/reference/" aria-current="page"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232,50H160a38,38,0,0,0-32,17.55A38,38,0,0,0,96,50H24a6,6,0,0,0-6,6V200a6,6,0,0,0,6,6H96a26,26,0,0,1,26,26,6,6,0,0,0,12,0,26,26,0,0,1,26-26h72a6,6,0,0,0,6-6V56A6,6,0,0,0,232,50ZM96,194H30V62H96a26,26,0,0,1,26,26V204.31A37.86,37.86,0,0,0,96,194Zm130,0H160a37.87,37.87,0,0,0-26,10.32V88a26,26,0,0,1,26-26h66Z"/></svg><span>リファレンス<small>すべてのページ、ノブ、キー</small></span></a><a href="../../../../ja/manual/reference/shortcuts/"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,50H32A14,14,0,0,0,18,64V192a14,14,0,0,0,14,14H224a14,14,0,0,0,14-14V64A14,14,0,0,0,224,50Zm2,142a2,2,0,0,1-2,2H32a2,2,0,0,1-2-2V64a2,2,0,0,1,2-2H224a2,2,0,0,1,2,2Zm-20-64a6,6,0,0,1-6,6H56a6,6,0,0,1,0-12H200A6,6,0,0,1,206,128Zm0-32a6,6,0,0,1-6,6H56a6,6,0,0,1,0-12H200A6,6,0,0,1,206,96ZM70,160a6,6,0,0,1-6,6H56a6,6,0,0,1,0-12h8A6,6,0,0,1,70,160Zm96,0a6,6,0,0,1-6,6H96a6,6,0,0,1,0-12h64A6,6,0,0,1,166,160Zm40,0a6,6,0,0,1-6,6h-8a6,6,0,0,1,0-12h8A6,6,0,0,1,206,160Z"/></svg><span>ショートカット<small>キーの組み合わせ、長押しとタップ</small></span></a><a href="../../../../ja/manual/help/"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M128,26A102,102,0,1,0,230,128,102.12,102.12,0,0,0,128,26Zm36.47,130a45.87,45.87,0,0,0,0-56l31.24-31.23a89.81,89.81,0,0,1,0,118.44ZM94,128a34,34,0,1,1,34,34A34,34,0,0,1,94,128Zm93.22-67.71L156,91.53a45.87,45.87,0,0,0-56,0L68.78,60.29a89.81,89.81,0,0,1,118.44,0ZM60.29,68.78,91.53,100a45.87,45.87,0,0,0,0,56L60.29,187.22a89.81,89.81,0,0,1,0-118.44Zm8.49,126.93L100,164.47a45.87,45.87,0,0,0,56,0l31.23,31.24a89.81,89.81,0,0,1-118.44,0Z"/></svg><span>ヘルプ<small>インストール、元に戻す、フィードバック</small></span></a><a href="../../../../ja/manual/about/"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M142,176a6,6,0,0,1-6,6,14,14,0,0,1-14-14V128a2,2,0,0,0-2-2,6,6,0,0,1,0-12,14,14,0,0,1,14,14v40a2,2,0,0,0,2,2A6,6,0,0,1,142,176ZM124,94a10,10,0,1,0-10-10A10,10,0,0,0,124,94Zm106,34A102,102,0,1,1,128,26,102.12,102.12,0,0,1,230,128Zm-12,0a90,90,0,1,0-90,90A90.1,90.1,0,0,0,218,128Z"/></svg><span>概要<small>できること、詳細、成り立ち</small></span></a><a class="langitem" href="../../../../manual/reference/lfo-pages/" hreflang="en"><svg class="mi" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M212.24,171.76a6,6,0,0,1,0,8.48l-32,32a6,6,0,0,1-8.48-8.48L193.51,182H48a6,6,0,0,1,0-12H193.51l-21.75-21.76a6,6,0,0,1,8.48-8.48ZM75.76,116.24a6,6,0,0,0,8.48-8.48L62.49,86H208a6,6,0,0,0,0-12H62.49L84.24,52.24a6,6,0,0,0-8.48-8.48l-32,32a6,6,0,0,0,0,8.48Z"/></svg><span><span lang="en">English</span><small>英語のページへ</small></span></a></div></details></nav>
+<div class="title"><small>Niagara Drift · リファレンス</small><h1>LFO sendsとMods</h1><p>LFO：LFOの行き先と、ほかに動かすもの</p></div>
+</div></div>
+<main id="main" tabindex="-1" class="page side"><nav class="toc" aria-label="リファレンス"><details><summary>リファレンスのページ<small>18</small></summary><h2>リファレンス</h2><ul><li><a href="../presets/">プリセット</a></li><li><a href="../controls/">コントロール</a></li><li><a href="../drones/">DronesとPitch</a></li><li><a href="../life/">LifeとTone</a></li><li><a href="../osc/">OscとSub · Drive</a></li><li><a href="../partner/">PartnerとPitch moves</a></li><li><a href="../lfo-pages/" aria-current="page">LFO sendsとMods</a></li><li><a href="../swell/">Swell</a></li><li><a href="../space/">SpaceとDetails</a></li><li><a href="../setup/">Setup</a></li><li><a href="../lfo/">LFO</a></li><li><a href="../scenes/">シーンとバンク</a></li><li><a href="../gestures/">ジェスチャー</a></li><li><a href="../black-keys/">黒鍵</a></li><li><a href="../midi/">MIDI</a></li><li><a href="../screen-reader/">画面を聴く</a></li><li><a href="../browser/">ブラウザーで弾く</a></li><li><a href="../shortcuts/">ショートカット</a></li></ul></details></nav><script>if (matchMedia("(min-width: 821px)").matches) document.querySelector(".toc details").open = true;</script><div class="prose"><!-- SPDX-License-Identifier: GPL-3.0-only -->
+<p>LFOの行き先と、ほかに動かすものです。</p>
+<h2 id="knobs">ノブ</h2>
+<p><span class="k">LFO</span>でLFO sendsが開き、もう一度<span class="k">LFO</span>でModsが開きます。LFOのレートと波形は左のノブにあります。<a href="../../../../ja/manual/reference/lfo/">LFO</a>を見てください。</p>
+<img src="../../../../manual/media/knobs-lfo.png?v=64a04459" width="520" alt="LFO sends（各ドローンのピッチとカットオフ）とMods（スピード・モジュレーション、ソース、ディレイ・モジュレーション、クロス・モジュレーション）のKNOB 1から4">
+<h2 id="lfo-sends">LFO sends</h2>
+<img class="shot" src="../../../../manual/media/screen-lfo.png?v=9f0903e8" width="240" alt="LFO sendsページ：2つのLFOと、キー付きの文で表した各ドローンのセンド">
+<div class="tablewrap"><table><thead><tr><th>KNOB 1</th><th>KNOB 2</th><th>KNOB 3</th><th>KNOB 4</th></tr></thead><tbody><tr><td>I pitch（またはX-Wave）</td><td>I cutoff（またはresonance）</td><td>II pitch（またはX-Wave）</td><td>II cutoff（またはresonance）</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>ノブ</th><th>働き</th></tr></thead><tbody><tr><td><b>ピッチ・センド</b></td><td>LFOがドローンのピッチを動かす幅。代わりにX-Waveを動かすこともできます（LFOページで<span class="k">G#3</span>、<span class="k">G#4</span>）</td></tr><tr><td><b>カットオフ・センド</b></td><td>LFOがドローンのカットオフを動かす幅。代わりにレゾナンスを動かすこともできます（LFOページで<span class="k">C#4</span>、<span class="k">C#5</span>）</td></tr></tbody></table></div>
+<h3 id="how-a-send-works">センドのしくみ</h3>
+<p>それぞれのセンドは、次の順につながっています：どのLFOを、どれだけ、Movementでスケールして、何を動かすか。</p>
+<svg class="diagram wide" role="img" aria-label="1つのセンド、ドローン Iのピッチ：LFO I、LFO II、または両方をF#3で選び、量をKNOB 1で決め（真ん中はゼロ）、Movement（ALGORITHM）でスケールし、G#3で動かすものを選ぶ：ドローン Iのピッチ（キー・オフ）かX-Wave（キー・オン）。ドローン Iのカットオフも同じで、A#3、KNOB 2、C#4（カットオフかレゾナンス）。ドローン IIの2つは自分のキーとKNOB 3、4を使う。" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 186" font-family="Inter Tight, Helvetica Neue, Arial, sans-serif">
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- The Japanese manual's copy of lfo-chain.svg: only its words changed. -->
+<!-- One LFO send, left to right: drone I's pitch send (the LFO sends page). Drawn in the site's colors
+     (web/manual/manual.css): the LFO lilac, drone I amber, the keys in boxes as the text's [[F#3]]. -->
+<defs>
+  <marker id="lc-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+    <path d="M0 0 8 4 0 8z" fill="#dcbcff"/>
+  </marker>
+  <marker id="lc-d" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+    <path d="M0 0 8 4 0 8z" fill="#ffb04a"/>
+  </marker>
+</defs>
+<rect width="760" height="186" rx="16" fill="#24081f"/>
+
+<!-- the steps, named above -->
+<g font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">
+  <text x="186" y="30">どのLFO</text>
+  <text x="300" y="30">量</text>
+  <text x="404" y="30">倍率</text>
+  <text x="508" y="30">動かすもの</text>
+</g>
+
+<!-- the two LFOs -->
+<g font-size="16" font-weight="600" fill="#dcbcff" text-anchor="middle">
+  <rect x="24" y="52" width="88" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+  <text x="68" y="74">LFO I</text>
+  <rect x="24" y="124" width="88" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+  <text x="68" y="146">LFO II</text>
+</g>
+
+<!-- the wires: the LFO's wave, lilac, until it reaches the drone -->
+<g fill="none" stroke="#dcbcff" stroke-width="2">
+  <path d="M112 69 C136 69 140 105 158 105"/>
+  <path d="M112 141 C136 141 140 105 158 105"/>
+  <path d="M214 105 H272" marker-end="url(#lc-a)"/>
+  <path d="M328 105 H384" marker-end="url(#lc-a)"/>
+  <path d="M424 105 H474" marker-end="url(#lc-a)"/>
+</g>
+<g fill="none" stroke="#ffb04a" stroke-width="2">
+  <path d="M542 105 C566 105 568 69 600 69" marker-end="url(#lc-d)"/>
+  <path d="M542 105 C566 105 568 141 600 141" marker-end="url(#lc-d)" stroke-dasharray="5 4"/>
+</g>
+
+<!-- which LFO: the key -->
+<rect x="158" y="91" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="186" y="110" font-family="IBM Plex Mono, Menlo, monospace" font-size="14" fill="#fbe9f2" text-anchor="middle">F#3</text>
+
+<!-- how much: KNOB 1 -->
+<circle cx="300" cy="105" r="25" fill="#14000f"/>
+<circle cx="300" cy="105" r="20" fill="#0a0a0b" stroke="#3a3a40" stroke-width="2"/>
+<line x1="300" y1="89" x2="300" y2="97" stroke="#e8e8ea" stroke-width="3"/>
+
+<!-- scaled by Movement -->
+<circle cx="404" cy="105" r="18" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="404" y="111" font-size="18" fill="#dcbcff" text-anchor="middle">×</text>
+
+<!-- moves: the key -->
+<rect x="478" y="91" width="64" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="510" y="110" font-family="IBM Plex Mono, Menlo, monospace" font-size="14" fill="#fbe9f2" text-anchor="middle">G#3</text>
+
+<!-- what it moves: drone I's pitch, or its X-Wave with the key on -->
+<g font-size="16" font-weight="600" fill="#ffb04a">
+  <text x="610" y="75">I ピッチ</text>
+  <text x="610" y="147">I X-Wave</text>
+</g>
+<g font-size="12.5" fill="#d3b3c4">
+  <text x="610" y="92">キー・オフ</text>
+  <text x="610" y="164">キー・オン</text>
+</g>
+
+<!-- what each step is, below -->
+<g font-size="13" fill="#d3b3c4" text-anchor="middle">
+  <text x="186" y="146">I、II、または両方</text>
+  <text x="300" y="150">KNOB 1</text>
+  <text x="300" y="166">真ん中でゼロ</text>
+  <text x="404" y="146">Movement</text>
+  <text x="404" y="162">（ALGORITHM）</text>
+</g>
+
+</svg><svg class="diagram tall" role="img" aria-label="1つのセンド、ドローン Iのピッチ：LFO I、LFO II、または両方をF#3で選び、量をKNOB 1で決め（真ん中はゼロ）、Movement（ALGORITHM）でスケールし、G#3で動かすものを選ぶ：ドローン Iのピッチ（キー・オフ）かX-Wave（キー・オン）。ドローン Iのカットオフも同じで、A#3、KNOB 2、C#4（カットオフかレゾナンス）。ドローン IIの2つは自分のキーとKNOB 3、4を使う。" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 446" font-family="Inter Tight, Helvetica Neue, Arial, sans-serif">
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- One LFO send, top to bottom (the phone's lfo-chain.svg). Drawn in the site's colors (web/manual/manual.css), as lfo-chain.svg. -->
+<defs>
+  <marker id="lfo-chain-ja-tall-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#dcbcff"/></marker>
+  <marker id="lfo-chain-ja-tall-d" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffb04a"/></marker>
+  <marker id="lfo-chain-ja-tall-e" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#45e3d3"/></marker>
+  <marker id="lfo-chain-ja-tall-p" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffd6f0"/></marker>
+</defs>
+<rect width="360" height="446" rx="16" fill="#24081f"/>
+<rect x="10.0" y="17" width="88" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="54" y="39.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO I</text>
+<rect x="122.0" y="17" width="88" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="166" y="39.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO II</text>
+<path d="M54 51 C54 70 110 64 110 84" fill="none" stroke="#dcbcff" stroke-width="2"/>
+<path d="M166 51 C166 70 110 64 110 84" fill="none" stroke="#dcbcff" stroke-width="2"/>
+<rect x="82.0" y="84" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="110" y="103" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">F#3</text>
+<text x="172" y="93" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="start">どのLFO</text>
+<text x="172" y="112" font-size="14" fill="#d3b3c4" text-anchor="start">I、II、または両方</text>
+<path d="M110 112 V148" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-chain-ja-tall-a)"/>
+<circle cx="110" cy="178" r="25" fill="#14000f"/>
+<circle cx="110" cy="178" r="20" fill="#0a0a0b" stroke="#3a3a40" stroke-width="2"/>
+<line x1="110" y1="162" x2="110" y2="170" stroke="#e8e8ea" stroke-width="3"/>
+<text x="172" y="173" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="start">量</text>
+<text x="172" y="192" font-size="14" fill="#d3b3c4" text-anchor="start">KNOB 1 · 真ん中でゼロ</text>
+<path d="M110 203 V234" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-chain-ja-tall-a)"/>
+<circle cx="110" cy="256" r="18" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="110" y="262" font-size="18" fill="#dcbcff" text-anchor="middle">×</text>
+<text x="172" y="251" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="start">倍率</text>
+<text x="172" y="270" font-size="14" fill="#d3b3c4" text-anchor="start">Movement（ALGORITHM）</text>
+<path d="M110 274 V306" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-chain-ja-tall-a)"/>
+<rect x="82.0" y="306" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="110" y="325" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">G#3</text>
+<text x="172" y="315" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="start">動かすもの</text>
+<text x="172" y="334" font-size="14" fill="#d3b3c4" text-anchor="start">ピッチかX-Wave</text>
+<path d="M110 334 C110 362 60 356 60 384" fill="none" stroke="#ffb04a" stroke-width="2" marker-end="url(#lfo-chain-ja-tall-d)"/>
+<path d="M110 334 C110 362 200 356 200 384" fill="none" stroke="#ffb04a" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#lfo-chain-ja-tall-d)"/>
+<text x="60" y="408" font-size="16" fill="#ffb04a" text-anchor="middle" font-weight="600">I ピッチ</text>
+<text x="60" y="426" font-size="12.5" fill="#d3b3c4" text-anchor="middle">キー・オフ</text>
+<text x="200" y="408" font-size="16" fill="#ffb04a" text-anchor="middle" font-weight="600">I X-Wave</text>
+<text x="200" y="426" font-size="12.5" fill="#d3b3c4" text-anchor="middle">キー・オン</text>
+</svg>
+<p>ドローン Iのピッチ・センドです。カットオフ・センドも同じで、<span class="k">A#3</span>、KNOB 2、<span class="k">C#4</span>（カットオフかレゾナンス）を使います。ドローン IIの2つは、自分のキーとKNOB 3、4を使います。</p>
+<h3 id="which-lfo-and-what-it-moves">どのLFOで、何を動かすか</h3>
+<p>LFOページでは、各ドローンの4つの黒鍵で、センドごとのLFOと、動かすものを選びます。</p>
+<img src="../../../../manual/media/black-keys-sends.png?v=1063b360" width="560" alt="LFOページの黒鍵で、各ドローンの4つのセンド・キーを示したもの：ドローン IはF#3からC#4、ドローン IIはF#4からC#5">
+<h2 id="mods">Mods</h2>
+<img class="shot" src="../../../../manual/media/screen-lfo2.png?v=562dd6d4" width="240" alt="Modsページ：LFO IとIIに送られるLFOのクロック、ディレイの揺れ、クロス・モジュレーションのモード">
+<div class="tablewrap"><table><thead><tr><th>KNOB 1</th><th>KNOB 2</th><th>KNOB 3</th><th>KNOB 4</th></tr></thead><tbody><tr><td>Speed mod</td><td>Source (LFO)</td><td>Delay mod</td><td>X-mod</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>ノブ</th><th>働き</th></tr></thead><tbody><tr><td><b>Speed mod</b>（画面ではSpeed）</td><td>LFO自身の波の1つで、LFOの速さが上下それぞれ最大3オクターブ変わります</td></tr><tr><td><b>Source</b></td><td>どのLFOがスピードを動かすか：I、II、または両方</td></tr><tr><td><b>Delay mod</b>（画面ではDelay）</td><td>LFOがディレイのタイムを揺らす幅、最大±25%</td></tr><tr><td><b>X-mod</b></td><td>クロス・モジュレーションの深さ。モードは<span class="k">F#5</span>で選びます。cutoff（ドローン Iがドローン IIのカットオフを動かす）、pitch（ドローンが互いのピッチを曲げる、クロスFM）、snarl</td></tr></tbody></table></div>
+<h3 id="how-the-mods-work">Modsのしくみ</h3>
+<svg class="diagram wide" role="img" aria-label="Modsの3つの部分。スピード・モジュレーション：LFO I、II、または両方がクロック自体を速くしたり遅くしたりする。KNOB 1で幅（最大3オクターブ）、KNOB 2でどのLFOか。ディレイ・モジュレーション：D#5で選んだLFO I、II、または両方がディレイのタイムを揺らす。KNOB 3で幅（最大25%）、Movementでスケールされ、ディレイのミックスがあるときに聞こえる。クロス・モジュレーションはLFOではない：ドローンが互いを動かす。KNOB 4で深さ、F#5でモードを選ぶ：ドローン Iがドローン IIのカットオフを動かす、互いを曲げる（クロスFM）、またはSnarl（音が両方を曲げる）。" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 240" font-family="Inter Tight, Helvetica Neue, Arial, sans-serif">
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- Mods' three knobs: Speed mod, Delay mod and Cross-mod. Drawn in the site's colors (web/manual/manual.css), as lfo-chain.svg. -->
+<defs>
+  <marker id="lfo-mods-ja-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#dcbcff"/></marker>
+  <marker id="lfo-mods-ja-d" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffb04a"/></marker>
+  <marker id="lfo-mods-ja-e" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#45e3d3"/></marker>
+  <marker id="lfo-mods-ja-p" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffd6f0"/></marker>
+</defs>
+<rect width="760" height="240" rx="16" fill="#24081f"/>
+<rect x="16" y="10" width="232" height="220" rx="12" fill="none" stroke="#d3b3c4" stroke-opacity=".45" stroke-width="1.2"/>
+<text x="132" y="28" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">SPEED MOD</text>
+<rect x="84.0" y="51" width="96" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="132" y="73.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">クロック</text>
+<rect x="77.0" y="141" width="110" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="132" y="163.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO I · II</text>
+<path d="M132 85 V138" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-mods-ja-a)"/>
+<path d="M187 158 C234 158 234 68 183 68" fill="none" stroke="#ffd6f0" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#lfo-mods-ja-p)"/>
+<text x="132" y="204" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 1：幅、±3オクターブ</text>
+<text x="132" y="222" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 2：どのLFO（I、II、両方）</text>
+<rect x="264" y="10" width="232" height="220" rx="12" fill="none" stroke="#d3b3c4" stroke-opacity=".45" stroke-width="1.2"/>
+<text x="380" y="28" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">DELAY MOD</text>
+<rect x="325.0" y="51" width="110" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="380" y="73.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO I · II</text>
+<path d="M380 85 V100" fill="none" stroke="#dcbcff" stroke-width="2"/>
+<rect x="352.0" y="100" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="380" y="119" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">D#5</text>
+<path d="M380 128 V141" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-mods-ja-a)"/>
+<text x="380" y="164" font-size="16" fill="#ffd6f0" text-anchor="middle" font-weight="600">ディレイ・タイム</text>
+<text x="380" y="204" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 3：幅、±25%</text>
+<text x="380" y="222" font-size="13" fill="#d3b3c4" text-anchor="middle">× Movement、ディレイのMixで聞こえる</text>
+<rect x="512" y="10" width="232" height="220" rx="12" fill="none" stroke="#d3b3c4" stroke-opacity=".45" stroke-width="1.2" stroke-dasharray="4 4"/>
+<text x="628" y="28" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">CROSS-MOD · LFOではない</text>
+<rect x="540.0" y="51" width="64" height="34" rx="17" fill="none" stroke="#ffb04a" stroke-width="1.5"/>
+<text x="572" y="73.5" font-size="16" fill="#ffb04a" text-anchor="middle" font-weight="600">I</text>
+<rect x="652.0" y="51" width="64" height="34" rx="17" fill="none" stroke="#45e3d3" stroke-width="1.5"/>
+<text x="684" y="73.5" font-size="16" fill="#45e3d3" text-anchor="middle" font-weight="600">II</text>
+<path d="M606 62 H650" fill="none" stroke="#ffb04a" stroke-width="2" marker-end="url(#lfo-mods-ja-d)"/>
+<path d="M650 76 H606" fill="none" stroke="#45e3d3" stroke-width="2" marker-end="url(#lfo-mods-ja-e)"/>
+<rect x="600.0" y="100" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="628" y="119" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">F#5</text>
+<text x="628" y="148" font-size="13.5" fill="#fbe9f2" text-anchor="middle">IがIIのカットオフを動かす</text>
+<text x="628" y="166" font-size="13.5" fill="#fbe9f2" text-anchor="middle">互いのピッチを曲げる（クロスFM）</text>
+<text x="628" y="184" font-size="13.5" fill="#fbe9f2" text-anchor="middle">Snarl：音が両方を曲げる</text>
+<text x="628" y="214" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 4：深さ</text>
+</svg><svg class="diagram tall" role="img" aria-label="Modsの3つの部分。スピード・モジュレーション：LFO I、II、または両方がクロック自体を速くしたり遅くしたりする。KNOB 1で幅（最大3オクターブ）、KNOB 2でどのLFOか。ディレイ・モジュレーション：D#5で選んだLFO I、II、または両方がディレイのタイムを揺らす。KNOB 3で幅（最大25%）、Movementでスケールされ、ディレイのミックスがあるときに聞こえる。クロス・モジュレーションはLFOではない：ドローンが互いを動かす。KNOB 4で深さ、F#5でモードを選ぶ：ドローン Iがドローン IIのカットオフを動かす、互いを曲げる（クロスFM）、またはSnarl（音が両方を曲げる）。" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 720" font-family="Inter Tight, Helvetica Neue, Arial, sans-serif">
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- Mods' three pieces, top to bottom (the phone's lfo-mods.svg). Drawn in the site's colors (web/manual/manual.css), as lfo-chain.svg. -->
+<defs>
+  <marker id="lfo-mods-ja-tall-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#dcbcff"/></marker>
+  <marker id="lfo-mods-ja-tall-d" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffb04a"/></marker>
+  <marker id="lfo-mods-ja-tall-e" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#45e3d3"/></marker>
+  <marker id="lfo-mods-ja-tall-p" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffd6f0"/></marker>
+</defs>
+<rect width="360" height="720" rx="16" fill="#24081f"/>
+<rect x="16" y="10" width="328" height="222" rx="12" fill="none" stroke="#d3b3c4" stroke-opacity=".45" stroke-width="1.2"/>
+<text x="180" y="30" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">SPEED MOD</text>
+<rect x="132.0" y="53" width="96" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="180" y="75.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">クロック</text>
+<rect x="125.0" y="143" width="110" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="180" y="165.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO I · II</text>
+<path d="M180 87 V140" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-mods-ja-tall-a)"/>
+<path d="M235 160 C282 160 282 70 231 70" fill="none" stroke="#ffd6f0" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#lfo-mods-ja-tall-p)"/>
+<text x="180" y="206" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 1：幅、±3オクターブ</text>
+<text x="180" y="224" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 2：どのLFO（I、II、両方）</text>
+<rect x="16" y="246" width="328" height="222" rx="12" fill="none" stroke="#d3b3c4" stroke-opacity=".45" stroke-width="1.2"/>
+<text x="180" y="266" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">DELAY MOD</text>
+<rect x="125.0" y="289" width="110" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="180" y="311.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO I · II</text>
+<path d="M180 323 V338" fill="none" stroke="#dcbcff" stroke-width="2"/>
+<rect x="152.0" y="338" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="180" y="357" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">D#5</text>
+<path d="M180 366 V379" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-mods-ja-tall-a)"/>
+<text x="180" y="402" font-size="16" fill="#ffd6f0" text-anchor="middle" font-weight="600">ディレイ・タイム</text>
+<text x="180" y="442" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 3：幅、±25%</text>
+<text x="180" y="460" font-size="13" fill="#d3b3c4" text-anchor="middle">× Movement、ディレイのMixで聞こえる</text>
+<rect x="16" y="482" width="328" height="222" rx="12" fill="none" stroke="#d3b3c4" stroke-opacity=".45" stroke-width="1.2" stroke-dasharray="4 4"/>
+<text x="180" y="502" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">CROSS-MOD · LFOではない</text>
+<rect x="92.0" y="525" width="64" height="34" rx="17" fill="none" stroke="#ffb04a" stroke-width="1.5"/>
+<text x="124" y="547.5" font-size="16" fill="#ffb04a" text-anchor="middle" font-weight="600">I</text>
+<rect x="204.0" y="525" width="64" height="34" rx="17" fill="none" stroke="#45e3d3" stroke-width="1.5"/>
+<text x="236" y="547.5" font-size="16" fill="#45e3d3" text-anchor="middle" font-weight="600">II</text>
+<path d="M158 536 H202" fill="none" stroke="#ffb04a" stroke-width="2" marker-end="url(#lfo-mods-ja-tall-d)"/>
+<path d="M202 550 H158" fill="none" stroke="#45e3d3" stroke-width="2" marker-end="url(#lfo-mods-ja-tall-e)"/>
+<rect x="152.0" y="574" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="180" y="593" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">F#5</text>
+<text x="180" y="622" font-size="13.5" fill="#fbe9f2" text-anchor="middle">IがIIのカットオフを動かす</text>
+<text x="180" y="640" font-size="13.5" fill="#fbe9f2" text-anchor="middle">互いのピッチを曲げる（クロスFM）</text>
+<text x="180" y="658" font-size="13.5" fill="#fbe9f2" text-anchor="middle">Snarl：音が両方を曲げる</text>
+<text x="180" y="688" font-size="13" fill="#d3b3c4" text-anchor="middle">KNOB 4：深さ</text>
+</svg>
+<p>スピード・モジュレーションとディレイ・モジュレーションはLFOと一緒に動きます。クロス・モジュレーションは違います：ドローンが互いを動かすものです。</p>
+<h2 id="where-the-lfo-goes">LFOの行き先</h2>
+<svg class="diagram wide" role="img" aria-label="LFOの全体：クロック（SELECTでそのレート）がLFO I（OCT−で波形を選ぶ）とLFO II（OCT+）を動かす。両方とも、Movement（ALGORITHM）でスケールされ、5つの場所に届く。それぞれのキーでLFO I、II、または両方を選ぶ：ドローン Iのピッチ／X-Wave（F#3、G#3、KNOB 1）、ドローン Iのカットオフ／レゾナンス（A#3、C#4、KNOB 2）、ドローン IIのピッチ／X-Wave（F#4、G#4、KNOB 3）、ドローン IIのカットオフ／レゾナンス（A#4、C#5、KNOB 4）、ディレイのタイム（D#5、ModsのKNOB 3）。スピード・モジュレーション（ModsのKNOB 1と2）は、波をクロックに戻して速くしたり遅くしたりする。" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" font-family="Inter Tight, Helvetica Neue, Arial, sans-serif">
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- The whole LFO: one clock, two waves, the five places they go (LFO sends, Mods). Drawn in the site's colors (web/manual/manual.css), as lfo-chain.svg. -->
+<defs>
+  <marker id="lfo-map-ja-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#dcbcff"/></marker>
+  <marker id="lfo-map-ja-d" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffb04a"/></marker>
+  <marker id="lfo-map-ja-e" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#45e3d3"/></marker>
+  <marker id="lfo-map-ja-p" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffd6f0"/></marker>
+</defs>
+<rect width="760" height="380" rx="16" fill="#24081f"/>
+<text x="84" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">クロック</text>
+<text x="250" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">波</text>
+<text x="452" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">× MOVEMENT</text>
+<text x="624" y="34" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" letter-spacing="1.3" fill="#d3b3c4" text-anchor="middle">動かすもの</text>
+<rect x="36.0" y="173" width="96" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="84" y="195.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">クロック</text>
+<text x="84" y="162" font-size="13" fill="#d3b3c4" text-anchor="middle">SELECT：レート</text>
+<rect x="206.0" y="123" width="88" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="250" y="145.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO I</text>
+<text x="250" y="176" font-size="13" fill="#d3b3c4" text-anchor="middle">OCT−：波形</text>
+<rect x="206.0" y="233" width="88" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="250" y="255.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO II</text>
+<text x="250" y="286" font-size="13" fill="#d3b3c4" text-anchor="middle">OCT+：波形</text>
+<path d="M132 190 C170 190 170 140 202 140" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-map-ja-a)"/>
+<path d="M132 190 C170 190 170 250 202 250" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-map-ja-a)"/>
+<path d="M206 258 C150 300 84 296 84 211" fill="none" stroke="#ffd6f0" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#lfo-map-ja-p)"/>
+<text x="132" y="318" font-size="13" fill="#ffd6f0" text-anchor="middle">Speed mod（ModsのKNOB 1 · 2）</text>
+<path d="M294 140 C380 140 400 80 470 80" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<path d="M294 250 C380 250 400 80 470 80" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<rect x="472.0" y="66" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="500" y="85" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">F#3</text>
+<path d="M528 80 H560" fill="none" stroke="#ffb04a" stroke-width="2" marker-end="url(#lfo-map-ja-d)"/>
+<text x="568" y="79" font-size="15" fill="#ffb04a" text-anchor="start" font-weight="600">I ピッチ · X-Wave</text>
+<text x="568" y="96" font-size="12.5" fill="#d3b3c4" text-anchor="start">G#3オン · KNOB 1</text>
+<path d="M294 140 C380 140 400 150 470 150" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<path d="M294 250 C380 250 400 150 470 150" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<rect x="472.0" y="136" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="500" y="155" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">A#3</text>
+<path d="M528 150 H560" fill="none" stroke="#ffb04a" stroke-width="2" marker-end="url(#lfo-map-ja-d)"/>
+<text x="568" y="149" font-size="15" fill="#ffb04a" text-anchor="start" font-weight="600">I カットオフ · レゾナンス</text>
+<text x="568" y="166" font-size="12.5" fill="#d3b3c4" text-anchor="start">C#4オン · KNOB 2</text>
+<path d="M294 140 C380 140 400 220 470 220" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<path d="M294 250 C380 250 400 220 470 220" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<rect x="472.0" y="206" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="500" y="225" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">F#4</text>
+<path d="M528 220 H560" fill="none" stroke="#45e3d3" stroke-width="2" marker-end="url(#lfo-map-ja-e)"/>
+<text x="568" y="219" font-size="15" fill="#45e3d3" text-anchor="start" font-weight="600">II ピッチ · X-Wave</text>
+<text x="568" y="236" font-size="12.5" fill="#d3b3c4" text-anchor="start">G#4オン · KNOB 3</text>
+<path d="M294 140 C380 140 400 290 470 290" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<path d="M294 250 C380 250 400 290 470 290" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<rect x="472.0" y="276" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="500" y="295" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">A#4</text>
+<path d="M528 290 H560" fill="none" stroke="#45e3d3" stroke-width="2" marker-end="url(#lfo-map-ja-e)"/>
+<text x="568" y="289" font-size="15" fill="#45e3d3" text-anchor="start" font-weight="600">II カットオフ · レゾナンス</text>
+<text x="568" y="306" font-size="12.5" fill="#d3b3c4" text-anchor="start">C#5オン · KNOB 4</text>
+<path d="M294 140 C380 140 400 352 470 352" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<path d="M294 250 C380 250 400 352 470 352" fill="none" stroke="#dcbcff" stroke-width="1.4" stroke-opacity=".55"/>
+<rect x="472.0" y="338" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="500" y="357" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">D#5</text>
+<path d="M528 352 H560" fill="none" stroke="#ffd6f0" stroke-width="2" marker-end="url(#lfo-map-ja-p)"/>
+<text x="568" y="351" font-size="15" fill="#ffd6f0" text-anchor="start" font-weight="600">ディレイ・タイム</text>
+<text x="568" y="368" font-size="12.5" fill="#d3b3c4" text-anchor="start">ModsのKNOB 3</text>
+<line x1="452" y1="52" x2="452" y2="364" stroke="#dcbcff" stroke-width="1.2" stroke-dasharray="3 5" stroke-opacity=".7"/>
+<text x="424" y="372" font-size="11" fill="#d3b3c4" text-anchor="end" font-family="IBM Plex Mono, Menlo, monospace">ALGORITHM</text>
+</svg><svg class="diagram tall" role="img" aria-label="LFOの全体：クロック（SELECTでそのレート）がLFO I（OCT−で波形を選ぶ）とLFO II（OCT+）を動かす。両方とも、Movement（ALGORITHM）でスケールされ、5つの場所に届く。それぞれのキーでLFO I、II、または両方を選ぶ：ドローン Iのピッチ／X-Wave（F#3、G#3、KNOB 1）、ドローン Iのカットオフ／レゾナンス（A#3、C#4、KNOB 2）、ドローン IIのピッチ／X-Wave（F#4、G#4、KNOB 3）、ドローン IIのカットオフ／レゾナンス（A#4、C#5、KNOB 4）、ディレイのタイム（D#5、ModsのKNOB 3）。スピード・モジュレーション（ModsのKNOB 1と2）は、波をクロックに戻して速くしたり遅くしたりする。" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 548" font-family="Inter Tight, Helvetica Neue, Arial, sans-serif">
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- The whole LFO, top to bottom (the phone's lfo-map.svg). Drawn in the site's colors (web/manual/manual.css), as lfo-chain.svg. -->
+<defs>
+  <marker id="lfo-map-ja-tall-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#dcbcff"/></marker>
+  <marker id="lfo-map-ja-tall-d" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffb04a"/></marker>
+  <marker id="lfo-map-ja-tall-e" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#45e3d3"/></marker>
+  <marker id="lfo-map-ja-tall-p" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8z" fill="#ffd6f0"/></marker>
+</defs>
+<rect width="360" height="548" rx="16" fill="#24081f"/>
+<rect x="132.0" y="17" width="96" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="180" y="39.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">クロック</text>
+<text x="240" y="39" font-size="13" fill="#d3b3c4" text-anchor="start">SELECT：レート</text>
+<path d="M180 51 C180 76 100 70 100 96" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-map-ja-tall-a)"/>
+<path d="M180 51 C180 76 260 70 260 96" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-map-ja-tall-a)"/>
+<rect x="56.0" y="97" width="88" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="100" y="119.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO I</text>
+<text x="100" y="150" font-size="13" fill="#d3b3c4" text-anchor="middle">OCT−：波形</text>
+<rect x="216.0" y="97" width="88" height="34" rx="17" fill="none" stroke="#dcbcff" stroke-width="1.5"/>
+<text x="260" y="119.5" font-size="16" fill="#dcbcff" text-anchor="middle" font-weight="600">LFO II</text>
+<text x="260" y="150" font-size="13" fill="#d3b3c4" text-anchor="middle">OCT+：波形</text>
+<text x="180" y="200" font-size="13" fill="#dcbcff" text-anchor="middle">× Movement（ALGORITHM）</text>
+<rect x="34.0" y="222" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="62" y="241" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">F#3</text>
+<text x="104" y="235" font-size="15" fill="#ffb04a" text-anchor="start" font-weight="600">I ピッチ · X-Wave</text>
+<text x="104" y="252" font-size="12.5" fill="#d3b3c4" text-anchor="start">G#3オン · KNOB 1</text>
+<rect x="34.0" y="292" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="62" y="311" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">A#3</text>
+<text x="104" y="305" font-size="15" fill="#ffb04a" text-anchor="start" font-weight="600">I カットオフ · レゾナンス</text>
+<text x="104" y="322" font-size="12.5" fill="#d3b3c4" text-anchor="start">C#4オン · KNOB 2</text>
+<rect x="34.0" y="362" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="62" y="381" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">F#4</text>
+<text x="104" y="375" font-size="15" fill="#45e3d3" text-anchor="start" font-weight="600">II ピッチ · X-Wave</text>
+<text x="104" y="392" font-size="12.5" fill="#d3b3c4" text-anchor="start">G#4オン · KNOB 3</text>
+<rect x="34.0" y="432" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="62" y="451" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">A#4</text>
+<text x="104" y="445" font-size="15" fill="#45e3d3" text-anchor="start" font-weight="600">II カットオフ · レゾナンス</text>
+<text x="104" y="462" font-size="12.5" fill="#d3b3c4" text-anchor="start">C#5オン · KNOB 4</text>
+<rect x="34.0" y="502" width="56" height="28" rx="6" fill="#24081f" stroke="#fbe9f2" stroke-width="1.5"/>
+<text x="62" y="521" font-size="14" fill="#fbe9f2" text-anchor="middle" font-family="IBM Plex Mono, Menlo, monospace">D#5</text>
+<text x="104" y="515" font-size="15" fill="#ffd6f0" text-anchor="start" font-weight="600">ディレイ・タイム</text>
+<text x="104" y="532" font-size="12.5" fill="#d3b3c4" text-anchor="start">ModsのKNOB 3</text>
+<path d="M100 158 V176 M260 158 V176 M16 176 H260 M16 176 V516" fill="none" stroke="#dcbcff" stroke-width="2"/>
+<path d="M16 236 H32" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-map-ja-tall-a)"/>
+<path d="M16 306 H32" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-map-ja-tall-a)"/>
+<path d="M16 376 H32" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-map-ja-tall-a)"/>
+<path d="M16 446 H32" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-map-ja-tall-a)"/>
+<path d="M16 516 H32" fill="none" stroke="#dcbcff" stroke-width="2" marker-end="url(#lfo-map-ja-tall-a)"/>
+</svg>
+<p>両方のページで、LFOが届くすべての場所です。それぞれのキーで、その場所に送るLFO I、II、または両方を選びます。スピード・モジュレーションでは、波がクロック自体を速くしたり遅くしたりします。</p>
+<h2 id="good-to-know">補足</h2>
+<h3 id="sends">センド</h3>
+<ul><li><b>LFOページの黒鍵すべて：</b><a href="../../../../ja/manual/reference/black-keys/#lfo-keys">黒鍵</a>を見てください。</li><li><b>各センドの値の下に、</b>実際に聞こえる振れ幅が、Movementを含めて表示されます（「±12c」「±3.6 oct」）。</li><li><b>X-Waveとレゾナンスでは、</b>100で全範囲をスイープし、端で折り返すので動き続けます。</li><li><b>Movement</b>（ALGORITHM）は、センドとディレイ・モジュレーションをスケールします。スピード・モジュレーションとクロス・モジュレーションはスケールしません。</li><li><b>レートの位置に「mvmt 0%」：</b>Movementが0なので、何も動きません。</li></ul>
+<h3 id="mods-2">Mods</h3>
+<ul><li><b>ディレイ・モジュレーション</b>は、ディレイのミックスがあるときだけ聞こえます。その波はLFOページの<span class="k">D#5</span>で選びます。</li><li><b>クロス・モジュレーションのモード</b>（画面の名前で）：<i>cutoff</i>（ドローン Iの音がドローン IIのフィルターを動かす）、<i>pitch</i>（それぞれのドローンが互いのピッチを曲げる。荒い音から金属的な音まで）、<i>snarl</i>（最終的な音が両方を曲げる：グロウル）。</li><li><b>クロス・モジュレーション</b>は、設定したピッチのまわりで曲げます。ピッチそのものは動きません。</li></ul>
+<h3 id="pictures">画面の絵</h3>
+<ul><li>LFO sendsでは、各ドローンのセンドがキー付きの文で表示され（「[F#3] LFO II → [G#3] x-wave」）、その上に2つのLFO。Modsでは、LFOのクロックがLFO IとIIに送られる様子と、クロス・モジュレーションのモードとそのキー。</li></ul></div></main>
+<p class="foot">Niagara Drift · M-VAVE FM-1用の無料・オープンソースのファームウェア（GPL-3.0）。音の例はファームウェア自身のコードからパソコン上で作ったもので（ヘッドホンの設定）、FM-1から録音したものではありません。このマニュアルはAIで翻訳しました。より自然な表現があれば、<a href="../../../../ja/manual/help/#send-feedback">お知らせください</a>。 <a href="../../../../ja/manual/about/">概要</a> · <a href="https://github.com/evanyerburgh/niagara-drift">GitHubのソース</a></p>
+
+<script src="../../../../manual/manual.js"></script>
+</body></html>
