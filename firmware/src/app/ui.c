@@ -48,9 +48,10 @@
 /* ------------------------------------------------------------- pages --- */
 /* the pages (2026-10-10, from the review: what's played together sits together, no half-empty pages) */
 enum { V_PLAY, V_PLAY2, V_LIFE, V_TONE, V_OSC, V_SOURCE, V_LFO, V_LFO2, V_PARTNER, V_MOVES, V_SETUP, V_SETUP2,
-       V_PULSE, V_FX, V_FX2, NVIEWS };
+       V_PULSE, V_FX, V_FX2, V_STRINGS, NVIEWS };
 static const char *const VIEW_NAME[NVIEWS] = {"Drones", "Pitch", "Life", "Tone", "Osc", "Sub · Drive", "LFO sends",
-                                              "Mods", "Partner", "Pitch moves", "Setup 1", "Setup 2", "Swell", "Space", "Details"};
+                                              "Mods", "Partner", "Pitch moves", "Setup 1", "Setup 2", "Swell", "Space", "Details",
+                                              "Strings"};
 /* what each knob moves on each page: a drone's parameter (g 0 or 1, GP_*), a global one (g G, P_*), or
  * nothing (g NONE) */
 #define G 2
@@ -80,6 +81,8 @@ static const knob_t VIEW_KNOB[NVIEWS][4] = {
      * SEL the delay's type over Time and what goes into the reverb over Type (sel_job) */
     {{G, P_DLY_REPEATS}, {G, P_DLY_MIX}, {G, P_REV_LEN}, {G, P_REV_MIX}},
     {{G, P_DLY_DRIVE}, {G, P_DLY_TIME}, {G, P_REV_DAMP}, {G, P_REV_TYPE}},
+    /* STRINGS (0.4, Evan 2026-11-16..18: FX's third page): Mix, Chord, Tone, Length; SEL + Tone Hollow (sel_job) */
+    {{G, P_ST_MIX}, {G, P_ST_CHORD}, {G, P_ST_TONE}, {G, P_ST_LENGTH}},
 };
 /* A KNOB's SECOND JOB with SEL held, on the pages that have one (its card shows both, the second "+ SEL"): the
  * choices set before playing, so a player who never finds them loses nothing. FX's KNOB 4: the delay's type, what goes
@@ -90,15 +93,20 @@ static int sel_job(int v, int i)
         return i == 1 ? P_DLY_TYPE : P_DLY_ROUTE;
     if (v == V_SOURCE && (i == 0 || i == 2))
         return i ? P_SUBW_1 : P_SUBW_0;
+    if (v == V_STRINGS && i == 2)              /* Strings: Hollow by Tone */
+        return P_ST_HOLLOW;
     return -1;
 }
-static int page_jobs(int v) { return sel_job(v, 0) >= 0 || sel_job(v, 1) >= 0 || sel_job(v, 3) >= 0; }
-static const char *sel_job_name(int p) { return p == P_DLY_ROUTE ? "Into" : p == P_DLY_TYPE ? "Type" : "Wave"; }
+static int page_jobs(int v) { return sel_job(v, 0) >= 0 || sel_job(v, 1) >= 0 || sel_job(v, 2) >= 0 || sel_job(v, 3) >= 0; }
+static const char *sel_job_name(int p)
+{
+    return p == P_DLY_ROUTE ? "Into" : p == P_DLY_TYPE ? "Type" : p == P_ST_HOLLOW ? "Hollow" : "Wave";
+}
 /* the page buttons: each shows its first page, pressed again the next */
 static const struct {
     uint8_t btn, first, n;
 } PAGE_BTN[] = {{B_HOME, V_PLAY, 2}, {B_ENV, V_LIFE, 2}, {B_EDIT, V_OSC, 2}, {B_LFO, V_LFO, 2},
-                {B_SEQ, V_PARTNER, 2}, {B_GLO, V_SETUP, 2}, {B_FX, V_FX, 2},
+                {B_SEQ, V_PARTNER, 2}, {B_GLO, V_SETUP, 2}, {B_FX, V_FX, 3},
                 {B_ARP, V_PULSE, 1}};                                    /* ARP: on its page, a tap toggles */
 #define NPAGE_BTN (sizeof PAGE_BTN / sizeof PAGE_BTN[0])
 #define HOLD_MS 400u                   /* a page button held this long (or a knob turned) is a peek */

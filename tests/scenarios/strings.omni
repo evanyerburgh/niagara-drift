@@ -1,0 +1,45 @@
+# the strings (0.4, FX's third page; drone_strings.c): FX's three pages in turn; Mix up from 0 washes them in; they
+# ring on after a stop and die away, under -120 dB within 40 s (the lines' rounding: a quiet string held at its level
+# for good, a limit cycle, rang on in the first test); an FM-1 that can't run them says so and stays silent there
+notips
+set 71 24
+set 74 0
+set 62 0
+set 63 0
+tap PLAY
+wait 1500
+tap FX
+expect view 13
+tap FX
+expect view 14
+tap FX
+expect view 15
+tap FX
+expect view 13
+page 15
+expect par112 0
+spin K1 70
+wait 6000
+expect par112 70
+shot on.png
+tap PLAY
+wait 2000
+peakreset
+wait 500
+expect peak_db_min -60
+wait 37500
+peakreset
+wait 1000
+expect peak_db_max -120
+tap PLAY
+wait 3000
+cpu1 0
+wait 500
+shot not-on.png
+tap PLAY
+wait 3000
+peakreset
+wait 40000
+peakreset
+wait 1000
+expect peak_db_max -120

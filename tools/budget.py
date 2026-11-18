@@ -71,14 +71,17 @@ def main():
     head = json.loads(head_f.read_text())
     rev, base = base_build()
     hc, bc = cost(ROOT), cost(BASE)
-    worst = max(hc, key=hc.get)
+    cpu0 = {k: v for k, v in hc.items() if "strings" not in k}     # the first core's (the strings' job is the second's)
+    worst = max(cpu0, key=cpu0.get)
+    job = next((v for k, v in hc.items() if "job alone" in k), None)
     pct = lambda i: f"{i * 0.017:.1f} %"                         # drone_cost's device estimate
     print(f"**Budget** (against main {rev[:7]}): "
           f"RAM {kb(head['ram'])} of {kb(head['ram_max'])} ({delta(head['ram'], base['ram'], kb)}) · "
           f"pool headroom {kb(head['pool_max'] - head['pool'])} ({delta(base['pool'], head['pool'], kb)}) · "
           f"image {kb(head['image'])} ({delta(head['image'], base['image'], kb)}) · "
           f"engine worst case {hc[worst]:,} instr/sample, ~{pct(hc[worst])} of the FM-1 "
-          f"({(hc[worst] - bc.get(worst, hc[worst])) / bc.get(worst, hc[worst]) * 100:+.1f} %)")
+          f"({(hc[worst] - bc.get(worst, hc[worst])) / bc.get(worst, hc[worst]) * 100:+.1f} %)" +
+          (f" · the second core's job {job:,} instr/sample, ~{pct(job)}" if job else ""))
     print("\n<details><summary>Engine cost by case</summary>\n")
     print("| Case | main | this PR | change |\n|---|---:|---:|---:|")
     for name, v in hc.items():

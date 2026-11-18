@@ -185,3 +185,8 @@ key w14 up
 wait 1000
 expect keymap 0
 release SEL
+# Strings (0.4, FX's third page): the strings ringing (last, so the pages above keep their sound)
+page 15
+spin K1 60
+wait 6000
+shot strings.png

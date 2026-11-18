@@ -26,18 +26,22 @@ struct om_dbg {
 static uint8_t safe_mode;                           /* two failed boots: no audio, USB on (safe_main) */
 
 #if OM_CPU2
-/* THE SECOND CORE (felucca-bsp's fm1_cpu1.h; 0.4's strings are its job): started at power-on, with no work of its own
- * yet. Its tests run only when a debug query asks (tools/fm1_cpu.py --cores), never in normal use:
+/* THE SECOND CORE (felucca-bsp's fm1_cpu1.h): started at power-on; its job is the strings (dsp/drone_strings.c), handed
+ * over at each block's start while they're on (dr_st_job_on) and waited for in dr_render (dr_st_wait), before the
+ * effects. Its tests run only when a debug query asks (tools/fm1_cpu.py --cores), never in normal use, in place of
+ * the strings' job for those blocks:
  * - the soak (0x79 1): each audio block a job that keeps CPU1 busy ~2 ms (the strings' share), summing a 256 B table
  *   CPU0 wrote (a misread counts a bad sum) and writing a pattern CPU0 checks after its wait (the cores see each
  *   other's writes: a bad echo); 0x79 0 stops it;
  * - the failures, one job each (0x79 2 a misread: the check word spoiled; 3 late: the job runs 7 ms; 4 a fault: the
- *   job calls through a bad pointer): CPU1 is retired, the audio plays on, and it stays retired until power-off.
- * A misread, a fault or a late job retires CPU1 (FM1_CPU1_FALLBACK: one core until power-off) and is counted. */
+ *   job calls through a bad pointer; 5 the strings' output spoiled, a NaN, which st_mix's check catches): CPU1 is
+ *   retired, the audio plays on, and it stays retired until power-off.
+ * A misread, a fault, a late job or a bad output retires CPU1 (FM1_CPU1_FALLBACK: one core until power-off) and is
+ * counted; the strings then stop and their page says "Not on this FM-1" (dr_st_avail). */
 #define C2_WORDS 64u
 #define C2_ECHO 16u
 #define C2_BUSY_US 2000u
-enum { C2_IDLE, C2_SOAK, C2_MISREAD, C2_LATE, C2_FAULT };
+enum { C2_IDLE, C2_SOAK, C2_MISREAD, C2_LATE, C2_FAULT, C2_NAN };
 static uint32_t c2_table[C2_WORDS];
 static uint32_t c2_sum;                             /* the table's, as CPU0 made it */
 static struct {                                     /* the job's (CPU1 writes, CPU0 reads after the wait) */
@@ -76,6 +80,27 @@ static void c2_work(uint32_t arg)                   /* on CPU1, from the flash, 
         c2_job.max_us = us;
 }
 
+static void c2_strings(uint32_t arg)                /* on CPU1, from the flash: the strings for a block */
+{
+    uint32_t t0 = fm1_ticks(), us;
+    dr_st_job(arg);
+    us = (fm1_ticks() - t0) / FM1_TICKS_PER_US;
+    c2_job.passes++;
+    c2_job.last_us = us;
+    if (us > c2_job.max_us)
+        c2_job.max_us = us;
+}
+
+static int c2_wait(void)                            /* dr_render's wait for the strings' job */
+{
+    uint32_t w0 = fm1_ticks(), w;
+    int r = fm1_cpu1_wait();
+    w = (fm1_ticks() - w0) / FM1_TICKS_PER_US;
+    if (w > c2.wait_max_us)
+        c2.wait_max_us = w;
+    return r;
+}
+
 static void c2_start(void)                          /* power-on, before the audio and the timers */
 {
     static const char when[] = __DATE__ " " __TIME__;
@@ -88,13 +113,21 @@ static void c2_start(void)                          /* power-on, before the audi
     fm1_cpu1_bar_build(id);                         /* a bar a crash set for an earlier build is lifted */
     if (!bootguard.failed && !safe_mode)            /* not after a failed start: one core */
         c2.two = fm1_cpu1_start() == 0;
+    dr_st_wait = c2_wait;
+    dr_st_avail = (uint8_t)(c2.two && fm1_cpu1_on);
 }
 
-static int c2_hand_over(void)                       /* the audio block's start: a test job, if one is asked for */
+static int c2_hand_over(void)                       /* the audio block's start: 1 a test job, 2 the strings', 0 none */
 {
     const uint32_t m = c2.mode;
-    if (m == C2_IDLE || !fm1_cpu1_on)
-        return 0;
+    if (m == C2_IDLE || m == C2_NAN || !fm1_cpu1_on) {
+        if (m == C2_NAN) {                          /* the strings' output spoiled once (if they're on) */
+            dr_st_poison = 1;
+            c2.mode = C2_IDLE;
+        }
+        dr_st_two = dr_st_job_on() && fm1_cpu1_run(c2_strings, 0);
+        return dr_st_two ? 2 : 0;
+    }
     if (m != C2_SOAK)
         c2.mode = C2_IDLE;                          /* a failure is tried once */
     c2.seed++;
@@ -137,14 +170,19 @@ static void render_block(int32_t *o)                /* ALNK0: one half, measured
         }
     }
 #if OM_CPU2
-    if (on2)
+    if (on2 == 1)
         c2_collect();
+    if (dr_st_failed && fm1_cpu1_on) {              /* the strings' output failed its check: a misread in the data */
+        dr_st_failed = 0;
+        fm1_cpu1_retire(FM1_CPU1_MISREAD);
+    }
     if (fm1_cpu1_outstanding())                     /* the backstop: no job outlives this interrupt (CPU1's jobs run
                                                      * from the flash, which the main loop may turn off); a refused or
                                                      * faulted one retires CPU1 here, so the flash isn't held */
         fm1_cpu1_wait();
     if (c2.two && fm1_cpu1_gave_up && !c2.off_ms)
         c2.off_ms = fm1_ms | 1u;                    /* when it was retired */
+    dr_st_avail = fm1_cpu1_on;                      /* (retired: the strings' page says so) */
 #endif
     us = (fm1_ticks() - t0) / FM1_TICKS_PER_US;
     om_dbg.cpu_q8 = (om_dbg.cpu_q8 * 15u + (us * 256u) / budget) / 16u;
@@ -498,8 +536,8 @@ static void dbg_service(void)
         ota_send_msg(0x7E, b, sizeof b);
     }
 #if OM_CPU2
-    else if (d == 8u && ota_dec[2] == 0x79) {       /* the second core's tests (above): 0 off, 1 the soak, 2-4 a failure */
-        if (ota_dec[6] <= C2_FAULT)
+    else if (d == 8u && ota_dec[2] == 0x79) {       /* the second core's tests (above): 0 off, 1 the soak, 2-5 a failure */
+        if (ota_dec[6] <= C2_NAN)
             c2.mode = ota_dec[6];
         ota_send_msg(0x79, ota_dec + 6, 1u);
     } else if (d == 7u && (ota_dec[2] == 0x7B || ota_dec[2] == 0x7A)) {   /* its report: 0x7B and 0x7A, 8 words each */
@@ -579,6 +617,8 @@ static void fm1_main(void)
     project_apply();
 #if OM_CPU2
     c2_start();
+#else
+    dr_st_avail = 0;                                /* one core: no strings (CPU0 can't run them as well) */
 #endif
     audio_init();
     usb_start();

@@ -3,6 +3,8 @@
  * glide, voice on / off, panic, and an output that stays finite and inside full scale with the filter
  * self-oscillating and driven. */
 #include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
@@ -1932,6 +1934,56 @@ int main(void)
             }
         }
         check("Random: an init repeats the sequence; a seed (the first PLAY) makes a new one", same0 && !same1);
+    }
+
+    {   /* THE STRINGS (0.4): the second core's job reads only what the last block published, so where it runs in the
+         * block can't change a sample (the block's start, as the host runs it, or at the wait, as late as the FM-1's
+         * can finish); with Feedback in, the strings feed back into the drones a block later either way. Each in its
+         * own process (a second dr_init doesn't start everything over) */
+        uint32_t hs[2] = {0, 0}, heard[2] = {0, 0};
+        int k;
+        for (k = 0; k < 2; k++) {
+            int fd[2];
+            pid_t pid;
+            if (pipe(fd))
+                break;
+            pid = fork();
+            if (!pid) {
+                static int32_t o[2 * 256];
+                uint32_t i, j, r[2] = {2166136261u, 0};
+                dr_init();
+                classic();
+                dr_set(P_FEEDBACK, 40);
+                dr_set(P_ST_MIX, 70);
+                dr_set(P_ST_CHORD, 60);
+                dr_st_late = k;
+                dr_play(1);
+                for (i = 0; i < 400; i++) {
+                    if (i == 200)
+                        dr_set(P_ST_CHORD, 20);   /* (a knob turned on the way: published the same in both) */
+                    dr_render(o, 256, 3277);
+                    for (j = 0; j < 2 * 256; j++) {
+                        r[0] = (r[0] ^ (uint32_t)o[j]) * 16777619u;
+                        r[1] |= o[j] > 1000;
+                    }
+                }
+                if (write(fd[1], r, sizeof r) != (ssize_t)sizeof r)
+                    _exit(1);
+                _exit(0);
+            }
+            close(fd[1]);
+            {
+                uint32_t r[2] = {0, 0};
+                if (read(fd[0], r, sizeof r) == (ssize_t)sizeof r) {
+                    hs[k] = r[0];
+                    heard[k] = r[1];
+                }
+            }
+            close(fd[0]);
+            waitpid(pid, 0, 0);
+        }
+        check("the strings: the job at the block's start or at the wait gives the same samples",
+              hs[0] && hs[0] == hs[1] && heard[0]);
     }
 
     check("output finite throughout", finite_ok);

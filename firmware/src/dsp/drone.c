@@ -87,6 +87,7 @@ static const dr_param_t PARAMS[DR_NPARAMS] = {
     {"Sub wave", 0, DR_NSUBW - 1, DR_SUBW_SQUARE}, {"Sub wave", 0, DR_NSUBW - 1, DR_SUBW_SQUARE},
     {"Tuning", 0, DR_NTUNING - 1, DR_TUN_12},
     {"Sync", 0, 1, 1},
+    {"Mix", 0, 100, 0}, {"Chord", 0, 100, 25}, {"Tone", 0, 100, 50}, {"Length", 0, 100, 70}, {"Hollow", 0, 100, 60},
 };
 const char *const DR_REV_NAME[DR_NREV] = {"Room", "Hall", "Cathedral", "Chorus hall", "Shimmer"};
 const char *const DR_DIV_NAME[DR_NDIV] = {"32 bars", "16 bars", "8 bars", "4 bars", "2 bars", "1 bar", "1/2", "1/4"};
@@ -660,7 +661,7 @@ void dr_param_text(int i, int v, char *b)
 enum { C_SET, C_PLAY, C_VOICE, C_PANIC, C_SLIDE, C_LFO_RESET, C_PSLIDE, C_SEED, C_DUCK, C_GEST };
 /* a load (boot, project_apply) posts every value at once, before the render drains any: the queue holds
  * them all (at 64 the last values of a saved sound were dropped at start-up, the macros among them) */
-#define QN 128u
+#define QN 144u
 typedef char qn_holds_a_load[DR_NPARAMS + 16 <= QN ? 1 : -1];
 static uint32_t q[QN];
 static volatile uint32_t q_w, q_r;
@@ -931,6 +932,7 @@ static float fade_rate(void)                      /* per sample: 0.05 s * 1200^(
 
 static void fx_clear(void);                      /* drone_fx.c, included below */
 static void macro_reset(void);                   /* the macros' moves at rest (below) */
+static void st_init(void);                       /* the strings (drone_strings.c, included below) */
 
 void dr_init(void)
 {
@@ -961,6 +963,7 @@ void dr_init(void)
     }
     fade = fade_target = 0.0f;
     dr_fade = 0.0f;
+    st_init();
     rng = 0x12345678u;                           /* the random ones from the same start: every init sounds the same */
     lfo_seed = 0x9E3779B9u;
     lfo_ph = lfo_s[0] = lfo_s[1] = 0.0f;
@@ -1822,6 +1825,7 @@ static float depth_amt(int d)
 }
 
 #include "drone_fx.c"                    /* the effects: they use the LFO, sat() and depth_amt() above */
+#include "drone_strings.c"               /* the strings: the second core's job */
 
 /* the X-WAVE: wave wi blended with the next by wf (0..1) */
 static inline float xosc(int wi, float wf, float ph, float dt, float pw)
@@ -2644,6 +2648,7 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
         uint32_t k = n > BLK ? BLK : n, j;
         int g;
         float frate = fade_rate();
+        st_block_start();
         for (j = 0; j < k; j++)
             mixl[j] = mixr[j] = 0.0f;
         pf_run(k);
@@ -2685,6 +2690,7 @@ void dr_render(int32_t *out, uint32_t n, uint32_t gain_q12)
             mixl[j] *= a;
             mixr[j] *= a;
         }
+        st_mix(mixl, mixr, k);                   /* the strings: in after the fade, before the effects */
         /* the effects, after the fade: the tails ring on when stopped. Stopped, and silent (below -120 dB)
          * for longer than the delay's line (743 ms: an echo still in it would have come out by then), they
          * rest until PLAY */

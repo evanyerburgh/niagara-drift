@@ -157,6 +157,13 @@ enum {
                                      * 2026-10-30; a sound's since 2026-11-08, ledger 3): 0 12-tone .. the 22 shrutis */
     P_CLK_SYNC,                     /* follow a MIDI clock (1, as since v0.3's step 3) or not (0: the clock ignored, its
                                      * tempo forgotten); a room setting (v0.3, Evan 2026-11-01, ledger item 5) */
+    P_ST_MIX,                       /* THE STRINGS (0.4, FX's third page; drone_strings.c): 0..100, 0 off; from 0 they
+                                     * wash in over 4 s, to 0 out (70: the test builds' level) */
+    P_ST_CHORD,                     /* 0..100: Rings' Structure, the strings' chord (its jumps kept) */
+    P_ST_TONE,                      /* 0..100: Rings' Brightness */
+    P_ST_LENGTH,                    /* 0..100: Rings' Damping, how long they ring */
+    P_ST_HOLLOW,                    /* 0..100: where the drones touch them, the nut .. the middle (Rings' Position 0..0.5;
+                                     * SEL + Tone) */
     DR_NPARAMS
 };
 
@@ -315,3 +322,17 @@ extern volatile uint32_t dr_scope_t0[DR_NGROUPS];   /* each capture's start, in 
 extern volatile float dr_scope_ci[DR_NGROUPS];      /* ... its oscillator's cycles a sample then */
 extern volatile uint16_t dr_scope_dec[DR_NGROUPS];  /* ... samples a point */
 extern volatile float dr_pitch[DR_NGROUPS];    /* each drone's pitch now (MIDI note, fractional while sliding) */
+/* THE STRINGS (drone_strings.c): Rings' sympathetic strings, on the second core one block behind */
+extern volatile uint8_t dr_st_avail;           /* the platform: 0 the second core can't run them (none, or retired) */
+extern int (*dr_st_wait)(void);                /* the platform's wait for the job (0 done, -1 dropped); NULL: the host */
+extern volatile int dr_st_two;                 /* the platform: 1 = it handed this block's job to the second core */
+extern volatile uint8_t dr_st_failed;          /* the job's output failed its check: the platform retires the core */
+extern volatile uint8_t dr_st_poison;          /* a debug query: the next output spoiled, to try that check */
+extern int dr_st_late;                         /* the host's test: the job run at the wait, not the block's start */
+int dr_st_job_on(void);                        /* a job this block? (the platform, once a block, before dr_render) */
+void dr_st_job(uint32_t arg);                  /* the job */
+float dr_st_heard(void);                       /* the picture's: the strings' level as heard */
+void dr_st_semis(float *dst);                  /* ... each of the 8 strings' notes, semitones over drone I */
+const int16_t *dr_st_line(int i, uint32_t *w, float *len);   /* ... string i's line, its write point, a cycle's length */
+#define DR_ST_N 8
+#define DR_ST_LINE 1024u

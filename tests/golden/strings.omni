@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# the same-samples check (tools/same_samples.py) and the strings' own test (0.4, FX's third page): FX three times to
+# Strings; Mix up from 0 (a 4 s wash in), each knob turned (Chord through its jumps, Tone, Length, Hollow on SEL +
+# Tone); a Tuning change (the chord's fifths the Tuning's); a scene recall that takes the strings down and back; Mix
+# to 0 (a 4 s wash out); then the strings again and a stop: with the delay and the reverb out, the output under
+# -120 dB within 40 s of the stop (a string held at a quiet level for good, the lines' limit cycle, can't come back)
+pressure w0 0
+pressure w1 0
+notips
+set 71 24
+set 74 0
+press SEL
+tapkey w8
+release SEL
+tap PLAY
+wait 1500
+tap FX
+tap FX
+tap FX
+expect view 15
+shot strings-off.png
+press SAVE
+tapkey w0
+release SAVE
+wav strings.wav
+spin K1 60
+wait 6000
+shot strings-on.png
+expect par112 60
+spin K2 50
+wait 4000
+spin K2 -50
+wait 3000
+spin K3 -40
+wait 3000
+spin K3 40
+wait 2000
+spin K4 -50
+wait 4000
+spin K4 50
+wait 2000
+press SEL
+spin K3 -60
+wait 300
+shot strings-sel.png
+wait 3000
+spin K3 60
+release SEL
+wait 2000
+expect par116 60
+set 110 7
+wait 4000
+set 110 0
+wait 2000
+press SAVE
+tapkey w1
+release SAVE
+tapkey w0
+wait 3000
+expect par112 0
+tapkey w1
+wait 6000
+expect par112 60
+spin K1 -60
+wait 5000
+spin K1 60
+wait 5000
+set 62 0
+set 63 0
+wait 1000
+tap PLAY
+wait 39000
+peakreset
+wait 1000
+expect peak_db_max -120

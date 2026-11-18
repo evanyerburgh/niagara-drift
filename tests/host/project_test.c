@@ -88,7 +88,7 @@ int main(void)
     const int16_t *a1, *a12, *b1, *b4;
     old_project(19u);
     check("a 0.1 project loads", project_load() == 0);
-    check("now format 44, on bank A", proj.format == 44u && PROJ_FORMAT == 44u && proj.bank == 0 && proj.mtime == MTIME_DEF);
+    check("now format 45, on bank A", proj.format == 45u && PROJ_FORMAT == 45u && proj.bank == 0 && proj.mtime == MTIME_DEF);
     check("a value 0.1 didn't have (Weight's depth) at its default", proj.par[P_GD_0] == dr_param_info(P_GD_0)->def);
     check("its sound is kept", proj.par[DR_GP(0, GP_PITCH)] == 4321);
     check("Colour pink (1) becomes 100, white stays 0",
@@ -595,8 +595,8 @@ int main(void)
                                                  scene_has(0, 1) && scene_has(1, 2));
         check("... the Tuning 12-tone, no offsets (39, 2026-10-30)", proj.par[P_TUNING] == DR_TUN_12 &&
               scene_get(1, 2)[P_TUNING] == DR_TUN_12 && !proj.tun_off[0] && !proj.tun_off[1] && !proj.tun_off[2]);
-        check("... and saved as 44", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 44u &&
-                                     ((const bank_t *)store[OBJ_BANKB])->format == 44u);
+        check("... and saved as 45", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 45u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 45u);
     }
     {   /* 40: the Tunings reordered, simplest to richest (Evan, 2026-10-30): a 39 sound keeps its Tuning */
         static proj_v40_t o;
@@ -631,8 +631,8 @@ int main(void)
         check("... each keeps its Tuning: LMY, Shruti, Harmonics", proj.par[P_TUNING] == DR_TUN_LMY &&
               scene_get(0, 0) && scene_get(0, 0)[P_TUNING] == DR_TUN_SHRUTI && scene_get(1, 1) &&
               scene_get(1, 1)[P_TUNING] == DR_TUN_HARM);
-        check("... and saved as 44", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 44u &&
-                                     ((const bank_t *)store[OBJ_BANKB])->format == 44u);
+        check("... and saved as 45", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 45u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 45u);
     }
     {   /* 41: Tune in Hz, Sync (Evan, 2026-11-01): a 40 Tune in cents becomes the nearest 0.1 Hz; Sync on */
         static proj_v40_t o;
@@ -669,13 +669,13 @@ int main(void)
               scene_get(0, 0)[P_TUNE] == 129 && scene_get(1, 3)[P_TUNE] == -125);
         check("... Sync on, the fine tuning kept", proj.par[P_CLK_SYNC] == 1 && scene_get(1, 3)[P_CLK_SYNC] == 1 &&
                                                    proj.tun_off[1] == 7);
-        check("... and saved as 44", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 44u &&
-                                     ((const bank_t *)store[OBJ_BANKB])->format == 44u);
+        check("... and saved as 45", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 45u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 45u);
     }
     {   /* 43: the LFO rate 0..152, every second from 100 s to 10 s (Evan, 2026-11-07): a 41 rate (the project) and a 42
          * one (bank B, #78's test build) become the nearest step of the same speed */
-        static project_t o;
-        static bank_t bb;
+        static proj_v44_t o;
+        static bank_v44_t bb;
         int i, k;
         memset(store_n, 0, sizeof store_n);
         project_defaults();
@@ -683,11 +683,11 @@ int main(void)
         o.magic = PROJ_MAGIC;
         o.format = 41u;
         o.mtime = MTIME_DEF;
-        for (k = 0; k < DR_NPARAMS; k++)
+        for (k = 0; k < NP44; k++)
             o.par[k] = dr_param_info(k)->def;
         o.par[P_LFO_RATE] = 8;
         o.tun_off[1] = 7;
-        for (k = 0; k < DR_NPARAMS; k++)
+        for (k = 0; k < NP44; k++)
             o.scene[0][k] = dr_param_info(k)->def;
         o.scene_used = 0x001u;
         o.scene[0][P_LFO_RATE] = 0;
@@ -698,7 +698,7 @@ int main(void)
         bb.format = 42u;
         bb.used = 3u << 3;
         for (i = 0; i < NSCENES; i++)
-            for (k = 0; k < DR_NPARAMS; k++)
+            for (k = 0; k < NP44; k++)
                 bb.scene[i][k] = dr_param_info(k)->def;
         bb.scene[3][P_LFO_RATE] = 54;              /* 42: 0.53 Hz */
         bb.scene[4][P_LFO_RATE] = 100;             /* 42: 70 Hz */
@@ -710,13 +710,13 @@ int main(void)
         check("... 26 s is 74, 50 s 50, 0.53 Hz 106, 70 Hz 152", proj.par[P_LFO_RATE] == 74 &&
               scene_get(0, 0)[P_LFO_RATE] == 50 && scene_get(1, 3)[P_LFO_RATE] == 106 && scene_get(1, 4)[P_LFO_RATE] == 152);
         check("... the rest kept", proj.tun_off[1] == 7 && proj.par[P_TUNE] == 0 && scene_get(1, 3)[P_CLK_SYNC] == 1);
-        check("... and saved as 44", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 44u &&
-                                     ((const bank_t *)store[OBJ_BANKB])->format == 44u);
+        check("... and saved as 45", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 45u &&
+                                     ((const bank_t *)store[OBJ_BANKB])->format == 45u);
     }
     {   /* format 43 (Evan, 2026-11-08): the LFO on X-Wave and the resonance turns at their ends, its depth 100 their
          * whole range; a saved sound keeps the range it reached */
-        static project_t o;
-        static bank8_t bx;
+        static proj_v44_t o;
+        static bank8_v44_t bx;
         int k;
         memset(store_n, 0, sizeof store_n);
         project_defaults();
@@ -724,7 +724,7 @@ int main(void)
         o.magic = PROJ_MAGIC;
         o.format = 43u;
         o.mtime = MTIME_DEF;
-        for (k = 0; k < DR_NPARAMS; k++)
+        for (k = 0; k < NP44; k++)
             o.par[k] = dr_param_info(k)->def;
         o.par[P_MOVE] = 50;
         o.par[DR_GP(0, GP_OLFO_DEST)] = DR_TO_XWAVE;     /* saw (67), depth 40: reached 51..83 */
@@ -741,7 +741,7 @@ int main(void)
         bx.magic = BANK_MAGIC;
         bx.format = 43u;
         bx.used = 3u;
-        for (k = 0; k < DR_NPARAMS; k++)
+        for (k = 0; k < NP44; k++)
             bx.scene[0][k] = bx.scene[1][k] = dr_param_info(k)->def;
         bx.scene[0][DR_GP(0, GP_FLFO_DEST)] = DR_TO_RESO;   /* Reso 250, depth 20: reached 5..45 % */
         bx.scene[0][DR_GP(0, GP_FLFO_DEPTH)] = 20;
@@ -767,8 +767,62 @@ int main(void)
                scene_get(BANK_D, 1)[DR_GP(1, GP_FLFO_DEPTH)]);
         check("... Movement 0 converted as at 50 (X-Wave 40 is 57), a negative send on both LFOs keeps its sign (-30 is -50)",
               scene_get(BANK_D, 1)[DR_GP(0, GP_OLFO_DEPTH)] == 57 && scene_get(BANK_D, 1)[DR_GP(1, GP_FLFO_DEPTH)] == -50);
-        check("... and saved as 44, D too", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 44u &&
-                                              ((const bank8_t *)store[BANKX_OBJ[0]])->format == 44u);
+        check("... and saved as 45, D too", project_save() == 0 && ((const project_t *)store[OBJ_PROJ])->format == 45u &&
+                                              ((const bank8_t *)store[BANKX_OBJ[0]])->format == 45u);
+    }
+    {   /* 45: the strings (0.4): a 44 sound, B and D keep every value, the strings at their defaults (off) */
+        static proj_v44_t o;
+        static bank_v44_t bb;
+        static bank8_v44_t bx;
+        int i, k, same = 1;
+        memset(store_n, 0, sizeof store_n);
+        project_defaults();
+        memset(&o, 0, sizeof o);
+        o.magic = PROJ_MAGIC;
+        o.format = 44u;
+        o.mtime = 61;
+        o.bank = 2;
+        o.tun_off[2] = -9;
+        for (k = 0; k < NP44; k++)
+            o.par[k] = dr_param_info(k)->lo + (int16_t)((k * 7) % (dr_param_info(k)->hi - dr_param_info(k)->lo + 1));
+        o.scene_used = 0x005u;
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < NP44; k++)
+                o.scene[i][k] = o.par[k];
+        memcpy(store[OBJ_PROJ], &o, sizeof o);
+        store_n[OBJ_PROJ] = (int)sizeof o;
+        memset(&bb, 0, sizeof bb);
+        bb.magic = BANK_MAGIC;
+        bb.format = 44u;
+        bb.used = 1u << 6;
+        for (i = 0; i < NSCENES; i++)
+            for (k = 0; k < NP44; k++)
+                bb.scene[i][k] = o.par[k];
+        memcpy(store[OBJ_BANKB], &bb, sizeof bb);
+        store_n[OBJ_BANKB] = (int)sizeof bb;
+        memset(&bx, 0, sizeof bx);
+        bx.magic = BANK_MAGIC;
+        bx.format = 44u;
+        bx.used = 1u << 2;
+        for (i = 0; i < NPLAY; i++)
+            for (k = 0; k < NP44; k++)
+                bx.scene[i][k] = o.par[k];
+        memcpy(store[BANKX_OBJ[0]], &bx, sizeof bx);
+        store_n[BANKX_OBJ[0]] = (int)sizeof bx;
+        check("a format-44 project loads", project_load() == 0 && proj.format == PROJ_FORMAT);
+        for (k = 0; k < NP44; k++)
+            same &= proj.par[k] == o.par[k] && scene_get(0, 2)[k] == o.par[k] && scene_get(1, 6)[k] == o.par[k] &&
+                    scene_get(BANK_D, 2)[k] == o.par[k];
+        check("... every value the same: the sound, A3, B7, D3", same);
+        for (k = P_ST_MIX; k <= P_ST_HOLLOW; k++)
+            same &= proj.par[k] == dr_param_info(k)->def && scene_get(0, 2)[k] == dr_param_info(k)->def &&
+                    scene_get(1, 6)[k] == dr_param_info(k)->def && scene_get(BANK_D, 2)[k] == dr_param_info(k)->def;
+        check("... the strings at their defaults, Mix 0 (off)", same && proj.par[P_ST_MIX] == 0);
+        check("... the player's settings kept", proj.mtime == 61 && proj.bank == 2 && proj.tun_off[2] == -9 &&
+                                                proj.scene_used == 0x005u);
+        check("... and saved as 45, B and D too", project_save() == 0 &&
+                  ((const project_t *)store[OBJ_PROJ])->format == 45u && ((const bank_t *)store[OBJ_BANKB])->format == 45u &&
+                  ((const bank8_t *)store[BANKX_OBJ[0]])->format == 45u);
     }
     {   /* 0.3's eight banks (Evan, 2026-11-07): D, E, F yours, keys 1-8, an object each; the Presets' second bank
          * P9-P16 on keys 1-8, fixed; a new FM-1's C and F empty (nothing copied into them) */

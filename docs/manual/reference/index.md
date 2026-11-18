@@ -14,7 +14,7 @@ intro: What every page, knob and key does, in the order of the buttons
 <li><a href="partner.md"><img class="ic" src="../../../web/manual/icons/music-notes-simple.svg" alt="" width="24" height="24"><b>Partner and Pitch moves</b><br><span>SEQ: partners, Shift, glide, Wander</span></a></li>
 <li><a href="lfo-pages.md"><img class="ic" src="../../../web/manual/icons/intersect.svg" alt="" width="24" height="24"><b>LFO sends and Mods</b><br><span>LFO: where the LFO goes, what else it moves</span></a></li>
 <li><a href="swell.md"><img class="ic" src="../../../web/manual/icons/pulse.svg" alt="" width="24" height="24"><b>Swell</b><br><span>ARP: both drones breathing in time</span></a></li>
-<li><a href="space.md"><img class="ic" src="../../../web/manual/icons/broadcast.svg" alt="" width="24" height="24"><b>Space and Details</b><br><span>FX: the delay, the drive, the reverb</span></a></li>
+<li><a href="space.md"><img class="ic" src="../../../web/manual/icons/broadcast.svg" alt="" width="24" height="24"><b>Space and Details</b><br><span>FX: the delay, the drive, the reverb, the strings</span></a></li>
 <li><a href="setup.md"><img class="ic" src="../../../web/manual/icons/gear-six.svg" alt="" width="24" height="24"><b>Setup</b><br><span>GLO: the room's settings, the Tuning</span></a></li>
 <li><a href="lfo.md"><img class="ic" src="../../../web/manual/icons/wave-sine.svg" alt="" width="24" height="24"><b>LFO</b><br><span>the rate, the waves, Movement</span></a></li>
 <li><a href="scenes.md"><img class="ic" src="../../../web/manual/icons/floppy-disk.svg" alt="" width="24" height="24"><b>Scenes and banks</b><br><span>the white keys</span></a></li>

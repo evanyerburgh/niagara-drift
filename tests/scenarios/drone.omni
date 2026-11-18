@@ -14,9 +14,9 @@ expect par74 0
 # depth 17, filter LFO to 18, noise 19, colour 20), drone II the same +21; then 42 cross-mod, 43 its amount,
 # 44 hard sync, 45 pitch link, 46 link offset, 47 LFO rate, 48 Wave I, 49 Wave II, 50 Glide, 51 Fade, 55 Pulse,
 # 56 its rate, 60 delay time, 61 repeats, 62 delay mix, 63 reverb mix, 64 reverb type, 65 delay LFO tap, 66 its
-# depth; 108, 109 each drone's sub wave; 110 the Tuning.
+# depth; 108, 109 each drone's sub wave; 110 the Tuning; 111 Sync; 112-116 the strings (Mix, Chord, Tone, Length, Hollow).
 # Pages: 0 Drones 1 Pitch 2 Life 3 Tone 4 Osc 5 Sub · Drive 6 LFO sends 7 Mods 8 Partner 9 Pitch moves
-# 10 Setup 1 11 Setup 2 12 Swell 13 Space 14 Details. "page V" goes to page V at once, in no time: since v0.3 moved
+# 10 Setup 1 11 Setup 2 12 Swell 13 Space 14 Details 15 Strings. "page V" goes to page V at once, in no time: since v0.3 moved
 # the knobs, the script turns each on its new page and comes back, its timing (and its sound) as before.
 # a new FM-1 plays the Presets; these scenes go in bank 1 (SEL + G4)
 expect bank 3

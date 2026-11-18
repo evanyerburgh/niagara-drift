@@ -18,7 +18,7 @@ AIで翻訳したページです。英語版：[Reference](../../reference/index
 <li><a href="partner.md"><img class="ic" src="../../../../web/manual/icons/music-notes-simple.svg" alt="" width="24" height="24"><b>PartnerとPitch moves</b><br><span>SEQ：パートナー、Shift、グライド、Wander</span></a></li>
 <li><a href="lfo-pages.md"><img class="ic" src="../../../../web/manual/icons/intersect.svg" alt="" width="24" height="24"><b>LFO sendsとMods</b><br><span>LFO：LFOの行き先、ほかに動かすもの</span></a></li>
 <li><a href="swell.md"><img class="ic" src="../../../../web/manual/icons/pulse.svg" alt="" width="24" height="24"><b>Swell</b><br><span>ARP：両方のドローンがそろって呼吸する</span></a></li>
-<li><a href="space.md"><img class="ic" src="../../../../web/manual/icons/broadcast.svg" alt="" width="24" height="24"><b>SpaceとDetails</b><br><span>FX：ディレイ、ドライブ、リバーブ</span></a></li>
+<li><a href="space.md"><img class="ic" src="../../../../web/manual/icons/broadcast.svg" alt="" width="24" height="24"><b>SpaceとDetails</b><br><span>FX：ディレイ、ドライブ、リバーブ、弦</span></a></li>
 <li><a href="setup.md"><img class="ic" src="../../../../web/manual/icons/gear-six.svg" alt="" width="24" height="24"><b>Setup</b><br><span>GLO：演奏環境の設定、Tuning</span></a></li>
 <li><a href="lfo.md"><img class="ic" src="../../../../web/manual/icons/wave-sine.svg" alt="" width="24" height="24"><b>LFO</b><br><span>レート、波形、Movement</span></a></li>
 <li><a href="scenes.md"><img class="ic" src="../../../../web/manual/icons/floppy-disk.svg" alt="" width="24" height="24"><b>シーンとバンク</b><br><span>白鍵</span></a></li>

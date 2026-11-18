@@ -150,6 +150,9 @@ checked by a native speaker: corrections welcome.
 | send (LFO) | センド | ピッチ・センド, カットオフ・センド |
 | runaway (echoes) | 暴走 | the screen's "runaway" stays |
 | tail (reverb) | 残響 | |
+| the strings (FX's third page) | 弦 | |
+| sympathetic strings | 共鳴弦 | |
+| nut (of a string) | ナット | |
 | the pictures (a page's drawing) | 画面の絵 | Good to know's "The pictures" |
 | stepped figure | ステップするフレーズ | |
 | growl, snarl (the sound) | グロウル | うなり is only for beating |

@@ -2095,6 +2095,54 @@ static void lk_pic_reverb(void)
     cv_text(233 - text_w(&LK_F_SMALL, "40 s"), 2, &LK_F_SMALL, "40 s", LK_LABEL);   /* on the name's line */
 }
 
+/* THE STRINGS' picture (the board 486:2, 2026-11-18): eight strings from a nut, each in its own lane (fixed, so a turn of
+ * Chord never swaps them), its length its pitch (an octave under drone I the longest, two over the shortest), its
+ * shape read from its own line in the engine (the wave in the line over one cycle, pinned at the nut and the bridge),
+ * as large as the strings are heard; off (Mix 0), or on an FM-1 that can't run them, still gray lines */
+#define LK_ST_X0 15                          /* the strings' left end (the board's 30) */
+#define LK_ST_LMAX 212.0f                    /* the longest string, an octave under drone I (424) */
+static const uint8_t LK_ST_LANE[DR_ST_N] = {4, 0, 2, 6, 7, 5, 1, 3};   /* each string's lane, from the bottom */
+static void lk_pic_strings(void)
+{
+    static float gs = 1.0f;                  /* the shapes' scale: the loudest line lately */
+    const float heard = dr_st_heard(), m = fm_minf(1.0f, fm_sqrtf(heard) * 0.7f);   /* ~ Mix / 100 */
+    const float lit = fm_minf(1.0f, 3.0f * m), amp = 5.0f * fm_sqrtf(m);
+    float semi[DR_ST_N], pk = 0.0f;
+    int16_t y[DR_ST_N][108];
+    int np[DR_ST_N], i, j;
+    dr_st_semis(semi);
+    cv_rect(12, 4, 1, 96, LK_RULE);          /* the nut */
+    for (i = 0; i < DR_ST_N; i++) {          /* the shapes, then their scale */
+        const float n = fm_clampf(semi[i], -12.0f, 24.0f), len = LK_ST_LMAX * fm_exp2f(-(n + 12.0f) * (1.0f / 12.0f));
+        uint32_t w;
+        float cyc;
+        const int16_t *ln = dr_st_line(i, &w, &cyc);
+        np[i] = (int)(len * 0.5f) + 1;
+        for (j = 0; j < np[i]; j++) {
+            const float u = (float)(2 * j) / len;
+            const float v = (float)ln[(w + 1u + (uint32_t)(u * cyc)) & (DR_ST_LINE - 1u)] * fm_sinf(FM_PI * u);
+            y[i][j] = (int16_t)fm_clampf(v, -32767.0f, 32767.0f);
+            pk = fm_maxf(pk, fm_fabsf(v));
+        }
+    }
+    gs = fm_maxf(fm_maxf(pk, gs * 0.97f), 256.0f);
+    for (i = 0; i < DR_ST_N; i++) {
+        const int32_t cy = 94 - 12 * LK_ST_LANE[i], xe = LK_ST_X0 + 2 * (np[i] - 1);
+        const float t = fm_clampf((fm_clampf(semi[i], -12.0f, 24.0f) + 12.0f) * (1.0f / 36.0f), 0.0f, 1.0f);
+        const uint32_t hue = (uint32_t)(120.0f + 81.0f * t) << 16 | (uint32_t)(173.0f + 73.0f * t) << 8 | 255u;
+        const uint16_t c = lk_mix(0x5A566Bu, hue, lit);
+        if (heard <= 0.0f) {                 /* still */
+            cv_rect(LK_ST_X0, cy, xe - LK_ST_X0, 1, LK_UNLIT);
+            cv_rect(xe, cy - 3, 1, 6, LK_UNLIT);
+            continue;
+        }
+        for (j = 0; j < np[i]; j++)
+            y[i][j] = (int16_t)(cy - (int32_t)fm_floorf((float)y[i][j] / gs * amp + 0.5f));
+        lk_plot(LK_ST_X0, y[i], np[i], c);
+        cv_rect(xe, cy - 3, 1, 6, c);        /* the bridge */
+    }
+}
+
 static void lk_pic_space(void)
 {
     lk_pic_delay();
@@ -2304,6 +2352,7 @@ static void lk_pic(void)
     case V_SETUP2: lk_pic_setup2(); break;
     case V_FX:
     case V_FX2: lk_pic_space(); break;
+    case V_STRINGS: lk_pic_strings(); break;
     default: lk_pic_drones2(); break;
     }
     if (ui.view == V_FX2 && !msg) {            /* Details' second jobs, on the rule above Time and Type: the delay's
@@ -2318,6 +2367,14 @@ static void lk_pic(void)
                 dr_param_text(ps, proj.par[ps], t);
             lk_sel_tag(c, t, held);
         }
+    }
+    if (ui.view == V_STRINGS && !msg) {        /* Strings: Hollow over Tone, named (a number alone says nothing) */
+        char t[16] = "hollow ";
+        if (ui.btn >> B_SEL & 1u)
+            scopy(t, "tone");
+        else
+            itoa_u((uint32_t)proj.par[P_ST_HOLLOW], t + 7);
+        lk_sel_tag(2, t, (int)(ui.btn >> B_SEL & 1u));
     }
     if (msg)
         lk_banner();
@@ -2523,6 +2580,8 @@ static void lk_text(int p, int v, char *t)
 /* a knob that does nothing heard just now, and why: Width (the pulse width) without a square in the wave */
 static const char *lk_unheard(int p)
 {
+    if (p >= P_ST_CHORD && p <= P_ST_HOLLOW && !proj.par[P_ST_MIX])   /* the strings off: their settings gray */
+        return "Mix 0";
     if (p < P_XMOD && p % GP_N == GP_WIDTH && gpar(p / GP_N, GP_WAVE) < 70)
         return "needs sqr";
     if (p < P_XMOD && p % GP_N == GP_DETUNE && !gpar(p / GP_N, GP_PARTNER))   /* its partner off (Evan, 2026-11-08) */
@@ -2745,7 +2804,8 @@ static void lk_values(void)
                             (uint32_t)gpar(VIEW_KNOB[ui.view][i].g, GP_OLFO_DEST) << 8 |
                             (uint32_t)gpar(VIEW_KNOB[ui.view][i].g, GP_FLFO_DEST) << 9);
     }
-    h = hash(h, (uint32_t)clk.shown | (uint32_t)clk.following << 12 | (uint32_t)(dr_ext_spb > 0.0f) << 13);   /* Sync */
+    h = hash(h, (uint32_t)clk.shown | (uint32_t)clk.following << 12 | (uint32_t)(dr_ext_spb > 0.0f) << 13 |
+                    (uint32_t)dr_st_avail << 14);   /* Sync; the strings' core */
     h = hash(h, (uint32_t)proj.par[P_MOVE] | (uint32_t)proj.par[P_XMOD] << 8 | (uint32_t)proj.par[P_LFO_RMOD_SRC] << 12 |
                     (uint32_t)proj.par[P_LFO_W1] << 16 | (uint32_t)proj.par[P_LFO_W2] << 20);
     if (h == ui.sig[2])
@@ -2776,6 +2836,12 @@ static void lk_values(void)
         }
         lo = dr_param_info(p)->lo;
         hi = dr_param_info(p)->hi;
+        if (ui.view == V_STRINGS && !dr_st_avail) {   /* an FM-1 that can't run them: the names, gray, and a line */
+            name = second ? sel_job_name(p) : card_name(p);
+            fn = lk_name_font(name);
+            text_c(cx, 7 + (int32_t)(FONT_T20.h - fn->h) / 2, fn, name, LK_LABEL);
+            continue;
+        }
         if (on) {
             cv_round(x + 1, 4, 54, 81, 5, acc);
             cv_round(x + 2, 5, 52, 79, 4, LK_BG);
@@ -2918,6 +2984,8 @@ static void lk_values(void)
                 lk_dots(cx, 70, frac, g, gp == GP_RESO);
         }
     }
+    if (ui.view == V_STRINGS && !dr_st_avail)  /* (the second core can't run them: Evan, 2026-11-18, "say it on the page") */
+        text_c(120, 42, &FONT_T20, "Not on this FM-1", LK_INK);
     cv_blit(0, LK_VAL_Y);
 }
 

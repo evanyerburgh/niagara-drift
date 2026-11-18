@@ -75,7 +75,7 @@ It isn't a groovebox: the keys don't play melodies, there's no sequencer, and it
 | **Partner** | A second oscillator on each drone: an octave or a fifth or fourth below, unison, a third, fourth or fifth above, an octave, or an octave and a fifth; each tempered or just (pure, beatless); detune up to 30 cents for slow beating |
 | **Sub and noise** | A sub of 4 waves (square, sine, triangle, saw), 1–4 octaves down or the subharmonics ⅓ and ⅕; under a low drone the lowest become ticks and pulses ([recipe](recipes/sounds.md#ticks)); noise from white to pink |
 | **Filter** | A state-variable filter (zero-delay feedback, after Andrew Simper): low-, band- or high-pass, resonant to self-oscillation; an antialiased drive |
-| **Effects** | A delay of 70 ms to 1.45 s in six types, from clean to tape; a drive between the delay and the reverb; a reverb of eight lines, 0.3 to 40 s or a freeze, in five types ([Space and Details](reference/space.md)) |
+| **Effects** | A delay of 70 ms to 1.45 s in six types, from clean to tape; a drive between the delay and the reverb; a reverb of eight lines, 0.3 to 40 s or a freeze, in five types; eight strings ringing with the drones ([Space and Details](reference/space.md)) |
 
 ### Movement and tuning
 
@@ -111,6 +111,7 @@ in the Stylophone CPM DS-2, the Moog Subharmonicon and the Soma Lyra-8, and has 
 | [MONK-1](https://github.com/charlesvestal/fm1-monk) | Charles Vestal | Reading the keys' pressure |
 | [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) | Quixotic7 | The delay and reverb's design; the scene crossfade and backup-before-install ideas |
 | [fm1-base](https://github.com/charlesvestal/fm1-base) | Charles Vestal | The safe restore's flash core (MPL-2.0) |
+| [Rings](https://github.com/pichenettes/eurorack) (Mutable Instruments) | Emilie Gillet | The strings: its sympathetic strings, ported (MIT) |
 | [FM-1 Screen Reader](https://github.com/charlesvestal/fm1-reader) | Charles Vestal | The screen's words over USB and the page that speaks them (its firmware side from fm1-base, MPL-2.0); thanks to João Durães (WoodJack) for asking for it |
 | [Groove OS](https://www.groove-os.com/) | | The idea of running FM-1 firmware in a browser |
 

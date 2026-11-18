@@ -684,7 +684,9 @@ int main(int argc, char **argv)
             run_ms(1);
         } else if (!strcmp(cmd, "savecut")) {      /* savecut 1: a save cuts an audio block, as on the FM-1 */
             save_cut = atoi(a);
-        } else if (!strcmp(cmd, "phones"))         /* phones 1: headphones in (the Speaker cut out) */
+        } else if (!strcmp(cmd, "cpu1"))           /* cpu1 0: an FM-1 whose second core can't run the strings */
+            dr_st_avail = (uint8_t)atoi(a);
+        else if (!strcmp(cmd, "phones"))           /* phones 1: headphones in (the Speaker cut out) */
             phones = atoi(a);
         else if (!strcmp(cmd, "master"))
             master = (uint32_t)atoi(a);

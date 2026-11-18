@@ -15,7 +15,7 @@ teal drone II, lilac the LFO. The black keys are switches (lit = on; on the LFO 
 LFO's routing, and cross-mod lets drone I move drone II's filter, or the drones and their sound bend each other's pitch); white keys 1–8 hold scenes, in
 eight banks you pick with SEL and the gesture keys; keys 9–12 and the top four are gestures. The page buttons' pages, each tap the next: HOME
 Drones, Pitch · ENV Life, Tone · EDIT Osc, Sub · Drive · SEQ Partner, Pitch moves · LFO LFO sends, Mods · ARP Swell ·
-FX Space, Details · GLO Setup 1, 2.*
+FX Space, Details, Strings · GLO Setup 1, 2.*
 
 **Status: 0.3.1.** It runs on the FM-1 and in the browser:
 [try it](https://evanyerburgh.github.io/niagara-drift/) without an FM-1, the same code with sound.
@@ -35,6 +35,8 @@ This manual describes the newest version; its pages are in [docs/manual](docs/ma
   **Stutter** on keys 9–12, as deep as you press. Tap any of them in to stay.
 - **Scenes**: 8 on the white keys in each of six banks (48 of yours), plus the presets' two, recalled gliding over the
   Scene time, or **crossfaded into by pressing the key harder**; a **motion loop** that records your knob moves, gestures and scenes.
+- **Strings**: eight strings ringing in sympathy with the drones, tuned to a chord on drone I (Mutable Instruments
+  Rings' sympathetic strings, on the FM-1's second core), on FX's third page.
 - **It moves on its own**: the LFO, the Swell, **Drift**, **Wander** (drone II's slow random melody on a scale) and
   **Age** (tape wear) keep it breathing without a hand on it.
 - **Two drones**, each a main oscillator that blends sine → triangle → saw → square (X-WAVE), a

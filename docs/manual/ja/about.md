@@ -78,7 +78,7 @@ AIで翻訳したページです。英語版：[About](../about.md)
 | **パートナー** | 各ドローンの2つめのオシレーター：1オクターブ下、5度下か4度下、ユニゾン、3度・4度・5度上、1オクターブ上、1オクターブと5度上。それぞれ平均律か純正（うならない）。ゆっくりしたうなりのために最大30セントのデチューン |
 | **サブとノイズ** | 4つの波形（矩形波、サイン波、三角波、ノコギリ波）のサブ。1–4オクターブ下、またはサブハーモニックの⅓と⅕。低いドローンの下では、いちばん低いものがクリックやパルスになります（[レシピ](recipes/sounds.md#ticks)）。ホワイトからピンクまでのノイズ |
 | **フィルター** | ステート・バリアブル・フィルター（ゼロ・ディレイ・フィードバック、Andrew Simperにもとづく）：ローパス、バンドパス、ハイパス。自己発振するまでのレゾナンス。エイリアシングを抑えたドライブ |
-| **エフェクト** | 70 msから1.45秒のディレイ（クリーンからテープまで6タイプ）。ディレイとリバーブの間にドライブ。8本のラインによるリバーブ（0.3から40秒またはフリーズ、5タイプ）（[SpaceとDetails](reference/space.md)） |
+| **エフェクト** | 70 msから1.45秒のディレイ（クリーンからテープまで6タイプ）。ディレイとリバーブの間にドライブ。8本のラインによるリバーブ（0.3から40秒またはフリーズ、5タイプ）。ドローンと共鳴する8本の弦（[SpaceとDetails](reference/space.md)） |
 
 ### 動きとチューニング {#movement-and-tuning}
 
@@ -114,6 +114,7 @@ DS-2、Moog Subharmonicon、Soma Lyra-8のアイデアから始まり、独自�
 | [MONK-1](https://github.com/charlesvestal/fm1-monk) | Charles Vestal | 鍵盤の押す強さの読み取り |
 | [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) | Quixotic7 | ディレイとリバーブの設計。シーンのクロスフェードと、インストール前のバックアップのアイデア |
 | [fm1-base](https://github.com/charlesvestal/fm1-base) | Charles Vestal | 安全な復元のフラッシュのコア（MPL-2.0） |
+| [Rings](https://github.com/pichenettes/eurorack)（Mutable Instruments） | Emilie Gillet | 弦：共鳴弦（sympathetic strings）を移植（MIT） |
 | [FM-1 Screen Reader](https://github.com/charlesvestal/fm1-reader) | Charles Vestal | USBで送る画面の言葉と、それを読み上げるページ（ファームウェア側はfm1-baseから、MPL-2.0）。求めてくれたJoão Durães（WoodJack）に感謝 |
 | [Groove OS](https://www.groove-os.com/) | | FM-1のファームウェアをブラウザーで動かすアイデア |
 

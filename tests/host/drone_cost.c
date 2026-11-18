@@ -128,6 +128,8 @@ static const char *const names[] = {
     "the same, Cross-mod on pitch (cross-FM)",
     "the same, Cross-mod on the output (Snarl)",
     "the same, the reverb Shimmer (v0.3)",
+    "worst case + the strings (0.4; here the job runs in place)",
+    "the strings, the drones stopped (the job alone, ringing on)",
 };
 #define NCASES ((int)(sizeof names / sizeof names[0]))
 
@@ -143,12 +145,17 @@ static void setup(int c)
     case 6: drone(1, 2, 2); dr_set(P_XMOD, DR_XMOD_FM); break;   /* cross-FM (v0.3) */
     case 7: drone(1, 2, 2); dr_set(P_XMOD, DR_XMOD_OUT); break;  /* Snarl (v0.3) */
     case 8: drone(1, 2, 2); dr_set(P_REV_TYPE, 4); break;         /* Shimmer: the octave in the reverb's loop */
+    case 9: drone(1, 2, 2); dr_set(P_ST_MIX, 70); break;           /* the strings: on the FM-1 the second core's job */
+    case 10: drone(1, 2, 0); dr_set(P_ST_MIX, 70); dr_play(0); break;   /* ... ringing on silence (denormals) */
     }
 }
 
 /* the limit: the engine's worst case under ~40 % of the device, leaving the rest for the delay, the
  * reverb and the UI */
 static double limit(int c) { return c == 4 ? 2350.0 : 0.0; }
+/* THE SECOND CORE's (0.4): the strings' job, its own instructions a sample (case 9 less case 5, which run the same
+ * drones), under ~45 % of the second core (it measured 36 % on the FM-1, 2026-11-16); the rest stays free */
+#define ST_JOB_LIMIT 2650.0
 
 /*   drone_cost N   only case N, for counting under valgrind (Linux has no instruction counter):
  *   valgrind --tool=callgrind --toggle-collect=cost* drone_cost N   counts the 2.5 s cost() renders */
@@ -166,10 +173,17 @@ int main(int argc, char **argv)
         return 0;
     }
     printf("drone cost, host instructions per 44.1 kHz sample (device estimate 1.7 %% per 100):\n");
-    for (c = 0; c < NCASES; c++) {
-        setup(c);
-        ipc = cost(dr_render, &ns);
-        report(names[c], ipc, ns, limit(c));
+    {
+        double worst = 0.0;
+        for (c = 0; c < NCASES; c++) {
+            setup(c);
+            ipc = cost(dr_render, &ns);
+            report(names[c], ipc, ns, limit(c));
+            if (c == 5)
+                worst = ipc;
+            if (c == 9 && ipc > 0.0 && worst > 0.0)   /* the job's own, as the second core runs it */
+                report("  the strings' job alone (the second core's share)", ipc - worst, 0.0, ST_JOB_LIMIT);
+        }
     }
     printf(bad ? "drone cost: OVER LIMIT\n" : "drone cost: ok\n");
     return bad ? 1 : 0;
