@@ -1,7 +1,7 @@
 ---
 title: Scenes and saving
 intro: Keep a sound, move between sounds, and get back to where you were
-description: Recipes for Niagara Drift's 48 scenes: make a preset your own, blend between two sounds by pressure, undo a scene change.
+description: "Recipes for Niagara Drift's 48 scenes: make a preset your own, blend between two sounds by pressure, undo a scene change."
 image: s-blend-0.png
 ---
 

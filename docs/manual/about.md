@@ -16,39 +16,39 @@ It isn't a groovebox: the keys don't play melodies, there's no sequencer, and it
 ### Sound
 
 <ul class="cards">
-<li><img class="ic" src="../../web/manual/icons/waveform.svg" alt=""><b>2 drones</b><span>Virtual-analog: each a wave from sine to square, a partner (a second oscillator) at an interval, a sub and noise, into its own resonant filter and drive</span></li>
-<li><img class="ic" src="../../web/manual/icons/music-notes-simple.svg" alt=""><b>11 tunings</b><span>12-tone and ten microtonal: quarter tones to Harry Partch's 43 notes, La Monte Young's, Lou Harrison's, the shrutis; intervals named in each one's terms</span></li>
-<li><img class="ic" src="../../web/manual/icons/intersect.svg" alt=""><b>FM cross-mod</b><span>FM between the drones: each bending the other's pitch, or the finished sound bending both (Snarl); or drone I moving drone II's filter</span></li>
-<li><img class="ic" src="../../web/manual/icons/arrows-clockwise.svg" alt=""><b>Feedback and Character</b><span>The finished sound fed back into the drones; the oscillators from clean to vintage</span></li>
-<li><img class="ic" src="../../web/manual/icons/broadcast.svg" alt=""><b>6 delays, 5 reverbs</b><span>Clean to tape and self-warping echoes, a drive after them, reverbs from a room to a freeze</span></li>
+<li><img class="ic" src="../../web/manual/icons/waveform.svg" alt="" width="24" height="24"><b>2 drones</b><br><span>Virtual-analog: each a wave from sine to square, a partner (a second oscillator) at an interval, a sub and noise, into its own resonant filter and drive</span></li>
+<li><img class="ic" src="../../web/manual/icons/music-notes-simple.svg" alt="" width="24" height="24"><b>11 tunings</b><br><span>12-tone and ten microtonal: quarter tones to Harry Partch's 43 notes, La Monte Young's, Lou Harrison's, the shrutis; intervals named in each one's terms</span></li>
+<li><img class="ic" src="../../web/manual/icons/intersect.svg" alt="" width="24" height="24"><b>FM cross-mod</b><br><span>FM between the drones: each bending the other's pitch, or the finished sound bending both (Snarl); or drone I moving drone II's filter</span></li>
+<li><img class="ic" src="../../web/manual/icons/arrows-clockwise.svg" alt="" width="24" height="24"><b>Feedback and Character</b><br><span>The finished sound fed back into the drones; the oscillators from clean to vintage</span></li>
+<li><img class="ic" src="../../web/manual/icons/broadcast.svg" alt="" width="24" height="24"><b>6 delays, 5 reverbs</b><br><span>Clean to tape and self-warping echoes, a drive after them, reverbs from a room to a freeze</span></li>
 </ul>
 
 ### Movement
 
 <ul class="cards">
-<li><img class="ic" src="../../web/manual/icons/wave-sine.svg" alt=""><b>Ultra LFO</b><span>2 waves of 10 shapes each, on each drone's pitch, wave, cutoff or resonance, and the delay</span></li>
-<li><img class="ic" src="../../web/manual/icons/gauge.svg" alt=""><b>Movement</b><span>One knob for every LFO's depth at once, from still to double</span></li>
-<li><img class="ic" src="../../web/manual/icons/pulse.svg" alt=""><b>Swell</b><span>A tremolo on both drones, in time: from a soft swell to a hard gate</span></li>
-<li><img class="ic" src="../../web/manual/icons/shuffle.svg" alt=""><b>Moves on its own</b><span>Drift (slow random modulation), Wander (a random melody on a scale) and Age (tape wear)</span></li>
+<li><img class="ic" src="../../web/manual/icons/wave-sine.svg" alt="" width="24" height="24"><b>Ultra LFO</b><br><span>2 waves of 10 shapes each, on each drone's pitch, wave, cutoff or resonance, and the delay</span></li>
+<li><img class="ic" src="../../web/manual/icons/gauge.svg" alt="" width="24" height="24"><b>Movement</b><br><span>One knob for every LFO's depth at once, from still to double</span></li>
+<li><img class="ic" src="../../web/manual/icons/pulse.svg" alt="" width="24" height="24"><b>Swell</b><br><span>A tremolo on both drones, in time: from a soft swell to a hard gate</span></li>
+<li><img class="ic" src="../../web/manual/icons/shuffle.svg" alt="" width="24" height="24"><b>Moves on its own</b><br><span>Drift (slow random modulation), Wander (a random melody on a scale) and Age (tape wear)</span></li>
 </ul>
 
 ### Playing
 
 <ul class="cards">
-<li><img class="ic" src="../../web/manual/icons/stack.svg" alt=""><b>16 presets</b><span>Each a different side of the instrument, each moving over a minute</span></li>
-<li><img class="ic" src="../../web/manual/icons/hand-pointing.svg" alt=""><b>8 gestures</b><span>Macros: several settings at once on top of your sound, each in its own order; held, pressed harder, or tapped to stay</span></li>
-<li><img class="ic" src="../../web/manual/icons/floppy-disk.svg" alt=""><b>Save 48 sounds</b><span>Six banks of eight scenes, yours to fill; each glides in, or crossfades as you press its key harder</span></li>
-<li><img class="ic" src="../../web/manual/icons/repeat.svg" alt=""><b>Motion loop</b><span>Records your knob moves, gestures and scenes, and plays them back</span></li>
-<li><img class="ic" src="../../web/manual/icons/path.svg" alt=""><b>Never jumps</b><span>Everything glides (morphs): buttons, keys and scenes move to new settings over times you set</span></li>
+<li><img class="ic" src="../../web/manual/icons/stack.svg" alt="" width="24" height="24"><b>16 presets</b><br><span>Each a different side of the instrument, each moving over a minute</span></li>
+<li><img class="ic" src="../../web/manual/icons/hand-pointing.svg" alt="" width="24" height="24"><b>8 gestures</b><br><span>Macros: several settings at once on top of your sound, each in its own order; held, pressed harder, or tapped to stay</span></li>
+<li><img class="ic" src="../../web/manual/icons/floppy-disk.svg" alt="" width="24" height="24"><b>Save 48 sounds</b><br><span>Six banks of eight scenes, yours to fill; each glides in, or crossfades as you press its key harder</span></li>
+<li><img class="ic" src="../../web/manual/icons/repeat.svg" alt="" width="24" height="24"><b>Motion loop</b><br><span>Records your knob moves, gestures and scenes, and plays them back</span></li>
+<li><img class="ic" src="../../web/manual/icons/path.svg" alt="" width="24" height="24"><b>Never jumps</b><br><span>Everything glides (morphs): buttons, keys and scenes move to new settings over times you set</span></li>
 </ul>
 
 ### Connect
 
 <ul class="cards">
-<li><img class="ic" src="../../web/manual/icons/metronome.svg" alt=""><b>MIDI in</b><span>Follows a MIDI clock over USB or TRS: the Swell, the LFO, the delay, Wander and the scenes keep its time; notes on channels 1 and 2 tune the drones</span></li>
-<li><img class="ic" src="../../web/manual/icons/ear.svg" alt=""><b>Hear the screen</b><span>With the FM-1 Screen Reader, it says what its screen shows, for players who can't see it</span></li>
-<li><img class="ic" src="../../web/manual/icons/browser.svg" alt=""><b>Play it in a browser</b><span>The emulator on the front page is the firmware itself, with sound; no FM-1 needed</span></li>
-<li><img class="ic" src="../../web/manual/icons/download-simple.svg" alt=""><b>Install from a browser</b><span>Install, update, back up and go back to M-VAVE's firmware from Chrome or Edge</span></li>
+<li><img class="ic" src="../../web/manual/icons/metronome.svg" alt="" width="24" height="24"><b>MIDI in</b><br><span>Follows a MIDI clock over USB or TRS: the Swell, the LFO, the delay, Wander and the scenes keep its time; notes on channels 1 and 2 tune the drones</span></li>
+<li><img class="ic" src="../../web/manual/icons/ear.svg" alt="" width="24" height="24"><b>Hear the screen</b><br><span>With the FM-1 Screen Reader, it says what its screen shows, for players who can't see it</span></li>
+<li><img class="ic" src="../../web/manual/icons/browser.svg" alt="" width="24" height="24"><b>Play it in a browser</b><br><span>The emulator on the front page is the firmware itself, with sound; no FM-1 needed</span></li>
+<li><img class="ic" src="../../web/manual/icons/download-simple.svg" alt="" width="24" height="24"><b>Install from a browser</b><br><span>Install, update, back up and go back to M-VAVE's firmware from Chrome or Edge</span></li>
 </ul>
 
 ## Videos

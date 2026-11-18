@@ -1,7 +1,7 @@
 ---
 title: Sounds
 intro: Ticks, bells, sync sweeps, warbling echoes, a frozen chord
-description: Recipes for sounds on Niagara Drift: ticks, a singing filter, hard sync, metallic cross-FM bells, stepped figures, warbling echoes, a frozen chord.
+description: "Recipes for sounds on Niagara Drift: ticks, a singing filter, hard sync, metallic cross-FM bells, stepped figures, warbling echoes, a frozen chord."
 image: ticks-1.png
 ---
 

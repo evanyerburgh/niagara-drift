@@ -1,6 +1,6 @@
 ---
 title: LFO sends and Mods
-intro: LFO: where the LFO goes, and what else it moves
+intro: "LFO: where the LFO goes, and what else it moves"
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->

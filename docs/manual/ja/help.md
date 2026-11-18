@@ -13,12 +13,12 @@ AIで翻訳したページです。英語版：[Help](../help.md)
 起きていることを選んでください。
 
 <ul class="doors">
-<li><a href="#installing-and-updating"><img class="ic" src="../../../web/manual/icons/download-simple.svg" alt=""><small>入手する</small><b>インストールとアップデート</b><span>Webインストーラー、ケーブル、サウンドを残す</span></a></li>
-<li><a href="#an-install-doesn-t-take"><img class="ic" src="../../../web/manual/icons/lifebuoy.svg" alt=""><small>困ったとき</small><b>インストールが通らない</b><span>何も変わらない、エラー、FM-1が起動しない</span></a></li>
-<li><a href="#sound-and-playing"><img class="ic" src="../../../web/manual/icons/speaker-high.svg" alt=""><small>演奏中に</small><b>音がおかしい</b><span>ドローンが鳴らない、音が飛ぶ、値がグレー、低音が出ない</span></a></li>
-<li><a href="#backups"><img class="ic" src="../../../web/manual/icons/floppy-disk.svg" alt=""><small>あなたのサウンド</small><b>バックアップ</b><span>サウンドとシーンの保存と復元</span></a></li>
-<li><a href="#going-back-or-to-another-firmware"><img class="ic" src="../../../web/manual/icons/arrows-left-right.svg" alt=""><small>やめるとき</small><b>元に戻す</b><span>M-VAVEのファームウェアへ、または別のファームウェアへ</span></a></li>
-<li><a href="#send-feedback"><img class="ic" src="../../../web/manual/icons/flag.svg" alt=""><small>アイデア、ご意見、不具合</small><b>フィードバック</b><span>ほしい機能、感想、うまくいかなかったこと</span></a></li>
+<li><a href="#installing-and-updating"><img class="ic" src="../../../web/manual/icons/download-simple.svg" alt="" width="24" height="24"><small>入手する</small><br><b>インストールとアップデート</b><br><span>Webインストーラー、ケーブル、サウンドを残す</span></a></li>
+<li><a href="#an-install-doesn-t-take"><img class="ic" src="../../../web/manual/icons/lifebuoy.svg" alt="" width="24" height="24"><small>困ったとき</small><br><b>インストールが通らない</b><br><span>何も変わらない、エラー、FM-1が起動しない</span></a></li>
+<li><a href="#sound-and-playing"><img class="ic" src="../../../web/manual/icons/speaker-high.svg" alt="" width="24" height="24"><small>演奏中に</small><br><b>音がおかしい</b><br><span>ドローンが鳴らない、音が飛ぶ、値がグレー、低音が出ない</span></a></li>
+<li><a href="#backups"><img class="ic" src="../../../web/manual/icons/floppy-disk.svg" alt="" width="24" height="24"><small>あなたのサウンド</small><br><b>バックアップ</b><br><span>サウンドとシーンの保存と復元</span></a></li>
+<li><a href="#going-back-or-to-another-firmware"><img class="ic" src="../../../web/manual/icons/arrows-left-right.svg" alt="" width="24" height="24"><small>やめるとき</small><br><b>元に戻す</b><br><span>M-VAVEのファームウェアへ、または別のファームウェアへ</span></a></li>
+<li><a href="#send-feedback"><img class="ic" src="../../../web/manual/icons/flag.svg" alt="" width="24" height="24"><small>アイデア、ご意見、不具合</small><br><b>フィードバック</b><br><span>ほしい機能、感想、うまくいかなかったこと</span></a></li>
 </ul>
 
 ## インストールとアップデート {#installing-and-updating}

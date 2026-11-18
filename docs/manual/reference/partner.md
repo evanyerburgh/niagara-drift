@@ -1,6 +1,6 @@
 ---
 title: Partner and Pitch moves
-intro: SEQ: each drone's partner; Shift, glide and Wander
+intro: "SEQ: each drone's partner; Shift, glide and Wander"
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->

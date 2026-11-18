@@ -19,39 +19,39 @@ AIで翻訳したページです。英語版：[About](../about.md)
 ### サウンド {#sound}
 
 <ul class="cards">
-<li><img class="ic" src="../../../web/manual/icons/waveform.svg" alt=""><b>2つのドローン</b><span>バーチャル・アナログ：サイン波から矩形波までの波形、ある音程に置いたパートナー（2つめのオシレーター）、サブ、ノイズを、それぞれ自分のレゾナントなフィルターとドライブへ</span></li>
-<li><img class="ic" src="../../../web/manual/icons/music-notes-simple.svg" alt=""><b>11種類のTuning</b><span>12音と、10のマイクロトーナルなTuning：4分音からHarry Partchの43音まで、La Monte Young、Lou Harrison、シュルティ。音程はそれぞれの書き方で名前が付きます</span></li>
-<li><img class="ic" src="../../../web/manual/icons/intersect.svg" alt=""><b>FMクロス・モジュレーション</b><span>ドローンの間のFM：互いのピッチを曲げる、または最終的な音が両方を曲げる（Snarl）。またはドローン Iがドローン IIのフィルターを動かす</span></li>
-<li><img class="ic" src="../../../web/manual/icons/arrows-clockwise.svg" alt=""><b>FeedbackとCharacter</b><span>最終的な音をドローンに戻す。オシレーターをクリーンからビンテージへ</span></li>
-<li><img class="ic" src="../../../web/manual/icons/broadcast.svg" alt=""><b>6種類のディレイ、5種類のリバーブ</b><span>クリーンからテープ、自分で揺らぐエコーまで。その後にドライブ。ルームからフリーズまでのリバーブ</span></li>
+<li><img class="ic" src="../../../web/manual/icons/waveform.svg" alt="" width="24" height="24"><b>2つのドローン</b><br><span>バーチャル・アナログ：サイン波から矩形波までの波形、ある音程に置いたパートナー（2つめのオシレーター）、サブ、ノイズを、それぞれ自分のレゾナントなフィルターとドライブへ</span></li>
+<li><img class="ic" src="../../../web/manual/icons/music-notes-simple.svg" alt="" width="24" height="24"><b>11種類のTuning</b><br><span>12音と、10のマイクロトーナルなTuning：4分音からHarry Partchの43音まで、La Monte Young、Lou Harrison、シュルティ。音程はそれぞれの書き方で名前が付きます</span></li>
+<li><img class="ic" src="../../../web/manual/icons/intersect.svg" alt="" width="24" height="24"><b>FMクロス・モジュレーション</b><br><span>ドローンの間のFM：互いのピッチを曲げる、または最終的な音が両方を曲げる（Snarl）。またはドローン Iがドローン IIのフィルターを動かす</span></li>
+<li><img class="ic" src="../../../web/manual/icons/arrows-clockwise.svg" alt="" width="24" height="24"><b>FeedbackとCharacter</b><br><span>最終的な音をドローンに戻す。オシレーターをクリーンからビンテージへ</span></li>
+<li><img class="ic" src="../../../web/manual/icons/broadcast.svg" alt="" width="24" height="24"><b>6種類のディレイ、5種類のリバーブ</b><br><span>クリーンからテープ、自分で揺らぐエコーまで。その後にドライブ。ルームからフリーズまでのリバーブ</span></li>
 </ul>
 
 ### 動き {#movement}
 
 <ul class="cards">
-<li><img class="ic" src="../../../web/manual/icons/wave-sine.svg" alt=""><b>Ultra LFO</b><span>それぞれ10の波形を持つ2つの波を、各ドローンのピッチ、波形、カットオフ、レゾナンス、そしてディレイへ</span></li>
-<li><img class="ic" src="../../../web/manual/icons/gauge.svg" alt=""><b>Movement</b><span>1つのノブで、すべてのLFOの深さを一度に。止まった状態から2倍まで</span></li>
-<li><img class="ic" src="../../../web/manual/icons/pulse.svg" alt=""><b>Swell</b><span>両方のドローンにかかる、テンポに合ったトレモロ：やわらかなふくらみから硬いゲートまで</span></li>
-<li><img class="ic" src="../../../web/manual/icons/shuffle.svg" alt=""><b>ひとりでに動く</b><span>Drift（ゆっくりしたランダムなモジュレーション）、Wander（スケールに沿ったランダムなメロディー）、Age（テープの劣化）</span></li>
+<li><img class="ic" src="../../../web/manual/icons/wave-sine.svg" alt="" width="24" height="24"><b>Ultra LFO</b><br><span>それぞれ10の波形を持つ2つの波を、各ドローンのピッチ、波形、カットオフ、レゾナンス、そしてディレイへ</span></li>
+<li><img class="ic" src="../../../web/manual/icons/gauge.svg" alt="" width="24" height="24"><b>Movement</b><br><span>1つのノブで、すべてのLFOの深さを一度に。止まった状態から2倍まで</span></li>
+<li><img class="ic" src="../../../web/manual/icons/pulse.svg" alt="" width="24" height="24"><b>Swell</b><br><span>両方のドローンにかかる、テンポに合ったトレモロ：やわらかなふくらみから硬いゲートまで</span></li>
+<li><img class="ic" src="../../../web/manual/icons/shuffle.svg" alt="" width="24" height="24"><b>ひとりでに動く</b><br><span>Drift（ゆっくりしたランダムなモジュレーション）、Wander（スケールに沿ったランダムなメロディー）、Age（テープの劣化）</span></li>
 </ul>
 
 ### 演奏 {#playing}
 
 <ul class="cards">
-<li><img class="ic" src="../../../web/manual/icons/stack.svg" alt=""><b>16種類のプリセット</b><span>それぞれが楽器の違う一面を見せ、1分かけて変わっていきます</span></li>
-<li><img class="ic" src="../../../web/manual/icons/hand-pointing.svg" alt=""><b>8つのジェスチャー</b><span>マクロ：いくつもの設定を、サウンドの上で、それぞれの順番で一度に。長押し、強く押す、タップで残す</span></li>
-<li><img class="ic" src="../../../web/manual/icons/floppy-disk.svg" alt=""><b>48のサウンドを保存</b><span>8つのシーンが入る6つのバンクを、自由に使えます。それぞれなめらかに入ってくるか、キーを強く押すにつれてクロスフェードします</span></li>
-<li><img class="ic" src="../../../web/manual/icons/repeat.svg" alt=""><b>モーション・ループ</b><span>ノブの動き、ジェスチャー、シーンを記録し、再生します</span></li>
-<li><img class="ic" src="../../../web/manual/icons/path.svg" alt=""><b>急に変わらない</b><span>すべてがなめらかに移ります（モーフ）：ボタン、キー、シーンが、設定した時間をかけて新しい設定へ動きます</span></li>
+<li><img class="ic" src="../../../web/manual/icons/stack.svg" alt="" width="24" height="24"><b>16種類のプリセット</b><br><span>それぞれが楽器の違う一面を見せ、1分かけて変わっていきます</span></li>
+<li><img class="ic" src="../../../web/manual/icons/hand-pointing.svg" alt="" width="24" height="24"><b>8つのジェスチャー</b><br><span>マクロ：いくつもの設定を、サウンドの上で、それぞれの順番で一度に。長押し、強く押す、タップで残す</span></li>
+<li><img class="ic" src="../../../web/manual/icons/floppy-disk.svg" alt="" width="24" height="24"><b>48のサウンドを保存</b><br><span>8つのシーンが入る6つのバンクを、自由に使えます。それぞれなめらかに入ってくるか、キーを強く押すにつれてクロスフェードします</span></li>
+<li><img class="ic" src="../../../web/manual/icons/repeat.svg" alt="" width="24" height="24"><b>モーション・ループ</b><br><span>ノブの動き、ジェスチャー、シーンを記録し、再生します</span></li>
+<li><img class="ic" src="../../../web/manual/icons/path.svg" alt="" width="24" height="24"><b>急に変わらない</b><br><span>すべてがなめらかに移ります（モーフ）：ボタン、キー、シーンが、設定した時間をかけて新しい設定へ動きます</span></li>
 </ul>
 
 ### つなぐ {#connect}
 
 <ul class="cards">
-<li><img class="ic" src="../../../web/manual/icons/metronome.svg" alt=""><b>MIDIイン</b><span>USBまたはTRSでMIDIクロックに従います。Swell、LFO、ディレイ、Wander、シーンがそのテンポに合います。チャンネル1と2のノートでドローンをチューニング</span></li>
-<li><img class="ic" src="../../../web/manual/icons/ear.svg" alt=""><b>画面を聴く</b><span>FM-1 Screen Readerで、画面が見えないプレイヤーのために、画面の内容を読み上げます</span></li>
-<li><img class="ic" src="../../../web/manual/icons/browser.svg" alt=""><b>ブラウザーで弾く</b><span>トップ・ページのエミュレーターはファームウェアそのもので、音も出ます。FM-1はいりません</span></li>
-<li><img class="ic" src="../../../web/manual/icons/download-simple.svg" alt=""><b>ブラウザーからインストール</b><span>ChromeかEdgeから、インストール、アップデート、バックアップ、M-VAVEのファームウェアへ戻す</span></li>
+<li><img class="ic" src="../../../web/manual/icons/metronome.svg" alt="" width="24" height="24"><b>MIDIイン</b><br><span>USBまたはTRSでMIDIクロックに従います。Swell、LFO、ディレイ、Wander、シーンがそのテンポに合います。チャンネル1と2のノートでドローンをチューニング</span></li>
+<li><img class="ic" src="../../../web/manual/icons/ear.svg" alt="" width="24" height="24"><b>画面を聴く</b><br><span>FM-1 Screen Readerで、画面が見えないプレイヤーのために、画面の内容を読み上げます</span></li>
+<li><img class="ic" src="../../../web/manual/icons/browser.svg" alt="" width="24" height="24"><b>ブラウザーで弾く</b><br><span>トップ・ページのエミュレーターはファームウェアそのもので、音も出ます。FM-1はいりません</span></li>
+<li><img class="ic" src="../../../web/manual/icons/download-simple.svg" alt="" width="24" height="24"><b>ブラウザーからインストール</b><br><span>ChromeかEdgeから、インストール、アップデート、バックアップ、M-VAVEのファームウェアへ戻す</span></li>
 </ul>
 
 ## 動画 {#videos}

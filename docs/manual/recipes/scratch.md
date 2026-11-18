@@ -3,7 +3,7 @@ title: Build a sound from scratch
 tab: From scratch
 intro: One drone with everything off, then a control at a time
 kicker: Tutorial
-description: A Niagara Drift tutorial: start from one plain drone (P16 Bare) and build a sound up yourself, a control at a time.
+description: "A Niagara Drift tutorial: start from one plain drone (P16 Bare) and build a sound up yourself, a control at a time."
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->

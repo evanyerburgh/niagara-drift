@@ -1,6 +1,6 @@
 ---
 title: Scenes and banks
-intro: The white keys: your sounds, gliding or crossfaded in by pressure
+intro: "The white keys: your sounds, gliding or crossfaded in by pressure"
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->

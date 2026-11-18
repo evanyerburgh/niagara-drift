@@ -1,6 +1,6 @@
 ---
 title: Swell
-intro: ARP: both drones breathing in time
+intro: "ARP: both drones breathing in time"
 ---
 
 <!-- SPDX-License-Identifier: GPL-3.0-only -->

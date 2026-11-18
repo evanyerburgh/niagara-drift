@@ -19,6 +19,7 @@ for Good to know, its pictures, and **Listen** (`NAME`) with its times (- 0:03 w
 import functools
 import hashlib
 import html
+import json
 import math
 import re
 import shutil
@@ -273,7 +274,10 @@ def front(text):
     if m:
         for ln in m.group(1).split("\n"):
             k, _, v = ln.partition(":")
-            meta[k.strip()] = v.strip()
+            v = v.strip()
+            if not v.startswith('"') and (": " in v or v.endswith(":")):   # GitHub reads it as YAML: an error atop the page
+                sys.exit(f"front matter: put the value in double quotes ({ln.strip()!r})")
+            meta[k.strip()] = json.loads(v) if v.startswith('"') else v
         text = text[m.end():]
     return meta, text
 
@@ -559,12 +563,13 @@ def page_rel(md, root=MAN):
 
 
 def icons(body):
-    """<img class="ic" src="…/icons/NAME.svg" alt=""> (it shows on GitHub too) as the icon's own SVG, in the text's color
-    (Phosphor's light weight, MIT, web/manual/icons)."""
+    """<img class="ic" src="…/icons/NAME.svg" alt=""> (it shows on GitHub too, 24 px) as the icon's own SVG, in the text's
+    color (Phosphor's light weight, MIT, web/manual/icons); a card's <br>s, for GitHub, taken out (the site's CSS sets it out)."""
     def svg(m):
         s = (WEB / "icons" / f"{m.group(1)}.svg").read_text(encoding="utf-8").strip()
         return s.replace("<svg ", '<svg class="ic" aria-hidden="true" focusable="false" ', 1)
-    return re.sub(r'<img class="ic" src="[^"]*icons/([\w-]+)\.svg" alt="">', svg, body)
+    body = re.sub(r"</small><br><b>|</b><br><span>", lambda m: m.group(0).replace("<br>", ""), body)   # GitHub's breaks
+    return re.sub(r'<img class="ic" src="[^"]*icons/([\w-]+)\.svg" alt=""(?: width="24" height="24")?>', svg, body)
 
 
 def unique_ids(body):
