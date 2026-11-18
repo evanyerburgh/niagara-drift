@@ -619,11 +619,13 @@ static DR_RAM_CODE void fx_run(float *l, float *r, uint32_t n)
     const float damt = depth_amt(par[P_DLY_LFO_DEPTH]) * 0.25f * pfs[P_MOVE] * 0.02f;   /* x the MOVEMENT */
     const dly_type_t *dt = &DLY_TYPE[(unsigned)par[P_DLY_TYPE] < DT_NTYPES ? par[P_DLY_TYPE] : DT_TAPE];
     const float ease = fm_minf((float)n * (1.0f / (0.25f * DR_SR)), 1.0f);   /* a type's glide: ~0.25 s */
-    static float sl[BLK], sr[BLK];       /* the reverb's send (mono, in sl) and its wet, a block */
-    static float in_m[BLK], wet_m[BLK];  /* the drones into the delay, and its echoes, mono (the routes' sends) */
+    /* the reverb's send (mono, in sl) and its wet, a block; the drones into the delay, and its echoes, mono (the
+     * routes' sends): in the drones' scratch, unused by now (each written before it's read, in the drones and here:
+     * 4 KB of RAM for the strings, the same samples) */
+    float *const sl = snq, *const sr = sfr, *const in_m = pgain, *const wet_m = xbuf;
     const int route = (unsigned)par[P_DLY_ROUTE] < DR_NROUTE ? par[P_DLY_ROUTE] : 0;
     float rw0[DR_NROUTE], drw[DR_NROUTE];
-    float pgain;
+    float dgain;
     int mono = 0;
     uint32_t j;
     if (!rv.ready)
@@ -646,7 +648,7 @@ static DR_RAM_CODE void fx_run(float *l, float *r, uint32_t n)
     dly_c.out += (dt->out - dly_c.out) * ease;
     dly_c.ping += (dt->ping - dly_c.ping) * ease;
     dly_c.gain += (dt->gain - dly_c.gain) * ease;
-    pgain = dly_c.gain;
+    dgain = dly_c.gain;
     if (pa->spread >= 1.0f && pa->ping <= 0.0f && dly_xf >= 1.0f && dly_c.ping < 0.0005f) {
         dly_c.ping = 0.0f;               /* settled on a mono type */
         mono = 1;
@@ -752,9 +754,9 @@ static DR_RAM_CODE void fx_run(float *l, float *r, uint32_t n)
                 dly_odd = 0;
             }
         }
-        wet_m[j] = (dly_olp[0] + dly_olp[1]) * 0.5f * wet1 * pgain;
-        l[j] = l[j] * dry1 + dly_olp[0] * wet1 * pgain;
-        r[j] = r[j] * dry1 + dly_olp[1] * wet1 * pgain;
+        wet_m[j] = (dly_olp[0] + dly_olp[1]) * 0.5f * wet1 * dgain;
+        l[j] = l[j] * dry1 + dly_olp[0] * wet1 * dgain;
+        r[j] = r[j] * dry1 + dly_olp[1] * wet1 * dgain;
     }
     drive_run(l, r, n);                  /* DRIVE: the drones and their repeats together */
     {

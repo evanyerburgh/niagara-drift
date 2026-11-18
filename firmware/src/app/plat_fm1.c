@@ -228,6 +228,8 @@ int plat_midi_in(uint32_t *pkt, uint32_t *us)
 void plat_midi_out(uint32_t pkt) { midi_out_event(pkt); }
 
 int plat_store_load(uint32_t obj, void *dst, uint32_t max) { return flash_ok ? st_load(obj, dst, max) : -1; }
+void *plat_store_buf(void) { return st_buf; }
+_Static_assert(sizeof st_buf >= PLAT_STORE_MAX, "plat_store_buf: an object fits the store's buffer");
 static uint8_t st_hold;                         /* a restore staged (main_fm1.c): no saves till it's done (they'd
                                                  * write over the staged copies) */
 int plat_store_save(uint32_t obj, const void *src, uint32_t len)

@@ -1606,6 +1606,7 @@ static float ybuf[BLK];                           /* drone II's sound, for drone
 static float snq[BLK];                            /* SNARL's bend each sample, worked out for drone I, shared with II */
 static uint8_t sbuf[BLK];
 static float sfr[BLK];                           /* ... and where in its sample it restarted (0..1) */
+static float pgain[BLK];                         /* the PULSE's gain each sample (pulse_run) */
 /* a route's LFO at control tick t: Wave I, Wave II, or both summed (as two DS-2 waves switched to one
  * destination); none: 0 */
 static inline float lfo_at(int tap, uint32_t t)
@@ -2466,7 +2467,6 @@ static DR_RAM_CODE void render_group(int g, uint32_t n)
  * and flat at the top and bottom, a gate only at 100 (and even then ~15 ms edges at the default rate, and a
  * 3 ms slew: no tick). It was a swell mixed with a square gate, so any Shape over 0 stepped twice a beat.
  * Depth: how far it dips, in dB (0 .. -30 dB at 99; 100: silence) */
-static float pgain[BLK];
 static float pulse_depth(int v)
 {
     return v >= 100 ? 1.0f : 1.0f - fm_exp2f((float)v * (-30.0f / 99.0f * 0.166096405f));

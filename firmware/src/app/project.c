@@ -620,7 +620,7 @@ typedef struct {
     uint16_t used, rsv;
     int16_t scene[NSCENES][NP40];
 } bank_v40_t;
-static union {
+typedef union {
     project_t p;
     proj_v31_t o31;
     bank_v31_t b31;
@@ -646,7 +646,11 @@ static union {
     proj_v22_t o22;
     bank_v22_t b22;
     uint8_t raw[PLAT_STORE_MAX];
-} ld;
+} ld_t;
+/* a stored object as read, in the store's own buffer (on the FM-1 storage.c's: 3.75 KB of RAM less, for the strings);
+ * read through before the next store call, which reuses it */
+#define ld (*(ld_t *)plat_store_buf())
+_Static_assert(sizeof(ld_t) == PLAT_STORE_MAX, "ld: one object, the store's buffer");
 
 static void widen(int16_t *dst, const int16_t *src, uint32_t from)   /* an old sound: the new values' defaults */
 {
