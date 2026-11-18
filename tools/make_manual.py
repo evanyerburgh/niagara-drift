@@ -57,6 +57,7 @@ MENU_ICON = {"Play it": "play", "Recipes": "cooking-pot", "Reference": "book-ope
              "Shortcuts": "keyboard", "Help": "lifebuoy", "About": "info"}
 TAB_ICON = {"sounds": "waveform", "gestures": "hand-pointing", "scenes": "floppy-disk", "time": "timer",
             "performing": "faders", "scratch": "plant"}
+CHANGES = SRC / "CHANGELOG.md"                     # the English What's new page (manual/changes/); ja/changes.md its twin
 JA = MAN / "ja"                                    # the Japanese pages (Help 2026-11-17, the rest 2026-11-18)
 MENU = [("", "Play it", "the emulator, and the first steps under it"),
         ("manual/recipes/sounds/", "Recipes", "how to get a sound or a move"),
@@ -83,11 +84,11 @@ def ja_href(h):
 WORDS = {"en": {"good": "Good to know", "listen": "Listen", "play_from": "Play {t} from {m}:{s}", "example": "{t}: a sound example",
                 "all_recipes": "All {n} recipes on this page", "coming": "(coming)", "recipes_of": "{l}: the recipes",
                 "kinds": "Recipe kinds", "all_ref": "All reference pages", "ref": "Reference", "the_ref": "The reference",
-                "recipes": "Recipes"},
+                "recipes": "Recipes", "changes": "What's new", "changes_intro": "Every version, newest first"},
          "ja": {"good": "補足", "listen": "聴いてみる", "play_from": "{t}を{m}:{s}から再生", "example": "{t}：音の例",
                 "all_recipes": "このページのレシピ（{n}）", "coming": "（準備中）", "recipes_of": "{l}：レシピ",
                 "kinds": "レシピの種類", "all_ref": "リファレンスのページ", "ref": "リファレンス", "the_ref": "リファレンス",
-                "recipes": "レシピ"}}
+                "recipes": "レシピ", "changes": "変更履歴", "changes_intro": "各バージョンの変更点（新しい順）"}}
 # a quiet line in the Japanese pages' small print (Evan, 2026-11-18: the boxed note at the top was "too prominent and too
 # strong"); {up}: the site's root from the page
 JA_NOTE = ('このマニュアルはAIで翻訳しました。より自然な表現があれば、'
@@ -484,11 +485,16 @@ def build_ja(out):
 def pages_of(root, dst, lang):
     """Every page of one language (root: docs/manual or docs/manual/ja) into dst; how many."""
     W, pages = WORDS[lang], 0
-    for md in sorted(root.rglob("*.md")):
-        if md.relative_to(root).as_posix().startswith(("renders/", "ja/")):
+    for md in sorted(root.rglob("*.md")) + ([CHANGES] if lang == "en" else []):
+        if md == CHANGES:                              # the repo's CHANGELOG.md, as the page What's new (one source)
+            rel, meta = "changes", {"title": W["changes"], "intro": W["changes_intro"]}
+            text = re.sub(r"\A# Changelog\n", "", md.read_text(encoding="utf-8"))
+            md = MAN / "changes.md"                    # its links read as from the manual's own folder
+        elif md.relative_to(root).as_posix().startswith(("renders/", "ja/")):
             continue
-        rel = page_rel(md, root)
-        meta, text = front(md.read_text(encoding="utf-8"))
+        else:
+            rel = page_rel(md, root)
+            meta, text = front(md.read_text(encoding="utf-8"))
         text = re.sub(r"<!-- github -->.*?<!-- /github -->\n?", "", text, flags=re.S)   # for the GitHub copy only
         kind = rel.split("/")[0] if rel else ""
         if kind == "reference":                        # "## Drones and Pitch" under the banner's "Drones and Pitch":
@@ -629,7 +635,9 @@ def rewrite_links(body, md, lang="en"):
         if re.match(r"[a-z]+:", href) or not path.endswith(".md"):
             return m.group(0)
         target = (md.parent / path).resolve()
-        if not target.is_relative_to(MAN):         # the repo's own files (CHANGELOG.md, BUILDING.md): on GitHub
+        if target == CHANGES:                      # the changelog: the site's own What's new page
+            target = MAN / "changes.md"
+        if not target.is_relative_to(MAN):         # the repo's own files (BUILDING.md): on GitHub
             return f'href="{REPO}/blob/main/{target.relative_to(SRC).as_posix()}{"#" + frag if frag else ""}"'
         t = page_rel(MAN / target.relative_to(MAN))
         url = "../" * depth + (t + "/" if t else "")
