@@ -206,7 +206,7 @@ def build_loader():
 
 def build_app():
     flags = [*CFLAGS, *FPU, "-Ifirmware/hal", "-Ifirmware/src", "-Ibuild/gen"]
-    for flag in ("OM_CDC", "OM_CLOCK_TEST", "OM_RAM_CODE"):
+    for flag in ("OM_CDC", "OM_CLOCK_TEST", "OM_RAM_CODE", "OM_CPU2", "OM_RAILS"):
         v = os.environ.get(flag)    # unset: the default in firmware/src/main.c
         if flag == "OM_RAM_CODE" and v is None:
             v = "1"                 # the audio's hot loops run from RAM (drone.c); OM_RAM_CODE=0: from the flash, to compare
@@ -219,8 +219,9 @@ def build_app():
     units = [("cc", "-c", FW / "crt0.S", "-o", OUT / "crt0.o"),
              ("cc", "-c", FW / "hal" / "fm1_vec.S", "-o", OUT / "fm1_vec.o"),
              ("cc", "-c", FW / "hal" / "fm1_isr.S", "-o", OUT / "fm1_isr.o"),
+             ("cc", "-c", FW / "hal" / "fm1_cpu1.S", "-o", OUT / "fm1_cpu1.o"),
              ("cc", *flags, "-c", FW / "src" / "main.c", "-o", OUT / "main.o")]
-    objs = [OUT / "crt0.o", OUT / "fm1_vec.o", OUT / "fm1_isr.o", OUT / "main.o"]
+    objs = [OUT / "crt0.o", OUT / "fm1_vec.o", OUT / "fm1_isr.o", OUT / "fm1_cpu1.o", OUT / "main.o"]
     (OUT / "o2").mkdir(parents=True, exist_ok=True)
     for u in O2_UNITS:
         o = OUT / "o2" / (u.replace("/", "_")[:-2] + ".o")
@@ -272,6 +273,16 @@ def check(img, syms, dis, rt):
         errors.append(f"_start is not at {APP_XIP:#x}")
     if img[:4] != bytes.fromhex("04818000"):
         errors.append(f"image starts with {img[:4].hex()}, not the entry stub")
+    # the second core's loop (.c1_text, _c1_start.._c1_end) calls its job through a register and nothing else: it runs
+    # only while CPU0 waits for it in the audio interrupt, and CPU0 turns the flash off only with interrupts off
+    c1 = [int(mm2.group(1), 16) for n in ("_c1_start", "_c1_end")
+          for mm2 in [re.search(r"^([0-9a-f]+) .*\s" + n + r"$", syms, re.M)] if mm2]
+    def in_c1(ln):
+        mm2 = LINE.match(ln)
+        return len(c1) == 2 and mm2 is not None and c1[0] <= int(mm2.group(1), 16) < c1[1]
+    c1_calls = [ln for ln in rt.splitlines() if re.search(r"\bcall\b", ln) and in_c1(ln)]
+    if [ln for ln in c1_calls if not re.search(r"\bcall r\d+\b", ln)] or len(c1_calls) > 1:
+        errors.append(f".c1_text calls more than its job: {c1_calls[:3]}")
     # .app_ram (inside .ram_text, _ar_start.._ar_end): the audio's hot loop, in RAM for speed with the flash on (fm1-base's
     # PLAT_RAM_CODE). It may call: the linker refuses a direct call that would leave RAM, a call through a pointer is a
     # DR_FAR one (drone.c). The rest of .ram_text runs with the flash off and calls nothing.
@@ -282,7 +293,7 @@ def check(img, syms, dis, rt):
         mm = LINE.match(ln)
         if not mm or not re.search(r"\bcall", ln):
             continue
-        if ar[0] <= int(mm.group(1), 16) < ar[1]:
+        if ar[0] <= int(mm.group(1), 16) < ar[1] or in_c1(ln):
             pass
         else:
             rt_calls.append(ln)

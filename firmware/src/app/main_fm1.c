@@ -25,9 +25,104 @@ struct om_dbg {
 } om_dbg __attribute__((section(".noinit")));
 static uint8_t safe_mode;                           /* two failed boots: no audio, USB on (safe_main) */
 
+#if OM_CPU2
+/* THE SECOND CORE (felucca-bsp's fm1_cpu1.h; 0.4's strings are its job): started at power-on, with no work of its own
+ * yet. Its tests run only when a debug query asks (tools/fm1_cpu.py --cores), never in normal use:
+ * - the soak (0x79 1): each audio block a job that keeps CPU1 busy ~2 ms (the strings' share), summing a 256 B table
+ *   CPU0 wrote (a misread counts a bad sum) and writing a pattern CPU0 checks after its wait (the cores see each
+ *   other's writes: a bad echo); 0x79 0 stops it;
+ * - the failures, one job each (0x79 2 a misread: the check word spoiled; 3 late: the job runs 7 ms; 4 a fault: the
+ *   job calls through a bad pointer): CPU1 is retired, the audio plays on, and it stays retired until power-off.
+ * A misread, a fault or a late job retires CPU1 (FM1_CPU1_FALLBACK: one core until power-off) and is counted. */
+#define C2_WORDS 64u
+#define C2_ECHO 16u
+#define C2_BUSY_US 2000u
+enum { C2_IDLE, C2_SOAK, C2_MISREAD, C2_LATE, C2_FAULT };
+static uint32_t c2_table[C2_WORDS];
+static uint32_t c2_sum;                             /* the table's, as CPU0 made it */
+static struct {                                     /* the job's (CPU1 writes, CPU0 reads after the wait) */
+    volatile uint32_t passes, bad, last_us, max_us;
+    volatile uint32_t echo[C2_ECHO];
+} c2_job __attribute__((aligned(32)));
+static struct {                                     /* CPU0's */
+    uint32_t two, off_ms, wait_max_us, rails_boot, bad_echo, seed;
+    volatile uint32_t mode;                         /* the debug query's (C2_*): the next blocks' test */
+} c2;
+
+static uint32_t c2_table_sum(void)
+{
+    uint32_t i, s = 0;
+    for (i = 0; i < C2_WORDS; i++)
+        s = (s << 1 | s >> 31) ^ c2_table[i];
+    return s;
+}
+
+static void c2_work(uint32_t arg)                   /* on CPU1, from the flash, as a real job is */
+{
+    uint32_t t0 = fm1_ticks(), n = 0, us, i, busy = arg == C2_LATE ? 7000u : C2_BUSY_US;
+    if (arg == C2_FAULT)
+        ((void (*)(void))(uintptr_t)0x00000004u)(); /* a call outside any code: CPU1 faults */
+    do {
+        if (c2_table_sum() != c2_sum)
+            c2_job.bad++;
+        n++;
+        us = (fm1_ticks() - t0) / FM1_TICKS_PER_US;
+    } while (us < busy);
+    for (i = 0; i < C2_ECHO; i++)                   /* the echo: CPU0 reads it after its wait */
+        c2_job.echo[i] = c2.seed * 2654435761u + i;
+    c2_job.passes += n;
+    c2_job.last_us = us;
+    if (us > c2_job.max_us)
+        c2_job.max_us = us;
+}
+
+static void c2_start(void)                          /* power-on, before the audio and the timers */
+{
+    static const char when[] = __DATE__ " " __TIME__;
+    uint32_t i, x = 0x12345678u, id = 2166136261u;
+    for (i = 0; i < C2_WORDS; i++)
+        c2_table[i] = x = x * 1664525u + 1013904223u;
+    c2_sum = c2_table_sum();
+    for (i = 0; when[i]; i++)
+        id = (id ^ (uint8_t)when[i]) * 16777619u;
+    fm1_cpu1_bar_build(id);                         /* a bar a crash set for an earlier build is lifted */
+    if (!bootguard.failed && !safe_mode)            /* not after a failed start: one core */
+        c2.two = fm1_cpu1_start() == 0;
+}
+
+static int c2_hand_over(void)                       /* the audio block's start: a test job, if one is asked for */
+{
+    const uint32_t m = c2.mode;
+    if (m == C2_IDLE || !fm1_cpu1_on)
+        return 0;
+    if (m != C2_SOAK)
+        c2.mode = C2_IDLE;                          /* a failure is tried once */
+    c2.seed++;
+    if (m == C2_MISREAD)                            /* the check word spoiled by the bit the units that misread get
+                                                     * wrong (0x00200000): CPU1 refuses the job, CPU0 retires it */
+        return fm1_cpu1_run_x(c2_work, C2_SOAK, 0x00200000u);
+    return fm1_cpu1_run(c2_work, m);
+}
+
+static void c2_collect(void)                        /* after the drones: wait for it, check its echo */
+{
+    uint32_t w0 = fm1_ticks(), w, i;
+    if (fm1_cpu1_wait() == 0)
+        for (i = 0; i < C2_ECHO; i++)
+            if (c2_job.echo[i] != c2.seed * 2654435761u + i)
+                c2.bad_echo++;
+    w = (fm1_ticks() - w0) / FM1_TICKS_PER_US;
+    if (w > c2.wait_max_us)
+        c2.wait_max_us = w;
+}
+#endif
+
 static void render_block(int32_t *o)                /* ALNK0: one half, measured */
 {
     uint32_t t0 = fm1_ticks(), us, budget = HALF_FRAMES * 1000000u / FS;
+#if OM_CPU2
+    int on2 = c2_hand_over();
+#endif
     om_dbg.in_audio = 1;
 #if FELUCCA_UAC
     uac_render_start();
@@ -41,6 +136,16 @@ static void render_block(int32_t *o)                /* ALNK0: one half, measured
 #endif
         }
     }
+#if OM_CPU2
+    if (on2)
+        c2_collect();
+    if (fm1_cpu1_outstanding())                     /* the backstop: no job outlives this interrupt (CPU1's jobs run
+                                                     * from the flash, which the main loop may turn off); a refused or
+                                                     * faulted one retires CPU1 here, so the flash isn't held */
+        fm1_cpu1_wait();
+    if (c2.two && fm1_cpu1_gave_up && !c2.off_ms)
+        c2.off_ms = fm1_ms | 1u;                    /* when it was retired */
+#endif
     us = (fm1_ticks() - t0) / FM1_TICKS_PER_US;
     om_dbg.cpu_q8 = (om_dbg.cpu_q8 * 15u + (us * 256u) / budget) / 16u;
     audio_cpu_pct = (om_dbg.cpu_q8 * 100u) >> 8;
@@ -392,6 +497,30 @@ static void dbg_service(void)
             b[i] = (uint8_t)(w[i / 4u] >> (8u * (i % 4u)));
         ota_send_msg(0x7E, b, sizeof b);
     }
+#if OM_CPU2
+    else if (d == 8u && ota_dec[2] == 0x79) {       /* the second core's tests (above): 0 off, 1 the soak, 2-4 a failure */
+        if (ota_dec[6] <= C2_FAULT)
+            c2.mode = ota_dec[6];
+        ota_send_msg(0x79, ota_dec + 6, 1u);
+    } else if (d == 7u && (ota_dec[2] == 0x7B || ota_dec[2] == 0x7A)) {   /* its report: 0x7B and 0x7A, 8 words each */
+        uint32_t w[8], i;
+        uint8_t b[32];
+        if (ota_dec[2] == 0x7B) {
+            uint32_t f = irq_save();
+            fm1_cpu1_check();                       /* (a misread or fault while idle: retired now, so reported) */
+            irq_restore(f);
+            w[0] = c2.two, w[1] = fm1_cpu1_on, w[2] = fm1_cpu1_gave_up, w[3] = fm1_cpu1_mb.jobs;
+            w[4] = fm1_cpu1_mb.rejected, w[5] = fm1_cpu1_fault.count, w[6] = c2_job.bad, w[7] = c2.off_ms;
+        } else {
+            w[0] = c2_job.max_us, w[1] = c2_job.last_us, w[2] = c2_job.passes, w[3] = c2.wait_max_us | fl_refused << 16;
+            w[4] = c2.two ? fm1_cpu1_stack_used() : 0u, w[5] = c2.rails_boot | c2.bad_echo << 16;
+            w[6] = fm1_vdc14() << 8 | fm1_sysvdd(), w[7] = fm1_ms;
+        }
+        for (i = 0; i < 32u; i++)
+            b[i] = (uint8_t)(w[i / 4u] >> (8u * (i % 4u)));
+        ota_send_msg(ota_dec[2], b, sizeof b);
+    }
+#endif
 }
 
 /* black from power-on until the UI's own animation, which fades in from black (FoMni's splash was here) */
@@ -448,6 +577,9 @@ static void fm1_main(void)
     dr_init();
     project_load();                                 /* defaults when nothing (or another format) is saved */
     project_apply();
+#if OM_CPU2
+    c2_start();
+#endif
     audio_init();
     usb_start();
 #if OM_TRS
@@ -536,13 +668,19 @@ static void fm1_main(void)
 
 void fm1_cstart(void)
 {
-    uint32_t *s, *d, p3, src, wdt;
+    uint32_t *s, *d, p3, src, wdt, rails, tries;
+    fm1_cpu1_stop();                                /* a reset that left the second core running: held first */
     fm1_time_init();
     fm1_reset_reason();
     p3 = fm1_boot.p3_rst;
     src = fm1_boot.rst_src;
     wdt = fm1_boot.wdt_con;
     fm1_wdt_arm(0x0D);
+    rails = fm1_vdc14() << 8 | fm1_sysvdd();        /* as the boot loader left them */
+    for (tries = 0; OM_RAILS && tries < 3u && !(fm1_vdc14() == 7u && fm1_sysvdd() == 15u); tries++) {
+        fm1_vdc14_raise(7);                         /* M-VAVE's own supplies, before anything loads them: 1.60 V, */
+        fm1_sysvdd_raise(15);                       /* then 1.38 V (fm1_sys.h; fm1-base, X0X 1.0.9 and Saadet do the same) */
+    }
     if (bootguard.magic != BOOTGUARD_MAGIC) {
         bootguard.magic = BOOTGUARD_MAGIC;
         bootguard.failed = 0;
@@ -572,6 +710,11 @@ void fm1_cstart(void)
     fm1_boot.p3_rst = (uint8_t)p3;
     fm1_boot.rst_src = src;
     fm1_boot.wdt_con = (uint8_t)wdt;
+#if OM_CPU2
+    c2.rails_boot = rails;                          /* (after the .bss clear) */
+#else
+    (void)rails;
+#endif
     fm1_main();
     for (;;)
         ;

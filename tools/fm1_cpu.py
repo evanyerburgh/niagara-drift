@@ -3,6 +3,11 @@
 """How hard the FM-1's audio works, over USB-MIDI (Niagara Drift's firmware, read-only).
 
   fm1_cpu.py [SECONDS]      poll for SECONDS (default 10), then print the load and the longest render
+  fm1_cpu.py --cores        the second core (a build with OM_CPU2): whether it runs, its misreads, faults, bad
+                            sums and echoes, how long its job takes and how long the first core waits, the supplies
+  fm1_cpu.py --cores TEST   first start a test: soak (a 2 ms job each audio block, as the strings' share), off
+                            (stop it), or one failure: misread, late, fault (the second core is retired till
+                            power-off and the audio plays on); then the report
 
 The load is the share of each audio block's time spent rendering it (smoothed over ~16 blocks);
 the longest render is since the FM-1 started. Late blocks are dropouts. Needs mido with python-rtmidi.
@@ -25,7 +30,84 @@ def parse(pkt):
     return dict(zip(["cpu_q8", "max_us", "budget_us", "late", "halves", "nested", "boots", "last_us"], w))
 
 
+RAILS = "VDC14 {} ({:.2f} V), SYSVDD {} ({:.2f} V)"
+GAVE_UP = {0: "no", 1: "it misread a job", 2: "a job was late", 3: "barred (an earlier failure)", 4: "it faulted",
+           5: "it didn't answer at its start"}
+
+
+def rails(v):
+    vdc, sys_ = v >> 8 & 7, v & 15
+    return RAILS.format(vdc, 1.25 + 0.05 * vdc, sys_, 0.93 + 0.03 * sys_)
+
+
+TESTS = {"off": 0, "soak": 1, "misread": 2, "late": 3, "fault": 4}
+
+
+def ask(link, cmd, body=b""):
+    q = b"\xF0" + pack7(bytes([0x00, 0x59, cmd, len(body), 0, 0]) + body + bytes([~sum(body) & 0xFF])) + b"\xF7"
+    for _ in range(3):                  # (the first query after the port opens is often lost)
+        link.drain()
+        link.send(q)
+        t = time.monotonic() + 1.0
+        while (left := t - time.monotonic()) > 0:
+            p = link.read(left)
+            d = p and unpack7(p[1:-1])
+            if d and len(d) >= 7 and d[:3] == bytes([0x00, 0x59, cmd]) and ~sum(d[6:-1]) & 0xFF == d[-1]:
+                return d[6:-1]
+    return None
+
+
+def cores(link, test=None):
+    if test is not None:
+        if ask(link, 0x79, bytes([TESTS[test]])) is None:
+            sys.exit("fm1_cpu: no reply to the test (a build without the second core's tests)")
+        if test in ("misread", "late", "fault"):
+            time.sleep(0.5)             # (its one job, and the retirement)
+    pages = []
+    for cmd in (0x7B, 0x7A):
+        q = b"\xF0" + pack7(bytes([0x00, 0x59, cmd, 0, 0, 0, 0xFF])) + b"\xF7"
+        for _ in range(3):              # (the first query after the port opens is often lost)
+            link.drain()
+            link.send(q)
+            t = time.monotonic() + 1.0
+            while (left := t - time.monotonic()) > 0:
+                p = link.read(left)
+                d = p and unpack7(p[1:-1])
+                if d and len(d) == 39 and d[:3] == bytes([0x00, 0x59, cmd]) and ~sum(d[6:38]) & 0xFF == d[38]:
+                    pages.append([int.from_bytes(d[6 + 4 * i:10 + 4 * i], "little") for i in range(8)])
+                    break
+            if len(pages) == (cmd == 0x7B and 1 or 2):
+                break
+        else:
+            sys.exit("fm1_cpu: no reply to --cores (a build without the second core's test)")
+    (two, on, gave, jobs, rej, faults, bad, off_ms), (jmax, jlast, passes, wmax, stack, rboot, rnow, ms) = pages
+    wmax, refused, echo, rboot = wmax & 0xFFFF, wmax >> 16, rboot >> 16, rboot & 0xFFFF
+    print(f"up        {ms / 1000:.0f} s")
+    print(f"second    {'started' if two else 'not started'}; {'running' if on else 'off'}; given up: "
+          f"{GAVE_UP.get(gave, gave)}" + (f" at {off_ms / 1000:.1f} s" if off_ms else ""))
+    print(f"jobs      {jobs} (misread {rej}, faults {faults}, bad table sums {bad} in {passes} passes, bad echoes "
+          f"{echo}; flash calls refused while it worked {refused})")
+    print(f"job       {jlast} us last, {jmax} us longest; the first core waited {wmax} us at most")
+    print(f"stack     {stack} B used of 1280")
+    print(f"supplies  boot {rails(rboot)}; now {rails(rnow)}")
+
+
 def main():
+    if "--cores" in sys.argv[1:]:
+        be = MidoBackend()
+        ins = [n for n in be.input_names() if PORT_RE.search(n)]
+        if not ins:
+            sys.exit("fm1_cpu: no FM-1 MIDI port")
+        link = be.open(ins[0], pair_output(ins[0], [n for n in be.output_names() if PORT_RE.search(n)]))
+        try:
+            i = sys.argv.index("--cores")
+            test = sys.argv[i + 1] if len(sys.argv) > i + 1 else None
+            if test is not None and test not in TESTS:
+                sys.exit(f"fm1_cpu: --cores TEST is one of {', '.join(TESTS)}")
+            cores(link, test)
+        finally:
+            link.close()
+        return
     secs = float(sys.argv[1]) if len(sys.argv) > 1 else 10.0
     be = MidoBackend()
     ins = [n for n in be.input_names() if PORT_RE.search(n)]
