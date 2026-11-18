@@ -268,21 +268,36 @@ export class Updater {
     this.log = log || (() => {});
   }
 
-  // every in/out pair with the same port name that answers the handshake
+  // every in/out pair with the same port name that answers the handshake; what each port did is kept in this.seen,
+  // for the log when nothing is found (a player's report then says why: no ports, a port another app holds, ...)
   async find(filter) {
     const outs = [...this.access.outputs.values()];
+    const seen = this.seen = [];
     for (const input of this.access.inputs.values()) {
-      if (input.state === "disconnected") continue;
-      if (!/fm-1|felucca|ota|composite|sinco|usb-midi/i.test(input.name || "")) continue;   // never probe other gear
+      const name = input.name || "(no name)";
+      if (input.state === "disconnected") { seen.push(`${name}: disconnected`); continue; }
+      if (!/fm-1|felucca|ota|composite|sinco|usb-midi/i.test(input.name || "")) { seen.push(`${name}: not probed`); continue; }   // never probe other gear
       const output = outs.find((o) => o.name === input.name) || (outs.length === 1 ? outs[0] : null);
-      if (!output) continue;
-      try { await input.open(); await output.open(); } catch (_) { continue; }
+      if (!output) { seen.push(`${name}: no output of that name`); continue; }
+      try { await input.open(); await output.open(); } catch (e) { seen.push(`${name}: wouldn't open (${e && e.name || e})`); continue; }
       const link = new Link(input, output);
       const id = await handshake(link, 2);
       if (id && (!filter || filter(id))) return { link, id, name: input.name };
+      seen.push(`${name}: ${id ? `answered ${id.text}, not wanted here` : "no answer"}`);
       link.close();
     }
+    if (!seen.length) seen.push(`no MIDI inputs (${outs.length} outputs)`);
     return null;
+  }
+
+  // the not-found error, with the last search's ports in the log
+  // and why, for the page to say in words: "busy" (an FM-1 port another app holds), "silent" (one that didn't
+  // answer) or "none" (no FM-1 port at all: the cable, or a browser that can't see MIDI devices)
+  notFound(code, msg) {
+    const seen = this.seen || ["not searched"];
+    this.log(`MIDI ports: ${seen.join("; ")}`);
+    const why = seen.some((l) => l.includes("wouldn't open")) ? "busy" : seen.some((l) => l.endsWith("no answer")) ? "silent" : "none";
+    return Object.assign(fail(code, msg), { why });
   }
 
   async waitFor(filter, ms) {
@@ -328,7 +343,7 @@ export class Updater {
   async install(image, product, onStep) {
     const step = onStep || (() => {});
     const dev = await this.find((id) => !IS_OTA(id));
-    if (!dev) throw fail("notfound", "FM-1 not found (USB cable, and no other app using it?)");
+    if (!dev) throw this.notFound("notfound", "FM-1 not found (USB cable, and no other app using it?)");
     const [model] = product.split("_");
     if (dev.id.model !== model) { dev.link.close(); throw fail("model", `the device is ${dev.id.text}, the package is for ${product}`); }
     step("start", dev.id.text);
@@ -340,13 +355,13 @@ export class Updater {
     step("loader");
     await sleep(3000);
     const ota = await this.waitFor(IS_OTA, 30000);
-    if (!ota) throw fail("noloader", "the update loader did not appear. Replug the USB cable and press Install again: the device stays in update mode until it is finished.");
+    if (!ota) throw this.notFound("noloader", "the update loader did not appear. Replug the USB cable and press Install again: the device stays in update mode until it is finished.");
     const s2 = await this.write(ota, image, step);
     if (!s2.finished) throw fail(s2.lost ? "lost" : "stopped", `the loader ${s2.lost ? "was disconnected" : "stopped"} after ${s2.served} requests. Replug and press Install again to resume.`);
     step("reboot");
     await sleep(3000);
     const back = await this.waitFor((id) => !IS_OTA(id), 40000);
-    if (!back) throw fail("noreturn", "the device did not come back: power-cycle it");
+    if (!back) throw this.notFound("noreturn", "the device did not come back: power-cycle it");
     back.link.close();
     if (back.id.text !== product) throw fail("mismatch", `installed, but the device reports ${back.id.text}`, back.id.text);
     step("done", back.id.text);
@@ -356,7 +371,7 @@ export class Updater {
   // Niagara Drift running: its saved objects and its identity, or null (another firmware, or update mode)
   async backup() {
     const dev = await this.find((id) => !IS_OTA(id));
-    if (!dev) throw fail("notfound", "FM-1 not found (USB cable, and no other app using it?)");
+    if (!dev) throw this.notFound("notfound", "FM-1 not found (USB cable, and no other app using it?)");
     try {
       const objs = await ndBackup(dev.link);
       return objs ? { objs, identity: dev.id.text } : null;
@@ -367,7 +382,7 @@ export class Updater {
   // when the firmware can't take one; onAsk: the FM-1 is asking
   async restore(objs, onAsk) {
     const dev = await this.find((id) => !IS_OTA(id));
-    if (!dev) throw fail("notfound", "FM-1 not found (USB cable, and no other app using it?)");
+    if (!dev) throw this.notFound("notfound", "FM-1 not found (USB cable, and no other app using it?)");
     try {
       if (!(await ndTransact(dev.link, 0x70, [0, 0, 0], (r) => r.length >= 5 && r[0] === 0))) return false;
       return await ndRestore(dev.link, objs, this.log, onAsk);

@@ -180,6 +180,9 @@ const TEXT = {
     error: "Error: ",
     denied: "MIDI access wasn't allowed. Allow MIDI in the site settings (the address bar) and press Install again.",
     notfound: "No FM-1 found. Check the cable is a data cable, straight into the computer, close other apps that use MIDI, and press Install again.",
+    notfound_busy: "The FM-1 is connected, but another app is using it. Close any music or MIDI apps (and any other tab with this page), then press Install again.",
+    notfound_silent: "The FM-1 is connected but didn't answer. Switch it off and on, then press Install again.",
+    notfound_none: "The browser sees no FM-1. Check the FM-1 is on and the cable is a data cable, straight into the computer, then reload the page and press Install again. On Linux, a browser installed as a Snap or Flatpak may need MIDI access turned on.",
     model: "The connected device isn't an FM-1.",
     lost: "The USB connection was lost. Replug it and press Install again.",
     noloader: "The FM-1 in update mode wasn't found. Replug the USB cable and press Install again (it stays in update mode until it's finished).",
@@ -263,6 +266,9 @@ const TEXT = {
     error: "エラー：",
     denied: "MIDIへのアクセスが許可されませんでした。サイトの設定（アドレス・バー）でMIDIを許可し、もう一度インストールを押してください。",
     notfound: "FM-1が見つかりません。データ・ケーブルでパソコンに直接つながっているか確かめ、MIDIを使う他のアプリを閉じて、もう一度インストールを押してください。",
+    notfound_busy: "FM-1はつながっていますが、他のアプリが使っています。音楽やMIDIのアプリ（このページを開いている他のタブも）を閉じて、もう一度インストールを押してください。",
+    notfound_silent: "FM-1はつながっていますが、応答がありません。電源を切って入れ直し、もう一度インストールを押してください。",
+    notfound_none: "ブラウザーからFM-1が見えません。FM-1の電源が入っていて、データ・ケーブルでパソコンに直接つながっているか確かめ、ページを再読み込みしてもう一度インストールを押してください。Linuxでは、SnapやFlatpakで入れたブラウザーはMIDIへのアクセスを有効にする必要がある場合があります。",
     model: "つながっている機器はFM-1ではありません。",
     lost: "USBの接続が切れました。差し直して、もう一度インストールを押してください。",
     noloader: "アップデート・モードのFM-1が見つかりません。USBケーブルを差し直し、もう一度インストールを押してください（終わるまでアップデート・モードのままです）。",
@@ -464,6 +470,7 @@ async function run(img, product, isStock) {
   } catch (e) {
     if (isStock && e && e.code === "mismatch") { $("bar").value = 100; sayK("stockdone"); }   /* stock names itself its own way */
     else if (isStock && e && e.code === "stopped" && e.step === 1) sayK("stockhead");          /* the other version's head */
+    else if (e && e.code === "notfound" && e.why) sayK("notfound_" + e.why);   /* why, in words: busy, silent, none */
     else if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
     else sayK("error", e && e.message);
     log(String(e && e.stack || e));
@@ -484,7 +491,8 @@ async function restore(objs) {               /* a backup back onto a Niagara Dri
     const r = await new Updater(midi, log).restore(objs, () => sayK("restoreask"));
     sayK(r === "restored" ? "restored" : r === "cancelled" ? "restorecancel" : "nobackup");
   } catch (e) {
-    if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
+    if (e && e.code === "notfound" && e.why) sayK("notfound_" + e.why);
+    else if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
     else sayK("error", e && e.message);
     log(String(e && e.stack || e));
     showReport();
@@ -502,7 +510,8 @@ $("backupgo").addEventListener("click", async () => {
     if (b) sayK("backupdone", b.name);
     else sayK("nobackup");
   } catch (e) {
-    if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
+    if (e && e.code === "notfound" && e.why) sayK("notfound_" + e.why);
+    else if (e && e.code && TEXT[lang][e.code]) sayK(e.code, e.detail || "");
     else sayK("error", e && e.message);
   }
   writing = false;
