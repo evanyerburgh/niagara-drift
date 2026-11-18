@@ -17,7 +17,9 @@ costs sound. They're how this code gets quality and speed at once.
   computed once a block), no branches that depend on the signal when a min / max or a blend will do.
 - Per block (256 samples): anything derived from a knob, an LFO's slow parts, filter coefficients,
   gains. Ramp them across the block (a linear step a sample) so a change never steps audibly.
-- Never in the audio path: allocation, logging, flash reads or writes, waits.
+- Never in the audio path: allocation, logging, flash reads or writes, waits. One exception: the audio
+  interrupt waits for the second core's job (`fm1_cpu1_wait`), which it handed over at the block's start;
+  a job not back 5 ms after its hand-over retires the second core (one late block, once, then one core).
 - Skip what isn't heard: a stage at zero depth or mix costs nothing (check before computing it), a
   stopped drone renders silence cheaply ("drone stopped" in drone_cost).
 - Look at the cost before and after with `drone_cost` (the Mac) or CI's valgrind table. Add a case to

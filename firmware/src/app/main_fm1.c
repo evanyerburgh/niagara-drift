@@ -26,20 +26,27 @@ struct om_dbg {
 static uint8_t safe_mode;                           /* two failed boots: no audio, USB on (safe_main) */
 
 #if OM_CPU2
-/* The second core's test ("The second core", step 2): CPU1 started at power-on (felucca-bsp's fm1_cpu1.h), and each
- * audio block a job that keeps it busy ~2 ms (~34 % of the block: Rings' 8 strings, the Mutable try) reading a 4 KB
- * table in RAM and checking its sum. A misread of the job (its check word), a fault or a late job retires CPU1 (one
- * core until power-off: FM1_CPU1_FALLBACK) and is counted; a misread of the table counts as a bad sum. Read with
- * `tools/fm1_cpu.py --cores` (SysEx 0x7B and 0x7A). */
-#define C2_WORDS 1024u
+/* THE SECOND CORE (felucca-bsp's fm1_cpu1.h; 0.4's strings are its job): started at power-on, with no work of its own
+ * yet. Its tests run only when a debug query asks (tools/fm1_cpu.py --cores), never in normal use:
+ * - the soak (0x79 1): each audio block a job that keeps CPU1 busy ~2 ms (the strings' share), summing a 256 B table
+ *   CPU0 wrote (a misread counts a bad sum) and writing a pattern CPU0 checks after its wait (the cores see each
+ *   other's writes: a bad echo); 0x79 0 stops it;
+ * - the failures, one job each (0x79 2 a misread: the check word spoiled; 3 late: the job runs 7 ms; 4 a fault: the
+ *   job calls through a bad pointer): CPU1 is retired, the audio plays on, and it stays retired until power-off.
+ * A misread, a fault or a late job retires CPU1 (FM1_CPU1_FALLBACK: one core until power-off) and is counted. */
+#define C2_WORDS 64u
+#define C2_ECHO 16u
 #define C2_BUSY_US 2000u
+enum { C2_IDLE, C2_SOAK, C2_MISREAD, C2_LATE, C2_FAULT };
 static uint32_t c2_table[C2_WORDS];
 static uint32_t c2_sum;                             /* the table's, as CPU0 made it */
 static struct {                                     /* the job's (CPU1 writes, CPU0 reads after the wait) */
     volatile uint32_t passes, bad, last_us, max_us;
+    volatile uint32_t echo[C2_ECHO];
 } c2_job __attribute__((aligned(32)));
 static struct {                                     /* CPU0's */
-    uint32_t two, off_ms, wait_max_us, rails_boot;
+    uint32_t two, off_ms, wait_max_us, rails_boot, bad_echo, seed;
+    volatile uint32_t mode;                         /* the debug query's (C2_*): the next blocks' test */
 } c2;
 
 static uint32_t c2_table_sum(void)
@@ -50,16 +57,19 @@ static uint32_t c2_table_sum(void)
     return s;
 }
 
-static void c2_work(uint32_t arg)                   /* on CPU1, from the flash, as a real job would be */
+static void c2_work(uint32_t arg)                   /* on CPU1, from the flash, as a real job is */
 {
-    uint32_t t0 = fm1_ticks(), n = 0, us;
-    (void)arg;
+    uint32_t t0 = fm1_ticks(), n = 0, us, i, busy = arg == C2_LATE ? 7000u : C2_BUSY_US;
+    if (arg == C2_FAULT)
+        ((void (*)(void))(uintptr_t)0x00000004u)(); /* a call outside any code: CPU1 faults */
     do {
         if (c2_table_sum() != c2_sum)
             c2_job.bad++;
         n++;
         us = (fm1_ticks() - t0) / FM1_TICKS_PER_US;
-    } while (us < C2_BUSY_US);
+    } while (us < busy);
+    for (i = 0; i < C2_ECHO; i++)                   /* the echo: CPU0 reads it after its wait */
+        c2_job.echo[i] = c2.seed * 2654435761u + i;
     c2_job.passes += n;
     c2_job.last_us = us;
     if (us > c2_job.max_us)
@@ -79,13 +89,39 @@ static void c2_start(void)                          /* power-on, before the audi
     if (!bootguard.failed && !safe_mode)            /* not after a failed start: one core */
         c2.two = fm1_cpu1_start() == 0;
 }
+
+static int c2_hand_over(void)                       /* the audio block's start: a test job, if one is asked for */
+{
+    const uint32_t m = c2.mode;
+    if (m == C2_IDLE || !fm1_cpu1_on)
+        return 0;
+    if (m != C2_SOAK)
+        c2.mode = C2_IDLE;                          /* a failure is tried once */
+    c2.seed++;
+    if (m == C2_MISREAD)                            /* the check word spoiled by the bit the units that misread get
+                                                     * wrong (0x00200000): CPU1 refuses the job, CPU0 retires it */
+        return fm1_cpu1_run_x(c2_work, C2_SOAK, 0x00200000u);
+    return fm1_cpu1_run(c2_work, m);
+}
+
+static void c2_collect(void)                        /* after the drones: wait for it, check its echo */
+{
+    uint32_t w0 = fm1_ticks(), w, i;
+    if (fm1_cpu1_wait() == 0)
+        for (i = 0; i < C2_ECHO; i++)
+            if (c2_job.echo[i] != c2.seed * 2654435761u + i)
+                c2.bad_echo++;
+    w = (fm1_ticks() - w0) / FM1_TICKS_PER_US;
+    if (w > c2.wait_max_us)
+        c2.wait_max_us = w;
+}
 #endif
 
 static void render_block(int32_t *o)                /* ALNK0: one half, measured */
 {
     uint32_t t0 = fm1_ticks(), us, budget = HALF_FRAMES * 1000000u / FS;
 #if OM_CPU2
-    int on2 = fm1_cpu1_run(c2_work, 0);
+    int on2 = c2_hand_over();
 #endif
     om_dbg.in_audio = 1;
 #if FELUCCA_UAC
@@ -101,13 +137,11 @@ static void render_block(int32_t *o)                /* ALNK0: one half, measured
         }
     }
 #if OM_CPU2
-    if (on2) {
-        uint32_t w0 = fm1_ticks(), w;
+    if (on2)
+        c2_collect();
+    if (fm1_cpu1_busy())                            /* the backstop: no job outlives this interrupt (CPU1's jobs run
+                                                     * from the flash, which the main loop may turn off) */
         fm1_cpu1_wait();
-        w = (fm1_ticks() - w0) / FM1_TICKS_PER_US;
-        if (w > c2.wait_max_us)
-            c2.wait_max_us = w;
-    }
     if (c2.two && fm1_cpu1_gave_up && !c2.off_ms)
         c2.off_ms = fm1_ms | 1u;                    /* when it was retired */
 #endif
@@ -463,16 +497,22 @@ static void dbg_service(void)
         ota_send_msg(0x7E, b, sizeof b);
     }
 #if OM_CPU2
-    else if (d == 7u && (ota_dec[2] == 0x7B || ota_dec[2] == 0x7A)) {   /* the second core's test (c2_start): 0x7B
-                                                                          * and 0x7A, 8 words each */
+    else if (d == 8u && ota_dec[2] == 0x79) {       /* the second core's tests (above): 0 off, 1 the soak, 2-4 a failure */
+        if (ota_dec[6] <= C2_FAULT)
+            c2.mode = ota_dec[6];
+        ota_send_msg(0x79, ota_dec + 6, 1u);
+    } else if (d == 7u && (ota_dec[2] == 0x7B || ota_dec[2] == 0x7A)) {   /* its report: 0x7B and 0x7A, 8 words each */
         uint32_t w[8], i;
         uint8_t b[32];
         if (ota_dec[2] == 0x7B) {
+            uint32_t f = irq_save();
+            fm1_cpu1_check();                       /* (a misread or fault while idle: retired now, so reported) */
+            irq_restore(f);
             w[0] = c2.two, w[1] = fm1_cpu1_on, w[2] = fm1_cpu1_gave_up, w[3] = fm1_cpu1_mb.jobs;
             w[4] = fm1_cpu1_mb.rejected, w[5] = fm1_cpu1_fault.count, w[6] = c2_job.bad, w[7] = c2.off_ms;
         } else {
-            w[0] = c2_job.max_us, w[1] = c2_job.last_us, w[2] = c2_job.passes, w[3] = c2.wait_max_us;
-            w[4] = c2.two ? fm1_cpu1_stack_used() : 0u, w[5] = c2.rails_boot;
+            w[0] = c2_job.max_us, w[1] = c2_job.last_us, w[2] = c2_job.passes, w[3] = c2.wait_max_us | fl_refused << 16;
+            w[4] = c2.two ? fm1_cpu1_stack_used() : 0u, w[5] = c2.rails_boot | c2.bad_echo << 16;
             w[6] = fm1_vdc14() << 8 | fm1_sysvdd(), w[7] = fm1_ms;
         }
         for (i = 0; i < 32u; i++)

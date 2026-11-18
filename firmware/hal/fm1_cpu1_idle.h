@@ -2,7 +2,9 @@
 /* The second core's idle word (fm1_cpu1.h, fm1_cpu1_stop.h): 1 while CPU1 sits in its RAM loop with no job, so the
  * flash may be turned off. felucca-bsp's fm1_flash_access.h holds it beside a gate on every flash entry; here the
  * flash driver (fm1_flash.h) runs only from the main loop with interrupts off, and CPU1 gets jobs only inside the
- * audio interrupt, which waits for each before it returns: CPU1 is always idle when the flash is touched. */
+ * audio interrupt, which waits for each before it returns: CPU1 is always idle when the flash is touched. Niagara
+ * Drift's flash calls (main.c, fl_cpu1_busy) check this word and refuse a busy CPU1. Static: one unit reads it
+ * (main.c, which includes the app); the loader has its own copy and never starts CPU1. */
 #pragma once
 #include <stdint.h>
 

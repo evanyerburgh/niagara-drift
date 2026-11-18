@@ -7,7 +7,7 @@
  * own user and supervisor stacks, then out of the start-up interrupt into fm1_cpu1_main (in RAM, fm1_cpu1.h), which
  * never returns. fm1_cpu1_start puts this address in the word the chip starts CPU1 from (0x01C7FFF8). */
 #ifndef FM1_CPU1_USTACK_BYTES
-#define FM1_CPU1_USTACK_BYTES 2816	/* the jobs' stack (fm1_cpu1.h reads the same macro); a multiple of 8 */
+#define FM1_CPU1_USTACK_BYTES 1280	/* the jobs' stack (fm1_cpu1.h reads the same macro); a multiple of 8 */
 #endif
 	.section .text.fm1_cpu1,"ax",@progbits
 	.balign 4

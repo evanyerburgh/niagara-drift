@@ -5,13 +5,14 @@
  * -Os. Order matters. */
 #include <stdint.h>
 #ifndef OM_CPU2
-#define OM_CPU2 1                 /* the second core (felucca-bsp's fm1_cpu1.h): started at power-on, a job each block */
+#define OM_CPU2 1                 /* the second core (felucca-bsp's fm1_cpu1.h): started at power-on; its tests on request */
 #endif
 #ifndef OM_RAILS
 #define OM_RAILS 1                /* M-VAVE's own supplies at start (fm1_cstart) */
 #endif
 #define FM1_CPU1 OM_CPU2          /* (before the first HAL header: fm1_irq.h and fm1_sys.h read it) */
 #define FM1_CPU1_FALLBACK 1       /* a misread, a fault or a late job: one core until power-off, no restart */
+#define FM1_CPU1_TIMEOUT_US 5000u /* a job not back 5 ms after its hand-over: retired inside the block (5.8 ms) */
 #include "fm1_time.h"
 #include "fm1_sys.h"
 #include "fm1_irq.h"
@@ -69,13 +70,30 @@ static inline int32_t clamp(int32_t v, int32_t lo, int32_t hi) { return v < lo ?
 #endif
 
 static uint8_t flash_ok;          /* JEDEC id matched at boot */
+#if OM_CPU2
+/* The second core's jobs run from the flash, so the flash is touched only while CPU1 is idle in its RAM loop (or
+ * held). Every job is waited for before the audio interrupt returns (main_fm1.c's backstop), so the main loop always
+ * finds it idle; this checks it, and refuses (counting it, in fm1_cpu.py --cores) rather than cut the flash under a
+ * running job. Called with interrupts off, or just before a driver call that turns them off. */
+static uint32_t fl_refused;
+static int fl_cpu1_busy(void)
+{
+    if (!fm1_cpu1_flash_ok()) {
+        fl_refused++;
+        return 1;
+    }
+    return 0;
+}
+#else
+#define fl_cpu1_busy() 0
+#endif
 static void audio_silence(void);
 static int st_read(uint32_t off, void *dst, uint32_t n)   /* 256-byte IRQ-off windows: audio keeps up */
 {
     uint8_t *d = dst;
     while (n) {
         uint32_t k = n > 256u ? 256u : n, f = irq_save();
-        int rc = FL_FAR(fl_read_ram)(off, d, k);
+        int rc = fl_cpu1_busy() ? -21 : FL_FAR(fl_read_ram)(off, d, k);
         irq_restore(f);
         if (rc)
             return rc;
@@ -90,6 +108,8 @@ static int st_erase(uint32_t off)
     uint32_t took;
     if (!FL_STORE_OK(off, 0x1000u))
         return -8;
+    if (fl_cpu1_busy())
+        return -21;
     audio_silence();
     return fl_erase4k(off, &took);
 }
@@ -97,6 +117,8 @@ static int st_prog(uint32_t off, const void *src, uint32_t n)
 {
     if (!FL_STORE_OK(off, n))
         return -8;
+    if (fl_cpu1_busy())
+        return -21;
     return fl_write(off, src, n);
 }
 #include "storage.c"
@@ -112,6 +134,8 @@ static int ota_erase(uint32_t off)
     uint32_t took;
     if (!ota_in_area(off, 0x1000u) || (off & 0xFFFu))
         return -8;
+    if (fl_cpu1_busy())
+        return -21;
     audio_silence();
     return fl_erase4k(off, &took);
 }
@@ -119,6 +143,8 @@ static int ota_prog(uint32_t off, const void *p, uint32_t n)
 {
     if (!ota_in_area(off, n))
         return -8;
+    if (fl_cpu1_busy())
+        return -21;
     return fl_write(off, p, n);
 }
 static int ota_fread(uint32_t off, void *p, uint32_t n) { return st_read(off, p, n); }

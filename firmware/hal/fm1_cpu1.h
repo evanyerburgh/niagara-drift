@@ -66,7 +66,8 @@
 #define FM1_CPU1_FALLBACK 0                     /* 1: one core after a failure, instead of a restart */
 #endif
 #ifndef FM1_CPU1_TIMEOUT_US
-#define FM1_CPU1_TIMEOUT_US 8000u               /* a job not back by then: far past any audio block, or it faulted */
+#define FM1_CPU1_TIMEOUT_US 8000u               /* a job not back by then (from its hand-over): far past any audio
+                                                 * block, or it faulted (Niagara Drift sets 5000: inside a block) */
 #endif
 #define FM1_CPU1_SYNC() __asm__ volatile("csync" ::: "memory")
 #define FM1_C1_CON (*(volatile uint32_t *)0x1EEE004u)
@@ -81,8 +82,10 @@ enum { FM1_CPU1_MISREAD = 1, FM1_CPU1_LATE = 2, FM1_CPU1_BARRED = 3, FM1_CPU1_FA
 extern void fm1_cpu1_entry(void);                       /* fm1_cpu1.S */
 extern uint32_t fm1_cpu1_ustack[], fm1_cpu1_sstack_top[];
 #ifndef FM1_CPU1_USTACK_BYTES
-#define FM1_CPU1_USTACK_BYTES 2816                      /* the jobs' stack, bytes (fm1_cpu1.S reads the same macro): a build may
-                                                         * set more for deeper jobs, a multiple of 8, the lowest 256 B a guard */
+#define FM1_CPU1_USTACK_BYTES 1280                      /* the jobs' stack, bytes (fm1_cpu1.S reads the same macro): a build may
+                                                         * set more for deeper jobs, a multiple of 8, the lowest 256 B a guard.
+                                                         * (Niagara Drift: 1280, felucca-bsp's 2816 less what the strings
+                                                         * don't use: they went 480 B deep on the FM-1) */
 #endif
 #define FM1_CPU1_USTACK_WORDS (FM1_CPU1_USTACK_BYTES / 4u)   /* (fm1_cpu1.S) */
 _Static_assert(FM1_CPU1_USTACK_BYTES % 8 == 0 && FM1_CPU1_USTACK_BYTES > 256,
@@ -102,6 +105,7 @@ static struct {
 #define FM1_CPU1_CHECK(fn, arg, request) ((uint32_t)(uintptr_t)(fn) ^ (arg) ^ (request) * 0x9E3779B1u)
 
 static uint8_t fm1_cpu1_on;                     /* started and answering: CPU0 may hand it work */
+static uint32_t fm1_cpu1_t_run;                 /* when the job out was handed over (fm1_ticks): its timeout counts from it */
 static inline void fm1_cpu1_sync(void) { FM1_CPU1_SYNC(); }   /* a barrier between the cores (a job's own sharing) */
 static uint8_t fm1_cpu1_gave_up;                /* why it is off (FM1_CPU1_*), 0 = it is not */
 
@@ -283,7 +287,8 @@ static void fm1_cpu1_check(void)
         fm1_cpu1_retire(FM1_CPU1_MISREAD);
 }
 
-static inline int fm1_cpu1_run(fm1_cpu1_fn fn, uint32_t arg)
+/* hand fn(arg) over, its check word XORed with spoil (0: as it should be; a test sets a bit to stand for a misread) */
+static inline int fm1_cpu1_run_x(fm1_cpu1_fn fn, uint32_t arg, uint32_t spoil)
 {
     uint32_t request;
     fm1_cpu1_check();
@@ -291,14 +296,23 @@ static inline int fm1_cpu1_run(fm1_cpu1_fn fn, uint32_t arg)
         return 0;
     request++;
     fm1_flash_cpu1_idle = 0;
+    fm1_cpu1_t_run = fm1_ticks();
     FM1_CPU1_SYNC();
     fm1_cpu1_mb.fn = fn;
     fm1_cpu1_mb.arg = arg;
-    fm1_cpu1_mb.check = FM1_CPU1_CHECK(fn, arg, request);
+    fm1_cpu1_mb.check = FM1_CPU1_CHECK(fn, arg, request) ^ spoil;
     FM1_CPU1_SYNC();
     fm1_cpu1_mb.request = request;
     FM1_CPU1_SYNC();
     return 1;
+}
+static inline int fm1_cpu1_run(fm1_cpu1_fn fn, uint32_t arg) { return fm1_cpu1_run_x(fn, arg, 0u); }
+
+/* the flash may be touched: CPU1 idle in its RAM loop, or not running (Niagara Drift's flash calls check it) */
+static inline int fm1_cpu1_flash_ok(void)
+{
+    FM1_CPU1_SYNC();
+    return !fm1_cpu1_on || fm1_flash_cpu1_idle;
 }
 
 static inline int fm1_cpu1_busy(void)            /* (a misread or a fault: not busy; fm1_cpu1_wait retires it) */
@@ -309,7 +323,7 @@ static inline int fm1_cpu1_busy(void)            /* (a misread or a fault: not b
 
 static int fm1_cpu1_wait(void)
 {
-    uint32_t t0 = fm1_ticks();
+    const uint32_t t0 = fm1_cpu1_t_run;
     for (;;) {
         FM1_CPU1_SYNC();
         if (!fm1_cpu1_on)
@@ -322,8 +336,10 @@ static int fm1_cpu1_wait(void)
             fm1_cpu1_retire(FM1_CPU1_MISREAD);
             return -1;
         }
-        if (fm1_cpu1_mb.complete == fm1_cpu1_mb.request)
+        if (fm1_cpu1_mb.complete == fm1_cpu1_mb.request) {
+            FM1_CPU1_SYNC();                    /* (what the job wrote is read after this) */
             return 0;
+        }
         if ((uint32_t)(fm1_ticks() - t0) >= FM1_CPU1_TIMEOUT_US * FM1_TICKS_PER_US) {
             fm1_cpu1_retire(FM1_CPU1_LATE);
             return -1;
